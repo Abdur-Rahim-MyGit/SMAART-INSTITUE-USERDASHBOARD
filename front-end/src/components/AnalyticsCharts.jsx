@@ -5,10 +5,10 @@ import {
   ComposedChart
 } from 'recharts';
 import {
-  TrendingUp, Users, Award, Clock, BookOpen, CheckCircle2,
-  ListFilter, ShieldAlert, BarChart2, ShieldCheck, HelpCircle,
-  Flame, LogIn, LogOut, Activity, Calendar, Zap, AlertTriangle
-} from 'lucide-react';
+  IconTrendingUp, IconUsers, IconAward, IconClock, IconBook, IconCircleCheck,
+  IconFilter, IconShieldX, IconChartBar, IconShieldCheck, IconHelp,
+  IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconZap, IconAlertTriangle
+} from '@tabler/icons-react';
 import { apiCall } from '@/services/api';
 import useUser from '@/hooks/useUser';
 import { streaksAPI } from '@/services/streaksApi';
@@ -887,10 +887,10 @@ export const StudentAnalyticsView = () => {
 
   const categoryBreakdown = [];
   const palette = [
-    { color: 'bg-blue-500', text: 'text-blue-500' },
-    { color: 'bg-indigo-500', text: 'text-indigo-500' },
-    { color: 'bg-violet-500', text: 'text-violet-500' },
-    { color: 'bg-sky-500', text: 'text-sky-500' },
+    { color: 'bg-[#1a3884] dark:bg-blue-400', text: 'text-[#1a3884] dark:text-blue-400' },
+    { color: 'bg-[#2b52b3] dark:bg-blue-500', text: 'text-[#2b52b3] dark:text-blue-500' },
+    { color: 'bg-[#3b6bdf] dark:bg-blue-300', text: 'text-[#3b6bdf] dark:text-blue-300' },
+    { color: 'bg-[#507bed] dark:bg-blue-600', text: 'text-[#507bed] dark:text-blue-600' },
   ];
 
   let colorIdx = 0;
@@ -913,8 +913,8 @@ export const StudentAnalyticsView = () => {
     categoryBreakdown.push({
       label: 'Assessments',
       minutes: Math.round(assessmentMins),
-      color: 'bg-amber-500',
-      text: 'text-amber-500'
+      color: 'bg-[#0d1f4e] dark:bg-blue-300',
+      text: 'text-[#0d1f4e] dark:text-blue-300'
     });
   }
 
@@ -922,8 +922,8 @@ export const StudentAnalyticsView = () => {
     categoryBreakdown.push({
       label: 'Vision Board',
       minutes: Math.round(visionBoardMins),
-      color: 'bg-emerald-500',
-      text: 'text-emerald-500'
+      color: 'bg-[#1a3884] dark:bg-blue-400',
+      text: 'text-[#1a3884] dark:text-blue-400'
     });
   }
 
@@ -931,8 +931,8 @@ export const StudentAnalyticsView = () => {
     categoryBreakdown.push({
       label: 'Career Direction & Coach',
       minutes: Math.round(careerDirectionMins),
-      color: 'bg-purple-500',
-      text: 'text-purple-500'
+      color: 'bg-[#2b52b3] dark:bg-blue-500',
+      text: 'text-[#2b52b3] dark:text-blue-500'
     });
   }
 
@@ -1041,22 +1041,19 @@ export const StudentAnalyticsView = () => {
   return (
     <div className="space-y-6">
       {/* Date Picker Header */}
-      <div className="bg-white dark:bg-[#002A5C] p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#001630] p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-            Temporal Dashboard Filters
-          </span>
-          <h2 className="text-xl font-black text-slate-800 dark:text-white mt-1">
-            Performance on: <span className="text-blue-500">{getFriendlyDate(selectedDate)}</span>
+          <h2 className="text-[20px] font-extrabold text-[#0d1f4e] dark:text-white mt-1">
+            Performance on: <span className="text-[#1a3884] dark:text-blue-400">{getFriendlyDate(selectedDate)}</span>
           </h2>
-          <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
+          <p className="text-[12.5px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
             Select any date to view historical study times, course completions, and activity logs.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <IconCalendar stroke={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="date" 
               value={selectedDate}
@@ -1064,7 +1061,7 @@ export const StudentAnalyticsView = () => {
                 if (e.target.value) setSelectedDate(e.target.value);
               }}
               max={getTodayStr()}
-              className="pl-9 pr-4 py-2 bg-[#F8FAFC] dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-semibold text-slate-800 dark:text-white cursor-pointer transition-all"
+              className="pl-9 pr-4 py-2 bg-[#F8FAFC] dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] text-sm font-semibold text-slate-800 dark:text-white cursor-pointer transition-all"
             />
           </div>
 
@@ -1072,7 +1069,7 @@ export const StudentAnalyticsView = () => {
             onClick={() => setSelectedDate(getTodayStr())}
             className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
               selectedDate === getTodayStr()
-                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20'
+                ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/20'
                 : 'bg-slate-100 dark:bg-slate-900 text-slate-650 hover:bg-slate-200 dark:hover:bg-slate-800'
             }`}
           >
@@ -1095,7 +1092,7 @@ export const StudentAnalyticsView = () => {
                 const localYesterday = new Date(yesterday.getTime() - (offset * 60 * 1000));
                 return localYesterday.toISOString().split('T')[0];
               })()
-                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20'
+                ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/20'
                 : 'bg-slate-100 dark:bg-slate-900 text-slate-650 hover:bg-slate-200 dark:hover:bg-slate-800'
             }`}
           >
@@ -1111,59 +1108,59 @@ export const StudentAnalyticsView = () => {
             label: 'Today Learning Time', 
             value: dailyTimeSpentStr, 
             subText: dailyHoursSpent > 0 ? 'Active learning session logged' : 'No learning time logged',
-            icon: Clock, 
-            color: 'text-blue-500', 
-            bg: 'bg-blue-50 dark:bg-blue-900/20' 
+            icon: IconClock, 
+            color: 'text-[#1a3884] dark:text-blue-400', 
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
           },
           { 
             label: 'Total Hours on System', 
             value: `${metrics.totalHoursSpent || 0} hours`, 
             subText: 'Cumulative time spent studying',
-            icon: BookOpen, 
-            color: 'text-purple-500', 
-            bg: 'bg-purple-50 dark:bg-purple-900/20' 
+            icon: IconBook, 
+            color: 'text-[#1a3884] dark:text-blue-400', 
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
           },
           { 
-            label: 'Daily Average Learning Time', 
+            label: 'Daily Avg Learning', 
             value: metrics.dailyUsage ? (metrics.dailyUsage >= 1 ? `${metrics.dailyUsage}h/day` : `${Math.round(metrics.dailyUsage * 60)} mins/day`) : '0 mins/day', 
             subText: 'Average hours spent per day',
-            icon: CheckCircle2, 
-            color: 'text-emerald-500', 
-            bg: 'bg-emerald-50 dark:bg-emerald-900/20' 
+            icon: IconCircleCheck, 
+            color: 'text-[#1a3884] dark:text-blue-400', 
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
           },
           { 
-            label: 'Current Learning Streak', 
+            label: 'Current Streak', 
             value: `${streakData?.currentStreak || 0} Days`, 
             subText: streakMessage,
-            icon: Flame, 
-            color: isStreakMaintained ? 'text-orange-500 animate-bounce' : 'text-slate-400', 
-            bg: 'bg-orange-50 dark:bg-orange-950/20' 
+            icon: IconFlame, 
+            color: isStreakMaintained ? 'text-[#1a3884] dark:text-blue-400 animate-pulse' : 'text-slate-400', 
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
           }
         ].map((item, i) => (
-          <div key={i} className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 flex flex-col justify-between hover:scale-[1.01] transition-transform duration-300">
+          <div key={i} className="bg-white dark:bg-[#001630] p-5 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col justify-between hover:scale-[1.01] transition-transform duration-300">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">{item.label}</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{item.value}</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-[12.5px] font-semibold mb-1">{item.label}</p>
+                <h3 className="text-[20px] font-extrabold text-[#0d1f4e] dark:text-white tracking-tight">{item.value}</h3>
               </div>
-              <div className={`p-3 rounded-xl ${item.bg} shrink-0`}>
-                <item.icon className={`w-5 h-5 ${item.color}`} />
+              <div className={`p-2.5 rounded-xl ${item.bg} shrink-0`}>
+                <item.icon stroke={1.5} className={`w-5 h-5 ${item.color}`} />
               </div>
             </div>
-            <p className="text-[10px] text-slate-400 dark:text-slate-400 font-medium">{item.subText}</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-400 font-medium leading-relaxed">{item.subText}</p>
           </div>
         ))}
       </div>
 
       {/* Main Progression Chart (Completion % vs Hours/Day) */}
-      <div className="bg-white dark:bg-[#002A5C] p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-white/10">
+      <div className="bg-white dark:bg-[#001630] p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <BarChart2 className="w-5 h-5 text-blue-500" />
+            <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2">
+              <IconChartBar stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
               Progression Over Time
             </h3>
-            <p className="text-xs text-slate-400 mt-1">Correlation between completion % and daily usage (hours/day). Highlighted date: <span className="text-blue-500 font-bold">{getFriendlyDate(selectedDate)}</span></p>
+            <p className="text-[12.5px] text-slate-500 mt-1">Correlation between completion % and daily usage (hours/day). Highlighted date: <span className="text-[#1a3884] dark:text-blue-400 font-bold">{getFriendlyDate(selectedDate)}</span></p>
           </div>
         </div>
         <div className="h-[350px] w-full">
@@ -1171,8 +1168,8 @@ export const StudentAnalyticsView = () => {
             <ComposedChart data={chartData}>
               <defs>
                 <linearGradient id="colorProgress" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#1a3884" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#1a3884" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.3} vertical={false} />
@@ -1181,8 +1178,8 @@ export const StudentAnalyticsView = () => {
               <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Hours/Day', angle: 90, position: 'insideRight', fill: '#94a3b8', fontSize: 11 }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-              <Area yAxisId="left" type="monotone" name="Completion %" dataKey="progress" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProgress)" />
-              <Bar yAxisId="right" name="Hours/Day" dataKey="hoursSpent" barSize={24} fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Area yAxisId="left" type="monotone" name="Completion %" dataKey="progress" stroke="#1a3884" strokeWidth={3} fillOpacity={1} fill="url(#colorProgress)" />
+              <Bar yAxisId="right" name="Hours/Day" dataKey="hoursSpent" barSize={24} fill="#8cb2f9" radius={[4, 4, 0, 0]} />
               <ReferenceLine x={selectedDate} yAxisId="left" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" label={{ value: 'Selected Date', fill: '#f59e0b', fontSize: 10, position: 'top' }} />
             </ComposedChart>
           </ResponsiveContainer>
@@ -1194,9 +1191,9 @@ export const StudentAnalyticsView = () => {
         {/* Left Column: Courses worked on & completion speed */}
         <div className="space-y-6">
           {/* Where Learning Time Was Spent Today */}
-          <div className="bg-white dark:bg-[#002A5C] p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-white/10">
-            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-              <Clock className="w-5 h-5 text-blue-500" />
+          <div className="bg-white dark:bg-[#001630] p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2 mb-6">
+              <IconClock stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
               Where Learning Time Was Spent (Today)
             </h3>
             
@@ -1207,8 +1204,8 @@ export const StudentAnalyticsView = () => {
                 
                 return (
                   <div key={idx} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-700 dark:text-slate-350 flex items-center gap-1.5 flex-wrap">
+                    <div className="flex justify-between text-[12.5px] font-semibold">
+                      <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5 flex-wrap">
                         <span>{item.label}</span>
                         {item.progress !== undefined && item.progress !== null && (
                           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
@@ -1231,9 +1228,9 @@ export const StudentAnalyticsView = () => {
           </div>
 
           {/* Completions & Milestones Today */}
-          <div className="bg-white dark:bg-[#002A5C] p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-white/10">
-            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-              <Award className="w-5 h-5 text-amber-500" />
+          <div className="bg-white dark:bg-[#001630] p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+            <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2 mb-6">
+              <IconAward stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
               Completions & Milestones (Today)
             </h3>
 
@@ -1245,7 +1242,7 @@ export const StudentAnalyticsView = () => {
                   <div className="space-y-2">
                     {coursesCompletedToday.map((c, idx) => (
                       <div key={idx} className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <IconCircleCheck stroke={1.5} className="w-4 h-4 text-emerald-500 shrink-0" />
                         <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">{c.course?.title} Completed!</span>
                       </div>
                     ))}
@@ -1263,7 +1260,7 @@ export const StudentAnalyticsView = () => {
                     {assessmentsCompletedToday.map((a, idx) => (
                       <div key={idx} className="flex items-center justify-between bg-blue-50 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/30 gap-2">
                         <div className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-blue-500 shrink-0" />
+                          <IconAward stroke={1.5} className="w-4 h-4 text-blue-500 shrink-0" />
                           <span className="text-xs font-semibold text-slate-850 dark:text-slate-200">{a.name}</span>
                         </div>
                         <span className="text-xs font-extrabold text-blue-500 whitespace-nowrap bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded-md">Score: {a.score}</span>
@@ -1279,11 +1276,11 @@ export const StudentAnalyticsView = () => {
         </div>
 
         {/* Right Column: Live Session Activity Timeline & Proctoring Checklist */}
-        <div className="bg-white dark:bg-[#002A5C] p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#001630] p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-500" />
+              <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2">
+                <IconActivity stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                 Session Logs & Activity Feed
               </h3>
               <span className="text-[9px] bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-350 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -1295,29 +1292,29 @@ export const StudentAnalyticsView = () => {
             <div className="relative border-l-2 border-slate-150 dark:border-white/10 pl-6 space-y-6 ml-3">
               {events.length > 0 ? (
                 events.map((event, idx) => {
-                  let Icon = BookOpen;
+                  let Icon = IconBook;
                   let colorClass = "bg-blue-500";
                   if (event.type === 'login') {
-                    Icon = LogIn;
+                    Icon = IconLogin;
                     colorClass = "bg-emerald-500";
                   } else if (event.type === 'logout') {
-                    Icon = LogOut;
+                    Icon = IconLogout;
                     colorClass = "bg-slate-500";
                   } else if (event.type === 'quiz') {
-                    Icon = Award;
+                    Icon = IconAward;
                     colorClass = "bg-amber-500";
                   } else if (event.type === 'task' || event.type === 'task_result') {
-                    Icon = CheckCircle2;
+                    Icon = IconCircleCheck;
                     colorClass = "bg-purple-500";
                   } else if (event.type === 'course_complete') {
-                    Icon = Zap;
+                    Icon = IconZap;
                     colorClass = "bg-orange-500 animate-bounce";
                   }
 
                   return (
                     <div key={idx} className="relative">
-                      <span className={`absolute -left-[33px] top-0.5 flex items-center justify-center w-5 h-5 rounded-full ${colorClass} ring-4 ring-white dark:ring-[#002A5C] shadow`}>
-                        <Icon className="w-3 h-3 text-white" />
+                      <span className={`absolute -left-[33px] top-0.5 flex items-center justify-center w-5 h-5 rounded-full ${colorClass} ring-4 ring-white dark:ring-[#001630] shadow`}>
+                        <Icon stroke={2} className="w-3 h-3 text-white" />
                       </span>
                       <div>
                         <div className="flex items-baseline justify-between gap-4">
@@ -1343,8 +1340,8 @@ export const StudentAnalyticsView = () => {
 
               {/* Proctor scorecard */}
               <div className="relative pt-2 border-t border-slate-100 dark:border-white/5">
-                <span className="absolute -left-[33px] top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-purple-500 ring-4 ring-white dark:ring-[#002A5C] shadow">
-                  <ShieldCheck className="w-3 h-3 text-white" />
+                <span className="absolute -left-[33px] top-2.5 flex items-center justify-center w-5 h-5 rounded-full bg-purple-500 ring-4 ring-white dark:ring-[#001630] shadow">
+                  <IconShieldCheck stroke={1.5} className="w-3 h-3 text-white" />
                 </span>
                 <div>
                   <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Compliance & Proctoring Scorecard</h4>

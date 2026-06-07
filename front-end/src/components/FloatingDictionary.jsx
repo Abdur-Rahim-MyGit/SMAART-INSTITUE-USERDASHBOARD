@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Book, Search, X, Volume2, Loader2, ExternalLink } from "lucide-react";
+import { Search, X, Volume2, Loader2, ExternalLink } from "lucide-react";
+import { IconBook2 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -151,7 +152,7 @@ const FloatingDictionary = () => {
             <motion.div
                 layout
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-4 sm:right-8 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] text-white shadow-[0_8px_32px_rgba(26,56,132,0.4)] border border-white/20 flex items-center justify-center cursor-pointer hover:shadow-[0_12px_40px_rgba(26,56,132,0.5)] transition-all duration-300 group"
+                className="fixed bottom-6 right-4 sm:right-8 z-50 w-14 h-14 rounded-full bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 group"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -163,10 +164,8 @@ const FloatingDictionary = () => {
                             <X className="w-6 h-6 text-white" />
                         </motion.div>
                     ) : (
-                        <motion.div key="book" className="relative flex items-center justify-center group-hover:rotate-[10deg] transition-transform duration-300" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                            <Book className="w-6 h-6 text-white" />
-                            {/* AI-like status/sparkle dot */}
-                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#1a3884] animate-pulse" />
+                        <motion.div key="book" className="relative flex items-center justify-center" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                            <IconBook2 stroke={1.5} className="w-6 h-6 text-white" />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -194,7 +193,7 @@ const FloatingDictionary = () => {
                         {/* Header */}
                         <div className="px-4 py-3.5 border-b border-[#1a3884]/10 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-[#1a3884] to-[#112b6b] text-white">
                             <div className="flex items-center gap-2">
-                                <Book className="w-4 h-4 text-blue-200" />
+                                <IconBook2 stroke={1.5} className="w-4 h-4 text-blue-200" />
                                 <h3 className="text-sm font-extrabold tracking-tight">Quick Dictionary</h3>
                             </div>
                             <button
@@ -247,7 +246,7 @@ const FloatingDictionary = () => {
 
                             {!loading && !error && !result && (
                                 <div className="text-center py-6">
-                                    <Book className="w-8 h-8 text-[#1a3884]/20 dark:text-blue-400/30 mx-auto mb-2" />
+                                    <IconBook2 stroke={1.5} className="w-8 h-8 text-[#1a3884]/20 dark:text-blue-400/30 mx-auto mb-2" />
                                     <p className="text-xs text-[#0d1f4e]/60 dark:text-slate-400">Start typing to see definitions instantly</p>
                                 </div>
                             )}

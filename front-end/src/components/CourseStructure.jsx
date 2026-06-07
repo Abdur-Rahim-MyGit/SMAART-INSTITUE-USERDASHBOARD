@@ -1,11 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
-  BookOpen, Target, Crown, CheckCircle2,
-  ArrowLeft, Zap, TrendingUp,
-  Play, GraduationCap, ArrowRight, ChevronRight,
-  Brain, Bot, Leaf
-} from "lucide-react";
+  IconStack2 as BookOpen,
+  IconActivity as Target,
+  IconHierarchy as Crown,
+  IconCircleCheckFilled as CheckCircle2,
+  IconArrowLeft as ArrowLeft,
+  IconBolt as Zap,
+  IconTrendingUp as TrendingUp,
+  IconPlayerPlayFilled as Play,
+  IconFingerprint as Brain,
+  IconCpu as Bot,
+  IconInfinity as Leaf
+} from "@tabler/icons-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -99,7 +106,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               ? "bg-white border-[#d8e6f7] group-hover:scale-110 group-hover:shadow-md dark:bg-white/5 dark:border-white/10"
               : "bg-white border-[#e2e8f0] opacity-70"
               }`}>
-              <Icon className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />
+              <Icon stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -207,9 +214,9 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               ? "bg-white border-[#d8e6f7] group-hover:scale-110 group-hover:shadow-md dark:bg-white/5 dark:border-white/10"
               : "bg-white border-[#e2e8f0] opacity-70"
               }`}>
-              {track.id === 'PIQ' && <Brain className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
-              {track.id === 'AIQ' && <Bot className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
-              {track.id === 'SQ' && <Leaf className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'PIQ' && <Brain stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'AIQ' && <Bot stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'SQ' && <Leaf stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -373,7 +380,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
           className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
         >
           <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft stroke={1.5} className="w-4 h-4" />
           </div>
           {t("my_courses_page.back_to_overview")}
         </button>
@@ -476,7 +483,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
       {stage.assessmentGate && (
         <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white dark:bg-[#002147] border border-slate-150 dark:border-white/10 rounded-3xl shadow-sm transition-colors duration-300">
           <div className="w-12 h-12 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <TrendingUp className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+            <TrendingUp stroke={1.5} className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
           </div>
           <div className="flex-1">
             <h4 className="font-extrabold text-[#112b6b] dark:text-white text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
@@ -766,14 +773,37 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       {/* Page header — standardized PageHero with restored old design */}
       {!selectedStageId && (
         <div className="relative z-10 pt-4 pb-0">
-          {/* Back Button */}
-          <div className="mb-6">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                <ArrowLeft className="w-4 h-4" />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="relative mb-6 mt-4 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+          >
+            {/* Back Button — mobile only */}
+            <div className="absolute top-4 left-4 md:hidden">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                  <ArrowLeft stroke={1.5} className="w-4 h-4" />
+                </div>
+                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+              </button>
+            </div>
+
+            <div className="relative z-10 flex-1 md:mt-0 mt-8">
+              <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                SMAART <span className="text-[#1a3884] dark:text-blue-300">Programme</span>
+              </h1>
+              <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                {t("my_courses_page.programme_desc", "Experience a structured pathway to mastery. Transformative stages designed to elevate capability.")}
+              </p>
+            </div>
+
+            {continueWatching && (
+              <div className="relative z-10 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex items-center justify-start md:justify-end">
+                {continueWatching}
               </div>
               {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
             </button>

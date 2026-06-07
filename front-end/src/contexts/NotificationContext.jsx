@@ -60,6 +60,13 @@ export function NotificationProvider({ children }) {
     if (mergedOptions.unreadOnly) {
       params.set('unreadOnly', 'true');
     }
+    
+    if (mergedOptions.startDate) {
+      params.set('startDate', mergedOptions.startDate);
+    }
+    if (mergedOptions.endDate) {
+      params.set('endDate', mergedOptions.endDate);
+    }
 
     setIsLoading(true);
     try {

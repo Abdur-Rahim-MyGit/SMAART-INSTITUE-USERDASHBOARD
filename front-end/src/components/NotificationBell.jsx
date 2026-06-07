@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import { useNotifications } from '@/contexts/NotificationContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 const TYPE_LABELS = {
   badge: 'Badge',
@@ -21,6 +21,12 @@ const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close dropdown when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   // Add loading state to prevent shaking during initial load
   useEffect(() => {
@@ -42,21 +48,17 @@ const NotificationBell = () => {
     };
   }, [isOpen]);
 
-  const handleNotificationClick = async (notification) => {
-    if (!notification.isRead) {
-      try {
-        await markRead(notification._id);
-      } catch (error) {
-        console.error('Failed to mark notification as read:', error);
-      }
-    }
-
-    if (notification.link) {
-      navigate(notification.link);
-    } else {
-      navigate('/notifications');
-    }
+  const handleNotificationClick = (notification) => {
+    // 1. Instantly navigate to the main notification hub
+    navigate('/notifications');
+    
+    // 2. Instantly close dropdown
     setIsOpen(false);
+
+    // 3. Mark as read in the background asynchronously (no awaiting, so UI doesn't freeze)
+    if (!notification.isRead) {
+      markRead(notification._id).catch(err => console.error('Failed to mark read:', err));
+    }
   };
 
   const getStatusColor = () => {
@@ -139,11 +141,10 @@ const NotificationBell = () => {
               </div>
             ) : (
               notifications.slice(0, 5).map((notification) => (
-                <button
+                <Link
                   key={notification._id}
-                  type="button"
-                  onClick={() => handleNotificationClick(notification)}
-                  className="w-full p-3 text-left hover:bg-[#F8FAFC] dark:hover:bg-[#001A36] border-b border-gray-100 dark:border-white/5 transition-colors group"
+                  to="/notifications"
+                  className="block w-full p-3 text-left hover:bg-[#F8FAFC] dark:hover:bg-[#001A36] border-b border-gray-100 dark:border-white/5 transition-colors group"
                 >
                   <div className="flex items-start gap-3">
                     {/* Icon */}
@@ -182,22 +183,19 @@ const NotificationBell = () => {
                       </p>
                     </div>
                   </div>
-                </button>
+                </Link>
               ))
             )}
           </div>
 
           {/* Footer */}
           <div className="p-3 border-t border-gray-200 dark:border-white/10">
-            <button
-              onClick={() => {
-                navigate('/notifications');
-                setIsOpen(false);
-              }}
-              className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium py-2 transition-colors"
+            <Link
+              to="/notifications"
+              className="block w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium py-2 transition-colors"
             >
               View all notifications
-            </button>
+            </Link>
           </div>
         </div>
       )}

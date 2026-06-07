@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  RiPlayFill,
-  RiBookOpenLine,
-  RiArrowRightSLine,
-  RiTimeLine,
-  RiCheckboxCircleLine,
-} from "@remixicon/react";
+  IconPlayerPlayFilled as RiPlayFill,
+  IconBook as RiBookOpenLine,
+  IconChevronRight as RiArrowRightSLine,
+  IconClock as RiTimeLine,
+  IconCircleCheckFilled as RiCheckboxCircleLine,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CourseStructure from "@/components/CourseStructure";
@@ -55,9 +55,9 @@ const MyCoursesHeroBanner = ({
         onClick={onPrimaryAction}
         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
       >
-        {(mode === "in_progress" || mode === "completed") && <RiPlayFill className="w-4 h-4 fill-current" />}
+        {(mode === "in_progress" || mode === "completed") && <RiPlayFill size={16} />}
         {mode === "completed" ? t("my_courses_page.resume_course", "Resume Course") : primaryLabel}
-        <RiArrowRightSLine className="w-4 h-4" />
+        <RiArrowRightSLine size={16} stroke={1.5} />
       </button>
     </div>
   );

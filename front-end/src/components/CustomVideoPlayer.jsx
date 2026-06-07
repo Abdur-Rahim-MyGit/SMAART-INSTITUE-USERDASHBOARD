@@ -442,8 +442,8 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   return (
     <div
       ref={containerRef}
-      className="group relative aspect-video rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 cursor-pointer select-none"
-      style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%)' }}
+      className="group relative aspect-video rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 cursor-pointer select-none transform-gpu"
+      style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%)', transform: 'translateZ(0)' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
       onClick={handleClick}
@@ -454,7 +454,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
         ref={videoRef}
         src={videoUrl}
         poster={poster}
-        className="w-full h-full object-contain bg-black"
+        className="absolute inset-0 w-full h-full object-contain bg-black"
         playsInline
         webkit-playsinline="true"
       />

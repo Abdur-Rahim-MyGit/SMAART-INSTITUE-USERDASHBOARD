@@ -2,19 +2,29 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Search, Save, X, Clock, Sparkles, ArrowLeft, StickyNote } from "lucide-react";
+import { 
+    IconPlus as Plus, 
+    IconTrash as Trash2, 
+    IconSearch as Search, 
+    IconDeviceFloppy as Save, 
+    IconX as X, 
+    IconClock as Clock, 
+    IconSparkles as Sparkles, 
+    IconArrowLeft as ArrowLeft, 
+    IconNote as StickyNote 
+} from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
 import { CardSkeleton } from "@/components/SkeletonPatterns";
 import { notesAPI } from "@/services/api";
 
-// Color palette — bg (light), bg (dark), border, label, swatch hex
+// Color palette — using responsive Tailwind classes for proper dark mode support
 const COLORS = [
-  { id: "yellow",  label: "Yellow",  light: "#fef9c3", dark: "#78350f33", border: "#fde047", hex: "#fde047" },
-  { id: "blue",    label: "Blue",    light: "#dbeafe", dark: "#1e3a5f55", border: "#93c5fd", hex: "#93c5fd" },
-  { id: "green",   label: "Green",   light: "#dcfce7", dark: "#14532d44", border: "#86efac", hex: "#86efac" },
-  { id: "purple",  label: "Purple",  light: "#f3e8ff", dark: "#4a1d9644", border: "#d8b4fe", hex: "#d8b4fe" },
-  { id: "rose",    label: "Rose",    light: "#ffe4e6", dark: "#881337aa", border: "#fda4af", hex: "#fda4af" },
-  { id: "indigo",  label: "Indigo",  light: "#e0e7ff", dark: "#312e8155", border: "#a5b4fc", hex: "#a5b4fc" },
+  { id: "yellow",  label: "Yellow",  twClasses: "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700/50", hex: "#fde047" },
+  { id: "blue",    label: "Blue",    twClasses: "bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700/50", hex: "#93c5fd" },
+  { id: "green",   label: "Green",   twClasses: "bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700/50", hex: "#86efac" },
+  { id: "purple",  label: "Purple",  twClasses: "bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700/50", hex: "#d8b4fe" },
+  { id: "rose",    label: "Rose",    twClasses: "bg-rose-100 dark:bg-rose-900/30 border-rose-300 dark:border-rose-700/50", hex: "#fda4af" },
+  { id: "indigo",  label: "Indigo",  twClasses: "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700/50", hex: "#a5b4fc" },
 ];
 
 const DEFAULT_COLOR = COLORS[0];
@@ -138,7 +148,7 @@ const MyNotes = () => {
     const activeColor = getColorById(currentNote.colorId);
 
     return (
-        <div className="min-h-screen bg-[#F5F8FF] dark:bg-[#00152E] pb-12 pt-3 transition-colors duration-300">
+        <div className="min-h-screen bg-transparent pb-12 pt-0 transition-colors duration-300">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
                 {/* Back button */}
@@ -149,7 +159,7 @@ const MyNotes = () => {
                     className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
                 >
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
-                        <ArrowLeft className="h-3.5 w-3.5" />
+                        <ArrowLeft stroke={1.5} className="h-4 w-4" />
                     </div>
                     Back to Toolkit
                 </motion.button>
@@ -163,11 +173,7 @@ const MyNotes = () => {
                 >
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-2.5 py-0.5 dark:border-[#1a3884]/40 dark:bg-[#1a3884]/20">
-                                <Sparkles className="h-3 w-3 text-[#1a3884] dark:text-blue-400" />
-                                <span className="text-[9.5px] font-black uppercase tracking-[0.22em] text-[#1a3884] dark:text-blue-400">Personal Study Notes</span>
-                            </div>
-                            <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                            <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
                                 My <span className="text-[#1a3884] dark:text-blue-300">Notes</span>
                             </h1>
                             <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
@@ -224,11 +230,7 @@ const MyNotes = () => {
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
                                         onClick={() => openEditNote(note)}
-                                        className="group relative flex min-h-[180px] cursor-pointer flex-col rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                                        style={{
-                                            backgroundColor: nc.light,
-                                            borderColor: nc.border,
-                                        }}
+                                        className={`group relative flex min-h-[180px] cursor-pointer flex-col rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${nc.twClasses}`}
                                     >
                                         <div className="mb-1.5 flex items-center gap-2">
                                             {note.isCourseNote && (
@@ -289,14 +291,13 @@ const MyNotes = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.96, y: 12 }}
                             transition={{ duration: 0.2 }}
-                            className="flex w-full max-w-xl flex-col overflow-hidden rounded-2xl shadow-2xl"
-                            style={{ backgroundColor: activeColor.light, borderColor: activeColor.border, border: "1.5px solid" }}
+                            className={`flex w-full max-w-xl flex-col overflow-hidden rounded-2xl shadow-2xl border-[1.5px] ${activeColor.twClasses}`}
                             onClick={e => e.stopPropagation()}
                         >
                             {/* Modal top bar */}
-                            <div className="flex items-center justify-between border-b px-5 py-3.5" style={{ borderColor: `${activeColor.border}88` }}>
+                            <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 px-5 py-3.5">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[13px] font-bold text-[#0d1f4e]">
+                                    <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">
                                         {currentNote.id ? "Edit Note" : "New Note"}
                                     </span>
                                     {/* Color picker swatches */}
@@ -342,8 +343,8 @@ const MyNotes = () => {
                             </div>
 
                             {/* Modal footer */}
-                            <div className="flex items-center justify-between border-t px-5 py-3" style={{ borderColor: `${activeColor.border}88` }}>
-                                <span className="text-[11px] font-medium text-slate-400">
+                            <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 px-5 py-3">
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                                     {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
                                 </span>
                                 <button

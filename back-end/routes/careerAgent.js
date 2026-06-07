@@ -616,7 +616,12 @@ router.get('/direction-lock/status', optionalAuth, async (req, res) => {
 
     // ── Auto-expiry check ────────────────────────────────────────────────────
     // If the 14-day window has closed and the record isn't locked yet → lock it now
-    if (!record.is_locked && record.lockExpiryDate && new Date(record.lockExpiryDate) < new Date()) {
+    let calculatedExpiryDate = record.lockExpiryDate;
+    if (!calculatedExpiryDate && record.created_at) {
+      calculatedExpiryDate = new Date(new Date(record.created_at).getTime() + 14 * 24 * 60 * 60 * 1000);
+    }
+
+    if (!record.is_locked && calculatedExpiryDate && new Date(calculatedExpiryDate) < new Date()) {
       const updated = await FinalCareerPathwayModel.findOneAndUpdate(
         { _id: record._id, is_locked: { $ne: true } }, // prevent double-lock race
         {
@@ -637,17 +642,17 @@ router.get('/direction-lock/status', optionalAuth, async (req, res) => {
     }
 
     const now = new Date();
-    const expiry = record.lockExpiryDate ? new Date(record.lockExpiryDate) : null;
+    const expiry = calculatedExpiryDate ? new Date(calculatedExpiryDate) : null;
     const remainingMs = expiry ? Math.max(0, expiry - now) : 0;
     const remainingDays = expiry ? Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24))) : 0;
-    const used = record.attemptsUsed || 0;
+    const used = record.attemptsUsed || 1; // Default to 1 if they have a pathway but no attempts logged
     const max  = record.maxAttempts  || 5;
 
     return res.json({
       found: true,
       isLocked: !!record.is_locked,
-      firstVisitAt: record.firstVisitAt || null,
-      lockExpiryDate: record.lockExpiryDate || null,
+      firstVisitAt: record.firstVisitAt || record.created_at || null,
+      lockExpiryDate: calculatedExpiryDate || null,
       attemptsUsed: used,
       maxAttempts: max,
       remainingAttempts: Math.max(0, max - used),

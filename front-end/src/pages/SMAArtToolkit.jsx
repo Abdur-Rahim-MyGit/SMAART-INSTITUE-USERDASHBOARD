@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  BookOpen,
-  BookText,
-  ArrowLeft,
-  ArrowRight,
-  FileText,
-  StickyNote,
-  ListTodo,
-  Wrench,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+  IconBriefcase as BookOpen,
+  IconBook2 as BookText,
+  IconArrowLeft as ArrowLeft,
+  IconArrowRight as ArrowRight,
+  IconFileDescription as FileText,
+  IconNotes as StickyNote,
+  IconListCheck as ListTodo,
+  IconTool as Wrench,
+  IconChevronDown as ChevronDown,
+  IconChevronUp as ChevronUp,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -127,32 +127,16 @@ const ToolkitCard = ({ section, index }) => {
     >
       <div
         onClick={() => navigate(section.path)}
-        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_20px_rgba(26,56,132,0.07)] transition-all duration-300 hover:border-[#1a3884]/40 hover:shadow-[0_8px_32px_rgba(26,56,132,0.18)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50"
+        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-sm transition-all duration-300 hover:border-[#1a3884]/40 hover:shadow-md dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50"
       >
-        {/* Top accent bar */}
-        <div className="h-[3px] w-full bg-gradient-to-r from-[#1a3884] via-[#2656c8] to-[#1a3884]" />
-
-        {/* Subtle bg glow on hover */}
-        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-[#eef4ff]/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-[#1a3884]/10" />
 
         <div className="relative z-10 flex flex-1 flex-col p-5">
           {/* Header row */}
           <div className="mb-4 flex items-start justify-between gap-3">
             {/* Icon */}
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884] text-white shadow-[0_4px_12px_rgba(26,56,132,0.35)] transition-transform duration-300 group-hover:scale-105">
-              <Icon size={18} strokeWidth={2} />
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884] text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+              <Icon size={18} stroke={1.5} />
             </div>
-            {/* Badge */}
-            <span
-              className="rounded-full border px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-widest"
-              style={{
-                color: section.badgeColor,
-                borderColor: section.badgeColor + "33",
-                backgroundColor: section.badgeColor + "12",
-              }}
-            >
-              {section.badge}
-            </span>
           </div>
 
           {/* Meta label */}
@@ -180,11 +164,11 @@ const ToolkitCard = ({ section, index }) => {
               >
                 {expanded ? (
                   <>
-                    Show Less <ChevronUp size={13} />
+                    Show Less <ChevronUp size={13} stroke={1.5} />
                   </>
                 ) : (
                   <>
-                    Read More <ChevronDown size={13} />
+                    Read More <ChevronDown size={13} stroke={1.5} />
                   </>
                 )}
               </button>
@@ -216,7 +200,7 @@ const ToolkitCard = ({ section, index }) => {
                 Launch from your toolkit
               </p>
             </div>
-            <ArrowRight className="h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-white" />
+            <ArrowRight stroke={1.5} className="h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-white" />
           </button>
         </div>
       </div>
@@ -257,7 +241,7 @@ const SMAArtToolkit = () => {
 
         {/* ── Section label ── */}
         <div className="mb-4 flex items-center gap-3">
-          <Wrench className="h-4 w-4 text-[#1a3884]/60 dark:text-blue-400/60" />
+          <Wrench stroke={1.5} className="h-4 w-4 text-[#1a3884]/60 dark:text-blue-400/60" />
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/60 dark:text-blue-400/60">
             Your Tools
           </p>

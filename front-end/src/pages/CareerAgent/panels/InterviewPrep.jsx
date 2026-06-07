@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Brain, Target, Code2, Mic } from 'lucide-react';
+import { IconBrain as Brain, IconTarget as Target, IconCode as Code2, IconMicrophone as Mic } from '@tabler/icons-react';
 
 const PROFILE_FILES = [
     '/Tech_Role_Profiles_AUDITED_FINAL.json',
@@ -110,24 +110,19 @@ const box = {
     display: 'flex',
     flexDirection: 'column',
 };
-const boxAccent = {
-    background: 'linear-gradient(135deg, var(--accent-tint) 0%, var(--navy2) 60%)',
-    borderColor: 'var(--accent-border)',
-};
 const divider = { height: '1px', background: 'var(--border)', margin: '0.75rem 0 1rem' };
 
-/* ── Box Header — Lucide icon ── */
-const BoxHeader = ({ icon: Icon, label, title }) => (
+/* ── Box Header ── */
+const BoxHeader = ({ icon: Icon, title }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0' }}>
         <div style={{
             width: '38px', height: '38px', borderRadius: '10px', flexShrink: 0,
             background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-            <Icon size={18} strokeWidth={1.75} color="var(--accent)" />
+            <Icon size={18} stroke={1.5} color="var(--accent)" />
         </div>
         <div>
-            {label && <div style={{ fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '0.1rem' }}>{label}</div>}
             <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--accent)' }}>{title}</div>
         </div>
     </div>
@@ -194,15 +189,15 @@ const InterviewPrep = ({ roleName }) => {
 
                 {/* Aptitude box */}
                 <div style={box}>
-                    <BoxHeader icon={Brain} label="Section 01" title="Aptitude & Reasoning" />
+                    <BoxHeader icon={Brain} title="Aptitude & Reasoning" />
                     <div style={divider} />
                     {APTITUDE_RESOURCES.map((r, i) => <ResLink key={i} r={r} />)}
                     <div style={{ height: 0, borderBottom: 'none' }} />
                 </div>
 
                 {/* Domain Resources box */}
-                <div style={{ ...box, ...boxAccent }}>
-                    <BoxHeader icon={Target} label="Section 02" title={profile?.job_family || 'Domain'} />
+                <div style={box}>
+                    <BoxHeader icon={Target} title={profile?.job_family || 'Domain'} />
                     <div style={divider} />
                     {domainRes.map((r, i) => <ResLink key={i} r={r} />)}
                 </div>
@@ -213,14 +208,14 @@ const InterviewPrep = ({ roleName }) => {
 
                 {/* Technical questions */}
                 <div style={box}>
-                    <BoxHeader icon={Code2} label="Section 03" title={`Technical — ${roleName}`} />
+                    <BoxHeader icon={Code2} title={`Technical — ${roleName}`} />
                     <div style={divider} />
                     {domainQs.map((q, i) => <QRow key={i} q={q} i={i} />)}
                 </div>
 
                 {/* HR & Behavioural */}
                 <div style={box}>
-                    <BoxHeader icon={Mic} label="Section 04" title="HR & Behavioural" />
+                    <BoxHeader icon={Mic} title="HR & Behavioural" />
                     <div style={divider} />
                     {COMMON_QUESTIONS.map((q, i) => <QRow key={i} q={q} i={i} badge="HR" badgeColor="var(--muted)" />)}
                 </div>

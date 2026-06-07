@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IconFileDescription } from '@tabler/icons-react';
 import {
     FileText,
     Download,
@@ -1040,8 +1041,8 @@ const ResumeBuilder = () => {
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     </button>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00152E] to-[#1a3884] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 ring-4 ring-[#1a3884]/10">
-                            <FileText className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-[#1a3884] flex items-center justify-center shadow-sm">
+                            <IconFileDescription stroke={1.5} className="w-5 h-5 text-white" />
                         </div>
                         <div>
                             <h1 className="text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Resume Builder</h1>
