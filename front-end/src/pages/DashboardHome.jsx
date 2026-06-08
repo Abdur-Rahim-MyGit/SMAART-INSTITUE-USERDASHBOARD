@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 const DashboardHome = () => {
   const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
-  const { paths, enrolledCourses, inProgressCourses, loading: pathsLoading } = useLearningPaths(user?._id);
+  const { paths, loading: pathsLoading } = useLearningPaths(user?._id);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -132,8 +132,6 @@ const DashboardHome = () => {
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
-              paths={enrolledCourses}
-              pathsLoading={pathsLoading}
             />
 
             {/* College Banners */}
@@ -142,7 +140,7 @@ const DashboardHome = () => {
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
           <div className="flex flex-col xl:flex-row gap-6">
-            {/* ── LEFT: Career Pathways + In-Progress Roadmap ── */}
+            {/* ── LEFT: Career Pathways ── */}
             <div className="flex-1 min-w-0 flex flex-col gap-6">
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
               <ActiveSkillsWidget userEmail={user?.email} paths={paths} />

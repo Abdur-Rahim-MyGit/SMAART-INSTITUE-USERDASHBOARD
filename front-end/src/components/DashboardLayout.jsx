@@ -429,6 +429,7 @@ const DashboardLayout = () => {
   }, [location.pathname]);
   
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
+  const isFullScreenPage = isCareerAgentDashboard;
   const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
   
   const { t, i18n } = useTranslation();
@@ -484,6 +485,53 @@ const DashboardLayout = () => {
       recordActivityAndFetch();
     }
   }, [user]);
+
+  // Track feature visits in localStorage for "Where Learning Time Was Spent" breakdown
+  useEffect(() => {
+    if (!user) return;
+    const path = location.pathname;
+    let featureKey = null;
+
+    if (path.includes('/career-') || path.includes('/career/')) {
+      featureKey = 'career';
+    } else if (path.includes('/vision-board') || path.includes('/vision-boards')) {
+      featureKey = 'vision_board';
+    } else if (path.includes('/resume-builder')) {
+      featureKey = 'resume_builder';
+    } else if (path.includes('/dictionary')) {
+      featureKey = 'dictionary';
+    } else if (path.includes('/notes')) {
+      featureKey = 'notes';
+    } else if (path.includes('/interview-prep')) {
+      featureKey = 'interview_prep';
+    } else if (path.includes('/skills-passport') || path.includes('/skills-vault') || path.includes('/skills/')) {
+      featureKey = 'skills_passport';
+    } else if (path.includes('/community')) {
+      featureKey = 'community';
+    } else if (path.includes('/profile')) {
+      featureKey = 'profile';
+    }
+
+    if (featureKey) {
+      try {
+        const nowISO = new Date().toISOString();
+        const storageKey = `smaart_visits_${user._id || user.id || 'guest'}_${featureKey}`;
+        const visits = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        const lastVisit = visits[visits.length - 1];
+        
+        // Debounce visit logging by 5 minutes to avoid spamming the timeline
+        if (!lastVisit || (new Date(nowISO).getTime() - new Date(lastVisit).getTime()) > 5 * 60 * 1000) {
+          visits.push(nowISO);
+          // Keep only the last 30 visits
+          const cleanVisits = visits.slice(-30);
+          localStorage.setItem(storageKey, JSON.stringify(cleanVisits));
+          console.log(`[Feature Tracker] Logged visit to ${featureKey} at ${nowISO}`);
+        }
+      } catch (err) {
+        console.warn('[Feature Tracker] Failed to log visit:', err);
+      }
+    }
+  }, [location.pathname, user]);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const hoverTimeoutRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -742,15 +790,15 @@ const DashboardLayout = () => {
       />
 
       {/* Left Sidebar */}
-      {!isCareerAgentDashboard && <LeftSidebar />}
+      {!isFullScreenPage && <LeftSidebar />}
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
+        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isFullScreenPage ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
           }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
-        {!isCareerAgentDashboard && (
+        {!isFullScreenPage && (
           <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#002147]/90 backdrop-blur-xl border-none sm:border-b border-slate-200/30 dark:border-[#1a3884]/20 shadow-[0_1px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.30)] transition-colors duration-300">
             <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
 
@@ -1161,12 +1209,12 @@ const DashboardLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className={isCareerAgentDashboard ? "p-0 h-screen overflow-hidden" : "p-4 sm:p-6 lg:p-8"}>
+        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 h-[calc(100vh-70px)] overflow-hidden" : "p-4 sm:p-6 lg:p-8")}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className={isCareerAgentDashboard ? "w-full h-full" : "max-w-[1600px] mx-auto"}
+            className={(isFullScreenPage || location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "w-full h-full" : "max-w-[1600px] mx-auto"}
           >
             <Outlet />
           </motion.div>
@@ -1320,19 +1368,6 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
         <div className="text-center space-y-0.5 flex flex-col items-center justify-center">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{user?.fullName || 'Student'}</h3>
           <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">{t(`common.${(user?.role || 'student').toLowerCase()}`)}</p>
-          {avatarData?.milestone && (
-            <div className={`mt-1.5 inline-flex items-center px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
-              avatarData.milestone === 'Job-ready/Professional'
-                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                : avatarData.milestone === 'Master'
-                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
-                : avatarData.milestone === 'Intermediate'
-                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-            }`}>
-              {avatarData.milestone}
-            </div>
-          )}
         </div>
 
         <div className="space-y-2">

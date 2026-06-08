@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
  *  accentFirst - bool    - if true, accent appears before main title text
  *  children    - node    - optional right-side content (stats, buttons, etc.)
  */
-const PageHero = ({ badge, title, titleAccent, accentFirst = false, subtitle, children }) => {
+const PageHero = ({ badge, icon: Icon, title, titleAccent, accentFirst = false, subtitle, children }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: -16 }}
@@ -49,7 +49,11 @@ const PageHero = ({ badge, title, titleAccent, accentFirst = false, subtitle, ch
                 text-[10px] font-black uppercase tracking-[0.18em]
                 mb-4 shadow-sm"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 animate-pulse" />
+              {Icon ? (
+                <Icon className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 animate-pulse" />
+              )}
               {badge}
             </motion.div>
           )}

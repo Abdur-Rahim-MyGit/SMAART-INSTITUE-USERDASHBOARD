@@ -7,6 +7,8 @@ import DashboardLoader from "@/components/DashboardLoader";
 import useTabSwitchProctor from "@/hooks/useTabSwitchProctor";
 import TabSwitchWarningOverlay from "@/components/TabSwitchWarningOverlay";
 import { clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
+import PageLoader from "@/components/PageLoader";
+
 
 /**
  * AssessmentFlowGuard component
@@ -136,6 +138,7 @@ const AssessmentFlowGuard = ({ children }) => {
   // Cache assessment data in state so we don't re-fetch on every route change
   const [assessmentData, setAssessmentData] = useState(null);
   const [splashComplete, setSplashComplete] = useState(false);
+
 
   // Initial Data Fetch - Runs once on mount
   useEffect(() => {
@@ -294,9 +297,8 @@ const AssessmentFlowGuard = ({ children }) => {
     navigate('/dashboard', { replace: true });
   };
 
-  // Combine initial loading state with splash screen duration
-  if (loading || !splashComplete) {
-    // Determine title based on path
+  // Phase 1: Show the branded SMAART Rocket Loader (DashboardLoader) for the initial splash sequence
+  if (!splashComplete) {
     const getLoaderTitle = () => {
       const path = location.pathname;
       if (path.includes('/courses')) return "Courses";
@@ -323,34 +325,16 @@ const AssessmentFlowGuard = ({ children }) => {
     };
 
     return (
-      <>
-        {!splashComplete && (
-          <DashboardLoader
-            title={getLoaderTitle()}
-            onComplete={() => setSplashComplete(true)}
-          />
-        )}
-
-        {/* Fallback loader if splash finishes but data is still fetching */}
-        {splashComplete && loading && (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-[#00152E]">
-            <div className="flex items-center">
-              <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
-              <p className="ml-4 text-white font-medium">Finalizing setup...</p>
-            </div>
-            {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
-            {import.meta.env.DEV && (
-              <button
-                onClick={handleDevSkip}
-                className="mt-8 text-[10px] text-white/30 hover:text-white/60 uppercase tracking-widest font-bold transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded"
-              >
-                ⚡ DEV: Skip to Dashboard
-              </button>
-            )}
-          </div>
-        )}
-      </>
+      <DashboardLoader 
+        title={getLoaderTitle()} 
+        onComplete={() => setSplashComplete(true)} 
+      />
     );
+  }
+
+  // Phase 2: If the splash animation is complete but the API is still loading, show the S diamond spinner
+  if (loading) {
+    return <PageLoader />;
   }
 
   // If there's a required assessment path

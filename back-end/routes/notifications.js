@@ -266,15 +266,9 @@ router.post('/test', protect, async (req, res) => {
 router.get('/summary', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
-    const User = require('../models/User');
-    const Student = require('../models/Student');
+    const userData = req.user;
     const UserBadge = require('../models/UserBadge');
     const CourseEnrollment = require('../models/CourseEnrollment');
-
-    let userData = await User.findById(userId).select('lastLogin previousLogin fullName');
-    if (!userData) {
-      userData = await Student.findById(userId).select('lastLogin previousLogin fullName');
-    }
 
     const badgesEarned = await UserBadge.countDocuments({ userId });
 

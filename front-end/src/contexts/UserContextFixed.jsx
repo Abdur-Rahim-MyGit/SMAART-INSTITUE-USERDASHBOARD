@@ -142,11 +142,30 @@ export const UserProvider = ({ children }) => {
       const userToStore = { ...userData };
       sessionStorage.setItem("user", JSON.stringify(userToStore));
       setUser(userToStore);
+
+      // Persist login timestamp so Activity Feed can show it
+      try {
+        const logKey = `smaart_session_logs_${userData._id || userData.id || userData.email}`;
+        const logs = JSON.parse(localStorage.getItem(logKey) || '[]');
+        logs.push({ type: 'login', ts: new Date().toISOString() });
+        localStorage.setItem(logKey, JSON.stringify(logs.slice(-60))); // keep last 60 entries
+      } catch (e) { /* non-blocking */ }
     }
   }, []);
 
   const logout = useCallback(async () => {
     console.log('[Logout] Starting logout process...');
+
+    // Persist logout timestamp BEFORE clearing storage so Activity Feed can show it
+    try {
+      const storedUser = JSON.parse(sessionStorage.getItem('user') || 'null');
+      if (storedUser) {
+        const logKey = `smaart_session_logs_${storedUser._id || storedUser.id || storedUser.email}`;
+        const logs = JSON.parse(localStorage.getItem(logKey) || '[]');
+        logs.push({ type: 'logout', ts: new Date().toISOString() });
+        localStorage.setItem(logKey, JSON.stringify(logs.slice(-60)));
+      }
+    } catch (e) { /* non-blocking */ }
 
     // Step 1: Invalidate server-side session (clear currentSessionId in DB)
     try {
@@ -165,7 +184,7 @@ export const UserProvider = ({ children }) => {
       console.warn('[Logout] Server logout request failed (non-blocking):', err.message);
     }
 
-    // Step 2: Clear all local storage
+    // Step 2: Clear all local storage (except session logs — keep them for the feed)
     sessionStorage.clear();
     localStorage.removeItem('user');
     localStorage.removeItem('token');

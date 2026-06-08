@@ -186,8 +186,43 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         let totalQuestions;
 
         if (stageKey) {
-            // Stage Assessment: Stratified Sampling
-            console.log(`🎯 ${stageKey} Assessment detected - Using Stratified Sampling for user ${userId}`);
+            // Stage Assessment: Check attempt limits before allowing a new attempt
+            const StageResult = require('../models/StageResult');
+
+            // Check if user already passed this stage
+            const passedResult = await StageResult.findOne({
+                userId,
+                stage: stageKey,
+                passed: true
+            });
+
+            if (passedResult) {
+                console.log(`✅ User ${userId} already PASSED ${stageKey}. Blocking new attempt.`);
+                return res.status(400).json({
+                    success: false,
+                    error: `You have already passed the ${stageInfo.name} assessment.`,
+                    alreadyPassed: true
+                });
+            }
+
+            // Check attempt count
+            const maxAttempts = stageInfo.maxAttempts || 3;
+            const attemptCount = await StageResult.countAttemptsForUserStage(userId, stageKey);
+
+            if (attemptCount >= maxAttempts) {
+                console.log(`🔒 User ${userId} exhausted all ${maxAttempts} attempts for ${stageKey}. Must restart course.`);
+                return res.status(403).json({
+                    success: false,
+                    error: `You have used all ${maxAttempts} attempts for the ${stageInfo.name} assessment. You must restart the course to try again.`,
+                    locked: true,
+                    mustRestartCourse: true,
+                    attemptCount,
+                    maxAttempts
+                });
+            }
+
+            console.log(`🎯 ${stageKey} Assessment - Attempt ${attemptCount + 1}/${maxAttempts} for user ${userId}`);
+            console.log(`🎯 Using Stratified Sampling with SEQ quotient support`);
 
             // Fetch previously attempted question IDs for this user (from completed results of this assessment)
             const previousResults = await Result.find({
@@ -202,6 +237,8 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     r.questionOrder.forEach(qId => previousQuestionIds.push(qId));
                 }
             });
+
+            console.log(`📊 Excluding ${previousQuestionIds.length} previously used questions for better variety`);
 
             // Perform stratified selection
             const selectedQuestions = selectStratifiedQuestionsForStage(
@@ -219,6 +256,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 console.warn(`⚠️ Warning: Expected ${expectedQuestions} questions, got ${totalQuestions}. Check Question Bank tagging.`);
             }
         } else {
+
             // Other assessments: Random shuffle, all questions
             const questionIds = assessment.questions.map(q => q._id);
             shuffledQuestionIds = shuffleArray(questionIds);

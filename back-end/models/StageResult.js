@@ -35,12 +35,19 @@ const stageResultSchema = new mongoose.Schema({
         ref: 'Result',
         required: true
     },
-    // Stage identifier: T1, T2, T3, T4
+    // Stage identifier: T1, T2, T3, T4, AIQ, SQ, PIQ
     stage: {
         type: String,
         required: true,
-        enum: ['T1', 'T2', 'T3', 'T4'],
+        enum: ['T1', 'T2', 'T3', 'T4', 'AIQ', 'SQ', 'PIQ'],
         index: true
+    },
+    // Which attempt this result belongs to (1, 2, or 3)
+    attemptNumber: {
+        type: Number,
+        default: 1,
+        min: 1,
+        max: 10
     },
     // Overall Stage Score (calculated via weighted formula)
     stageScore: {
@@ -69,7 +76,8 @@ const stageResultSchema = new mongoose.Schema({
         LQ: quotientScoreSchema,
         SIQ: quotientScoreSchema,
         PEQ: quotientScoreSchema,
-        DAQ: quotientScoreSchema
+        DAQ: quotientScoreSchema,
+        SEQ: quotientScoreSchema
     },
     // Question IDs used in this assessment
     questionIds: [{
@@ -116,8 +124,18 @@ stageResultSchema.statics.getAllForUser = function (userId) {
 
 // Check if user has completed a specific stage
 stageResultSchema.statics.hasCompletedStage = async function (userId, stage) {
-    const result = await this.findOne({ userId, stage });
+    const result = await this.findOne({ userId, stage, passed: true });
     return !!result;
+};
+
+// Get all attempts for a user and stage (for retry tracking)
+stageResultSchema.statics.getAttemptsForUserStage = function (userId, stage) {
+    return this.find({ userId, stage }).sort({ attemptNumber: 1, createdAt: 1 });
+};
+
+// Count attempts for a user and stage
+stageResultSchema.statics.countAttemptsForUserStage = async function (userId, stage) {
+    return this.countDocuments({ userId, stage });
 };
 
 module.exports = mongoose.model('StageResult', stageResultSchema);

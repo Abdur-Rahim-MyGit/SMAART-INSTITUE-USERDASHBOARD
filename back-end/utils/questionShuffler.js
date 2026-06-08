@@ -199,7 +199,9 @@ function selectStratifiedQuestionsForStage(allQuestions, userId, stageKey, previ
     }
 
     // Final shuffle to mix quotients (so they don't appear in chunks)
-    return shuffleArrayDeterministic(selectedQuestions, `${userId}_${stageKey}_final`);
+    // Use Date.now() component in seed to ensure each attempt gets different ordering
+    const attemptSeed = `${userId}_${stageKey}_final_${Date.now()}_${selectedQuestions.length}`;
+    return shuffleArrayDeterministic(selectedQuestions, attemptSeed);
 }
 
 /**

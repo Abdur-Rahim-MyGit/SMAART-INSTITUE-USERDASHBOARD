@@ -43,6 +43,7 @@ const VisionBoardEditorPro = () => {
   const location = useLocation();
   const { toast } = useToast();
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
 
   const TITLE_CHAR_LIMIT = 50;
   const DESCRIPTION_CHAR_LIMIT = 250;
@@ -96,8 +97,14 @@ const VisionBoardEditorPro = () => {
   const fitCanvas = () => {
     if (!canvasRef.current) return;
 
-    const containerWidth = window.innerWidth;
-    const containerHeight = window.innerHeight;
+    let containerWidth = window.innerWidth;
+    let containerHeight = window.innerHeight;
+
+    if (containerRef.current) {
+      containerWidth = containerRef.current.clientWidth;
+      containerHeight = containerRef.current.clientHeight;
+    }
+
     const isMobile = containerWidth < 1024;
 
     // Leave enough breathing room for the tool chrome so the board reads like a preview surface.
@@ -1462,7 +1469,7 @@ const VisionBoardEditorPro = () => {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-[#eef3f9] dark:bg-[#00152E]">
+    <div ref={containerRef} className="flex h-full w-full flex-col overflow-hidden bg-[#eef3f9] dark:bg-[#00152E]">
 
       {/* Top Bar */}
       <EditorTopBar
