@@ -7,7 +7,7 @@ import {
 import {
   IconTrendingUp, IconUsers, IconAward, IconClock, IconBook, IconCircleCheck,
   IconFilter, IconShieldX, IconChartBar, IconShieldCheck, IconHelp,
-  IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconZap, IconAlertTriangle
+  IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconBolt, IconAlertTriangle
 } from '@tabler/icons-react';
 import { apiCall } from '@/services/api';
 import useUser from '@/hooks/useUser';
@@ -115,7 +115,7 @@ export const StudentAnalyticsView = () => {
 
   // 1. Interpolate Selected Date in Chart Timeline Data
   const chartData = [...timeline];
-  const hasDateInTimeline = chartData.some(d => d.date === selectedDate);
+  const hasDateInTimeline = chartData.some(d => d.date.startsWith(selectedDate));
   if (!hasDateInTimeline) {
     const selectedTime = new Date(selectedDate).getTime();
     let before = null;
@@ -156,7 +156,7 @@ export const StudentAnalyticsView = () => {
   }
 
   // Get active day data
-  const dayData = chartData.find(d => d.date === selectedDate) || { progress: 0, hoursSpent: 0 };
+  const dayData = chartData.find(d => d.date.startsWith(selectedDate)) || { progress: 0, hoursSpent: 0 };
   const dailyHoursSpent = dayData.hoursSpent || 0;
 
   // Calculate activities & active courses for Selected Date (timezone-safe split)
@@ -1075,29 +1075,6 @@ export const StudentAnalyticsView = () => {
           >
             Today
           </button>
-
-          <button 
-            onClick={() => {
-              const yesterday = new Date();
-              yesterday.setDate(yesterday.getDate() - 1);
-              const offset = yesterday.getTimezoneOffset();
-              const localYesterday = new Date(yesterday.getTime() - (offset * 60 * 1000));
-              setSelectedDate(localYesterday.toISOString().split('T')[0]);
-            }}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
-              selectedDate === (() => {
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const offset = yesterday.getTimezoneOffset();
-                const localYesterday = new Date(yesterday.getTime() - (offset * 60 * 1000));
-                return localYesterday.toISOString().split('T')[0];
-              })()
-                ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/20'
-                : 'bg-slate-100 dark:bg-slate-900 text-slate-650 hover:bg-slate-200 dark:hover:bg-slate-800'
-            }`}
-          >
-            Yesterday
-          </button>
         </div>
       </div>
 
@@ -1183,7 +1160,6 @@ export const StudentAnalyticsView = () => {
               <ReferenceLine x={selectedDate} yAxisId="left" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" label={{ value: 'Selected Date', fill: '#f59e0b', fontSize: 10, position: 'top' }} />
             </ComposedChart>
           </ResponsiveContainer>
-
         </div>
       </div>
 
@@ -1307,7 +1283,7 @@ export const StudentAnalyticsView = () => {
                     Icon = IconCircleCheck;
                     colorClass = "bg-purple-500";
                   } else if (event.type === 'course_complete') {
-                    Icon = IconZap;
+                    Icon = IconBolt;
                     colorClass = "bg-orange-500 animate-bounce";
                   }
 
@@ -1354,7 +1330,7 @@ export const StudentAnalyticsView = () => {
           </div>
 
           <div className="text-[10px] text-slate-450 dark:text-slate-400 mt-6 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3 flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <IconAlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             Security system captures abnormal activities, tab switching, and minimizes. Keep your proctoring logs clean.
           </div>
         </div>

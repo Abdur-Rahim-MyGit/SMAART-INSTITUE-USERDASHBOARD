@@ -164,6 +164,23 @@ router.post('/register-details', upload.fields([
       }
     }
 
+    // Link college to user and student if institution name is provided in personalDetails
+    if (parsedPersonalDetails?.institution) {
+      const college = await College.findOne({
+        collegeName: { $regex: new RegExp(`^${escapeRegex(parsedPersonalDetails.institution.trim())}$`, 'i') }
+      });
+      if (college) {
+        user.college = college._id;
+        await user.save();
+
+        const student = await Student.findOne(emailQuery);
+        if (student) {
+          student.college = college._id;
+          await student.save();
+        }
+      }
+    }
+
     // Prepare registration data with all 11 sections
 
     // Higher Education (Allow array or single object, convert to array)
@@ -483,6 +500,14 @@ router.patch('/register-section', async (req, res) => {
           if (data.bio) user.bio = data.bio;
           if (data.timezone) user.timezone = data.timezone;
           if (data.dateFormat) user.dateFormat = data.dateFormat;
+          if (data.institution) {
+            const college = await College.findOne({
+              collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
+            });
+            if (college) {
+              user.college = college._id;
+            }
+          }
           await user.save();
         }
         if (student) {
@@ -491,6 +516,14 @@ router.patch('/register-section', async (req, res) => {
           if (data.bio) student.bio = data.bio;
           if (data.dob) student.dateOfBirth = data.dob;
           if (data.gender) student.gender = data.gender.toLowerCase();
+          if (data.institution) {
+            const college = await College.findOne({
+              collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
+            });
+            if (college) {
+              student.college = college._id;
+            }
+          }
           await student.save();
         }
       },

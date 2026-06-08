@@ -9,6 +9,7 @@ import {
     Briefcase,
     Building2,
     CheckCircle2,
+    Clock,
     Download,
     GraduationCap,
     Mail,
@@ -393,12 +394,12 @@ const PassportProfile = ({ fullName, passportId, profilePhoto }) => {
 
             {/* Profile Info styled as the skeleton-like rounded pills */}
             <div className="flex-1 min-w-0 flex flex-col items-start gap-2.5">
-                <div className="flex items-center px-5 py-2 rounded-2xl bg-[#f1f3f7] border border-slate-100/50 w-fit max-w-full">
+                <div className="flex items-center px-5 py-2 w-fit max-w-full">
                     <h1 className="text-[18px] font-black text-[#0f2c59] tracking-tight leading-none">
                         {fullName}
                     </h1>
                 </div>
-                <div className="flex items-center px-4 py-1.5 rounded-2xl bg-[#f8f9fc] border border-slate-100/30 w-fit max-w-full">
+                <div className="flex items-center px-4 py-1.5 w-fit max-w-full">
                     <p className="text-[13px] font-black uppercase tracking-wider text-slate-450 leading-none">
                         {passportId}
                     </p>
@@ -418,7 +419,7 @@ const PassportRow = ({ label, badgeText }) => {
                 </div>
 
                 {/* Label pill in center */}
-                <div className="h-7.5 rounded-full bg-[#f1f3f7] flex items-center px-4 w-fit max-w-full border border-slate-100/40">
+                <div className="h-7.5 flex items-center px-4 w-fit max-w-full">
                     <span className="text-[12px] font-bold text-[#0f2c59] truncate leading-none">
                         {label}
                     </span>
@@ -427,7 +428,7 @@ const PassportRow = ({ label, badgeText }) => {
 
             {/* Badge pill on right */}
             {badgeText && (
-                <div className="h-6.5 rounded-full bg-[#f8f9fc] flex items-center px-4 border border-slate-100/30 shrink-0">
+                <div className="h-6.5 flex items-center px-4 shrink-0">
                     <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider leading-none">
                         {badgeText}
                     </span>
@@ -445,19 +446,16 @@ const PassportFooter = ({ passportId }) => {
     return (
         <div className="mt-auto pt-6 border-t border-slate-100">
             <div className="flex items-center justify-between">
-                {/* Bottom Left: Real QR code and passport ID */}
+                {/* Bottom Left: Real QR code */}
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shadow-sm shrink-0">
+                    <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200/80 p-2 flex items-center justify-center shadow-sm shrink-0">
                         <QRCodeSVG
                             value={qrUrl}
-                            size={40}
+                            size={64}
                             level="H"
                             includeMargin={false}
                         />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-                        {passportId}
-                    </span>
                 </div>
 
                 {/* Bottom Right: Issued By SMAART Institute */}
@@ -572,12 +570,108 @@ const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = 
 );
 
 const getExpDateString = (exp) => {
-    if (!exp) return "Verified Experience";
+    if (!exp) return "Date Range";
+    if (exp.duration) return exp.duration;
     const start = exp.startDate ? new Date(exp.startDate).toLocaleDateString(undefined, { year: "numeric", month: "short" }) : "";
     const end = exp.currentlyWorking ? "Present" : (exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: "numeric", month: "short" }) : "");
     if (start && end) return `${start} - ${end}`;
     if (start) return `${start} - Present`;
-    return "Verified Experience";
+    return "Date Range";
+};
+
+const ElaboratedExperienceCard = ({ exp }) => {
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] flex items-center gap-1.5 flex-wrap leading-none">
+                <span>{exp.companyName || exp.organizationName || exp.organization || "Organization"}</span>
+                {exp.location && (
+                    <>
+                        <span className="text-slate-300 font-normal">|</span>
+                        <span className="text-slate-400 font-medium text-[12.5px]">{exp.location}</span>
+                    </>
+                )}
+            </div>
+
+            <div className="text-[13px] font-bold text-blue-600 dark:text-blue-500 leading-none pt-0.5">
+                {exp.role || exp.jobTitle || exp.title || "Professional Role"}
+            </div>
+
+            <div className="flex items-center gap-1.5 text-[11.5px] text-slate-500 font-semibold leading-none pt-0.5">
+                <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>{getExpDateString(exp)}</span>
+            </div>
+
+            <p className="text-[12px] text-slate-600 leading-relaxed font-medium pt-1">
+                {exp.description || "Verified employment tenure, key contributions, and team deliverables under this professional capacity."}
+            </p>
+        </div>
+    );
+};
+
+const ElaboratedCertificateCard = ({ cert }) => {
+    const certUrl = cert.certificateFile || cert.link;
+    const resolvedUrl = certUrl ? (certUrl.includes("cloudinary.com") && certUrl.includes("/upload/fl_attachment/") ? certUrl.replace("/upload/fl_attachment/", "/upload/") : certUrl) : null;
+
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+                {cert.title || "Certification"}
+            </div>
+
+            <div className="text-[12.5px] font-semibold text-slate-400 leading-none pt-0.5">
+                {cert.issuer || cert.issuingOrg || "Issuing Body"}
+            </div>
+
+            <div className="pt-1">
+                {resolvedUrl ? (
+                    <a
+                        href={resolvedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[12px] text-teal-600 font-extrabold hover:underline inline-flex items-center"
+                    >
+                        View Certificate
+                    </a>
+                ) : (
+                    <span className="text-[12px] text-teal-600 font-extrabold cursor-pointer hover:underline">
+                        View Certificate
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const ElaboratedProjectCard = ({ project }) => {
+    const projectUrl = project.link || project.projectLink;
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+                {project.title || "Capstone Project"}
+            </div>
+
+            <div className="pt-0.5">
+                {projectUrl ? (
+                    <a
+                        href={projectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[12px] text-blue-600 font-bold hover:underline inline-flex items-center"
+                    >
+                        View Project +
+                    </a>
+                ) : (
+                    <span className="text-[12px] text-blue-600 font-bold cursor-pointer hover:underline">
+                        View Project +
+                    </span>
+                )}
+            </div>
+
+            <p className="text-[12px] text-slate-600 leading-relaxed font-medium pt-0.5">
+                {project.description || "An advanced capstone assignment completed under academic supervision, verifying direct hands-on application of technical concepts."}
+            </p>
+        </div>
+    );
 };
 
 const SkillsPassport = () => {
@@ -1004,7 +1098,7 @@ const SkillsPassport = () => {
     }
 
     return (
-        <div className="min-h-screen bg-transparent" style={documentFont}>
+        <div className="min-h-screen bg-transparent p-8" style={documentFont}>
             <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1112,10 +1206,9 @@ const SkillsPassport = () => {
                                 </div>
                                 <div className="space-y-3">
                                     {passportData.experiences.slice(0, 4).map((exp, index) => (
-                                        <PassportRow
+                                        <ElaboratedExperienceCard
                                             key={exp._id || exp.id || index}
-                                            label={`${exp.jobTitle || exp.role || "Professional Role"} at ${exp.organizationName || exp.companyName || "Organization"}`}
-                                            badgeText={getExpDateString(exp)}
+                                            exp={exp}
                                         />
                                     ))}
                                     {passportData.experiences.length === 0 && (
@@ -1200,10 +1293,9 @@ const SkillsPassport = () => {
                                 </div>
                                 <div className="space-y-3">
                                     {passportData.certificates.slice(0, 4).map((cert, index) => (
-                                        <PassportRow
+                                        <ElaboratedCertificateCard
                                             key={cert._id || cert.id || index}
-                                            label={cert.title || "Certification"}
-                                            badgeText={cert.issuingOrg || "VERIFIED"}
+                                            cert={cert}
                                         />
                                     ))}
                                     {passportData.certificates.length === 0 && (
@@ -1244,10 +1336,9 @@ const SkillsPassport = () => {
                                 </div>
                                 <div className="space-y-3">
                                     {passportData.projects.slice(0, 4).map((project, index) => (
-                                        <PassportRow
+                                        <ElaboratedProjectCard
                                             key={project._id || project.id || index}
-                                            label={project.title || "Capstone Project"}
-                                            badgeText={project.teamType || project.qualificationLevel || "VERIFIED"}
+                                            project={project}
                                         />
                                     ))}
                                     {passportData.projects.length === 0 && (

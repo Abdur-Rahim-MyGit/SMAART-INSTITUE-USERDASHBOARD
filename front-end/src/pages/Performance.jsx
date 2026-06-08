@@ -43,7 +43,7 @@ const Performance = () => {
   };
 
   return (
-    <div className="bg-transparent font-sans transition-colors duration-300">
+    <div className="p-8 bg-transparent font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -124,7 +124,7 @@ const DashboardHome = () => {
         )}
 
         {/* Dashboard Layout */}
-        <div className="flex flex-col gap-6 pb-10 min-h-screen bg-transparent transition-colors duration-300">
+        <div className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300">
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
           <div className="w-full space-y-6">

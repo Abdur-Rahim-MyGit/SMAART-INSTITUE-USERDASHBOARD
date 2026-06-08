@@ -8,10 +8,10 @@ const mongoose = require('mongoose');
 
 // Helper to generate a timeline for student progress
 function getStudentTimeline(enrollments) {
+  const today = new Date();
   if (!enrollments || enrollments.length === 0) {
     // Return empty timeline default
     const timeline = [];
-    const today = new Date();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
@@ -30,15 +30,20 @@ function getStudentTimeline(enrollments) {
   });
 
   const timeline = [];
-  const start = new Date(primary.enrollmentDate || primary.createdAt || new Date(Date.now() - 14 * 24 * 60 * 60 * 1000));
-  const end = primary.completionDate ? new Date(primary.completionDate) : new Date(primary.lastAccessedAt || primary.updatedAt || Date.now());
+  const start = new Date(primary.enrollmentDate || primary.createdAt || new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000));
+  const end = primary.completionDate ? new Date(primary.completionDate) : new Date(primary.lastAccessedAt || primary.updatedAt || today);
+
+  let timeDifference = end.getTime() - start.getTime();
+  if (timeDifference < 60 * 60 * 1000) {
+    // Less than an hour: space by 14 hours total (2 hours per step) to ensure uniqueness
+    timeDifference = 14 * 60 * 60 * 1000;
+    start.setTime(end.getTime() - timeDifference);
+  }
+
   const totalHours = (primary.totalTimeSpent || 0) / 60;
   const finalProgress = primary.progress || 0;
-
-  // Let's generate 7 progression steps over time
   const steps = 7;
-  const timeDifference = end.getTime() - start.getTime();
-  
+
   for (let i = 0; i <= steps; i++) {
     const ratio = i / steps;
     const pointDate = new Date(start.getTime() + timeDifference * ratio);
@@ -55,8 +60,17 @@ function getStudentTimeline(enrollments) {
       dailyHours = Math.max(0.1, Math.round((base + variance) * 100) / 100);
     }
     
+    // Format date: include time if non-zero UTC hours or minutes
+    let formattedDate = pointDate.toISOString().split('T')[0];
+    const hours = pointDate.getUTCHours();
+    const minutes = pointDate.getUTCMinutes();
+    if (hours !== 0 || minutes !== 0) {
+      const pad = (num) => String(num).padStart(2, '0');
+      formattedDate = `${formattedDate} ${pad(hours)}:${pad(minutes)}`;
+    }
+
     timeline.push({
-      date: pointDate.toISOString().split('T')[0],
+      date: formattedDate,
       progress: progressVal,
       hoursSpent: dailyHours
     });

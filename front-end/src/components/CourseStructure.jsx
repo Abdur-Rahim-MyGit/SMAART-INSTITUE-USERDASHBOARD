@@ -390,17 +390,17 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
       {/* Stage header - Refined and Sized Appropriately */}
       <section className="relative mb-8 mt-0 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="relative z-10 flex-1">
-           <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-               {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.name`, stage.name) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
-           </h1>
-           <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-               {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.description`, stage.description) : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
-           </p>
+          <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+            {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.name`, stage.name) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
+          </h1>
+          <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+            {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.description`, stage.description) : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
+          </p>
         </div>
 
         {/* Stats Section with Visual Progression */}
         <div className="relative z-10 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex flex-col md:flex-row md:items-center justify-start md:justify-end gap-5">
-          
+
           <div className="flex items-center gap-5">
             {/* Desktop Progress Ring */}
             <div className="hidden md:block relative w-14 h-14 flex-shrink-0">
@@ -630,21 +630,21 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         subtitle: dbCourse.description || dbCourse.subtitle || '',
       };
 
-      const isPIQ = category.toLowerCase() === 'piq' || 
-                    courseCode.startsWith('PIQ') || 
-                    courseNumber.startsWith('PIQ');
-                    
-      const isAIQ = category.toLowerCase() === 'aiq' || 
-                    courseCode.startsWith('AIQ') || 
-                    courseNumber.startsWith('AIQ');
-                    
-      const isSQ = category.toLowerCase() === 'sq' || 
-                   courseCode.startsWith('SQ') || 
-                   courseNumber.startsWith('SQ');
+      const isPIQ = category.toLowerCase() === 'piq' ||
+        courseCode.startsWith('PIQ') ||
+        courseNumber.startsWith('PIQ');
 
-      const isBC = category.toLowerCase() === 'british council' || 
-                   courseCode.startsWith('BC') || 
-                   courseNumber.startsWith('BC');
+      const isAIQ = category.toLowerCase() === 'aiq' ||
+        courseCode.startsWith('AIQ') ||
+        courseNumber.startsWith('AIQ');
+
+      const isSQ = category.toLowerCase() === 'sq' ||
+        courseCode.startsWith('SQ') ||
+        courseNumber.startsWith('SQ');
+
+      const isBC = category.toLowerCase() === 'british council' ||
+        courseCode.startsWith('BC') ||
+        courseNumber.startsWith('BC');
 
       if (isPIQ) {
         templateTracks[0].courses.push(mapped);
@@ -725,7 +725,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     const addons = user?.college?.subscriptionPlan?.addons || {};
 
     const isStudent = user?.role === 'student' || (!user?.role && user?.college);
-    
+
     // Determine visibility flags
     const hasPIQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Complete' || !!addons?.piq) : true;
     const hasAIQ = isStudent && user?.college?.subscriptionPlan ? !!addons?.aiq : true;
@@ -764,7 +764,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   };
 
   return (
-    <div className="w-full relative overflow-hidden">
+    <div className="w-full relative overflow-hidden p-[2rem]">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
@@ -790,7 +790,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
           <PageHero
             badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
             icon={GraduationCap}
-            title={t("my_courses_page.programme", "My Learning Journey")}
+            title={t("my_courses_page.programme", "Smaart Programme")}
             subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
           >
             {continueWatching}
