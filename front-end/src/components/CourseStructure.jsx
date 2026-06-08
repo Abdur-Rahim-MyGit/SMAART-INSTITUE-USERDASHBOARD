@@ -13,6 +13,7 @@ import {
   IconCpu as Bot,
   IconInfinity as Leaf
 } from "@tabler/icons-react";
+import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -805,18 +806,9 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
               <div className="relative z-10 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex items-center justify-start md:justify-end">
                 {continueWatching}
               </div>
-              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-            </button>
-          </div>
+            )}
+          </motion.div>
 
-          <PageHero
-            badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
-            icon={GraduationCap}
-            title={t("my_courses_page.programme", "My Learning Journey")}
-            subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
-          >
-            {continueWatching}
-          </PageHero>
         </div>
       )}
 

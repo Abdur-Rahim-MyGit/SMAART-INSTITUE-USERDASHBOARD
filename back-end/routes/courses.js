@@ -600,4 +600,97 @@ router.post('/:id/modules', async (req, res) => {
     }
 });
 
+const VideoTranscript = require('../models/VideoTranscript');
+
+// Auto-generate video transcript using Deepgram
+router.post('/transcribe-video', async (req, res) => {
+    try {
+        const { videoUrl } = req.body;
+        if (!videoUrl) {
+            return res.status(400).json({ success: false, error: 'videoUrl is required' });
+        }
+
+        // 1. Check if we already transcribed this video
+        let existing = await VideoTranscript.findOne({ videoUrl });
+        
+        // Self-healing: If cached transcript is JSON instead of VTT, delete it and regenerate
+        if (existing && existing.transcriptText.trim().startsWith('{')) {
+            await VideoTranscript.deleteOne({ _id: existing._id });
+            existing = null;
+        }
+
+        if (existing) {
+            return res.json({ success: true, transcription: existing.transcriptText, source: 'cache' });
+        }
+
+        // 2. Transcribe via Deepgram
+        const deepgramApiKey = process.env.DEEPGRAM_API_KEY;
+        if (!deepgramApiKey) {
+            return res.status(500).json({ success: false, error: 'Deepgram API key not configured' });
+        }
+
+        // Using native fetch to call Deepgram
+        const response = await fetch('https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&utterances=true', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${deepgramApiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: videoUrl })
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error('Deepgram API Error:', errText);
+            return res.status(500).json({ success: false, error: 'Failed to transcribe video with external API' });
+        }
+
+        const data = await response.json();
+        
+        // Convert Deepgram JSON to WebVTT
+        let vttText = "WEBVTT\n\n";
+        
+        const formatVTTTime = (seconds) => {
+            const date = new Date(0);
+            date.setSeconds(Math.floor(seconds));
+            date.setMilliseconds((seconds % 1) * 1000);
+            return date.toISOString().substr(11, 12);
+        };
+
+        if (data.results && data.results.utterances) {
+            data.results.utterances.forEach((utterance) => {
+                vttText += `${formatVTTTime(utterance.start)} --> ${formatVTTTime(utterance.end)}\n`;
+                vttText += `${utterance.transcript}\n\n`;
+            });
+        } else if (data.results && data.results.channels && data.results.channels[0] && data.results.channels[0].alternatives && data.results.channels[0].alternatives[0].words) {
+            const words = data.results.channels[0].alternatives[0].words;
+            if (words.length > 0) {
+                let currentChunk = [];
+                let chunkStart = words[0].start;
+                
+                words.forEach((word, index) => {
+                    currentChunk.push(word.punctuated_word || word.word);
+                    if (currentChunk.length >= 10 || index === words.length - 1) {
+                        vttText += `${formatVTTTime(chunkStart)} --> ${formatVTTTime(word.end)}\n`;
+                        vttText += `${currentChunk.join(" ")}\n\n`;
+                        if (index < words.length - 1) {
+                            currentChunk = [];
+                            chunkStart = words[index + 1].start;
+                        }
+                    }
+                });
+            }
+        }
+
+        // 3. Save to cache
+        const newTranscript = new VideoTranscript({ videoUrl, transcriptText: vttText });
+        await newTranscript.save();
+
+        res.json({ success: true, transcription: vttText, source: 'deepgram' });
+    } catch (err) {
+        console.error('Transcription error:', err);
+        res.status(500).json({ success: false, error: 'Failed to process transcription', message: err.message });
+    }
+});
+
 module.exports = router;
