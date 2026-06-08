@@ -77,10 +77,15 @@ export const useLearningPaths = (userId) => {
                 }
               }
 
+              const buildDirRoles = (roleData) => {
+                const dir = roleData?.direction || {};
+                return (dir.roles || []).map(r => typeof r === 'string' ? r : (r.role || r.role_name)).filter(Boolean);
+              };
+
               const careerPaths = [
-                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   locked: isLocked, navigateTo: '/dashboard/career-agent' },
-                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', locked: isLocked, navigateTo: '/dashboard/career-agent' },
-                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   roles: buildDirRoles(analysis.primary),   progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, roles: buildDirRoles(analysis.secondary), progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  roles: buildDirRoles(analysis.tertiary),  progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  locked: isLocked, navigateTo: '/dashboard/career-agent' },
               ].filter(Boolean);
 
               if (careerPaths.length > 0) {
