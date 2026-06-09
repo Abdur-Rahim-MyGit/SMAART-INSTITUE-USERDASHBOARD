@@ -11,7 +11,8 @@ import {
   IconPlayerPlayFilled as Play,
   IconFingerprint as Brain,
   IconCpu as Bot,
-  IconInfinity as Leaf
+  IconInfinity as Leaf,
+  IconSchool as GraduationCap
 } from "@tabler/icons-react";
 import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
