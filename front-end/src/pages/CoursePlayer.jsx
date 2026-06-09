@@ -1064,7 +1064,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-transparent overflow-hidden transition-colors duration-500 relative min-h-[calc(100vh-130px)]">
+    <div className="flex flex-col bg-transparent overflow-hidden transition-colors duration-500 relative min-h-[calc(100vh-130px)] p-[2rem]">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-900/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none" />

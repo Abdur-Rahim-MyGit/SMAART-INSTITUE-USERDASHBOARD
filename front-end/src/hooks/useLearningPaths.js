@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { coursesAPI, courseEnrollmentAPI } from '@/services/api';
 import { assessmentApi } from '@/services/assessmentApi';
+import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from '@/data/courseStructureData';
+import { compareCourseIds } from '@/utils/courseUnlock';
 
 export const useLearningPaths = (userId) => {
   const [paths, setPaths] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [inProgressCourses, setInProgressCourses] = useState([]);
+  const [nextCourse, setNextCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -122,7 +125,7 @@ export const useLearningPaths = (userId) => {
                       icon: getIconForCourse(course.category),
                       color: getColorForCourse(course.category),
                       enrollmentId: enrollment._id,
-                      navigateTo: '/dashboard/courses'
+                      navigateTo: `/dashboard/courses/${course._id}/player`
                     };
                   } catch (err) {
                     console.error('Error fetching course details:', err);
@@ -193,12 +196,79 @@ export const useLearningPaths = (userId) => {
                     progress: e.progress || 0,
                     status: e.status,
                     stages, // array of { id, label, dayId, moduleTitle, status }
-                    navigateTo: '/dashboard/courses'
+                    navigateTo: `/dashboard/courses/${course._id}/player`
                   };
                 })
-                .filter(Boolean);
+                .filter(Boolean)
+                // Sort by lowest progress first → next unseen course appears first
+                .sort((a, b) => (a.progress || 0) - (b.progress || 0));
 
               setInProgressCourses(inProgressList);
+
+              // ── Derive Next Unseen Course from full sequence ───────────────
+              // Build set of completed course IDs (by code, _id, or courseNumber)
+              const completedIds = new Set();
+              enrollmentList.forEach(e => {
+                const isComplete = e.status === 'completed' || (e.progress || 0) >= 100;
+                if (isComplete) {
+                  const c = e.course;
+                  if (typeof c === 'object') {
+                    if (c.courseCode) completedIds.add(c.courseCode.toUpperCase());
+                    if (c._id) completedIds.add(c._id.toString());
+                    if (c.courseNumber) completedIds.add(c.courseNumber.toUpperCase());
+                  } else if (typeof c === 'string') {
+                    completedIds.add(c.toUpperCase());
+                  }
+                }
+              });
+              // Also mark localStorage-completed courses
+              const lsCompleted = localStorage.getItem('smaart_completed_courses');
+              if (lsCompleted) {
+                try { JSON.parse(lsCompleted).forEach(id => completedIds.add(String(id).toUpperCase())); } catch {}
+              }
+
+              // Walk the full static sequence; first non-completed = next course
+              const FULL_SEQUENCE = [
+                ...STAGE_1_COURSES,
+                ...STAGE_2_COURSES,
+                ...STAGE_3_COURSES,
+                ...PIQ_TRACK,
+                ...AIQ_TRACK,
+                ...SQ_TRACK,
+              ];
+
+              const nextStatic = FULL_SEQUENCE.find(c => !completedIds.has(c.id.toUpperCase()));
+
+              if (nextStatic) {
+                // Try to find the real DB course object for this static entry
+                try {
+                  const allPublished = await coursesAPI.getPublished();
+                  const dbList = allPublished?.data || [];
+                  const dbMatch = dbList.find(dc =>
+                    compareCourseIds(dc.courseCode, nextStatic.id) ||
+                    compareCourseIds(dc.courseNumber, nextStatic.id)
+                  );
+                  setNextCourse({
+                    id: dbMatch?._id || nextStatic.id,
+                    courseCode: dbMatch?.courseCode || nextStatic.id,
+                    title: dbMatch?.title || nextStatic.title,
+                    subtitle: dbMatch?.description || nextStatic.subtitle,
+                    progress: 0,
+                    navigateTo: dbMatch ? `/dashboard/courses/${dbMatch._id}/player` : '/dashboard/courses',
+                  });
+                } catch {
+                  setNextCourse({
+                    id: nextStatic.id,
+                    courseCode: nextStatic.id,
+                    title: nextStatic.title,
+                    subtitle: nextStatic.subtitle,
+                    progress: 0,
+                    navigateTo: '/dashboard/courses',
+                  });
+                }
+              } else {
+                setNextCourse(null); // all courses done!
+              }
             }
           } catch (apiErr) {
             console.log('[useLearningPaths] Enrollment fetch failed:', apiErr.message);
@@ -217,7 +287,7 @@ export const useLearningPaths = (userId) => {
     fetchLearningPaths();
   }, [userId]);
 
-  return { paths, enrolledCourses, inProgressCourses, loading, error };
+  return { paths, enrolledCourses, inProgressCourses, nextCourse, loading, error };
 };
 
 export default useLearningPaths;

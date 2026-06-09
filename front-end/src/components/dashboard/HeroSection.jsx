@@ -17,17 +17,25 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
     [paths]
   );
 
-  // Derive the active path or fallback to last watched course/module from local storage
-  const activePath = paths.length > 0 ? paths[0] : null;
+  // Find the first course that isn't fully completed — skip 100%-done courses
+  const activePath = paths.length > 0
+    ? (paths.find(p => (p.progress || 0) < 100) ?? paths[0])
+    : null;
   const lastWatchedCourse = localStorage.getItem("smaart_last_watched_course");
   const storedProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
   
   const rawTitle = activePath ? activePath.title : (localStorage.getItem("smaart_last_watched_title") || lastWatchedCourse || "Capacity: Foundations");
   const displayTitle = resolveStaticCourseTitle(rawTitle) || resolveStaticCourseTitle(activePath?.id) || resolveStaticCourseTitle(activePath?.courseCode) || rawTitle;
 
-  const isLastWatched = activePath ? (compareCourseIds(activePath.id, lastWatchedCourse) || compareCourseIds(activePath.courseCode, lastWatchedCourse)) : false;
-  const displayProgress = activePath 
-    ? Math.max(activePath.progress || 0, isLastWatched ? storedProgress : 0)
+  const isLastWatched = activePath
+    ? (compareCourseIds(activePath.id, lastWatchedCourse) || compareCourseIds(activePath.courseCode, lastWatchedCourse))
+    : false;
+
+  // Prefer live localStorage progress over stale DB enrollment value when on the active course.
+  const enrollmentProgress = activePath?.progress || 0;
+  const liveProgress = isLastWatched && storedProgress > 0 ? storedProgress : 0;
+  const displayProgress = activePath
+    ? Math.max(enrollmentProgress, liveProgress)
     : (storedProgress || averageProgress);
 
   return (
