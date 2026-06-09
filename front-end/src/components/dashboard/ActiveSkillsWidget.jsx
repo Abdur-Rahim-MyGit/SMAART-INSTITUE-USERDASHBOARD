@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Terminal, Zap, Layers, Map, Target } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Terminal, Zap, Layers, Map, Target, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import CertificateModal from '../CertificateModal';
 
@@ -7,10 +7,43 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
     const { theme } = useTheme();
     const [userSkills, setUserSkills] = useState([]);
     const [loadingSkills, setLoadingSkills] = useState(true);
-    const [activeTab, setActiveTab] = useState(0); 
+    const [activeTab, setActiveTab] = useState(0);
     const [roleSkillsCache, setRoleSkillsCache] = useState({});
     const [certModal, setCertModal] = useState(null);
     const [loadingRoleSkills, setLoadingRoleSkills] = useState(false);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+    const scrollContainerRef = useRef(null);
+
+    const scroll = (direction) => {
+        if (scrollContainerRef.current) {
+            const scrollAmount = 227; // card width (215) + gap (12)
+            scrollContainerRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const checkScrollLimits = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            // Add a 2px buffer for rounding differences
+            setCanScrollLeft(scrollLeft > 2);
+            setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+        }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            checkScrollLimits();
+        }, 100);
+        window.addEventListener('resize', checkScrollLimits);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', checkScrollLimits);
+        };
+    }, [userSkills, activeTab, roleSkillsCache]);
 
     // Filter to only include the 3 core career directions (if available)
     const validPaths = (paths || []).filter(p => p && p.title && ['primary', 'secondary', 'tertiary'].includes(p.id));
@@ -52,7 +85,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
             try {
                 let allPathSkills = new Set();
                 const rolesToFetch = currentPath.roles || [];
-                
+
                 // Fetch skills for all roles within this path
                 await Promise.all(rolesToFetch.map(async (role) => {
                     if (!role) return;
@@ -72,14 +105,14 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                 setLoadingRoleSkills(false);
             }
         };
-        
+
         fetchPathSkills();
     }, [activeTab, validPaths, roleSkillsCache]);
 
     const handleCertConfirm = async (skillName, file) => {
         setCertModal(null);
-        setUserSkills(prev => prev.filter(s => s.skillName !== skillName)); 
-        
+        setUserSkills(prev => prev.filter(s => s.skillName !== skillName));
+
         try {
             await fetch('/api/career-agent/user-skills/progress', {
                 method: 'POST',
@@ -101,31 +134,31 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
     const currentPath = validPaths[activeTab];
     const pathSkillSet = currentPath ? roleSkillsCache[currentPath.id] : null;
-    
+
     let displayedSkills = [];
     if (pathSkillSet) {
-        displayedSkills = userSkills.filter(s => pathSkillSet.has(s.skillName)).slice(0, 5);
+        displayedSkills = userSkills.filter(s => pathSkillSet.has(s.skillName));
     }
 
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     return (
-        <div className="w-full mb-6 rounded-2xl overflow-hidden shadow-sm"
-             style={{ 
-                 background: isDark ? 'var(--navy)' : '#ffffff',
-                 border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0' 
-             }}>
-            
+        <div className="w-full mb-6 rounded-2xl overflow-hidden shadow-sm group/widget"
+            style={{
+                background: isDark ? 'var(--navy)' : '#ffffff',
+                border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0'
+            }}>
+
             {/* Header & Tabs */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 sm:p-5 border-b"
-                 style={{ 
-                     borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
-                     background: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc'
-                 }}>
-                
+                style={{
+                    borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
+                    background: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc'
+                }}>
+
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                         style={{ background: isDark ? 'rgba(59, 130, 246, 0.1)' : '#eff6ff' }}>
+                        style={{ background: isDark ? 'rgba(59, 130, 246, 0.1)' : '#eff6ff' }}>
                         <Target size={20} color={isDark ? '#60a5fa' : '#1a3884'} />
                     </div>
                     <div>
@@ -134,19 +167,19 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                             Active Skills to Master
                         </h2>
                         <p className="text-[0.72rem] mt-0.5" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
-                            Track your top 5 targeted skills across your career directions
+                            Track your targeted skills across your career directions
                         </p>
                     </div>
                 </div>
-                
+
                 {/* Pathway Tabs */}
                 <div className="flex p-1 rounded-xl w-full lg:w-auto overflow-x-auto no-scrollbar"
-                     style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f1f5f9' }}>
+                    style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f1f5f9' }}>
                     {validPaths.map((path, idx) => {
                         const isActive = activeTab === idx;
-                        const label = path.id === 'primary' ? 'Primary Path' : 
-                                      path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path';
-                                      
+                        const label = path.id === 'primary' ? 'Primary Path' :
+                            path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path';
+
                         return (
                             <button
                                 key={path.id}
@@ -182,32 +215,74 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
             )}
 
             {/* Skills Grid Area */}
-            <div className="p-4 sm:p-5 min-h-[170px] relative">
+            <div className="p-4 sm:p-5 min-h-[170px] relative group/skills">
+                {displayedSkills.length > 5 && !loadingRoleSkills && (
+                    <>
+                        {/* Left Arrow Overlay Button */}
+                        <button
+                            onClick={() => scroll('left')}
+                            className={`absolute z-10 w-7 h-7 rounded-full border shadow-sm flex items-center justify-center transition-all duration-300 left-4 sm:left-5 ${
+                                canScrollLeft 
+                                ? 'opacity-0 group-hover/widget:opacity-100 pointer-events-none group-hover/widget:pointer-events-auto hover:scale-105 active:scale-95' 
+                                : 'opacity-0 pointer-events-none'
+                            }`}
+                            style={{
+                                top: '50%',
+                                marginTop: '-20px',
+                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                                background: isDark ? 'rgba(0, 42, 92, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                color: isDark ? '#ffffff' : '#1a3884',
+                            }}
+                        >
+                            <ChevronLeft size={14} />
+                        </button>
+
+                        {/* Right Arrow Overlay Button */}
+                        <button
+                            onClick={() => scroll('right')}
+                            className={`absolute z-10 w-7 h-7 rounded-full border shadow-sm flex items-center justify-center transition-all duration-300 right-4 sm:right-5 ${
+                                canScrollRight 
+                                ? 'opacity-0 group-hover/widget:opacity-100 pointer-events-none group-hover/widget:pointer-events-auto hover:scale-105 active:scale-95' 
+                                : 'opacity-0 pointer-events-none'
+                            }`}
+                            style={{
+                                top: '50%',
+                                marginTop: '-20px',
+                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#cbd5e1',
+                                background: isDark ? 'rgba(0, 42, 92, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                color: isDark ? '#ffffff' : '#1a3884',
+                            }}
+                        >
+                            <ChevronRight size={14} />
+                        </button>
+                    </>
+                )}
+
                 {loadingRoleSkills ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-10"
-                         style={{ background: isDark ? 'var(--navy)' : '#ffffff' }}>
+                        style={{ background: isDark ? 'var(--navy)' : '#ffffff' }}>
                         <div className="w-7 h-7 border-2 border-[#3b82f6]/30 border-t-[#3b82f6] rounded-full animate-spin mb-3" />
                         <span className="text-[0.75rem] font-semibold" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>Mapping skills to pathway...</span>
                     </div>
                 ) : displayedSkills.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div ref={scrollContainerRef} onScroll={checkScrollLimits} className="flex overflow-x-auto gap-3 pb-3 no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                         {displayedSkills.map((skill, idx) => (
-                            <SkillDashboardCard 
-                                key={`${currentPath.id}-${idx}`} 
-                                skill={skill} 
+                            <SkillDashboardCard
+                                key={`${currentPath.id}-${idx}`}
+                                skill={skill}
                                 isDark={isDark}
-                                onMarkDone={() => setCertModal({ skillName: skill.skillName })} 
+                                onMarkDone={() => setCertModal({ skillName: skill.skillName })}
                             />
                         ))}
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-32 text-center rounded-xl border border-dashed"
-                         style={{ 
-                             background: isDark ? '#00152e' : '#f8fafc',
-                             borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'
-                         }}>
+                        style={{
+                            background: isDark ? '#00152e' : '#f8fafc',
+                            borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0'
+                        }}>
                         <div className="w-10 h-10 rounded-full mb-2 flex items-center justify-center"
-                             style={{ background: isDark ? 'rgba(255,255,255,0.03)' : '#f1f5f9' }}>
+                            style={{ background: isDark ? 'rgba(255,255,255,0.03)' : '#f1f5f9' }}>
                             <Layers size={18} color={isDark ? '#475569' : '#94a3b8'} />
                         </div>
                         <p className="text-[0.82rem] font-bold" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
@@ -225,7 +300,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
 const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
     const [isHovered, setIsHovered] = useState(false);
-    
+
     // Pick a subtle accent color based on the first letter of the skill name
     const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
     const colorIndex = skill.skillName.charCodeAt(0) % colors.length;
@@ -236,8 +311,8 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
             title={skill.skillName}
             style={{
                 background: isDark ? '#002A5C' : '#ffffff',
-                border: isHovered 
-                    ? `1px solid #1a3884` 
+                border: isHovered
+                    ? `1px solid #1a3884`
                     : (isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0'),
                 borderRadius: '12px',
                 padding: '1rem',
@@ -248,6 +323,8 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 minHeight: '145px',
+                width: '215px',
+                flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
             }}
@@ -255,13 +332,13 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: isHovered ? '#1a3884' : 'transparent', transition: 'background 0.3s' }} />
-            
+
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem', gap: '8px' }}>
-                    <span style={{ 
-                        fontSize: '0.8rem', 
-                        fontWeight: 700, 
-                        color: isDark ? '#ffffff' : '#0f172a', 
+                    <span style={{
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        color: isDark ? '#ffffff' : '#0f172a',
                         lineHeight: 1.3,
                         display: '-webkit-box',
                         WebkitLineClamp: 3,
@@ -272,7 +349,7 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
                     </span>
                     <Target size={16} color={isDark ? '#60a5fa' : '#1a3884'} style={{ opacity: 0.8, flexShrink: 0, marginTop: '2px' }} />
                 </div>
-                
+
                 <div style={{ marginTop: 'auto', marginBottom: '0.8rem' }}>
                     <span style={{
                         fontSize: '0.55rem',

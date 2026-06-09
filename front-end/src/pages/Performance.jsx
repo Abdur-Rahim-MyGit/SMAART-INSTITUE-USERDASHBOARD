@@ -1,4 +1,7 @@
 import React from "react";
+import { IconArrowLeft as ArrowLeft } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useUser from "@/hooks/useUser";
 import {
   StudentAnalyticsView,
@@ -8,6 +11,8 @@ import {
 
 const Performance = () => {
   const { user, loading: userLoading } = useUser();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (userLoading) {
     return (
@@ -45,6 +50,19 @@ const Performance = () => {
   return (
     <div className="p-8 bg-transparent font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+              <ArrowLeft stroke={1.5} className="h-4 w-4" />
+            </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+          </button>
+        </div>
+
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

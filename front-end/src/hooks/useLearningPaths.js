@@ -57,13 +57,13 @@ export const useLearningPaths = (userId) => {
                 );
               };
 
-              const primaryName   = getDirectionName(analysis.primary,   preferences.primary,   'smaart_pref_primary');
+              const primaryName = getDirectionName(analysis.primary, preferences.primary, 'smaart_pref_primary');
               const secondaryName = getDirectionName(analysis.secondary, preferences.secondary, 'smaart_pref_secondary');
-              const tertiaryName  = getDirectionName(analysis.tertiary,  preferences.tertiary,  'smaart_pref_tertiary');
+              const tertiaryName = getDirectionName(analysis.tertiary, preferences.tertiary, 'smaart_pref_tertiary');
 
-              const primarySub   = getDirectionSubtitle(analysis.primary,   preferences.primary);
+              const primarySub = getDirectionSubtitle(analysis.primary, preferences.primary);
               const secondarySub = getDirectionSubtitle(analysis.secondary, preferences.secondary);
-              const tertiarySub  = getDirectionSubtitle(analysis.tertiary,  preferences.tertiary);
+              const tertiarySub = getDirectionSubtitle(analysis.tertiary, preferences.tertiary);
 
               // Build path cards only for valid directions
               let assessmentPct = 0;
@@ -86,9 +86,9 @@ export const useLearningPaths = (userId) => {
               };
 
               const careerPaths = [
-                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   roles: buildDirRoles(analysis.primary),   progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   locked: isLocked, navigateTo: '/dashboard/career-agent' },
-                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, roles: buildDirRoles(analysis.secondary), progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', locked: isLocked, navigateTo: '/dashboard/career-agent' },
-                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  roles: buildDirRoles(analysis.tertiary),  progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   roles: buildDirRoles(analysis.primary),   progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   locked: isLocked, navigateTo: '/dashboard/career-agent?tab=primary' },
+                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, roles: buildDirRoles(analysis.secondary), progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', locked: isLocked, navigateTo: '/dashboard/career-agent?tab=secondary' },
+                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  roles: buildDirRoles(analysis.tertiary),  progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  locked: isLocked, navigateTo: '/dashboard/career-agent?tab=tertiary' },
               ].filter(Boolean);
 
               if (careerPaths.length > 0) {
@@ -229,7 +229,7 @@ export const useLearningPaths = (userId) => {
               // Also mark localStorage-completed courses
               const lsCompleted = localStorage.getItem('smaart_completed_courses');
               if (lsCompleted) {
-                try { JSON.parse(lsCompleted).forEach(id => completedIds.add(String(id).toUpperCase())); } catch {}
+                try { JSON.parse(lsCompleted).forEach(id => completedIds.add(String(id).toUpperCase())); } catch { }
               }
 
               // Walk the full static sequence; first non-completed = next course

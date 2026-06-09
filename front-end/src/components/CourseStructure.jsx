@@ -11,9 +11,9 @@ import {
   IconPlayerPlayFilled as Play,
   IconFingerprint as Brain,
   IconCpu as Bot,
-  IconInfinity as Leaf
+  IconInfinity as Leaf,
+  IconSchool as GraduationCap
 } from "@tabler/icons-react";
-import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -764,44 +764,43 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   };
 
   return (
-    <div className="w-full relative overflow-hidden p-[2rem]">
+    <div className="w-full relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header — standardized PageHero with restored old design */}
-      {!selectedStageId && (
-        <div className="relative z-10 pt-4 pb-0">
-          {/* Back Button */}
-          <div className="mb-6">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+      <div className="relative z-10 mx-auto max-w-7xl space-y-6 p-8">
+        {/* Page header — standardized PageHero with restored old design */}
+        {!selectedStageId && (
+          <>
+            {/* Back Button - Mobile Only */}
+            <div className="mb-4 md:hidden">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                  <ArrowLeft stroke={1.5} className="h-4 w-4" />
+                </div>
+                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+              </button>
+            </div>
+
+            <PageHero
+              badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
+              icon={GraduationCap}
+              title={t("my_courses_page.programme", "Smaart Programme")}
+              subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
             >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-            </button>
-          </div>
+              {continueWatching}
+            </PageHero>
+          </>
+        )}
 
-          <PageHero
-            badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
-            icon={GraduationCap}
-            title={t("my_courses_page.programme", "Smaart Programme")}
-            subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
-          >
-            {continueWatching}
-          </PageHero>
-        </div>
-      )}
-
-
-
-      {/* Main content */}
-      <div className="w-full py-4 relative z-10">
+        {/* Main content */}
+        <div className="w-full relative z-10">
         <AnimatePresence mode="wait">
           {!selectedStageId ? (
             /* Category cards view */
@@ -874,6 +873,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
