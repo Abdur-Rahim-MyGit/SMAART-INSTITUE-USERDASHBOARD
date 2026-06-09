@@ -7,7 +7,7 @@ import {
 import {
   IconTrendingUp, IconUsers, IconAward, IconClock, IconBook, IconCircleCheck,
   IconFilter, IconShieldX, IconChartBar, IconShieldCheck, IconHelp,
-  IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconZap, IconAlertTriangle
+  IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconBolt, IconAlertTriangle
 } from '@tabler/icons-react';
 import { apiCall } from '@/services/api';
 import useUser from '@/hooks/useUser';
@@ -1307,7 +1307,7 @@ export const StudentAnalyticsView = () => {
                     Icon = IconCircleCheck;
                     colorClass = "bg-purple-500";
                   } else if (event.type === 'course_complete') {
-                    Icon = IconZap;
+                    Icon = IconBolt;
                     colorClass = "bg-orange-500 animate-bounce";
                   }
 

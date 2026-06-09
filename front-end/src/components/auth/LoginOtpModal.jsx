@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Mail, ArrowRight, RefreshCw, AlertTriangle } from "lucide-react";
+import { X, Loader2, Mail, ArrowRight, RefreshCw, AlertTriangle, Monitor, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { apiCall } from "@/services/api";
@@ -338,7 +338,12 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
               </div>
             ) : (
               // Force Logout Confirmation View
-              <div className="p-8 text-center bg-white dark:bg-[#002147]">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="p-8 text-center bg-white dark:bg-[#002147] flex flex-col items-center relative"
+              >
                 <button
                   onClick={onClose}
                   className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors z-30"
@@ -346,37 +351,138 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <X className="w-5 h-5" />
                 </button>
 
-                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 shadow-sm relative">
-                  <div className="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-20" />
-                  <AlertTriangle className="w-10 h-10 text-red-500 relative z-10" />
+                {/* Animated Graphic: Device Collision/Conflict */}
+                <div className="relative w-full max-w-[280px] h-32 flex items-center justify-center mb-6 mt-2">
+                  {/* Glowing background halo */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-amber-500/10 dark:from-red-500/5 dark:to-amber-500/5 blur-xl rounded-full" />
+                  
+                  {/* Multi-layered Pulsing Radar Rings */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <motion.div
+                      animate={{ scale: [0.9, 1.3, 0.9], opacity: [0.15, 0.35, 0.15] }}
+                      transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                      className="absolute w-28 h-28 border border-red-500/20 dark:border-red-500/10 rounded-full"
+                    />
+                    <motion.div
+                      animate={{ scale: [1, 1.5, 1], opacity: [0.05, 0.18, 0.05] }}
+                      transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1 }}
+                      className="absolute w-36 h-36 border border-amber-500/20 dark:border-amber-500/10 rounded-full"
+                    />
+                  </div>
+
+                  {/* Device Grid Interaction */}
+                  <div className="relative flex items-center justify-between w-full px-4 z-10">
+                    {/* Left Device: Current PC/Browser (Active attempt) */}
+                    <motion.div 
+                      initial={{ x: -15, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.6, type: "spring", delay: 0.1 }}
+                      className="flex flex-col items-center gap-1.5"
+                    >
+                      <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-navy-light/40 dark:to-navy-light/20 border border-blue-100 dark:border-blue-500/10 rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/5 relative group">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-0 group-hover:opacity-10 transition duration-300" />
+                        <Monitor className="w-6 h-6 text-blue-600 dark:text-blue-400 relative z-10" />
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">This Device</span>
+                    </motion.div>
+
+                    {/* Center: Clash / Conflict Wave */}
+                    <div className="relative flex flex-col items-center justify-center w-12">
+                      <div className="h-0.5 w-full bg-gradient-to-r from-blue-400/30 via-red-400/50 to-red-500/30 dark:from-blue-500/20 dark:via-red-500/30 dark:to-red-500/10 relative">
+                        <motion.div 
+                          animate={{ x: [-15, 15, -15] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                          className="absolute -top-[3px] left-1/2 w-2 h-2 rounded-full bg-red-500 shadow-lg shadow-red-500/50" 
+                        />
+                      </div>
+                      
+                      {/* Warning Shield Badge */}
+                      <motion.div
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 4, -4, 0]
+                        }}
+                        transition={{ 
+                          scale: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+                          rotate: { repeat: Infinity, duration: 4, ease: "easeInOut" }
+                        }}
+                        className="absolute w-10 h-10 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-500/30 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/10 z-20"
+                      >
+                        <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" />
+                      </motion.div>
+                    </div>
+
+                    {/* Right Device: The Other Active Session */}
+                    <motion.div 
+                      initial={{ x: 15, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.6, type: "spring", delay: 0.15 }}
+                      className="flex flex-col items-center gap-1.5"
+                    >
+                      <div className="w-14 h-14 bg-gradient-to-br from-red-50 to-rose-50 dark:from-navy-light/40 dark:to-navy-light/20 border border-red-100 dark:border-red-500/10 rounded-2xl flex items-center justify-center shadow-md shadow-red-500/5 relative group">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-2xl blur opacity-0 group-hover:opacity-10 transition duration-300" />
+                        <Smartphone className="w-6 h-6 text-red-500/80 dark:text-red-400 relative z-10" />
+                        {/* Red warning aura */}
+                        <span className="absolute -top-1 -left-1 flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-bold text-red-500/80 dark:text-red-400 uppercase tracking-widest">Other Device</span>
+                    </motion.div>
+                  </div>
                 </div>
 
-                <h3 className="text-[20px] font-extrabold text-gray-900 dark:text-white mb-2">Active Session</h3>
-                <p className="text-[13px] text-gray-500 dark:text-slate-300 mb-8 max-w-[280px] mx-auto leading-relaxed">
-                  {forceLogoutMessage || "You are already logged in on another device."}
-                </p>
+                {/* Typography and Descriptions */}
+                <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent mb-2.5">
+                  Active Session
+                </h3>
+                
+                {/* Warning Card Container */}
+                <div className="bg-red-50/50 dark:bg-red-950/20 border border-red-100/60 dark:border-red-500/10 rounded-2xl p-4 mb-8 max-w-[320px] mx-auto text-left flex items-start gap-3">
+                  <div className="mt-0.5 p-1 bg-red-100/60 dark:bg-red-900/30 rounded-lg shrink-0">
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-extrabold text-red-800 dark:text-red-300 uppercase tracking-widest mb-0.5">Security Notice</h4>
+                    <p className="text-[12.5px] text-red-700/95 dark:text-red-300/85 leading-relaxed font-semibold">
+                      {forceLogoutMessage || "You are already logged in on another device."}
+                    </p>
+                  </div>
+                </div>
 
-                <div className="space-y-3">
+                {/* Dynamic buttons with premium interactions */}
+                <div className="space-y-3 w-full px-2">
                   <Button
                     onClick={handleForceLogoutConfirm}
                     disabled={isLoading}
-                    className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-red-500/20 text-white bg-red-500 hover:bg-red-600 transition-all hover:-translate-y-1 active:translate-y-0"
+                    className="w-full h-12 rounded-xl text-sm font-bold text-white shadow-lg shadow-red-500/20 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 hover:shadow-red-500/30 hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden group"
                   >
+                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : "Sign out other device"}
+                      <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                    ) : (
+                      <>
+                        <span className="relative z-10">Sign out other device</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 relative z-10" />
+                      </>
+                    )}
                   </Button>
 
                   <Button
                     onClick={handleForceLogoutCancel}
-                    variant="ghost"
                     disabled={isLoading}
-                    className="w-full h-11 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white font-bold text-[13px] transition-colors"
+                    variant="ghost"
+                    className="w-full h-11 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/80 dark:hover:bg-white/5 font-bold text-[13px] rounded-xl transition-all duration-300"
                   >
                     Cancel
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             )}
           </motion.div>
         </div>
