@@ -645,14 +645,14 @@ const Profile = () => {
             <ProfileSkeleton />
           ) : (
             <main className="container mx-auto px-4 py-6 max-w-6xl">
-              {/* Back Button */}
-              <div className="mb-4">
+              {/* Back Button - Mobile Only */}
+              <div className="mb-4 md:hidden">
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+                  className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                    <ArrowLeft className="w-4 h-4" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                    <ArrowLeft className="h-4 w-4" />
                   </div>
                   {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
                 </button>

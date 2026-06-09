@@ -541,7 +541,7 @@ const Settings = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className="mx-auto max-w-7xl space-y-6 p-8"
     >
       {/* Back Button - Mobile Only */}
       <div className="md:hidden">
