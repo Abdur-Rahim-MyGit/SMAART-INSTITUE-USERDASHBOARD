@@ -43,7 +43,7 @@ const MyCoursesHeroBanner = ({
       {(mode === "in_progress" || mode === "assessment" || mode === "completed") && (
           <div className="flex flex-col text-left">
              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                {mode === "assessment" ? "Next Step" : mode === "completed" ? "Completed Course" : "Current Course"}
+                {mode === "assessment" ? "Next Step" : "Continue Learning"}
              </span>
              <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white truncate max-w-[200px] md:max-w-[250px]" title={displayTitle}>
                 {displayTitle}
@@ -55,8 +55,8 @@ const MyCoursesHeroBanner = ({
         onClick={onPrimaryAction}
         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
       >
-        {(mode === "in_progress" || mode === "completed") && <RiPlayFill size={16} />}
-        {mode === "completed" ? t("my_courses_page.resume_course", "Resume Course") : primaryLabel}
+        {mode !== "assessment" && <RiPlayFill size={16} />}
+        Continue
         <RiArrowRightSLine size={16} stroke={1.5} />
       </button>
     </div>
@@ -177,17 +177,56 @@ const MyCourses = () => {
           ...SQ_TRACK,
         ];
 
-        // If the course is completed, find the next one in sequence
-        const isCompleted = userProgress.completedCourses?.some(c => compareCourseIds(c, lastWatched));
+        // ── Step 1: Fetch course from DB first ─────────────────────────────
+        let found = null;
+        let allDbCourses = [];
+        try {
+          const response = await coursesAPI.getPublished();
+          allDbCourses = response.data || [];
+          if (Array.isArray(allDbCourses)) {
+            found = allDbCourses.find(
+              (c) => c.courseCode === lastWatched ||
+                     (c._id || c.id) === lastWatched ||
+                     compareCourseIds(c.courseCode, lastWatched) ||
+                     compareCourseIds(c.courseNumber, lastWatched)
+            );
+          }
+        } catch (e) {
+          console.warn("API fetch failed, using localStorage only");
+        }
+
+        // ── Step 2: Check completion using ALL identifiers ─────────────────
+        // This fixes format mismatches (e.g. localStorage has MongoDB _id,
+        // but completedCourses only has course codes like "S07")
+        const courseIdentifiers = [
+          lastWatched,
+          found?.courseCode,
+          found?._id?.toString(),
+          found?.courseNumber,
+        ].filter(Boolean);
+
+        const isCompleted = courseIdentifiers.some(id =>
+          userProgress.completedCourses?.some(c => compareCourseIds(c, id))
+        ) || (found && (userProgress.completedCourses || []).some(c =>
+          compareCourseIds(c, found.courseCode) || compareCourseIds(c, found._id?.toString())
+        ));
+
+        // ── Step 3: Advance to next if completed ───────────────────────────
         if (isCompleted) {
-          const idx = allCourses.findIndex(c => compareCourseIds(c.id, lastWatched));
+          // Find position in static sequence using the found course's code
+          const searchId = found?.courseCode || found?.courseNumber || lastWatched;
+          const idx = allCourses.findIndex(c =>
+            compareCourseIds(c.id, searchId) || compareCourseIds(c.id, lastWatched)
+          );
+
           if (idx !== -1 && idx < allCourses.length - 1) {
             const nextCourseObj = allCourses[idx + 1];
             let nextId = nextCourseObj.id;
+
+            // If original lastWatched was CRS-format, keep that format
             if (lastWatched.startsWith("CRS")) {
-              const isS = nextId.startsWith("S");
               const numPart = parseInt(nextId.replace(/\D/g, ''), 10);
-              if (isS && !isNaN(numPart)) {
+              if (nextId.startsWith("S") && !isNaN(numPart)) {
                 nextId = `CRS${String(numPart).padStart(5, '0')}`;
               } else if (nextId.startsWith("PIQ") && !isNaN(numPart)) {
                 nextId = `CRS${String(25 + numPart).padStart(5, '0')}`;
@@ -197,43 +236,49 @@ const MyCourses = () => {
                 nextId = `CRS${String(35 + numPart).padStart(5, '0')}`;
               }
             }
-            lastWatched = nextId;
+
+            // Try to resolve next course to its DB _id for direct navigation
+            const nextDbCourse = allDbCourses.find(c =>
+              compareCourseIds(c.courseCode, nextCourseObj.id) ||
+              compareCourseIds(c.courseNumber, nextCourseObj.id) ||
+              compareCourseIds(c.courseCode, nextId)
+            );
+            const resolvedNextId = nextDbCourse?._id?.toString() || nextDbCourse?.courseCode || nextId;
+
+            // Advance localStorage to the next course
+            localStorage.setItem("smaart_last_watched_course", resolvedNextId);
+            localStorage.removeItem("smaart_last_watched_title");
+            localStorage.setItem("smaart_course_progress", "0");
+            lastWatched = resolvedNextId;
             lastProgress = 0;
             lastWatchedLesson = null;
+
+            // Update found to the next course
+            found = nextDbCourse || null;
           }
         }
 
-        try {
-          const response = await coursesAPI.getPublished();
-          const courses = response.data || [];
-          if (Array.isArray(courses)) {
-            const found = courses.find(
-              (c) => c.courseCode === lastWatched || (c._id || c.id) === lastWatched
-            );
-            if (found) {
-              const completedModules = (found.modules || []).filter(
-                (m) => m.status === "completed"
-              ).length;
-              const totalModules = (found.modules || []).length;
-              const pct =
-                totalModules > 0
-                  ? Math.round((completedModules / totalModules) * 100)
-                  : lastProgress;
+        // ── Step 4: Show the resolved course ──────────────────────────────
+        if (found) {
+          const completedModules = (found.modules || []).filter(
+            (m) => m.status === "completed"
+          ).length;
+          const totalModules = (found.modules || []).length;
+          const pct = totalModules > 0
+            ? Math.round((completedModules / totalModules) * 100)
+            : lastProgress;
 
-              setCurrentCourse({
-                ...found,
-                lastWatchedLesson: lastWatchedLesson || null,
-                completedModules,
-                totalModules,
-              });
-              setCurrentProgress(pct || lastProgress);
-              return;
-            }
-          }
-        } catch (e) {
-          console.warn("API fetch failed, using localStorage only");
+          setCurrentCourse({
+            ...found,
+            lastWatchedLesson: lastWatchedLesson || null,
+            completedModules,
+            totalModules,
+          });
+          setCurrentProgress(pct || lastProgress);
+          return;
         }
 
+        // ── Step 5: Fallback (no DB match) ─────────────────────────────────
         const staticTitle = resolveStaticCourseTitle(lastWatched);
         setCurrentCourse({
           _id: lastWatched,
@@ -259,8 +304,10 @@ const MyCourses = () => {
     const lastWatched = localStorage.getItem("smaart_last_watched_course");
     if (!lastWatched || !currentCourse) return;
 
+    const courseId = currentCourse?.courseCode || currentCourse?._id || currentCourse?.id;
     const storedProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
-    if (userProgress.completedCourses?.includes(lastWatched)) {
+    // Only mark 100% if the *current displayed course* (not a past one) is completed
+    if (courseId && userProgress.completedCourses?.some(c => compareCourseIds(c, courseId))) {
       setCurrentProgress(100);
     } else if (storedProgress > 0) {
       setCurrentProgress(storedProgress);

@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 const DashboardHome = () => {
   const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
-  const { paths, loading: pathsLoading } = useLearningPaths(user?._id);
+  const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -125,13 +125,25 @@ const DashboardHome = () => {
         )}
 
         {/* Dashboard Layout */}
-        <div className="flex flex-col gap-6 pb-10 min-h-screen bg-transparent transition-colors duration-300">
+        <div className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300">
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
           <div className="w-full space-y-6">
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
+              paths={(() => {
+                const incomplete = (list) => (list || []).filter(c => (c.progress || 0) < 100);
+                // 1. In-progress enrolled courses (progress > 0 and < 100) — highest priority
+                if (incomplete(inProgressCourses).length > 0) return incomplete(inProgressCourses);
+                // 2. Next unseen course from the full sequence (course not yet completed)
+                if (nextCourse) return [nextCourse];
+                // 3. Enrolled incomplete courses
+                if (incomplete(enrolledCourses).length > 0) return incomplete(enrolledCourses);
+                // 4. All done — show last completed
+                return enrolledCourses?.length > 0 ? enrolledCourses : paths;
+              })()}
+              pathsLoading={pathsLoading}
             />
 
             {/* College Banners */}

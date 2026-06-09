@@ -427,11 +427,11 @@ const DashboardLayout = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
-  
+
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
   const isFullScreenPage = isCareerAgentDashboard;
   const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
-  
+
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -518,7 +518,7 @@ const DashboardLayout = () => {
         const storageKey = `smaart_visits_${user._id || user.id || 'guest'}_${featureKey}`;
         const visits = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const lastVisit = visits[visits.length - 1];
-        
+
         // Debounce visit logging by 5 minutes to avoid spamming the timeline
         if (!lastVisit || (new Date(nowISO).getTime() - new Date(lastVisit).getTime()) > 5 * 60 * 1000) {
           visits.push(nowISO);
@@ -565,14 +565,14 @@ const DashboardLayout = () => {
             isLocked = true;
           }
         }
-        
+
         if (!isLocked) {
           // Calculate remaining days based on user.createdAt
           const regDate = user.createdAt || user.registrationDate || new Date();
           const diffTime = Date.now() - new Date(regDate).getTime();
           const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
           const remaining = 14 - diffDays;
-          
+
           setCareerLockDaysRemaining(remaining);
           setShowCareerLockWarning(true);
         } else {
@@ -910,12 +910,11 @@ const DashboardLayout = () => {
                                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                                       {item.title}
                                     </span>
-                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                                      item.type === 'Page' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' :
-                                      item.type === 'Course' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300' :
-                                      item.type === 'Track' ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300' :
-                                      'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300'
-                                    }`}>
+                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${item.type === 'Page' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' :
+                                        item.type === 'Course' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300' :
+                                          item.type === 'Track' ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300' :
+                                            'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300'
+                                      }`}>
                                       {item.type}
                                     </span>
                                   </div>
@@ -1018,27 +1017,27 @@ const DashboardLayout = () => {
                                         setShowNotifications(false);
                                       }}
                                       className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/40 dark:bg-slate-800/20' : ''}`}
-                                      >
-                                        <div className="flex gap-3">
-                                          <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                                            n.type === 'assessment' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' :
-                                              'bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400'
-                                            }`}>
-                                            {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
-                                          </div>
-                                          <div className="flex-1 min-w-0 pr-3">
-                                            <div className="flex items-start gap-2 mb-1">
-                                              {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0 mt-[5px]" />}
-                                              <p className={`text-[12px] leading-relaxed ${!n.isRead ? 'font-bold text-[#0d1f4e] dark:text-white' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
-                                                {n.message}
-                                              </p>
-                                            </div>
-                                            <p className={`text-[10px] text-slate-400 ${!n.isRead ? 'ml-3.5' : ''}`}>
-                                              {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                    >
+                                      <div className="flex gap-3">
+                                        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                                          n.type === 'assessment' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' :
+                                            'bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400'
+                                          }`}>
+                                          {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3">
+                                          <div className="flex items-start gap-2 mb-1">
+                                            {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0 mt-[5px]" />}
+                                            <p className={`text-[12px] leading-relaxed ${!n.isRead ? 'font-bold text-[#0d1f4e] dark:text-white' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
+                                              {n.message}
                                             </p>
                                           </div>
+                                          <p className={`text-[10px] text-slate-400 ${!n.isRead ? 'ml-3.5' : ''}`}>
+                                            {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                          </p>
                                         </div>
                                       </div>
+                                    </div>
                                   ))}
                                 </div>
                               ) : (
@@ -1209,12 +1208,12 @@ const DashboardLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 h-[calc(100vh-70px)] overflow-hidden" : "p-4 sm:p-6 lg:p-8")}>
+        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 h-[calc(100vh-70px)] overflow-hidden" : "")}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className={(isFullScreenPage || location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "w-full h-full" : "max-w-[1600px] mx-auto"}
+            className={(isFullScreenPage || location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "w-full h-full" : "max-w-[1600px]"}
           >
             <Outlet />
           </motion.div>

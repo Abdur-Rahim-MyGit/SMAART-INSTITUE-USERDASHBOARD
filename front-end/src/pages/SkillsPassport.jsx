@@ -9,6 +9,7 @@ import {
     Briefcase,
     Building2,
     CheckCircle2,
+    Clock,
     Download,
     GraduationCap,
     Mail,
@@ -113,7 +114,12 @@ const TECH_KEYWORDS = [
     "cyber"
 ];
 
-const PAGE_DIMENSIONS = {
+const PAGE_DIMENSIONS_COVER = {
+    width: "556px",
+    height: "640px"
+};
+
+const PAGE_DIMENSIONS_STANDARD = {
     width: "210mm",
     minHeight: "297mm"
 };
@@ -348,44 +354,187 @@ const pushSkill = (buckets, label, options = {}) => {
     });
 };
 
-const PassportSectionTitle = ({ title, hint }) => (
-    <div className="flex items-end justify-between gap-4">
-        <div className="flex items-center gap-3">
-            <div className="h-px w-6 bg-[#163878]" />
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.36em] text-[#355894]" style={documentFont}>
-                {title}
-            </h2>
+const PassportHeader = ({ sectionName, count }) => {
+    const subtitle = sectionName
+        ? (count !== undefined ? `${sectionName} • ${count} ${count === 1 ? "RECORD" : "RECORDS"}` : sectionName)
+        : "CAPABILITY & SKILLS RECORD";
+
+    return (
+        <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+                <div>
+                    <h2 className="text-[20px] font-black text-[#0f2c59] tracking-tight leading-none">
+                        SMAART Passport
+                    </h2>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mt-2">
+                        {subtitle}
+                    </p>
+                </div>
+            </div>
+
+            {/* Verified Badge */}
+            <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#fafbfd] text-[9px] font-black text-slate-450 uppercase tracking-widest shrink-0 shadow-sm">
+                <ShieldCheck className="w-4 h-4 text-slate-400" />
+                <span>VERIFIED</span>
+            </div>
         </div>
-        {hint ? (
-            <p className="text-[10px] font-medium text-slate-500" style={documentFont}>
-                {hint}
-            </p>
-        ) : null}
+    );
+};
+const PassportProfile = ({ fullName, passportId, profilePhoto }) => {
+    return (
+        <div className="flex items-center gap-5">
+            {/* Avatar Box */}
+            <div className="w-32 h-32 rounded-[22px] bg-[#f0f2f5] border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                {profilePhoto ? (
+                    <img src={profilePhoto} alt={fullName} className="w-full h-full object-cover" />
+                ) : (
+                    <UserCircle2 className="w-10 h-10 text-slate-350" />
+                )}
+            </div>
+
+            {/* Profile Info styled as the skeleton-like rounded pills */}
+            <div className="flex-1 min-w-0 flex flex-col items-start gap-2.5">
+                <div className="flex items-center px-5 py-2 w-fit max-w-full">
+                    <h1 className="text-[18px] font-black text-[#0f2c59] tracking-tight leading-none">
+                        {fullName}
+                    </h1>
+                </div>
+                <div className="flex items-center px-4 py-1.5 w-fit max-w-full">
+                    <p className="text-[13px] font-black uppercase tracking-wider text-slate-450 leading-none">
+                        {passportId}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const PassportRow = ({ label, badgeText }) => {
+    return (
+        <div className="flex items-center justify-between gap-4 p-3.5 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.01)] hover:border-slate-200/80 transition-all">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+                {/* Circular Check Outline Icon */}
+                <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50/20 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-[#0b2b73]" />
+                </div>
+
+                {/* Label pill in center */}
+                <div className="h-7.5 flex items-center px-4 w-fit max-w-full">
+                    <span className="text-[12px] font-bold text-[#0f2c59] truncate leading-none">
+                        {label}
+                    </span>
+                </div>
+            </div>
+
+            {/* Badge pill on right */}
+            {badgeText && (
+                <div className="h-6.5 flex items-center px-4 shrink-0">
+                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider leading-none">
+                        {badgeText}
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const PassportFooter = ({ passportId }) => {
+    const qrUrl = typeof window !== "undefined"
+        ? `${window.location.origin}/verify-passport/${passportId}`
+        : `https://smaart.institute/verify-passport/${passportId}`;
+
+    return (
+        <div className="mt-auto pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+                {/* Bottom Left: Real QR code */}
+                <div className="flex items-center gap-3">
+                    <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200/80 p-2 flex items-center justify-center shadow-sm shrink-0">
+                        <QRCodeSVG
+                            value={qrUrl}
+                            size={64}
+                            level="H"
+                            includeMargin={false}
+                        />
+                    </div>
+                </div>
+
+                {/* Bottom Right: Issued By SMAART Institute */}
+                <div className="text-right">
+                    <span className="text-[8px] font-black uppercase tracking-[0.25em] text-slate-400 block">
+                        ISSUED BY
+                    </span>
+                    <span className="text-[14px] font-black text-slate-500 tracking-tight leading-none mt-1.5 block">
+                        SMAART Institute
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const PassportPage = ({
+    pageNumber,
+    passportId,
+    sectionName,
+    count,
+    children,
+    pageRef
+}) => (
+    <section
+        ref={pageRef}
+        className="relative w-full overflow-hidden rounded-[32px] border border-slate-100 bg-white px-8 py-8 text-slate-900 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05),_0_4px_18px_-8px_rgba(0,0,0,0.02)] flex flex-col justify-between"
+        style={{
+            width: "100%",
+            maxWidth: pageNumber === 1 ? PAGE_DIMENSIONS_COVER.width : PAGE_DIMENSIONS_STANDARD.width,
+            minHeight: pageNumber === 1 ? PAGE_DIMENSIONS_COVER.height : PAGE_DIMENSIONS_STANDARD.minHeight,
+            ...documentFont
+        }}
+    >
+        {/* Decorative background grids/patterns */}
+        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(#1a3884 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+
+        <div className="relative z-10 flex flex-col flex-1 justify-between">
+            {/* Header */}
+            <PassportHeader sectionName={sectionName} count={count} />
+
+            {/* Page Content */}
+            <div className="flex-1 flex flex-col justify-start my-4">
+                {children}
+            </div>
+
+            {/* Footer */}
+            <PassportFooter passportId={passportId} />
+        </div>
+    </section>
+);
+
+const EmptySkillState = ({ title }) => (
+    <div className="rounded-[22px] border border-dashed border-slate-200 bg-white/75 px-5 py-8 text-center">
+        <p className="text-sm font-semibold text-[#163878]">{title}</p>
+        <p className="mt-2 text-sm text-slate-500">No synced records are available for this category yet.</p>
     </div>
 );
 
 const InlinePager = ({ activePage, totalPages, onPrevious, onNext, dark = false }) => (
     <div
-        className={`inline-flex h-[42px] w-full max-w-[210px] items-center justify-between rounded-[12px] border px-2 py-1 ${
-            dark
-                ? "border-white/20 bg-white/5"
-                : "border-[#d6dfef] bg-white/96 shadow-[0_4px_12px_-4px_rgba(15,23,42,0.12)]"
-        }`}
+        className={`inline-flex h-[42px] w-full max-w-[210px] items-center justify-between rounded-[12px] border px-2 py-1 ${dark
+            ? "border-white/20 bg-white/5"
+            : "border-slate-200 bg-white shadow-[0_4px_12px_-4px_rgba(15,23,42,0.1)]"
+            }`}
     >
         <button
             type="button"
             onClick={onPrevious}
             disabled={activePage === 1}
-            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${
-                dark
-                    ? "border border-white/10 bg-white/20 text-white hover:bg-white/25 hover:border-white/30 active:bg-white/15"
-                    : "border border-[#cbd6ea] bg-white text-[#163878] hover:bg-[#eaf0fc] hover:border-[#adc4eb] hover:shadow-sm active:bg-[#dbe6f8]"
-            }`}
+            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${dark
+                ? "border border-white/10 bg-white/20 text-white hover:bg-white/25 hover:border-white/30 active:bg-white/15"
+                : "border border-slate-200 bg-white text-[#163878] hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm active:bg-slate-100"
+                }`}
         >
             Prev
         </button>
         <div className="flex flex-col items-center justify-center min-w-[58px] text-center leading-none">
-            <p className={`text-[8px] font-bold uppercase tracking-[0.2em] ${dark ? "text-blue-200/55" : "text-[#45639b]"}`}>Page</p>
+            <p className={`text-[8px] font-bold uppercase tracking-[0.2em] ${dark ? "text-blue-200/55" : "text-slate-400"}`}>Page</p>
             <p className={`mt-0.5 text-[13px] font-semibold ${dark ? "text-white" : "text-[#10285a]"}`}>
                 {activePage} / {totalPages}
             </p>
@@ -394,79 +543,14 @@ const InlinePager = ({ activePage, totalPages, onPrevious, onNext, dark = false 
             type="button"
             onClick={onNext}
             disabled={activePage === totalPages}
-            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${
-                dark
-                    ? "border border-[#27498d] bg-[#183b7f] text-white hover:bg-[#214893] active:bg-[#122c60] hover:shadow-[0_6px_12px_-8px_rgba(255,255,255,0.25)]"
-                    : "border border-[#163878] bg-[#163878] text-white hover:bg-[#102c66] active:bg-[#0b1e47] hover:shadow-[0_6px_12px_-8px_rgba(22,56,120,0.45)]"
-            }`}
+            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${dark
+                ? "border border-[#27498d] bg-[#183b7f] text-white hover:bg-[#214893] active:bg-[#122c60] hover:shadow-[0_6px_12px_-8px_rgba(255,255,255,0.25)]"
+                : "border border-[#163878] bg-[#163878] text-white hover:bg-[#102c66] active:bg-[#0b1e47] hover:shadow-[0_6px_12px_-8px_rgba(22,56,120,0.45)]"
+                }`}
         >
             Next
         </button>
     </div>
-);
-
-const PageRibbon = ({ title, subtitle, pageNumber }) => (
-    <div className="mb-6 flex items-start justify-between gap-6 border-b border-[#d5deef] pb-5">
-        <div>
-            <p
-                className="text-[10px] font-bold uppercase tracking-[0.34em] text-[#45639b]"
-                style={documentFont}
-            >
-                DIGITAL SKILLS PASSPORT
-            </p>
-            <h2 className="mt-2 text-[22px] font-semibold text-[#10285a]" style={displayFont}>
-                {title}
-            </h2>
-            <p className="mt-1 text-sm text-slate-600" style={documentFont}>
-                {subtitle}
-            </p>
-        </div>
-        <div className="flex min-w-[120px] flex-col items-end gap-3 pt-1 text-right">
-            <span className="text-[12px] font-bold uppercase tracking-[0.34em] text-slate-400" style={documentFont}>
-                Page {pageNumber} / 4
-            </span>
-        </div>
-    </div>
-);
-
-const PassportPage = ({
-    pageNumber,
-    title,
-    subtitle,
-    passportId,
-    children,
-    pageRef,
-    showRibbon = true,
-    showChrome = true
-}) => (
-    <section
-        ref={pageRef}
-        className="relative w-full overflow-hidden rounded-[28px] border border-[#cfd9ea] bg-[#f8fbff] px-5 py-5 text-slate-900 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.32)] sm:px-8 sm:py-8"
-        style={{ ...PAGE_DIMENSIONS, ...documentFont }}
-    >
-        <div className="relative z-10 flex min-h-full flex-col">
-            {showRibbon ? (
-                <PageRibbon
-                    title={title}
-                    subtitle={subtitle}
-                    pageNumber={pageNumber}
-                />
-            ) : null}
-            <div className="flex-1">{children}</div>
-            <div className="mt-6 flex items-center justify-between border-t border-[#d5deef] pt-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#45639b]">
-                    {passportId} | SMAART INSTITUTE
-                </span>
-                <div className="flex items-center justify-end rounded-[12px] px-2 py-1">
-                    <img
-                        src={blueLogo}
-                        alt="SMAART Institute"
-                        className="h-16 w-auto object-contain opacity-100"
-                    />
-                </div>
-            </div>
-        </div>
-    </section>
 );
 
 const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = false }) => (
@@ -474,11 +558,10 @@ const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = 
         type="button"
         onClick={onClick}
         disabled={disabled}
-        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-            primary
-                ? "border-[#163878] bg-[#163878] text-white hover:bg-[#102c66]"
-                : "border-[#cbd6ea] bg-white text-[#163878] hover:bg-[#f7faff]"
-        } disabled:cursor-not-allowed disabled:opacity-60`}
+        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${primary
+            ? "border-[#163878] bg-[#163878] text-white hover:bg-[#102c66]"
+            : "border-slate-200 bg-white text-[#163878] hover:bg-slate-50"
+            } disabled:cursor-not-allowed disabled:opacity-60`}
         style={documentFont}
     >
         <Icon className="h-4 w-4" />
@@ -486,107 +569,115 @@ const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = 
     </button>
 );
 
-const StatCell = ({ label, value, isFirst = false }) => (
-    <div className={`flex flex-1 flex-col items-center justify-center px-3 py-3 text-center ${isFirst ? "" : "border-l border-white/10"}`}>
-        <span className="text-[18px] font-semibold text-white" style={displayFont}>
-            {value}
-        </span>
-        <span className="mt-1 text-[8px] font-bold uppercase tracking-[0.3em] text-blue-200/70" style={documentFont}>
-            {label}
-        </span>
-    </div>
-);
-
-const StandardCard = ({ title, rating }) => (
-    <div className="rounded-[18px] border border-[#d3def0] bg-[#f3f7fe] px-3 py-4 text-center">
-        <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-[#20417e]">{title}</p>
-        <p className="mt-2 text-[22px] font-semibold text-[#10285a]" style={displayFont}>
-            {rating.toFixed(1)}
-        </p>
-    </div>
-);
-
-const BadgePill = ({ label, tone = "blue" }) => {
-    const tones = {
-        blue: "border-[#c8d6f0] bg-[#edf3ff] text-[#163878]",
-        emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
-        amber: "border-amber-200 bg-amber-50 text-amber-700"
-    };
-
-    return (
-        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.24em] ${tones[tone] || tones.blue}`}>
-            {label}
-        </span>
-    );
+const getExpDateString = (exp) => {
+    if (!exp) return "Date Range";
+    if (exp.duration) return exp.duration;
+    const start = exp.startDate ? new Date(exp.startDate).toLocaleDateString(undefined, { year: "numeric", month: "short" }) : "";
+    const end = exp.currentlyWorking ? "Present" : (exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: "numeric", month: "short" }) : "");
+    if (start && end) return `${start} - ${end}`;
+    if (start) return `${start} - Present`;
+    return "Date Range";
 };
 
-const CredentialCard = ({ credential }) => (
-    <div className="flex h-full flex-col justify-between rounded-[22px] border border-[#cfdaee] bg-white px-4 py-4">
-        <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-[#d5def0] bg-[#163878]/[0.03]">
-                {credential.icon ? (
-                    <img src={credential.icon} alt={credential.title} className="h-full w-full object-cover" />
-                ) : (
-                    <Award className="h-5 w-5 text-[#163878]" />
+const ElaboratedExperienceCard = ({ exp }) => {
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] flex items-center gap-1.5 flex-wrap leading-none">
+                <span>{exp.companyName || exp.organizationName || exp.organization || "Organization"}</span>
+                {exp.location && (
+                    <>
+                        <span className="text-slate-300 font-normal">|</span>
+                        <span className="text-slate-400 font-medium text-[12.5px]">{exp.location}</span>
+                    </>
                 )}
             </div>
-            <div className="min-w-0 flex-1">
-                <h3 className="text-[15px] font-semibold leading-snug text-[#10285a]" style={documentFont}>
-                    {credential.title}
-                </h3>
-                <p className="mt-1 text-[11px] text-slate-500" style={documentFont}>
-                    {credential.subtitle}
-                </p>
+
+            <div className="text-[13px] font-bold text-blue-600 dark:text-blue-500 leading-none pt-0.5">
+                {exp.role || exp.jobTitle || exp.title || "Professional Role"}
             </div>
-        </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-            <BadgePill
-                label={credential.difficulty}
-                tone={credential.difficulty === "ADVANCED" ? "blue" : credential.difficulty === "INTERMEDIATE" ? "emerald" : "amber"}
-            />
-            <BadgePill label="VERIFIED" tone="emerald" />
-            <BadgePill label="AI VERIFIED" tone="blue" />
-            <BadgePill label="SMAART VERIFIED" tone="blue" />
-        </div>
+            <div className="flex items-center gap-1.5 text-[11.5px] text-slate-500 font-semibold leading-none pt-0.5">
+                <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>{getExpDateString(exp)}</span>
+            </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e5ecf7] pt-3 text-[11px]">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                {credential.liveStatus}
-            </span>
-            <span className="text-slate-500">{credential.meta}</span>
-        </div>
-    </div>
-);
-
-const SkillChip = ({ label, source, verified = true, tone = "blue" }) => {
-    const tones = {
-        blue: "border-[#c9d7ef] bg-[#edf4ff] text-[#163878]",
-        teal: "border-teal-200 bg-teal-50 text-teal-800",
-        slate: "border-slate-200 bg-white text-slate-700"
-    };
-
-    return (
-        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-semibold ${tones[tone] || tones.blue}`}>
-            {verified ? <ShieldCheck className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-            <span>{label}</span>
-            {source ? <span className="text-[9px] font-bold uppercase tracking-[0.18em] opacity-60">{source}</span> : null}
+            <p className="text-[12px] text-slate-600 leading-relaxed font-medium pt-1">
+                {exp.description || "Verified employment tenure, key contributions, and team deliverables under this professional capacity."}
+            </p>
         </div>
     );
 };
 
-const EmptySkillState = ({ title }) => (
-    <div className="rounded-[22px] border border-dashed border-[#cfd9ea] bg-white/75 px-5 py-8 text-center">
-        <p className="text-sm font-semibold text-[#163878]">{title}</p>
-        <p className="mt-2 text-sm text-slate-500">No synced records are available for this category yet.</p>
-    </div>
-);
+const ElaboratedCertificateCard = ({ cert }) => {
+    const certUrl = cert.certificateFile || cert.link;
+    const resolvedUrl = certUrl ? (certUrl.includes("cloudinary.com") && certUrl.includes("/upload/fl_attachment/") ? certUrl.replace("/upload/fl_attachment/", "/upload/") : certUrl) : null;
+
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+                {cert.title || "Certification"}
+            </div>
+
+            <div className="text-[12.5px] font-semibold text-slate-400 leading-none pt-0.5">
+                {cert.issuer || cert.issuingOrg || "Issuing Body"}
+            </div>
+
+            <div className="pt-1">
+                {resolvedUrl ? (
+                    <a
+                        href={resolvedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[12px] text-teal-600 font-extrabold hover:underline inline-flex items-center"
+                    >
+                        View Certificate
+                    </a>
+                ) : (
+                    <span className="text-[12px] text-teal-600 font-extrabold cursor-pointer hover:underline">
+                        View Certificate
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const ElaboratedProjectCard = ({ project }) => {
+    const projectUrl = project.link || project.projectLink;
+    return (
+        <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
+            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+                {project.title || "Capstone Project"}
+            </div>
+
+            <div className="pt-0.5">
+                {projectUrl ? (
+                    <a
+                        href={projectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[12px] text-blue-600 font-bold hover:underline inline-flex items-center"
+                    >
+                        View Project +
+                    </a>
+                ) : (
+                    <span className="text-[12px] text-blue-600 font-bold cursor-pointer hover:underline">
+                        View Project +
+                    </span>
+                )}
+            </div>
+
+            <p className="text-[12px] text-slate-600 leading-relaxed font-medium pt-0.5">
+                {project.description || "An advanced capstone assignment completed under academic supervision, verifying direct hands-on application of technical concepts."}
+            </p>
+        </div>
+    );
+};
 
 const SkillsPassport = () => {
     const navigate = useNavigate();
     const activePageRef = useRef(null);
-    const TOTAL_PAGES = 4;
+    const TOTAL_PAGES = 6;
 
     const [currentUser, setCurrentUser] = useState(null);
     const [registrationProfile, setRegistrationProfile] = useState(null);
@@ -908,6 +999,12 @@ const SkillsPassport = () => {
             technicalSkills: Array.from(buckets.technical.values()).sort((a, b) => a.label.localeCompare(b.label)),
             aiSkills: Array.from(buckets.ai.values()).sort((a, b) => a.label.localeCompare(b.label)),
             domainSkills: Array.from(buckets.domain.values()).sort((a, b) => a.label.localeCompare(b.label)),
+            experiences: registrationProfile?.workExperience || [],
+            projects: registrationProfile?.projects || [],
+            certificates: [
+                ...(registrationProfile?.certificates || []),
+                ...(externalCertificates || [])
+            ],
             profilePhoto,
             verificationDate: formatDateLabel(
                 stageResults?.T4?.updatedAt ||
@@ -978,7 +1075,10 @@ const SkillsPassport = () => {
 
                 const imgData = canvas.toDataURL("image/png");
                 if (pageNumber > 1) pdf.addPage();
-                pdf.addImage(imgData, "PNG", 0, 0, 210, 297, undefined, "FAST");
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const yOffset = imgHeight < 297 ? (297 - imgHeight) / 2 : 0;
+                pdf.addImage(imgData, "PNG", 0, yOffset, imgWidth, imgHeight, undefined, "FAST");
             }
 
             setActivePage(previousPage);
@@ -998,14 +1098,14 @@ const SkillsPassport = () => {
     }
 
     return (
-        <div className="min-h-screen bg-transparent" style={documentFont}>
+        <div className="min-h-screen bg-transparent p-8" style={documentFont}>
             <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, ease: "easeOut" }}
                 className="mx-auto flex max-w-[235mm] flex-col gap-5"
             >
-                <div className="mx-auto flex w-full max-w-[210mm] flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between">
+                <div className={`mx-auto flex w-full flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between transition-all duration-300 ${activePage === 1 ? "max-w-[556px]" : "max-w-[210mm]"}`}>
                     <div>
                         <h1 className="text-[1.65rem] font-[800] tracking-tight text-[#10285a]" style={displayFont}>
                             Skills Passport
@@ -1028,352 +1128,290 @@ const SkillsPassport = () => {
                 </div>
 
                 {activePage === 1 ? (
-                <div className="mx-auto w-full max-w-[210mm]">
-                    <div className="mb-2 flex justify-end">
-                        <InlinePager
-                            activePage={activePage}
-                            totalPages={TOTAL_PAGES}
-                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                        />
-                    </div>
-                <PassportPage
-                    pageNumber={1}
-                    title="Main Passport Overview"
-                    subtitle="Identity, standards matrix, and verified SMAART credentials"
-                    passportId={passportData.passportId}
-                    pageRef={activePageRef}
-                    showRibbon={false}
-                    showChrome={false}
-                >
-                    <div className="bg-[linear-gradient(135deg,_#102c66_0%,_#173d87_58%,_#1b4ba5_100%)] px-5 py-5 text-white sm:px-6 sm:py-5" style={{ borderRadius: "18px 18px 0 0" }}>
-                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                            <div className="flex-1">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-blue-200/75">
-                                    DIGITAL SKILLS PASSPORT
-                                </p>
-                                <h2 className="mt-2 text-[30px] leading-none text-white sm:text-[34px]" style={displayFont}>
-                                    {passportData.fullName}
-                                </h2>
-                                <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#f5d88d]">
-                                    {passportData.degree}
-                                </p>
-                                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-blue-50/90">
-                                    <span className="inline-flex items-center gap-2">
-                                        <Mail className="h-3.5 w-3.5 text-blue-200" />
-                                        {passportData.email}
-                                    </span>
-                                    <span className="inline-flex items-center gap-2">
-                                        <Phone className="h-3.5 w-3.5 text-blue-200" />
-                                        {passportData.phone}
-                                    </span>
-                                    <span className="inline-flex items-center gap-2">
-                                        <ShieldCheck className="h-3.5 w-3.5 text-blue-200" />
-                                        {passportData.passportId}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-4">
-                                <div className="flex flex-col items-center justify-center rounded-[16px] bg-white p-2 shadow-lg h-[88px] w-[88px]">
-                                    <QRCodeSVG
-                                        value={`${typeof window !== "undefined" ? window.location.origin : ""}/verify-passport/${passportData.passportId}?name=${encodeURIComponent(passportData.fullName)}&institution=${encodeURIComponent(passportData.institution)}`}
-                                        size={56}
-                                        bgColor={"#ffffff"}
-                                        fgColor={"#102c66"}
-                                        level={"M"}
-                                    />
-                                    <span className="mt-1 text-[6px] font-bold uppercase tracking-[0.15em] text-[#102c66] whitespace-nowrap">
-                                        Scan to Verify
-                                    </span>
-                                </div>
-                                <div className="flex flex-col items-center justify-start gap-2 min-w-[100px]">
-                                    <div className="relative">
-                                        <div className="relative h-[88px] w-[88px] overflow-hidden rounded-[20px] border border-white/20 bg-white/10 shadow-md">
-                                            {passportData.profilePhoto ? (
-                                                <img
-                                                    src={passportData.profilePhoto}
-                                                    alt={passportData.fullName}
-                                                    className="h-full w-full object-cover"
-                                                    onError={(event) => {
-                                                        event.currentTarget.src = spImage;
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center">
-                                                    <UserCircle2 className="h-16 w-16 text-white/80" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#173d87] bg-emerald-500 text-white shadow-lg">
-                                            <CheckCircle2 className="h-3.5 w-3.5" />
-                                        </div>
-                                    </div>
-                                    <p className="pt-1 text-center text-[18px] font-semibold uppercase tracking-[0.04em] text-white/92 w-full" style={displayFont}>
-                                        {sanitizeLabel(passportData.institution).split(" ")[0] || passportData.institution}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-4 overflow-hidden rounded-[12px] border border-white/10 bg-white/5">
-                            <div className="flex flex-col sm:flex-row">
-                                <StatCell label="Avg Rating" value={passportData.avgRating.toFixed(1)} isFirst />
-                                <StatCell label="Standards" value={String(passportData.standardRatings.length)} />
-                                <StatCell label="Credentials" value={String(passportData.credentials.length)} />
-                                <StatCell label="Cohort" value={passportData.cohort} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-7 border-x border-b border-[#d9e3f2] bg-white px-5 py-7 sm:px-7">
-                        <div className="space-y-4">
-                            <PassportSectionTitle title="Professional Standards Matrix" hint="Assessment-aligned ratings" />
-                            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-                                {passportData.standardRatings.map((item) => (
-                                    <StandardCard key={item.title} title={item.title} rating={item.rating} />
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <PassportSectionTitle
-                                title="Verified SMAART Credentials"
-                                hint={`${passportData.credentials.length} live credentials synced from backend`}
+                    <div className="mx-auto w-full max-w-[556px]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
                             />
-                            {passportData.credentials.length ? (
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    {passportData.credentials.map((credential) => (
-                                        <CredentialCard key={credential.id} credential={credential} />
-                                    ))}
-                                </div>
-                            ) : (
-                                <EmptySkillState title="No SMAART credentials are available yet." />
-                            )}
                         </div>
+                        <PassportPage
+                            pageNumber={1}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="CAPABILITY & SKILLS RECORD"
+                        >
+                            {/* Profile Cover Section */}
+                            <PassportProfile
+                                fullName={passportData.fullName}
+                                passportId={passportData.passportId}
+                                profilePhoto={passportData.profilePhoto}
+                            />
+
+                            {/* Section Indexes / Table of Contents */}
+                            <div className="space-y-3 mt-6">
+                                <PassportRow
+                                    label="Experience"
+                                    badgeText={`${passportData.experiences.length} ${passportData.experiences.length === 1 ? 'Record' : 'Records'}`}
+                                />
+                                <PassportRow
+                                    label="Courses"
+                                    badgeText={`${passportData.credentials.length} ${passportData.credentials.length === 1 ? 'Course' : 'Courses'}`}
+                                />
+                                <PassportRow
+                                    label="Certificates"
+                                    badgeText={`${passportData.certificates.length} ${passportData.certificates.length === 1 ? 'Certificate' : 'Certificates'}`}
+                                />
+                                <PassportRow
+                                    label="Projects"
+                                    badgeText={`${passportData.projects.length} ${passportData.projects.length === 1 ? 'Project' : 'Projects'}`}
+                                />
+                                <PassportRow
+                                    label="Skills"
+                                    badgeText={`${passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length} Verified`}
+                                />
+                            </div>
+                        </PassportPage>
                     </div>
-                </PassportPage>
-                </div>
                 ) : null}
 
                 {activePage === 2 ? (
-                <div className="mx-auto w-full max-w-[210mm]">
-                    <div className="mb-2 flex justify-end">
-                        <InlinePager
-                            activePage={activePage}
-                            totalPages={TOTAL_PAGES}
-                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                        />
-                    </div>
-                <PassportPage
-                    pageNumber={2}
-                    title="Technical Skills"
-                    subtitle="Backend-synced technical competencies and verified learning signals"
-                    passportId={passportData.passportId}
-                    pageRef={activePageRef}
-                >
-                    <div className="space-y-6">
-                        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-                            <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#edf4ff] text-[#163878]">
-                                        <Monitor className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Technical Ledger</p>
-                                        <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
-                                            Verified technical stack
-                                        </h3>
-                                    </div>
-                                </div>
-                                <p className="mt-4 text-sm leading-6 text-slate-600">
-                                    This page consolidates technical skills inferred from enrolled courses, submitted projects, course metadata,
-                                    and synced credential records.
-                                </p>
-                            </div>
-
-                            <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Verification Status</p>
-                                <div className="mt-4 space-y-3 text-sm text-slate-600">
-                                    <div className="flex items-center gap-3">
-                                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                                        <span>Skills are rendered only from synced backend records.</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Sparkles className="h-4 w-4 text-[#163878]" />
-                                        <span>Credential-linked course tags elevate skills to verified status.</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Star className="h-4 w-4 text-amber-500" />
-                                        <span>Layout is optimized for export-ready A4 rendering.</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="mx-auto w-full max-w-[210mm]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                            />
                         </div>
-
-                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                            <PassportSectionTitle title="Technical Skills" hint={`${passportData.technicalSkills.length} synced skills`} />
-                            {passportData.technicalSkills.length ? (
-                                <div className="mt-5 flex flex-wrap gap-3">
-                                    {passportData.technicalSkills.map((skill) => (
-                                        <SkillChip
-                                            key={`${skill.label}-${skill.source}`}
-                                            label={skill.label}
-                                            source={skill.source}
-                                            verified={skill.verified}
-                                            tone="blue"
+                        <PassportPage
+                            pageNumber={2}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="EXPERIENCE"
+                            count={passportData.experiences.length}
+                        >
+                            {/* Professional Experience */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                        Professional Experience
+                                    </h3>
+                                    <span className="text-[10px] text-slate-400 font-bold">
+                                        {passportData.experiences.length} total
+                                    </span>
+                                </div>
+                                <div className="space-y-3">
+                                    {passportData.experiences.slice(0, 4).map((exp, index) => (
+                                        <ElaboratedExperienceCard
+                                            key={exp._id || exp.id || index}
+                                            exp={exp}
                                         />
                                     ))}
+                                    {passportData.experiences.length === 0 && (
+                                        <EmptySkillState title="No professional experience records synced yet." />
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="mt-5">
-                                    <EmptySkillState title="No technical skills are synced yet." />
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        </PassportPage>
                     </div>
-                </PassportPage>
-                </div>
                 ) : null}
 
                 {activePage === 3 ? (
-                <div className="mx-auto w-full max-w-[210mm]">
-                    <div className="mb-2 flex justify-end">
-                        <InlinePager
-                            activePage={activePage}
-                            totalPages={TOTAL_PAGES}
-                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                        />
-                    </div>
-                <PassportPage
-                    pageNumber={3}
-                    title="AI Skills"
-                    subtitle="AI capability page with verified tools, prompts, and automation-oriented learning"
-                    passportId={passportData.passportId}
-                    pageRef={activePageRef}
-                >
-                    <div className="space-y-6">
-                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                                    <Sparkles className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">AI Competency Registry</p>
-                                    <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
-                                        AI-verified skill surface
-                                    </h3>
-                                </div>
-                            </div>
-                            <p className="mt-4 text-sm leading-6 text-slate-600">
-                                AI skills are grouped from course metadata, synced certificate categories, and profile-linked AI learning entries.
-                            </p>
+                    <div className="mx-auto w-full max-w-[210mm]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                            />
                         </div>
-
-                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                            <PassportSectionTitle title="AI Skills" hint={`${passportData.aiSkills.length} synced skills`} />
-                            {passportData.aiSkills.length ? (
-                                <div className="mt-5 flex flex-wrap gap-3">
-                                    {passportData.aiSkills.map((skill) => (
-                                        <SkillChip
-                                            key={`${skill.label}-${skill.source}`}
-                                            label={skill.label}
-                                            source={skill.source}
-                                            verified={skill.verified}
-                                            tone="teal"
+                        <PassportPage
+                            pageNumber={3}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="COURSES"
+                            count={passportData.credentials.length}
+                        >
+                            {/* Courses */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                        Academic & Professional Courses
+                                    </h3>
+                                    <span className="text-[10px] text-slate-400 font-bold">
+                                        {passportData.credentials.length} total
+                                    </span>
+                                </div>
+                                <div className="space-y-3">
+                                    {passportData.credentials.slice(0, 4).map((credential) => (
+                                        <PassportRow
+                                            key={credential.id}
+                                            label={credential.title}
+                                            badgeText={credential.difficulty || "COMPLETED"}
                                         />
                                     ))}
+                                    {passportData.credentials.length === 0 && (
+                                        <EmptySkillState title="No courses synced yet." />
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="mt-5">
-                                    <EmptySkillState title="No AI skills are synced yet." />
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        </PassportPage>
                     </div>
-                </PassportPage>
-                </div>
                 ) : null}
 
                 {activePage === 4 ? (
-                <div className="mx-auto w-full max-w-[210mm]">
-                    <div className="mb-2 flex justify-end">
-                        <InlinePager
-                            activePage={activePage}
-                            totalPages={TOTAL_PAGES}
-                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                        />
-                    </div>
-                <PassportPage
-                    pageNumber={4}
-                    title="Domain Skills"
-                    subtitle="Academic domain signals and career-aligned specialization markers"
-                    passportId={passportData.passportId}
-                    pageRef={activePageRef}
-                    showChrome={false}
-                >
-                    <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#edf4ff] text-[#163878]">
-                                <Briefcase className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Domain Skills</p>
-                                <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
-                                    Academic and career domains
-                                </h3>
-                            </div>
+                    <div className="mx-auto w-full max-w-[210mm]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                            />
                         </div>
-                        {passportData.domainSkills.length ? (
-                            <div className="mt-5 flex flex-wrap gap-3">
-                                {passportData.domainSkills.map((skill) => (
-                                    <SkillChip
-                                        key={`${skill.label}-${skill.source}`}
-                                        label={skill.label}
-                                        source={skill.source}
-                                        verified={skill.verified}
-                                        tone="blue"
-                                    />
-                                ))}
+                        <PassportPage
+                            pageNumber={4}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="CERTIFICATES"
+                            count={passportData.certificates.length}
+                        >
+                            {/* Certificates */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                        Verified Certifications
+                                    </h3>
+                                    <span className="text-[10px] text-slate-400 font-bold">
+                                        {passportData.certificates.length} total
+                                    </span>
+                                </div>
+                                <div className="space-y-3">
+                                    {passportData.certificates.slice(0, 4).map((cert, index) => (
+                                        <ElaboratedCertificateCard
+                                            key={cert._id || cert.id || index}
+                                            cert={cert}
+                                        />
+                                    ))}
+                                    {passportData.certificates.length === 0 && (
+                                        <EmptySkillState title="No certifications synced yet." />
+                                    )}
+                                </div>
                             </div>
-                        ) : (
-                            <div className="mt-5">
-                                <EmptySkillState title="No domain skills are synced yet." />
-                            </div>
-                        )}
+                        </PassportPage>
                     </div>
+                ) : null}
 
-                    <div className="mt-6 rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
-                        <PassportSectionTitle title="Verification Summary" hint="Institutional digital identity profile" />
-                        <div className="mt-5 grid gap-4 md:grid-cols-3">
-                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
-                                <div className="flex items-center gap-2 text-[#163878]">
-                                    <GraduationCap className="h-4 w-4" />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Institution</span>
-                                </div>
-                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.institution}</p>
-                            </div>
-                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
-                                <div className="flex items-center gap-2 text-[#163878]">
-                                    <BookOpen className="h-4 w-4" />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Programme</span>
-                                </div>
-                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.degree}</p>
-                            </div>
-                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
-                                <div className="flex items-center gap-2 text-[#163878]">
-                                    <ShieldCheck className="h-4 w-4" />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Verified On</span>
-                                </div>
-                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.verificationDate}</p>
-                            </div>
+                {activePage === 5 ? (
+                    <div className="mx-auto w-full max-w-[210mm]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                            />
                         </div>
+                        <PassportPage
+                            pageNumber={5}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="PROJECTS"
+                            count={passportData.projects.length}
+                        >
+                            {/* Projects */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                        Featured Projects
+                                    </h3>
+                                    <span className="text-[10px] text-slate-400 font-bold">
+                                        {passportData.projects.length} total
+                                    </span>
+                                </div>
+                                <div className="space-y-3">
+                                    {passportData.projects.slice(0, 4).map((project, index) => (
+                                        <ElaboratedProjectCard
+                                            key={project._id || project.id || index}
+                                            project={project}
+                                        />
+                                    ))}
+                                    {passportData.projects.length === 0 && (
+                                        <EmptySkillState title="No projects synced yet." />
+                                    )}
+                                </div>
+                            </div>
+                        </PassportPage>
                     </div>
-                </PassportPage>
-                </div>
+                ) : null}
+
+                {activePage === 6 ? (
+                    <div className="mx-auto w-full max-w-[210mm]">
+                        <div className="mb-2 flex justify-end">
+                            <InlinePager
+                                activePage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                            />
+                        </div>
+                        <PassportPage
+                            pageNumber={6}
+                            passportId={passportData.passportId}
+                            pageRef={activePageRef}
+                            sectionName="SKILLS"
+                            count={passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length}
+                        >
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
+                                        Technical Skills
+                                    </h3>
+                                    <div className="space-y-2.5">
+                                        {passportData.technicalSkills.slice(0, 2).map((skill) => (
+                                            <PassportRow key={skill.label} label={skill.label} badgeText="TECHNICAL" />
+                                        ))}
+                                        {passportData.technicalSkills.length === 0 && (
+                                            <p className="text-[11px] text-slate-400 italic pl-1">No technical skills added</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
+                                        AI Capabilities
+                                    </h3>
+                                    <div className="space-y-2.5">
+                                        {passportData.aiSkills.slice(0, 2).map((skill) => (
+                                            <PassportRow key={skill.label} label={skill.label} badgeText="AI & AUTOMATION" />
+                                        ))}
+                                        {passportData.aiSkills.length === 0 && (
+                                            <p className="text-[11px] text-slate-400 italic pl-1">No AI capabilities added</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
+                                        Domain Expertise
+                                    </h3>
+                                    <div className="space-y-2.5">
+                                        {passportData.domainSkills.slice(0, 2).map((skill) => (
+                                            <PassportRow key={skill.label} label={skill.label} badgeText="DOMAIN SPECIALIST" />
+                                        ))}
+                                        {passportData.domainSkills.length === 0 && (
+                                            <p className="text-[11px] text-slate-400 italic pl-1">No domain specializations added</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </PassportPage>
+                    </div>
                 ) : null}
             </motion.div>
         </div>
