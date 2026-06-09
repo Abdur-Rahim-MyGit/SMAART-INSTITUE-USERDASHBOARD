@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
  * CareerAgentEntry
  * Smart entry guard: checks if user has existing career analysis.
  * First checks localStorage. If missing, calls API to verify.
- * If found → redirects to /dashboard/career-agent/dashboard
+ * If found → redirects to /dashboard/career-agent/dashboard (preserving ?tab= query)
  * If not found → redirects to /dashboard/career-agent/onboarding
  */
 const CareerAgentEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkStatus = async () => {
+      // Preserve any query params (e.g. ?tab=secondary) through the redirect
+      const search = location.search;
+
       // Fast path: if we have it in localStorage, go to dashboard
       const analysisId = localStorage.getItem('smaart_analysis_id');
       const analysis = localStorage.getItem('smaart_analysis');
 
       if (analysisId && analysis) {
-        navigate('/dashboard/career-agent/dashboard', { replace: true });
+        navigate(`/dashboard/career-agent/dashboard${search}`, { replace: true });
         return;
       }
 
@@ -37,7 +41,7 @@ const CareerAgentEntry = () => {
           const payload = await res.json();
           // If the backend has an analysis for this user, route to dashboard
           if (payload.found && payload.output_data) {
-            navigate('/dashboard/career-agent/dashboard', { replace: true });
+            navigate(`/dashboard/career-agent/dashboard${search}`, { replace: true });
             return;
           }
         }
@@ -50,7 +54,7 @@ const CareerAgentEntry = () => {
     };
 
     checkStatus();
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   if (loading) {
     return (

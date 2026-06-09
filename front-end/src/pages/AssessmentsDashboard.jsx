@@ -270,7 +270,20 @@ const AssessmentsDashboard = () => {
     return (
         <div className="bg-transparent transition-colors duration-300 min-h-screen pb-8">
             <main>
-                <div className="mx-auto max-w-7xl space-y-6 pt-4">
+                <div className="mx-auto max-w-7xl space-y-6 p-8">
+
+                    {/* Back Button - Mobile Only */}
+                    <div className="mb-4 md:hidden">
+                        <button
+                            onClick={() => navigate("/dashboard")}
+                            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+                        >
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                                <ArrowLeft stroke={1.5} className="h-4 w-4" />
+                            </div>
+                            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                        </button>
+                    </div>
 
                     {/* Clean header matching My Courses style */}
                     <motion.div
@@ -279,19 +292,6 @@ const AssessmentsDashboard = () => {
                         transition={{ duration: 0.4, ease: "easeOut" }}
                         className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
                     >
-                        {/* Mobile back button */}
-                        <div className="md:hidden mb-2">
-                            <button
-                                onClick={() => navigate("/dashboard")}
-                                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
-                            >
-                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                                    <ArrowLeft stroke={1.5} className="w-4 h-4" />
-                                </div>
-                                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-                            </button>
-                        </div>
-
                         <div className="flex-1">
                             <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
                                 {t("assessments_dashboard.title", "Assessments")}{" "}

@@ -12,15 +12,14 @@ import { useTranslation } from "react-i18next";
 import CourseStructure from "@/components/CourseStructure";
 import useUser from "@/hooks/useUser";
 import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
+import { useLearningPaths } from "@/hooks/useLearningPaths";
 import { coursesAPI } from "@/services/api";
 import {
   enableCapacityDevUnlock,
   isCapacityDevUnlock,
   hasPassedBaseline,
   resolveStaticCourseTitle,
-  compareCourseIds,
 } from "@/utils/courseUnlock";
-import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from "@/data/courseStructureData";
 
 /* ─── Single My Courses hero (assessment → in-progress → completed) ─── */
 const MyCoursesHeroBanner = ({
@@ -36,7 +35,11 @@ const MyCoursesHeroBanner = ({
       ? t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment")
       : course?.title || t("my_courses_page.your_current_course");
 
-  const displayTitle = resolveStaticCourseTitle(rawTitle) || rawTitle;
+  const displayTitle =
+    resolveStaticCourseTitle(rawTitle) ||
+    resolveStaticCourseTitle(course?.id) ||
+    resolveStaticCourseTitle(course?.courseCode) ||
+    rawTitle;
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -69,37 +72,41 @@ const MyCourses = () => {
   const { user } = useUser();
   const { t } = useTranslation();
 
-  const [currentCourse, setCurrentCourse] = useState(null);
-  const [currentProgress, setCurrentProgress] = useState(0);
   const [publishedCourseCodes, setPublishedCourseCodes] = useState(null);
   const [quizTestCourse, setQuizTestCourse] = useState(null);
   const userId = user?._id || user?.id;
   const { userProgress, loading: progressLoading, refresh: refreshProgress } =
     useSmaartCourseProgress(userId);
+  const {
+    enrolledCourses,
+    inProgressCourses,
+    nextCourse,
+    loading: pathsLoading,
+  } = useLearningPaths(userId);
 
-  const lastWatchedId =
-    currentCourse?.courseCode ||
-    currentCourse?._id ||
-    currentCourse?.id ||
-    localStorage.getItem("smaart_last_watched_course");
+  // Same course-selection logic as DashboardHome → HeroSection
+  const activePath = useMemo(() => {
+    const incomplete = (list) => (list || []).filter((c) => (c.progress || 0) < 100);
+    let paths = [];
+    if (incomplete(inProgressCourses).length > 0) paths = incomplete(inProgressCourses);
+    else if (nextCourse) paths = [nextCourse];
+    else if (incomplete(enrolledCourses).length > 0) paths = incomplete(enrolledCourses);
+    else if (enrolledCourses?.length > 0) paths = enrolledCourses;
 
-  const isCourseComplete = useMemo(() => {
-    if (!lastWatchedId) return false;
-    return (
-      currentProgress >= 100 ||
-      userProgress.completedCourses?.includes(lastWatchedId)
-    );
-  }, [lastWatchedId, currentProgress, userProgress.completedCourses]);
+    return paths.length > 0
+      ? (paths.find((p) => (p.progress || 0) < 100) ?? paths[0])
+      : null;
+  }, [inProgressCourses, nextCourse, enrolledCourses]);
 
   const heroMode = useMemo(() => {
-    if (progressLoading) return null;
+    if (progressLoading || pathsLoading) return null;
     const t1Done = hasPassedBaseline(userProgress);
 
     if (!t1Done) return "assessment";
-    if (!currentCourse || !lastWatchedId) return null;
-    if (isCourseComplete) return "completed";
+    if (!activePath) return null;
+    if ((activePath.progress || 0) >= 100) return "completed";
     return "in_progress";
-  }, [progressLoading, userProgress, lastWatchedId, currentCourse, isCourseComplete]);
+  }, [progressLoading, pathsLoading, userProgress, activePath]);
 
   useEffect(() => {
     enableCapacityDevUnlock();
@@ -155,165 +162,6 @@ const MyCourses = () => {
     loadPublished();
   }, []);
 
-  useEffect(() => {
-    const loadCurrentCourse = async () => {
-      try {
-        let lastWatched = localStorage.getItem("smaart_last_watched_course");
-        let lastWatchedLesson = localStorage.getItem("smaart_last_watched_lesson");
-        let lastProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
-
-        if (!lastWatched) {
-          setCurrentCourse(null);
-          setCurrentProgress(0);
-          return;
-        }
-
-        const allCourses = [
-          ...STAGE_1_COURSES,
-          ...STAGE_2_COURSES,
-          ...STAGE_3_COURSES,
-          ...PIQ_TRACK,
-          ...AIQ_TRACK,
-          ...SQ_TRACK,
-        ];
-
-        // ── Step 1: Fetch course from DB first ─────────────────────────────
-        let found = null;
-        let allDbCourses = [];
-        try {
-          const response = await coursesAPI.getPublished();
-          allDbCourses = response.data || [];
-          if (Array.isArray(allDbCourses)) {
-            found = allDbCourses.find(
-              (c) => c.courseCode === lastWatched ||
-                     (c._id || c.id) === lastWatched ||
-                     compareCourseIds(c.courseCode, lastWatched) ||
-                     compareCourseIds(c.courseNumber, lastWatched)
-            );
-          }
-        } catch (e) {
-          console.warn("API fetch failed, using localStorage only");
-        }
-
-        // ── Step 2: Check completion using ALL identifiers ─────────────────
-        // This fixes format mismatches (e.g. localStorage has MongoDB _id,
-        // but completedCourses only has course codes like "S07")
-        const courseIdentifiers = [
-          lastWatched,
-          found?.courseCode,
-          found?._id?.toString(),
-          found?.courseNumber,
-        ].filter(Boolean);
-
-        const isCompleted = courseIdentifiers.some(id =>
-          userProgress.completedCourses?.some(c => compareCourseIds(c, id))
-        ) || (found && (userProgress.completedCourses || []).some(c =>
-          compareCourseIds(c, found.courseCode) || compareCourseIds(c, found._id?.toString())
-        ));
-
-        // ── Step 3: Advance to next if completed ───────────────────────────
-        if (isCompleted) {
-          // Find position in static sequence using the found course's code
-          const searchId = found?.courseCode || found?.courseNumber || lastWatched;
-          const idx = allCourses.findIndex(c =>
-            compareCourseIds(c.id, searchId) || compareCourseIds(c.id, lastWatched)
-          );
-
-          if (idx !== -1 && idx < allCourses.length - 1) {
-            const nextCourseObj = allCourses[idx + 1];
-            let nextId = nextCourseObj.id;
-
-            // If original lastWatched was CRS-format, keep that format
-            if (lastWatched.startsWith("CRS")) {
-              const numPart = parseInt(nextId.replace(/\D/g, ''), 10);
-              if (nextId.startsWith("S") && !isNaN(numPart)) {
-                nextId = `CRS${String(numPart).padStart(5, '0')}`;
-              } else if (nextId.startsWith("PIQ") && !isNaN(numPart)) {
-                nextId = `CRS${String(25 + numPart).padStart(5, '0')}`;
-              } else if (nextId.startsWith("AIQ") && !isNaN(numPart)) {
-                nextId = `CRS${String(30 + numPart).padStart(5, '0')}`;
-              } else if (nextId.startsWith("SQ") && !isNaN(numPart)) {
-                nextId = `CRS${String(35 + numPart).padStart(5, '0')}`;
-              }
-            }
-
-            // Try to resolve next course to its DB _id for direct navigation
-            const nextDbCourse = allDbCourses.find(c =>
-              compareCourseIds(c.courseCode, nextCourseObj.id) ||
-              compareCourseIds(c.courseNumber, nextCourseObj.id) ||
-              compareCourseIds(c.courseCode, nextId)
-            );
-            const resolvedNextId = nextDbCourse?._id?.toString() || nextDbCourse?.courseCode || nextId;
-
-            // Advance localStorage to the next course
-            localStorage.setItem("smaart_last_watched_course", resolvedNextId);
-            localStorage.removeItem("smaart_last_watched_title");
-            localStorage.setItem("smaart_course_progress", "0");
-            lastWatched = resolvedNextId;
-            lastProgress = 0;
-            lastWatchedLesson = null;
-
-            // Update found to the next course
-            found = nextDbCourse || null;
-          }
-        }
-
-        // ── Step 4: Show the resolved course ──────────────────────────────
-        if (found) {
-          const completedModules = (found.modules || []).filter(
-            (m) => m.status === "completed"
-          ).length;
-          const totalModules = (found.modules || []).length;
-          const pct = totalModules > 0
-            ? Math.round((completedModules / totalModules) * 100)
-            : lastProgress;
-
-          setCurrentCourse({
-            ...found,
-            lastWatchedLesson: lastWatchedLesson || null,
-            completedModules,
-            totalModules,
-          });
-          setCurrentProgress(pct || lastProgress);
-          return;
-        }
-
-        // ── Step 5: Fallback (no DB match) ─────────────────────────────────
-        const staticTitle = resolveStaticCourseTitle(lastWatched);
-        setCurrentCourse({
-          _id: lastWatched,
-          courseCode: lastWatched,
-          title:
-            staticTitle ||
-            localStorage.getItem("smaart_last_watched_title") ||
-            t("my_courses_page.your_course"),
-          lastWatchedLesson: lastWatchedLesson || null,
-          completedModules: 0,
-          totalModules: 0,
-        });
-        setCurrentProgress(lastProgress);
-      } catch (e) {
-        console.warn("Could not load current course:", e);
-      }
-    };
-
-    loadCurrentCourse();
-  }, [t, refreshProgress, userProgress]);
-
-  useEffect(() => {
-    const lastWatched = localStorage.getItem("smaart_last_watched_course");
-    if (!lastWatched || !currentCourse) return;
-
-    const courseId = currentCourse?.courseCode || currentCourse?._id || currentCourse?.id;
-    const storedProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
-    // Only mark 100% if the *current displayed course* (not a past one) is completed
-    if (courseId && userProgress.completedCourses?.some(c => compareCourseIds(c, courseId))) {
-      setCurrentProgress(100);
-    } else if (storedProgress > 0) {
-      setCurrentProgress(storedProgress);
-    }
-  }, [userProgress.completedCourses, currentCourse]);
-
   const handleCourseClick = (courseId) => {
     navigate(`/dashboard/courses/${courseId}/player`);
   };
@@ -334,27 +182,26 @@ const MyCourses = () => {
       handleStartBaseline();
       return;
     }
-    const id =
-      currentCourse?.courseCode ||
-      localStorage.getItem("smaart_last_watched_course") ||
-      currentCourse?._id ||
-      currentCourse?.id;
+    if (activePath?.navigateTo) {
+      navigate(activePath.navigateTo);
+      return;
+    }
+    const id = activePath?.courseCode || activePath?.id;
     if (id) navigate(`/dashboard/courses/${id}/player`);
   };
 
   const continueWatchingEl = heroMode && heroMode !== "assessment" ? (
     <MyCoursesHeroBanner
       mode={heroMode}
-      course={currentCourse}
-      progress={currentProgress}
+      course={activePath}
       onPrimaryAction={handlePrimaryClick}
       primaryLabel={primaryLabel}
     />
   ) : null;
 
   return (
-    <div className="min-h-screen bg-transparent transition-colors duration-300">
-      <div id="my-courses-programme">
+    <div className="min-h-screen bg-transparent pb-8 transition-colors duration-300">
+      <main id="my-courses-programme">
         <CourseStructure
           onCourseClick={handleCourseClick}
           userProgress={userProgress}
@@ -362,7 +209,7 @@ const MyCourses = () => {
           publishedCourseCodes={publishedCourseCodes}
           continueWatching={continueWatchingEl}
         />
-      </div>
+      </main>
     </div>
   );
 };

@@ -217,14 +217,27 @@ const SMAArtToolkit = () => {
 
   return (
     <div className="min-h-screen bg-transparent pb-12 transition-colors duration-300">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl p-8">
+
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+              <ArrowLeft stroke={1.5} className="h-4 w-4" />
+            </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+          </button>
+        </div>
 
         {/* ── Hero Header ── */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative mb-6 mt-4 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
+          className="relative mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
         >
           <div className="relative z-10">
             {/* Title */}

@@ -28,6 +28,7 @@ import {
 import StreaksWidget from "@/components/dashboard/StreaksWidget";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
+import Footer from "./Footer";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import useUser from "@/hooks/useUser";
@@ -1217,6 +1218,10 @@ const DashboardLayout = () => {
           >
             <Outlet />
           </motion.div>
+
+          {!isFullScreenPage && !isImmersiveRoute && (
+            <Footer variant="dashboard" />
+          )}
         </div>
       </main>
 
