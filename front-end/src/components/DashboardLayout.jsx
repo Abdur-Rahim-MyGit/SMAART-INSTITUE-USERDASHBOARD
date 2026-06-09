@@ -534,7 +534,9 @@ const DashboardLayout = () => {
     }
   }, [location.pathname, user]);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const hoverTimeoutRef = useRef(null);
+  const profileMenuRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [activeSearchIndex, setActiveSearchIndex] = useState(0);
@@ -587,16 +589,43 @@ const DashboardLayout = () => {
     checkCareerLockStatus();
   }, [user, location.pathname]);
 
+  const closeProfileMenu = () => {
+    setIsProfileMenuOpen(false);
+    setIsProfileHovered(false);
+  };
+
+  const isDesktopViewport = () => window.matchMedia("(min-width: 1024px)").matches;
+
   const handleMouseEnter = () => {
+    if (!isDesktopViewport()) return;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     setIsProfileHovered(true);
   };
 
   const handleMouseLeave = () => {
+    if (!isDesktopViewport()) return;
     hoverTimeoutRef.current = setTimeout(() => {
       setIsProfileHovered(false);
     }, 150); // Small delay to allow moving to the modal
   };
+
+  const handleProfileClick = () => {
+    if (!isDesktopViewport()) {
+      setIsProfileMenuOpen((prev) => !prev);
+    }
+  };
+
+  useEffect(() => {
+    closeProfileMenu();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isProfileMenuOpen]);
 
   // === AUTH PROTECTION ===
   useEffect(() => {
@@ -625,6 +654,9 @@ const DashboardLayout = () => {
       }
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
         setShowSearchResults(false);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -1147,6 +1179,7 @@ const DashboardLayout = () => {
 
                 {/* 3. User Profile Card */}
                 <div
+                  ref={profileMenuRef}
                   className="relative"
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
@@ -1154,7 +1187,9 @@ const DashboardLayout = () => {
                   <motion.div
                     whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
                     className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-white/10 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
-                    onClick={() => navigate('/profile')}
+                    onClick={handleProfileClick}
+                    aria-expanded={isProfileMenuOpen}
+                    aria-haspopup="true"
                   >
                     <div className="relative shrink-0">
                       <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
@@ -1186,7 +1221,7 @@ const DashboardLayout = () => {
                     </div>
                   </motion.div>
 
-                  {/* Hover Profile Card Modal */}
+                  {/* Desktop hover profile dropdown */}
                   <AnimatePresence>
                     {isProfileHovered && (
                       <motion.div
@@ -1194,12 +1229,38 @@ const DashboardLayout = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
+                        className="absolute top-full right-0 mt-2 z-[100] hidden w-72 pointer-events-auto lg:block"
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                       >
-                        <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
+                        <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} onClose={closeProfileMenu} />
                       </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Mobile tap profile dropdown */}
+                  <AnimatePresence>
+                    {isProfileMenuOpen && (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="fixed inset-x-0 top-[70px] bottom-0 z-[90] bg-black/40 lg:hidden"
+                          onClick={closeProfileMenu}
+                          aria-hidden="true"
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="fixed right-4 top-[78px] z-[100] w-[min(18rem,calc(100vw-2rem))] pointer-events-auto lg:hidden"
+                        >
+                          <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} onClose={closeProfileMenu} />
+                        </motion.div>
+                      </>
                     )}
                   </AnimatePresence>
                 </div>
@@ -1268,7 +1329,7 @@ const DashboardLayout = () => {
 };
 
 // Profile Hover Card Component
-const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
+const ProfileHoverCard = ({ user, avatarData, onLogout, onClose }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const videoRefs = useRef([]);
@@ -1387,7 +1448,10 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
 
           <div className="pt-2 flex justify-center">
             <button
-              onClick={() => navigate('/dashboard/profile')}
+              onClick={() => {
+                onClose?.();
+                navigate('/dashboard/profile');
+              }}
               className="group w-full h-11 px-6 py-2.5 rounded-xl flex justify-center items-center text-[#112b6b] bg-slate-100 dark:bg-white/5 hover:bg-[#112b6b] dark:hover:bg-[#1a3884] border border-slate-200 dark:border-white/5 transition-all duration-300 active:scale-95"
             >
               <div className="w-8 h-8 flex items-center justify-center transition-colors">
@@ -1400,7 +1464,10 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
           {/* Premium Logout Button */}
           <div className="pt-1 border-t border-slate-100 dark:border-[#1a3884]/15 flex justify-center">
             <button
-              onClick={onLogout}
+              onClick={() => {
+                onClose?.();
+                onLogout();
+              }}
               className="group w-full h-11 px-6 py-2.5 rounded-xl flex justify-center items-center text-rose-500 hover:bg-rose-500/10 transition-all duration-300 active:scale-95"
             >
               <div className="w-8 h-8 flex items-center justify-center transition-colors">
