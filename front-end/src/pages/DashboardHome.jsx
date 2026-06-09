@@ -5,6 +5,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
 import CareerPathsWidget from "@/components/dashboard/CareerPathsWidget";
+import ActiveSkillsWidget from "@/components/dashboard/ActiveSkillsWidget";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
@@ -154,6 +155,7 @@ const DashboardHome = () => {
             {/* ── LEFT: Career Pathways ── */}
             <div className="flex-1 min-w-0 flex flex-col gap-6">
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
+              <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
             </div>
 
             {/* ── RIGHT: Calendar + Tasks ── */}

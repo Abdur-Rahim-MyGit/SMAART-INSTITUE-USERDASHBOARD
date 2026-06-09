@@ -12,6 +12,7 @@ import {
 import { apiCall } from '@/services/api';
 import useUser from '@/hooks/useUser';
 import { streaksAPI } from '@/services/streaksApi';
+import { ShieldAlert, Award, Users, TrendingUp, ShieldCheck, BookOpen, Clock } from 'lucide-react';
 
 // ----------------------------------------------------
 // CUSTOM TOOLTIP COMPONENTS
@@ -1305,7 +1306,7 @@ export const StudentAnalyticsView = () => {
               ) : (
                 <div className="relative">
                   <span className="absolute -left-[33px] top-0.5 flex items-center justify-center w-5 h-5 rounded-full bg-slate-400 ring-4 ring-white dark:ring-[#002A5C] shadow">
-                    <Calendar className="w-3 h-3 text-white" />
+                    <IconCalendar className="w-3 h-3 text-white" />
                   </span>
                   <div>
                     <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">No Learning Sessions Logged</h4>

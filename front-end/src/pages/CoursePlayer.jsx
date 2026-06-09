@@ -907,8 +907,9 @@ const CoursePlayer = () => {
                   >
                     <SyncedTranscript
                       currentTime={currentVideoTime}
+                      videoUrl={stepData.videoUrl}
                       transcriptUrl={stepData.transcriptUrl || stepData.transcriptionUrl || "/transcripts/sample-course.vtt"}
-                      transcriptText={stepData.transcriptText || stepData.captions}
+                      transcriptText={stepData.transcription || stepData.transcriptText || stepData.captions}
                       title={t("course_player.video_transcription")}
                     />
                   </motion.div>
@@ -1071,7 +1072,7 @@ const CoursePlayer = () => {
 
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-transparent border-b border-[#d8e6f7] dark:border-[#1a3884]/20 sticky top-0 z-30">
+        <div className="bg-transparent border-b border-[#d8e6f7] dark:border-[#1a3884]/20 mb-6">
           <div className="w-full px-0 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-wrap items-center gap-3 sm:gap-5">

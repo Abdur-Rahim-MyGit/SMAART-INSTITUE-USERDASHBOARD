@@ -13,13 +13,13 @@ import {
   IconCpu as Bot,
   IconInfinity as Leaf
 } from "@tabler/icons-react";
+import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
 import { coursesAPI } from "@/services/api";
 import PageHero from "@/components/ui/PageHero";
-import { GraduationCap } from "lucide-react";
 import {
   isStageUnlocked as checkStageUnlocked,
   isTrackUnlocked as checkTrackUnlocked,

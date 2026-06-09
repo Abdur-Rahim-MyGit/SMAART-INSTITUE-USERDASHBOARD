@@ -8,8 +8,8 @@
   --navy:   #ffffff;
   --navy2:  #F8FAFC;
   --navy3:  #F1F5F9;
-  --navy4:  #E2E8F0;
   --accent: #1a3884;
+  --accent-text: #1a3884;
   --accent2:#132c6b;
   --accent3:#2a4d9e;
   --accent-rgb: 26, 56, 132;
@@ -42,30 +42,31 @@
 /* ── Dark Mode — matches SMAART global dark theme ── */
 :is(.dark) .career-agent-page {
   --navy:   #00152E;
-  --navy2:  #002147;
-  --navy3:  #002A5C;
-  --navy4:  #003580;
-  --accent: #4f8ef7;
-  --accent2:#60a5fa;
-  --accent3:#93c5fd;
-  --accent-rgb: 79, 142, 247;
-  --accent-tint: rgba(79, 142, 247, 0.12);
-  --accent-border: rgba(79, 142, 247, 0.25);
-  --text:   #f1f5f9;
-  --text1:  #f1f5f9;
-  --text2:  #cbd5e1;
+  --navy2:  #00152E; /* Unified with sidebar for a clean look */
+  --navy3:  #001f44;
+  --navy4:  #002a5c;
+  --accent: #1a3884; /* Deep Navy accent for consistent theme */
+  --accent-text: #60a5fa; /* Lighter blue for readable text/icons */
+  --accent2:#132c6b;
+  --accent3:#2a4d9e;
+  --accent-rgb: 26, 56, 132;
+  --accent-tint: rgba(26, 56, 132, 0.25);
+  --accent-border: rgba(26, 56, 132, 0.4);
+  --text:   #f8fafc;
+  --text1:  #f8fafc;
+  --text2:  #e2e8f0;
   --muted:  #94a3b8;
-  --border: rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.10);
-  --card:   rgba(0,33,71,0.98);
-  --card2:  rgba(0,42,92,0.9);
+  --border: rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.12);
+  --card:   #001b3a; /* Slightly elevated from background */
+  --card2:  #002147;
   --header-bg: #00152E;
-  --header-border: rgba(255,255,255,0.07);
+  --header-border: rgba(255,255,255,0.08);
   --sidebar-bg: #00152E;
-  --sidebar-hover: rgba(79,142,247,0.08);
-  --tooltip-bg: #001835;
-  --card-bg: rgba(0,33,71,0.98);
-  --card-hover: rgba(26,56,132,0.12);
+  --sidebar-hover: rgba(255,255,255,0.05);
+  --tooltip-bg: #002147;
+  --card-bg: #001b3a;
+  --card-hover: rgba(255,255,255,0.04);
   --green:  #34d399;
   --amber:  #fbbf24;
   --red:    #f87171;
@@ -122,7 +123,7 @@
 }
 
 .career-agent-page .dash-name span {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .career-agent-page .dash-meta {
@@ -283,8 +284,19 @@
   box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
 }
 
+:is(.dark) .career-agent-page .sitem.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .career-agent-page .sitem.active .si-icon-wrap {
   color: #ffffff;
+}
+
+:is(.dark) .career-agent-page .sitem.active .si-icon-wrap {
+  color: var(--accent);
 }
 
 .career-agent-page .si-icon-wrap {
@@ -532,7 +544,7 @@
   display: inline-flex; align-items: center; gap: 0.5rem;
   background: rgba(37,99,235,0.1);
   border: 1px solid rgba(37,99,235,0.25);
-  color: var(--accent);
+  color: var(--accent-text);
   border-radius: 100px;
   font-size: 0.75rem; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
@@ -589,7 +601,7 @@
   transition: all 0.3s;
 }
 .career-agent-page .step-ind.active .step-circle {
-  border-color: var(--accent); color: var(--accent);
+  border-color: var(--accent); color: var(--accent-text);
   background: rgba(var(--accent-rgb), 0.15);
   box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.1);
 }
@@ -600,7 +612,7 @@
   font-size: 0.6rem; color: var(--muted);
   margin-top: 0.3rem; text-align: center; font-weight: 500;
 }
-.career-agent-page .step-ind.active .step-label { color: var(--accent); }
+.career-agent-page .step-ind.active .step-label { color: var(--accent-text); }
 
 /* Form card */
 .career-agent-page .form-card {
@@ -625,7 +637,7 @@
 .career-agent-page .step-tag {
   background: var(--accent-tint);
   border: 1px solid var(--accent-border);
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.58rem; font-weight: 700;
   padding: 0.18rem 0.48rem;
   border-radius: 5px;
@@ -695,7 +707,7 @@
   display: inline-flex; align-items: center; gap: 0.35rem;
   background: var(--accent-tint);
   border: 1px solid var(--accent-border);
-  color: var(--accent);
+  color: var(--accent-text);
   border-radius: 100px;
   font-size: 0.72rem; font-weight: 600;
   padding: 0.2rem 0.65rem;

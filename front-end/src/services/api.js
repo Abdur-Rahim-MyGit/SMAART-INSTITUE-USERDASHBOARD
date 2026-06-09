@@ -362,6 +362,13 @@ export const coursesAPI = {
   syncDefaults: async () => {
     return apiCall('/courses/sync-defaults', { method: 'POST' });
   },
+
+  transcribeVideo: async (videoUrl) => {
+    return apiCall('/courses/transcribe-video', {
+      method: 'POST',
+      body: JSON.stringify({ videoUrl })
+    });
+  },
 };
 
 // Course Enrollment API Functions

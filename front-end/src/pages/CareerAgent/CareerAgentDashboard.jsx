@@ -18,7 +18,33 @@ import { fetchLockStatus } from '@/services/CareerLockService';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor, ChevronDown, X, Menu, RefreshCw } from 'lucide-react';
+import {
+  IconCompass as Compass,
+  IconClipboardList as ClipboardList,
+  IconChartBar as BarChart3,
+  IconDna as Dna,
+  IconMap2 as Map,
+  IconAward as Award,
+  IconRocket as Rocket,
+  IconRobot as Bot,
+  IconMicrophone as Mic,
+  IconFileText as FileText,
+  IconCode as Code,
+  IconLock as Lock,
+  IconLockOpen as Unlock,
+  IconCircleCheck as CheckCircle,
+  IconTrophy as Trophy,
+  IconMedal as Medal,
+  IconTarget as Target,
+  IconSparkles as Sparkles,
+  IconSun as Sun,
+  IconMoon as Moon,
+  IconDeviceDesktop as Monitor,
+  IconChevronDown as ChevronDown,
+  IconX as X,
+  IconMenu2 as Menu,
+  IconRefresh as RefreshCw
+} from '@tabler/icons-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
@@ -183,8 +209,8 @@ const CareerAgentDashboard = () => {
         return (
             <div className="career-agent-page" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--navy)' }}>
                 <div className="pulse-ring" style={{ width: '80px', height: '80px' }}></div>
-                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
-                    <Sparkles size={32} color="var(--accent)" className="animate-pulse" />
+                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: 'var(--navy2)', border: '2px solid var(--accent-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
+                    <Sparkles size={32} color="var(--accent-text)" className="animate-pulse" />
                 </div>
                 <h2 style={{ marginTop: '1.5rem', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.loading_title', 'Synchronizing Intelligence...')}</h2>
                 <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{t('career_agent.loading_subtitle', 'Mapping your career trajectory')}</p>
@@ -254,14 +280,14 @@ const CareerAgentDashboard = () => {
     };
 
     const panels = [
-        { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} /> },
-        { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} /> },
-        { id: 'market', label: t('career_agent.panels.market', 'Market Intel'), icon: <BarChart3 size={18} /> },
-        { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} /> },
-        { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} /> },
-        { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} /> },
-        { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} /> },
-        { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} /> }
+        { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} stroke={1.5} /> },
+        { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} stroke={1.5} /> },
+        { id: 'market', label: t('career_agent.panels.market', 'Market Intel'), icon: <BarChart3 size={18} stroke={1.5} /> },
+        { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} stroke={1.5} /> },
+        { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} stroke={1.5} /> },
+        { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} stroke={1.5} /> },
+        { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} stroke={1.5} /> },
+        { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} stroke={1.5} /> }
     ];
 
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
@@ -353,39 +379,19 @@ const CareerAgentDashboard = () => {
                             <span className="show-mobile-inline">← {t('common.back', 'Back')}</span>
                         </button>
 
-                        {/* ── Theme Switcher ── */}
                         <button
                             onClick={() => {
                                 const next = theme === 'light' ? 'dark' : 'light';
                                 setTheme(next);
                             }}
                             title="Toggle Theme"
-                            style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '38px', height: '38px',
-                                borderRadius: '50%',
-                                border: '1px solid var(--border)',
-                                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                                color: theme === 'dark' ? '#E2E8F0' : '#475569',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                flexShrink: 0,
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                            }}
-                            onMouseEnter={e => { 
-                                e.currentTarget.style.transform = 'translateY(-2px)'; 
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; 
-                                e.currentTarget.style.color = 'var(--accent)';
-                                e.currentTarget.style.borderColor = 'var(--accent)';
-                            }}
-                            onMouseLeave={e => { 
-                                e.currentTarget.style.transform = 'translateY(0)'; 
-                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; 
-                                e.currentTarget.style.color = theme === 'dark' ? '#E2E8F0' : '#475569';
-                                e.currentTarget.style.borderColor = 'var(--border)';
-                            }}
+                            className={`flex items-center justify-center w-[38px] h-[38px] rounded-full border transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${
+                                theme === 'dark' 
+                                ? 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20 hover:text-white' 
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-[#1a3884]/30 hover:text-[#1a3884]'
+                            }`}
                         >
-                            {theme === 'dark' ? <Moon size={18} fill="currentColor" fillOpacity={0.2} /> : <Sun size={18} fill="currentColor" fillOpacity={0.2} />}
+                            {theme === 'dark' ? <Sun size={20} stroke={1.5} /> : <Moon size={20} stroke={1.5} />}
                         </button>
 
 
@@ -404,16 +410,16 @@ const CareerAgentDashboard = () => {
 
                 <div className="role-tabs-bar">
                     <button className={`rtab ${activeRole === 1 ? 'active' : ''}`} onClick={() => setActiveRole(1)}>
-                        <Trophy size={15} />
-                        {prefPrimary}
+                        <Trophy size={15} stroke={1.5} style={{ flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefPrimary}</span>
                     </button>
                     <button className={`rtab ${activeRole === 2 ? 'active' : ''}`} onClick={() => setActiveRole(2)}>
-                        <Medal size={15} />
-                        {prefSecondary}
+                        <Medal size={15} stroke={1.5} style={{ flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefSecondary}</span>
                     </button>
                     <button className={`rtab ${activeRole === 3 ? 'active' : ''}`} onClick={() => setActiveRole(3)}>
-                        <Target size={15} />
-                        {prefTertiary}
+                        <Target size={15} stroke={1.5} style={{ flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefTertiary}</span>
                     </button>
                 </div>
             </header>
@@ -468,14 +474,14 @@ const CareerAgentDashboard = () => {
                                 </div>
                                 <div className="oh-card" style={{ background: 'var(--navy3)', border: '1px solid var(--border)' }}>
                                     <div className="oh-card-label">{t('career_agent.overview.market_demand', 'Market Demand')}</div>
-                                    <div className="oh-pct" style={{ fontSize: '1.5rem', color: 'var(--accent)', marginTop: '0.3rem' }}>{currentData?.tab1?.job_demand || 'Stable'}</div>
+                                    <div className="oh-pct" style={{ fontSize: '1.5rem', color: 'var(--accent-text)', marginTop: '0.3rem' }}>{currentData?.tab1?.job_demand || 'Stable'}</div>
                                     <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{t('career_agent.overview.hiring_velocity', 'Hiring Velocity')}</div>
                                 </div>
                             </div>
                             <div className="ml-score-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div style={{ flex: 1 }}>
-                                        <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.role_function', 'What This Role Does')}</div>
+                                        <div className="ri-label" style={{ color: 'var(--accent-text)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.role_function', 'What This Role Does')}</div>
                                         <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para1 || currentData?.tab1?.role_description || t('career_agent.overview.no_description', 'No description available.')}</div>
                                     </div>
                                     <div style={{ textAlign: 'right', marginLeft: '2rem' }}>
@@ -484,11 +490,11 @@ const CareerAgentDashboard = () => {
                                     </div>
                                 </div>
                                 <div style={{ flex: 1, width: '100%' }}>
-                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.ai_evolution', 'AI Evolution')}</div>
+                                    <div className="ri-label" style={{ color: 'var(--accent-text)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.ai_evolution', 'AI Evolution')}</div>
                                     <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para2 || currentData?.tab1?.ai_impact || t('career_agent.overview.ai_pending', 'AI assessment pending.')}</div>
                                 </div>
                                 <div style={{ flex: 1, width: '100%' }}>
-                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.who_consider', 'Who Should Consider')}</div>
+                                    <div className="ri-label" style={{ color: 'var(--accent-text)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.who_consider', 'Who Should Consider')}</div>
                                     <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para3 || t('career_agent.overview.preparing_role', 'Preparing for this role...')}</div>
                                 </div>
                             </div>
@@ -514,7 +520,7 @@ const CareerAgentDashboard = () => {
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                                 <div>
                                     <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Compass size={22} color="var(--accent)" /> {t('career_agent.panels.direction', 'Direction Overview')}
+                                        <Compass size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.direction', 'Direction Overview')}
                                     </h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
                                         {t('career_agent.direction.desc', 'Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database.')}
@@ -549,7 +555,7 @@ const CareerAgentDashboard = () => {
                             {/* Header row with lock button */}
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                                 <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={22} color="var(--accent)" /> {t('career_agent.panels.roledetail', 'Role Detailed View')}</h2>
+                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.roledetail', 'Role Detailed View')}</h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>{t('career_agent.roledetail.desc_start', 'Reviewing ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.roledetail.desc_end', ' — confirm if this is your career path.')}</p>
                                 </div>
                             </div>
@@ -568,7 +574,7 @@ const CareerAgentDashboard = () => {
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                                 <div>
                                     <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <BarChart3 size={22} color="var(--accent)" /> {t('career_agent.market.title', 'Market Intelligence')}
+                                        <BarChart3 size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.market.title', 'Market Intelligence')}
                                     </h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
                                         {t('career_agent.market.desc_start', 'Showing roles for ')}<strong style={{ color: 'var(--text2)' }}>
@@ -589,7 +595,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel 3: Skills */}
                     {activePanel === 'skills' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Dna size={22} color="var(--accent)" /> {t('career_agent.skills.title', 'Skills Overview')}</h2>
+                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Dna size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.skills.title', 'Skills Overview')}</h2>
                             <SkillsPanel
                                 roleName={roleName}
                                 mongoRoleData={currentData}
@@ -604,7 +610,7 @@ const CareerAgentDashboard = () => {
                         <div className="panel animate-fade-in" style={{ padding: '1.75rem' }}>
                             <div style={{ marginBottom: '2rem' }}>
                                 <h2 style={{ fontSize: '1.4rem', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                    <Compass size={24} color="var(--accent)" /> {t('career_agent.roadmap.title', 'SMAART Career Intelligence')}
+                                    <Compass size={24} color="var(--accent-text)" /> {t('career_agent.roadmap.title', 'SMAART Career Intelligence')}
                                 </h2>
                                 <p style={{ color: 'var(--muted)', fontSize: '0.85rem', maxWidth: '600px' }}>
                                     {t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}
@@ -631,7 +637,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Interview Prep */}
                     {activePanel === 'interview' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mic size={22} color="var(--accent)" /> {t('career_agent.interview.title', 'Interview Prep')}</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mic size={22} color="var(--accent-text)" /> {t('career_agent.interview.title', 'Interview Prep')}</h2>
                             <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>{t('career_agent.interview.desc_start', 'Resources and questions tailored for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.interview.desc_end', ' — aptitude, domain, technical & HR rounds.')}</p>
                             <InterviewPrep roleName={roleName} />
                         </div>
@@ -640,7 +646,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Resume Tips */}
                     {activePanel === 'resume' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileText size={22} color="var(--accent)" /> {t('career_agent.resume.title', 'Resume Tips')}</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileText size={22} color="var(--accent-text)" /> {t('career_agent.resume.title', 'Resume Tips')}</h2>
                             <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>
                                 {t('career_agent.resume.desc_start', 'Build a strong, ATS-ready resume for ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.resume.desc_end', ' — structure, keywords, and an AI generator.')}
                             </p>
@@ -651,7 +657,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Certifications */}
                     {activePanel === 'certs' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent)" /> {t('career_agent.certs.title', 'Certifications')}</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent-text)" /> {t('career_agent.certs.title', 'Certifications')}</h2>
                             <Certifications
                                 roleName={currentData.tab1.role_name}
                                 directionName={currentData?.direction?.directionName || ''}

@@ -12,9 +12,11 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
     const [totalRolesCount, setTotalRolesCount] = useState(0);
     const [certModal, setCertModal] = useState(null); // { skillName } or null
 
-    // Get user from localStorage
-    const user = JSON.parse(localStorage.getItem('smaart_user') || '{}');
-    const userEmail = user.email || 'guest@smaart.edu';
+    // Get user properly from sessionStorage first, fallback to old localStorage if needed
+    const userStr = sessionStorage.getItem('user');
+    const parsedUser = userStr ? JSON.parse(userStr) : {};
+    const legacyUser = JSON.parse(localStorage.getItem('smaart_user') || '{}');
+    const userEmail = parsedUser.email || legacyUser.email || 'guest@smaart.edu';
 
     useEffect(() => {
         const fetchManualRoadmap = async () => {
@@ -261,7 +263,7 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
                             <div style={styles.tooltipHeader}>Required for:</div>
                             <div style={styles.tooltipList}>
                                 {item.roles.map((r, i) => (
-                                    <div key={i} style={styles.tooltipItem}>â€¢ {r}</div>
+                                    <div key={i} style={styles.tooltipItem}>&bull; {r}</div>
                                 ))}
                             </div>
                             <div style={styles.tooltipArrow} />
@@ -301,7 +303,7 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
     );
 };
 
-/* â”€â”€ Certificate Modal â”€â”€ */
+/* ── Certificate Modal ── */
 const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
     const [file, setFile] = useState(null);
     const [dragOver, setDragOver] = useState(false);
@@ -502,7 +504,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                 }}>
                                     <CheckCircle size={26} color="#22c55e" />
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#22c55e' }}>Certificate Verified âœ“</div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#22c55e' }}>Certificate Verified ✓</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
                             </>
                         ) : file ? (
@@ -513,9 +515,9 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     border: '1px solid rgba(34,197,94,0.3)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: '1.5rem',
-                                }}>ðŸ“„</div>
+                                }}>📄</div>
                                 <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#22c55e' }}>{file.name}</div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB Â· Click to change</div>
+                                <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
                             </>
                         ) : (
                             <>
@@ -578,7 +580,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                 borderRadius: '9px',
                                 display: 'flex', alignItems: 'center', gap: '0.35rem',
                             }}>
-                                âš  Marking as complete without a certificate
+                                ⚠️ Marking as complete without a certificate
                             </div>
                         )}
                     </div>
