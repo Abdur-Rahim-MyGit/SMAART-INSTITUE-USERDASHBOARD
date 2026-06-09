@@ -13,6 +13,7 @@ import {
   IconCpu as Bot,
   IconInfinity as Leaf
 } from "@tabler/icons-react";
+import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -783,9 +784,8 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
               <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
                 <ArrowLeft className="w-4 h-4" />
               </div>
-              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-            </button>
-          </div>
+            )}
+          </motion.div>
 
           <PageHero
             badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}

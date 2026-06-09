@@ -25,9 +25,9 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
         : 'You have confirmed your career direction.';
 
     const paths = [
-        { label: 'Primary Career Path',   path: primaryCareerPath,   color: '#6366f1', bg: 'rgba(99,102,241,0.08)',  border: 'rgba(99,102,241,0.2)' },
-        { label: 'Secondary Career Path', path: secondaryCareerPath, color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' },
-        { label: 'Tertiary Career Path',  path: tertiaryCareerPath,  color: '#a78bfa', bg: 'rgba(167,139,250,0.08)', border: 'rgba(167,139,250,0.2)' },
+        { label: 'Primary Career Path',   path: primaryCareerPath,   color: '#3b82f6', bg: 'rgba(59,130,246,0.1)',  border: 'rgba(59,130,246,0.2)' },
+        { label: 'Secondary Career Path', path: secondaryCareerPath, color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', border: 'rgba(139,92,246,0.2)' },
+        { label: 'Tertiary Career Path',  path: tertiaryCareerPath,  color: '#06b6d4', bg: 'rgba(6,182,212,0.1)', border: 'rgba(6,182,212,0.2)' },
     ].filter(p => p.path);
 
     return (
@@ -54,19 +54,19 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                         onClick={e => e.stopPropagation()}
                         style={{
                             width: '100%', maxWidth: '440px',
-                            background: 'linear-gradient(145deg, #0a1628 0%, #071020 100%)',
+                            background: 'linear-gradient(145deg, #002147 0%, #00152E 100%)',
                             borderRadius: '24px',
-                            border: '1px solid rgba(16,185,129,0.3)',
-                            boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(16,185,129,0.08)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            boxShadow: '0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(26,56,132,0.3)',
                             overflow: 'hidden',
                             position: 'relative',
                         }}
                     >
-                        {/* Green glow top */}
+                        {/* Blue glow top */}
                         <div style={{
                             position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)',
                             width: '260px', height: '160px',
-                            background: 'radial-gradient(ellipse, rgba(16,185,129,0.15) 0%, transparent 70%)',
+                            background: 'radial-gradient(ellipse, rgba(59,130,246,0.25) 0%, transparent 70%)',
                             pointerEvents: 'none',
                         }} />
 
@@ -80,7 +80,7 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                                         style={{
                                             position: 'absolute', inset: '-8px',
                                             borderRadius: '50%',
-                                            border: '2px solid rgba(16,185,129,0.4)',
+                                            border: '2px solid rgba(59,130,246,0.4)',
                                         }}
                                     />
                                     <motion.div
@@ -89,12 +89,12 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                                         transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.2 }}
                                         style={{
                                             width: '56px', height: '56px', borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.15) 100%)',
-                                            border: '2px solid rgba(16,185,129,0.4)',
+                                            background: 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(37,99,235,0.15) 100%)',
+                                            border: '2px solid rgba(59,130,246,0.4)',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         }}
                                     >
-                                        <Lock size={24} color="#10b981" />
+                                        <Lock size={24} color="#3b82f6" />
                                     </motion.div>
                                 </div>
                             </div>
@@ -108,10 +108,10 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                             >
                                 <span style={{
                                     fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.14em',
-                                    textTransform: 'uppercase', color: '#10b981',
-                                    border: '1px solid rgba(16,185,129,0.3)',
+                                    textTransform: 'uppercase', color: '#60a5fa',
+                                    border: '1px solid rgba(59,130,246,0.3)',
                                     padding: '0.25rem 0.75rem', borderRadius: '999px',
-                                    background: 'rgba(16,185,129,0.05)'
+                                    background: 'rgba(59,130,246,0.1)'
                                 }}>
                                     ✅ Path Finalized
                                 </span>
@@ -192,7 +192,7 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                                 }}
                             >
                                 <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, margin: 0, textAlign: 'center' }}>
-                                    <Sparkles size={10} style={{ display: 'inline', marginRight: '4px', color: '#a78bfa' }} />
+                                    <Sparkles size={10} style={{ display: 'inline', marginRight: '4px', color: '#60a5fa' }} />
                                     Future learning plans, mentor guidance, and job opportunities will now be aligned with these career directions.
                                 </p>
                             </motion.div>
@@ -208,10 +208,10 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                                 style={{
                                     width: '100%', padding: '0.75rem',
                                     borderRadius: '10px', border: 'none',
-                                    background: 'linear-gradient(135deg, rgba(16,185,129,0.8) 0%, rgba(5,150,105,0.9) 100%)',
+                                    background: 'linear-gradient(135deg, #112b6b 0%, #1a3884 100%)',
                                     color: 'white', fontSize: '0.85rem', fontWeight: 800,
                                     cursor: 'pointer',
-                                    boxShadow: '0 8px 24px rgba(16,185,129,0.25)',
+                                    boxShadow: '0 8px 24px rgba(26,56,132,0.4)',
                                 }}
                             >
                                 Begin My Career Journey →

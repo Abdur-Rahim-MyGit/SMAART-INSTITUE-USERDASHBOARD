@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlignLeft, Captions, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { DEMO_TRANSCRIPT_VTT } from "@/constants/demoMedia";
 import { parseTranscript } from "@/utils/transcriptParser";
+import { coursesAPI } from "@/services/api";
 
 const fallbackTranscript = `WEBVTT
 
@@ -32,6 +33,7 @@ const SyncedTranscript = ({
   currentTime = 0,
   transcriptUrl,
   transcriptText,
+  videoUrl,
   title = "Video Transcription",
   onCueClick,
 }) => {
@@ -40,6 +42,7 @@ const SyncedTranscript = ({
   const [isLoading, setIsLoading] = useState(Boolean(transcriptUrl && !transcriptText));
   const [loadError, setLoadError] = useState("");
   const activeLineRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -56,6 +59,23 @@ const SyncedTranscript = ({
       setLoadError("");
 
       try {
+        if (videoUrl && (!transcriptUrl || transcriptUrl.includes('sample-course.vtt'))) {
+          setLoadError("Auto-generating transcript with Deepgram... this may take a moment.");
+          try {
+            const res = await coursesAPI.transcribeVideo(videoUrl);
+            if (res && res.transcription) {
+              if (isMounted) {
+                setRawTranscript(res.transcription);
+                setLoadError("");
+              }
+              return;
+            }
+          } catch (apiErr) {
+             console.warn("Auto-transcription failed:", apiErr);
+             if (isMounted) setLoadError("Auto-transcription failed. Using fallback transcript.");
+          }
+        }
+
         const response = await fetch(transcriptUrl || DEMO_TRANSCRIPT_VTT);
         if (!response.ok) throw new Error("Transcript unavailable");
         const text = await response.text();
@@ -63,7 +83,9 @@ const SyncedTranscript = ({
       } catch (error) {
         if (isMounted) {
           setRawTranscript(fallbackTranscript);
-          setLoadError("Using sample transcript until lesson captions are uploaded.");
+          if (!loadError || !loadError.includes("failed")) {
+            setLoadError("Using sample transcript until lesson captions are uploaded.");
+          }
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -104,8 +126,18 @@ const SyncedTranscript = ({
   }, [cues, currentTime]);
 
   useEffect(() => {
-    if (!isFullView && activeLineRef.current) {
-      activeLineRef.current.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (!isFullView && activeLineRef.current && containerRef.current) {
+      const container = containerRef.current;
+      const element = activeLineRef.current;
+      
+      const containerHalfHeight = container.clientHeight / 2;
+      const elementHalfHeight = element.clientHeight / 2;
+      const scrollPosition = element.offsetTop - containerHalfHeight + elementHalfHeight;
+
+      container.scrollTo({
+        top: Math.max(0, scrollPosition),
+        behavior: "smooth"
+      });
     }
   }, [activeIndex, isFullView]);
 
@@ -153,10 +185,11 @@ const SyncedTranscript = ({
           ) : (
             <motion.div
               key="synced"
+              ref={containerRef}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="max-h-[320px] overflow-y-auto p-3 sm:p-4 space-y-2"
+              className="relative max-h-[320px] overflow-y-auto p-3 sm:p-4 space-y-2"
             >
               {cues.map((cue, index) => {
                 const isActive = index === activeIndex;
