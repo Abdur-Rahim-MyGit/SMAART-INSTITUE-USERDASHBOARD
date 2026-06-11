@@ -416,6 +416,8 @@ const ModuleView = ({ courseId, onBack }) => {
                   transcriptUrl={resolveLessonTranscriptUrl(day)}
                   transcriptText={day.transcription}
                   onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+                  videoUrl={day.videoUrl}
+                  courseCode={courseData?.courseCode || courseData?.id || courseId}
                 />
               </div>
               <div className="p-4 sm:p-6">

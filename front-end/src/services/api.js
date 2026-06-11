@@ -365,10 +365,10 @@ export const coursesAPI = {
     return apiCall('/courses/sync-defaults', { method: 'POST' });
   },
 
-  transcribeVideo: async (videoUrl) => {
+  transcribeVideo: async (videoUrl, courseCode) => {
     return apiCall('/courses/transcribe-video', {
       method: 'POST',
-      body: JSON.stringify({ videoUrl })
+      body: JSON.stringify({ videoUrl, courseCode })
     });
   },
 };

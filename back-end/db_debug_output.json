@@ -1,0 +1,1050 @@
+[
+  {
+    "courseCode": "CRS00004",
+    "title": "Critical Thinking Fundamentals",
+    "learningFlow": {
+      "stepA_Why": {
+        "isEnabled": true,
+        "title": "Critical Thinking Fundamentals - Why it matters",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908404/smaart-minds/videos/fvrg4fwh85di0ul3nyca.mp4",
+        "text": "Understand the purpose, value, and professional relevance of mastering Critical Thinking Fundamentals."
+      },
+      "stepB_Story": {
+        "isEnabled": true,
+        "title": "Critical Thinking Fundamentals - In Action",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908437/smaart-minds/videos/qsa6g5myzjyafymscz1a.mp4",
+        "narrative": "Explore a real-world story showing the importance of Critical Thinking Fundamentals in navigating day-to-day workplace dynamics."
+      },
+      "stepC_Framework": {
+        "isEnabled": true,
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908477/smaart-minds/videos/z5uqj3gpo80stlr2v72n.mp4",
+        "content": "Learn the core principles, methodologies, and actionable frameworks behind Critical Thinking Fundamentals.",
+        "diagramUrl": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1780486194/smaart-minds/images/pyy3bzjfk2kizbe3sruu.jpg",
+        "keyPoints": []
+      },
+      "stepD_Practice": {
+        "isEnabled": true,
+        "instructions": "Test your foundational knowledge on Critical Thinking Fundamentals.",
+        "submissionType": "quiz",
+        "activityType": "quiz",
+        "randomizeQuestions": true,
+        "questions": [
+          {
+            "question": "What is critical thinking?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "The objective analysis and evaluation of an issue in order to form a judgment",
+              "Believing everything you read on social media",
+              "Arguing with others to prove your point at all costs",
+              "Accepting the first solution that comes to mind"
+            ],
+            "correctAnswer": "The objective analysis and evaluation of an issue in order to form a judgment",
+            "explanation": "Critical thinking is self-guided, disciplined thinking that attempts to reason at the highest level of quality in a fair-minded way.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d83"
+          },
+          {
+            "question": "What is confirmation bias?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "The tendency to search for, interpret, and recall information in a way that confirms one's beliefs",
+              "Always agreeing with your manager during a team meeting",
+              "Verifying the accuracy of a document before sharing it",
+              "Learning from your mistakes"
+            ],
+            "correctAnswer": "The tendency to search for, interpret, and recall information in a way that confirms one's beliefs",
+            "explanation": "Confirmation bias leads us to favor information that supports our pre-existing views while ignoring contradictory evidence.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d84"
+          },
+          {
+            "question": "What is the Socratic method of inquiry?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "Asking a series of open-ended questions to challenge assumptions and uncover underlying truths",
+              "Writing long essays explaining your perspective",
+              "Conducting statistical analysis on a large dataset",
+              "Listening to lectures without asking questions"
+            ],
+            "correctAnswer": "Asking a series of open-ended questions to challenge assumptions and uncover underlying truths",
+            "explanation": "The Socratic method uses structured questioning to stimulate critical thinking and illuminate ideas.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d85"
+          }
+        ]
+      },
+      "stepE_FlashCard": {
+        "isEnabled": true,
+        "cards": [
+          {
+            "front": "Confirmation Bias",
+            "back": "The cognitive bias where one favors information that confirms their existing beliefs.",
+            "order": 0,
+            "_id": "6a268871e0cf5e5c0e201d86"
+          },
+          {
+            "front": "Correlation vs. Causation",
+            "back": "The error of assuming that because two events occur together, one caused the other.",
+            "order": 1,
+            "_id": "6a268871e0cf5e5c0e201d87"
+          },
+          {
+            "front": "Ad Hominem",
+            "back": "A logical fallacy where an argument is rejected by attacking the person making it, rather than the argument itself.",
+            "order": 2,
+            "_id": "6a268871e0cf5e5c0e201d88"
+          },
+          {
+            "front": "First Principles",
+            "back": "Breaking a problem down to its most basic, foundational truths and building a solution from there.",
+            "order": 3,
+            "_id": "6a268871e0cf5e5c0e201d89"
+          }
+        ]
+      },
+      "stepF_AdvancedPractice": {
+        "isEnabled": true,
+        "submissionType": "quiz",
+        "questions": [
+          {
+            "question": "How does a critical thinker distinguish between correlation and causation?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "By looking for a direct mechanism of cause and effect and testing for confounding variables",
+              "By assuming that if two variables rise together, they are definitely linked",
+              "By relying on popular opinion or consensus",
+              "By choosing the simplest explanation without questioning it"
+            ],
+            "correctAnswer": "By looking for a direct mechanism of cause and effect and testing for confounding variables",
+            "explanation": "Correlation only indicates a relationship, whereas establishing causation requires verifying that one event directly triggers the second.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8a"
+          },
+          {
+            "question": "What is the 'Straw Man' logical fallacy?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "Misrepresenting an opponent's argument to make it easier to attack",
+              "Attacking the character of the speaker instead of their point",
+              "Claiming that because a practice is traditional, it must be correct",
+              "Assuming that a small first step will inevitably lead to a chain of negative events"
+            ],
+            "correctAnswer": "Misrepresenting an opponent's argument to make it easier to attack",
+            "explanation": "A straw man fallacy involves oversimplifying or distorting someone's position so it is easier to refute.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8b"
+          },
+          {
+            "question": "Why is intellectual humility critical to analytical thinking?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "It allows you to recognize the limits of your knowledge and remain open to new evidence",
+              "It makes you look less confident to your peers",
+              "It guarantees you will never make an error",
+              "It requires you to defer all decisions to senior management"
+            ],
+            "correctAnswer": "It allows you to recognize the limits of your knowledge and remain open to new evidence",
+            "explanation": "Intellectual humility is the willingness to admit when you do not know something or when your beliefs are incorrect.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8c"
+          }
+        ]
+      },
+      "stepG_CaseStudy": {
+        "isEnabled": true,
+        "caseTitle": "The New Software Tool Dilemma",
+        "caseText": "A tech team is experiencing project delays. The department director, impressed by a recent sales pitch, claims that adopting a new enterprise software tool will instantly solve their productivity issues. The tool costs $50,000 annually. Instead of blindly agreeing, Clara, the lead analyst, decides to run a thorough cost-benefit analysis and interview developers about where their real bottlenecks lie.",
+        "questions": [
+          {
+            "question": "Clara's decision to investigate the actual bottlenecks rather than immediately buying the tool shows she is resisting:",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "Authority bias and confirmation bias",
+              "Technological advancement",
+              "Budget constraints",
+              "Team collaboration"
+            ],
+            "correctAnswer": "Authority bias and confirmation bias",
+            "explanation": "Clara questioned the director's assumption (authority bias) and avoided buying the tool without verifying its fit.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8d"
+          },
+          {
+            "question": "If Clara's survey shows that developers suffer from poor requirement definitions, not slow coding tools, what should she advise?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "Do not buy the software; instead, improve the requirement scoping process",
+              "Buy the software anyway to make the director happy",
+              "Train developers to code faster",
+              "Cancel the project entirely"
+            ],
+            "correctAnswer": "Do not buy the software; instead, improve the requirement scoping process",
+            "explanation": "Addressing the root cause (unclear requirements) is far more effective and less costly than buying an irrelevant tool.",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8e"
+          },
+          {
+            "question": "What critical thinking framework is Clara using by breaking the productivity problem into its component parts?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "First Principles Analysis",
+              "Emotional Reasoning",
+              "Intuitive leap",
+              "Deconstructive delay"
+            ],
+            "correctAnswer": "First Principles Analysis",
+            "explanation": "She broke the problem down to its fundamental truth (why are we slow?) rather than accepting the superficial explanation (we need new software).",
+            "points": 1,
+            "_id": "6a268871e0cf5e5c0e201d8f"
+          }
+        ]
+      },
+      "stepH_Notes": {
+        "isEnabled": true,
+        "prompt": "Reflect on your personal learnings and key takeaways from Critical Thinking Fundamentals. How will you apply this in your career and daily work?",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908581/smaart-minds/videos/thug00c2o5f9sprptqts.mp4"
+      }
+    },
+    "modules": [
+      {
+        "textReading": {
+          "estimatedTime": 10
+        },
+        "passingCriteria": {
+          "quizScore": 60,
+          "requiredVideos": true,
+          "requiredReflections": true
+        },
+        "title": "Seven Stage Learning Flow",
+        "description": "Dynamic seven-stage flow for Critical Thinking Fundamentals.",
+        "duration": 7,
+        "totalBatches": 25,
+        "sequence": 1,
+        "days": [
+          {
+            "moduleDetails": {
+              "title": "Why",
+              "description": "Why stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Why",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 1,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 1,
+                "title": "Why",
+                "type": "video",
+                "content": {
+                  "title": "Why",
+                  "body": "Why learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb5222b"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5222a",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Story",
+              "description": "Story stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Story",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 2,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 2,
+                "title": "Story",
+                "type": "video",
+                "content": {
+                  "title": "Story",
+                  "body": "Story learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb5222d"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5222c",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Framework",
+              "description": "Framework stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Framework",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 3,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 3,
+                "title": "Framework",
+                "type": "video",
+                "content": {
+                  "title": "Framework",
+                  "body": "Framework learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb5222f"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5222e",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Practice",
+              "description": "Practice stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Practice",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 4,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 4,
+                "title": "Practice",
+                "type": "video",
+                "content": {
+                  "title": "Practice",
+                  "body": "Practice learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52231"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52230",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Apply",
+              "description": "Apply stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Apply",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 5,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 5,
+                "title": "Apply",
+                "type": "video",
+                "content": {
+                  "title": "Apply",
+                  "body": "Apply learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52233"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52232",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Reflect",
+              "description": "Reflect stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Reflect",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 6,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 6,
+                "title": "Reflect",
+                "type": "video",
+                "content": {
+                  "title": "Reflect",
+                  "body": "Reflect learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52235"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52234",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Notes",
+              "description": "Notes stage for Critical Thinking Fundamentals."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Critical Thinking Fundamentals - Notes",
+              "description": "Analyzing information objectively",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 7,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 7,
+                "title": "Notes",
+                "type": "text",
+                "content": {
+                  "title": "Notes",
+                  "body": "Notes learning activity for Critical Thinking Fundamentals.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52237"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52236",
+            "tasks": [],
+            "VideoContent": []
+          }
+        ],
+        "status": "active",
+        "_id": "6a1fbdb17cc3afa57eb52229",
+        "videos": [],
+        "quizzes": [],
+        "reflectionQuestions": [],
+        "handouts": [],
+        "microAssessments": []
+      }
+    ]
+  },
+  {
+    "courseCode": "CRS00009",
+    "title": "Communication Basics",
+    "learningFlow": {
+      "stepA_Why": {
+        "isEnabled": true,
+        "title": "Communication Basics - Why it matters",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908404/smaart-minds/videos/fvrg4fwh85di0ul3nyca.mp4",
+        "text": "Understand the purpose, value, and professional relevance of mastering Communication Basics."
+      },
+      "stepB_Story": {
+        "isEnabled": true,
+        "title": "Communication Basics - In Action",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908437/smaart-minds/videos/qsa6g5myzjyafymscz1a.mp4",
+        "narrative": "Explore a real-world story showing the importance of Communication Basics in navigating day-to-day workplace dynamics."
+      },
+      "stepC_Framework": {
+        "isEnabled": true,
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908477/smaart-minds/videos/z5uqj3gpo80stlr2v72n.mp4",
+        "content": "Learn the core principles, methodologies, and actionable frameworks behind Communication Basics.",
+        "diagramUrl": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1780486194/smaart-minds/images/pyy3bzjfk2kizbe3sruu.jpg",
+        "keyPoints": []
+      },
+      "stepD_Practice": {
+        "isEnabled": true,
+        "instructions": "Test your foundational knowledge on Communication Basics.",
+        "submissionType": "quiz",
+        "activityType": "quiz",
+        "randomizeQuestions": true,
+        "questions": [
+          {
+            "question": "Which of the following is a primary objective when applying Communication Basics?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "To improve performance and achieve better outcomes in related situations",
+              "To avoid taking any action or responsibility",
+              "To complicate simple tasks unnecessarily",
+              "To work entirely in isolation without feedback"
+            ],
+            "correctAnswer": "To improve performance and achieve better outcomes in related situations",
+            "explanation": "Communication Basics is focused on structuring your approach to deliver maximum value, clarity, and effectiveness.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e2d"
+          },
+          {
+            "question": "What is a common pitfall when developing capacity in Communication Basics?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "Relying on outdated assumptions without verifying facts or gathering fresh data",
+              "Asking too many clarifying questions",
+              "Collaborating with peers across different domains",
+              "Documenting your progress and tracking results"
+            ],
+            "correctAnswer": "Relying on outdated assumptions without verifying facts or gathering fresh data",
+            "explanation": "Developing competence in Communication Basics requires objective evaluation, continuous refinement, and adjusting to actual feedback.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e2e"
+          },
+          {
+            "question": "Why is Communication Basics considered an essential soft skill in the modern professional landscape?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "It enables professionals to navigate complex, fast-changing environments successfully",
+              "It guarantees that no challenges or conflicts will ever arise",
+              "It removes the need for technical skills or training",
+              "It allows individuals to work slower with less effort"
+            ],
+            "correctAnswer": "It enables professionals to navigate complex, fast-changing environments successfully",
+            "explanation": "Mastering Communication Basics increases adaptability, resilience, and problem-solving capacities in volatile markets.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e2f"
+          }
+        ]
+      },
+      "stepE_FlashCard": {
+        "isEnabled": true,
+        "cards": [
+          {
+            "front": "Core Principle of Communication Basics",
+            "back": "The fundamental methodology and mindset needed to implement this skill effectively.",
+            "order": 0,
+            "_id": "6a268872e0cf5e5c0e201e30"
+          },
+          {
+            "front": "Common Challenge",
+            "back": "Overcoming cognitive bias, external distractions, or resistance to change when applying Communication Basics.",
+            "order": 1,
+            "_id": "6a268872e0cf5e5c0e201e31"
+          },
+          {
+            "front": "Best Practice",
+            "back": "Consistent small actions, continuous feedback loops, and open-minded reflection.",
+            "order": 2,
+            "_id": "6a268872e0cf5e5c0e201e32"
+          },
+          {
+            "front": "Key Value Indicator",
+            "back": "Improved collaboration, faster conflict resolution, and higher output quality.",
+            "order": 3,
+            "_id": "6a268872e0cf5e5c0e201e33"
+          }
+        ]
+      },
+      "stepF_AdvancedPractice": {
+        "isEnabled": true,
+        "submissionType": "quiz",
+        "questions": [
+          {
+            "question": "Which advanced strategy is most effective for optimizing Communication Basics in a high-performing team?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "Creating a culture of psychological safety, open feedback, and collaborative learning",
+              "Implementing strict micromanagement policies and penalizing mistakes",
+              "Relying exclusively on automated tools without human oversight",
+              "Keeping team members isolated to prevent differences of opinion"
+            ],
+            "correctAnswer": "Creating a culture of psychological safety, open feedback, and collaborative learning",
+            "explanation": "Advanced mastery of Communication Basics thrives when teams feel safe to experiment, evaluate outcomes, and communicate honestly.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e34"
+          },
+          {
+            "question": "How does mastering Communication Basics impact long-term career resilience?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "It helps you adapt to role changes and technological disruptions by focusing on core transferable strengths",
+              "It ensures you will stay in the exact same job for your entire career",
+              "It makes technical certifications unnecessary",
+              "It decreases the need to interact with other departments"
+            ],
+            "correctAnswer": "It helps you adapt to role changes and technological disruptions by focusing on core transferable strengths",
+            "explanation": "Communication Basics is a core meta-skill that remains highly relevant regardless of sector-specific automation.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e35"
+          },
+          {
+            "question": "What role does reflection play in maintaining proficiency in Communication Basics?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "It allows you to assess what worked, identify weaknesses, and plan concrete adjustments",
+              "It causes unproductive delay and should be avoided",
+              "It is only useful if you fail a major assignment",
+              "It replaces the need for data-driven analytics"
+            ],
+            "correctAnswer": "It allows you to assess what worked, identify weaknesses, and plan concrete adjustments",
+            "explanation": "Continuous improvement in Communication Basics is driven by mindful evaluation of past actions and experiences.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e36"
+          }
+        ]
+      },
+      "stepG_CaseStudy": {
+        "isEnabled": true,
+        "caseTitle": "Applying Communication Basics at TechCorp",
+        "caseText": "The product team at TechCorp is facing a sudden shift in customer demand. The leadership asks the team to quickly pivot and apply Communication Basics to realign their priorities, manage internal friction, and deliver high-quality solutions. Some members are anxious about the change, while others see it as an opportunity. The team lead organizes a collaborative workshop to align everyone around a structured framework.",
+        "questions": [
+          {
+            "question": "What is the most productive first action the team lead should take to launch Communication Basics in this scenario?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 1,
+            "options": [
+              "Acknowledge team concerns, explain the strategic 'why', and invite constructive input",
+              "Directly assign tasks without explaining the reasons behind the shift",
+              "Cancel the project until full market certainty is restored",
+              "Hire external consultants to handle all decision-making"
+            ],
+            "correctAnswer": "Acknowledge team concerns, explain the strategic 'why', and invite constructive input",
+            "explanation": "Explaining the purpose and welcoming suggestions aligns the team and builds trust during transitions.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e37"
+          },
+          {
+            "question": "How can the team evaluate the direct impact of their alignment efforts around Communication Basics?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 2,
+            "options": [
+              "By establishing clear success metrics, collecting team feedback, and analyzing project cycle times",
+              "By counting the total hours worked by each engineer",
+              "By assuming everything is successful if no one openly complains",
+              "By asking competitors for their opinions on the team's structure"
+            ],
+            "correctAnswer": "By establishing clear success metrics, collecting team feedback, and analyzing project cycle times",
+            "explanation": "Objective metrics and internal surveys are critical to verifying that the pivot yielded positive results.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e38"
+          },
+          {
+            "question": "Which behavior by a team member represents a failure to support Communication Basics in this case study?",
+            "type": "mcq",
+            "isRequired": true,
+            "sequence": 3,
+            "options": [
+              "Refusing to participate in workshops and silently working on outdated tasks",
+              "Asking questions about the new timeline during meetings",
+              "Offering to assist colleagues who are falling behind",
+              "Suggesting improvements to the team's project tracking board"
+            ],
+            "correctAnswer": "Refusing to participate in workshops and silently working on outdated tasks",
+            "explanation": "Resistance to change and disengagement undermine alignment and team performance.",
+            "points": 1,
+            "_id": "6a268872e0cf5e5c0e201e39"
+          }
+        ]
+      },
+      "stepH_Notes": {
+        "isEnabled": true,
+        "prompt": "Reflect on your personal learnings and key takeaways from Communication Basics. How will you apply this in your career and daily work?",
+        "videoUrl": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1780908581/smaart-minds/videos/thug00c2o5f9sprptqts.mp4"
+      }
+    },
+    "modules": [
+      {
+        "textReading": {
+          "estimatedTime": 10
+        },
+        "passingCriteria": {
+          "quizScore": 60,
+          "requiredVideos": true,
+          "requiredReflections": true
+        },
+        "title": "Seven Stage Learning Flow",
+        "description": "Dynamic seven-stage flow for Communication Basics.",
+        "duration": 7,
+        "totalBatches": 25,
+        "sequence": 1,
+        "days": [
+          {
+            "moduleDetails": {
+              "title": "Why",
+              "description": "Why stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Why",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 1,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 1,
+                "title": "Why",
+                "type": "video",
+                "content": {
+                  "title": "Why",
+                  "body": "Why learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb5227c"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5227b",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Story",
+              "description": "Story stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Story",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 2,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 2,
+                "title": "Story",
+                "type": "video",
+                "content": {
+                  "title": "Story",
+                  "body": "Story learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb5227e"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5227d",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Framework",
+              "description": "Framework stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Framework",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 3,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 3,
+                "title": "Framework",
+                "type": "video",
+                "content": {
+                  "title": "Framework",
+                  "body": "Framework learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52280"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb5227f",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Practice",
+              "description": "Practice stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Practice",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 4,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 4,
+                "title": "Practice",
+                "type": "video",
+                "content": {
+                  "title": "Practice",
+                  "body": "Practice learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52282"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52281",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Apply",
+              "description": "Apply stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Apply",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 5,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 5,
+                "title": "Apply",
+                "type": "video",
+                "content": {
+                  "title": "Apply",
+                  "body": "Apply learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52284"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52283",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Reflect",
+              "description": "Reflect stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Reflect",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 6,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 6,
+                "title": "Reflect",
+                "type": "video",
+                "content": {
+                  "title": "Reflect",
+                  "body": "Reflect learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52286"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52285",
+            "tasks": [],
+            "VideoContent": []
+          },
+          {
+            "moduleDetails": {
+              "title": "Notes",
+              "description": "Notes stage for Communication Basics."
+            },
+            "textReading": {
+              "estimatedTime": 10
+            },
+            "videoContent": {
+              "title": "Communication Basics - Notes",
+              "description": "Foundational verbal and written skills",
+              "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "duration": 5,
+              "transcription": "",
+              "embeddedQuestions": []
+            },
+            "dayNumber": 7,
+            "dayType": "course",
+            "steps": [
+              {
+                "stepNumber": 7,
+                "title": "Notes",
+                "type": "text",
+                "content": {
+                  "title": "Notes",
+                  "body": "Notes learning activity for Communication Basics.",
+                  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+                },
+                "introText": [],
+                "isRequired": true,
+                "_id": "6a1fbdb17cc3afa57eb52288"
+              }
+            ],
+            "keyTakeaways": [],
+            "status": "active",
+            "_id": "6a1fbdb17cc3afa57eb52287",
+            "tasks": [],
+            "VideoContent": []
+          }
+        ],
+        "status": "active",
+        "_id": "6a1fbdb17cc3afa57eb5227a",
+        "videos": [],
+        "quizzes": [],
+        "reflectionQuestions": [],
+        "handouts": [],
+        "microAssessments": []
+      }
+    ]
+  }
+]

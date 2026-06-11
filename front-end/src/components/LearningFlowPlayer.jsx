@@ -149,6 +149,8 @@ const LearningFlowPlayer = ({
                   transcriptUrl={resolveLessonTranscriptUrl(currentStepData)}
                   transcriptText={currentStepData.transcriptText || currentStepData.transcription}
                   onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+                  videoUrl={currentStepData.videoUrl || DEMO_VIDEO_URL}
+                  courseCode={urlCourseId || courseData?.courseCode || courseData?.id}
                 />
               </div>
             </div>

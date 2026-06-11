@@ -36,6 +36,7 @@ const SyncedTranscript = ({
   videoUrl,
   title = "Video Transcription",
   onCueClick,
+  courseCode,
 }) => {
   const [rawTranscript, setRawTranscript] = useState(transcriptText || "");
   const [isFullView, setIsFullView] = useState(false);
@@ -62,7 +63,7 @@ const SyncedTranscript = ({
         if (videoUrl && (!transcriptUrl || transcriptUrl.includes('sample-course.vtt'))) {
           setLoadError("Auto-generating transcript with Deepgram... this may take a moment.");
           try {
-            const res = await coursesAPI.transcribeVideo(videoUrl);
+            const res = await coursesAPI.transcribeVideo(videoUrl, courseCode);
             if (res && res.transcription) {
               if (isMounted) {
                 setRawTranscript(res.transcription);
@@ -97,7 +98,7 @@ const SyncedTranscript = ({
     return () => {
       isMounted = false;
     };
-  }, [transcriptText, transcriptUrl]);
+  }, [transcriptText, transcriptUrl, videoUrl, courseCode]);
 
   const cues = useMemo(() => {
     const parsed = parseTranscript(rawTranscript);

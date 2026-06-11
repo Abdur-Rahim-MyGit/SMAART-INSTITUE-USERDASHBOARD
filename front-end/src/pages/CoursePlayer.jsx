@@ -913,6 +913,7 @@ const CoursePlayer = () => {
                       transcriptUrl={stepData.transcriptUrl || stepData.transcriptionUrl || "/transcripts/sample-course.vtt"}
                       transcriptText={stepData.transcription || stepData.transcriptText || stepData.captions}
                       title={t("course_player.video_transcription")}
+                      courseCode={courseId}
                     />
                   </motion.div>
                 )}
