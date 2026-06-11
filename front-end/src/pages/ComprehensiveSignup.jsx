@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2 } from "lucide-react";
+import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2, Home, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ const ComprehensiveSignup = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showDashboardWarning, setShowDashboardWarning] = useState(false);
 
   const [preFilledFields, setPreFilledFields] = useState({
     email: false, fullName: false, mobileNumber: false, institution: false, department: false,
@@ -472,7 +473,7 @@ const ComprehensiveSignup = () => {
   const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
   const selectClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
   const textareaClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
-  const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
+  const yearOptions = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
   const sectorOptions = excelData.sectors.length > 0
@@ -517,37 +518,47 @@ const ComprehensiveSignup = () => {
             </span>
           </div>
 
-          {/* Center: Current Step Status with Modern Capsule Design */}
-          <div className="hidden sm:flex items-center gap-3 bg-slate-50/70 border border-slate-200/60 rounded-2xl px-4 py-2.5 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300">
-            <div className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active:</span>
-              <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
-                {steps[currentStep].title}
-              </span>
-            </div>
-            <div className="h-4 w-[1px] bg-slate-200 mx-1" />
-            <span className="font-mono text-[10px] font-extrabold bg-[#1a3884] text-white px-2 py-0.5 rounded-lg">
-              {currentStep + 1} / {steps.length}
-            </span>
-          </div>
+          {/* Center: Current Step Status with Modern Capsule Design (Hidden per user request) */}
+          <div className="hidden"></div>
 
-          {/* Right: Clean Spacer & Mobile Step Indicator */}
+          {/* Right: Clean Spacer & Back to Home */}
           <div className="flex items-center gap-3">
-            {/* Mobile indicator for step */}
-            <div className="flex sm:hidden items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>{currentStep + 1}/{steps.length}</span>
-            </div>
+            {/* Mobile indicator for step (Hidden per user request) */}
+            <div className="hidden"></div>
+
+            <button
+              onClick={() => setShowDashboardWarning(true)}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 hover:border-[#1a3884]/30 text-slate-600 hover:text-[#1a3884] bg-white hover:bg-blue-50/20 shadow-sm hover:shadow transition-all duration-200 text-xs font-bold uppercase tracking-wider group"
+            >
+              <Briefcase className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-colors" />
+              <span className="hidden sm:inline">Go into Dashboard</span>
+            </button>
           </div>
 
         </div>
       </header>
 
       <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
+
+        {/* Attractive Title & Slogan */}
+        <div className="text-center mb-8 mt-2">
+          <motion.h1
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl md:text-4xl font-extrabold text-[#1a3884] mb-3 tracking-tight"
+          >
+            Complete Your Profile
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm md:text-base text-slate-600 max-w-2xl mx-auto"
+          >
+            Build a comprehensive and professional profile to unlock the best career opportunities, personalized recommendations
+          </motion.p>
+        </div>
+
         {/* Progress Bar */}
         <div className="mb-6 px-2">
           <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
@@ -578,7 +589,7 @@ const ComprehensiveSignup = () => {
                 <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <div className="flex flex-col justify-start mb-8">
                     <Label className="text-sm text-slate-500 font-medium mb-2">Profile Photo *</Label>
-                    <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo (Max 5MB)" />
+                    <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo" accept=".jpg,.png,.jpeg" />
                   </div>
                   <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
                     <div className="space-y-1">
@@ -597,7 +608,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
                       <div className="relative">
-                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
+                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} min="1900-01-01" max={new Date(new Date().setFullYear(new Date().getFullYear() - 15)).toISOString().split('T')[0]} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <User className="w-4 h-4 text-slate-400" />
                         </div>
@@ -1245,6 +1256,59 @@ const ComprehensiveSignup = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Go to Dashboard Warning Modal */}
+      <AnimatePresence>
+        {showDashboardWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDashboardWarning(false)}
+            className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center mb-5 shrink-0">
+                <AlertCircle className="w-8 h-8 text-amber-600 animate-pulse" />
+              </div>
+
+              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight mb-2">
+                Incomplete Profile Registration
+              </h3>
+
+              <p className="text-sm text-slate-500 leading-relaxed mb-6 px-2">
+                You have not completed your profile registration. We highly recommend completing it now to unlock your personalized courses, assessments, and full dashboard features.
+              </p>
+
+              <div className="w-full flex flex-col gap-2.5">
+                <Button
+                  onClick={() => setShowDashboardWarning(false)}
+                  className="w-full h-12 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
+                  style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+                >
+                  Continue Registration
+                </Button>
+
+                <button
+                  onClick={() => {
+                    setShowDashboardWarning(false);
+                    navigate("/dashboard", { replace: true });
+                  }}
+                  className="w-full h-11 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 transition-all shadow-sm flex items-center justify-center"
+                >
+                  Go to Dashboard Anyway
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

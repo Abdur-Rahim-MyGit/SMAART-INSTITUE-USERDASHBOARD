@@ -35,16 +35,9 @@ const LoginCard = () => {
 
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
   const [passwordChangeData, setPasswordChangeData] = useState({ tempToken: "", email: "", fullName: "" });
-  const [rememberMe, setRememberMe] = useState(false);
 
-  // Load remembered email
-  useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail");
-    if (savedEmail) {
-      setLoginEmail(savedEmail);
-      setRememberMe(true);
-    }
-  }, []);
+
+
 
   useEffect(() => {
     const storedInstitution = sessionStorage.getItem("selectedInstitution");
@@ -117,13 +110,7 @@ const LoginCard = () => {
 
       login(data.user, data.token);
 
-      // Handle Remember Me
-      if (rememberMe) {
-        const normalizedEmail = loginEmail.trim().toLowerCase();
-        localStorage.setItem("rememberedEmail", normalizedEmail);
-      } else {
-        localStorage.removeItem("rememberedEmail");
-      }
+
 
       toast.success("Login successful!");
 
@@ -168,9 +155,9 @@ const LoginCard = () => {
       setSelectedInstitution(targetInstitution);
       setShowInstitutionSelector(false);
 
-      // CRITICAL FIX: If we are on an institution-specific page, 
+      // CRITICAL FIX: If we are on an institution-specific page or the login page, 
       // sync the URL so the parent component (like Institution.jsx) updates its video/data
-      if (window.location.pathname.includes('/institution/')) {
+      if (window.location.pathname.includes('/institution/') || window.location.pathname.startsWith('/login')) {
         navigate(`/institution/${encodeURIComponent(targetInstitution.name)}`, { replace: true });
       }
     }
@@ -221,6 +208,9 @@ const LoginCard = () => {
 
   const handlePasswordChangeSuccess = (data, redirectToDashboard = false) => {
     login(data.user, data.token);
+    if (data.sessionExpiresAt) {
+      sessionStorage.setItem("sessionExpiresAt", data.sessionExpiresAt);
+    }
     setShowPasswordChangeModal(false);
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
     resetUserIdCache();
@@ -232,6 +222,11 @@ const LoginCard = () => {
       sessionStorage.setItem("signupFullName", data.user?.fullName || "");
       navigate("/complete-registration", { replace: true });
     }
+  };
+
+  const handlePasswordChangeClose = () => {
+    setShowPasswordChangeModal(false);
+    setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
   };
 
   if (showInstitutionSelector) {
@@ -424,7 +419,21 @@ const LoginCard = () => {
                 </label>
                 <button
                   type="button"
-                  onClick={() => setShowForgotPassword(true)}
+                  onClick={() => {
+                    if (!selectedInstitution) {
+                      toast.error("Please select your institution first");
+                      return;
+                    }
+                    if (!loginEmail.trim()) {
+                      toast.error("Please enter your registered email address first");
+                      return;
+                    }
+                    if (!validateEmail(loginEmail.trim())) {
+                      toast.error("Please enter a valid email address to reset your password");
+                      return;
+                    }
+                    setShowForgotPassword(true);
+                  }}
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300"
                 >
                   Forgot?
@@ -462,27 +471,7 @@ const LoginCard = () => {
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center justify-between px-1 -mt-1">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <div className="relative flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="peer appearance-none w-4 h-4 rounded border border-slate-300 checked:bg-[#1a3884] checked:border-[#1a3884] transition-all cursor-pointer"
-                  />
-                  <div className="absolute opacity-0 peer-checked:opacity-100 text-white pointer-events-none transition-opacity">
-                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                </div>
-                <span className="text-[11px] font-bold text-gray-500 dark:text-slate-300 uppercase tracking-wider group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
-                  Remember Me
-                </span>
-              </label>
-            </div>
+
 
             {/* Submit Button */}
             <button
@@ -542,12 +531,13 @@ const LoginCard = () => {
       <ForgotPasswordModal
         isOpen={showForgotPassword}
         onClose={() => setShowForgotPassword(false)}
+        initialEmail={loginEmail.trim()}
       />
 
       {/* First Login Password Change Modal */}
       <FirstLoginPasswordModal
         isOpen={showPasswordChangeModal}
-        onClose={() => { }}
+        onClose={handlePasswordChangeClose}
         tempToken={passwordChangeData.tempToken}
         email={passwordChangeData.email}
         fullName={passwordChangeData.fullName}

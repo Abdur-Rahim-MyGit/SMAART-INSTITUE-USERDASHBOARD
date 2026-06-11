@@ -332,7 +332,7 @@ exports.getAdminAnalytics = async (req, res) => {
 
     if (formattedTrends.length === 0) {
       // Calculate current numbers to seed mock trends
-      const totalColleges = await College.countDocuments({ status: 'active' });
+      const totalColleges = await College.countDocuments({ status: 'Active' });
       const totalStudents = await Student.countDocuments({ status: 'active' });
       const totalEnrollmentsCount = await CourseEnrollment.countDocuments();
       const completedCount = await CourseEnrollment.countDocuments({ status: 'completed' });
@@ -367,7 +367,7 @@ exports.getAdminAnalytics = async (req, res) => {
       collegeLeaderboard = latestAnalytics.collegeRankings.slice(0, 10);
     } else {
       // Fetch colleges and construct a fallback leaderboard
-      const colleges = await College.find({ status: 'active' }).limit(10);
+      const colleges = await College.find({ status: 'Active' }).limit(10);
       collegeLeaderboard = await Promise.all(colleges.map(async (col, index) => {
         const studentCount = await Student.countDocuments({ college: col._id });
         const enrollmentStats = await CourseEnrollment.aggregate([

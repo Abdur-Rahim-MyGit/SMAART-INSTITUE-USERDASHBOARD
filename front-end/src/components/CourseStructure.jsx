@@ -11,9 +11,9 @@ import {
   IconPlayerPlayFilled as Play,
   IconFingerprint as Brain,
   IconCpu as Bot,
-  IconInfinity as Leaf,
-  IconSchool as GraduationCap
+  IconInfinity as Leaf
 } from "@tabler/icons-react";
+import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -744,7 +744,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     };
   }, [dbCourses, t, user]);
 
-  const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
+  // checkStageUnlocked and checkTrackUnlocked used directly in render (imported aliases)
 
   const selectedStage = activeStages.find(s => s.id === selectedStageId) || activeTracks.find(t => t.id === selectedStageId);
   const selectedCfg = STAGE_CONFIG[selectedStageId] || {
@@ -758,10 +758,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   const totalCourses = activeStages.reduce((a, s) => a + s.totalCourses, 0) + activeTracks.reduce((a, t) => a + t.totalCourses, 0);
   const overallPct = totalCourses > 0 ? Math.round((totalCompleted / totalCourses) * 100) : 0;
 
-  const isTrackUnlocked = (trackId) => {
-    const track = activeTracks.find((t) => t.id === trackId);
-    return track ? checkTrackUnlocked(track, userProgress) : false;
-  };
+  const getTrackUnlocked = (track) => checkTrackUnlocked(track, userProgress);
 
   return (
     <div className="w-full relative overflow-hidden">
@@ -814,78 +811,78 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
 
         {/* Main content */}
         <div className="w-full relative z-10">
-        <AnimatePresence mode="wait">
-          {!selectedStageId ? (
-            /* Category cards view */
-            <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
-              <div>
-                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  {t("my_courses_page.human_intelligence_courses")}
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {activeStages.map((stage, i) => {
-                    const cfg = STAGE_CONFIG[stage.id];
-                    const unlocked = isStageUnlocked(stage);
-                    const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+          <AnimatePresence mode="wait">
+            {!selectedStageId ? (
+              /* Category cards view */
+              <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
+                <div>
+                  <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
+                    {t("my_courses_page.human_intelligence_courses")}
+                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {activeStages.map((stage, i) => {
+                      const cfg = STAGE_CONFIG[stage.id] || { tag: `Stage ${stage.id}`, Icon: BookOpen, color: "#112b6b" };
+                      const unlocked = checkStageUnlocked(stage, userProgress);
+                      const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
 
-                    return (
-                      <CategoryCard
-                        key={stage.id}
-                        stage={stage}
-                        cfg={cfg}
-                        isUnlocked={unlocked}
-                        completedCount={completed}
-                        delay={i * 0.15}
-                        onClick={() => {
-                          setSelectedStageId(stage.id);
-                        }}
-                      />
-                    );
-                  })}
+                      return (
+                        <CategoryCard
+                          key={stage.id}
+                          stage={stage}
+                          cfg={cfg}
+                          isUnlocked={unlocked}
+                          completedCount={completed}
+                          delay={i * 0.15}
+                          onClick={() => {
+                            setSelectedStageId(stage.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  {t("my_courses_page.readiness_tracks")}
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {activeTracks.map((track, i) => {
-                    const unlocked = isTrackUnlocked(track.id);
-                    const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+                <div>
+                  <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
+                    {t("my_courses_page.readiness_tracks")}
+                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {activeTracks.map((track, i) => {
+                      const unlocked = checkTrackUnlocked(track, userProgress);
+                      const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
 
-                    return (
-                      <TrackCard
-                        key={track.id}
-                        track={track}
-                        isUnlocked={unlocked}
-                        completedCount={completed}
-                        delay={0.45 + (i * 0.1)}
-                        onClick={() => {
-                          setSelectedStageId(track.id);
-                        }}
-                      />
-                    );
-                  })}
+                      return (
+                        <TrackCard
+                          key={track.id}
+                          track={track}
+                          isUnlocked={unlocked}
+                          completedCount={completed}
+                          delay={0.45 + (i * 0.1)}
+                          onClick={() => {
+                            setSelectedStageId(track.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ) : (
-            /* Stage/Track detail view */
-            <motion.div key={`stage-${selectedStageId}`}>
-              <StageDetailView
-                stage={selectedStage}
-                cfg={selectedCfg}
-                userProgress={userProgress}
-                onBack={() => setSelectedStageId(null)}
-                onCourseClick={onCourseClick}
-                publishedCourseCodes={publishedCourseCodes}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            ) : (
+              /* Stage/Track detail view */
+              <motion.div key={`stage-${selectedStageId}`}>
+                <StageDetailView
+                  stage={selectedStage}
+                  cfg={selectedCfg}
+                  userProgress={userProgress}
+                  onBack={() => setSelectedStageId(null)}
+                  onCourseClick={onCourseClick}
+                  publishedCourseCodes={publishedCourseCodes}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

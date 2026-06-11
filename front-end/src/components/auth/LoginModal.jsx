@@ -11,7 +11,9 @@ import useUser from "@/hooks/useUser";
 
 const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  // Bug #8 Fix: Read savedEmail once at top — avoids calling setFormData inside useState initializer
+  const savedEmail = localStorage.getItem("rememberedEmail") || "";
+  const [formData, setFormData] = useState({ email: savedEmail, password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,14 +25,8 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({ tempToken: "", email: "", fullName: "" });
   const { login } = useUser();
-  const [rememberMe, setRememberMe] = useState(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail");
-    if (savedEmail) {
-      setFormData(prev => ({ ...prev, email: savedEmail }));
-      return true;
-    }
-    return false;
-  });
+  // Bug #8 Fix: Simple boolean init — savedEmail already applied to formData above
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,10 +37,20 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     setIsLoading(true);
 
     try {
+      // Bug #3 Fix: Include institution from InstitutionSelector (stored in sessionStorage)
+      const storedInstitution = sessionStorage.getItem('selectedInstitution');
+      let institutionPayload = {};
+      if (storedInstitution) {
+        try {
+          const parsed = JSON.parse(storedInstitution);
+          if (parsed?.code) institutionPayload.collegeCode = parsed.code;
+          else if (parsed?.name) institutionPayload.institution = parsed.name;
+        } catch (e) { /* non-blocking */ }
+      }
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...institutionPayload }),
       });
 
       const data = await response.json();
@@ -102,12 +108,15 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     // Use the login function from context to update global state
     login(userToStore, data.token);
 
-    // Handle Remember Me
-    if (rememberMe) {
-      localStorage.setItem("rememberedEmail", data.user?.email || formData.email);
-    } else {
-      localStorage.removeItem("rememberedEmail");
+    // Bug #5 Fix: Store session expiry so useSessionGuard can enforce the 3-hour limit
+    if (data.sessionExpiresAt) {
+      sessionStorage.setItem('sessionExpiresAt', data.sessionExpiresAt);
     }
+    if (data.sessionId) {
+      sessionStorage.setItem('sessionId', data.sessionId);
+    }
+
+
 
     console.log("[LoginModal] Data stored and state updated");
     onClose();
@@ -145,7 +154,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     const nextStep = data.nextStep || "/dashboard";
     console.log("[LoginModal] Navigating to:", nextStep);
     navigate(nextStep);
-  }, [rememberMe, formData.email, onClose, navigate, login]);
+  }, [formData.email, onClose, navigate, login]);
 
   // Handle OTP verification success
   const handleOtpSuccess = (data) => {
@@ -301,27 +310,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                     </div>
                   </div>
 
-                  {/* Remember Me */}
-                  <div className="flex items-center justify-between px-1 -mt-2">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <div className="relative flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          checked={rememberMe}
-                          onChange={(e) => setRememberMe(e.target.checked)}
-                          className="peer appearance-none w-4 h-4 rounded border border-slate-300 checked:bg-[#1a3884] checked:border-[#1a3884] transition-all cursor-pointer"
-                        />
-                        <div className="absolute opacity-0 peer-checked:opacity-100 text-white pointer-events-none transition-opacity">
-                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
-                        Remember Me
-                      </span>
-                    </label>
-                  </div>
+
 
                   <Button
                     type="submit"

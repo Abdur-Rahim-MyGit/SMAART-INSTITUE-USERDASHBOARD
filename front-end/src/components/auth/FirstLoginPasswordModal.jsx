@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Lock, Eye, EyeOff, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Lock, Eye, EyeOff, ShieldCheck, AlertCircle, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { apiCall } from "@/services/api";
@@ -125,6 +125,16 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
           className="relative w-full max-w-[440px] bg-white rounded-3xl shadow-2xl overflow-hidden"
           style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}
         >
+          {/* Close Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-[90] p-1.5 rounded-full hover:bg-gray-100/80 transition-all duration-200"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
           {/* ── Header ──────────────────────────────────────────────────────── */}
           <div className="bg-[#F8FAFC] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
             {/* Shield badge */}
@@ -289,25 +299,35 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
               <RequirementItem label="Passwords match"    met={passwordChecks.match} />
             </div>
 
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={isLoading || !isPasswordValid}
-              className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  <span>Securing Account…</span>
-                </>
-              ) : (
-                <>
-                  <span>Update &amp; Access Portal</span>
-                  <ShieldCheck className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
+            {/* Submit & Cancel Actions */}
+            <div className="flex flex-col gap-2.5">
+              <Button
+                type="submit"
+                disabled={isLoading || !isPasswordValid}
+                className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    <span>Securing Account…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Update &amp; Access Portal</span>
+                    <ShieldCheck className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={onClose}
+                className="w-full h-11 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 bg-white hover:bg-slate-50 border border-gray-200 transition-all shadow-sm flex items-center justify-center gap-1.5"
+              >
+                Cancel &amp; Exit
+              </Button>
+            </div>
 
             <p className="text-center text-[11px] text-gray-400 leading-relaxed">
               🔒 This step is mandatory. Your account cannot be accessed until a secure password is set.

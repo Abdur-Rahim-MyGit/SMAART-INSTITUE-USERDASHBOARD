@@ -15,9 +15,19 @@ const VerifyOTP = () => {
   const { theme } = useTheme();
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
+  const [resendCooldown, setResendCooldown] = useState(0); // 20s resend limit
   const [email, setEmail] = useState("");
   const [tempToken, setTempToken] = useState("");
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   useEffect(() => {
     // Get email and tempToken from sessionStorage
@@ -100,6 +110,7 @@ const VerifyOTP = () => {
   };
 
   const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
     setIsLoading(true);
     try {
       // SECURITY FIX #6: Call real backend resend endpoint
@@ -122,7 +133,8 @@ const VerifyOTP = () => {
 
       toast.success("OTP resent to your email!");
       setOtp("");
-      setTimeLeft(300);
+      setTimeLeft(180);
+      setResendCooldown(20);
     } catch (error) {
       toast.error(error.message || "Failed to resend OTP");
     } finally {
@@ -267,10 +279,10 @@ const VerifyOTP = () => {
             <Button
               type="button"
               onClick={handleResendOTP}
-              disabled={isLoading}
+              disabled={isLoading || resendCooldown > 0}
               className="w-full bg-white hover:bg-[#F8FAFC] text-gray-700 border border-gray-200 h-10 sm:h-11 text-sm font-semibold transition-colors rounded-xl shadow-sm"
             >
-              {isLoading ? "Resending..." : "Send New Code"}
+              {isLoading ? "Resending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Send New Code"}
             </Button>
           </motion.div>
         </form>

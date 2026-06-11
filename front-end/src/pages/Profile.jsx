@@ -725,6 +725,17 @@ const Profile = () => {
                       <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || t("profile_page.institution_not_set")}</span>
                     </div>
                   </div>
+
+                  <div className="mt-5 flex justify-center md:justify-start">
+                    <button
+                      onClick={() => navigate('/dashboard/skills-passport')}
+                      className="group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] duration-300"
+                    >
+                      <Award className="w-4.5 h-4.5" />
+                      <span>{t("profile_page.view_skills_passport", "View Skills Passport")}</span>
+                      <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
 
