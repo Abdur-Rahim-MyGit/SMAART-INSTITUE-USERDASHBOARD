@@ -744,7 +744,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     };
   }, [dbCourses, t, user]);
 
-  const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
+  // checkStageUnlocked and checkTrackUnlocked used directly in render (imported aliases)
 
   const selectedStage = activeStages.find(s => s.id === selectedStageId) || activeTracks.find(t => t.id === selectedStageId);
   const selectedCfg = STAGE_CONFIG[selectedStageId] || {
@@ -758,122 +758,119 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   const totalCourses = activeStages.reduce((a, s) => a + s.totalCourses, 0) + activeTracks.reduce((a, t) => a + t.totalCourses, 0);
   const overallPct = totalCourses > 0 ? Math.round((totalCompleted / totalCourses) * 100) : 0;
 
-  const isTrackUnlocked = (trackId) => {
-    const track = activeTracks.find((t) => t.id === trackId);
-    return track ? checkTrackUnlocked(track, userProgress) : false;
-  };
+  const getTrackUnlocked = (track) => checkTrackUnlocked(track, userProgress);
 
   return (
-    <div className="w-full relative overflow-hidden p-[2rem]">
+    <div className="w-full relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header — standardized PageHero with restored old design */}
-      {!selectedStageId && (
-        <div className="relative z-10 pt-4 pb-0">
-          {/* Back Button */}
-          <div className="mb-6">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+      <div className="relative z-10 mx-auto max-w-7xl space-y-6 p-8">
+        {/* Page header — standardized PageHero with restored old design */}
+        {!selectedStageId && (
+          <>
+            {/* Back Button - Mobile Only */}
+            <div className="mb-4 md:hidden">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                  <ArrowLeft stroke={1.5} className="h-4 w-4" />
+                </div>
+                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+              </button>
+            </div>
+
+            <PageHero
+              badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
+              icon={GraduationCap}
+              title={t("my_courses_page.programme", "Smaart Programme")}
+              subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
             >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-            </button>
-          </div>
+              {continueWatching}
+            </PageHero>
+          </>
+        )}
 
-          <PageHero
-            badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
-            icon={GraduationCap}
-            title={t("my_courses_page.programme", "Smaart Programme")}
-            subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
-          >
-            {continueWatching}
-          </PageHero>
+        {/* Main content */}
+        <div className="w-full relative z-10">
+          <AnimatePresence mode="wait">
+            {!selectedStageId ? (
+              /* Category cards view */
+              <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
+                <div>
+                  <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
+                    {t("my_courses_page.human_intelligence_courses")}
+                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {activeStages.map((stage, i) => {
+                      const cfg = STAGE_CONFIG[stage.id] || { tag: `Stage ${stage.id}`, Icon: BookOpen, color: "#112b6b" };
+                      const unlocked = checkStageUnlocked(stage, userProgress);
+                      const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+
+                      return (
+                        <CategoryCard
+                          key={stage.id}
+                          stage={stage}
+                          cfg={cfg}
+                          isUnlocked={unlocked}
+                          completedCount={completed}
+                          delay={i * 0.15}
+                          onClick={() => {
+                            setSelectedStageId(stage.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
+                    {t("my_courses_page.readiness_tracks")}
+                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {activeTracks.map((track, i) => {
+                      const unlocked = checkTrackUnlocked(track, userProgress);
+                      const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+
+                      return (
+                        <TrackCard
+                          key={track.id}
+                          track={track}
+                          isUnlocked={unlocked}
+                          completedCount={completed}
+                          delay={0.45 + (i * 0.1)}
+                          onClick={() => {
+                            setSelectedStageId(track.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              /* Stage/Track detail view */
+              <motion.div key={`stage-${selectedStageId}`}>
+                <StageDetailView
+                  stage={selectedStage}
+                  cfg={selectedCfg}
+                  userProgress={userProgress}
+                  onBack={() => setSelectedStageId(null)}
+                  onCourseClick={onCourseClick}
+                  publishedCourseCodes={publishedCourseCodes}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      )}
-
-
-
-      {/* Main content */}
-      <div className="w-full py-4 relative z-10">
-        <AnimatePresence mode="wait">
-          {!selectedStageId ? (
-            /* Category cards view */
-            <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
-              <div>
-                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  {t("my_courses_page.human_intelligence_courses")}
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {activeStages.map((stage, i) => {
-                    const cfg = STAGE_CONFIG[stage.id];
-                    const unlocked = isStageUnlocked(stage);
-                    const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
-
-                    return (
-                      <CategoryCard
-                        key={stage.id}
-                        stage={stage}
-                        cfg={cfg}
-                        isUnlocked={unlocked}
-                        completedCount={completed}
-                        delay={i * 0.15}
-                        onClick={() => {
-                          setSelectedStageId(stage.id);
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  {t("my_courses_page.readiness_tracks")}
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {activeTracks.map((track, i) => {
-                    const unlocked = isTrackUnlocked(track.id);
-                    const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
-
-                    return (
-                      <TrackCard
-                        key={track.id}
-                        track={track}
-                        isUnlocked={unlocked}
-                        completedCount={completed}
-                        delay={0.45 + (i * 0.1)}
-                        onClick={() => {
-                          setSelectedStageId(track.id);
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            /* Stage/Track detail view */
-            <motion.div key={`stage-${selectedStageId}`}>
-              <StageDetailView
-                stage={selectedStage}
-                cfg={selectedCfg}
-                userProgress={userProgress}
-                onBack={() => setSelectedStageId(null)}
-                onCourseClick={onCourseClick}
-                publishedCourseCodes={publishedCourseCodes}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

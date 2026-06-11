@@ -195,8 +195,121 @@ const AddDetails = () => {
         return false;
     };
 
+    const validateProfilePhoto = () => {
+        if (!personalDetails.profilePhoto) { toast.error("Profile Photo is required"); return false; }
+        return true;
+    };
+
+    const validatePersonalDetails = () => {
+        if (!personalDetails.fullName?.trim()) { toast.error("Full name is required"); return false; }
+        if (!personalDetails.nickname?.trim()) { toast.error("Nick name is required"); return false; }
+        if (!personalDetails.dob) { toast.error("Date of Birth is required"); return false; }
+        const dobDate = new Date(personalDetails.dob);
+        const today = new Date();
+        const age = today.getFullYear() - dobDate.getFullYear();
+        if (age < 15) { toast.error("You must be at least 15 years old."); return false; }
+        if (!personalDetails.gender) { toast.error("Gender is required"); return false; }
+        return true;
+    };
+
+    const validateTenthDetails = () => {
+        if (!tenthDetails.schoolName?.trim()) { toast.error("10th School Name is required"); return false; }
+        if (!tenthDetails.yearOfPassing) { toast.error("10th Year of Passing is required"); return false; }
+        if (!tenthDetails.percentage) { toast.error("10th Percentage is required"); return false; }
+        if (parseFloat(tenthDetails.percentage) > 100 || parseFloat(tenthDetails.percentage) < 0) { toast.error("Percentage must be between 0 and 100"); return false; }
+        if (!tenthDetails.marksheet) { toast.error("10th Marksheet is required"); return false; }
+        return true;
+    };
+
+    const validateTwelfthDetails = () => {
+        if (!twelfthDetails.schoolName?.trim()) { toast.error("12th School Name is required"); return false; }
+        if (!twelfthDetails.stream) { toast.error("12th Stream is required"); return false; }
+        if (!twelfthDetails.yearOfPassing) { toast.error("12th Year of Passing is required"); return false; }
+        if (!twelfthDetails.percentage) { toast.error("12th Percentage is required"); return false; }
+        if (parseFloat(twelfthDetails.percentage) > 100 || parseFloat(twelfthDetails.percentage) < 0) { toast.error("Percentage must be between 0 and 100"); return false; }
+        if (!twelfthDetails.marksheet) { toast.error("12th Marksheet is required"); return false; }
+        return true;
+    };
+
+    const validateHigherEducation = () => {
+        for (let i = 0; i < higherEducation.length; i++) {
+            const h = higherEducation[i];
+            if (!h.qualificationLevel) { toast.error(`Higher Ed ${i + 1}: Degree Level is required`); return false; }
+            if (!h.degree) { toast.error(`Higher Ed ${i + 1}: Domain Field is required`); return false; }
+            if (!h.degreeFullName) { toast.error(`Higher Ed ${i + 1}: Degree Full Name is required`); return false; }
+            if (!h.institutionName?.trim()) { toast.error(`Higher Ed ${i + 1}: Institution Name is required`); return false; }
+            if (!h.yearOfPassing) { toast.error(`Higher Ed ${i + 1}: Year of Passing is required`); return false; }
+            if (!h.cgpaPercentage) { toast.error(`Higher Ed ${i + 1}: CGPA/Percentage is required`); return false; }
+            if (!h.certificate) { toast.error(`Higher Ed ${i + 1}: Certificate upload is required`); return false; }
+        }
+        return true;
+    };
+
+    const validateJobPreferences = () => {
+        for (let i = 0; i < jobPreferences.items.length; i++) {
+            const j = jobPreferences.items[i];
+            if (!j.preferredRole?.trim()) { toast.error(`Job Pref ${i + 1}: Preferred Job Role is required`); return false; }
+            if (!j.jobType) { toast.error(`Job Pref ${i + 1}: Job Type is required`); return false; }
+        }
+        return true;
+    };
+
+    const validateSectorPreferences = () => {
+        if (sectorPreferences.preferredSectors.length === 0) { toast.error("Please select at least one preferred sector"); return false; }
+        return true;
+    };
+
+    const validateCareerGoals = () => {
+        if (!careerGoals.shortTerm?.trim() || !careerGoals.mediumTerm?.trim() || !careerGoals.longTerm?.trim()) { toast.error("All career goals are required"); return false; }
+        if (!personalDevelopmentGoals.shortTerm?.trim() || !personalDevelopmentGoals.mediumTerm?.trim() || !personalDevelopmentGoals.longTerm?.trim()) { toast.error("All personal development goals are required"); return false; }
+        return true;
+    };
+
+    const validateProjects = () => {
+        if (!projects.isApplicable) return true;
+        for (let i = 0; i < projects.items.length; i++) {
+            const p = projects.items[i];
+            if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim()) { toast.error(`Project ${i + 1}: All fields marked * are required`); return false; }
+        }
+        return true;
+    };
+
+    const validateWorkExperience = () => {
+        if (!workExperience.isApplicable) return true;
+        for (let i = 0; i < workExperience.items.length; i++) {
+            const w = workExperience.items[i];
+            if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.startDate) { toast.error(`Experience ${i + 1}: All fields marked * are required`); return false; }
+        }
+        return true;
+    };
+
+    const validateCertificates = () => {
+        if (!certificates.isApplicable) return true;
+        for (let i = 0; i < certificates.items.length; i++) {
+            const c = certificates.items[i];
+            if (!c.title?.trim() || !c.issuingOrg?.trim() || !c.yearOfCompletion) { toast.error(`Certificate ${i + 1}: All fields marked * are required`); return false; }
+        }
+        return true;
+    };
+
     const handleNextStep = () => {
-        if (currentStep < steps.length - 1) {
+        let isValid = true;
+        switch (currentStep) {
+            case 0: isValid = validateProfilePhoto(); break;
+            case 1: isValid = validatePersonalDetails(); break;
+            case 2: isValid = validateTenthDetails(); break;
+            case 3: isValid = validateTwelfthDetails(); break;
+            case 4: isValid = validateHigherEducation(); break;
+            case 5: isValid = validateJobPreferences(); break;
+            case 6: isValid = validateSectorPreferences(); break;
+            case 7: isValid = validateCareerGoals(); break;
+            case 8: isValid = validateProjects(); break;
+            case 9: isValid = validateWorkExperience(); break;
+            case 10: isValid = validateCertificates(); break;
+            default: isValid = true;
+        }
+
+        if (isValid && currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
             window.scrollTo(0, 0);
         }
@@ -273,7 +386,7 @@ const AddDetails = () => {
     const inputClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
     const selectClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 appearance-none disabled:opacity-60 disabled:cursor-not-allowed";
     const textareaClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 resize-none placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
-    const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
+    const yearOptions = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => 2010 + i);
 
     if (isInitialLoading) {
         return (
@@ -302,6 +415,25 @@ const AddDetails = () => {
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-[#C0C0C0]/30">
             <div className="max-w-4xl mx-auto py-10 px-4 relative">
+                
+                <div className="text-center mb-10">
+                    <motion.h1 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-4xl md:text-5xl font-extrabold text-[#1a3884] mb-4 tracking-tight"
+                    >
+                        Activate Your Profile
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-lg text-slate-600 max-w-2xl mx-auto"
+                    >
+                        Complete your profile with your best details to unlock top career opportunities and stand out to recruiters!
+                    </motion.p>
+                </div>
+
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] relative flex flex-col min-h-[600px]">
 
                     <div className="mb-8 flex items-center justify-between">
@@ -373,7 +505,7 @@ const AddDetails = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Date of Birth</Label>
-                                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
+                                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} min="1900-01-01" max={new Date(new Date().setFullYear(new Date().getFullYear() - 15)).toISOString().split('T')[0]} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Gender</Label>

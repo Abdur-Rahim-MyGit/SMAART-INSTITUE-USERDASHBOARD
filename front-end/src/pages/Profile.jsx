@@ -645,14 +645,14 @@ const Profile = () => {
             <ProfileSkeleton />
           ) : (
             <main className="container mx-auto px-4 py-6 max-w-6xl">
-              {/* Back Button */}
-              <div className="mb-4">
+              {/* Back Button - Mobile Only */}
+              <div className="mb-4 md:hidden">
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+                  className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                    <ArrowLeft className="w-4 h-4" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                    <ArrowLeft className="h-4 w-4" />
                   </div>
                   {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
                 </button>
@@ -724,6 +724,17 @@ const Profile = () => {
                       <Building className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
                       <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || t("profile_page.institution_not_set")}</span>
                     </div>
+                  </div>
+
+                  <div className="mt-5 flex justify-center md:justify-start">
+                    <button
+                      onClick={() => navigate('/dashboard/skills-passport')}
+                      className="group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] duration-300"
+                    >
+                      <Award className="w-4.5 h-4.5" />
+                      <span>{t("profile_page.view_skills_passport", "View Skills Passport")}</span>
+                      <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                   </div>
                 </div>
               </motion.div>

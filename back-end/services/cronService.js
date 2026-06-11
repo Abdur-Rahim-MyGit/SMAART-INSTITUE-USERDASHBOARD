@@ -77,7 +77,7 @@ async function runDailyRollup(targetDateStr) {
 
     // 6. College Rankings
     // We group students/enrollments by college and calculate average progress and student count
-    const colleges = await College.find({ status: 'active' });
+    const colleges = await College.find({ status: 'Active' });
     const collegeRankingData = [];
 
     for (const col of colleges) {

@@ -11,6 +11,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
     const [skillProgress, setSkillProgress] = useState({});
     const [totalRolesCount, setTotalRolesCount] = useState(0);
     const [certModal, setCertModal] = useState(null); // { skillName } or null
+    const [inProgressModal, setInProgressModal] = useState(null); // { skillName } or null
 
     // Get user properly from sessionStorage first, fallback to old localStorage if needed
     const userStr = sessionStorage.getItem('user');
@@ -194,16 +195,28 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                 />
             )}
 
+            {inProgressModal && (
+                <InProgressModal
+                    skillName={inProgressModal.skillName}
+                    onConfirm={() => {
+                        handleStatusChange(inProgressModal.skillName, 'In Progress');
+                        setInProgressModal(null);
+                    }}
+                    onClose={() => setInProgressModal(null)}
+                    theme={theme}
+                />
+            )}
+
             <div style={styles.roadmapFlow}>
-                {foundation.length > 0 && <RoadmapPhase title="Foundational Skills" icon={ShieldCheck} items={foundation} color="var(--accent)" skillProgress={skillProgress} onStatusChange={handleStatusChange} totalRoles={totalRolesCount} />}
-                {growth.length > 0 && <RoadmapPhase title="Specialization Skills" icon={Terminal} items={growth} color="var(--accent2)" skillProgress={skillProgress} onStatusChange={handleStatusChange} totalRoles={totalRolesCount} />}
-                {mastery.length > 0 && <RoadmapPhase title="Edge Skills" icon={Zap} items={mastery} color="#a78bfa" skillProgress={skillProgress} onStatusChange={handleStatusChange} totalRoles={totalRolesCount} />}
+                {foundation.length > 0 && <RoadmapPhase title="Foundational Skills" icon={ShieldCheck} items={foundation} color="var(--accent)" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
+                {growth.length > 0 && <RoadmapPhase title="Specialization Skills" icon={Terminal} items={growth} color="var(--accent2)" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
+                {mastery.length > 0 && <RoadmapPhase title="Edge Skills" icon={Zap} items={mastery} color="#a78bfa" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
             </div>
         </div>
     );
 };
 
-const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatusChange, totalRoles }) => (
+const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatusChange, onInProgress, totalRoles }) => (
     <div style={styles.phaseWrap}>
         <div style={{ ...styles.phaseLine, background: `linear-gradient(to bottom, ${color}, transparent)` }} />
         <div style={styles.phaseHeader}>
@@ -218,6 +231,7 @@ const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatus
                     color={color}
                     status={skillProgress[item.name] || 'Not Started'}
                     onStatusChange={onStatusChange}
+                    onInProgress={onInProgress}
                     totalRoles={totalRoles}
                 />
             ))}
@@ -225,7 +239,7 @@ const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatus
     </div>
 );
 
-const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
+const SkillCard = ({ item, color, status, onStatusChange, onInProgress, totalRoles }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
 
@@ -283,12 +297,20 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
 
             {status !== 'Completed' && (
                 <div style={{ ...styles.progressActions, opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(5px)' }}>
-                    {status !== 'In Progress' && (
+                    {status !== 'In Progress' ? (
                         <button
-                            onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'In Progress'); }}
+                            onClick={(e) => { e.stopPropagation(); onInProgress({ skillName: item.name }); }}
                             style={{ ...styles.actionBtn, background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}
                         >
                             In Progress
+                        </button>
+                    ) : (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Not Started'); }}
+                            style={{ ...styles.actionBtn, background: 'rgba(148, 163, 184, 0.12)', color: '#94a3b8', border: '1px solid rgba(148,163,184,0.25)' }}
+                            title="Undo In Progress"
+                        >
+                            ↩ Undo
                         </button>
                     )}
                     <button
@@ -300,6 +322,113 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
                 </div>
             )}
         </div>
+    );
+};
+
+/* ── In Progress Confirmation Modal ── */
+const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const C = {
+        bg:      isDark ? '#0f1729' : '#ffffff',
+        surface: isDark ? '#141f35' : '#f8fafc',
+        border:  isDark ? 'rgba(255,255,255,0.09)' : '#e2e8f0',
+        text1:   isDark ? '#f1f5f9' : '#0f172a',
+        text2:   isDark ? '#94a3b8' : '#475569',
+        muted:   isDark ? '#64748b' : '#94a3b8',
+        btnBg:   isDark ? '#1e2d48' : '#f1f5f9',
+    };
+
+    return ReactDOM.createPortal(
+        <div
+            style={{
+                position: 'fixed', inset: 0,
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
+                zIndex: 99999,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '1rem',
+                animation: 'fadeIn 0.15s ease',
+            }}
+            onClick={onClose}
+        >
+            <div
+                style={{
+                    background: C.bg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: '20px',
+                    width: '100%', maxWidth: '380px',
+                    overflow: 'hidden',
+                    boxShadow: isDark
+                        ? '0 32px 64px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06)'
+                        : '0 20px 50px -10px rgba(0,0,0,0.18)',
+                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+                    animation: 'slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+                }}
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Top accent bar */}
+                <div style={{ height: '4px', background: 'linear-gradient(90deg, #3b82f6, #6366f1)' }} />
+
+                {/* Body */}
+                <div style={{ padding: '1.8rem 1.5rem 1.2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+                    <div style={{
+                        width: '54px', height: '54px', borderRadius: '50%',
+                        background: 'rgba(59, 130, 246, 0.12)',
+                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.6rem',
+                    }}>🎯</div>
+
+                    <div>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: C.text1, marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
+                            Start Learning?
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: C.text2, lineHeight: 1.6 }}>
+                            Mark <strong style={{ color: C.text1 }}>&#34;{skillName}&#34;</strong> as{' '}
+                            <span style={{ color: '#3b82f6', fontWeight: 700 }}>In Progress</span>?<br />
+                            <span style={{ color: C.muted, fontSize: '0.76rem' }}>You can undo this at any time.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div style={{
+                    display: 'flex', gap: '0.6rem',
+                    padding: '1rem 1.5rem',
+                    borderTop: `1px solid ${C.border}`,
+                    background: C.surface,
+                    justifyContent: 'flex-end',
+                }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            padding: '0.55rem 1.2rem',
+                            background: C.btnBg, color: C.text2,
+                            border: `1px solid ${C.border}`, borderRadius: '9px',
+                            fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        style={{
+                            padding: '0.55rem 1.4rem',
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            color: '#3b82f6',
+                            border: '1px solid rgba(59,130,246,0.4)',
+                            borderRadius: '9px',
+                            fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(59,130,246,0.2)',
+                        }}
+                    >
+                        Yes, Start Learning
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
     );
 };
 

@@ -34,6 +34,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import useUser from "@/hooks/useUser";
 import useAvatar from "@/hooks/useAvatar";
+import ProfileHoverCard from "@/components/ProfileHoverCard";
 import { getBackendUrl } from "@/services/api";
 
 // Import logos for different themes
@@ -110,8 +111,31 @@ const LeftSidebar = () => {
   const { theme, setTheme } = useTheme();
   const { isCollapsed, toggleSidebar, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { user, logout } = useUser();
+  const { avatarData } = useAvatar();
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
+
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const hoverTimeoutRef = useRef(null);
+
+  const isDesktopViewport = () => window.matchMedia("(min-width: 1024px)").matches;
+
+  const handleMouseEnter = () => {
+    if (!isDesktopViewport()) return;
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsProfileHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isDesktopViewport()) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsProfileHovered(false);
+    }, 150);
+  };
+
+  const closeProfileMenu = () => {
+    setIsProfileHovered(false);
+  };
 
   // Auto-toggle between profile photo and college logo
   useEffect(() => {
@@ -608,7 +632,11 @@ const LeftSidebar = () => {
         </div>
 
         {/* User Profile Section with Hover Card */}
-        <div className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-50">
+        <div 
+          className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-50"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           <div
             className={`flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] dark:bg-white/5 cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-white/10 ${isCollapsed ? 'justify-center' : ''}`}
             onClick={() => navigate('/dashboard/profile')}
@@ -627,7 +655,7 @@ const LeftSidebar = () => {
                 </div>
               )}
             </div>
-
+ 
             {/* User Info - Displaying College Name */}
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
@@ -639,12 +667,34 @@ const LeftSidebar = () => {
                 </p>
               </div>
             )}
-
+ 
             {/* Arrow Indicator */}
             {!isCollapsed && (
               <ChevronRight size={16} stroke={1.5} className="w-4 h-4 text-slate-400" />
             )}
           </div>
+
+          {/* Desktop hover profile dropdown */}
+          <AnimatePresence>
+            {isProfileHovered && (
+              <motion.div
+                initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="absolute bottom-2 left-full ml-4 z-[100] w-72 pointer-events-auto"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <ProfileHoverCard 
+                  user={user} 
+                  avatarData={avatarData} 
+                  onLogout={handleLogout} 
+                  onClose={closeProfileMenu} 
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.aside>
     </>

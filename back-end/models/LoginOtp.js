@@ -46,7 +46,7 @@ const loginOtpSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 300, // Document expires after 5 minutes (300 seconds)
+    expires: 180, // Document expires after 3 minutes (180 seconds)
   },
 });
 

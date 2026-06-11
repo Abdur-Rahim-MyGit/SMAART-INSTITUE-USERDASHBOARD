@@ -12,7 +12,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [currentTempToken, setCurrentTempToken] = useState(tempToken);
-  const [expirationTime, setExpirationTime] = useState(300); // 5 minutes
+  const [expirationTime, setExpirationTime] = useState(180); // 3 minutes
   const [announcement, setAnnouncement] = useState("");
 
   // Force Logout State
@@ -20,6 +20,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   const [forceLogoutMessage, setForceLogoutMessage] = useState("");
 
   const inputRefs = useRef([]);
+  // Bug #4 Fix: Track auto-submit to prevent double-fire from React re-renders
+  const hasAutoSubmittedRef = useRef(false);
 
   useEffect(() => {
     setCurrentTempToken(tempToken);
@@ -50,16 +52,24 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
   // Reset timer when token changes (initial or resend)
   useEffect(() => {
-    setExpirationTime(300);
+    setExpirationTime(180);
   }, [currentTempToken]);
 
   // AUTO-SUBMIT: When all 6 digits are filled, automatically verify
+  // Bug #4 Fix: Added missing deps + ref guard to prevent duplicate POST calls
   useEffect(() => {
     const otpString = otp.join("");
-    if (otpString.length === 6 && !isLoading && !showForceLogout) {
-      verifyOtp(false);
+    if (otpString.length === 6 && !isLoading && !showForceLogout && !hasAutoSubmittedRef.current) {
+      hasAutoSubmittedRef.current = true;
+      verifyOtp(false).finally(() => {
+        hasAutoSubmittedRef.current = false;
+      });
     }
-  }, [otp]);
+    // Reset the guard when OTP is cleared
+    if (otpString.length < 6) {
+      hasAutoSubmittedRef.current = false;
+    }
+  }, [otp, isLoading, showForceLogout]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -191,7 +201,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
       toast.success("New OTP sent to your email");
       setCurrentTempToken(data.tempToken);
-      setResendCooldown(60);
+      setResendCooldown(20);
       setOtp(["", "", "", "", "", ""]);
       setShowForceLogout(false); // Reset this just in case
       inputRefs.current[0]?.focus();

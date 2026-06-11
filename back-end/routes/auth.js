@@ -145,6 +145,13 @@ router.post('/verify-signup-otp', otpLimiter, async (req, res) => {
       return res.status(400).json({ error: 'OTP has expired or is invalid. Please request a new one.' });
     }
 
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(otpRecord.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: otpRecord._id });
+      return res.status(400).json({ error: 'OTP has expired or is invalid. Please request a new one.' });
+    }
+
     // Check max attempts
     if (otpRecord.attempts >= otpRecord.maxAttempts) {
       await LoginOtp.deleteOne({ _id: otpRecord._id });
@@ -194,6 +201,13 @@ router.post('/resend-signup-otp', passwordResetLimiter, async (req, res) => {
     });
 
     if (!existingOtp) {
+      return res.status(400).json({ error: 'Session expired. Please start over.' });
+    }
+
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(existingOtp.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: existingOtp._id });
       return res.status(400).json({ error: 'Session expired. Please start over.' });
     }
 
@@ -360,6 +374,11 @@ router.post('/login',
           ]
         });
         if (collegeInfo) {
+          if (collegeInfo.status !== 'Active') {
+            return res.status(403).json({
+              error: 'This institution portal is currently inactive. Please contact your college administrator.'
+            });
+          }
           collegeId = collegeInfo._id;
         }
       }
@@ -392,7 +411,7 @@ router.post('/login',
       console.log('collegeId:', collegeId);
       console.log('institutionToCheck:', institutionToCheck);
 
-      user = await Student.findOne(studentQuery).populate('college', 'logo collegeName').select('+password');
+      user = await Student.findOne(studentQuery).populate('college', 'logo collegeName status').select('+password');
       console.log('Student found:', !!user);
 
       if (user) {
@@ -405,7 +424,7 @@ router.post('/login',
         let teacherQuery = isEmail ? { email: identifier.toLowerCase() } : { teacherId: identifier };
         if (collegeId) teacherQuery.college = collegeId;
 
-        user = await Teacher.findOne(teacherQuery).populate('college', 'logo collegeName').select('+password');
+        user = await Teacher.findOne(teacherQuery).populate('college', 'logo collegeName status').select('+password');
         console.log('Teacher found:', !!user);
 
         if (user) {
@@ -417,7 +436,7 @@ router.post('/login',
       // 3. If not found, try generic User (Admin, etc)
       if (!user) {
         let userQuery = isEmail ? { email: identifier.toLowerCase() } : { userId: identifier };
-        user = await User.findOne(userQuery).populate('college', 'logo collegeName').select('+password');
+        user = await User.findOne(userQuery).populate('college', 'logo collegeName status').select('+password');
 
         if (user) {
           userType = 'user';
@@ -460,16 +479,25 @@ router.post('/login',
         if (collegeId) {
           const userInOtherCollege = await Student.findOne({ email: normalizedEmail });
           if (userInOtherCollege) {
-            return res.status(400).json({ error: 'Invalid credentials for the selected college. This account belongs to a different institution.' });
+            return res.status(400).json({ error: 'User not found.' });
           }
         }
-        return res.status(400).json({ error: 'Invalid credentials or user not found in selected institution' });
+        return res.status(400).json({ error: 'User not found.' });
+      }
+
+      // Check if associated college is active
+      if (user.college && user.college.status && user.college.status !== 'Active') {
+        return res.status(403).json({
+          error: 'This institution portal is currently inactive. Please contact your college administrator.'
+        });
       }
 
       // === SECURITY FIX #1: Check account status before allowing login ===
       if (user.status && !['active'].includes(user.status)) {
+        if (user.status === 'pending') {
+          return res.status(400).json({ error: 'User not found.' });
+        }
         const statusMessages = {
-          pending: 'Your account is pending approval. Please contact your administrator.',
           inactive: 'Your account has been deactivated. Please contact your administrator.',
           suspended: 'Your account has been suspended. Please contact your administrator.',
           graduated: 'Your account has been archived. Please contact your administrator.'
@@ -785,6 +813,13 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
       return res.status(400).json({ error: 'OTP expired or invalid. Please login again.' });
     }
 
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(loginOtp.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: loginOtp._id });
+      return res.status(400).json({ error: 'OTP expired or invalid. Please login again.' });
+    }
+
     // Check max attempts
     const maxAttempts = loginOtp.maxAttempts || OTP_MAX_ATTEMPTS;
     if (loginOtp.attempts >= maxAttempts) {
@@ -805,9 +840,6 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
 
     // Verify OTP
     let isValid = await loginOtp.verifyOtp(otp);
-    if (!isValid && process.env.NODE_ENV !== 'production' && otp === '999999') {
-      isValid = true;
-    }
 
     if (!isValid) {
       loginOtp.attempts += 1;
@@ -1006,6 +1038,13 @@ router.post('/resend-login-otp', async (req, res) => {
       return res.status(400).json({ error: 'Session expired. Please login again.' });
     }
 
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(loginOtp.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: loginOtp._id });
+      return res.status(400).json({ error: 'Session expired. Please login again.' });
+    }
+
     // Generate new OTP
     const otp = generateOTP();
     console.log(`[OTP] Resent OTP for ${loginOtp.email}: '${otp}'`);
@@ -1052,27 +1091,81 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
 
     // SECURITY FIX: Validate college context if provided
     let collegeId = null;
+    let college = null;
     if (collegeCode) {
-      const college = await College.findOne({
+      college = await College.findOne({
         $or: [
           { collegeCode: collegeCode },
           { collegeName: collegeCode }
-        ],
-        status: 'active'
+        ]
       });
       console.log('[Forgot Password] College lookup result:', college ? college.collegeName : 'NOT FOUND'); // DEBUG
-      if (college) {
-        collegeId = college._id;
+      
+      if (!college) {
+        return res.status(404).json({
+          error: 'Email not found at this institution.',
+          wrongCollege: true
+        });
       }
+
+      if (college.status !== 'Active') {
+        return res.status(403).json({
+          error: 'This institution portal is currently inactive. Please contact your college administrator.',
+          wrongCollege: true
+        });
+      }
+      
+      collegeId = college._id;
     } else {
       console.log('[Forgot Password] No collegeCode provided - using fallback mode'); // DEBUG
     }
 
     // Find user - if collegeCode provided, STRICTLY search within that college only
     let user = null;
-    if (collegeId) {
-      // STRICT MODE: Only allow password reset if user belongs to the selected college
-      user = await Student.findOne({ email: normalizedEmail, college: collegeId });
+    if (collegeCode && collegeId) {
+      const Registration = require('../models/Registration');
+      const User = require('../models/User');
+
+      if (college) {
+        // 1. Search in Student
+        user = await Student.findOne({ email: normalizedEmail, college: collegeId });
+
+        // 2. Search in Registration (matching institution name or code context)
+        if (!user) {
+          const registration = await Registration.findOne({ email: normalizedEmail });
+          if (registration) {
+            const regInst = registration.institution || '';
+            let regInstName = regInst;
+            try {
+              if (regInst.startsWith('{')) {
+                const parsed = JSON.parse(regInst);
+                regInstName = parsed.name || regInst;
+              }
+            } catch (e) {}
+
+            if (
+              regInstName === college.collegeName ||
+              regInstName === college.collegeCode ||
+              regInst === college.collegeName ||
+              regInst === college.collegeCode
+            ) {
+              user = registration;
+            }
+          }
+        }
+
+        // 3. Search in User
+        if (!user) {
+          user = await User.findOne({ email: normalizedEmail, college: collegeId });
+        }
+
+        // 4. Search in Teacher
+        if (!user) {
+          const Teacher = require('../models/Teacher');
+          user = await Teacher.findOne({ email: normalizedEmail, college: collegeId });
+        }
+      }
+
       // If not found in this college, DO NOT fall back to other collections
       // This prevents cross-college password resets
       if (!user) {
@@ -1084,12 +1177,18 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
       }
     } else {
       // Backwards compatibility: No college specified, search all collections
+      const Registration = require('../models/Registration');
+      const User = require('../models/User');
       user = await Student.findOne({ email: normalizedEmail });
       if (!user) {
         user = await Registration.findOne({ email: normalizedEmail });
       }
       if (!user) {
         user = await User.findOne({ email: normalizedEmail });
+      }
+      if (!user) {
+        const Teacher = require('../models/Teacher');
+        user = await Teacher.findOne({ email: normalizedEmail });
       }
     }
 
@@ -1098,6 +1197,17 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         error: 'No account found with this email address.'
+      });
+    }
+
+    // SECURITY: Block fresh/first-time users from using forgot password
+    // They haven't logged in yet and still have the default admin-assigned password.
+    // They must log in using the default password first, then set their own password.
+    if (user.constructor.modelName === 'Student' && user.isFirstLogin === true && user.mustChangePassword === true) {
+      console.log(`[Forgot Password] Blocked first-time user ${normalizedEmail} - must log in with default password first`);
+      return res.status(403).json({
+        error: 'You have not set up your account yet. Please log in using the default password provided by your institution to set your own password.',
+        isFirstTimeUser: true
       });
     }
 
@@ -1151,6 +1261,13 @@ router.post('/verify-reset-otp', async (req, res) => {
       return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
     }
 
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(resetOtp.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: resetOtp._id });
+      return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
+    }
+
     if (resetOtp.attempts >= 5) {
       await LoginOtp.deleteOne({ _id: resetOtp._id });
       return res.status(400).json({ error: 'Too many attempts. Please request a new reset link.' });
@@ -1200,6 +1317,13 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
     }
 
+    // Verify code expiration explicitly (3 minutes)
+    const isExpired = Date.now() - new Date(resetOtp.createdAt).getTime() > 3 * 60 * 1000;
+    if (isExpired) {
+      await LoginOtp.deleteOne({ _id: resetOtp._id });
+      return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
+    }
+
     // Check max attempts
     if (resetOtp.attempts >= 5) {
       await LoginOtp.deleteOne({ _id: resetOtp._id });
@@ -1236,6 +1360,9 @@ router.post('/reset-password', async (req, res) => {
       await Registration.findByIdAndUpdate(userId, passwordUpdate);
     } else if (userModel === 'User') {
       await User.findByIdAndUpdate(userId, passwordUpdate);
+    } else if (userModel === 'Teacher') {
+      const Teacher = require('../models/Teacher');
+      await Teacher.findByIdAndUpdate(userId, passwordUpdate);
     }
 
     // Delete all existing OTPs for this user (security cleanup)
@@ -1316,12 +1443,14 @@ router.post('/first-login-change-password', async (req, res) => {
 
       // Generate session ID for single-session enforcement
       const sessionId = require('crypto').randomUUID();
+      const sessionExpiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hours
 
       // Update student record to mark as not first login
       await Student.findByIdAndUpdate(student._id, {
         mustChangePassword: false,
         isFirstLogin: false,
         currentSessionId: sessionId,
+        sessionExpiresAt: sessionExpiresAt,
         lastLogin: new Date()
       });
 
@@ -1354,6 +1483,7 @@ router.post('/first-login-change-password', async (req, res) => {
         alreadyRegistered: true,
         redirectToDashboard: true,
         token,
+        sessionExpiresAt,
         user: {
           id: student._id,
           fullName: student.fullName,
@@ -1376,6 +1506,7 @@ router.post('/first-login-change-password', async (req, res) => {
     // Update student password and first login flags
     // Generate session ID for single-session enforcement
     const sessionId = require('crypto').randomUUID();
+    const sessionExpiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hours
 
     student.password = newPassword; // Will be hashed by pre-save hook
     student.mustChangePassword = false;
@@ -1383,6 +1514,7 @@ router.post('/first-login-change-password', async (req, res) => {
     student.passwordChangedAt = new Date();
     student.lastLogin = new Date();
     student.currentSessionId = sessionId;
+    student.sessionExpiresAt = sessionExpiresAt;
     await student.save();
 
     // Delete the temp token
@@ -1446,6 +1578,7 @@ router.post('/first-login-change-password', async (req, res) => {
     res.json({
       message: 'Password changed successfully! Welcome to SMAART Minds.',
       token,
+      sessionExpiresAt,
       user: userResponse
     });
   } catch (err) {

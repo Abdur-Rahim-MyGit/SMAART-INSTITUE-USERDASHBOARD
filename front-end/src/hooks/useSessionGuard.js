@@ -27,6 +27,9 @@ const useSessionGuard = (onExpired) => {
   const countdownRef = useRef(null);
   const checkRef = useRef(null);
   const hasExpiredRef = useRef(false);
+  // Bug #6 Fix: Track warning state in a ref so setInterval callback doesn't
+  // depend on stale closure or trigger the effect to re-subscribe on every render
+  const showWarningRef = useRef(false);
 
   const getExpiresAt = useCallback(() => {
     const val = sessionStorage.getItem('sessionExpiresAt');
@@ -81,7 +84,9 @@ const useSessionGuard = (onExpired) => {
         return;
       }
 
-      if (remaining <= WARNING_THRESHOLD_MS && !showWarning) {
+      // Bug #6 Fix: use ref instead of state to avoid re-subscribing the interval
+      if (remaining <= WARNING_THRESHOLD_MS && !showWarningRef.current) {
+        showWarningRef.current = true;
         setShowWarning(true);
         startCountdown(expiresAt);
       }
@@ -94,6 +99,7 @@ const useSessionGuard = (onExpired) => {
       if (remaining <= 0) {
         triggerExpiry();
       } else if (remaining <= WARNING_THRESHOLD_MS) {
+        showWarningRef.current = true;
         setShowWarning(true);
         startCountdown(expiresAt);
       }
@@ -103,10 +109,12 @@ const useSessionGuard = (onExpired) => {
       clearInterval(checkRef.current);
       clearInterval(countdownRef.current);
     };
-  }, [getExpiresAt, showWarning, startCountdown, triggerExpiry]);
+    // Bug #6 Fix: removed showWarning from deps — it is now tracked via showWarningRef
+  }, [getExpiresAt, startCountdown, triggerExpiry]);
 
   const dismissWarning = useCallback(() => {
     // "Extend Session" was clicked — renew via backend and update stored expiry
+    showWarningRef.current = false; // Bug #6 Fix: reset the ref too
     setShowWarning(false);
     clearInterval(countdownRef.current);
   }, []);

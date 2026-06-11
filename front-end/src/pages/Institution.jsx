@@ -15,7 +15,7 @@ const Institution = () => {
   const [collegeData, setCollegeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -167,6 +167,7 @@ const Institution = () => {
                       </div>
                     ) : (
                       <iframe
+                        key={currentVideoUrl}
                         src={currentVideoUrl}
                         className="absolute inset-0 w-full h-full border-0 rounded-2xl"
                         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
@@ -180,30 +181,18 @@ const Institution = () => {
 
                 {/* Welcome text below */}
                 <div
-                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-white dark:bg-card"
+                  className="px-6 py-8 sm:px-8 sm:py-9 flex flex-col items-center justify-center text-center rounded-b-3xl relative overflow-hidden bg-white dark:bg-card"
                 >
-                  <div className="relative z-10">
-                    <h2 className="text-xl sm:text-2xl font-bold text-[#002147] dark:text-foreground mb-1.5 tracking-tight leading-snug">
+                  <div className="relative z-10 max-w-lg mx-auto">
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#002147] dark:text-foreground mb-3 tracking-tight leading-snug">
                       A Message from {" "}
                       <span className="font-extrabold text-[#1a3884] dark:text-blue-400">
                         Your Institution
                       </span>
                     </h2>
-                    <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed max-w-xs">
+                    <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed">
                       Hear from your institution’s leadership as they introduce this platform and share their best wishes for your learning journey and future success.
-
                     </p>
-                  </div>
-                  {/* Play button */}
-                  <div
-                    onClick={() => setIsPlaying(true)}
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer rounded-full relative z-10"
-                    style={{
-                      background: "linear-gradient(135deg, #1a3884 0%, #002147 100%)",
-                      boxShadow: "0 8px 24px rgba(0,33,71,0.25)",
-                    }}
-                  >
-                    <Play className="w-5 h-5 text-white fill-white ml-0.5" />
                   </div>
                 </div>
               </div>

@@ -15,45 +15,60 @@ import CareerLockBanner from './components/CareerLockBanner';
 
 import CareerLockedModal from './components/CareerLockedModal';
 import { fetchLockStatus } from '@/services/CareerLockService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import {
-  IconCompass as Compass,
-  IconClipboardList as ClipboardList,
-  IconChartBar as BarChart3,
-  IconDna as Dna,
-  IconMap2 as Map,
-  IconAward as Award,
-  IconRocket as Rocket,
-  IconRobot as Bot,
-  IconMicrophone as Mic,
-  IconFileText as FileText,
-  IconCode as Code,
-  IconLock as Lock,
-  IconLockOpen as Unlock,
-  IconCircleCheck as CheckCircle,
-  IconTrophy as Trophy,
-  IconMedal as Medal,
-  IconTarget as Target,
-  IconSparkles as Sparkles,
-  IconSun as Sun,
-  IconMoon as Moon,
-  IconDeviceDesktop as Monitor,
-  IconChevronDown as ChevronDown,
-  IconX as X,
-  IconMenu2 as Menu,
-  IconRefresh as RefreshCw
+    IconCompass as Compass,
+    IconClipboardList as ClipboardList,
+    IconChartBar as BarChart3,
+    IconDna as Dna,
+    IconMap2 as Map,
+    IconAward as Award,
+    IconRocket as Rocket,
+    IconRobot as Bot,
+    IconMicrophone as Mic,
+    IconFileText as FileText,
+    IconCode as Code,
+    IconLock as Lock,
+    IconLockOpen as Unlock,
+    IconCircleCheck as CheckCircle,
+    IconTrophy as Trophy,
+    IconMedal as Medal,
+    IconTarget as Target,
+    IconSparkles as Sparkles,
+    IconSun as Sun,
+    IconMoon as Moon,
+    IconDeviceDesktop as Monitor,
+    IconChevronDown as ChevronDown,
+    IconX as X,
+    IconMenu2 as Menu,
+    IconRefresh as RefreshCw
 } from '@tabler/icons-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
     const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
-    const [activeRole, setActiveRole] = useState(1);
+    const [activeRole, setActiveRole] = useState(() => {
+        // Initialize from ?tab= query param so the correct path tab is shown immediately
+        const tab = new URLSearchParams(window.location.search).get('tab');
+        if (tab === 'secondary') return 2;
+        if (tab === 'tertiary') return 3;
+        return 1;
+    });
     const [activePanel, setActivePanel] = useState('direction');
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
+    // Keep activeRole in sync if user navigates with different ?tab= param
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab === 'secondary') setActiveRole(2);
+        else if (tab === 'tertiary') setActiveRole(3);
+        else if (tab === 'primary') setActiveRole(1);
+    }, [searchParams]);
 
     // ── Career Direction Locking System ────────────────────────────────────────
     const [lockStatus, setLockStatus] = useState(null);
@@ -146,16 +161,16 @@ const CareerAgentDashboard = () => {
                 || null;
         };
 
-        const primaryName   = getPrefName(data.primary,   _dp.primary,   'smaart_pref_primary');
+        const primaryName = getPrefName(data.primary, _dp.primary, 'smaart_pref_primary');
         const secondaryName = getPrefName(data.secondary, _dp.secondary, 'smaart_pref_secondary');
-        const tertiaryName  = getPrefName(data.tertiary,  _dp.tertiary,  'smaart_pref_tertiary');
+        const tertiaryName = getPrefName(data.tertiary, _dp.tertiary, 'smaart_pref_tertiary');
 
         // ALWAYS re-fetch roles from DB for ALL paths — the cached direction.roles in the
         // saved analysis may be incomplete. Only skip if we have no name to search by.
         const toFetch = [
-            { key: 'primary',   name: primaryName },
+            { key: 'primary', name: primaryName },
             { key: 'secondary', name: secondaryName },
-            { key: 'tertiary',  name: tertiaryName },
+            { key: 'tertiary', name: tertiaryName },
         ].filter(p => p.name);
 
         if (toFetch.length === 0) return;
@@ -173,12 +188,12 @@ const CareerAgentDashboard = () => {
                             const existingDir = data[key]?.direction || {};
                             patches[key] = {
                                 ...existingDir,
-                                directionId:          dir.directionId   || existingDir.directionId   || '',
-                                directionName:        dir.directionName || existingDir.directionName || name,
-                                directionDescription: dir.overview      || existingDir.directionDescription || '',
-                                directionOverview:    dir.overview      || existingDir.directionOverview    || '',
-                                type:                 existingDir.type  || (key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative'),
-                                roles:                dir.roles         || [],  // ← always use fresh DB roles (full list)
+                                directionId: dir.directionId || existingDir.directionId || '',
+                                directionName: dir.directionName || existingDir.directionName || name,
+                                directionDescription: dir.overview || existingDir.directionDescription || '',
+                                directionOverview: dir.overview || existingDir.directionOverview || '',
+                                type: existingDir.type || (key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative'),
+                                roles: dir.roles || [],  // ← always use fresh DB roles (full list)
                             };
                         }
                     }
@@ -219,11 +234,11 @@ const CareerAgentDashboard = () => {
     }
 
     const { primary = {}, secondary = {}, tertiary = {}, combined_tab4 = {} } = data || {};
-    
+
     // Safety check for current data structure
     const getSafeRole = (roleData) => {
         if (!roleData || !roleData.tab1) {
-            return { 
+            return {
                 tab1: { role_name: 'Analyzing...', role_description: 'Processing role intelligence...' },
                 tab3: { ai_tools: [], ai_exposure: { percentage: '0%', level: 'Analyzing' } }
             };
@@ -238,9 +253,9 @@ const CareerAgentDashboard = () => {
     const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
     const _dp = _draft?.preferences || {};
     // Priority: analysis direction name → localStorage pref key → draft pref → role name
-    const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
+    const prefPrimary = primary?.direction?.directionName || localStorage.getItem('smaart_pref_primary') || _dp.primary?.careerDirectionName || _dp.primary?.role || primary?.tab1?.role_name || 'Primary';
     const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
-    const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
+    const prefTertiary = tertiary?.direction?.directionName || localStorage.getItem('smaart_pref_tertiary') || _dp.tertiary?.careerDirectionName || _dp.tertiary?.role || tertiary?.tab1?.role_name || 'Tertiary';
 
     const userStr = sessionStorage.getItem("user");
     const user = userStr ? JSON.parse(userStr) : null;
@@ -257,9 +272,9 @@ const CareerAgentDashboard = () => {
         return (dir.roles || []).filter(r => r && (r.role || typeof r === 'string'));
     };
     const allDirections = [
-        { label: prefPrimary,   directionName: primary?.direction?.directionName   || prefPrimary,   roles: buildDirRoles(primary)   },
+        { label: prefPrimary, directionName: primary?.direction?.directionName || prefPrimary, roles: buildDirRoles(primary) },
         { label: prefSecondary, directionName: secondary?.direction?.directionName || prefSecondary, roles: buildDirRoles(secondary) },
-        { label: prefTertiary,  directionName: tertiary?.direction?.directionName  || prefTertiary,  roles: buildDirRoles(tertiary)  },
+        { label: prefTertiary, directionName: tertiary?.direction?.directionName || prefTertiary, roles: buildDirRoles(tertiary) },
     ];
 
 
@@ -319,11 +334,11 @@ const CareerAgentDashboard = () => {
 
             {/* ── Mobile Sidebar Drawer ── */}
             {showMobileSidebar && (
-                <div 
+                <div
                     className="mobile-drawer-overlay"
                     onClick={() => setShowMobileSidebar(false)}
                 >
-                    <div 
+                    <div
                         className="mobile-drawer"
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -332,7 +347,7 @@ const CareerAgentDashboard = () => {
                                 <div className="mobile-drawer-subtitle">{t('career_agent.drawer.title', 'SELECT SECTION')}</div>
                                 <div className="mobile-drawer-title">{currentData?.tab1?.role_name || 'Career Path'}</div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setShowMobileSidebar(false)}
                                 className="mobile-drawer-close"
                             >
@@ -385,18 +400,17 @@ const CareerAgentDashboard = () => {
                                 setTheme(next);
                             }}
                             title="Toggle Theme"
-                            className={`flex items-center justify-center w-[38px] h-[38px] rounded-full border transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${
-                                theme === 'dark' 
-                                ? 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20 hover:text-white' 
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-[#1a3884]/30 hover:text-[#1a3884]'
-                            }`}
+                            className={`flex items-center justify-center w-[38px] h-[38px] rounded-full border transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${theme === 'dark'
+                                    ? 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20 hover:text-white'
+                                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-[#1a3884]/30 hover:text-[#1a3884]'
+                                }`}
                         >
                             {theme === 'dark' ? <Sun size={20} stroke={1.5} /> : <Moon size={20} stroke={1.5} />}
                         </button>
 
 
-                        <button 
-                            className="btn-primary" 
+                        <button
+                            className="btn-primary"
                             onClick={() => navigate('/dashboard/career-agent/onboarding')}
                             disabled={isCareerLocked}
                             style={{ opacity: isCareerLocked ? 0.5 : 1, cursor: isCareerLocked ? 'not-allowed' : 'pointer' }}

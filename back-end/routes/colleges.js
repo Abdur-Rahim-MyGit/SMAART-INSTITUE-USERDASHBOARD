@@ -127,8 +127,8 @@ router.get('/:id', async (req, res) => {
 router.get('/code/:code', async (req, res) => {
   try {
     const college = await College.findOne({
-      code: req.params.code.toUpperCase(),
-      isActive: true
+      collegeCode: req.params.code.toUpperCase(),
+      status: 'Active'
     });
 
     if (!college) {
@@ -159,8 +159,8 @@ router.post('/', async (req, res) => {
     // Check if college with same name or code already exists
     const existingCollege = await College.findOne({
       $or: [
-        { name: collegeData.name },
-        { code: collegeData.code?.toUpperCase() }
+        { collegeName: collegeData.collegeName || collegeData.name },
+        { collegeCode: (collegeData.collegeCode || collegeData.code)?.toUpperCase() }
       ]
     });
 
