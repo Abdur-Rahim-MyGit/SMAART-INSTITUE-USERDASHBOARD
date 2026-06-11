@@ -5,13 +5,21 @@
 const express = require('express');
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protect } = require('../middleware/auth');
 router.use(generalLimiter);
+// SECURITY: require a valid session. This endpoint proxies images to a paid
+// third-party OCR API; leaving it open let anyone drain the quota / run up cost
+// (and accept arbitrary image payloads). Its only caller is the logged-in vision
+// board editor, which now sends the JWT.
+router.use(protect);
 
 const axios = require('axios');
 const FormData = require('form-data');
 
 // OCR.space API configuration
-const OCR_API_KEY = process.env.OCR_SPACE_API_KEY || 'K81119449488957';
+// SECURITY: no hardcoded fallback key — the previous literal was committed to
+// source and must be rotated. Read strictly from the environment.
+const OCR_API_KEY = process.env.OCR_SPACE_API_KEY;
 const OCR_API_URL = 'https://api.ocr.space/parse/image';
 
 /**
@@ -36,6 +44,13 @@ router.post('/extract', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Missing imageData in request body',
+      });
+    }
+
+    if (!OCR_API_KEY) {
+      return res.status(503).json({
+        success: false,
+        error: 'OCR service is not configured',
       });
     }
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { generalLimiter } = require('../middleware/rateLimiter');
+const { generalLimiter, aiLimiter } = require('../middleware/rateLimiter');
 router.use(generalLimiter);
 
 const careerIntelligenceController = require('../controllers/careerIntelligenceController');
@@ -12,8 +12,8 @@ const careerSimulationController = require('../controllers/careerSimulationContr
  * All routes require authentication (middleware applied in server.js)
  */
 
-// Generate new career intelligence report
-router.post('/generate', careerIntelligenceController.generateCareerReport);
+// Generate new career intelligence report (rate-limited — calls paid LLM API)
+router.post('/generate', aiLimiter, careerIntelligenceController.generateCareerReport);
 
 // Get all reports for the current user
 router.get('/reports', careerIntelligenceController.getReports);

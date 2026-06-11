@@ -59,74 +59,35 @@ const VerifyPassport = () => {
         setVerificationResult(null);
 
         try {
-            // Placeholder for actual API call to verify the passport
-            // E.g., await apiCall(`/passports/verify/${id.trim()}`, { method: 'GET' });
-            
-            // Simulating API latency
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            
-            // Mocking a successful verification for now
-            // In a real scenario, this would be based on backend response
-            const isSuccess = id.startsWith('SM-');
-            
-            if (isSuccess) {
-                let finalName = qrName;
-                let finalInstitution = qrInstitution;
-                let finalPhoto = qrPhoto;
+            // SECURITY: verification MUST come from the server. The previous code
+            // fabricated a "verified: true" result for any id starting with "SM-"
+            // and pulled the displayed name/photo from URL query params / localStorage
+            // — anyone could forge an "Authenticated" passport screen for any name.
+            // We now render strictly from the backend response and never synthesise
+            // a verified state on the client.
+            // NOTE (team): the backend route GET /api/passports/verify/:id does not
+            // exist yet. Until it is implemented, this page will correctly report
+            // "verification unavailable" instead of lying. Build that endpoint to
+            // make the feature functional.
+            const response = await apiCall(`/passports/verify/${encodeURIComponent(id.trim())}`, {
+                method: 'GET'
+            });
 
-                let fetchedFromLocal = false;
-                try {
-                    const localData = localStorage.getItem(`passport_demo_${id.trim()}`);
-                    if (localData) {
-                        const parsed = JSON.parse(localData);
-                        if (parsed.fullName && finalName === "Verified Student") finalName = parsed.fullName;
-                        if (parsed.profilePhoto) finalPhoto = parsed.profilePhoto;
-                        if (parsed.institution && finalInstitution === "SMAART Institute") finalInstitution = parsed.institution;
-                        fetchedFromLocal = true;
-                    }
-                } catch (e) {
-                    console.error('Failed to parse local passport demo data', e);
-                }
-
-                if (!fetchedFromLocal && user?.email && (!finalPhoto || finalName === "Verified Student")) {
-                    try {
-                        const response = await apiCall(`/users/register-details/${encodeURIComponent(user.email)}`);
-                        if (response) {
-                            if (finalName === "Verified Student") {
-                                finalName = response.fullName || `${response.firstName || ''} ${response.lastName || ''}`.trim() || finalName;
-                            }
-                            finalPhoto = response.profilePhoto || response.avatarUrl || user.photoURL || finalPhoto;
-                            if (finalInstitution === "SMAART Institute") {
-                                finalInstitution = response.institution || response.university || finalInstitution;
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Failed to fetch user details for verification demo', e);
-                    }
-                }
-
-                const mockResult = {
-                    success: true,
-                    verified: true,
-                    message: "Digital Skills Passport Authenticated Successfully.",
-                    passport: {
-                        studentId: id.trim(),
-                        fullName: finalName,
-                        institution: finalInstitution,
-                        photo: finalPhoto,
-                        status: "Active",
-                        verificationDate: new Date().toLocaleDateString()
-                    }
-                };
-                setVerificationResult(mockResult);
+            if (response && response.success && response.verified) {
+                // Render ONLY fields the server returned — not query/localStorage values.
+                setVerificationResult(response);
                 toast.success('Passport Authenticated Successfully!');
             } else {
-                setError('Passport not found or invalid ID format. Please check the ID and try again.');
+                setError((response && response.message) || 'Passport not found. Please check the ID and try again.');
             }
-            
+
         } catch (err) {
             console.error('Verification error:', err);
-            setError(err.data?.message || err.message || 'Authentication failed. Please try again.');
+            if (err.status === 404) {
+                setError('Passport not found. Please check the ID and try again.');
+            } else {
+                setError('Passport verification is currently unavailable. Please try again later.');
+            }
         } finally {
             setIsVerifying(false);
         }

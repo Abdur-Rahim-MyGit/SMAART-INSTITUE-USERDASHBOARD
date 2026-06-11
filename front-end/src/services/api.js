@@ -228,10 +228,12 @@ export const apiCall = async (endpoint, options = {}) => {
       error.message.includes('NetworkError') ||
       error.message.includes('ERR_CONNECTION_REFUSED');
 
-    // Only probe fallback ports if this is a network/connection error
-    const isDev = import.meta.env.DEV;
-    const is404InDev = isDev && error.status === 404;
-    const isErrorThatTriggersFallback = isNetworkError || is404InDev;
+    // PERF: a 404 means the server REPLIED — it is reachable, the resource just
+    // doesn't exist. It must NOT trigger fallback-port probing. The old code
+    // re-issued every dev 404 against ports 5001 and 5002 (up to 3s timeout each,
+    // ~6s added latency) and replayed the request — the main cause of pages that
+    // "sometimes take 5-10s". Only genuine connection failures probe for the port.
+    const isErrorThatTriggersFallback = isNetworkError;
 
     if (isErrorThatTriggersFallback) {
       console.warn("⚠️ API connection failed, searching for backend on fallback ports (5001, 5002)...");
@@ -244,8 +246,8 @@ export const apiCall = async (endpoint, options = {}) => {
 
       for (const fallbackUrl of fallbacks) {
         try {
-          // Use a short timeout for fallback discovery (3s)
-          const result = await performCall(fallbackUrl, 3000);
+          // Use a short timeout for fallback discovery (1s)
+          const result = await performCall(fallbackUrl, 1000);
           console.log(`✅ Backend discovered on ${fallbackUrl}`);
           workingBaseUrl = fallbackUrl;
           sessionStorage.setItem("workingApiPort", fallbackUrl);

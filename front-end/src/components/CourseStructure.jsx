@@ -785,14 +785,27 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
               </button>
             </div>
 
-            <PageHero
-              badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
-              icon={GraduationCap}
-              title={t("my_courses_page.programme", "Smaart Programme")}
-              subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6"
             >
-              {continueWatching}
-            </PageHero>
+              <div className="flex-1">
+                <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                  {t("my_courses_page.programme", "Smaart Programme")}
+                </h1>
+                <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                  {t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
+                </p>
+              </div>
+
+              {continueWatching && (
+                <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex justify-start md:justify-end">
+                  {continueWatching}
+                </div>
+              )}
+            </motion.div>
           </>
         )}
 

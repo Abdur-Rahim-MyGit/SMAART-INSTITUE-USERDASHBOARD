@@ -5,7 +5,14 @@ const { notifySessionScheduled } = require('../services/notificationService');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protect } = require('../middleware/auth');
 router.use(generalLimiter);
+// SECURITY: this router was fully unauthenticated — GET / dumped every coaching
+// session with populated student PII (name/email/studentId/mobile), and
+// POST/PUT/DELETE allowed anyone to forge, alter, or delete sessions. The only
+// caller (MindCareSessions.jsx) is a logged-in page using apiCall, so requiring
+// a token does not change the client contract.
+router.use(protect);
 
 
 // Get all coach sessions with filters

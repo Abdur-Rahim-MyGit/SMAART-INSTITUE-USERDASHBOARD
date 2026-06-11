@@ -1,4 +1,5 @@
 const express = require('express');
+
 const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -98,6 +99,10 @@ app.use(cors({
 // Increase payload size limit for base64 images (50MB)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// SECURITY: strip MongoDB operator-injection keys ($ne, $gt, $where, dotted
+// paths, ...) from all request input before it reaches any query. Must run
+// AFTER the body parsers so req.body is populated.
+app.use(require('./middleware/sanitizeMongo'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
@@ -173,20 +178,22 @@ app.use('/api/avatar', require('./routes/avatar'));
 // AI Career Coach Routes - Inline to avoid module loading issues
 const aiCareerCoachController = require('./controllers/aiCareerCoachController');
 const { protect: authMiddleware } = require('./middleware/auth');
+// Cost guard for paid-LLM endpoints (OpenRouter/Anthropic). Keyed per user/IP.
+const { aiLimiter } = require('./middleware/rateLimiter');
 
 // Profile Management
 app.get('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.getProfile);
 app.put('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.updateProfile);
-app.post('/api/ai-career-coach/profile/analyze', authMiddleware, aiCareerCoachController.analyzeProfile);
+app.post('/api/ai-career-coach/profile/analyze', authMiddleware, aiLimiter, aiCareerCoachController.analyzeProfile);
 
 // Career Features
 app.get('/api/ai-career-coach/recommendations', authMiddleware, aiCareerCoachController.getCareerRecommendations);
-app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiCareerCoachController.analyzeSkillGap);
-app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiCareerCoachController.generateLearningPlan);
-app.post('/api/ai-career-coach/resume', authMiddleware, aiCareerCoachController.generateResume);
+app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiLimiter, aiCareerCoachController.analyzeSkillGap);
+app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiLimiter, aiCareerCoachController.generateLearningPlan);
+app.post('/api/ai-career-coach/resume', authMiddleware, aiLimiter, aiCareerCoachController.generateResume);
 
 // Chat Features
-app.post('/api/ai-career-coach/chat', authMiddleware, aiCareerCoachController.chat);
+app.post('/api/ai-career-coach/chat', authMiddleware, aiLimiter, aiCareerCoachController.chat);
 app.get('/api/ai-career-coach/chat/sessions', authMiddleware, aiCareerCoachController.getChatSessions);
 app.get('/api/ai-career-coach/chat/:sessionId', authMiddleware, aiCareerCoachController.getChatHistory);
 
@@ -194,7 +201,7 @@ logger.info('✅ AI Career Coach Routes Loaded (Inline)');
 
 // Career Intelligence Routes (Career Data Fetcher)
 const careerIntelligenceController = require('./controllers/careerIntelligenceController');
-app.post('/api/career-intelligence/generate', authMiddleware, careerIntelligenceController.generateCareerReport);
+app.post('/api/career-intelligence/generate', authMiddleware, aiLimiter, careerIntelligenceController.generateCareerReport);
 app.get('/api/career-intelligence/reports', authMiddleware, careerIntelligenceController.getReports);
 app.get('/api/career-intelligence/latest', authMiddleware, careerIntelligenceController.getLatestReport);
 app.get('/api/career-intelligence/excel-data', authMiddleware, careerIntelligenceController.getExcelData);

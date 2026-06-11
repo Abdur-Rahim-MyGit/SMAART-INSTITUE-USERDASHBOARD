@@ -203,13 +203,17 @@ const assessmentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate assessment code before saving
+// Generate assessment code before saving (atomic — avoids duplicate-key races)
+const { nextSequentialCode } = require('../utils/idGenerator');
 assessmentSchema.pre('save', async function (next) {
-  if (!this.assessmentCode) {
-    const count = await mongoose.model('Assessment').countDocuments();
-    this.assessmentCode = `ASM${String(count + 1).padStart(5, '0')}`;
+  try {
+    if (!this.assessmentCode) {
+      this.assessmentCode = await nextSequentialCode('assessmentCode', 'ASM', 'Assessment', 'assessmentCode');
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 });
 
 module.exports = mongoose.model('Assessment', assessmentSchema);

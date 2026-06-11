@@ -581,9 +581,8 @@ const AddDetails = () => {
                                 <div className="pt-4">
                                     <FileUpload
                                         label="Upload 10th Marksheet"
-                                        onUpload={(file) => setTenthDetails({ ...tenthDetails, marksheet: file })}
+                                        onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })}
                                         value={tenthDetails.marksheet}
-                                       
                                     />
                                 </div>
                             </motion.div>
@@ -632,9 +631,8 @@ const AddDetails = () => {
                                 <div className="pt-4">
                                     <FileUpload
                                         label="Upload 12th Marksheet"
-                                        onUpload={(file) => setTwelfthDetails({ ...twelfthDetails, marksheet: file })}
+                                        onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })}
                                         value={twelfthDetails.marksheet}
-                                       
                                     />
                                 </div>
                             </motion.div>

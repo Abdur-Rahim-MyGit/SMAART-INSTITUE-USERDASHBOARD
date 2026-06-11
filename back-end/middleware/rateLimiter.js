@@ -15,12 +15,12 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: false,
-  // Use X-Forwarded-For (set by proxy) when available, fall back to direct IP
+  // SECURITY: key on req.ip (which respects the configured `trust proxy` hop)
+  // plus the email. The previous version read the raw X-Forwarded-For header,
+  // which is fully attacker-controlled — sending a random XFF per request gave
+  // each attempt a fresh bucket and completely bypassed the brute-force limit.
   keyGenerator: (req) => {
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
-      || req.ip
-      || req.connection.remoteAddress
-      || 'unknown';
+    const ip = req.ip || 'unknown';
     const email = req.body?.email?.toLowerCase() || 'unknown';
     return `${ip}-${email}`;
   }
@@ -89,6 +89,23 @@ const resumeExportLimiter = rateLimit({
   keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
 });
 
+// AI / LLM rate limiter — caps calls to paid third-party LLM APIs (OpenRouter/
+// OpenAI) to prevent runaway cost from abuse or runaway clients.
+// 30 requests per 15 minutes per authenticated user (falls back to IP).
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,
+  message: {
+    success: false,
+    error: 'AI request limit reached. Please wait a few minutes before trying again.',
+    retryAfter: 15,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
+});
+
 module.exports = {
   loginLimiter,
   otpLimiter,
@@ -96,4 +113,5 @@ module.exports = {
   searchLimiter,
   generalLimiter,
   resumeExportLimiter,
+  aiLimiter,
 };

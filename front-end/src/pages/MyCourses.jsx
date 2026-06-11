@@ -59,7 +59,7 @@ const MyCoursesHeroBanner = ({
         className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
       >
         {mode !== "assessment" && <RiPlayFill size={16} />}
-        Continue
+        {primaryLabel || "Continue"}
         <RiArrowRightSLine size={16} stroke={1.5} />
       </button>
     </div>

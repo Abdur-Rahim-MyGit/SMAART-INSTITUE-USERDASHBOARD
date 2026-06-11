@@ -414,15 +414,19 @@ const NoticesFeed = ({ currentUser }) => {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
-                      {(ann.createdById?.fullName || "A")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
-                    <span className="text-gray-500 dark:text-slate-300 font-semibold">
-                      {ann.createdById?.fullName || t("community_page.admin")}
-                    </span>
-                    <span className="text-gray-305 dark:text-slate-700">•</span>
+                    {ann.createdByRole !== "admin" && (
+                      <>
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
+                          {(ann.createdById?.fullName || "C")
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+                        <span className="text-gray-500 dark:text-slate-300 font-semibold">
+                          {ann.createdById?.fullName || t("community_page.college")}
+                        </span>
+                        <span className="text-gray-305 dark:text-slate-700">•</span>
+                      </>
+                    )}
                     <span>{timeAgo(ann.createdAt)}</span>
                     {ann.expiryDate && (
                       <>

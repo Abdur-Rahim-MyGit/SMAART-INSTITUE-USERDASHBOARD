@@ -11,13 +11,19 @@ router.use(generalLimiter);
 // Apply auth protection
 router.use(protect);
 
+// Staff may act on any user; everyone else is scoped to their own id. Prevents
+// reading or resetting another user's stage results via a guessed userId.
+const STAFF_ROLES = ['admin', 'teacher', 'moderator'];
+const isStaff = (u) => STAFF_ROLES.includes(u?.role) || (Array.isArray(u?.roles) && u.roles.some((r) => STAFF_ROLES.includes(r)));
+const ownUserId = (req, fromBody = false) => (isStaff(req.user) ? (fromBody ? req.body.userId : req.params.userId) : String(req.user._id));
+
 /**
  * GET /api/stageresults/user/:userId
  * Get all stage results for a user
  */
 router.get('/user/:userId', async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = ownUserId(req);
 
         // Fetch from both StageResult (new T2-T4) and BaseLineResult (legacy T1)
         const [stageResults, baselineResult] = await Promise.all([
@@ -88,7 +94,8 @@ router.get('/user/:userId', async (req, res) => {
  */
 router.get('/user/:userId/stage/:stage', async (req, res) => {
     try {
-        const { userId, stage } = req.params;
+        const { stage } = req.params;
+        const userId = ownUserId(req);
         const stageKey = stage.toUpperCase();
 
         // For T1, also check BaseLineResult for backward compat
@@ -170,7 +177,7 @@ router.get('/user/:userId/stage/:stage', async (req, res) => {
  */
 router.get('/user/:userId/status', async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = ownUserId(req);
 
         const [stageResults, baselineResult] = await Promise.all([
             StageResult.find({ userId }).select('stage passed stageScore createdAt'),
@@ -240,7 +247,8 @@ router.get('/user/:userId/status', async (req, res) => {
  */
 router.get('/user/:userId/stage/:stage/attempts', async (req, res) => {
     try {
-        const { userId, stage } = req.params;
+        const { stage } = req.params;
+        const userId = ownUserId(req);
         const stageKey = stage.toUpperCase();
 
         const attempts = await StageResult.find({ userId, stage: stageKey })
@@ -282,7 +290,8 @@ router.get('/user/:userId/stage/:stage/attempts', async (req, res) => {
  */
 router.post('/restart-course', async (req, res) => {
     try {
-        const { userId, stage } = req.body;
+        const { stage } = req.body;
+        const userId = ownUserId(req, true);
         const stageKey = stage.toUpperCase();
 
         const stageCoursesMap = {
@@ -341,7 +350,8 @@ router.post('/restart-course', async (req, res) => {
  */
 router.delete('/reset/:userId/:stage', async (req, res) => {
     try {
-        const { userId, stage } = req.params;
+        const { stage } = req.params;
+        const userId = ownUserId(req);
         const stageKey = stage.toUpperCase();
 
         if (stageKey === 'ALL') {

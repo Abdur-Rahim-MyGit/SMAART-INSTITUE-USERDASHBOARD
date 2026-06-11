@@ -1,7 +1,7 @@
 const express = require('express');
 const Badge = require('../models/Badge');
 const UserBadge = require('../models/UserBadge');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const {
     getUserBadges,
     getUserBadgeStats,
@@ -136,7 +136,7 @@ router.get('/user/:userId/earned', async (req, res) => {
  * POST /api/badges/award
  * Award a badge to a user (Admin/System use)
  */
-router.post('/award', async (req, res) => {
+router.post('/award', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const { userId, badgeId, metadata } = req.body;
 
@@ -216,7 +216,7 @@ router.put('/user/:userId/:badgeId/view', async (req, res) => {
  * POST /api/badges/create
  * Create a new badge (Admin only)
  */
-router.post('/create', async (req, res) => {
+router.post('/create', authorize('admin'), async (req, res) => {
     try {
         const badge = new Badge(req.body);
         await badge.save();
@@ -240,7 +240,7 @@ router.post('/create', async (req, res) => {
  * PUT /api/badges/:badgeId
  * Update a badge (Admin only)
  */
-router.put('/:badgeId', async (req, res) => {
+router.put('/:badgeId', authorize('admin'), async (req, res) => {
     try {
         const { badgeId } = req.params;
 

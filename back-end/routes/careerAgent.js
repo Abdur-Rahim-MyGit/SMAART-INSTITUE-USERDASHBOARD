@@ -25,7 +25,9 @@ const {
 
 const Degree = require('../models/Degree');
 // Auth middleware — optional auth (passes through without token, attaches user if token present)
-const { optionalAuth } = require('../middleware/auth');
+const { optionalAuth, protect } = require('../middleware/auth');
+// Cost guard: caps calls to the paid LLM (OpenRouter/Anthropic) per user/IP.
+const { aiLimiter } = require('../middleware/rateLimiter');
 
 // Records directory for local caching of analyses
 const RECORDS_DIR = path.join(__dirname, '..', 'records', 'careerAgent');
@@ -46,7 +48,7 @@ function findCachedRecord(hash) {
     const files = fs.readdirSync(RECORDS_DIR).filter(f => f.endsWith('.json'));
     for (const file of files) {
       const data = JSON.parse(fs.readFileSync(path.join(RECORDS_DIR, file), 'utf8'));
-      if (data.profile_hash === hash) return data;
+      if (data.profile_hash === hash && data.status === 'completed') return data;
     }
   } catch (e) { }
   return null;
@@ -550,8 +552,16 @@ router.get('/directions/:uniqueId', async (req, res) => {
 router.post('/career-direction', async (req, res) => {
   try {
     const { degree, specialisation, roleName } = req.body;
+    if (!degree || typeof degree !== 'string') {
+      return res.status(400).json({ error: 'degree is required' });
+    }
+    // SECURITY: escape regex metacharacters and cap length so an attacker cannot
+    // send a catastrophic-backtracking pattern (e.g. "(a+)+$") to hang the query
+    // (ReDoS). Escaping keeps the original case-insensitive substring match for
+    // legitimate degree names while neutralising metacharacters.
+    const escapedDegree = degree.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const degreeDoc = await CareerDirectionModel.findOne({
-      degree_name: { $regex: new RegExp(degree, 'i') }
+      degree_name: { $regex: new RegExp(escapedDegree, 'i') }
     }).lean();
 
     if (!degreeDoc) {
@@ -707,7 +717,7 @@ router.put('/direction-lock/mark-modal-shown', optionalAuth, async (req, res) =>
  *  4. On success: increments attemptsUsed, sets firstVisitAt/lockExpiryDate on first save,
  *     auto-locks if this save consumed the last attempt.
  */
-router.post('/onboarding', optionalAuth, async (req, res) => {
+router.post('/onboarding', aiLimiter, optionalAuth, async (req, res) => {
   try {
     const studentData = req.body;
 
@@ -787,43 +797,45 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
 
     // Cache check — return cached result if profile hasn't changed
     const cached = findCachedRecord(profileHash);
-    if (cached) {
-      const cachedAnalysis = cached.output_generated_report || cached.analysis || cached;
-      return res.json({ success: true, cached: true, analysis: cachedAnalysis, id: cached.id || profileHash });
-    }
-
-    const traceId = Date.now();
-    const recordFilename = `analysis_${traceId}_${(studentData.personalDetails?.name || 'unknown').replace(/\s+/g, '_')}.json`;
-    const recordPath = path.join(RECORDS_DIR, recordFilename);
-
-    // Save initial draft
-    const initialRecord = {
-      id: String(traceId),
-      timestamp: new Date().toISOString(),
-      status: 'pending_analysis',
-      profile_hash: profileHash,
-      input_user_data: studentData,
-      output_generated_report: null
-    };
-    try {
-      fs.writeFileSync(recordPath, JSON.stringify(initialRecord, null, 2));
-    } catch (fsErr) {
-      console.error('[career-agent] Failed to save draft:', fsErr.message);
-    }
-
-    // Run the engine
     let analysis;
-    try {
-      analysis = await processCareerIntelligence(studentData);
-      analysis = await enhanceWithAI(studentData, analysis);
+    let traceId = Date.now();
+    
+    if (cached) {
+      analysis = cached.output_generated_report || cached.analysis || cached;
+      traceId = cached.id || traceId;
+      console.log(`[career-agent] Found cached analysis for ${profileHash}`);
+    } else {
+      const recordFilename = `analysis_${traceId}_${(studentData.personalDetails?.name || 'unknown').replace(/\s+/g, '_')}.json`;
+      const recordPath = path.join(RECORDS_DIR, recordFilename);
 
-      const finalRecord = { ...initialRecord, status: 'completed', output_generated_report: analysis };
-      fs.writeFileSync(recordPath, JSON.stringify(finalRecord, null, 2));
-    } catch (procErr) {
-      console.error(`[career-agent] Engine failed:`, procErr.message);
-      const errorRecord = { ...initialRecord, status: 'failed', error: procErr.message };
-      try { fs.writeFileSync(recordPath, JSON.stringify(errorRecord, null, 2)); } catch (e) { }
-      throw procErr;
+      // Save initial draft
+      const initialRecord = {
+        id: String(traceId),
+        timestamp: new Date().toISOString(),
+        status: 'pending_analysis',
+        profile_hash: profileHash,
+        input_user_data: studentData,
+        output_generated_report: null
+      };
+      try {
+        fs.writeFileSync(recordPath, JSON.stringify(initialRecord, null, 2));
+      } catch (fsErr) {
+        console.error('[career-agent] Failed to save draft:', fsErr.message);
+      }
+
+      // Run the engine
+      try {
+        analysis = await processCareerIntelligence(studentData);
+        analysis = await enhanceWithAI(studentData, analysis);
+
+        const finalRecord = { ...initialRecord, status: 'completed', output_generated_report: analysis };
+        fs.writeFileSync(recordPath, JSON.stringify(finalRecord, null, 2));
+      } catch (procErr) {
+        console.error(`[career-agent] Engine failed:`, procErr.message);
+        const errorRecord = { ...initialRecord, status: 'failed', error: procErr.message };
+        try { fs.writeFileSync(recordPath, JSON.stringify(errorRecord, null, 2)); } catch (e) { }
+        throw procErr;
+      }
     }
 
     // Common variables used for both FinalCareerPathway and CareerAnalysis saves
@@ -871,46 +883,53 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
         console.log(`[career-agent] Auto-locking career direction for user ${userId} — all ${maxAttempts} attempts used.`);
       }
 
-      FinalCareerPathwayModel.findOneAndUpdate(
-        { userId },
-        {
-          $set: {
-            userId,
-            student_name:   studentName,
-            student_email:  studentEmail,
-            input_data:     studentData,
-            output_data:    analysis,
-            primary_role:   primaryRole,
-            secondary_role: studentData.preferences?.secondary?.role || '',
-            tertiary_role:  studentData.preferences?.tertiary?.role  || '',
-            zone_primary:   preV?.primaryZone?.employer_zone   || 'Unknown',
-            zone_secondary: preV?.secondaryZone?.employer_zone || 'Unknown',
-            zone_tertiary:  preV?.tertiaryZone?.employer_zone  || 'Unknown',
-            updated_at:     now,
-            ...lockFields,
+      try {
+        await FinalCareerPathwayModel.findOneAndUpdate(
+          { userId },
+          {
+            $set: {
+              userId,
+              student_name:   studentName,
+              student_email:  studentEmail,
+              input_data:     studentData,
+              output_data:    analysis,
+              primary_role:   primaryRole,
+              secondary_role: studentData.preferences?.secondary?.role || '',
+              tertiary_role:  studentData.preferences?.tertiary?.role  || '',
+              zone_primary:   preV?.primaryZone?.employer_zone   || 'Unknown',
+              zone_secondary: preV?.secondaryZone?.employer_zone || 'Unknown',
+              zone_tertiary:  preV?.tertiaryZone?.employer_zone  || 'Unknown',
+              updated_at:     now,
+              ...lockFields,
+            },
+            $setOnInsert: { created_at: now }
           },
-          $setOnInsert: { created_at: now }
-        },
-        { upsert: true, new: true }
-      ).catch(err => console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message));
+          { upsert: true, new: true }
+        );
+      } catch (err) {
+        console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message);
+      }
     }
 
-    // Also save to CareerAnalysis for history
-    CareerAnalysisModel.create({
-      userId: loggedInUser?._id || loggedInUser?.id || null,
-      student_name: studentName,
-      student_email: studentEmail,
-      primary_role: primaryRole,
-      input_data: studentData,
-      output_data: analysis,
-      profile_hash: profileHash,
-      zone_primary: preVerifiedData?.primaryZone?.employer_zone || 'Unknown',
-      zone_secondary: preVerifiedData?.secondaryZone?.employer_zone || 'Unknown',
-      zone_tertiary: preVerifiedData?.tertiaryZone?.employer_zone || 'Unknown',
-      missing_skills: preVerifiedData?.primarySkillGap?.missing || [],
-      matched_skills: preVerifiedData?.primarySkillGap?.matched || [],
-      skill_coverage_pct: preVerifiedData?.primarySkillGap?.coveragePct || 0
-    }).catch(err => console.warn('[career-agent] MongoDB save warning:', err.message));
+    try {
+      await CareerAnalysisModel.create({
+        userId: loggedInUser?._id || loggedInUser?.id || null,
+        student_name: studentName,
+        student_email: studentEmail,
+        primary_role: primaryRole,
+        input_data: studentData,
+        output_data: analysis,
+        profile_hash: profileHash,
+        zone_primary: preVerifiedData?.primaryZone?.employer_zone || 'Unknown',
+        zone_secondary: preVerifiedData?.secondaryZone?.employer_zone || 'Unknown',
+        zone_tertiary: preVerifiedData?.tertiaryZone?.employer_zone || 'Unknown',
+        missing_skills: preVerifiedData?.primarySkillGap?.missing || [],
+        matched_skills: preVerifiedData?.primarySkillGap?.matched || [],
+        skill_coverage_pct: preVerifiedData?.primarySkillGap?.coveragePct || 0
+      });
+    } catch (err) {
+      console.warn('[career-agent] MongoDB save warning:', err.message);
+    }
 
     res.json({
       status: 'success',
@@ -1133,10 +1152,21 @@ const { SkillProgressModel } = require('../models/careerAgentModels');
  * GET /api/career-agent/user-skills/:email
  * Returns all skill progress entries for a user.
  */
-router.get('/user-skills/:email', async (req, res) => {
+router.get('/user-skills/:email', protect, async (req, res) => {
   try {
-    const { email } = req.params;
-    const progress = await SkillProgressModel.find({ email: decodeURIComponent(email) }).lean();
+    // Preserve the original (possibly mixed-case) email for the DB lookup so we
+    // don't miss records stored with uppercase characters.
+    const email = decodeURIComponent(req.params.email).trim();
+    // SECURITY: was unauthenticated — anyone could read any user's skill progress
+    // by guessing their email (IDOR). Callers may only read their OWN skills;
+    // staff may read anyone's. Ownership is compared case-insensitively.
+    const staffRoles = ['admin', 'teacher', 'moderator'];
+    const isStaff = staffRoles.includes(req.user?.role);
+    const ownEmail = (req.user?.email || '').toLowerCase().trim();
+    if (!isStaff && email.toLowerCase() !== ownEmail) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    const progress = await SkillProgressModel.find({ email }).lean();
     res.json(progress);
   } catch (error) {
     console.error('[career-agent] Error fetching user skills:', error);

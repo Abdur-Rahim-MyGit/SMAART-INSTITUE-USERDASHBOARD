@@ -1,6 +1,6 @@
 const express = require('express');
 const Assessment = require('../models/Assessment');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
@@ -9,6 +9,27 @@ router.use(generalLimiter);
 
 // Apply protection to all assessment routes
 router.use(protect);
+
+// SECURITY: only staff may see the answer key. For everyone else (e.g. students
+// loading an assessment to take it) strip questions[].correctAnswer so the
+// answers cannot be read straight from the API response.
+const STAFF_ROLES = ['admin', 'teacher', 'moderator'];
+const isStaffUser = (user) => {
+    if (!user) return false;
+    if (user.role && STAFF_ROLES.includes(user.role)) return true;
+    if (Array.isArray(user.roles) && user.roles.some((r) => STAFF_ROLES.includes(r))) return true;
+    return false;
+};
+const sanitizeAssessment = (assessmentDoc, user) => {
+    const obj = typeof assessmentDoc.toObject === 'function' ? assessmentDoc.toObject() : assessmentDoc;
+    if (!isStaffUser(user) && Array.isArray(obj.questions)) {
+        obj.questions = obj.questions.map((q) => {
+            const { correctAnswer, ...rest } = q;
+            return rest;
+        });
+    }
+    return obj;
+};
 
 // Get all assessments with search and filter functionality
 router.get('/', async (req, res) => {
@@ -78,7 +99,7 @@ router.get('/code/:code', async (req, res) => {
 
         res.json({
             success: true,
-            data: assessment
+            data: sanitizeAssessment(assessment, req.user)
         });
     } catch (err) {
         res.status(500).json({
@@ -182,7 +203,7 @@ router.get('/:id', async (req, res) => {
 
         res.json({
             success: true,
-            data: assessment
+            data: sanitizeAssessment(assessment, req.user)
         });
     } catch (err) {
         res.status(500).json({
@@ -194,8 +215,8 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// Create new assessment
-router.post('/', async (req, res) => {
+// Create new assessment (staff only)
+router.post('/', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const assessment = new Assessment(req.body);
         await assessment.save();
@@ -214,8 +235,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update assessment
-router.put('/:id', async (req, res) => {
+// Update assessment (staff only)
+router.put('/:id', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const assessment = await Assessment.findByIdAndUpdate(
             req.params.id,
@@ -244,8 +265,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete assessment
-router.delete('/:id', async (req, res) => {
+// Delete assessment (admin only)
+router.delete('/:id', authorize('admin'), async (req, res) => {
     try {
         const assessment = await Assessment.findByIdAndDelete(req.params.id);
 

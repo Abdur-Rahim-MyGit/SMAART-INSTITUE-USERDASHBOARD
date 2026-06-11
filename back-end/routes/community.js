@@ -839,13 +839,15 @@ router.post("/discussions", uploadCommunity.any(), async (req, res) => {
     const {
       title,
       content,
-      authorId,
       authorEmail,
       channelType,
       tags,
       category,
       isMentorInteraction,
     } = req.body;
+    // SECURITY: never trust an authorId supplied in the request body — that lets
+    // a user post as anyone. Always use the authenticated user's id.
+    const authorId = req.user._id;
     const file = (req.files && req.files[0]) || req.file;
 
     const normalizedChannel = (channelType || "").toString().toLowerCase();
@@ -1144,7 +1146,7 @@ router.patch(
 // Mark/Unmark a reply as Best Answer
 router.post("/discussions/:id/best-answer", async (req, res) => {
   try {
-    const { replyId, authorId } = req.body;
+    const { replyId } = req.body;
     const discussion = await CommunityPost.findById(req.params.id);
 
     if (!discussion) {
@@ -1153,10 +1155,11 @@ router.post("/discussions/:id/best-answer", async (req, res) => {
         .json({ success: false, error: "Discussion not found" });
     }
 
+    // SECURITY: identity must come from the authenticated session only — do not
+    // fall back to a body-supplied authorId (that allowed impersonation).
     const requesterId = (
       req.user?._id ||
       req.user?.id ||
-      authorId ||
       ""
     ).toString();
     const requesterRole = (
@@ -1595,7 +1598,9 @@ router.post("/discussions/:id/vote", async (req, res) => {
 // Add reply to a discussion
 router.post("/discussions/:id/reply", async (req, res) => {
   try {
-    const { content, authorId } = req.body;
+    const { content } = req.body;
+    // SECURITY: derive author from the authenticated session, not the body.
+    const authorId = req.user._id;
     const discussion = await CommunityPost.findById(req.params.id);
     let author = await User.findById(authorId).select("college role");
     if (!author)
@@ -2163,7 +2168,10 @@ router.get("/search-users", async (req, res) => {
       return res.json({ success: true, data: [] });
     }
 
-    const searchRegex = new RegExp(query, "i");
+    // SECURITY: escape metacharacters and cap length so a crafted query (e.g.
+    // "(a+)+$") cannot hang the event loop (ReDoS) across the user collections.
+    const escapedQuery = String(query).slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const searchRegex = new RegExp(escapedQuery, "i");
 
     // Search across all user types
     const [users, students, teachers] = await Promise.all([
@@ -2207,7 +2215,9 @@ router.get("/search-users", async (req, res) => {
 // Add threaded reply to an existing reply
 router.post("/discussions/:id/reply/:replyId/thread", async (req, res) => {
   try {
-    const { content, authorId } = req.body;
+    const { content } = req.body;
+    // SECURITY: derive author from the authenticated session, not the body.
+    const authorId = req.user._id;
     const { id, replyId } = req.params;
 
     if (!content?.trim()) {

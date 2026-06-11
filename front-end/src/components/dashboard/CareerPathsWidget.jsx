@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, ArrowRight, Lock, TrendingUp, Code, Database, Cloud, Megaphone, MonitorPlay } from "lucide-react";
+import { BookOpen, ArrowRight, Lock, TrendingUp, Code, Database, Cloud, Megaphone, MonitorPlay, Sparkles } from "lucide-react";
 
 // Map string identifiers to actual components
 const ICON_MAP = {
@@ -17,36 +17,9 @@ const ICON_MAP = {
 const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
   const navigate = useNavigate();
 
-  // Fallback locked placeholder paths shown when no real data yet
-  const FALLBACK_LOCKED = [
-    {
-      id: "primary",
-      title: "Social Media Marketing & Community Management",
-      subtitle: "Focus on social media strategy and brand growth.",
-      locked: true,
-      icon: "Megaphone",
-    },
-    {
-      id: "secondary",
-      title: "PR, Events & Integrated Marketing",
-      subtitle: "Combine PR, events, and traditional channels.",
-      locked: true,
-      icon: "MonitorPlay",
-    },
-    {
-      id: "tertiary",
-      title: "Digital Sales & Business Development",
-      subtitle: "Drive business growth through digital sales.",
-      locked: true,
-      icon: "TrendingUp",
-    },
-  ];
+  const isCareerPathway = paths.some(p => ['primary', 'secondary', 'tertiary'].includes(p.id));
 
-  const displayPaths = loading
-    ? []
-    : paths.length > 0
-      ? paths.map((p, i) => ({ ...p, locked: false, index: i }))
-      : FALLBACK_LOCKED;
+  const displayPaths = paths.filter(p => ['primary', 'secondary', 'tertiary'].includes(p.id)).map((p, i) => ({ ...p, index: i }));
 
   return (
     <div className="w-full">
@@ -57,14 +30,14 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
         </h2>
       </div>
 
-      {/* Grid */}
+      {/* Grid or Banner */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-40 rounded-2xl bg-slate-100 dark:bg-[#002147] animate-pulse border border-slate-200 dark:border-[#1a3884]/20" />
           ))}
         </div>
-      ) : (
+      ) : isCareerPathway ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayPaths.map((path, idx) => {
             const IconComponent = ICON_MAP[path.icon] || BookOpen;
@@ -122,6 +95,29 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
             );
           })}
         </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full bg-white dark:bg-[#002147] rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-sm hover:shadow-md border border-slate-200 dark:border-[#1a3884]/30 transition-all"
+        >
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 justify-between">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-5 text-center sm:text-left">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-[#112b6b] dark:text-white mb-1.5 tracking-tight">Unlock Your Career Path</h3>
+                <p className="text-slate-600 dark:text-slate-300 text-[13px] max-w-lg leading-relaxed">
+                  Discover the right career direction tailored to your skills and aspirations. Take our AI-driven assessment and let us guide you to your ideal role.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate("/dashboard/career-agent")}
+              className="mt-2 md:mt-0 whitespace-nowrap px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md group"
+            >
+              Start Career Agent <ArrowRight className="w-4 h-4 translate-x-0 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </motion.div>
       )}
     </div>
   );

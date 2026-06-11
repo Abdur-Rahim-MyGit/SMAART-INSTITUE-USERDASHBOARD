@@ -180,12 +180,19 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                 backgroundColor: '#ffffff',
                 useCORS: true,
                 logging: false,
+                width: 1122,
+                height: 794,
+                windowWidth: 1122,
+                windowHeight: 794,
+                scrollY: 0,
+                scrollX: 0,
                 onclone: (clonedDoc) => {
-                    // Ensure the cloned element is perfectly visible to the internal renderer
+                    // Ensure the cloned element is perfectly visible to the internal renderer without scroll offset
                     const el = clonedDoc.getElementById('hidden-pdf-certificate');
                     if (el) {
                         el.style.left = '0px';
-                        el.style.position = 'relative';
+                        el.style.top = '0px';
+                        el.style.position = 'fixed';
                     }
                 }
             });
@@ -264,82 +271,131 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                 boxSizing: 'border-box',
                             }}
                         >
-                            {/* Premium Header Stripes */}
-                            <div style={{ position: 'absolute', top: '0px', left: '0px', width: '1122px', height: '20px', backgroundColor: '#1a3884' }}></div>
-                            <div style={{ position: 'absolute', top: '20px', left: '0px', width: '1122px', height: '6px', backgroundColor: '#f59e0b' }}></div>
-                            
-                            {/* Flat Decorative Circles */}
-                            <div style={{ position: 'absolute', top: '-150px', right: '-150px', width: '500px', height: '500px', backgroundColor: '#f0f6ff', borderRadius: '50%', zIndex: 0 }}></div>
-                            <div style={{ position: 'absolute', bottom: '-150px', left: '-150px', width: '500px', height: '500px', backgroundColor: '#f0fdf4', borderRadius: '50%', zIndex: 0 }}></div>
+                            {/* ── NAVY TOP BAND ── */}
+                            <div style={{ position: 'absolute', top: '0px', left: '0px', width: '1122px', height: '76px', backgroundColor: '#002147', zIndex: 5 }} />
+                            {/* ── GOLD STRIPE TOP ── */}
+                            <div style={{ position: 'absolute', top: '76px', left: '0px', width: '1122px', height: '5px', backgroundColor: '#DAA520', zIndex: 5 }} />
+                            {/* ── NAVY BOTTOM BAND ── */}
+                            <div style={{ position: 'absolute', bottom: '0px', left: '0px', width: '1122px', height: '56px', backgroundColor: '#002147', zIndex: 5 }} />
+                            {/* ── GOLD STRIPE BOTTOM ── */}
+                            <div style={{ position: 'absolute', bottom: '56px', left: '0px', width: '1122px', height: '4px', backgroundColor: '#DAA520', zIndex: 5 }} />
 
-                            {/* Header Text */}
-                            <div style={{ position: 'absolute', top: '100px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
-                                <h1 style={{ fontSize: '42px', fontWeight: 900, color: '#1a3884', textTransform: 'uppercase', letterSpacing: '4px', margin: '0 0 10px 0' }}>SMAART Institute</h1>
-                                <p style={{ fontSize: '20px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '6px', margin: 0 }}>Official Badge Certificate</p>
+                            {/* ── OUTER BORDER ── */}
+                            <div style={{ position: 'absolute', top: '8px', left: '8px', right: '8px', bottom: '8px', border: '1.5px solid #002147', zIndex: 4, pointerEvents: 'none', width: '1106px', height: '778px' }} />
+                            {/* ── INNER GOLD PINSTRIPE ── */}
+                            <div style={{ position: 'absolute', top: '11px', left: '11px', right: '11px', bottom: '11px', border: '0.5px solid rgba(184,134,11,0.35)', zIndex: 4, pointerEvents: 'none', width: '1100px', height: '772px' }} />
+
+                            {/* ── WATERMARK ── */}
+                            <div style={{
+                                position: 'absolute', top: '280px', left: '120px',
+                                fontSize: '130px', fontWeight: 900,
+                                color: 'rgba(0,33,71,0.022)',
+                                whiteSpace: 'nowrap', zIndex: 1,
+                                letterSpacing: '0.05em', fontFamily: 'serif',
+                                userSelect: 'none', pointerEvents: 'none',
+                                transform: 'rotate(-18deg)',
+                            }}>SMAART INSTITUTE</div>
+
+                            {/* ── HEADER: Institute name on dark band ── */}
+                            <div style={{ position: 'absolute', top: 0, left: 0, width: '1122px', height: '76px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                                <div style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.22em', textTransform: 'uppercase', fontFamily: 'Georgia, serif', lineHeight: '1.2' }}>SMAART INSTITUTE</div>
+                                <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#DAA520', letterSpacing: '0.38em', textTransform: 'uppercase', marginTop: '2px' }}>OFFICIAL BADGE CERTIFICATE</div>
                             </div>
 
-                            {/* Recipient Section */}
-                            <div style={{ position: 'absolute', top: '240px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
-                                <p style={{ fontSize: '24px', color: '#64748b', fontWeight: 500, letterSpacing: '1px', margin: '0 0 15px 0' }}>This formally certifies that</p>
-                                <h2 style={{ fontSize: '64px', fontWeight: 900, color: '#0f172a', margin: '0', padding: '0 0 15px 0' }}>{userName}</h2>
+                            {/* ── GOLD DIAMOND DIVIDER ── */}
+                            <div style={{ position: 'absolute', top: '108px', left: '436px', width: '250px', height: '16px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10 }}>
+                                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(184,134,11,0.45)' }} />
+                                <div style={{ width: '7px', height: '7px', backgroundColor: '#B8860B', transform: 'rotate(45deg)' }} />
+                                <div style={{ width: '5px', height: '5px', backgroundColor: '#B8860B', transform: 'rotate(45deg)', opacity: '0.5' }} />
+                                <div style={{ width: '7px', height: '7px', backgroundColor: '#B8860B', transform: 'rotate(45deg)' }} />
+                                <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(184,134,11,0.45)' }} />
                             </div>
 
-                            {/* Divider Line */}
-                            <div style={{ position: 'absolute', top: '350px', left: '511px', width: '100px', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '10px', zIndex: 10 }}></div>
-
-                            {/* Subtitle */}
-                            <div style={{ position: 'absolute', top: '390px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
-                                <p style={{ fontSize: '20px', color: '#64748b', fontWeight: 500, letterSpacing: '1px', margin: 0 }}>has successfully demonstrated mastery and earned the</p>
+                            {/* ── "This formally certifies that" ── */}
+                            <div style={{ position: 'absolute', top: '136px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <span style={{ fontSize: '15px', color: '#64748b', fontStyle: 'italic', letterSpacing: '0.03em', fontFamily: 'Georgia, serif' }}>This formally certifies that</span>
                             </div>
 
-                            {/* Badge Box (Absolute Positioning to avoid layout collapse) */}
-                            <div style={{ position: 'absolute', top: '450px', left: '161px', width: '800px', height: '180px', backgroundColor: '#ffffff', borderRadius: '32px', border: '2px solid #f1f5f9', zIndex: 10 }}>
-                                {/* Badge Image */}
-                                <div style={{ position: 'absolute', top: '20px', left: '40px', width: '140px', height: '140px' }}>
+                            {/* ── RECIPIENT NAME ── */}
+                            <div style={{ position: 'absolute', top: '162px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <span style={{ fontSize: '56px', fontWeight: 800, color: '#002147', fontFamily: 'Georgia, serif', lineHeight: '1', letterSpacing: '-0.01em' }}>{userName}</span>
+                            </div>
+                            {/* Decorative gold underline removed as per request */}
+
+                            {/* ── SUBTITLE ── */}
+                            <div style={{ position: 'absolute', top: '252px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <span style={{ fontSize: '14px', color: '#475569', fontWeight: 500, letterSpacing: '0.03em' }}>has successfully demonstrated mastery and earned the</span>
+                            </div>
+
+                            {/* ── BADGE CARD ── */}
+                            <div style={{
+                                position: 'absolute', top: '284px', left: '181px',
+                                width: '760px', height: '180px',
+                                backgroundColor: '#f8faff',
+                                borderRadius: '16px',
+                                border: '1px solid #dde5f4',
+                                zIndex: 10,
+                                boxSizing: 'border-box',
+                                overflow: 'hidden',
+                            }}>
+                                {/* Left accent bar */}
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '5px', height: '180px', backgroundColor: '#002147' }} />
+
+                                {/* Badge hex */}
+                                <div style={{ position: 'absolute', top: '20px', left: '30px', width: '140px', height: '140px' }}>
                                     <ModalHexBadge badge={badge} />
                                 </div>
-                                
-                                {/* Badge Title */}
-                                <div style={{ position: 'absolute', top: '45px', left: '210px', width: '550px', textAlign: 'left' }}>
-                                    <h3 style={{ fontSize: '38px', fontWeight: 900, color: '#1a3884', margin: '0', lineHeight: 1.2 }}>{badge.title}</h3>
-                                </div>
 
-                                {/* Verified Pill */}
-                                <div style={{ position: 'absolute', top: '105px', left: '210px', padding: '8px 20px', borderRadius: '50px', border: '2px solid #a7f3d0', backgroundColor: '#ecfdf5' }}>
-                                    <span style={{ color: '#047857', fontSize: '15px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                        ✓ Verified Credential
-                                    </span>
+                                {/* Vertical separator */}
+                                <div style={{ position: 'absolute', top: '30px', left: '190px', width: '1px', height: '120px', backgroundColor: 'rgba(0,33,71,0.12)' }} />
+
+                                {/* Badge details */}
+                                <div style={{ position: 'absolute', top: '38px', left: '214px', width: '500px' }}>
+                                    <div style={{ fontSize: '8px', fontWeight: 700, color: '#B8860B', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: '10px' }}>Achievement Badge</div>
+                                    <div style={{ fontSize: '28px', fontWeight: 900, color: '#002147', lineHeight: '1.2', marginBottom: '16px' }}>{badge.title}</div>
+                                    {/* Verified pill removed per request */}
                                 </div>
                             </div>
 
-                            {/* Footer Line */}
-                            <div style={{ position: 'absolute', top: '680px', left: '80px', width: '962px', height: '2px', backgroundColor: '#f1f5f9', zIndex: 10 }}></div>
+                            {/* ── FOOTER DIVIDER ── */}
+                            <div style={{ position: 'absolute', top: '490px', left: '80px', width: '962px', height: '1px', backgroundColor: 'rgba(0,33,71,0.1)', zIndex: 10 }} />
 
-                            {/* Footer: Date */}
-                            <div style={{ position: 'absolute', top: '700px', left: '80px', width: '300px', textAlign: 'left', zIndex: 10 }}>
-                                <p style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px', margin: '0 0 5px 0' }}>Date of Issue</p>
-                                <p style={{ fontSize: '24px', fontWeight: 900, color: '#1e293b', margin: 0 }}>
-                                    {badge.earnedDate ? new Date(badge.earnedDate).toLocaleDateString(i18n.language || 'en-GB', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    }) : new Date().toLocaleDateString()}
-                                </p>
+                            {/* ── FOOTER: Date of Issue (left) ── */}
+                            <div style={{ position: 'absolute', top: '508px', left: '100px', zIndex: 10 }}>
+                                <div style={{ fontSize: '8px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '6px' }}>Date of Issue</div>
+                                <div style={{ fontSize: '17px', fontWeight: 700, color: '#002147' }}>
+                                    {badge.earnedDate
+                                        ? new Date(badge.earnedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                                        : new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </div>
                             </div>
 
-                            {/* Footer: Verification Code */}
-                            <div style={{ position: 'absolute', top: '700px', left: '500px', width: '400px', textAlign: 'right', zIndex: 10 }}>
-                                <p style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px', margin: '0 0 5px 0' }}>Verification Code</p>
-                                <p style={{ fontSize: '20px', fontFamily: 'monospace', fontWeight: 700, color: '#334155', letterSpacing: '2px', margin: 0 }}>{displayCode}</p>
+                            {/* ── FOOTER: Issuing Authority (center) ── */}
+                            <div style={{ position: 'absolute', top: '508px', left: '400px', width: '322px', textAlign: 'center', zIndex: 10 }}>
+                                <div style={{ fontSize: '8px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '6px' }}>Issuing Authority</div>
+                                <div style={{ fontSize: '15px', fontWeight: 800, color: '#002147', letterSpacing: '0.05em' }}>SMAART INSTITUTE (UK)</div>
                             </div>
 
-                            {/* Footer: QR Code */}
-                            <div style={{ position: 'absolute', top: '675px', left: '942px', width: '100px', height: '100px', backgroundColor: '#ffffff', borderRadius: '16px', border: '2px solid #f1f5f9', zIndex: 10, padding: '8px' }}>
-                                <QRCodeSVG value={verificationUrl} size={80} level="H" includeMargin={false} fgColor="#1a3884" />
+                            {/* ── FOOTER: QR + verify (right) ── */}
+                            <div style={{ position: 'absolute', top: '500px', left: '790px', zIndex: 10, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '8px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '5px' }}>Verify at</div>
+                                    <div style={{ fontSize: '10px', fontWeight: 700, color: '#002147', marginBottom: '4px' }}>{window.location.host}/verify-badge</div>
+                                    <div style={{ fontSize: '9px', fontFamily: 'Courier New, monospace', fontWeight: 700, color: '#475569', backgroundColor: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', display: 'inline-block' }}>
+                                        {displayCode}
+                                    </div>
+                                </div>
+                                <div style={{ padding: '5px', backgroundColor: '#ffffff', border: '1px solid #dde5f4', borderRadius: '8px' }}>
+                                    <QRCodeSVG value={verificationUrl} size={68} level="H" includeMargin={false} fgColor="#002147" />
+                                </div>
                             </div>
 
-                            {/* Bottom Stripe */}
-                            <div style={{ position: 'absolute', bottom: '0px', left: '0px', width: '1122px', height: '30px', backgroundColor: '#f8fafc' }}></div>
+                            {/* ── BOTTOM BAND TEXT ── */}
+                            <div style={{ position: 'absolute', bottom: '18px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <span style={{ fontSize: '9px', fontWeight: 600, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+                                    © {new Date().getFullYear()} SMAART Institute London  ·  Professional Badge Credential
+                                </span>
+                            </div>
                         </div>
 
                         {/* Certificate Content for PDF */}

@@ -4,7 +4,10 @@
 .env.*.local
 .env.production
 .env.development
+.env.backup
+*.env.backup
 back-end/.env
+back-end/.env.backup
 
 # Dependencies
 node_modules/

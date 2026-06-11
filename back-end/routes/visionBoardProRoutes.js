@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protect } = require('../middleware/auth');
 router.use(generalLimiter);
+// SECURITY: require a valid JWT for every Vision Board Pro route. The frontend
+// (visionBoardProApi.js) already sends the token via the apiCall helper, so this
+// does not change the client contract — it only closes the unauthenticated IDOR
+// where any caller could read/modify another user's boards via ?userId=.
+router.use(protect);
 
 const controller = require("../controllers/visionBoardProController");
 

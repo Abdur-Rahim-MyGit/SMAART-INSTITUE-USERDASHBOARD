@@ -1,0 +1,254 @@
+{
+  "id": "1781106146578",
+  "timestamp": "2026-06-10T15:42:26.578Z",
+  "status": "pending_analysis",
+  "profile_hash": "2d45e2f4f372b3dabed2711e1ad527b692e7187c1523231afaec36b4b3d88751",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Dharsini J",
+      "email": "dharsinismaart@gmail.com",
+      "phone": "9445150351",
+      "registrationNumber": "12345"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Commerce & Management",
+        "degreeGroup": "Bachelor of Business Administration",
+        "specialisation": [
+          "Digital Marketing",
+          "Entrepreneurship"
+        ],
+        "university": "",
+        "graduationYear": "2027",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-006009-P04",
+          "directionName": "E-Commerce Marketing & Growth",
+          "directionDescription": "E-commerce marketing involves driving traffic, conversion, and repeat purchase on online retail platforms. D2C marketing managers run owned-channel acquisition programmes; marketplace analysts optimise product listings; growth hackers find low-cost customer acquisition channels. BBA Digital Marketing graduates understand the digital funnel, product listing optimisation, and customer lifecycle management that are central to e-commerce marketing.",
+          "directionOverview": "E-commerce marketing involves driving traffic, conversion, and repeat purchase on online retail platforms. D2C marketing managers run owned-channel acquisition programmes; marketplace analysts optimise product listings; growth hackers find low-cost customer acquisition channels. BBA Digital Marketing graduates understand the digital funnel, product listing optimisation, and customer lifecycle management that are central to e-commerce marketing.",
+          "type": "Primary",
+          "uniqueId": "UG-006-009",
+          "roles": [
+            {
+              "role": "D2C Marketing Manager",
+              "id": "JF21-010"
+            },
+            {
+              "role": "Marketplace Analyst",
+              "id": "JF21-008"
+            },
+            {
+              "role": "Growth Hacker",
+              "id": "JF15-006"
+            },
+            {
+              "role": "Performance Marketing Analyst",
+              "id": "JF15-004"
+            },
+            {
+              "role": "CRM Analyst",
+              "id": "JF15-012"
+            },
+            {
+              "role": "CRM Marketing Executive",
+              "id": "JF15-016"
+            },
+            {
+              "role": "D2C Brand Executive",
+              "id": "JF21-017"
+            },
+            {
+              "role": "Social Media Executive",
+              "id": "JF15-009"
+            },
+            {
+              "role": "Affiliate Marketing Executive",
+              "id": "JF15-013"
+            },
+            {
+              "role": "E-Commerce Executive",
+              "id": "JF21-013"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-006009-P04",
+        "careerDirectionName": "E-Commerce Marketing & Growth",
+        "careerDirectionDescription": "E-commerce marketing involves driving traffic, conversion, and repeat purchase on online retail platforms. D2C marketing managers run owned-channel acquisition programmes; marketplace analysts optimise product listings; growth hackers find low-cost customer acquisition channels. BBA Digital Marketing graduates understand the digital funnel, product listing optimisation, and customer lifecycle management that are central to e-commerce marketing.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "E-Commerce Marketing & Growth",
+        "type": "Full-Time",
+        "salary": "5-8 LPA",
+        "locations": [
+          "Ahmedabad"
+        ],
+        "location": "Ahmedabad",
+        "orgTypes": [
+          "Small or Medium Enterprise (SME)",
+          "Scale-up / High-growth company",
+          "Large Indian Corporate / Conglomerate"
+        ]
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-006009-P05",
+          "directionName": "Brand Management & Communications",
+          "directionDescription": "Brand management involves building and protecting brand identity across digital and traditional channels. Brand executives execute brand guidelines; campaign managers plan and run marketing campaigns; brand communications executives produce consistent messaging across touchpoints. BBA Digital Marketing graduates who develop brand strategy skills alongside their digital tool proficiency are well suited for brand management roles.",
+          "directionOverview": "Brand management involves building and protecting brand identity across digital and traditional channels. Brand executives execute brand guidelines; campaign managers plan and run marketing campaigns; brand communications executives produce consistent messaging across touchpoints. BBA Digital Marketing graduates who develop brand strategy skills alongside their digital tool proficiency are well suited for brand management roles.",
+          "type": "Primary",
+          "uniqueId": "UG-006-009",
+          "roles": [
+            {
+              "role": "Brand Executive",
+              "id": "JF15-011"
+            },
+            {
+              "role": "Brand Communications Executive",
+              "id": "JF15-015"
+            },
+            {
+              "role": "Brand Manager",
+              "id": "JF16-002"
+            },
+            {
+              "role": "Campaign Manager",
+              "id": "JF16-011"
+            },
+            {
+              "role": "Brand Monitoring Analyst",
+              "id": "JF16-012"
+            },
+            {
+              "role": "Public Relations Executive",
+              "id": "JF16-007"
+            },
+            {
+              "role": "Corporate Communications Executive",
+              "id": "JF16-008"
+            },
+            {
+              "role": "Copywriter",
+              "id": "JF16-001"
+            },
+            {
+              "role": "Product Marketing Manager",
+              "id": "JF15-005"
+            },
+            {
+              "role": "Account Manager - Ad Agency",
+              "id": "JF16-005"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-006009-P05",
+        "careerDirectionName": "Brand Management & Communications",
+        "careerDirectionDescription": "Brand management involves building and protecting brand identity across digital and traditional channels. Brand executives execute brand guidelines; campaign managers plan and run marketing campaigns; brand communications executives produce consistent messaging across touchpoints. BBA Digital Marketing graduates who develop brand strategy skills alongside their digital tool proficiency are well suited for brand management roles.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Brand Management & Communications",
+        "type": "Full-Time",
+        "salary": "5-8 LPA",
+        "locations": [
+          "Ahmedabad"
+        ],
+        "location": "Ahmedabad",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Large Indian Corporate / Conglomerate",
+          "Small or Medium Enterprise (SME)"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-006009-P01",
+          "directionName": "Performance Marketing & Paid Advertising",
+          "directionDescription": "Performance marketing involves managing paid acquisition campaigns on Google Search, Display, YouTube, Meta, and programmatic platforms. Performance marketing analysts monitor campaign KPIs, optimise ad spend, and improve cost-per-acquisition. BBA Digital Marketing is one of the few undergraduate programmes that teaches campaign management, digital advertising platforms, and conversion analytics as core subjects — making this the most direct career outcome.",
+          "directionOverview": "Performance marketing involves managing paid acquisition campaigns on Google Search, Display, YouTube, Meta, and programmatic platforms. Performance marketing analysts monitor campaign KPIs, optimise ad spend, and improve cost-per-acquisition. BBA Digital Marketing is one of the few undergraduate programmes that teaches campaign management, digital advertising platforms, and conversion analytics as core subjects — making this the most direct career outcome.",
+          "type": "Primary",
+          "uniqueId": "UG-006-009",
+          "roles": [
+            {
+              "role": "Performance Marketing Analyst",
+              "id": "JF15-004"
+            },
+            {
+              "role": "SEO Specialist",
+              "id": "JF15-003"
+            },
+            {
+              "role": "Growth Hacker",
+              "id": "JF15-006"
+            },
+            {
+              "role": "Email Marketing Specialist",
+              "id": "JF15-007"
+            },
+            {
+              "role": "Affiliate Marketing Executive",
+              "id": "JF15-013"
+            },
+            {
+              "role": "Media Buying Executive",
+              "id": "JF16-013"
+            },
+            {
+              "role": "Media Planner",
+              "id": "JF16-004"
+            },
+            {
+              "role": "Campaign Manager",
+              "id": "JF16-011"
+            },
+            {
+              "role": "Digital Marketing Manager",
+              "id": "JF15-002"
+            },
+            {
+              "role": "Marketing Executive",
+              "id": "JF15-001"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-006009-P01",
+        "careerDirectionName": "Performance Marketing & Paid Advertising",
+        "careerDirectionDescription": "Performance marketing involves managing paid acquisition campaigns on Google Search, Display, YouTube, Meta, and programmatic platforms. Performance marketing analysts monitor campaign KPIs, optimise ad spend, and improve cost-per-acquisition. BBA Digital Marketing is one of the few undergraduate programmes that teaches campaign management, digital advertising platforms, and conversion analytics as core subjects — making this the most direct career outcome.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Performance Marketing & Paid Advertising",
+        "type": "Full-Time",
+        "salary": "8-12 LPA",
+        "locations": [
+          "Chennai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Large Indian Corporate / Conglomerate",
+          "Scale-up / High-growth company"
+        ]
+      }
+    }
+  },
+  "output_generated_report": null
+}

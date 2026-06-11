@@ -5,6 +5,8 @@ const { searchLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
 
 
@@ -151,8 +153,8 @@ router.get('/code/:code', async (req, res) => {
   }
 });
 
-// Create new college (admin only - can be protected with auth middleware later)
-router.post('/', async (req, res) => {
+// Create new college (admin only)
+router.post('/', protectOrBypass, requireRole('admin'), async (req, res) => {
   try {
     const collegeData = req.body;
 

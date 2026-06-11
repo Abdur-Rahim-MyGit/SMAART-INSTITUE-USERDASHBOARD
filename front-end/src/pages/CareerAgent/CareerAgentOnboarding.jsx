@@ -4,7 +4,24 @@ import PageTransition from '@/components/PageTransition';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, GraduationCap, Target, Briefcase, ShieldCheck, CheckCircle, MapPin, CreditCard, Clock, Compass, Search, Navigation, Zap, Trophy, Sparkles } from 'lucide-react';
+import { 
+  IconUser as User, 
+  IconSchool as GraduationCap, 
+  IconTarget as Target, 
+  IconBriefcase as Briefcase, 
+  IconShieldCheck as ShieldCheck, 
+  IconCircleCheck as CheckCircle, 
+  IconMapPin as MapPin, 
+  IconCreditCard as CreditCard, 
+  IconClock as Clock, 
+  IconCompass as Compass, 
+  IconSearch as Search, 
+  IconNavigation as Navigation, 
+  IconBolt as Zap, 
+  IconTrophy as Trophy, 
+  IconSparkles as Sparkles,
+  IconLock as Lock 
+} from '@tabler/icons-react';
 import dropdownData from './data/dropdownData.json';
 import jobRolesData from './data/jobRolesData.json';
 import indianCities from './data/indianCities.json';
@@ -58,10 +75,9 @@ const STEP_DISPLAY_LABELS = ['Personal', 'Education', 'Primary', 'Secondary', 'T
 const createEmptyValidationState = () => ({ messages: [], fields: {} });
 
 
-// MultiSelect
+// MultiSelect — clean open chip grid, no scrollbox
 function MultiSelect({ options, selected = [], onChange, max = 3, placeholder }) {
   const { t } = useTranslation();
-  const displayPlaceholder = placeholder || t('career_agent.onboarding.select_placeholder', 'Select...');
 
   const toggle = (opt) => {
     if (selected.includes(opt)) {
@@ -71,45 +87,80 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
     }
   };
 
-
   return (
     <div>
-      <div className="tags" style={{ marginBottom: '0.6rem' }}>
-        {selected.map(s => (
-          <span key={s} className="tag">
-            {s} <button type="button" onClick={() => toggle(s)}>x</button>
-          </span>
-        ))}
-        {selected.length === 0 && <span style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>{displayPlaceholder}</span>}
+      {/* Counter + hint */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+        <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+          {selected.length === 0
+            ? (placeholder || t('career_agent.onboarding.select_placeholder', 'Select...'))
+            : t('career_agent.onboarding.select_up_to', 'Select up to {{count}}.', { count: max })}
+        </span>
+        <span style={{
+          fontSize: '0.65rem', fontWeight: 700,
+          padding: '0.15rem 0.55rem', borderRadius: '100px',
+          background: selected.length >= max ? 'rgba(var(--accent-rgb),0.15)' : 'rgba(255,255,255,0.05)',
+          color: selected.length >= max ? 'var(--accent)' : 'var(--muted)',
+          border: '1px solid', borderColor: selected.length >= max ? 'var(--accent)' : 'var(--border)'
+        }}>
+          {selected.length} / {max}
+        </span>
       </div>
 
-      {options.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', maxHeight: '140px', overflowY: 'auto', padding: '0.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-          {options.map(opt => (
-            <button
-              key={opt} type="button"
-              onClick={() => toggle(opt)}
-              style={{
-                padding: '0.25rem 0.75rem', fontSize: '0.72rem', borderRadius: '100px', cursor: 'pointer',
-                fontFamily: 'var(--font)', border: '1px solid',
-                background: selected.includes(opt) ? 'var(--accent)' : 'var(--navy2)',
-                borderColor: selected.includes(opt) ? 'var(--accent)' : 'var(--border2)',
-                color: selected.includes(opt) ? '#ffffff' : 'var(--text2)',
-                transition: 'all 0.15s',
-                opacity: (!selected.includes(opt) && selected.length >= max) ? 0.4 : 1
-              }}
-            >
-              {opt}
-            </button>
+      {/* Selected tags row */}
+      {selected.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
+          {selected.map(s => (
+            <span key={s} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+              padding: '0.3rem 0.75rem', fontSize: '0.72rem', fontWeight: 600,
+              borderRadius: '100px', background: 'var(--accent)',
+              color: '#fff', border: '1px solid var(--accent)'
+            }}>
+              {s}
+              <button type="button" onClick={() => toggle(s)} style={{
+                background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%',
+                width: '14px', height: '14px', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.6rem', fontWeight: 900, lineHeight: 1
+              }}>×</button>
+            </span>
           ))}
         </div>
+      )}
+
+      {/* All options as chips */}
+      {options.length > 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+          {options.map(opt => {
+            const isSel = selected.includes(opt);
+            const isDisabled = !isSel && selected.length >= max;
+            return (
+              <button
+                key={opt} type="button"
+                onClick={() => toggle(opt)}
+                disabled={isDisabled}
+                style={{
+                  padding: '0.3rem 0.85rem', fontSize: '0.72rem', fontWeight: 600,
+                  borderRadius: '100px', cursor: isDisabled ? 'not-allowed' : 'pointer',
+                  fontFamily: 'var(--font)', border: '1.5px solid',
+                  background: isSel ? 'rgba(var(--accent-rgb),0.12)' : 'transparent',
+                  borderColor: isSel ? 'var(--accent)' : 'var(--border2)',
+                  color: isSel ? 'var(--accent)' : isDisabled ? 'rgba(var(--text2-rgb),0.35)' : 'var(--text2)',
+                  opacity: isDisabled ? 0.45 : 1,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {isSel && <span style={{ marginRight: '0.3rem', fontSize: '0.65rem' }}>✓</span>}
+                {opt}
+              </button>
+            );
+          })}
+        </div>
       ) : (
-        <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic', marginTop: '0.2rem' }}>
+        <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic' }}>
           {t('career_agent.onboarding.select_degree_first', 'Select a degree group to view available specialisations.')}
         </p>
       )}
-
-      {max > 1 && <p style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: '0.4rem' }}>{t('career_agent.onboarding.select_up_to', 'Select up to {{count}}.', { count: max })}</p>}
     </div>
   );
 }
@@ -210,113 +261,142 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
   );
 }
 
-// CareerDirectionSelector
+// CareerDirectionSelector — clean dropdown + preview panel
 function CareerDirectionSelector({ directions = [], selected = null, onChange, loading = false, excludeRoles = [] }) {
   const { t } = useTranslation();
   if (loading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted)', background: 'var(--navy2)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-        <div style={{ marginBottom: '0.8rem', color: 'var(--accent)' }}><Search size={24} className="animate-pulse" /></div>
-        <div style={{ fontSize: '0.82rem', fontWeight: 500 }}>{t('career_agent.onboarding.sourcing_intelligence', 'Sourcing intelligence for your profile...')}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.2rem', background: 'var(--navy2)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+        <Search size={18} className="animate-pulse" style={{ color: 'var(--accent)', flexShrink: 0 }} />
+        <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--muted)' }}>{t('career_agent.onboarding.sourcing_intelligence', 'Sourcing intelligence for your profile...')}</span>
       </div>
     );
   }
 
   if (directions.length === 0) return null;
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '480px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-      {directions.map(dir => {
-        const isSel = selected?.directionId === dir.directionId;
-        const themeColor = 'var(--accent)';
+  const selectedDir = selected ? directions.find(d => d.directionId === selected.directionId) : null;
+  const availableRoles = selectedDir ? (selectedDir.roles || []).filter(r => !excludeRoles.includes(r.role)) : [];
 
-        return (
-          <div key={dir.directionId} style={{ position: 'relative' }}>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      {/* Clean Dropdown */}
+      <div style={{ position: 'relative' }}>
+        <select
+          value={selected?.directionId || ''}
+          onChange={e => {
+            const val = e.target.value;
+            if (!val) { onChange(null); return; }
+            const dir = directions.find(d => d.directionId === val);
+            if (dir) onChange(dir);
+          }}
+          style={{
+            width: '100%',
+            appearance: 'none',
+            WebkitAppearance: 'none',
+            padding: '0.75rem 2.5rem 0.75rem 1rem',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: selected ? 'var(--text1)' : 'var(--muted)',
+            background: 'var(--navy2)',
+            border: selected ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            outline: 'none',
+            transition: 'border-color 0.2s ease',
+            fontFamily: 'var(--font)',
+          }}
+        >
+          <option value="">{t('career_agent.onboarding.select_direction_placeholder', '— Select a career direction —')}</option>
+          {directions.map(dir => (
+            <option key={dir.directionId} value={dir.directionId}>
+              {dir.directionName}
+            </option>
+          ))}
+        </select>
+        {/* Dropdown arrow */}
+        <div style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: selected ? 'var(--accent)' : 'var(--muted)' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      {/* Preview Panel — appears only when a direction is chosen */}
+      {selectedDir && (
+        <motion.div
+          key={selectedDir.directionId}
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{
+            padding: '1rem 1.2rem',
+            background: 'rgba(var(--accent-rgb), 0.04)',
+            border: '1.5px solid var(--accent)',
+            borderRadius: '12px',
+          }}
+        >
+          {/* Header row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <CheckCircle size={13} color="#fff" strokeWidth={2.5} />
+              </div>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)' }}>{selectedDir.directionName}</span>
+            </div>
             <button
               type="button"
-              onClick={() => onChange(isSel ? null : dir)}
-              className={`direction-select-btn ${isSel ? 'selected' : ''}`}
+              onClick={() => onChange(null)}
+              style={{ fontSize: '0.65rem', color: 'var(--muted)', background: 'transparent', border: '1px solid var(--border)', cursor: 'pointer', padding: '0.2rem 0.6rem', borderRadius: '6px', transition: 'all 0.15s' }}
             >
-              <div className="icon-box" style={{
-                width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                background: isSel ? 'var(--accent)' : 'var(--navy2)',
-                border: isSel ? '1px solid var(--accent)' : '1px solid var(--border)',
-                color: isSel ? '#ffffff' : 'var(--muted)',
-                boxShadow: isSel ? '0 4px 15px rgba(var(--accent-rgb),0.3)' : 'none'
-              }}>
-                <Target size={24} />
-              </div>
-
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.58rem', fontWeight: 700, color: isSel ? 'var(--accent)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.2rem', transition: 'color 0.3s ease' }}>Career Pathway</div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: isSel ? 'var(--accent)' : 'var(--text1)', marginBottom: '0.2rem', letterSpacing: '-0.015em' }}>{dir.directionName}</div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{dir.directionDescription}</div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                {isSel && (
-                  <div style={{
-                    background: 'var(--accent-tint)', color: 'var(--accent)', borderRadius: '50%',
-                    width: '32px', height: '32px', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    <CheckCircle size={18} strokeWidth={2.5} />
-                  </div>
-                )}
-              </div>
+              ✕ Clear
             </button>
-            {isSel && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                style={{ padding: '1.2rem 1.5rem', background: `rgba(var(--accent-rgb),0.01)`, border: `1.5px solid var(--accent)`, borderTop: 'none', borderRadius: '0 0 20px 20px', overflow: 'hidden' }}
-              >
-                {dir.directionOverview && (
-                  <p style={{ fontSize: '0.7rem', color: 'var(--text2)', lineHeight: 1.6, marginBottom: dir.roles?.length > 0 ? '0.8rem' : 0 }}>{dir.directionOverview}</p>
-                )}
-                {dir.roles && dir.roles.filter(r => !excludeRoles.includes(r.role)).length > 0 && (
-                  <>
-                    <div style={{ fontSize: '0.58rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{t('career_agent.onboarding.core_entry_roles', 'Core Entry Roles')}</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                      {dir.roles.filter(r => !excludeRoles.includes(r.role)).map((r, ri) => {
-                        const isRoleSel = selected?.role === r.role;
-                        return (
-                          <button
-                            key={ri}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onChange({ ...dir, role: r.role });
-                            }}
-                            style={{
-                              fontSize: '0.62rem',
-                              padding: '0.2rem 0.65rem',
-                              background: isRoleSel ? 'var(--accent)' : '#fff',
-                              border: isRoleSel ? '1px solid var(--accent)' : '1px solid var(--border2)',
-                              borderRadius: '100px',
-                              color: isRoleSel ? '#fff' : 'var(--text2)',
-                              fontWeight: 600,
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease'
-                            }}
-                          >
-                            {r.role}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-
-              </motion.div>
-            )}
           </div>
-        );
-      })}
+
+          {/* Description */}
+          {selectedDir.directionDescription && (
+            <p style={{ fontSize: '0.72rem', color: 'var(--text2)', lineHeight: 1.65, marginBottom: availableRoles.length > 0 ? '0.75rem' : 0 }}>
+              {selectedDir.directionDescription}
+            </p>
+          )}
+
+          {/* Role chips */}
+          {availableRoles.length > 0 && (
+            <>
+              <div style={{ fontSize: '0.6rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+                {t('career_agent.onboarding.core_entry_roles', 'Core Entry Roles')}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                {availableRoles.map((r, ri) => {
+                  const isRoleSel = selected?.role === r.role;
+                  return (
+                    <button
+                      key={ri}
+                      type="button"
+                      onClick={e => { e.stopPropagation(); onChange({ ...selectedDir, role: r.role }); }}
+                      style={{
+                        fontSize: '0.65rem',
+                        padding: '0.25rem 0.7rem',
+                        background: isRoleSel ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
+                        border: isRoleSel ? '1px solid var(--accent)' : '1px solid var(--border2)',
+                        borderRadius: '100px',
+                        color: isRoleSel ? '#fff' : 'var(--text2)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {r.role}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </motion.div>
+      )}
     </div>
   );
 }
+
 
 function PrefBlock({ label, colorClass, data, onChange, directions = [], directionsLoading = false, dbRoles = [], excludeRoles = [], excludeDirections = [], fieldErrors = {} }) {
   const { t } = useTranslation();
@@ -325,10 +405,10 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
 
   // Priority branding
   const theme = {
-    primary: { glow: 'rgba(var(--accent-rgb), 0.08)', bg: 'rgba(var(--accent-rgb), 0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' },
-    secondary: { glow: 'rgba(34,211,238,0.06)', bg: 'rgba(34,211,238,0.08)', accent: 'var(--accent2)', icon: <Compass size={18} />, label: 'Secondary Path' },
-    tertiary: { glow: 'rgba(167,139,250,0.06)', bg: 'rgba(167,139,250,0.08)', accent: '#a78bfa', icon: <Sparkles size={18} />, label: 'Tertiary Option' }
-  }[colorClass] || { glow: 'rgba(var(--accent-rgb), 0.08)', bg: 'rgba(var(--accent-rgb), 0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' };
+    primary: { glow: 'rgba(26,56,132, 0.08)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Trophy size={18} stroke={1.5} />, label: 'Primary Goal' },
+    secondary: { glow: 'rgba(26,56,132, 0.06)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Compass size={18} stroke={1.5} />, label: 'Secondary Path' },
+    tertiary: { glow: 'rgba(26,56,132, 0.06)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Target size={18} stroke={1.5} />, label: 'Tertiary Option' }
+  }[colorClass] || { glow: 'rgba(26,56,132, 0.08)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Trophy size={18} stroke={1.5} />, label: 'Primary Goal' };
 
   const sectionLabelStyle = {
     fontSize: '0.7rem',
@@ -408,21 +488,53 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
 
         {/* SECTION B: MARKET PREFERENCES */}
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-          <div style={sectionLabelStyle}><span style={{ color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><MapPin size={16} /> 02</span> {t('career_agent.onboarding.market_preferences', 'Market Preferences')}</div>
+          <div style={sectionLabelStyle}><span style={{ color: '#1a3884', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><MapPin size={16} stroke={2} /> 02</span> {t('career_agent.onboarding.market_preferences', 'Market Preferences')}</div>
           <div className="fgrid">
+            {/* Assignment Type */}
             <div className="fg">
               <label className="fl">{t('career_agent.onboarding.assignment_type', 'Assignment Type')}</label>
-              <select value={data.type || 'Full-Time'} onChange={e => up('type', e.target.value)}>
-                {JOB_TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <select
+                  value={data.type || 'Full-Time'}
+                  onChange={e => up('type', e.target.value)}
+                  style={{
+                    width: '100%', appearance: 'none', WebkitAppearance: 'none',
+                    paddingRight: '2.2rem', fontFamily: 'var(--font)',
+                    fontWeight: 600, fontSize: '0.85rem'
+                  }}
+                >
+                  {JOB_TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
+                </select>
+                <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--muted)' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
             </div>
+
+            {/* Expected CTC */}
             <div className="fg">
               <label className="fl">{t('career_agent.onboarding.expected_ctc', 'Expected CTC (Range)')} <span className="req">*</span></label>
-              <select className={fieldErrorClass(`preferences.${colorClass}.salary`)} value={data.salary || ''} onChange={e => up('salary', e.target.value)}>
-                <option value="">{t('career_agent.onboarding.select_range', 'Select range...')}</option>
-                {SALARY_OPTIONS.map(s => <option key={s}>{s}</option>)}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <select
+                  className={fieldErrorClass(`preferences.${colorClass}.salary`)}
+                  value={data.salary || ''}
+                  onChange={e => up('salary', e.target.value)}
+                  style={{
+                    width: '100%', appearance: 'none', WebkitAppearance: 'none',
+                    paddingRight: '2.2rem', fontFamily: 'var(--font)',
+                    fontWeight: data.salary ? 600 : 400, fontSize: '0.85rem'
+                  }}
+                >
+                  <option value="">{t('career_agent.onboarding.select_range', 'Select range...')}</option>
+                  {SALARY_OPTIONS.map(s => <option key={s}>{s}</option>)}
+                </select>
+                <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: data.salary ? 'var(--accent)' : 'var(--muted)' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
             </div>
+
+            {/* Location */}
             <div className="fg full">
               <label className="fl">{t('career_agent.onboarding.location_preferences', 'Location Preferences (Max 3)')} <span className="req">*</span></label>
               <div className={fieldErrorClass(`preferences.${colorClass}.locations`)}>
@@ -438,7 +550,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
 
         {/* SECTION C: ORGANIZATION FIT */}
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-          <div style={sectionLabelStyle}><span style={{ color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Briefcase size={16} /> 03</span> {t('career_agent.onboarding.organization_fit', 'Organization Fit')}</div>
+          <div style={sectionLabelStyle}><span style={{ color: '#1a3884', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Briefcase size={16} stroke={2} /> 03</span> {t('career_agent.onboarding.organization_fit', 'Organization Fit')}</div>
           <div className="fg full">
             <label className="fl">{t('career_agent.onboarding.target_cultures', 'Target Cultures (Multi)')} <span className="req">*</span></label>
             <div className={fieldErrorClass(`preferences.${colorClass}.orgTypes`)}>
@@ -1305,12 +1417,17 @@ const CareerAgentOnboarding = () => {
           {/* STEP 1: PERSONAL DETAILS */}
           {step === 1 && (
             <div className="form-card">
-              <div className="step-title"><User size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.personal_details', 'Personal Details')}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>{t('career_agent.onboarding.personal_details_subtitle', 'Your basic information to personalise your career report.')}</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <User size={24} color="#ffffff" stroke={1.5} />
                 </div>
-                <span className="step-tag">{t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 1, total: 6 })}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.personal_details', 'Personal Details')}</span>
+                    <span className="step-tag">{t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 1, total: 6 })}</span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>{t('career_agent.onboarding.personal_details_subtitle', 'Your basic information to personalise your career report.')}</p>
+                </div>
               </div>
 
 
@@ -1376,12 +1493,17 @@ const CareerAgentOnboarding = () => {
           {/* STEP 2: EDUCATION */}
           {step === 2 && (
             <div className="form-card">
-              <div className="step-title"><GraduationCap size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your academic background - you can add up to 3 qualifications.</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <GraduationCap size={24} color="#ffffff" stroke={1.5} />
                 </div>
-                <span className="step-tag">STEP 2 / 6</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</span>
+                    <span className="step-tag">STEP 2 / 6</span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your academic background - you can add up to 3 qualifications.</p>
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -1482,15 +1604,15 @@ const CareerAgentOnboarding = () => {
           {step === 3 && (
             <div className="form-card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(37,99,235,0.2)' }}>
-                  <Trophy size={22} color="var(--accent)" />
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <Trophy size={24} color="#ffffff" stroke={1.5} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Primary Preference</span>
                     <span className="step-tag">STEP 3 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your main career direction - used for your deepest intelligence analysis.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your main career direction - used for your deepest intelligence analysis.</p>
                 </div>
               </div>
               <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
@@ -1501,15 +1623,15 @@ const CareerAgentOnboarding = () => {
           {step === 4 && (
             <div className="form-card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(34,211,238,0.15), rgba(34,211,238,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(34,211,238,0.2)' }}>
-                  <Compass size={22} color="var(--accent2)" />
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <Compass size={24} color="#ffffff" stroke={1.5} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Secondary Preference</span>
                     <span className="step-tag">STEP 4 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your alternative path - helps calculate market zone overlap.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your alternative path - helps calculate market zone overlap.</p>
                 </div>
               </div>
               <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
@@ -1520,15 +1642,15 @@ const CareerAgentOnboarding = () => {
           {step === 5 && (
             <div className="form-card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(167,139,250,0.2)' }}>
-                  <Sparkles size={22} color="#a78bfa" />
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <Target size={24} color="#ffffff" stroke={1.5} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Tertiary Preference</span>
                     <span className="step-tag">STEP 5 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your backup or curiosity direction - gives a complete market view.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your backup or curiosity direction - gives a complete market view.</p>
                 </div>
               </div>
               <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
@@ -1539,51 +1661,74 @@ const CareerAgentOnboarding = () => {
           {step === 6 && (
             <div className="form-card">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(16,185,129,0.2)' }}>
-                  <CheckCircle size={22} color="#10b981" />
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
+                  <CheckCircle size={24} color="#ffffff" stroke={1.5} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Review & Submit</span>
                     <span className="step-tag">STEP 6 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
                 </div>
               </div>
 
               {/* Summary Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.75rem' }}>
 
                 {/* Education Summary */}
-                <div style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04), rgba(37,99,235,0.01))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
-                    <GraduationCap size={15} color="var(--accent)" />
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Education History</span>
+                <div style={{ border: '1px solid rgba(37,99,235,0.15)', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.85rem 1.2rem', background: 'linear-gradient(135deg, rgba(37,99,235,0.07), rgba(37,99,235,0.03))', borderBottom: '1px solid rgba(37,99,235,0.1)' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'rgba(37,99,235,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <GraduationCap size={13} color="var(--accent)" />
+                    </div>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Education History</span>
                   </div>
+                  <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {formData.education.map((edu, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < formData.education.length - 1 ? '0.6rem' : 0 }}>
-                      <p style={{ fontSize: '0.9rem', color: 'var(--text1)', fontWeight: 700 }}>{edu.degreeGroup || 'Not set'} {edu.specialisation?.length > 0 ? `in ${edu.specialisation.join(', ')}` : ''}</p>
-                      {edu.graduationYear && <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.1rem' }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' - Currently Pursuing' : ''}</p>}
+                    <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingBottom: idx < formData.education.length - 1 ? '0.75rem' : 0, borderBottom: idx < formData.education.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(37,99,235,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                        <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--accent)' }}>{idx === 0 ? 'UG' : 'PG'}</span>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '0.87rem', color: 'var(--text1)', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.2rem' }}>{edu.degreeGroup || 'Degree not set'}{edu.specialisation?.length > 0 ? ` in ${edu.specialisation.join(', ')}` : ''}</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                          {edu.graduationYear && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' · Currently Pursuing' : ''}</span>}
+                          {edu.university && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>· {edu.university}</span>}
+                        </div>
+                      </div>
                     </div>
                   ))}
+                  </div>
                 </div>
 
                 {/* Career Directions Summary */}
-                <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.04), rgba(245,158,11,0.01))', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
-                    <Target size={15} color="#f59e0b" />
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Career Directions</span>
+                <div style={{ border: '1px solid rgba(245,158,11,0.2)', borderRadius: '16px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.85rem 1.2rem', background: 'linear-gradient(135deg, rgba(245,158,11,0.07), rgba(245,158,11,0.02))', borderBottom: '1px solid rgba(245,158,11,0.12)' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Target size={13} color="#f59e0b" />
+                    </div>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Career Directions</span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                    {[{ label: 'Primary', color: 'var(--accent)', val: formData.preferences.primary }, { label: 'Secondary', color: 'var(--accent2)', val: formData.preferences.secondary }, { label: 'Tertiary', color: '#a78bfa', val: formData.preferences.tertiary }].map(({ label, color, val }) => (
-                      (val?.careerDirectionName || val?.role) && (
-                        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                          <span style={{ fontSize: '0.6rem', fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '60px' }}>{label}</span>
-                          <span style={{ fontSize: '0.88rem', color: 'var(--text1)', fontWeight: 600 }}>{val?.careerDirectionName || val?.role}</span>
-                          {val?.role && val?.careerDirectionName && <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Role: {val.role}</span>}
+                  <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+                    {[
+                      { label: 'Primary',   accent: 'var(--accent)',  bg: 'rgba(37,99,235,0.06)',   border: 'rgba(37,99,235,0.18)',   val: formData.preferences.primary },
+                      { label: 'Secondary', accent: 'var(--accent2)', bg: 'rgba(34,211,238,0.05)',  border: 'rgba(34,211,238,0.18)',  val: formData.preferences.secondary },
+                      { label: 'Tertiary',  accent: '#a78bfa',        bg: 'rgba(167,139,250,0.05)', border: 'rgba(167,139,250,0.18)', val: formData.preferences.tertiary }
+                    ].map(({ label, accent, bg, border, val }) =>
+                      (val?.careerDirectionName || val?.role) ? (
+                        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem 0.85rem', borderRadius: '10px', background: bg, border: `1px solid ${border}` }}>
+                          <span style={{ fontSize: '0.58rem', fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', minWidth: '60px', flexShrink: 0 }}>{label}</span>
+                          <div style={{ width: '1px', height: '26px', background: border, flexShrink: 0 }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text1)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{val?.careerDirectionName || val?.role}</p>
+                            {val?.role && val?.careerDirectionName && (
+                              <p style={{ fontSize: '0.67rem', color: 'var(--muted)', margin: '0.12rem 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Role: {val.role}</p>
+                            )}
+                          </div>
                         </div>
-                      )
-                    ))}
+                      ) : null
+                    )}
                   </div>
                 </div>
 
@@ -1595,13 +1740,26 @@ const CareerAgentOnboarding = () => {
                 </div>
               )}
 
-              <div style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                <Sparkles size={16} color="var(--accent)" style={{ flexShrink: 0 }} />
-                Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
+              {/* AI Notice Strip */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', padding: '0.85rem 1.1rem', marginBottom: '1.5rem', background: 'linear-gradient(135deg,rgba(37,99,235,0.05),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '12px' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Sparkles size={14} color="var(--accent)" />
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text2)', lineHeight: 1.55, margin: 0 }}>
+                  Once submitted, SMAART’s intelligence engine will compute your career mapping and personalized roadmap.{' '}
+                  <strong style={{ color: 'var(--text1)' }}>This typically takes 15–30 seconds.</strong>
+                </p>
               </div>
 
-              <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-                <Sparkles size={18} />
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.65rem', boxShadow: '0 8px 24px rgba(var(--accent-rgb), 0.3)', transition: 'all 0.2s', fontFamily: 'var(--font)', opacity: isSubmitting ? 0.7 : 1 }}
+                onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(var(--accent-rgb), 0.4)'; }}}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(var(--accent-rgb), 0.3)'; }}
+              >
+                <Sparkles size={17} />
                 {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
               </button>
             </div>
