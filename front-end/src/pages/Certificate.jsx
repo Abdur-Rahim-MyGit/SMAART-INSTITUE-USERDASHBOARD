@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Download, Award, CheckCircle2, ShieldCheck, Brain, Activity, Target, Users, Zap, Cpu, Scale, Trophy, Medal, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
@@ -10,6 +10,7 @@ import apiCall from '@/services/api';
 import { BadgeGallery } from "@/components/badges";
 import useUser from "@/hooks/useUser";
 import blueLogo from '@/assets/blue.png';
+import { STAGES } from '@/data/courseStructureData';
 import './Certificate.css';
 
 const certificateTypes = [
@@ -18,28 +19,32 @@ const certificateTypes = [
         title: 'Professional Certificate in Capacity & Work Readiness',
         shortTitle: 'Certificate\nin Capacity & Work Readiness',
         subtitle: 'Capacity & Work Readiness',
-        code: 'CAP'
+        code: 'CAP',
+        level: 'Level 1'
     },
     {
         id: 'capability',
         title: 'Advanced Professional Certificate in Applied Capability',
         shortTitle: 'Advanced Certificate\nin Applied Capability',
         subtitle: 'Applied Capability',
-        code: 'APC'
+        code: 'APC',
+        level: 'Level 2'
     },
     {
         id: 'leadership',
         title: 'Professional Diploma in Employability & Leadership Readiness',
         shortTitle: 'Professional Diploma\nin Employability & Leadership Readiness',
         subtitle: 'Employability & Leadership Readiness',
-        code: 'ELR'
+        code: 'ELR',
+        level: 'Level 3'
     },
     {
         id: 'combined',
         title: 'Master Professional Diploma in Comprehensive Readiness',
         shortTitle: 'Master Professional Diploma\nin Comprehensive Readiness',
         subtitle: 'Acknowledging Capacity, Capability & Leadership',
-        code: 'MPD'
+        code: 'MPD',
+        level: 'Master'
     }
 ];
 
@@ -55,9 +60,15 @@ const skills = [
 
 const Certificate = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const certificateRef = useRef(null);
     const { user, refreshUser } = useUser();
-    const [selectedType, setSelectedType] = useState(null);
+    const [selectedType, setSelectedType] = useState(() => {
+        if (location.state?.selectedCertId) {
+            return certificateTypes.find(c => c.id === location.state.selectedCertId) || null;
+        }
+        return null;
+    });
     const [activeTab, setActiveTab] = useState('certificates'); // 'certificates' or 'badges'
     const [userData, setUserData] = useState({ fullName: 'Ms. Rehana Ameer', gender: 'Female' });
     const [issueDate] = useState(new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
@@ -339,6 +350,17 @@ const Certificate = () => {
     // --- RENDER CERTIFICATE VIEW ---
     const verificationUrl = qrCodeDataUrl ? `${window.location.origin}/verify-certificate/${certId}` : '';
 
+    let courseList = [];
+    if (selectedType) {
+        if (selectedType.id === 'capacity') {
+            courseList = STAGES.find(s => s.id === 1)?.courses || [];
+        } else if (selectedType.id === 'capability') {
+            courseList = STAGES.find(s => s.id === 2)?.courses || [];
+        } else if (selectedType.id === 'leadership') {
+            courseList = STAGES.find(s => s.id === 3)?.courses || [];
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 flex flex-col items-center">
@@ -346,7 +368,13 @@ const Certificate = () => {
                 {/* Controls */}
                 <div className="z-[30] flex w-full max-w-[794px] items-center justify-between mb-8 no-print bg-white dark:bg-[#002147] p-3 sm:p-4 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
                     <button
-                        onClick={() => setSelectedType(null)}
+                        onClick={() => {
+                            if (location.state?.selectedCertId) {
+                                navigate("/dashboard/skills-vault");
+                            } else {
+                                setSelectedType(null);
+                            }
+                        }}
                         className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 dark:bg-[#00152e] dark:hover:bg-[#001a38] text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl transition-all font-semibold text-sm border border-slate-200 dark:border-white/5"
                     >
                         ← Back
@@ -370,9 +398,6 @@ const Certificate = () => {
 
                         <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
                             <header className="cert-header">
-                                <div className="cert-logo-container">
-                                    <img src={blueLogo} alt="SMAART INSTITUTE Logo" className="cert-logo" />
-                                </div>
                                 <div className="cert-title-container">
                                     <h1 className="cert-org-name">SMAART INSTITUTE</h1>
                                     <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
@@ -403,7 +428,7 @@ const Certificate = () => {
                                         <div className="included-certs-list">
                                             <div className="included-cert-item red-theme">
                                                 <div className="cert-bullet"></div>
-                                                <span>Professional Certificate in Capacity & Work Readiness</span>
+                                                <span>Professional Certificate in Capacity &amp; Work Readiness</span>
                                             </div>
                                             <div className="included-cert-item blue-theme">
                                                 <div className="cert-bullet"></div>
@@ -411,7 +436,7 @@ const Certificate = () => {
                                             </div>
                                             <div className="included-cert-item gold-theme">
                                                 <div className="cert-bullet"></div>
-                                                <span>Professional Diploma in Employability & Leadership Readiness</span>
+                                                <span>Professional Diploma in Employability &amp; Leadership Readiness</span>
                                             </div>
                                         </div>
                                     </div>
@@ -423,13 +448,23 @@ const Certificate = () => {
 
                                 <section className="skills-panel">
                                     <div className="skills-column">
-                                        <h2 className="panel-title">Validated Skill Quotients</h2>
+                                        <h2 className="panel-title">
+                                            {selectedType.id === 'combined' ? 'Validated Skill Quotients' : 'Completed Course Modules'}
+                                        </h2>
                                         <ul className="skills-list">
-                                            {skills.map((skill, i) => (
-                                                <li key={i} className={skill.accent ? 'teal-accent' : ''}>
-                                                    <span>{skill.label}</span>
-                                                </li>
-                                            ))}
+                                            {selectedType.id === 'combined' ? (
+                                                skills.map((skill, i) => (
+                                                    <li key={i} className={skill.accent ? 'teal-accent' : ''}>
+                                                        <span>{skill.label}</span>
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                courseList.map((course, i) => (
+                                                    <li key={i}>
+                                                        <span>{course.title}</span>
+                                                    </li>
+                                                ))
+                                            )}
                                         </ul>
                                     </div>
 

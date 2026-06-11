@@ -438,9 +438,6 @@ const CareerAgentDashboard = () => {
                 </div>
             </header>
 
-            {/* Career Direction Lock Banner */}
-            <CareerLockBanner lockStatus={lockStatus} />
-
             <div className="dash-body">
                 <aside className="sidebar">
                     <div className="sb-header">
@@ -472,6 +469,9 @@ const CareerAgentDashboard = () => {
                 </aside>
 
                 <main className="dash-main">
+                    {/* Career Direction Lock Banner */}
+                    <CareerLockBanner lockStatus={lockStatus} />
+
                     {/* Panel 1: Overview */}
                     {activePanel === 'overview' && (
                         <div className="panel animate-fade-in">

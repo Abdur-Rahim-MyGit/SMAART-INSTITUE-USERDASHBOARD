@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Award, Trophy, BookOpen, Layers, ChevronRight, Download,
-    Shield, Zap, Brain, Play, ArrowLeft
+    Shield, Zap, Brain, Play, ArrowLeft, ChevronDown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
@@ -32,6 +32,7 @@ const SkillsVault = () => {
     const [stageStatus, setStageStatus] = useState({});
     const [earnedBadgesCount, setEarnedBadgesCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [activeFlashcardCategory, setActiveFlashcardCategory] = useState("all");
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -193,6 +194,17 @@ const SkillsVault = () => {
     });
 
     const allFlashcards = [...defaultFlashcards, ...courseFlashcards];
+
+    // Filter by category
+    const uniqueFlashcardCategories = ['all', ...new Set(allFlashcards.map(c => c.category || 'Course Concept'))];
+    const flashcardFilterOptions = uniqueFlashcardCategories.map(cat => ({
+        id: cat,
+        label: cat === 'all' ? 'All Categories' : cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    }));
+
+    const filteredFlashcards = allFlashcards.filter(card => {
+        return activeFlashcardCategory === 'all' || (card.category || 'Course Concept') === activeFlashcardCategory;
+    });
 
     if (userLoading) {
         return (
@@ -356,7 +368,7 @@ const SkillsVault = () => {
                                         {certificateTypes.map((cert) => (
                                             <div
                                                 key={cert.id}
-                                                onClick={() => navigate("/dashboard/certificate")}
+                                                onClick={() => navigate("/dashboard/certificate", { state: { selectedCertId: cert.id } })}
                                                 className="group flex cursor-pointer items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
                                             >
                                                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
@@ -412,17 +424,46 @@ const SkillsVault = () => {
 
                         {/* ════════ FLASHCARDS TAB ════════ */}
                         {activeTab === "flashcards" && (
-                            <div className="space-y-4">
-                                {/* Removed Debug Info */}
-                                <div className="px-1">
-                                    <h3 className="text-[15px] font-extrabold text-[#0d1f4e] dark:text-white">Key Flashcards</h3>
-                                    <p className="text-[12.5px] text-slate-500 dark:text-slate-400">Quick-reference cards covering the core SMAART quotients.</p>
+                            <div className="space-y-6">
+                                {/* Header with Filters */}
+                                <div className="flex items-center justify-between flex-wrap gap-4 px-1">
+                                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
+                                        <h3 className="text-[13.5px] font-extrabold uppercase tracking-wider text-[#002147] dark:text-white">
+                                            Key Flashcards
+                                        </h3>
+                                    </div>
+                                    <div className="flex w-full items-center gap-3 sm:w-auto">
+                                        <div className="relative w-full sm:w-auto">
+                                            <select
+                                                value={activeFlashcardCategory}
+                                                onChange={(e) => setActiveFlashcardCategory(e.target.value)}
+                                                className="w-full appearance-none rounded-xl border border-[#d8e6f7] bg-white px-4 py-2.5 pr-10 text-[12.5px] font-bold text-[#0d1f4e] shadow-sm outline-none transition-all hover:border-[#1a3884]/30 focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/20 sm:w-auto dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                                            >
+                                                {flashcardFilterOptions.map((cat) => (
+                                                    <option key={cat.id} value={cat.id}>
+                                                        {cat.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                    {allFlashcards.map((card, i) => (
-                                        <FlashcardItem key={i} card={card} index={i} />
-                                    ))}
-                                </div>
+                                
+                                {filteredFlashcards.length > 0 ? (
+                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                        {filteredFlashcards.map((card, i) => (
+                                            <FlashcardItem key={i} card={card} index={i} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 bg-white dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-white/5">
+                                        <Zap className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                                        <h3 className="text-[14px] font-semibold text-slate-500 dark:text-slate-400 mb-2">
+                                            No flashcards found for this category.
+                                        </h3>
+                                    </div>
+                                )}
                             </div>
                         )}
 

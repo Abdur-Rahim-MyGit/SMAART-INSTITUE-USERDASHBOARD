@@ -77,8 +77,8 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
         const currentPath = validPaths[activeTab];
         if (!currentPath) return;
 
-        const pathId = currentPath.id;
-        if (roleSkillsCache[pathId]) return; // Already fetched
+        const cacheKey = currentPath.title || currentPath.id;
+        if (roleSkillsCache[cacheKey]) return; // Already fetched
 
         const fetchPathSkills = async () => {
             setLoadingRoleSkills(true);
@@ -98,7 +98,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                     } catch (e) { }
                 }));
 
-                setRoleSkillsCache(prev => ({ ...prev, [pathId]: allPathSkills }));
+                setRoleSkillsCache(prev => ({ ...prev, [cacheKey]: allPathSkills }));
             } catch (e) {
                 console.error('Failed to fetch role skills:', e);
             } finally {
@@ -133,11 +133,15 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
     }
 
     const currentPath = validPaths[activeTab];
-    const pathSkillSet = currentPath ? roleSkillsCache[currentPath.id] : null;
+    const pathSkillSet = currentPath ? roleSkillsCache[currentPath.title || currentPath.id] : null;
 
     let displayedSkills = [];
-    if (pathSkillSet) {
-        displayedSkills = userSkills.filter(s => pathSkillSet.has(s.skillName));
+    if (pathSkillSet && pathSkillSet.size > 0) {
+        const pathSkillsArray = Array.from(pathSkillSet).map(s => s.toLowerCase().trim());
+        displayedSkills = userSkills.filter(s => {
+            const userSkillName = s.skillName.toLowerCase().trim();
+            return pathSkillsArray.some(ps => ps === userSkillName || ps.includes(userSkillName) || userSkillName.includes(ps));
+        });
     }
 
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);

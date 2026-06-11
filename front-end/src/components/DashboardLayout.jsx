@@ -1164,12 +1164,12 @@ const DashboardLayout = () => {
                     {/* 5. Daily Streak Glowing Flame Icon */}
                     <button
                       onClick={() => setShowStreakModal(true)}
-                      className="relative p-1.5 rounded-full text-amber-500 hover:text-orange-600 transition-all active:scale-95 group"
+                      className="relative p-1.5 rounded-full text-[#1a3884] dark:text-blue-400 hover:text-[#112b6b] dark:hover:text-blue-300 hover:bg-[#1a3884]/8 dark:hover:bg-[#1a3884]/20 transition-all active:scale-95 group"
                       aria-label="Daily Streaks"
                     >
-                      <Flame size={18} stroke={1.5} className="animate-pulse filter drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
+                      <Flame size={18} stroke={1.5} className="animate-pulse filter drop-shadow-[0_0_6px_rgba(26,56,132,0.5)]" />
                       {streakCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-extrabold text-[8px] px-1 rounded-full min-w-[14px] text-center border border-white dark:border-slate-800 scale-90 shadow-sm">
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-br from-[#1a3884] to-[#4c6ef5] text-white font-extrabold text-[8px] px-1 rounded-full min-w-[14px] text-center border border-white dark:border-slate-800 scale-90 shadow-sm">
                           {streakCount}
                         </span>
                       )}
@@ -1300,7 +1300,7 @@ const DashboardLayout = () => {
               {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
                 <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-amber-500 animate-bounce" />
+                  <Flame className="w-5 h-5 text-[#1a3884] dark:text-blue-400 animate-pulse" />
                   <span className="text-sm font-bold text-[#1a3884] dark:text-white uppercase tracking-wider">
                     My Daily Streaks
                   </span>

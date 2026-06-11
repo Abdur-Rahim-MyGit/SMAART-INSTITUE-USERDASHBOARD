@@ -1,0 +1,256 @@
+{
+  "id": "1781104624527",
+  "timestamp": "2026-06-10T15:17:04.528Z",
+  "status": "pending_analysis",
+  "profile_hash": "74c314ac2969de9d95f59a5a6e2cb43a5a30eb5199218695a2f474c1d05473fb",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Dharsini J",
+      "email": "dharsinismaart@gmail.com",
+      "phone": "9445150351",
+      "registrationNumber": "12345"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Computer Science & IT",
+        "degreeGroup": "Bachelor of Computer Applications",
+        "specialisation": [
+          "AI & ML",
+          "Cloud Computing"
+        ],
+        "university": "",
+        "graduationYear": "2027",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-011005-P07",
+          "directionName": "AI in Business Analytics & Decision Support",
+          "directionDescription": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+          "directionOverview": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Data Analyst",
+              "id": "JF05-001"
+            },
+            {
+              "role": "Business Intelligence Analyst",
+              "id": "JF05-003"
+            },
+            {
+              "role": "Power BI Developer",
+              "id": "JF05-010"
+            },
+            {
+              "role": "Reporting Analyst",
+              "id": "JF05-013"
+            },
+            {
+              "role": "Data Visualization Analyst",
+              "id": "JF05-017"
+            },
+            {
+              "role": "Quantitative Analyst",
+              "id": "JF05-006"
+            },
+            {
+              "role": "Analytics Engineer",
+              "id": "JF05-014"
+            },
+            {
+              "role": "MIS Analyst",
+              "id": "JF27-010"
+            },
+            {
+              "role": "AI Product Analyst",
+              "id": "JF06-012"
+            },
+            {
+              "role": "Business Analyst",
+              "id": "JF55-012"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-P07",
+        "careerDirectionName": "AI in Business Analytics & Decision Support",
+        "careerDirectionDescription": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AI in Business Analytics & Decision Support",
+        "type": "Full-Time",
+        "salary": "5-8 LPA",
+        "locations": [
+          "Chennai",
+          "Madurai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Scale-up / High-growth company",
+          "Large Indian Corporate / Conglomerate"
+        ]
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-011004-A01",
+          "directionName": "AI & ML on Cloud Platforms",
+          "directionDescription": "Cloud-based AI and ML involves deploying and managing machine learning models and AI services on cloud platforms — AWS SageMaker, Azure ML Studio, and Google Vertex AI. MLOps engineers manage ML model deployment pipelines; prompt engineers design inputs for cloud-hosted LLM APIs; AI product analysts evaluate cloud AI feature performance. BCA Cloud Computing graduates who develop ML fundamentals alongside their cloud expertise can access these alternate roles at the intersection of cloud infrastructure and AI.",
+          "directionOverview": "Cloud-based AI and ML involves deploying and managing machine learning models and AI services on cloud platforms — AWS SageMaker, Azure ML Studio, and Google Vertex AI. MLOps engineers manage ML model deployment pipelines; prompt engineers design inputs for cloud-hosted LLM APIs; AI product analysts evaluate cloud AI feature performance. BCA Cloud Computing graduates who develop ML fundamentals alongside their cloud expertise can access these alternate roles at the intersection of cloud infrastructure and AI.",
+          "type": "Primary",
+          "uniqueId": "UG-011-004",
+          "roles": [
+            {
+              "role": "MLOps Engineer",
+              "id": "JF06-006"
+            },
+            {
+              "role": "Prompt Engineer",
+              "id": "JF06-010"
+            },
+            {
+              "role": "AI Product Analyst",
+              "id": "JF06-012"
+            },
+            {
+              "role": "AI Engineer",
+              "id": "JF06-007"
+            },
+            {
+              "role": "Generative AI Specialist",
+              "id": "JF06-013"
+            },
+            {
+              "role": "AI Research Analyst",
+              "id": "JF06-014"
+            },
+            {
+              "role": "Embedded AI Engineer",
+              "id": "JF49-014"
+            },
+            {
+              "role": "Emerging Technology Analyst",
+              "id": "JF49-011"
+            },
+            {
+              "role": "Data Engineer",
+              "id": "JF05-002"
+            },
+            {
+              "role": "Data Pipeline Analyst",
+              "id": "JF05-015"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011004-A01",
+        "careerDirectionName": "AI & ML on Cloud Platforms",
+        "careerDirectionDescription": "Cloud-based AI and ML involves deploying and managing machine learning models and AI services on cloud platforms — AWS SageMaker, Azure ML Studio, and Google Vertex AI. MLOps engineers manage ML model deployment pipelines; prompt engineers design inputs for cloud-hosted LLM APIs; AI product analysts evaluate cloud AI feature performance. BCA Cloud Computing graduates who develop ML fundamentals alongside their cloud expertise can access these alternate roles at the intersection of cloud infrastructure and AI.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AI & ML on Cloud Platforms",
+        "type": "Full-Time",
+        "salary": "5-8 LPA",
+        "locations": [
+          "Chennai",
+          "Madurai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Scale-up / High-growth company",
+          "Large Indian Corporate / Conglomerate"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-011005-S03",
+          "directionName": "Cybersecurity & AI Security",
+          "directionDescription": "AI security involves applying machine learning to cybersecurity problems — anomaly detection, threat classification, and adversarial attack defence. Cybersecurity analysts use AI-powered SIEM platforms; SOC analysts leverage ML-based threat detection tools; GRC analysts assess AI system risk and bias. BCA AI & ML graduates who develop security fundamentals alongside their ML skills can enter the growing intersection of AI and cybersecurity, which is a priority area for enterprise security teams.",
+          "directionOverview": "AI security involves applying machine learning to cybersecurity problems — anomaly detection, threat classification, and adversarial attack defence. Cybersecurity analysts use AI-powered SIEM platforms; SOC analysts leverage ML-based threat detection tools; GRC analysts assess AI system risk and bias. BCA AI & ML graduates who develop security fundamentals alongside their ML skills can enter the growing intersection of AI and cybersecurity, which is a priority area for enterprise security teams.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Cybersecurity Analyst",
+              "id": "JF07-001"
+            },
+            {
+              "role": "SOC Analyst",
+              "id": "JF07-003"
+            },
+            {
+              "role": "GRC Analyst",
+              "id": "JF07-007"
+            },
+            {
+              "role": "Threat Intelligence Analyst",
+              "id": "JF07-008"
+            },
+            {
+              "role": "Cloud Security Analyst",
+              "id": "JF07-010"
+            },
+            {
+              "role": "Technology Risk Analyst",
+              "id": "JF55-022"
+            },
+            {
+              "role": "Vulnerability Assessment Analyst",
+              "id": "JF07-006"
+            },
+            {
+              "role": "Security Operations Engineer",
+              "id": "JF07-012"
+            },
+            {
+              "role": "Incident Response Analyst",
+              "id": "JF07-013"
+            },
+            {
+              "role": "Identity & Access Management Analyst",
+              "id": "JF07-011"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-S03",
+        "careerDirectionName": "Cybersecurity & AI Security",
+        "careerDirectionDescription": "AI security involves applying machine learning to cybersecurity problems — anomaly detection, threat classification, and adversarial attack defence. Cybersecurity analysts use AI-powered SIEM platforms; SOC analysts leverage ML-based threat detection tools; GRC analysts assess AI system risk and bias. BCA AI & ML graduates who develop security fundamentals alongside their ML skills can enter the growing intersection of AI and cybersecurity, which is a priority area for enterprise security teams.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Cybersecurity & AI Security",
+        "type": "Full-Time",
+        "salary": "3-5 LPA",
+        "locations": [
+          "Ahmedabad"
+        ],
+        "location": "Ahmedabad",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Large Indian Corporate / Conglomerate",
+          "Small or Medium Enterprise (SME)"
+        ]
+      }
+    }
+  },
+  "output_generated_report": null
+}

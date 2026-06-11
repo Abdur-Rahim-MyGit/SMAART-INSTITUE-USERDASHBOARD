@@ -244,8 +244,8 @@ export const apiCall = async (endpoint, options = {}) => {
 
       for (const fallbackUrl of fallbacks) {
         try {
-          // Use a short timeout for fallback discovery (3s)
-          const result = await performCall(fallbackUrl, 3000);
+          // Use a short timeout for fallback discovery (1s)
+          const result = await performCall(fallbackUrl, 1000);
           console.log(`✅ Backend discovered on ${fallbackUrl}`);
           workingBaseUrl = fallbackUrl;
           sessionStorage.setItem("workingApiPort", fallbackUrl);

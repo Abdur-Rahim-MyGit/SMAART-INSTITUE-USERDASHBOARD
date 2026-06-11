@@ -1,0 +1,547 @@
+{
+  "id": "1781105865811",
+  "timestamp": "2026-06-10T15:37:45.811Z",
+  "status": "completed",
+  "profile_hash": "d511d0c33a6add8a5785795dfe1afbde4047815f22480603f4b532136596f0a8",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Dharsini J",
+      "email": "dharsinismaart@gmail.com",
+      "phone": "9445150351",
+      "registrationNumber": "12345"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Engineering & Technology",
+        "degreeGroup": "Bachelor of Technology",
+        "specialisation": [
+          "Information Technology (IT)"
+        ],
+        "university": "",
+        "graduationYear": "2027",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": ".NET Developer",
+        "type": "Full-Time",
+        "salary": "3-5 LPA",
+        "locations": [
+          "Ambala"
+        ],
+        "location": "Ambala",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Scale-up / High-growth company",
+          "Small or Medium Enterprise (SME)"
+        ]
+      },
+      "secondary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AI Engineer",
+        "type": "Full-Time",
+        "salary": "3-5 LPA",
+        "locations": [
+          "Madurai"
+        ],
+        "location": "Madurai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Scale-up / High-growth company",
+          "Large Indian Corporate / Conglomerate"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AML Analyst",
+        "type": "Full-Time",
+        "salary": "5-8 LPA",
+        "locations": [
+          "Ahmedabad"
+        ],
+        "location": "Ahmedabad",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Large Indian Corporate / Conglomerate",
+          "Scale-up / High-growth company"
+        ]
+      }
+    }
+  },
+  "output_generated_report": {
+    "status": "success_deterministic",
+    "generated_at": "2026-06-10T15:37:46.044Z",
+    "preVerified": {
+      "dataFilesReady": true,
+      "primaryZone": {
+        "employer_zone": "Amber",
+        "skill_coverage_pct": 40
+      },
+      "secondaryZone": {
+        "employer_zone": "Amber",
+        "skill_coverage_pct": 40
+      },
+      "tertiaryZone": {
+        "employer_zone": "Red"
+      },
+      "primaryMarket": {
+        "demand_level": "Medium",
+        "salary_min_lpa": 6,
+        "salary_max_lpa": 18,
+        "ai_automation_risk": "High",
+        "emerging_roles": [
+          "Cloud Architect",
+          "DevOps Engineer",
+          "Full Stack Developer"
+        ]
+      },
+      "primarySkillGap": {
+        "missing": [],
+        "matched": [],
+        "coveragePct": 0,
+        "dataReady": true,
+        "source": "local"
+      }
+    },
+    "primary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": ".NET Developer",
+        "job_family": "Software Engineering",
+        "role_description": "A junior .NET Developer in India builds ASP.NET Core web APIs, writes C# business logic and LINQ queries, creates Entity Framework database models, and writes unit tests using NUnit or xUnit. Their week includes fixing defects in Visual Studio, reviewing code in Azure DevOps or GitHub, attending sprint ceremonies, and deploying services to Azure or on-premises Windows servers. .NET roles are prominent in IT services companies delivering to US and UK banking and insurance clients, as well as in companies building Windows-based enterprise software.",
+        "narrative_para1": "A junior .NET Developer in India builds ASP.NET Core web APIs, writes C# business logic and LINQ queries, creates Entity Framework database models, and writes unit tests using NUnit or xUnit. Their week includes fixing defects in Visual Studio, reviewing code in Azure DevOps or GitHub, attending sprint ceremonies, and deploying services to Azure or on-premises Windows servers. .NET roles are prominent in IT services companies delivering to US and UK banking and insurance clients, as well as in companies building Windows-based enterprise software.",
+        "narrative_para2": "GitHub Copilot with C# support and a major software platform's Copilot in Visual Studio meaningfully assist .NET developers with ASP.NET Core controller generation, Entity Framework queries, LINQ expressions, and XML documentation. a major software platform's deep AI toolchain integration benefits .NET developers particularly. What remains human: architecting enterprise solutions with Azure cloud and Windows identity management, making legacy .NET Framework migration decisions, and managing WCF/SOAP service maintenance in regulated enterprise environments requiring deep ecosystem knowledge.",
+        "narrative_para3": ".NET development suits developers comfortable in the a major software platform ecosystem who appreciate strongly-typed, IDE-supported development with excellent refactoring tooling. Those who enjoy building reliable enterprise applications - banking systems, insurance platforms, internal business tools - and are comfortable in structured IT services environments tend to align well with .NET career paths. Familiarity with Azure services alongside .NET is increasingly expected. An interest in the a major software platform technology stack specifically is a practical predictor of career satisfaction.",
+        "typical_employers_india": "MNCs, IT Product Companies, Startups, IT Services",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹3.5L - ₹7.0L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "58",
+        "ai_impact": "GitHub Copilot with C# support and a major software platform's Copilot in Visual Studio meaningfully assist .NET developers with ASP.NET Core controller generation, Entity Framework queries, LINQ expressions, and XML documentation. a major software platform's deep AI toolchain integration benefits .NET developers particularly. What remains human: architecting enterprise solutions with Azure cloud and Windows identity management, making legacy .NET Framework migration decisions, and managing WCF/SOAP service maintenance in regulated enterprise environments requiring deep ecosystem knowledge.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced .NET Developer",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "58%",
+          "level": "High",
+          "tasks_assisted": "AI tools like GitHub Copilot with C# support and Microsoft's own Copilot in Visual Studio assist .NET developers significantly with ASP.NET Core controllers, Entity Framework queries, and LINQ expressions. AI can generate unit tests, XML documentation, and configuration boilerplate efficiently. Microsoft's deep integration of AI into its developer toolchain benefits .NET developers particularly.",
+          "human_value": ".NET developers architect enterprise-grade solutions involving Azure cloud integration, Windows identity management, and COM interoperability that require deep ecosystem knowledge. Legacy .NET Framework migration decisions, WCF/SOAP service maintenance, and enterprise security compliance require experienced human judgment."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for .NET Developer."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a .NET Developer portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified .NET Developer",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": ".NET Developer Capstone",
+            "description": "Complete .NET Developer end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": ".NET development suits developers comfortable in the a major software platform ecosystem who appreciate strongly-typed, IDE-supported development with excellent refactoring tooling. Those who enjoy building reliable enterprise applications - banking systems, insurance platforms, internal business tools - and are comfortable in structured IT services environments tend to align well with .NET career paths. Familiarity with Azure services alongside .NET is increasingly expected. An interest in the a major software platform technology stack specifically is a practical predictor of career satisfaction.",
+        "target_audience": "UG/PG graduates with interest in Software Engineering.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": ".NET Developer",
+        "job_family": "Software Engineering",
+        "narrative_para1": "A junior .NET Developer in India builds ASP.NET Core web APIs, writes C# business logic and LINQ queries, creates Entity Framework database models, and writes unit tests using NUnit or xUnit. Their week includes fixing defects in Visual Studio, reviewing code in Azure DevOps or GitHub, attending sprint ceremonies, and deploying services to Azure or on-premises Windows servers. .NET roles are prominent in IT services companies delivering to US and UK banking and insurance clients, as well as in companies building Windows-based enterprise software.",
+        "narrative_para2": "GitHub Copilot with C# support and a major software platform's Copilot in Visual Studio meaningfully assist .NET developers with ASP.NET Core controller generation, Entity Framework queries, LINQ expressions, and XML documentation. a major software platform's deep AI toolchain integration benefits .NET developers particularly. What remains human: architecting enterprise solutions with Azure cloud and Windows identity management, making legacy .NET Framework migration decisions, and managing WCF/SOAP service maintenance in regulated enterprise environments requiring deep ecosystem knowledge.",
+        "narrative_para3": ".NET development suits developers comfortable in the a major software platform ecosystem who appreciate strongly-typed, IDE-supported development with excellent refactoring tooling. Those who enjoy building reliable enterprise applications - banking systems, insurance platforms, internal business tools - and are comfortable in structured IT services environments tend to align well with .NET career paths. Familiarity with Azure services alongside .NET is increasingly expected. An interest in the a major software platform technology stack specifically is a practical predictor of career satisfaction.",
+        "salary_range_low": "350000",
+        "salary_range_high": "700000",
+        "ai_exposure_pct": "58",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "AI tools like GitHub Copilot with C# support and Microsoft's own Copilot in Visual Studio assist .NET developers significantly with ASP.NET Core controllers, Entity Framework queries, and LINQ expressions. AI can generate unit tests, XML documentation, and configuration boilerplate efficiently. Microsoft's deep integration of AI into its developer toolchain benefits .NET developers particularly.",
+        "human_value_tasks": ".NET developers architect enterprise-grade solutions involving Azure cloud integration, Windows identity management, and COM interoperability that require deep ecosystem knowledge. Legacy .NET Framework migration decisions, WCF/SOAP service maintenance, and enterprise security compliance require experienced human judgment.",
+        "english_requirement": "Important"
+      }
+    },
+    "secondary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "AI Engineer",
+        "job_family": "Data Science & Machine Learning",
+        "role_description": "An AI Engineer in India builds AI-powered applications and systems — developing retrieval-augmented generation (RAG) pipelines, AI agent architectures, LLM-powered APIs, and intelligent automation solutions using foundation models from OpenAI, Anthropic, and others. This is a rapidly growing role in India, reflecting the shift from traditional ML model-building toward AI application development using foundation models. AI Engineers work in product companies, GCCs, AI-focused startups, and IT services firms building AI-enabled solutions for enterprise clients.",
+        "narrative_para1": "An AI Engineer in India builds AI-powered applications and systems — developing retrieval-augmented generation (RAG) pipelines, AI agent architectures, LLM-powered APIs, and intelligent automation solutions using foundation models from OpenAI, Anthropic, and others. This is a rapidly growing role in India, reflecting the shift from traditional ML model-building toward AI application development using foundation models. AI Engineers work in product companies, GCCs, AI-focused startups, and IT services firms building AI-enabled solutions for enterprise clients.",
+        "narrative_para2": "AI Engineers work with AI tools as core infrastructure — OpenAI API (GPT-4o), Anthropic Claude API, and GitHub Copilot are central to their daily workflow. RAG pipelines, AI agent frameworks (LangChain, LlamaIndex), and vector databases can be substantially built using AI-assisted development. ChatGPT and Claude assist with system prompt design, API integration debugging, and documentation. This is an AI-Evolving role with among the highest AI exposure in the sector — the tools are the product. The human value — AI system architecture decisions, hallucination risk management, and responsible deployment governance — requires deep practical expertise.",
+        "narrative_para3": "AI Engineering suits people who are excited by the pace of LLM capability development and want to build practical AI applications using foundation models. If you enjoy working with cutting-edge AI tools, have strong software engineering skills, and are motivated by building AI systems that real users rely on — this is a fast-moving, high-demand career track. Python, REST API development, and familiarity with LLM APIs (OpenAI, Anthropic, Hugging Face) are the core entry skills; LangChain/LlamaIndex and vector database experience (Pinecone, Weaviate) build rapidly through project work.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹7.0L - ₹15.0L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "68",
+        "ai_impact": "AI Engineers work with AI tools as core infrastructure — OpenAI API (GPT-4o), Anthropic Claude API, and GitHub Copilot are central to their daily workflow. RAG pipelines, AI agent frameworks (LangChain, LlamaIndex), and vector databases can be substantially built using AI-assisted development. ChatGPT and Claude assist with system prompt design, API integration debugging, and documentation. This is an AI-Evolving role with among the highest AI exposure in the sector — the tools are the product. The human value — AI system architecture decisions, hallucination risk management, and responsible deployment governance — requires deep practical expertise.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced AI Engineer",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "68%",
+          "level": "High",
+          "tasks_assisted": "AI Engineers have among the highest AI tool exposure in this family, with OpenAI API (GPT-4o/o1), Anthropic Claude API, and GitHub Copilot for ML Code enabling rapid AI-powered application development. Docker-containerised LLM deployments, RAG pipeline implementations, and AI agent orchestration frameworks can be substantially accelerated using AI tools. ChatGPT/Claude assists with system prompt design, API integration debugging, and AI application documentation.",
+          "human_value": "AI Engineers make nuanced decisions about AI system architecture — choosing between RAG, fine-tuning, or agent-based approaches based on specific requirements — that require deep practical understanding of model capabilities and limitations. Evaluating output quality, managing hallucination risk in production systems, and ensuring responsible AI deployment require human oversight and accountability."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for AI Engineer."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a AI Engineer portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified AI Engineer",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "AI Engineer Capstone",
+            "description": "Complete AI Engineer end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "AI Engineering suits people who are excited by the pace of LLM capability development and want to build practical AI applications using foundation models. If you enjoy working with cutting-edge AI tools, have strong software engineering skills, and are motivated by building AI systems that real users rely on — this is a fast-moving, high-demand career track. Python, REST API development, and familiarity with LLM APIs (OpenAI, Anthropic, Hugging Face) are the core entry skills; LangChain/LlamaIndex and vector database experience (Pinecone, Weaviate) build rapidly through project work.",
+        "target_audience": "UG/PG graduates with interest in Data Science & Machine Learning.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "AI Engineer",
+        "job_family": "Data Science & Machine Learning",
+        "narrative_para1": "An AI Engineer in India builds AI-powered applications and systems — developing retrieval-augmented generation (RAG) pipelines, AI agent architectures, LLM-powered APIs, and intelligent automation solutions using foundation models from OpenAI, Anthropic, and others. This is a rapidly growing role in India, reflecting the shift from traditional ML model-building toward AI application development using foundation models. AI Engineers work in product companies, GCCs, AI-focused startups, and IT services firms building AI-enabled solutions for enterprise clients.",
+        "narrative_para2": "AI Engineers work with AI tools as core infrastructure — OpenAI API (GPT-4o), Anthropic Claude API, and GitHub Copilot are central to their daily workflow. RAG pipelines, AI agent frameworks (LangChain, LlamaIndex), and vector databases can be substantially built using AI-assisted development. ChatGPT and Claude assist with system prompt design, API integration debugging, and documentation. This is an AI-Evolving role with among the highest AI exposure in the sector — the tools are the product. The human value — AI system architecture decisions, hallucination risk management, and responsible deployment governance — requires deep practical expertise.",
+        "narrative_para3": "AI Engineering suits people who are excited by the pace of LLM capability development and want to build practical AI applications using foundation models. If you enjoy working with cutting-edge AI tools, have strong software engineering skills, and are motivated by building AI systems that real users rely on — this is a fast-moving, high-demand career track. Python, REST API development, and familiarity with LLM APIs (OpenAI, Anthropic, Hugging Face) are the core entry skills; LangChain/LlamaIndex and vector database experience (Pinecone, Weaviate) build rapidly through project work.",
+        "salary_range_low": "700000",
+        "salary_range_high": "1500000",
+        "ai_exposure_pct": "68",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "AI Engineers have among the highest AI tool exposure in this family, with OpenAI API (GPT-4o/o1), Anthropic Claude API, and GitHub Copilot for ML Code enabling rapid AI-powered application development. Docker-containerised LLM deployments, RAG pipeline implementations, and AI agent orchestration frameworks can be substantially accelerated using AI tools. ChatGPT/Claude assists with system prompt design, API integration debugging, and AI application documentation.",
+        "human_value_tasks": "AI Engineers make nuanced decisions about AI system architecture — choosing between RAG, fine-tuning, or agent-based approaches based on specific requirements — that require deep practical understanding of model capabilities and limitations. Evaluating output quality, managing hallucination risk in production systems, and ensuring responsible AI deployment require human oversight and accountability.",
+        "english_requirement": "Important"
+      }
+    },
+    "tertiary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "AML Analyst",
+        "job_family": "Insurance & Risk",
+        "role_description": "An AML (Anti-Money Laundering) Analyst in India investigates suspicious financial transactions, monitors for money laundering and terrorist financing activity, and ensures compliance with PMLA (Prevention of Money Laundering Act) and RBI/IRDAI AML guidelines. Core work includes reviewing transaction monitoring alerts, conducting Enhanced Due Diligence (EDD) on high-risk customers, investigating layering and integration patterns, filing Suspicious Transaction Reports (STRs) with FIU-IND, and supporting regulatory examination responses. AML Analysts work in the compliance and financial crime functions of banks, insurance companies, NBFCs, stockbrokers, and payment companies.",
+        "narrative_para1": "An AML (Anti-Money Laundering) Analyst in India investigates suspicious financial transactions, monitors for money laundering and terrorist financing activity, and ensures compliance with PMLA (Prevention of Money Laundering Act) and RBI/IRDAI AML guidelines. Core work includes reviewing transaction monitoring alerts, conducting Enhanced Due Diligence (EDD) on high-risk customers, investigating layering and integration patterns, filing Suspicious Transaction Reports (STRs) with FIU-IND, and supporting regulatory examination responses. AML Analysts work in the compliance and financial crime functions of banks, insurance companies, NBFCs, stockbrokers, and payment companies.",
+        "narrative_para2": "AI-powered transaction monitoring systems automate suspicious activity detection, PEP/sanctions screening, and Currency Transaction Report threshold alerts. ChatGPT and Claude assist with interpreting PMLA regulations, FIU-IND guidance, and drafting STR narratives. Insurance KYC and proposal processing is increasingly AI-assisted through automated document verification. This is an AI-Evolving role with high AI exposure on automated detection and screening — the irreplaceable human value, investigating complex layering schemes involving Indian informal financial networks, benami transactions, and hawala connections, and applying PMLA accountability in STR filings, requires deep contextual knowledge and professional judgment.",
+        "narrative_para3": "AML Analysis suits people with strong investigative instincts, genuine interest in financial crime patterns and money laundering typologies, and the professional discipline for the rigorous documentation standards that regulatory accountability requires. If you can identify patterns in financial transaction data that indicate suspicious behaviour, understand India's informal finance ecosystem including hawala and benami structures, and can write clear, legally defensible investigation narratives — this is a growing and respected specialisation. CAMS (Certified Anti-Money Laundering Specialist) certification is the most valued professional credential for AML careers in India's financial services market.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹4.0L - ₹8.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "58",
+        "ai_impact": "AI-powered transaction monitoring systems automate suspicious activity detection, PEP/sanctions screening, and Currency Transaction Report threshold alerts. ChatGPT and Claude assist with interpreting PMLA regulations, FIU-IND guidance, and drafting STR narratives. Insurance KYC and proposal processing is increasingly AI-assisted through automated document verification. This is an AI-Evolving role with high AI exposure on automated detection and screening — the irreplaceable human value, investigating complex layering schemes involving Indian informal financial networks, benami transactions, and hawala connections, and applying PMLA accountability in STR filings, requires deep contextual knowledge and professional judgment.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced AML Analyst",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "58%",
+          "level": "High",
+          "tasks_assisted": "AML Analysts benefit substantially from AI with AI-powered transaction monitoring systems automating suspicious activity detection, PEP/sanctions screening, and Currency Transaction Report (CTR) threshold alerts. ChatGPT/Claude for Risk and Compliance Research assists with interpreting PMLA regulations, FIU-IND guidance, and drafting STR narratives. Proposal Form and KYC for Insurance processing is increasingly AI-assisted through automated document verification tools.",
+          "human_value": "AML Analysts investigate complex layering and integration schemes involving Indian informal financial networks, benami transactions, and hawala connections that require deep contextual knowledge of local financial practices AI cannot independently identify. Filing Suspicious Transaction Reports to FIU-IND, managing regulatory examination responses, and applying judgment on complex beneficial ownership structures in Indian family-held businesses require experienced professional expertise."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for AML Analyst."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a AML Analyst portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified AML Analyst",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "AML Analyst Capstone",
+            "description": "Complete AML Analyst end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "AML Analysis suits people with strong investigative instincts, genuine interest in financial crime patterns and money laundering typologies, and the professional discipline for the rigorous documentation standards that regulatory accountability requires. If you can identify patterns in financial transaction data that indicate suspicious behaviour, understand India's informal finance ecosystem including hawala and benami structures, and can write clear, legally defensible investigation narratives — this is a growing and respected specialisation. CAMS (Certified Anti-Money Laundering Specialist) certification is the most valued professional credential for AML careers in India's financial services market.",
+        "target_audience": "UG/PG graduates with interest in Insurance & Risk.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "AML Analyst",
+        "job_family": "Insurance & Risk",
+        "narrative_para1": "An AML (Anti-Money Laundering) Analyst in India investigates suspicious financial transactions, monitors for money laundering and terrorist financing activity, and ensures compliance with PMLA (Prevention of Money Laundering Act) and RBI/IRDAI AML guidelines. Core work includes reviewing transaction monitoring alerts, conducting Enhanced Due Diligence (EDD) on high-risk customers, investigating layering and integration patterns, filing Suspicious Transaction Reports (STRs) with FIU-IND, and supporting regulatory examination responses. AML Analysts work in the compliance and financial crime functions of banks, insurance companies, NBFCs, stockbrokers, and payment companies.",
+        "narrative_para2": "AI-powered transaction monitoring systems automate suspicious activity detection, PEP/sanctions screening, and Currency Transaction Report threshold alerts. ChatGPT and Claude assist with interpreting PMLA regulations, FIU-IND guidance, and drafting STR narratives. Insurance KYC and proposal processing is increasingly AI-assisted through automated document verification. This is an AI-Evolving role with high AI exposure on automated detection and screening — the irreplaceable human value, investigating complex layering schemes involving Indian informal financial networks, benami transactions, and hawala connections, and applying PMLA accountability in STR filings, requires deep contextual knowledge and professional judgment.",
+        "narrative_para3": "AML Analysis suits people with strong investigative instincts, genuine interest in financial crime patterns and money laundering typologies, and the professional discipline for the rigorous documentation standards that regulatory accountability requires. If you can identify patterns in financial transaction data that indicate suspicious behaviour, understand India's informal finance ecosystem including hawala and benami structures, and can write clear, legally defensible investigation narratives — this is a growing and respected specialisation. CAMS (Certified Anti-Money Laundering Specialist) certification is the most valued professional credential for AML careers in India's financial services market.",
+        "salary_range_low": "400000",
+        "salary_range_high": "800000",
+        "ai_exposure_pct": "58",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "AML Analysts benefit substantially from AI with AI-powered transaction monitoring systems automating suspicious activity detection, PEP/sanctions screening, and Currency Transaction Report (CTR) threshold alerts. ChatGPT/Claude for Risk and Compliance Research assists with interpreting PMLA regulations, FIU-IND guidance, and drafting STR narratives. Proposal Form and KYC for Insurance processing is increasingly AI-assisted through automated document verification tools.",
+        "human_value_tasks": "AML Analysts investigate complex layering and integration schemes involving Indian informal financial networks, benami transactions, and hawala connections that require deep contextual knowledge of local financial practices AI cannot independently identify. Filing Suspicious Transaction Reports to FIU-IND, managing regulatory examination responses, and applying judgment on complex beneficial ownership structures in Indian family-held businesses require experienced professional expertise.",
+        "english_requirement": "Essential"
+      }
+    },
+    "ml_success_probability": null,
+    "ml_semantic_skills": [],
+    "combined_tab4": {
+      "combined_pathway_summary": "Your immediate focus must be learning the missing fundamentals for .NET Developer (Target Direction). Role success probability: Calculating",
+      "skill_gap": {
+        "current_skills": [
+          "Basic Academics",
+          "Communication"
+        ],
+        "missing_skills": []
+      },
+      "learning_roadmap": [
+        {
+          "step": "Step 1 - Foundation Skills",
+          "description": "Master prerequisites and theoretical fundamentals."
+        },
+        {
+          "step": "Step 2 - Core Technical Skills",
+          "description": "Learn core technologies."
+        },
+        {
+          "step": "Step 3 - Advanced Applications",
+          "description": "Apply skills in complex scenarios."
+        },
+        {
+          "step": "Step 4 - Projects & Portfolio",
+          "description": "Deploy market-ready portfolios demonstrating these skills."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Certified .NET Developer Professional",
+          "issuer": "Industry Standard Provider",
+          "difficulty": "Intermediate",
+          "duration": "3 months"
+        }
+      ],
+      "courses": [
+        {
+          "course_name": ".NET Developer Crash Course",
+          "platform": "YouTube / Coursera",
+          "link_status": "Free"
+        }
+      ],
+      "projects": [
+        {
+          "project_name": ".NET Developer Capstone",
+          "description": "A complete end-to-end implementation.",
+          "skills_demonstrated": ""
+        }
+      ]
+    }
+  }
+}
