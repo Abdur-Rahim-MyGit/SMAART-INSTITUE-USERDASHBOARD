@@ -150,6 +150,14 @@ const studentSchema = new mongoose.Schema({
     xp: { type: Number, default: 0 },
     category: String,
     earnedAt: { type: Date, default: Date.now }
+  }],
+  pushSubscriptions: [{
+    endpoint: String,
+    expirationTime: Date,
+    keys: {
+      p256dh: String,
+      auth: String
+    }
   }]
 }, {
   timestamps: true

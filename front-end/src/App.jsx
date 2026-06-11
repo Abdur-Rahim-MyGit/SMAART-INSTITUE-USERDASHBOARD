@@ -10,7 +10,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AnimatedRoutes from "./components/AnimatedRoutes";
-
+import { PWAPrompt } from "@/components/PWAPrompt";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,6 +25,7 @@ const App = () => (
                   <ErrorBoundary>
                     <Toaster />
                     <Sonner />
+                    <PWAPrompt />
                     <AnimatedRoutes />
                   </ErrorBoundary>
                 </SidebarProvider>
