@@ -150,9 +150,8 @@ const MindCareSessions = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/coachSessions/${selectedSession._id}`, {
+      const data = await apiCall(`/coachSessions/${selectedSession._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           studentFeedback: {
             rating: feedbackRating,
@@ -161,7 +160,6 @@ const MindCareSessions = () => {
         })
       });
 
-      const data = await response.json();
       if (data.success) {
         toast.success("Feedback submitted successfully!");
         setShowFeedbackModal(false);

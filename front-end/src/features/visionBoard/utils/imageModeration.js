@@ -146,10 +146,13 @@ const checkDangerousObjects = async (imageElement) => {
 
 const extractTextFromImage = async (base64Image) => {
   try {
+    // Send the session JWT — the backend /api/ocr/extract route now requires auth.
+    const token = sessionStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/api/ocr/extract`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({ imageData: base64Image }),
     });
@@ -196,10 +199,13 @@ const checkImageText = async (imageSource) => {
 
 const checkImageServerSide = async (base64Image) => {
   try {
+    // Send the session JWT — the backend /api/nsfw/check route now requires auth.
+    const token = sessionStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/api/nsfw/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({ imageData: base64Image }),
     });

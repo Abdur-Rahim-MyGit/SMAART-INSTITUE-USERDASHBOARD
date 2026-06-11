@@ -1,7 +1,7 @@
 const express = require('express');
 const Course = require('../models/Course');
 const College = require('../models/College');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const {
     COURSE_STAGE_TITLES,
     CURRENT_COURSE_CATALOG,
@@ -18,57 +18,10 @@ const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
 router.use(generalLimiter);
 
-// Public debug endpoint to inspect flashcard data structure in MongoDB
-router.get('/debug-flashcards-db', async (req, res) => {
-    try {
-        const courses = await Course.find({});
-        const result = courses.map(c => {
-            const flowCards = [];
-            const moduleCards = [];
-            if (c.learningFlow) {
-                Object.values(c.learningFlow).forEach(step => {
-                    if (step.cards) {
-                        flowCards.push(...step.cards);
-                    } else if (step.content?.cards) {
-                        flowCards.push(...step.content.cards);
-                    }
-                });
-            }
-            if (c.modules) {
-                c.modules.forEach(m => {
-                    if (m.days) {
-                        m.days.forEach(d => {
-                            if (d.steps) {
-                                d.steps.forEach(s => {
-                                    if (s.type === 'flashcard' || s.type === 'flashcards' || s.contentType === 'flashcard') {
-                                        const cards = s.cards || s.content?.cards || [];
-                                        moduleCards.push(...cards);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-            return {
-                courseCode: c.courseCode,
-                courseNumber: c.courseNumber,
-                title: c.title,
-                hasLearningFlow: !!c.learningFlow,
-                learningFlowCardsCount: flowCards.length,
-                modulesCardsCount: moduleCards.length,
-                modulesCards: moduleCards
-            };
-        });
-        res.json({
-            success: true,
-            coursesCount: courses.length,
-            data: result
-        });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
+// SECURITY: the public GET /debug-flashcards-db endpoint was removed — it was
+// registered before router.use(protect) and dumped the entire course catalog
+// (every course's flashcards/modules) to any anonymous caller. It was a debug
+// aid with no production use.
 
 // Apply protection to all course routes
 router.use(protect);
@@ -192,7 +145,7 @@ router.get('/', async (req, res) => {
 });
 
 // Upsert the current dashboard course catalog as published DB courses
-router.post('/sync-defaults', async (req, res) => {
+router.post('/sync-defaults', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const createdBy = req.user?._id || req.body.createdBy;
         const synced = [];
@@ -224,7 +177,7 @@ router.post('/sync-defaults', async (req, res) => {
 });
 
 // Publish course and enforce the seven-stage learning flow
-router.patch('/:id/publish', async (req, res) => {
+router.patch('/:id/publish', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
@@ -455,7 +408,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new course
-router.post('/', async (req, res) => {
+router.post('/', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const shouldPublish = req.body.publish === true || req.body.status === 'active';
         const payload = shouldPublish
@@ -484,7 +437,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update course
-router.put('/:id', async (req, res) => {
+router.put('/:id', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const existing = await Course.findById(req.params.id);
         if (!existing) {
@@ -521,7 +474,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete course
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authorize('admin'), async (req, res) => {
     try {
         const course = await Course.findByIdAndDelete(req.params.id);
 
@@ -572,7 +525,7 @@ router.get('/:id/modules', async (req, res) => {
 });
 
 // Add module to course
-router.post('/:id/modules', async (req, res) => {
+router.post('/:id/modules', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);
 
@@ -603,7 +556,7 @@ router.post('/:id/modules', async (req, res) => {
 const VideoTranscript = require('../models/VideoTranscript');
 
 // Auto-generate video transcript using Deepgram
-router.post('/transcribe-video', async (req, res) => {
+router.post('/transcribe-video', authorize('admin', 'teacher'), async (req, res) => {
     try {
         const { videoUrl } = req.body;
         if (!videoUrl) {

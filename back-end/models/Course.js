@@ -282,10 +282,11 @@ courseSchema.index({ colleges: 1 });
 courseSchema.index({ createdBy: 1 });
 
 // Generate course code and sync micro-assessments before saving
+const { nextSequentialCode } = require('../utils/idGenerator');
 courseSchema.pre('save', async function (next) {
   if (!this.courseCode) {
-    const count = await mongoose.model('Course').countDocuments();
-    this.courseCode = `CRS${String(count + 1).padStart(5, '0')}`;
+    // Atomic sequential code — avoids the duplicate-key race of countDocuments()+1
+    this.courseCode = await nextSequentialCode('courseCode', 'CRS', 'Course', 'courseCode');
   }
 
   // Sync microAssessments from day quiz steps; keep manually set assessments when no quiz steps exist

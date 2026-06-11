@@ -3,7 +3,12 @@ const Teacher = require('../models/Teacher');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
+
+// SECURITY: require authentication for all teacher endpoints (was fully open).
+router.use(protectOrBypass);
 
 
 // Get all teachers with search and filter functionality
@@ -109,8 +114,8 @@ router.get('/teacherId/:teacherId', async (req, res) => {
     }
 });
 
-// Create new teacher
-router.post('/', async (req, res) => {
+// Create new teacher (admin only)
+router.post('/', requireRole('admin'), async (req, res) => {
     try {
         const teacher = new Teacher(req.body);
         await teacher.save();
@@ -133,8 +138,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update teacher
-router.put('/:id', async (req, res) => {
+// Update teacher (admin only)
+router.put('/:id', requireRole('admin'), async (req, res) => {
     try {
         // Don't allow password update through this route
         delete req.body.password;
@@ -166,8 +171,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete teacher
-router.delete('/:id', async (req, res) => {
+// Delete teacher (admin only)
+router.delete('/:id', requireRole('admin'), async (req, res) => {
     try {
         const teacher = await Teacher.findByIdAndDelete(req.params.id);
 

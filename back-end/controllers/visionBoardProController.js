@@ -16,12 +16,13 @@ const mongoose = require("mongoose");
 // Maximum 3 vision boards per user
 const MAX_VISION_BOARDS_PER_USER = 3;
 
-// Helper to get userId from various sources
+// Helper to get userId — ONLY from the verified JWT (set by the protect
+// middleware). We deliberately no longer fall back to req.body.userId /
+// req.query.userId: trusting a client-supplied id was the IDOR that let anyone
+// read or destroy another user's boards by passing ?userId=<victim>.
 const getUserId = (req) => {
   if (req.user?.id) return req.user.id;
   if (req.user?._id) return req.user._id;
-  if (req.body?.userId) return req.body.userId;
-  if (req.query?.userId) return req.query.userId;
   return null;
 };
 

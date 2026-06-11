@@ -3,11 +3,16 @@ const Student = require('../models/Student');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
 
+// SECURITY: require an authenticated session (or trusted admin dashboard).
+// Blocks the previously-open anonymous access to all student PII.
+router.use(protectOrBypass);
 
-// Get all students with search and filter functionality
-router.get('/', async (req, res) => {
+// Get all students with search and filter functionality (staff only)
+router.get('/', requireRole('admin', 'teacher'), async (req, res) => {
     try {
         const { search, college, status, assignedTeacher, limit = 50 } = req.query;
         let query = {};
@@ -62,9 +67,11 @@ router.get('/', async (req, res) => {
 router.get('/by-email/:email', async (req, res) => {
     try {
         const email = decodeURIComponent(req.params.email).toLowerCase().trim();
-        
+        // SECURITY: escape regex metacharacters so the email param cannot be used
+        // as a ReDoS pattern or to enumerate records via `.*`-style wildcards.
+        const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const student = await Student.findOne({
-            email: { $regex: new RegExp(`^${email}$`, 'i') }
+            email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
         })
             .select('_id fullName email studentId')
             .lean();
@@ -149,8 +156,8 @@ router.get('/studentId/:studentId', async (req, res) => {
     }
 });
 
-// Create new student
-router.post('/', async (req, res) => {
+// Create new student (staff only)
+router.post('/', requireRole('admin', 'teacher'), async (req, res) => {
     try {
         const student = new Student(req.body);
         await student.save();
@@ -173,8 +180,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update student
-router.put('/:id', async (req, res) => {
+// Update student (staff only)
+router.put('/:id', requireRole('admin', 'teacher'), async (req, res) => {
     try {
         // Don't allow password update through this route
         delete req.body.password;
@@ -206,8 +213,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete student
-router.delete('/:id', async (req, res) => {
+// Delete student (admin only)
+router.delete('/:id', requireRole('admin'), async (req, res) => {
     try {
         const student = await Student.findByIdAndDelete(req.params.id);
 

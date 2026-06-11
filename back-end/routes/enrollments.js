@@ -3,7 +3,12 @@ const Enrollment = require('../models/Enrollment');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
+
+// SECURITY: require authentication for all enrollment endpoints (was fully open).
+router.use(protectOrBypass);
 
 
 // Get all enrollments with search and filter functionality
@@ -74,8 +79,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create new enrollment
-router.post('/', async (req, res) => {
+// Create new enrollment (staff only)
+router.post('/', requireRole('admin', 'teacher'), async (req, res) => {
     try {
         const enrollment = new Enrollment(req.body);
         await enrollment.save();
@@ -94,8 +99,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update enrollment
-router.put('/:id', async (req, res) => {
+// Update enrollment (staff only)
+router.put('/:id', requireRole('admin', 'teacher'), async (req, res) => {
     try {
         const enrollment = await Enrollment.findByIdAndUpdate(
             req.params.id,
@@ -129,8 +134,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete enrollment
-router.delete('/:id', async (req, res) => {
+// Delete enrollment (admin only)
+router.delete('/:id', requireRole('admin'), async (req, res) => {
     try {
         const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
 

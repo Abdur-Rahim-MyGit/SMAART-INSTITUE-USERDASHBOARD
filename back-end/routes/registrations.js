@@ -3,6 +3,8 @@ const Registration = require('../models/Registration');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protect } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
 
 
@@ -64,7 +66,10 @@ router.get('/institutions', async (req, res) => {
 });
 
 // Get all registrations
-router.get('/', async (req, res) => {
+// SECURITY: was unauthenticated — exposed every applicant's name/email/
+// institution/studentId. Now staff-only. (/institutions above stays public for
+// the signup institution selector.)
+router.get('/', protect, requireRole('admin', 'teacher'), async (req, res) => {
   try {
     const { limit = 50, skip = 0 } = req.query;
     
@@ -92,7 +97,9 @@ router.get('/', async (req, res) => {
 });
 
 // Get registration by ID
-router.get('/:id', async (req, res) => {
+// SECURITY: was unauthenticated and returned the FULL registration document.
+// Now staff-only.
+router.get('/:id', protect, requireRole('admin', 'teacher'), async (req, res) => {
   try {
     const registration = await Registration.findById(req.params.id);
     

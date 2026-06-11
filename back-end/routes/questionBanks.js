@@ -3,7 +3,14 @@ const QuestionBank = require('../models/QuestionBank');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
+
+// SECURITY: question banks contain correct answers. Restrict to staff to
+// prevent answer-key disclosure and tampering (was fully open).
+router.use(protectOrBypass);
+router.use(requireRole('admin', 'teacher', 'moderator'));
 
 
 // Get all questions with search and filter functionality

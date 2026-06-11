@@ -705,7 +705,9 @@ const CoursePlayer = () => {
       setActiveStep(null);
       setShowCongratulation(false);
       setCongratulationAcknowledged(false);
-      setIsCompleted(false);
+      // NOTE: `isCompleted` is derived via useMemo from completedSteps (reset above),
+      // so it recomputes automatically. There is no setIsCompleted setter — calling
+      // one here threw a ReferenceError and crashed "Next Lesson".
       setVideoProgress(0); // Reset video progress for next course
 
       let nextId = nextCourse.id;

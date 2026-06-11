@@ -73,9 +73,12 @@ const exportToExcel = (reports) => {
                 input.interestedJobRole || 'N/A',            // JOB ROLE
                 education,                                   // EDUCATION
                 mustHave,                                    // MUST HAVE
-                "Required in " + (Math.floor(Math.random() * 20) + 75) + "% of job ads.", // Narrative MUST
+                // NOTE: previously these narratives injected a Math.random() percentage,
+                // fabricating different "demand %" figures on every export. Replaced with
+                // honest qualitative phrasing since no real job-ad statistics source exists.
+                "Commonly required across job postings for this role.", // Narrative MUST
                 niceToHave,                                  // NICE TO HAVE
-                "Preferable in " + (Math.floor(Math.random() * 30) + 40) + "% of job ads.", // Narrative NICE
+                "Frequently preferred in job postings for this role.",  // Narrative NICE
                 certs,                                       // RECOMMENDED CERTIFICATES
                 courses                                      // FREE/ PAID COURSES
             ];

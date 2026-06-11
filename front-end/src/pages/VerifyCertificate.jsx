@@ -95,7 +95,7 @@ const VerifyCertificate = () => {
         setVerificationResult(null);
 
         try {
-            const response = await apiCall(`/certificates/verify/${certId}`, {
+            const response = await apiCall(`/certificates/verify/${encodeURIComponent(certId)}`, {
                 method: 'GET'
             });
 
@@ -109,59 +109,12 @@ const VerifyCertificate = () => {
             }
         } catch (err) {
             console.error('Verification error:', err);
-            
-            // DEMO FALLBACK: If the backend fails but the user is verifying a locally-generated fallback certificate
-            if (err.status === 404 && certId.startsWith('SMAART-')) {
-                const codeParts = certId.split('-');
-                const typeCode = codeParts.length > 1 ? codeParts[1] : '';
-                
-                let title = 'Professional Credential';
-                if (typeCode === 'CAP') title = 'Professional Certificate in Capacity & Work Readiness';
-                else if (typeCode === 'APC') title = 'Advanced Professional Certificate in Applied Capability';
-                else if (typeCode === 'ELR') title = 'Professional Diploma in Employability & Leadership Readiness';
-                else if (typeCode === 'MPD') title = 'Master Professional Diploma in Comprehensive Readiness';
 
-                let finalPhoto = user?.personal?.profilePhoto || user?.profilePhoto || user?.photoURL || null;
-
-                // Explicitly fetch profile photo for the demo if user is logged in but photo is missing
-                if (!finalPhoto && user?.email) {
-                    try {
-                        const userResponse = await apiCall(`/users/register-details/${encodeURIComponent(user.email)}`);
-                        if (userResponse) {
-                            finalPhoto = userResponse.profilePhoto || userResponse.avatarUrl || finalPhoto;
-                        }
-                    } catch (fetchErr) {
-                        console.error('Failed to fetch user details for certificate demo', fetchErr);
-                    }
-                }
-
-                const mockResponse = {
-                    success: true,
-                    verified: true,
-                    message: "Certificate Authenticated Successfully",
-                    certificate: {
-                        certificateId: certId,
-                        certificateTitle: title,
-                        recipientName: user?.fullName || "Verified Student",
-                        fullName: user?.fullName || "Verified Student",
-                        studentId: "STU00006",
-                        photo: finalPhoto,
-                        issueDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
-                        readinessBand: "Proficient",
-                        issuingAuthority: "SMAART Institute UK",
-                        validatedSkills: [
-                            { label: 'Cognitive Reasoning (CRQ)', score: 85 },
-                            { label: 'Learning Agility (LQ)', score: 85 }
-                        ]
-                    }
-                };
-
-                setVerificationResult(mockResponse);
-                toast.success('Certificate Authenticated Successfully! (Demo Mode)');
-                setIsVerifying(false);
-                return;
-            }
-
+            // SECURITY: Do NOT fabricate a verified result. A public credential-
+            // verification page must reflect only what the server confirms — the
+            // previous demo fallback synthesised a green "Authenticated" screen on
+            // a 404, defeating the entire anti-fraud purpose. A real 404 means the
+            // certificate does not exist and must be shown as such.
             if (err.status === 404) {
                 setError('Certificate not found. Please check the ID and try again.');
             } else {
