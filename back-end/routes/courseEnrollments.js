@@ -15,6 +15,14 @@ router.use(generalLimiter);
 // Apply protection to all enrollment routes
 router.use(protect);
 
+// Staff may act on any student; everyone else is forced to their own id. This
+// prevents a student from reading or writing another student's progress/score
+// by passing a different studentId in the body or URL. For legitimate self-
+// service the value is identical to what the client already sends.
+const STAFF_ROLES = ['admin', 'teacher', 'moderator'];
+const isStaff = (u) => STAFF_ROLES.includes(u?.role) || (Array.isArray(u?.roles) && u.roles.some((r) => STAFF_ROLES.includes(r)));
+const ownStudentId = (req, provided) => (isStaff(req.user) ? provided : String(req.user._id));
+
 // Get all course enrollments with filters
 router.get('/', async (req, res) => {
     try {
@@ -164,7 +172,8 @@ router.delete('/:id', async (req, res) => {
 // Get student's enrollments
 router.get('/student/:studentId', async (req, res) => {
     try {
-        const enrollments = await CourseEnrollment.find({ student: req.params.studentId })
+        const studentId = ownStudentId(req, req.params.studentId);
+        const enrollments = await CourseEnrollment.find({ student: studentId })
             .populate({
                 path: 'course',
                 select: 'title courseCode courseNumber duration status banner modules'
@@ -191,7 +200,8 @@ router.get('/student/:studentId', async (req, res) => {
 router.post('/task-progress', async (req, res) => {
     try {
         console.log('Received task-progress request:', req.body);
-        const { studentId, courseCode, moduleId, dayId, taskId, completed } = req.body;
+        const { courseCode, moduleId, dayId, taskId, completed } = req.body;
+        const studentId = ownStudentId(req, req.body.studentId);
 
 
         // Find course by code
@@ -331,7 +341,8 @@ router.post('/task-progress', async (req, res) => {
 // Update video progress (sync maxWatchedTime)
 router.post('/video-progress', async (req, res) => {
     try {
-        const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
+        const { courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
+        const studentId = ownStudentId(req, req.body.studentId);
 
         // Find course
         const course = await Course.findOne({
@@ -464,7 +475,8 @@ router.post('/video-progress', async (req, res) => {
 // Update quiz/assessment progress
 router.post('/quiz-progress', async (req, res) => {
     try {
-        const { studentId, courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
+        const { courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
+        const studentId = ownStudentId(req, req.body.studentId);
 
         // Find course
         const course = await Course.findOne({
@@ -583,7 +595,8 @@ router.post('/quiz-progress', async (req, res) => {
 // Update task result (with score)
 router.post('/task-result', async (req, res) => {
     try {
-        const { studentId, courseCode, moduleId, dayId, stepId, score, totalPoints, responses } = req.body;
+        const { courseCode, moduleId, dayId, stepId, score, totalPoints, responses } = req.body;
+        const studentId = ownStudentId(req, req.body.studentId);
 
         // Find course
         const course = await Course.findOne({

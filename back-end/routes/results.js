@@ -18,6 +18,11 @@ console.log("✅ Results Route Loaded with Multi-Stage Support (T1-T4)");
 // Apply protection to all result routes
 router.use(protect);
 
+// Staff may act on any user; everyone else is scoped to their own id (prevents
+// reading another user's results/scores via a guessed userId).
+const STAFF_ROLES = ['admin', 'teacher', 'moderator'];
+const isStaff = (u) => STAFF_ROLES.includes(u?.role) || (Array.isArray(u?.roles) && u.roles.some((r) => STAFF_ROLES.includes(r)));
+
 // Fisher-Yates shuffle algorithm (non-deterministic - for non-stage assessments)
 function shuffleArray(array) {
     const shuffled = [...array];
@@ -414,7 +419,8 @@ router.post('/:resultId/submit', verifyAssessmentToken, resultController.submitA
 // Get all results for a user
 router.get('/user/:userId', async (req, res) => {
     try {
-        const { userId } = req.params;
+        // Non-staff can only read their own results.
+        const userId = isStaff(req.user) ? req.params.userId : String(req.user._id);
         const { status } = req.query;
 
 
@@ -456,6 +462,15 @@ router.get('/:resultId', async (req, res) => {
             return res.status(404).json({
                 success: false,
                 error: 'Result not found'
+            });
+        }
+
+        // SECURITY: non-staff may only view their own result detail.
+        const ownerId = String(result.userId?._id || result.userId || '');
+        if (!isStaff(req.user) && ownerId && ownerId !== String(req.user._id)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Not authorized to view this result'
             });
         }
 

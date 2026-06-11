@@ -26,7 +26,10 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
 
                 // 1. Fetch existing progress
                 try {
-                    const progRes = await fetch(`/api/career-agent/user-skills/${encodeURIComponent(userEmail)}`);
+                    const token = sessionStorage.getItem('token');
+                    const progRes = await fetch(`/api/career-agent/user-skills/${encodeURIComponent(userEmail)}`, {
+                        headers: token ? { Authorization: `Bearer ${token}` } : {},
+                    });
                     if (progRes.ok) {
                         const progData = await progRes.json();
                         const progMap = {};

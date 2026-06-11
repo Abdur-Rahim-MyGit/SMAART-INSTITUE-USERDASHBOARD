@@ -3,7 +3,12 @@ const Coach = require('../models/Coach');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
+
+// SECURITY: require authentication for all coach endpoints (was fully open).
+router.use(protectOrBypass);
 
 
 // Get all coaches with search and filter functionality
@@ -77,8 +82,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create new coach
-router.post('/', async (req, res) => {
+// Create new coach (admin only)
+router.post('/', requireRole('admin'), async (req, res) => {
     try {
         const coach = new Coach(req.body);
         await coach.save();
@@ -97,8 +102,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update coach
-router.put('/:id', async (req, res) => {
+// Update coach (admin only)
+router.put('/:id', requireRole('admin'), async (req, res) => {
     try {
         const coach = await Coach.findByIdAndUpdate(
             req.params.id,
@@ -127,8 +132,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete coach
-router.delete('/:id', async (req, res) => {
+// Delete coach (admin only)
+router.delete('/:id', requireRole('admin'), async (req, res) => {
     try {
         const coach = await Coach.findByIdAndDelete(req.params.id);
 

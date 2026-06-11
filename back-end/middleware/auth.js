@@ -172,6 +172,31 @@ const optionalAuth = async (req, res, next) => {
 };
 
 /**
+ * protectOrBypass - allows either the trusted external admin dashboard
+ * (x-admin-bypass + matching x-admin-secret) OR a normal authenticated
+ * session (cookie / Bearer token via `protect`). Blocks anonymous callers.
+ * Used to secure routers that are consumed by BOTH the admin dashboard and
+ * logged-in users.
+ */
+const protectOrBypass = (req, res, next) => {
+  const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
+  if (
+    req.headers['x-admin-bypass'] === 'true' &&
+    adminSecret &&
+    req.headers['x-admin-secret'] === adminSecret
+  ) {
+    req.user = {
+      role: 'admin',
+      roles: ['admin'],
+      _id: new mongoose.Types.ObjectId(),
+      id: 'admin-bypass'
+    };
+    return next();
+  }
+  return protect(req, res, next);
+};
+
+/**
  * Role-based access control
  */
 const authorize = (...roles) => {
@@ -194,4 +219,4 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protect, optionalAuth, authorize };
+module.exports = { protect, optionalAuth, authorize, protectOrBypass };

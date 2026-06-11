@@ -5,7 +5,9 @@ const requireRole = (...allowedRoles) => {
     // Bypass for trusted admin system (used by external dashboard)
     if (req.headers['x-admin-bypass'] === 'true') {
       const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
-      if (req.headers['x-admin-secret'] === adminSecret) {
+      // SECURITY: never allow the bypass when the secret is unset/empty,
+      // otherwise `undefined === undefined` would grant admin to anyone.
+      if (adminSecret && req.headers['x-admin-secret'] === adminSecret) {
         const mongoose = require('mongoose');
         req.user = {
           role: 'admin',

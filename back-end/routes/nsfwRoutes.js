@@ -8,7 +8,12 @@
 const express = require('express');
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protect } = require('../middleware/auth');
 router.use(generalLimiter);
+// SECURITY: require a valid session — this image-moderation endpoint was open to
+// the internet (resource/cost abuse). Its only caller is the logged-in vision
+// board editor, which now sends the JWT.
+router.use(protect);
 
 const { scanImage } = require('../helpers/nsfwModeration');
 

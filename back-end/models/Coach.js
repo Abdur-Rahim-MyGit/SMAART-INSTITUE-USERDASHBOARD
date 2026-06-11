@@ -59,13 +59,17 @@ const coachSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate coach ID before saving
+// Generate coach ID before saving (atomic — avoids duplicate-key races)
+const { nextSequentialCode } = require('../utils/idGenerator');
 coachSchema.pre('save', async function(next) {
-  if (!this.coachId) {
-    const count = await mongoose.model('Coach').countDocuments();
-    this.coachId = `CCH${String(count + 1).padStart(5, '0')}`;
+  try {
+    if (!this.coachId) {
+      this.coachId = await nextSequentialCode('coachId', 'CCH', 'Coach', 'coachId');
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 });
 
 module.exports = mongoose.model('Coach', coachSchema);

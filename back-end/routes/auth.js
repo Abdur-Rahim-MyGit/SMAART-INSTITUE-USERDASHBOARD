@@ -805,7 +805,15 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
 
     // Verify OTP
     let isValid = await loginOtp.verifyOtp(otp);
-    if (!isValid && process.env.NODE_ENV !== 'production' && otp === '999999') {
+    // DEV-ONLY OTP bypass: requires BOTH a non-production environment AND an
+    // explicit opt-in flag (ENABLE_DEV_OTP_BYPASS=true). This ensures the
+    // backdoor can never activate in production even if NODE_ENV is misconfigured.
+    if (
+      !isValid &&
+      process.env.NODE_ENV !== 'production' &&
+      process.env.ENABLE_DEV_OTP_BYPASS === 'true' &&
+      otp === '999999'
+    ) {
       isValid = true;
     }
 

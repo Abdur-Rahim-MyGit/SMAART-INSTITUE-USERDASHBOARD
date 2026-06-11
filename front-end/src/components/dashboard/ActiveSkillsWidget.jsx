@@ -57,7 +57,10 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
             }
             try {
                 setLoadingSkills(true);
-                const res = await fetch(`/api/career-agent/user-skills/${encodeURIComponent(emailToUse)}`);
+                const token = sessionStorage.getItem('token');
+                const res = await fetch(`/api/career-agent/user-skills/${encodeURIComponent(emailToUse)}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setUserSkills(data.filter(s => s.status === 'In Progress'));

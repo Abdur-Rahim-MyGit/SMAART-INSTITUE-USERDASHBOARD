@@ -234,7 +234,11 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Resume not found' });
     }
 
-    resume = await Resume.findByIdAndUpdate(req.params.id, req.body, {
+    // SECURITY: never let the body reassign ownership or the document id. Without
+    // this, a user could PUT {"userId":"<victim>"} and hand their resume to (or
+    // overwrite under) another account.
+    const { userId, _id, ...updatable } = req.body || {};
+    resume = await Resume.findByIdAndUpdate(req.params.id, updatable, {
       new: true,
       runValidators: true,
     });

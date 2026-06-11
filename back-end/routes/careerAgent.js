@@ -25,7 +25,9 @@ const {
 
 const Degree = require('../models/Degree');
 // Auth middleware — optional auth (passes through without token, attaches user if token present)
-const { optionalAuth } = require('../middleware/auth');
+const { optionalAuth, protect } = require('../middleware/auth');
+// Cost guard: caps calls to the paid LLM (OpenRouter/Anthropic) per user/IP.
+const { aiLimiter } = require('../middleware/rateLimiter');
 
 // Records directory for local caching of analyses
 const RECORDS_DIR = path.join(__dirname, '..', 'records', 'careerAgent');
@@ -550,8 +552,16 @@ router.get('/directions/:uniqueId', async (req, res) => {
 router.post('/career-direction', async (req, res) => {
   try {
     const { degree, specialisation, roleName } = req.body;
+    if (!degree || typeof degree !== 'string') {
+      return res.status(400).json({ error: 'degree is required' });
+    }
+    // SECURITY: escape regex metacharacters and cap length so an attacker cannot
+    // send a catastrophic-backtracking pattern (e.g. "(a+)+$") to hang the query
+    // (ReDoS). Escaping keeps the original case-insensitive substring match for
+    // legitimate degree names while neutralising metacharacters.
+    const escapedDegree = degree.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const degreeDoc = await CareerDirectionModel.findOne({
-      degree_name: { $regex: new RegExp(degree, 'i') }
+      degree_name: { $regex: new RegExp(escapedDegree, 'i') }
     }).lean();
 
     if (!degreeDoc) {
@@ -707,7 +717,7 @@ router.put('/direction-lock/mark-modal-shown', optionalAuth, async (req, res) =>
  *  4. On success: increments attemptsUsed, sets firstVisitAt/lockExpiryDate on first save,
  *     auto-locks if this save consumed the last attempt.
  */
-router.post('/onboarding', optionalAuth, async (req, res) => {
+router.post('/onboarding', aiLimiter, optionalAuth, async (req, res) => {
   try {
     const studentData = req.body;
 
@@ -1133,10 +1143,21 @@ const { SkillProgressModel } = require('../models/careerAgentModels');
  * GET /api/career-agent/user-skills/:email
  * Returns all skill progress entries for a user.
  */
-router.get('/user-skills/:email', async (req, res) => {
+router.get('/user-skills/:email', protect, async (req, res) => {
   try {
-    const { email } = req.params;
-    const progress = await SkillProgressModel.find({ email: decodeURIComponent(email) }).lean();
+    // Preserve the original (possibly mixed-case) email for the DB lookup so we
+    // don't miss records stored with uppercase characters.
+    const email = decodeURIComponent(req.params.email).trim();
+    // SECURITY: was unauthenticated — anyone could read any user's skill progress
+    // by guessing their email (IDOR). Callers may only read their OWN skills;
+    // staff may read anyone's. Ownership is compared case-insensitively.
+    const staffRoles = ['admin', 'teacher', 'moderator'];
+    const isStaff = staffRoles.includes(req.user?.role);
+    const ownEmail = (req.user?.email || '').toLowerCase().trim();
+    if (!isStaff && email.toLowerCase() !== ownEmail) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    const progress = await SkillProgressModel.find({ email }).lean();
     res.json(progress);
   } catch (error) {
     console.error('[career-agent] Error fetching user skills:', error);

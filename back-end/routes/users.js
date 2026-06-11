@@ -157,8 +157,12 @@ router.post('/register-details', upload.fields([
       });
       await user.save();
     } else {
-      // Update existing user password if provided
-      if (password) {
+      // SECURITY: this endpoint is unauthenticated, so it must NOT be able to
+      // overwrite the password of an account that already has one — that would
+      // let anyone reset any victim's password by posting their email (account
+      // takeover). Only allow setting an initial password for an account that
+      // does not yet have one (first-time registration before first login).
+      if (password && !user.password) {
         user.password = password;
         await user.save();
       }
@@ -311,74 +315,6 @@ router.post('/register-details', upload.fields([
 
     // Create or update registration
     let registration = await Registration.findOne({ userId: user._id });
-
-    // Dev-only: Backfill Users from Registrations so old registrations can log in
-    router.post('/_dev/backfill', async (req, res) => {
-      try {
-        if (process.env.NODE_ENV === 'production') {
-          return res.status(403).json({ error: 'Backfill disabled in production' });
-        }
-
-        const emailInput = (req.body?.email || req.query?.email || '').trim().toLowerCase();
-
-        const regFilter = emailInput
-          ? { email: { $regex: new RegExp(`^${escapeRegex(emailInput)}$`, 'i') } }
-          : {};
-
-        const registrations = await Registration.find(regFilter);
-        if (registrations.length === 0) {
-          return res.json({ processed: 0, created: 0, updated: 0, message: 'No registrations found for filter' });
-        }
-
-        let created = 0;
-        let updated = 0;
-        const results = [];
-
-        for (const reg of registrations) {
-          const normalizedEmail = (reg.email || '').trim().toLowerCase();
-          const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-
-          let user = null;
-          if (reg.userId) {
-            user = await User.findById(reg.userId);
-          }
-          if (!user) {
-            user = await User.findOne(emailQuery);
-          }
-
-          if (!user) {
-            // Create new user from registration
-            user = new User({
-              fullName: reg.fullName || 'User',
-              email: normalizedEmail,
-              mobileNumber: reg.mobileNumber || '',
-              password: reg.password || undefined, // will hash if provided
-              registrationCompleted: true,
-            });
-            await user.save();
-            created += 1;
-            results.push({ email: user.email, action: 'created' });
-          } else {
-            // Ensure flags are set and email normalized
-            let changed = false;
-            if (!user.registrationCompleted) { user.registrationCompleted = true; changed = true; }
-            if (user.email !== normalizedEmail) { user.email = normalizedEmail; changed = true; }
-            if (!user.password && reg.password) { user.password = reg.password; changed = true; }
-            if (changed) { await user.save(); updated += 1; results.push({ email: user.email, action: 'updated' }); }
-          }
-
-          // Link registration to user if missing
-          if (!reg.userId || String(reg.userId) !== String(user._id)) {
-            reg.userId = user._id;
-            await reg.save();
-          }
-        }
-
-        return res.json({ processed: registrations.length, created, updated, results });
-      } catch (err) {
-        return res.status(500).json({ error: err.message });
-      }
-    });
 
     if (registration) {
       // Update existing registration
@@ -1090,6 +1026,76 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
   } catch (err) {
     console.error('[verify-badge] Error:', err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Dev-only: Backfill Users from Registrations so old registrations can log in.
+// Registered ONCE at module level (previously this was mistakenly defined inside
+// the /register-details handler, stacking a new route on every signup request).
+router.post('/_dev/backfill', async (req, res) => {
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ error: 'Backfill disabled in production' });
+    }
+
+    const emailInput = (req.body?.email || req.query?.email || '').trim().toLowerCase();
+
+    const regFilter = emailInput
+      ? { email: { $regex: new RegExp(`^${escapeRegex(emailInput)}$`, 'i') } }
+      : {};
+
+    const registrations = await Registration.find(regFilter);
+    if (registrations.length === 0) {
+      return res.json({ processed: 0, created: 0, updated: 0, message: 'No registrations found for filter' });
+    }
+
+    let created = 0;
+    let updated = 0;
+    const results = [];
+
+    for (const reg of registrations) {
+      const normalizedEmail = (reg.email || '').trim().toLowerCase();
+      const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
+
+      let user = null;
+      if (reg.userId) {
+        user = await User.findById(reg.userId);
+      }
+      if (!user) {
+        user = await User.findOne(emailQuery);
+      }
+
+      if (!user) {
+        // Create new user from registration
+        user = new User({
+          fullName: reg.fullName || 'User',
+          email: normalizedEmail,
+          mobileNumber: reg.mobileNumber || '',
+          password: reg.password || undefined, // will hash if provided
+          registrationCompleted: true,
+        });
+        await user.save();
+        created += 1;
+        results.push({ email: user.email, action: 'created' });
+      } else {
+        // Ensure flags are set and email normalized
+        let changed = false;
+        if (!user.registrationCompleted) { user.registrationCompleted = true; changed = true; }
+        if (user.email !== normalizedEmail) { user.email = normalizedEmail; changed = true; }
+        if (!user.password && reg.password) { user.password = reg.password; changed = true; }
+        if (changed) { await user.save(); updated += 1; results.push({ email: user.email, action: 'updated' }); }
+      }
+
+      // Link registration to user if missing
+      if (!reg.userId || String(reg.userId) !== String(user._id)) {
+        reg.userId = user._id;
+        await reg.save();
+      }
+    }
+
+    return res.json({ processed: registrations.length, created, updated, results });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 

@@ -3,7 +3,22 @@ const Escalation = require('../models/Escalation');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const { protectOrBypass } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 router.use(generalLimiter);
+
+// SECURITY: escalations contain sensitive mental-health (PHI) data.
+// Require authentication AND restrict to clinical/admin staff (was fully open).
+router.use(protectOrBypass);
+router.use(requireRole('admin', 'moderator', 'teacher', 'counselor', 'therapist'));
+
+// Whitelist writable fields to prevent mass-assignment of unexpected fields.
+const ESCALATION_FIELDS = ['student', 'college', 'source', 'reason', 'priority', 'category', 'assignedTherapist', 'status', 'followUpRequired', 'notes'];
+const pickEscalationFields = (body = {}) =>
+    ESCALATION_FIELDS.reduce((acc, key) => {
+        if (body[key] !== undefined) acc[key] = body[key];
+        return acc;
+    }, {});
 
 
 // Get all escalations with filters
@@ -72,7 +87,7 @@ router.get('/:id', async (req, res) => {
 // Create new escalation
 router.post('/', async (req, res) => {
     try {
-        const escalation = new Escalation(req.body);
+        const escalation = new Escalation(pickEscalationFields(req.body));
         await escalation.save();
 
         res.status(201).json({
@@ -94,7 +109,7 @@ router.put('/:id', async (req, res) => {
     try {
         const escalation = await Escalation.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            pickEscalationFields(req.body),
             { new: true, runValidators: true }
         );
 
