@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
-
+import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -64,6 +64,43 @@ export default defineConfig(({ mode }) => ({
       webp: {
         lossless: true,
       },
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      includeAssets: ['favicon.png', 'logo.png', 'pwa-192x192.png', 'pwa-512x512.png'],
+      manifest: {
+        name: 'SMAART Institute User Dashboard',
+        short_name: 'SMAART Dashboard',
+        description: 'Student and User Dashboard for SMAART Institute',
+        theme_color: '#1a3884',
+        background_color: '#ffffff',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'favicon.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'favicon.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'favicon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
+      },
+      devOptions: {
+        enabled: true
+      }
     }),
   ].filter(Boolean),
   esbuild: {

@@ -374,4 +374,40 @@ router.post('/broadcast', protect, async (req, res) => {
   }
 });
 
+router.post('/subscribe', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const subscription = req.body;
+    const Student = require('../models/Student');
+    const User = require('../models/User');
+
+    if (!subscription || !subscription.endpoint) {
+      return res.status(400).json({ success: false, message: 'Invalid subscription object' });
+    }
+
+    let userObj = await Student.findById(userId);
+    if (!userObj) {
+      userObj = await User.findById(userId);
+    }
+
+    if (!userObj) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Check if subscription already exists
+    const exists = userObj.pushSubscriptions?.some(sub => sub.endpoint === subscription.endpoint);
+    
+    if (!exists) {
+      userObj.pushSubscriptions = userObj.pushSubscriptions || [];
+      userObj.pushSubscriptions.push(subscription);
+      await userObj.save();
+    }
+
+    res.status(201).json({ success: true, message: 'Subscription saved successfully' });
+  } catch (error) {
+    console.error('Error saving push subscription:', error);
+    res.status(500).json({ success: false, message: 'Failed to save push subscription' });
+  }
+});
+
 module.exports = router;
