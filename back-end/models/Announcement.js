@@ -55,7 +55,13 @@ const announcementSchema = new mongoose.Schema({
   reactions: [{
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     emoji: String
-  }]
+  }],
+  // Optional degree targeting for college admin announcements
+  targetDegree: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CollegeDegree',
+    default: null
+  }
 }, { timestamps: true });
 
 announcementSchema.index({ createdAt: -1 });

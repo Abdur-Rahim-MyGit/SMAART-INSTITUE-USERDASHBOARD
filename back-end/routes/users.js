@@ -6,6 +6,7 @@ const Registration = require('../models/Registration');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const College = require('../models/College');
+const CollegeDegree = require('../models/CollegeDegree');
 const upload = require('../middleware/upload');
 const { protect } = require('../middleware/auth');
 const { createDefaultUserSettings } = require('../models/schemas/userSettings');
@@ -330,6 +331,23 @@ router.post('/register-details', upload.fields([
     user.registrationCompleted = true;
     await user.save();
 
+    // Sync academic details to Student document
+    try {
+      const student = await Student.findOne(emailQuery);
+      if (student && mappedHigherEducation && mappedHigherEducation.length > 0) {
+        const he = mappedHigherEducation[0];
+        student.academic = {
+          degreeLevel: he.qualificationLevel || '',
+          domain: he.degree || '',
+          degreeGroup: he.degreeFullName || '',
+          specialisation: he.specialization || ''
+        };
+        await student.save();
+      }
+    } catch (err) {
+      console.warn('Student academic sync in register-details failed:', err.message);
+    }
+
     res.status(201).json({
       message: 'Registration details saved successfully',
       registration: {
@@ -486,6 +504,17 @@ router.patch('/register-section', async (req, res) => {
       'higherEducation': async () => {
         // For array of higher education entries
         registration.higherEducation = data;
+
+        if (student && Array.isArray(data) && data.length > 0) {
+          const he = data[0];
+          student.academic = {
+            degreeLevel: he.qualificationLevel || he.level || '',
+            domain: he.degree || he.domain || '',
+            degreeGroup: he.degreeFullName || he.degreeGroup || '',
+            specialisation: he.specialization || he.specialisation || ''
+          };
+          await student.save();
+        }
       },
       'extracurricular': async () => {
         registration.extracurricular = Array.isArray(data) ? data : [];
@@ -691,7 +720,7 @@ router.get('/register-details/:email', async (req, res) => {
 
     // Even if User is found, if college is missing, check Student collection
     if (!user || !user.college) {
-      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
+      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan').populate('degree');
       if (student) {
         if (user) {
           fallbackCollege = student.college;
@@ -757,6 +786,16 @@ router.get('/register-details/:email', async (req, res) => {
       }
     }
 
+    // Fetch student to get degree and academic details if not already fetched as user
+    let studentForDetails = null;
+    if (userSource === 'Student') {
+      studentForDetails = user;
+    } else {
+      studentForDetails = await Student.findOne({ email: normalizedEmail }).populate('degree');
+    }
+    const populatedDegree = studentForDetails?.degree || null;
+    const academic = studentForDetails?.academic || null;
+
     if (registration) {
       return res.json({
         ...registration.toObject(),
@@ -764,6 +803,8 @@ router.get('/register-details/:email', async (req, res) => {
         gender: registration.gender || user.gender,
         badges: aggregatedBadges,
         college: user?.college || fallbackCollege || null,
+        degree: populatedDegree,
+        academic,
         lastLogin: user?.lastLogin || null,
         previousLogin: user?.previousLogin || null
       });
@@ -776,6 +817,8 @@ router.get('/register-details/:email', async (req, res) => {
     }
     res.json({
       ...userObj,
+      degree: populatedDegree,
+      academic,
       badges: aggregatedBadges,
       otherDetails: {}
     });

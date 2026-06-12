@@ -84,6 +84,28 @@ const studentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'CoachSession'
   }],
+  degree: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CollegeDegree'
+  },
+  academic: {
+    degreeLevel: {
+      type: String,
+      default: ''
+    },
+    domain: {
+      type: String,
+      default: ''
+    },
+    degreeGroup: {
+      type: String,
+      default: ''
+    },
+    specialisation: {
+      type: String,
+      default: ''
+    }
+  },
   status: {
     type: String,
     enum: ['pending', 'active', 'inactive', 'suspended', 'graduated'],
@@ -133,7 +155,7 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-// Hard 3-hour session expiry — set on login, checked on every request
+  // Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null

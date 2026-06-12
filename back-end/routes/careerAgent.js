@@ -24,6 +24,7 @@ const {
 } = require('../models/careerAgentModels');
 
 const Degree = require('../models/Degree');
+const Student = require('../models/Student');
 // Auth middleware — optional auth (passes through without token, attaches user if token present)
 const { optionalAuth, protect } = require('../middleware/auth');
 // Cost guard: caps calls to the paid LLM (OpenRouter/Anthropic) per user/IP.
@@ -909,6 +910,32 @@ router.post('/onboarding', aiLimiter, optionalAuth, async (req, res) => {
       } catch (err) {
         console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message);
       }
+    }
+
+    // Sync academic details from onboarding input_data to Student document
+    try {
+      if (studentData.education && studentData.education.length > 0) {
+        const edu = studentData.education[0];
+        const spec = Array.isArray(edu.specialisation)
+          ? edu.specialisation.join(', ')
+          : edu.specialisation || '';
+
+        await Student.findOneAndUpdate(
+          { email: { $regex: new RegExp(`^${studentEmail.trim()}$`, 'i') } },
+          {
+            $set: {
+              academic: {
+                degreeLevel: edu.level || '',
+                domain: edu.domain || '',
+                degreeGroup: edu.degreeGroup || '',
+                specialisation: spec || ''
+              }
+            }
+          }
+        );
+      }
+    } catch (syncErr) {
+      console.warn('[career-agent] Student academic sync warning:', syncErr.message);
     }
 
     try {
