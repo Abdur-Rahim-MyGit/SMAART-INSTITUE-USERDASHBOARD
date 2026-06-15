@@ -179,12 +179,18 @@ studentSchema.methods.matchPassword = async function (enteredPassword) {
 studentSchema.pre('save', async function (next) {
   if (!this.studentId) {
     try {
+      const College = mongoose.model('College');
+      const collegeDoc = await College.findById(this.college);
+      const collegeNumber = collegeDoc?.collegeNumber || '00';
+      const currentYear = new Date().getFullYear().toString().slice(-2);
+      const counterId = `studentId_${collegeNumber}_${currentYear}`;
+
       const counter = await Counter.findByIdAndUpdate(
-        { _id: 'studentId' },
+        { _id: counterId },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }
       );
-      this.studentId = `STU${String(counter.seq).padStart(5, '0')}`;
+      this.studentId = `STU${collegeNumber}${currentYear}${String(counter.seq).padStart(5, '0')}`;
     } catch (error) {
       return next(error);
     }

@@ -12,7 +12,7 @@ import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 const UserContext = createContext(null);
 
 const clearCareerAgentStorage = () => {
-  [
+  const explicitKeys = [
     'smaart_student_name',
     'smaart_student_email',
     'smaart_analysis',
@@ -25,7 +25,25 @@ const clearCareerAgentStorage = () => {
     'smaart_user_specialisation',
     'smaart_user_skills',
     'smaart_user',
-  ].forEach((key) => localStorage.removeItem(key));
+    'smaart_completed_courses',
+    'smaart_last_watched_course',
+    'smaart_last_watched_title',
+    'smaart_last_watched_lesson',
+    'smaart_course_progress',
+    'smaart_last_active',
+    'smaart_demo_progress',
+    'smaart_capacity_dev_unlocked'
+  ];
+  explicitKeys.forEach((key) => localStorage.removeItem(key));
+
+  // Dynamically clear specific prefixes to prevent cross-user data bleed
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('course-notes-') || 
+        key.startsWith('passport_demo_') || 
+        key.startsWith('note_color_')) {
+      localStorage.removeItem(key);
+    }
+  });
 };
 
 export const UserProvider = ({ children }) => {

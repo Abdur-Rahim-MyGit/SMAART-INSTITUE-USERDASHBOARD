@@ -7,6 +7,9 @@ const collegeSchema = new mongoose.Schema({
     unique: true,
     sparse: true // Auto-generated
   },
+  collegeNumber: {
+    type: String
+  },
   collegeName: { // institution_name
     type: String,
     required: [true, 'Please provide college name'],
@@ -184,8 +187,21 @@ const collegeSchema = new mongoose.Schema({
 // Generate college code and update numberOfDepartments before saving
 collegeSchema.pre('save', async function (next) {
   if (!this.collegeCode) {
-    const count = await mongoose.model('College').countDocuments();
-    this.collegeCode = `CLG${String(count + 1).padStart(5, '0')}`;
+    try {
+      const Counter = mongoose.model('Counter');
+      const currentYear = new Date().getFullYear().toString().slice(-2);
+      
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: 'collegeNumberCounter' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      
+      this.collegeNumber = String(counter.seq).padStart(2, '0');
+      this.collegeCode = `CLG${this.collegeNumber}${currentYear}`;
+    } catch (error) {
+      return next(error);
+    }
   }
   if (this.departments && Array.isArray(this.departments)) {
     this.numberOfDepartments = this.departments.length;

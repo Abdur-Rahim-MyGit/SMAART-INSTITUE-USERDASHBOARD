@@ -49,6 +49,17 @@ const useSessionGuard = (onExpired) => {
     sessionStorage.clear();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    
+    // Dynamically clear smaart prefix and notes to prevent cross-user data bleed
+    Object.keys(localStorage).forEach(key => {
+      if ((key.startsWith('smaart_') && !key.startsWith('smaart_session_logs_')) ||
+          key.startsWith('course-notes-') || 
+          key.startsWith('passport_demo_') || 
+          key.startsWith('note_color_')) {
+        localStorage.removeItem(key);
+      }
+    });
+
     clearAssessmentTimerStorage();
 
     // Broadcast to other tabs
