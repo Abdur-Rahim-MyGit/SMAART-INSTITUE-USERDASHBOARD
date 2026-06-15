@@ -832,19 +832,62 @@ const CareerAgentOnboarding = () => {
     loadSavedData();
   }, [isEditMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // â”€â”€â”€ AUTO-FILL PERSONAL DETAILS FROM PROFILE â”€â”€â”€
+  // ─── AUTO-FILL PERSONAL DETAILS & ACADEMIC RECORD FROM PROFILE ───
   useEffect(() => {
     if (user) {
-      setFormData(prev => ({
-        ...prev,
-        personalDetails: {
+      setFormData(prev => {
+        const updatedPersonal = {
           ...prev.personalDetails,
           name: prev.personalDetails.name || user.fullName || user.name || '',
           email: prev.personalDetails.email || user.email || '',
           phone: prev.personalDetails.phone || user.mobileNumber || user.mobile || user.phone || '',
           registrationNumber: prev.personalDetails.registrationNumber || user.studentId || user.registrationNumber || ''
+        };
+
+        let updatedEdu = prev.education;
+        const firstEdu = prev.education[0];
+        const isBlank = !firstEdu || (!firstEdu.level && !firstEdu.domain && !firstEdu.degreeGroup && (!firstEdu.specialisation || firstEdu.specialisation.length === 0));
+        
+        if (isBlank) {
+          if (user.academic && (user.academic.degreeLevel || user.academic.domain || user.academic.degreeGroup || user.academic.specialisation)) {
+            updatedEdu = [{
+              level: user.academic.degreeLevel || '',
+              domain: user.academic.domain || '',
+              degreeGroup: user.academic.degreeGroup || '',
+              specialisation: user.academic.specialisation ? [user.academic.specialisation] : [],
+              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
+              graduationYear: user.yearOfPassing || user.batch || '',
+              currentlyPursuing: true
+            }];
+          } else if (user.degree) {
+            updatedEdu = [{
+              level: user.degree.level || '',
+              domain: user.degree.domain || '',
+              degreeGroup: user.degree.fullName || '',
+              specialisation: user.degree.specialization ? [user.degree.specialization] : [],
+              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
+              graduationYear: user.yearOfPassing || user.batch || '',
+              currentlyPursuing: true
+            }];
+          } else if (user.qualification || user.specialization || user.department) {
+            updatedEdu = [{
+              level: '',
+              domain: '',
+              degreeGroup: user.qualification || user.department || '',
+              specialisation: user.specialization ? [user.specialization] : [],
+              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
+              graduationYear: user.yearOfPassing || user.batch || '',
+              currentlyPursuing: true
+            }];
+          }
         }
-      }));
+
+        return {
+          ...prev,
+          personalDetails: updatedPersonal,
+          education: updatedEdu
+        };
+      });
     }
   }, [user]);
 

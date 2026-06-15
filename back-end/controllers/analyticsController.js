@@ -5,7 +5,9 @@ const CourseEnrollment = require('../models/CourseEnrollment');
 const DailyAnalytics = require('../models/DailyAnalytics');
 const Teacher = require('../models/Teacher');
 const mongoose = require('mongoose');
-
+const Assessment = require('../models/Assessment');
+const CoachSession = require('../models/CoachSession');
+const Task = require('../models/Task');
 // Helper to generate a timeline for student progress
 function getStudentTimeline(enrollments) {
   const today = new Date();
@@ -411,5 +413,126 @@ exports.getAdminAnalytics = async (req, res) => {
   } catch (err) {
     console.error('Error in getAdminAnalytics:', err);
     res.status(500).json({ success: false, message: 'Server error retrieving admin analytics' });
+  }
+};
+
+// @route   GET /api/analytics/calendar-events
+// @access  Private
+exports.getCalendarEvents = async (req, res) => {
+  try {
+    // Fetch Scheduled Assessments
+    const assessments = await Assessment.find({
+      $or: [
+        { status: 'scheduled' },
+        { availableFrom: { $exists: true } }
+      ]
+    }).select('assessmentName availableFrom status createdAt createdBy').populate('createdBy', 'role');
+
+    // Fetch Coach Sessions
+    const sessions = await CoachSession.find({
+      status: { $in: ['scheduled', 'pending'] }
+    }).populate('student', 'fullName').populate('coach', 'name').select('date startTime status');
+
+    let taskQuery = {};
+    if (!['superadmin', 'admin', 'consultant'].includes(req.user.role)) {
+      const userCollegeId = req.user.college || req.user.collegeId;
+      const orConditions = [
+        { createdBy: req.user.id },
+        { assignedTo: req.user.id }
+      ];
+
+      if (req.user.role === 'college_admin') {
+         orConditions.push({ targetAudience: 'all' });
+         orConditions.push({ targetAudience: 'college_admins' });
+         if (userCollegeId) {
+             orConditions.push({ targetAudience: { $in: ['specific_college', 'specific_college_admin'] }, college: userCollegeId });
+         }
+      } else {
+         orConditions.push({ targetAudience: 'all' });
+         if (userCollegeId) {
+             const studentDegreeId = req.user.degree || req.user.degreeId || req.user.department;
+             const deptConditions = [
+                 { department: { $exists: false } },
+                 { department: null },
+                 { department: '' }
+             ];
+             if (studentDegreeId) {
+                 deptConditions.push({ department: studentDegreeId.toString() });
+             }
+
+             orConditions.push({ 
+                 targetAudience: 'specific_college', 
+                 college: userCollegeId,
+                 $or: deptConditions
+             });
+         }
+      }
+
+      taskQuery = { $or: orConditions };
+    }
+
+    // Fetch Tasks
+    const tasks = await Task.find(taskQuery)
+      .select('title description date priority status targetAudience college department createdBy')
+      .populate('createdBy', 'role');
+
+    let events = [];
+
+    assessments.forEach(a => {
+      const date = a.availableFrom || a.createdAt; // Fallback if active
+      if (date) {
+        events.push({
+          id: `asm-${a._id}`,
+          title: `Assessment: ${a.assessmentName}`,
+          date: date.toISOString().split('T')[0],
+          type: 'assessment',
+          priority: 'high',
+          creatorRole: a.createdBy ? a.createdBy.role : 'admin'
+        });
+      }
+    });
+
+    sessions.forEach(s => {
+      if (s.date) {
+        let dateStr = '';
+        if (s.date instanceof Date) dateStr = s.date.toISOString().split('T')[0];
+        else dateStr = new Date(s.date).toISOString().split('T')[0];
+
+        events.push({
+          id: `sess-${s._id}`,
+          title: `Session: ${s.student?.fullName || 'Student'} with ${s.coach?.name || 'Coach'}`,
+          date: dateStr,
+          type: 'session',
+          priority: 'medium'
+        });
+      }
+    });
+
+    tasks.forEach(t => {
+      if (t.date) {
+        events.push({
+          id: `task-${t._id}`,
+          title: t.title,
+          description: t.description,
+          date: t.date.toISOString().split('T')[0],
+          type: 'task',
+          priority: t.priority,
+          status: t.status,
+          targetAudience: t.targetAudience,
+          college: t.college,
+          department: t.department,
+          createdBy: t.createdBy ? t.createdBy._id : null,
+          creatorRole: t.createdBy ? t.createdBy.role : 'admin'
+        });
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: events
+    });
+  } catch (error) {
+    console.error('Calendar Events Error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

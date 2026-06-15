@@ -4,7 +4,7 @@ import {
   Calendar, CheckCircle2, Plus, Trash2, Circle,
   ChevronLeft, ChevronRight, ClipboardList
 } from "lucide-react";
-import { todosAPI } from "@/services/api";
+import { todosAPI, apiCall } from "@/services/api";
 
 const LearningProgress = memo(() => {
   const today = new Date();
@@ -19,12 +19,34 @@ const LearningProgress = memo(() => {
 
   const fetchTodos = useCallback(async () => {
     try {
-      const res = await todosAPI.getAll();
-      if (res?.success) {
-        setTodos(res.data || []);
+      const [todosRes, eventsRes] = await Promise.all([
+        todosAPI.getAll().catch(() => ({ success: false, data: [] })),
+        apiCall('/analytics/calendar-events').catch(() => ({ success: false, data: [] }))
+      ]);
+      
+      let combined = [];
+      if (todosRes?.success) {
+        combined = [...(todosRes.data || [])];
       }
+      
+      if (eventsRes?.success) {
+        const globalEvents = (eventsRes.data || []).map(ev => ({
+          _id: ev.id,
+          title: ev.title,
+          dueDate: ev.date + "T12:00:00.000Z", // add time to ensure ISO string split works
+          priority: ev.priority || "medium",
+          completed: ev.status === 'completed',
+          isGlobalEvent: true,
+          type: ev.type,
+          description: ev.description,
+          creatorRole: ev.creatorRole
+        }));
+        combined = [...combined, ...globalEvents];
+      }
+      
+      setTodos(combined);
     } catch (err) {
-      console.error("Failed to fetch todos:", err);
+      console.error("Failed to fetch todos and events:", err);
     } finally {
       setLoadingTodos(false);
     }
@@ -41,12 +63,22 @@ const LearningProgress = memo(() => {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const isoOf = (d) => new Date(year, month, d).toISOString().split("T")[0];
-  const selectedIso = selectedDate.toISOString().split("T")[0];
+  const formatDateLocal = (dateObj) => {
+    if (!dateObj) return "";
+    const d = new Date(dateObj);
+    if (isNaN(d)) return "";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  const isoOf = (d) => formatDateLocal(new Date(year, month, d));
+  const selectedIso = formatDateLocal(selectedDate);
 
   const getTasksForDay = (d) => {
     const dayIso = isoOf(d);
-    return todos.filter(t => t.dueDate?.split("T")[0] === dayIso);
+    return todos.filter(t => formatDateLocal(t.dueDate) === dayIso);
   };
 
   const getPriorityColorForDay = (d) => {
@@ -59,7 +91,7 @@ const LearningProgress = memo(() => {
     return "bg-emerald-500 shadow-emerald-500/50";
   };
 
-  const selectedTodos = todos.filter(t => t.dueDate?.split("T")[0] === selectedIso);
+  const selectedTodos = todos.filter(t => formatDateLocal(t.dueDate) === selectedIso);
 
   const isToday = (d) => {
     const n = new Date();
@@ -309,23 +341,44 @@ const LearningProgress = memo(() => {
                     } group hover:border-[#1a3884]/25 transition-all`}
                 >
                   <button
-                    onClick={() => toggleTodo(todo._id, todo.completed)}
-                    className="shrink-0 transition-transform hover:scale-110"
+                    onClick={() => !todo.isGlobalEvent && toggleTodo(todo._id, todo.completed)}
+                    className={`shrink-0 transition-transform ${!todo.isGlobalEvent ? 'hover:scale-110' : 'cursor-default'}`}
                   >
                     {todo.completed
                       ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      : <Circle className="w-4 h-4 text-slate-300 dark:text-slate-600 hover:text-[#1a3884] transition-colors" />
+                      : <Circle className={`w-4 h-4 ${todo.isGlobalEvent ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-300 dark:text-slate-600 hover:text-[#1a3884] transition-colors'}`} />
                     }
                   </button>
-                  <span className={`flex-1 text-xs leading-snug font-medium ${todo.completed ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"}`}>
-                    {todo.title}
-                  </span>
-                  <button
-                    onClick={() => deleteTodo(todo._id)}
-                    className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-300 hover:text-red-400 dark:text-slate-600 dark:hover:text-red-400 transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex-1 min-w-0">
+                    <span className={`block text-xs leading-snug font-medium truncate ${todo.completed ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"}`}>
+                      {todo.title}
+                    </span>
+                    {todo.isGlobalEvent && (
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[9px] font-bold text-[#1a3884]/70 dark:text-blue-400/70 uppercase tracking-wider">
+                          {todo.type === 'assessment' ? 'Assessment' : todo.type === 'session' ? 'Session' : 'Event'}
+                        </span>
+                        {(todo.creatorRole === 'admin' || todo.creatorRole === 'superadmin') && (
+                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-[8px] font-bold uppercase tracking-wider">
+                            SMAART Admin
+                          </span>
+                        )}
+                        {todo.creatorRole === 'college_admin' && (
+                          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-[8px] font-bold uppercase tracking-wider">
+                            College Admin
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {!todo.isGlobalEvent && (
+                    <button
+                      onClick={() => deleteTodo(todo._id)}
+                      className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-300 hover:text-red-400 dark:text-slate-600 dark:hover:text-red-400 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </motion.div>
               );
             })

@@ -647,20 +647,24 @@ router.get("/discussions", async (req, res) => {
       query.channelType = channelFilter;
     } else {
       // Include discussion/coach + legacy posts; exclude support and mentor by omission
-      query.$or = [
-        { channelType: "discussion" },
-        { channelType: "coach" },
-        { channelType: { $exists: false } },
-        { channelType: null },
-      ];
+      appendQueryClause(query, {
+        $or: [
+          { channelType: "discussion" },
+          { channelType: "coach" },
+          { channelType: { $exists: false } },
+          { channelType: null },
+        ]
+      });
     }
 
     if (collegeId) {
-      query.$or = [
-        { college: collegeId },
-        { college: { $exists: false } },
-        { college: null }
-      ];
+      appendQueryClause(query, {
+        $or: [
+          { college: collegeId },
+          { college: { $exists: false } },
+          { college: null }
+        ]
+      });
     }
 
     if (category && category !== "all") {
@@ -682,6 +686,78 @@ router.get("/discussions", async (req, res) => {
       appendQueryClause(query, searchClause);
     }
 
+    // Filter by degree if student
+    if (req.user && req.user.role === "student") {
+      const studentDegreeId = req.user.degree || req.user.degreeId || req.user.department;
+      const targetDegreeIds = [];
+
+      if (studentDegreeId) {
+        if (mongoose.Types.ObjectId.isValid(studentDegreeId)) {
+          targetDegreeIds.push(new mongoose.Types.ObjectId(studentDegreeId.toString()));
+
+          try {
+            const CollegeDegree = mongoose.model("CollegeDegree");
+            // Check if studentDegreeId is a CollegeDegree ID
+            const cdDoc = await CollegeDegree.findById(studentDegreeId);
+            if (cdDoc) {
+              if (cdDoc.degree) {
+                const collegeDegs = await CollegeDegree.find({
+                  degree: cdDoc.degree,
+                  college: req.user.college
+                }).select("_id");
+                collegeDegs.forEach(cd => {
+                  if (cd._id.toString() !== cdDoc._id.toString()) {
+                    targetDegreeIds.push(cd._id);
+                  }
+                });
+              }
+            } else {
+              // Not a CollegeDegree, treat as Degree master ID
+              const collegeDegs = await CollegeDegree.find({
+                degree: studentDegreeId,
+                college: req.user.college
+              }).select("_id");
+              collegeDegs.forEach(cd => {
+                targetDegreeIds.push(cd._id);
+              });
+            }
+          } catch (err) {
+            console.error("Error finding matching college degrees in user dashboard route:", err.message);
+          }
+        } else {
+          try {
+            const CollegeDegree = mongoose.model("CollegeDegree");
+            const collegeDegs = await CollegeDegree.find({
+              college: req.user.college,
+              $or: [
+                { specialization: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } },
+                { fullName: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } }
+              ]
+            }).select("_id");
+            collegeDegs.forEach(cd => {
+              targetDegreeIds.push(cd._id);
+            });
+          } catch (err) {
+            console.error("Error finding matching college degrees by department string in user dashboard route:", err.message);
+          }
+        }
+      }
+
+      const degreeConditions = [
+        { targetDegree: { $exists: false } },
+        { targetDegree: null },
+        { targetDegree: "" }
+      ];
+
+      if (targetDegreeIds.length > 0) {
+        targetDegreeIds.forEach(id => {
+          degreeConditions.push({ targetDegree: id });
+        });
+      }
+
+      appendQueryClause(query, { $or: degreeConditions });
+    }
+
     let discussions;
     if (sortBy === "popularity") {
       const aggQuery = { ...query };
@@ -693,6 +769,29 @@ router.get("/discussions", async (req, res) => {
         } catch (e) {
           delete aggQuery.college;
         }
+      }
+
+      if (aggQuery.$and) {
+        aggQuery.$and = aggQuery.$and.map(cond => {
+          if (cond.$or) {
+            return {
+              $or: cond.$or.map(orCond => {
+                if (orCond.targetDegree && typeof orCond.targetDegree === 'string' && mongoose.Types.ObjectId.isValid(orCond.targetDegree)) {
+                  try {
+                    return { targetDegree: new mongoose.Types.ObjectId(orCond.targetDegree) };
+                  } catch (err) {
+                    return orCond;
+                  }
+                }
+                if (orCond.targetDegree && orCond.targetDegree instanceof mongoose.Types.ObjectId) {
+                  return orCond;
+                }
+                return orCond;
+              })
+            };
+          }
+          return cond;
+        });
       }
 
       discussions = await CommunityPost.aggregate([
@@ -714,6 +813,7 @@ router.get("/discussions", async (req, res) => {
       ]);
     } else {
       discussions = await CommunityPost.find(query)
+        .populate("targetDegree", "fullName specialization")
         .sort({ isPinned: -1, [sortBy]: -1 })
         .skip((page - 1) * limit)
         .limit(parseInt(limit))
@@ -721,6 +821,7 @@ router.get("/discussions", async (req, res) => {
     }
 
     await hydrateAuthors(discussions);
+    await CommunityPost.populate(discussions, { path: "targetDegree", select: "fullName specialization" });
 
     const total = await CommunityPost.countDocuments(query);
 

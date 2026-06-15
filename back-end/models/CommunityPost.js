@@ -187,6 +187,11 @@ const communityPostSchema = new mongoose.Schema({
       voters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
     }],
     expiresAt: Date
+  },
+  targetDegree: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CollegeDegree',
+    default: null
   }
 }, {
   timestamps: true

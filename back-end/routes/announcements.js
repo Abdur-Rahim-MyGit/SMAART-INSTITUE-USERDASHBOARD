@@ -22,7 +22,7 @@ const getEntityId = (value) => {
 };
 
 // Build the visibility filter based on current user
-const buildVisibilityFilter = (user) => {
+const buildVisibilityFilter = async (user) => {
   const now = new Date();
   const baseConditions = [
     { $or: [{ expiryDate: null }, { expiryDate: { $gt: now } }] }
@@ -46,12 +46,86 @@ const buildVisibilityFilter = (user) => {
       );
     }
 
-    return {
+    const filterObj = {
       $and: [
         ...baseConditions,
         { $or: visibilityConditions }
       ]
     };
+
+    // Filter by degree if student
+    if (user.role === 'student') {
+      const studentDegreeId = user.degree || user.degreeId || user.department;
+      const targetDegreeIds = [];
+
+      if (studentDegreeId) {
+        const mongoose = require('mongoose');
+        if (mongoose.Types.ObjectId.isValid(studentDegreeId)) {
+          targetDegreeIds.push(new mongoose.Types.ObjectId(studentDegreeId.toString()));
+
+          try {
+            const CollegeDegree = mongoose.model('CollegeDegree');
+            // Check if studentDegreeId is a CollegeDegree ID
+            const cdDoc = await CollegeDegree.findById(studentDegreeId);
+            if (cdDoc) {
+              if (cdDoc.degree) {
+                const collegeDegs = await CollegeDegree.find({
+                  degree: cdDoc.degree,
+                  college: collegeId
+                }).select('_id');
+                collegeDegs.forEach(cd => {
+                  if (cd._id.toString() !== cdDoc._id.toString()) {
+                    targetDegreeIds.push(cd._id);
+                  }
+                });
+              }
+            } else {
+              // Not a CollegeDegree, treat as Degree master ID
+              const collegeDegs = await CollegeDegree.find({
+                degree: studentDegreeId,
+                college: collegeId
+              }).select('_id');
+              collegeDegs.forEach(cd => {
+                targetDegreeIds.push(cd._id);
+              });
+            }
+          } catch (err) {
+            console.error('[Announcements] Error finding matching college degrees:', err.message);
+          }
+        } else {
+          try {
+            const CollegeDegree = mongoose.model('CollegeDegree');
+            const collegeDegs = await CollegeDegree.find({
+              college: collegeId,
+              $or: [
+                { specialization: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } },
+                { fullName: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } }
+              ]
+            }).select('_id');
+            collegeDegs.forEach(cd => {
+              targetDegreeIds.push(cd._id);
+            });
+          } catch (err) {
+            console.error('[Announcements] Error finding matching college degrees by department string:', err.message);
+          }
+        }
+      }
+
+      const degreeConditions = [
+        { targetDegree: { $exists: false } },
+        { targetDegree: null }
+      ];
+
+      if (targetDegreeIds.length > 0) {
+        targetDegreeIds.forEach(id => {
+          degreeConditions.push({ targetDegree: id });
+        });
+      }
+
+      filterObj.$and.push({ $or: degreeConditions });
+    }
+
+    return filterObj;
   }
 
   // Fallback (shouldn't really be reached for valid users)
@@ -63,7 +137,7 @@ const buildVisibilityFilter = (user) => {
 router.get('/', protect, async (req, res) => {
   try {
     const user = req.user;
-    const filter = buildVisibilityFilter(user);
+    const filter = await buildVisibilityFilter(user);
     const { dateFilter } = req.query; // 'today' | 'week' | undefined
 
     if (dateFilter === 'today') {
