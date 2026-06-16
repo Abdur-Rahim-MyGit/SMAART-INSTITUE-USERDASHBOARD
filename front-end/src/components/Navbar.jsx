@@ -23,12 +23,30 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
     { code: 'en', name: 'English', native: 'English', shortLabel: 'EN' },
     { code: 'hi', name: 'Hindi', native: 'हिन्दी', shortLabel: 'HI' },
     { code: 'ta', name: 'Tamil', native: 'தமிழ்', shortLabel: 'TA' },
+    { code: 'te', name: 'Telugu', native: 'తెలుగు', shortLabel: 'TE' },
+    { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ', shortLabel: 'KN' },
+    { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
+    { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
     { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
   ];
 
   const activeLanguageCode = i18n.language || 'en';
   const activeLanguage = languageOptions.find(lang => lang.code === activeLanguageCode) || languageOptions[0];
+
+  const getInstituteLabel = () => {
+    switch (activeLanguageCode) {
+      case 'fr': return "Institut";
+      case 'hi': return "संस्थान";
+      case 'ta': return "நிறுவனம்";
+      case 'te': return "సంస్థ";
+      case 'kn': return "ಸಂಸ್ಥೆ";
+      case 'ml': return "സ്ഥാപനം";
+      case 'pa': return "ਸੰਸਥਾ";
+      case 'ur': return "ادارہ";
+      default: return "Institute";
+    }
+  };
 
   const navItems = [
     { key: "Services", label: t("landing.navbar.services") },
@@ -94,7 +112,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 <div className="w-2 h-2 rounded-full bg-[#C0C0C0]" />
               </div>
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
-                {t("landing.navbar.enquiry") === "Enquiry" ? "Institute" : t("landing.navbar.enquiry") === "Demande" ? "Institut" : t("landing.navbar.enquiry") === "पूछताछ" ? "संस्थान" : t("landing.navbar.enquiry") === "விசாரணை" ? "நிறுவனம்" : "ادارہ"}
+                {getInstituteLabel()}
               </span>
             </div>
           </Link>
@@ -250,7 +268,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             {/* Mobile Language Selector */}
             <div className="pt-2 pb-1 border-b border-gray-50 dark:border-white/5">
               <span className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-wider block mb-2">
-                Language / भाषा / மொழி / زبان / Langue
+                Language / भाषा / மொழி / తెలుగు / ಕನ್ನಡ / മലയാളം / ਪੰਜਾਬੀ / زبان / Langue
               </span>
               <div className="flex flex-wrap gap-2">
                 {languageOptions.map((lang) => (

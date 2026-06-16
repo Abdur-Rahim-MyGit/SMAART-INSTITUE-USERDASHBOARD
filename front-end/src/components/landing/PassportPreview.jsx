@@ -20,7 +20,8 @@ const PassportPreview = () => {
     y.set(event.clientY - centerY);
   }
 
-  const features = t("landing.passport.features", { returnObjects: true }) || [
+  const featuresObj = t("landing.passport.features", { returnObjects: true });
+  const features = Array.isArray(featuresObj) ? featuresObj : [
     "Verified Capability Profile",
     "Universal Portability",
     "Evidence-Based Progression"

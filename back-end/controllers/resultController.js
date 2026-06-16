@@ -21,7 +21,9 @@ const submitAssessment = async (req, res) => {
         const { resultId } = req.params;
         const {
             submissionReason = 'manual',
-            completeMissingAnswers = false
+            completeMissingAnswers = false,
+            forcePassDev = false,
+            forceFailDev = false
         } = req.body || {};
 
         const result = await Result.findById(resultId);
@@ -97,7 +99,103 @@ const submitAssessment = async (req, res) => {
             result.totalQuestions = 36;
         }
 
-        if (completeMissingAnswers) {
+        if (forcePassDev) {
+            console.log(`🔧 [DEV] forcePassDev active. Overwriting responses to achieve 70% correct score.`);
+            
+            // 1. Ensure responses for all questions in order
+            const existingQuestionIds = new Set(
+                result.responses.map((response) => response.questionId.toString())
+            );
+            const missingQuestionIds = (result.questionOrder || []).filter(
+                (questionId) => !existingQuestionIds.has(questionId.toString())
+            );
+
+            missingQuestionIds.forEach((questionId) => {
+                const question = assessment.questions.id(questionId);
+                result.responses.push({
+                    questionId,
+                    questionText: question?.questionText || '',
+                    selectedValue: 'A',
+                    isCorrect: false,
+                    score: 0,
+                    answeredAt: new Date()
+                });
+            });
+            result.updateAnsweredCount();
+
+            // 2. Map question ID to correct answer
+            const questionDetailsMap = {};
+            assessment.questions.forEach(q => {
+                questionDetailsMap[q._id.toString()] = q;
+            });
+
+            // 3. Set exactly 70% of responses to correct answers
+            const total = result.responses.length;
+            const targetCorrect = Math.ceil(total * 0.70);
+
+            result.responses.forEach((r, idx) => {
+                const qId = r.questionId.toString();
+                const question = questionDetailsMap[qId];
+                if (!question) return;
+
+                if (idx < targetCorrect) {
+                    // Make correct
+                    r.selectedValue = question.correctAnswer || 'A';
+                    r.isCorrect = true;
+                    r.score = question.points || 1;
+                } else {
+                    // Make incorrect
+                    const options = (question.options || []).map(o => o.value);
+                    const wrongOption = options.find(val => val !== question.correctAnswer) || 'X';
+                    r.selectedValue = wrongOption;
+                    r.isCorrect = false;
+                    r.score = 0;
+                }
+            });
+        } else if (forceFailDev) {
+            console.log(`🔧 [DEV] forceFailDev active. Overwriting responses to achieve 0% score.`);
+            
+            // 1. Ensure responses for all questions in order
+            const existingQuestionIds = new Set(
+                result.responses.map((response) => response.questionId.toString())
+            );
+            const missingQuestionIds = (result.questionOrder || []).filter(
+                (questionId) => !existingQuestionIds.has(questionId.toString())
+            );
+
+            missingQuestionIds.forEach((questionId) => {
+                const question = assessment.questions.id(questionId);
+                result.responses.push({
+                    questionId,
+                    questionText: question?.questionText || '',
+                    selectedValue: 'A',
+                    isCorrect: false,
+                    score: 0,
+                    answeredAt: new Date()
+                });
+            });
+            result.updateAnsweredCount();
+
+            // 2. Map question ID to correct answer
+            const questionDetailsMap = {};
+            assessment.questions.forEach(q => {
+                questionDetailsMap[q._id.toString()] = q;
+            });
+
+            // 3. Set all responses to incorrect answers
+            result.responses.forEach((r) => {
+                const qId = r.questionId.toString();
+                const question = questionDetailsMap[qId];
+                if (!question) return;
+
+                // Make incorrect by choosing something other than correctAnswer
+                const options = (question.options || []).map(o => o.value);
+                const wrongOption = options.find(val => val !== question.correctAnswer) || 'X';
+                r.selectedValue = wrongOption;
+                r.isCorrect = false;
+                r.score = 0;
+            });
+        } else if (completeMissingAnswers) {
             const existingQuestionIds = new Set(
                 result.responses.map((response) => response.questionId.toString())
             );
