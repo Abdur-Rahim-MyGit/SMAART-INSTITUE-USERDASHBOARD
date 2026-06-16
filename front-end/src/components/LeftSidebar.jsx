@@ -438,6 +438,10 @@ const LeftSidebar = () => {
                                       { code: 'en', name: 'English' },
                                       { code: 'hi', name: 'Hindi (हिन्दी)' },
                                       { code: 'ta', name: 'Tamil (தமிழ்)' },
+                                      { code: 'te', name: 'Telugu (తెలుగు)' },
+                                      { code: 'kn', name: 'Kannada (ಕನ್ನಡ)' },
+                                      { code: 'ml', name: 'Malayalam (മലയാളം)' },
+                                      { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)' },
                                       { code: 'ur', name: 'Urdu (اردو)' },
                                       { code: 'fr', name: 'French (Français)' }
                                     ].map((lang) => (

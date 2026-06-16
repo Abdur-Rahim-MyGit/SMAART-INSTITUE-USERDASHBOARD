@@ -1,0 +1,1662 @@
+{
+  "sidebar": {
+    "dashboard": "ਡੈਸ਼ਬੋਰਡ",
+    "profile": "ਮੇਰਾ ਪ੍ਰੋਫ਼ਾਈਲ",
+    "settings": "ਸੈਟਿੰਗਾਂ ਸੈਟਿੰਗਾਂ",
+    "courses": "ਮੇਰੇ ਕੋਰਸ ਮੇਰੇ ਕੋਰਸ",
+    "results": "ਨਤੀਜੇ",
+    "assessments": "ਮੁਲਾਂਕਣ",
+    "toolkit": "ਟੂਲਕਿੱਟ",
+    "performance": "ਪ੍ਰਦਰਸ਼ਨ",
+    "skills_vault": "ਹੁਨਰ ਵਾਲਟ",
+    "badges": "ਮੇਰੇ ਬੈਜ",
+    "skills_passport": "ਹੁਨਰ ਪਾਸਪੋਰਟ",
+    "vision_board": "ਵਿਜ਼ਨ ਬੋਰਡ",
+    "career_directions": "ਕੈਰੀਅਰ ਨਿਰਦੇਸ਼",
+    "community": "ਭਾਈਚਾਰਾ ਭਾਈਚਾਰਾ",
+    "help": "ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ",
+    "logout": "ਲਾਗਆਉਟ",
+    "theme": "ਥੀਮ ਮੋਡ",
+    "notifications": "ਸੂਚਨਾਵਾਂ ਸੂਚਨਾਵਾਂ",
+    "group_main": "ਮੁੱਖ ਮੀਨੂ",
+    "group_skills": "ਹੁਨਰ ਅਤੇ ਵਿਕਾਸ",
+    "group_community": "ਭਾਈਚਾਰਾ",
+    "group_system": "ਸਿਸਟਮ"
+  },
+  "settings": {
+    "title": "ਸੈਟਿੰਗਾਂ",
+    "profile_settings": "ਪ੍ਰੋਫਾਈਲ ਸੈਟਿੰਗਾਂ",
+    "notifications": "ਸੂਚਨਾਵਾਂ",
+    "privacy": "ਗੋਪਨੀਯਤਾ ਅਤੇ ਸੁਰੱਖਿਆ",
+    "appearance": "ਦਿੱਖ",
+    "language": "ਭਾਸ਼ਾ ਅਤੇ ਖੇਤਰ ਭਾਸ਼ਾ ਅਤੇ ਖੇਤਰ",
+    "help": "ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ",
+    "save_changes": "ਤਬਦੀਲੀਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "language_region": "ਭਾਸ਼ਾ ਅਤੇ ਖੇਤਰ",
+    "customisation": "ਕਸਟਮਾਈਜ਼ੇਸ਼ਨ"
+  },
+  "dashboard": {
+    "good_morning": "ਸ਼ੁਭ ਸਵੇਰ",
+    "good_afternoon": "ਚੰਗੀ ਦੁਪਹਿਰ",
+    "good_evening": "ਚੰਗੀ ਸ਼ਾਮ",
+    "welcome": "ਦੁਬਾਰਾ ਸੁਆਗਤ ਹੈ",
+    "search_placeholder": "ਖੋਜ ਕੋਰਸ, ਹੁਨਰ, ਸੂਝ...",
+    "ready_message": "ਆਪਣੇ ਕਰੀਅਰ ਦੀ ਯਾਤਰਾ ਵਿੱਚ ਅਗਲਾ ਕਦਮ ਚੁੱਕਣ ਲਈ ਤਿਆਰ ਹੋ? ",
+    "overview": "ਸੰਖੇਪ ਜਾਣਕਾਰੀ",
+    "recent_activity": "ਹਾਲੀਆ ਗਤੀਵਿਧੀ",
+    "my_courses": "ਮੇਰੇ ਕੋਰਸ",
+    "upcoming_tasks": "ਆਗਾਮੀ ਕਾਰਜ",
+    "view_all": "ਸਭ ਦੇਖੋ",
+    "unable_to_connect": "ਕਨੈਕਟ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ",
+    "connection_error": "ਅਸੀਂ ਸਰਵਰ ਨਾਲ ਕਨੈਕਟ ਨਹੀਂ ਕਰ ਸਕੇ। ",
+    "reload": "ਡੈਸ਼ਬੋਰਡ ਰੀਲੋਡ ਕਰੋ",
+    "continue_learning": "ਸਿੱਖਣਾ ਜਾਰੀ ਰੱਖੋ",
+    "capability_program": "ਸਮਰੱਥਾ ਪ੍ਰੋਗਰਾਮ",
+    "complete": "ਸੰਪੂਰਨ",
+    "retry": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+    "no_paths": "ਅਜੇ ਤੱਕ ਕੋਈ ਸਿੱਖਣ ਦੇ ਰਸਤੇ ਨਹੀਂ ਹਨ",
+    "browse_courses": "ਕੋਰਸ ਬ੍ਰਾਊਜ਼ ਕਰੋ",
+    "unable_to_load_paths": "ਪਾਥ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ"
+  },
+  "profile_page": {
+    "personal_information": "ਨਿੱਜੀ ਜਾਣਕਾਰੀ",
+    "contact_information": "ਸੰਪਰਕ ਜਾਣਕਾਰੀ",
+    "educational_history": "ਵਿਦਿਅਕ ਇਤਿਹਾਸ",
+    "higher_education": "ਉੱਚ ਸਿੱਖਿਆ",
+    "work_experience": "ਕੰਮ ਦਾ ਤਜਰਬਾ",
+    "professional_experience": "ਪੇਸ਼ੇਵਰ ਅਨੁਭਵ",
+    "vision_goals": "ਵਿਜ਼ਨ ਅਤੇ ਟੀਚੇ",
+    "edit_profile": "ਪ੍ਰੋਫਾਈਲ ਦਾ ਸੰਪਾਦਨ ਕਰੋ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "full_name": "ਪੂਰਾ ਨਾਮ",
+    "phone": "ਫ਼ੋਨ",
+    "institution": "ਸੰਸਥਾ",
+    "department": "ਵਿਭਾਗ",
+    "my_profile": "ਮੇਰਾ ਪ੍ਰੋਫ਼ਾਈਲ",
+    "active": "ਕਿਰਿਆਸ਼ੀਲ",
+    "student": "ਵਿਦਿਆਰਥੀ",
+    "not_specified": "ਨਿਰਧਾਰਤ ਨਹੀਂ ਕੀਤਾ ਗਿਆ",
+    "institution_not_set": "ਸੰਸਥਾ ਸੈਟ ਨਹੀਂ ਕੀਤੀ ਗਈ",
+    "email_address": "ਈਮੇਲ ਪਤਾ",
+    "phone_number": "ਫ਼ੋਨ ਨੰਬਰ",
+    "date_of_birth": "ਜਨਮ ਮਿਤੀ",
+    "gender": "ਲਿੰਗ",
+    "user_role": "ਯੂਜ਼ਰ ਰੋਲ",
+    "member_since": "ਤੋਂ ਮੈਂਬਰ",
+    "education_level": "ਸਿੱਖਿਆ ਦਾ ਪੱਧਰ",
+    "street": "ਗਲੀ",
+    "city": "ਸ਼ਹਿਰ",
+    "state": "ਰਾਜ",
+    "country": "ਦੇਸ਼",
+    "address": "ਪਤਾ",
+    "twelfth_standard": "12ਵੀਂ ਜਮਾਤ",
+    "tenth_standard": "10 ਵੀਂ ਸਟੈਂਡਰਡ",
+    "passing_year": "ਲੰਘਦਾ ਸਾਲ",
+    "grade": "ਗ੍ਰੇਡ",
+    "edit": "ਸੰਪਾਦਿਤ ਕਰੋ",
+    "add": "ਸ਼ਾਮਲ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "projects": "ਪ੍ਰੋਜੈਕਟਸ",
+    "view_project": "ਪ੍ਰੋਜੈਕਟ ਦੇਖੋ",
+    "no_projects": "ਅਜੇ ਤੱਕ ਕੋਈ ਵੀ ਪ੍ਰੋਜੈਕਟ ਪ੍ਰਦਰਸ਼ਿਤ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।",
+    "certifications": "ਪ੍ਰਮਾਣੀਕਰਣ",
+    "no_certificates": "ਅਜੇ ਤੱਕ ਕੋਈ ਸਰਟੀਫਿਕੇਟ ਸੂਚੀਬੱਧ ਨਹੀਂ ਹਨ।",
+    "issued": "ਜਾਰੀ ਕੀਤਾ",
+    "id": "ਆਈ.ਡੀ",
+    "view_certificate": "ਸਰਟੀਫਿਕੇਟ ਵੇਖੋ",
+    "extracurricular": "ਪਾਠਕ੍ਰਮ ਤੋਂ ਬਾਹਰ",
+    "no_extracurricular": "ਪਾਠਕ੍ਰਮ ਤੋਂ ਬਾਹਰਲੀਆਂ ਗਤੀਵਿਧੀਆਂ ਦਾ ਜ਼ਿਕਰ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।",
+    "career_preferences": "ਕਰੀਅਰ ਦੀਆਂ ਤਰਜੀਹਾਂ",
+    "no_job_preferences": "ਕੋਈ ਨੌਕਰੀ ਤਰਜੀਹਾਂ ਸੈੱਟ ਨਹੀਂ ਕੀਤੀਆਂ ਗਈਆਂ।",
+    "job_type": "ਨੌਕਰੀ ਦੀ ਕਿਸਮ",
+    "preferred_location": "ਟਿਕਾਣਾ",
+    "career_goals": "ਕਰੀਅਰ ਦੇ ਟੀਚੇ",
+    "short_term": "ਛੋਟੀ ਮਿਆਦ",
+    "medium_term": "ਦਰਮਿਆਨੀ ਮਿਆਦ",
+    "long_term": "ਲੰਬੀ ਮਿਆਦ",
+    "change_profile_photo": "ਪ੍ਰੋਫਾਈਲ ਫੋਟੋ ਬਦਲੋ",
+    "no_work_experience": "ਅਜੇ ਤੱਕ ਕੋਈ ਕੰਮ ਦਾ ਤਜਰਬਾ ਨਹੀਂ ਜੋੜਿਆ ਗਿਆ।",
+    "not_set": "ਸੈੱਟ ਨਹੀਂ ਹੈ",
+    "not_available": "ਉਪਲਬਧ ਨਹੀਂ ਹੈ",
+    "add_higher_education": "ਉੱਚ ਸਿੱਖਿਆ ਸ਼ਾਮਲ ਕਰੋ",
+    "no_higher_education": "ਅਜੇ ਤੱਕ ਉੱਚ ਸਿੱਖਿਆ ਦੇ ਵੇਰਵੇ ਸ਼ਾਮਲ ਨਹੀਂ ਕੀਤੇ ਗਏ ਹਨ।",
+    "add_work_experience": "ਕੰਮ ਦਾ ਤਜਰਬਾ ਸ਼ਾਮਲ ਕਰੋ",
+    "add_project": "ਪ੍ਰੋਜੈਕਟ ਸ਼ਾਮਲ ਕਰੋ",
+    "add_activity": "ਗਤੀਵਿਧੀ ਸ਼ਾਮਲ ਕਰੋ",
+    "add_another_item": "ਕੋਈ ਹੋਰ ਆਈਟਮ ਸ਼ਾਮਲ ਕਰੋ",
+    "save_changes": "ਤਬਦੀਲੀਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "upload_certificate": "ਸਰਟੀਫਿਕੇਟ ਅੱਪਲੋਡ ਕਰੋ",
+    "edit_certificate": "ਸਰਟੀਫਿਕੇਟ ਦਾ ਸੰਪਾਦਨ ਕਰੋ",
+    "add_credential_vault": "ਆਪਣੇ ਵਾਲਟ ਵਿੱਚ ਇੱਕ ਨਵਾਂ ਪ੍ਰਮਾਣ ਪੱਤਰ ਸ਼ਾਮਲ ਕਰੋ",
+    "drag_drop_file": "ਫਾਈਲ ਨੂੰ ਇੱਥੇ ਖਿੱਚੋ ਅਤੇ ਛੱਡੋ",
+    "browse_files": "ਫ਼ਾਈਲਾਂ ਬ੍ਰਾਊਜ਼ ਕਰੋ",
+    "certificate_file_pdf": "ਸਰਟੀਫਿਕੇਟ ਫਾਈਲ (PDF/ਚਿੱਤਰ)",
+    "verification_code_qr": "ਪੁਸ਼ਟੀਕਰਨ ਕੋਡ / QR ID",
+    "verification_url": "ਪੁਸ਼ਟੀਕਰਨ URL",
+    "expiry_optional": "ਮਿਆਦ ਸਮਾਪਤੀ (ਵਿਕਲਪਿਕ)",
+    "issue_date": "ਜਾਰੀ ਕਰਨ ਦੀ ਮਿਤੀ",
+    "issuer": "ਜਾਰੀਕਰਤਾ",
+    "certificate_title": "ਸਰਟੀਫਿਕੇਟ ਦਾ ਸਿਰਲੇਖ",
+    "file_attached_success": "ਫਾਈਲ ਸਫਲਤਾਪੂਰਵਕ ਨੱਥੀ ਕੀਤੀ ਗਈ",
+    "remove_file": "ਫਾਇਲ ਹਟਾਓ",
+    "save_credential": "ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "saving": "ਰੱਖਿਅਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+  },
+  "support_tickets_page": {
+    "back": "ਪਿੱਛੇ",
+    "support_center": "ਸਹਾਇਤਾ ਕੇਂਦਰ",
+    "we_are_here_to_help": "ਅਸੀਂ 24/7 ਤੁਹਾਡੀ ਮਦਦ ਕਰਨ ਲਈ ਇੱਥੇ ਹਾਂ",
+    "new_ticket": "ਨਵੀਂ ਟਿਕਟ",
+    "history": "ਇਤਿਹਾਸ",
+    "ticket_submitted_success": "ਟਿਕਟ ਸਫਲਤਾਪੂਰਵਕ ਸਪੁਰਦ ਕੀਤੀ ਗਈ",
+    "itsm_reference_prefix": "ਤੁਹਾਡਾ ITSM ਹਵਾਲਾ ਨੰਬਰ ਹੈ",
+    "itsm_reference_suffix": ". ",
+    "chat_included": "ਗੱਲਬਾਤ ਗੱਲਬਾਤ ਸ਼ਾਮਲ ਹੈ",
+    "chat_history_automatic": "ਤੁਹਾਡਾ ਚੈਟ ਇਤਿਹਾਸ ਆਪਣੇ ਆਪ ਇਸ ਟਿਕਟ ਨਾਲ ਨੱਥੀ ਹੋ ਜਾਵੇਗਾ।",
+    "filters": "ਫਿਲਟਰ",
+    "status": "ਸਥਿਤੀ",
+    "all": "ਸਾਰੇ",
+    "loading_tickets": "ਤੁਹਾਡੀਆਂ ਟਿਕਟਾਂ ਲੋਡ ਕੀਤੀਆਂ ਜਾ ਰਹੀਆਂ ਹਨ...",
+    "no_tickets_yet": "ਅਜੇ ਤੱਕ ਕੋਈ ਟਿਕਟ ਨਹੀਂ",
+    "no_tickets_desc": "ਤੁਸੀਂ ਕੋਈ ਸਹਾਇਤਾ ਬੇਨਤੀਆਂ ਦਰਜ ਨਹੀਂ ਕੀਤੀਆਂ ਹਨ।",
+    "create_ticket": "ਟਿਕਟ ਬਣਾਓ",
+    "responses": "ਜਵਾਬ",
+    "status_open": "ਖੋਲ੍ਹੋ",
+    "status_in_progress": "ਪ੍ਰਗਤੀ ਵਿੱਚ ਹੈ",
+    "status_resolved": "ਹੱਲ ਕੀਤਾ",
+    "status_closed": "ਬੰਦ",
+    "title": "ਸਿਰਲੇਖ",
+    "title_placeholder": "ਤੁਹਾਡੀ ਸਮੱਸਿਆ ਦਾ ਸੰਖੇਪ ਸਾਰ",
+    "category": "ਸ਼੍ਰੇਣੀ",
+    "description": "ਵਰਣਨ",
+    "description_placeholder": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਸਮੱਸਿਆ ਦਾ ਵਿਸਥਾਰ ਵਿੱਚ ਵਰਣਨ ਕਰੋ। ",
+    "attachments": "ਅਟੈਚਮੈਂਟ (ਵਿਕਲਪਿਕ)",
+    "add_file": "ਫਾਈਲ ਸ਼ਾਮਲ ਕਰੋ",
+    "attachments_hint": "ਅਧਿਕਤਮ 3 ਫ਼ਾਈਲਾਂ, ਹਰੇਕ 5MB। ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "submit_ticket": "ਟਿਕਟ ਜਮ੍ਹਾਂ ਕਰੋ",
+    "submitting": "ਸਪੁਰਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "ticket_submitted_successfully": "ਟਿਕਟ ਸਫਲਤਾਪੂਰਵਕ ਸਪੁਰਦ ਕੀਤੀ ਗਈ!",
+    "validation_title_required": "ਸਿਰਲੇਖ ਲੋੜੀਂਦਾ ਹੈ",
+    "validation_title_min": "ਸਿਰਲੇਖ ਘੱਟੋ-ਘੱਟ 5 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
+    "validation_title_max": "ਸਿਰਲੇਖ 100 ਅੱਖਰਾਂ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦਾ",
+    "validation_desc_required": "ਵਰਣਨ ਲੋੜੀਂਦਾ ਹੈ",
+    "validation_desc_min": "ਵਰਣਨ ਘੱਟੋ-ਘੱਟ 10 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
+    "validation_desc_max": "ਵਰਣਨ 2000 ਅੱਖਰਾਂ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦਾ",
+    "validation_category_required": "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਸ਼੍ਰੇਣੀ ਚੁਣੋ",
+    "validation_file_size": "ਫ਼ਾਈਲ ਦਾ ਆਕਾਰ 5MB ਤੋਂ ਘੱਟ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
+    "validation_file_count": "ਅਧਿਕਤਮ 3 ਫ਼ਾਈਲਾਂ ਦੀ ਇਜਾਜ਼ਤ ਹੈ",
+    "cat_technical": "ਤਕਨੀਕੀ ਮੁੱਦਾ",
+    "cat_technical_desc": "ਪਲੇਟਫਾਰਮ ਨਾਲ ਸਮੱਸਿਆਵਾਂ",
+    "cat_account": "ਖਾਤਾ",
+    "cat_account_desc": "ਲੌਗਇਨ, ਪ੍ਰੋਫਾਈਲ ਜਾਂ ਸੈਟਿੰਗਾਂ",
+    "cat_content": "ਕੋਰਸ ਸਮੱਗਰੀ",
+    "cat_content_desc": "ਕੋਰਸਾਂ ਬਾਰੇ ਸਵਾਲ",
+    "cat_billing": "ਬਿਲਿੰਗ",
+    "cat_billing_desc": "ਭੁਗਤਾਨ ਅਤੇ ਗਾਹਕੀ",
+    "cat_feedback": "ਫੀਡਬੈਕ",
+    "cat_feedback_desc": "ਸੁਝਾਅ ਅਤੇ ਸੁਧਾਰ",
+    "cat_other": "ਹੋਰ",
+    "cat_other_desc": "ਆਮ ਪੁੱਛਗਿੱਛ",
+    "characters": "ਅੱਖਰ"
+  },
+  "community_page": {
+    "title": "ਭਾਈਚਾਰਕ ਘੋਸ਼ਣਾਵਾਂ",
+    "subtitle": "ਤੁਹਾਡੀ ਸੰਸਥਾ ਤੋਂ ਅਧਿਕਾਰਤ ਨੋਟਿਸ ਅਤੇ ਅਪਡੇਟਸ",
+    "search_placeholder": "ਘੋਸ਼ਣਾਵਾਂ ਖੋਜੋ...",
+    "filter_all": "ਸਾਰੇ",
+    "filter_today": "ਅੱਜ",
+    "filter_week": "ਇਸ ਹਫਤੇ",
+    "filter_smaart_admin": "🌐 ਸਮਾਰਟ ਐਡਮਿਨ",
+    "filter_college_admin": "🏫 ਕਾਲਜ ਐਡਮਿਨ",
+    "no_results": "ਕੋਈ ਨਤੀਜੇ ਨਹੀਂ ਮਿਲੇ",
+    "no_results_desc": "ਆਪਣੀ ਖੋਜ ਜਾਂ ਫਿਲਟਰ ਨੂੰ ਵਿਵਸਥਿਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+    "clear_filters": "ਫਿਲਟਰ ਸਾਫ਼ ਕਰੋ",
+    "no_announcements": "ਅਜੇ ਤੱਕ ਕੋਈ ਘੋਸ਼ਣਾਵਾਂ ਨਹੀਂ ਹਨ",
+    "no_announcements_desc": "ਆਪਣੀ ਸੰਸਥਾ ਤੋਂ ਅੱਪਡੇਟ ਲਈ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਜਾਂਚ ਕਰੋ।",
+    "pinned": "ਪਿੰਨ ਕੀਤਾ",
+    "expired": "ਮਿਆਦ ਪੁੱਗ ਗਈ",
+    "expires": "ਮਿਆਦ ਪੁੱਗਦੀ ਹੈ",
+    "smaart": "ਸਮਾਰਟ",
+    "college": "ਕਾਲਜ",
+    "view_attachment": "ਅਟੈਚਮੈਂਟ ਦੇਖੋ",
+    "just_now": "ਹੁਣੇ ਹੀ",
+    "m_ago": "ਮੀ ਪਹਿਲਾਂ",
+    "h_ago": "ਘੰਟੇ ਪਹਿਲਾਂ",
+    "admin": "ਐਡਮਿਨ"
+  },
+  "vision_board": {
+    "vision_journey": "ਵਿਜ਼ਨ ਯਾਤਰਾ",
+    "gallery_title": "ਵਿਜ਼ਨ ਬੋਰਡ ਗੈਲਰੀ",
+    "gallery_subtitle": "ਆਪਣੇ ਟੀਚਿਆਂ ਲਈ ਵਿਸਤ੍ਰਿਤ ਬੋਰਡ ਬਣਾਓ, ਸਪੱਸ਼ਟਤਾ ਨਾਲ ਆਪਣੀਆਂ ਇੱਛਾਵਾਂ ਨੂੰ ਟਰੈਕ ਕਰੋ, ਅਤੇ ਪ੍ਰੇਰਿਤ ਰਹਿਣ ਲਈ ਆਪਣੇ ਡੈਸ਼ਬੋਰਡ 'ਤੇ ਆਪਣੀ ਪ੍ਰਾਇਮਰੀ ਦ੍ਰਿਸ਼ਟੀ ਨੂੰ ਕਿਰਿਆਸ਼ੀਲ ਰੱਖੋ।",
+    "slots": "ਸਲਾਟਸ",
+    "create_new_board": "ਨਵਾਂ ਬੋਰਡ ਬਣਾਓ",
+    "active_vision": "ਕਿਰਿਆਸ਼ੀਲ ਦ੍ਰਿਸ਼ਟੀ",
+    "current_focus": "ਮੌਜੂਦਾ ਫੋਕਸ",
+    "stored_vision": "ਸਟੋਰਡ ਵਿਜ਼ਨ",
+    "default_board_desc": "ਵਿਜ਼ੂਅਲ ਟੀਚਿਆਂ ਅਤੇ ਨਿੱਜੀ ਦਿਸ਼ਾਵਾਂ ਦਾ ਇੱਕ ਚੁਣਿਆ ਬੋਰਡ।",
+    "preview": "ਝਲਕ",
+    "edit": "ਸੰਪਾਦਿਤ ਕਰੋ",
+    "duplicate": "ਡੁਪਲੀਕੇਟ",
+    "delete": "ਮਿਟਾਓ",
+    "deleting": "ਮਿਟਾਇਆ ਜਾ ਰਿਹਾ ਹੈ...",
+    "active": "ਕਿਰਿਆਸ਼ੀਲ",
+    "set_active": "ਕਿਰਿਆਸ਼ੀਲ ਸੈੱਟ ਕਰੋ",
+    "updating": "ਅੱਪਡੇਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ",
+    "delete_modal_title": "ਕੀ ਵਿਜ਼ਨ ਬੋਰਡ ਨੂੰ ਮਿਟਾਉਣਾ ਹੈ?",
+    "delete_modal_desc": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਤੌਰ 'ਤੇ \"{{title}}\" ਨੂੰ ਮਿਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ? ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "manifest_vision": "ਆਪਣੇ ਦਰਸ਼ਨ ਨੂੰ ਪ੍ਰਗਟ ਕਰੋ",
+    "manifest_desc": "ਆਪਣੇ ਟੀਚਿਆਂ ਨੂੰ ਪ੍ਰਗਟ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਆਪਣੇ ਦਰਸ਼ਨ ਨੂੰ ਇੱਕ ਨਾਮ ਅਤੇ ਇੱਕ ਸੰਖੇਪ ਵਰਣਨ ਦਿਓ।",
+    "board_title": "ਬੋਰਡ ਦਾ ਸਿਰਲੇਖ",
+    "title_placeholder": "ਉਦਾਹਰਨ ਲਈ, ਮਾਈ ਪ੍ਰੋਫੈਸ਼ਨਲ ਜਰਨੀ 2026",
+    "aspiration_details": "ਇੱਛਾ ਦੇ ਵੇਰਵੇ",
+    "aspiration_placeholder": "ਵਰਣਨ ਕਰੋ ਕਿ ਤੁਸੀਂ ਕੀ ਪ੍ਰਾਪਤ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ ਅਤੇ ਇਹ ਤੁਹਾਡੇ ਲਈ ਮਹੱਤਵਪੂਰਨ ਕਿਉਂ ਹੈ...",
+    "start_creating": "ਬਣਾਉਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+    "no_boards": "ਅਜੇ ਤੱਕ ਕੋਈ ਬੋਰਡ ਨਹੀਂ",
+    "no_boards_desc": "ਇੱਕ ਸਪੱਸ਼ਟ ਬੋਰਡ ਨਾਲ ਸ਼ੁਰੂ ਕਰੋ, ਫਿਰ ਵੱਖ-ਵੱਖ ਖੇਤਰਾਂ ਵਿੱਚ ਆਪਣੇ ਟੀਚਿਆਂ ਦੀ ਸ਼ਾਖਾ ਵਜੋਂ ਹੋਰ ਜੋੜੋ।",
+    "create_vision_board": "ਵਿਜ਼ਨ ਬੋਰਡ ਬਣਾਓ",
+    "no_boards_match": "ਕੋਈ ਬੋਰਡ ਉਹਨਾਂ ਫਿਲਟਰਾਂ ਨਾਲ ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ",
+    "no_boards_match_desc": "ਕੋਈ ਹੋਰ ਖੋਜ ਸ਼ਬਦ ਅਜ਼ਮਾਓ ਜਾਂ ਸਾਰੇ ਬੋਰਡਾਂ 'ਤੇ ਵਾਪਸ ਜਾਓ।",
+    "loading_boards": "ਤੁਹਾਡੇ ਬੋਰਡ ਲੋਡ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ...",
+    "enable_vision": "ਵਿਜ਼ਨ ਦੇ ਤੌਰ 'ਤੇ ਯੋਗ ਕਰੋ",
+    "disable_vision": "ਵਿਜ਼ਨ ਨੂੰ ਅਸਮਰੱਥ ਬਣਾਓ",
+    "download": "ਡਾਊਨਲੋਡ ਕਰੋ",
+    "boards": "ਬੋਰਡ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "saving": "ਸੰਭਾਲ ਰਿਹਾ ਹੈ",
+    "ready": "ਤਿਆਰ ਹੈ",
+    "saved_at": "ਬਚਾਏ ਗਏ {{time}}",
+    "untitled_board": "ਬਿਨਾਂ ਸਿਰਲੇਖ ਵਾਲਾ ਵਿਜ਼ਨ ਬੋਰਡ",
+    "undo": "ਅਣਡੂ",
+    "redo": "ਦੁਬਾਰਾ ਕਰੋ",
+    "design": "ਡਿਜ਼ਾਈਨ ਡਿਜ਼ਾਈਨ",
+    "assets": "ਸੰਪਤੀਆਂ ਸੰਪਤੀਆਂ ਸੰਪਤੀਆਂ",
+    "text": "ਟੈਕਸਟ ਟੈਕਸਟ ਟੈਕਸਟ",
+    "style": "ਸ਼ੈਲੀ ਸ਼ੈਲੀ",
+    "layers": "ਪਰਤਾਂ ਪਰਤਾਂ ਪਰਤਾਂ",
+    "canvas": "ਕੈਨਵਸ ਕੈਨਵਸ",
+    "tab_design": "ਡਿਜ਼ਾਈਨ",
+    "tab_assets": "ਸੰਪਤੀਆਂ",
+    "tab_text": "ਟੈਕਸਟ",
+    "tab_style": "ਸ਼ੈਲੀ",
+    "tab_layers": "ਪਰਤਾਂ",
+    "tab_canvas": "ਕੈਨਵਸ",
+    "panel_layout_title": "ਖਾਕਾ",
+    "panel_layout_desc": "ਪਹਿਲਾਂ ਇੱਕ ਮਜ਼ਬੂਤ ਬਣਤਰ ਦੀ ਚੋਣ ਕਰੋ, ਫਿਰ ਰਚਨਾ ਨੂੰ ਸੋਧੋ।",
+    "panel_assets_title": "ਸੰਪਤੀਆਂ",
+    "panel_assets_desc": "ਆਕਾਰਾਂ, ਬੈਜਾਂ, ਸਜਾਵਟੀ ਪੈਕ ਅਤੇ ਸੁਰੱਖਿਅਤ ਕੀਤੇ ਅੱਪਲੋਡਾਂ ਨਾਲ ਅਮੀਰ ਬੋਰਡ ਬਣਾਓ।",
+    "panel_text_title": "ਟਾਈਪੋਗ੍ਰਾਫੀ ਟਾਈਪੋਗ੍ਰਾਫੀ",
+    "panel_text_desc": "ਸੁਰਖੀਆਂ, ਪੁਸ਼ਟੀਕਰਨ ਅਤੇ ਸਹਾਇਕ ਕਾਪੀ ਸ਼ਾਮਲ ਕਰੋ।",
+    "panel_style_title": "ਕੈਨਵਸ ਸ਼ੈਲੀ",
+    "panel_style_desc": "ਰੰਗ, ਸਪੇਸਿੰਗ, ਕੋਨੇ, ਅਤੇ ਸਮੁੱਚੇ ਮੂਡ ਨੂੰ ਟਿਊਨ ਕਰੋ।",
+    "panel_layers_title": "ਪਰਤਾਂ",
+    "panel_layers_desc": "ਸਟੈਕਿੰਗ ਆਰਡਰ ਨੂੰ ਸੰਗਠਿਤ ਕਰੋ, ਸਮਗਰੀ ਨੂੰ ਲਾਕ ਕਰੋ, ਅਤੇ ਨਿਯੰਤਰਣ ਸ਼ੁੱਧਤਾ ਸਾਧਨ।",
+    "panel_canvas_title": "ਕੈਨਵਸ ਦਾ ਆਕਾਰ",
+    "panel_canvas_desc": "ਬੋਰਡ ਅਨੁਪਾਤ ਨੂੰ ਫ਼ੋਨ, ਡੈਸਕਟਾਪ, ਜਾਂ ਪੇਸ਼ਕਾਰੀ ਦੀਆਂ ਲੋੜਾਂ ਨਾਲ ਮੇਲ ਕਰੋ।",
+    "aspect_ratio": "ਆਕਾਰ ਅਨੁਪਾਤ",
+    "current_output": "ਮੌਜੂਦਾ ਆਉਟਪੁੱਟ",
+    "template_library": "ਟੈਂਪਲੇਟ ਲਾਇਬ੍ਰੇਰੀ",
+    "typography": "ਟਾਈਪੋਗ੍ਰਾਫੀ",
+    "close_panel": "ਪੈਨਲ ਬੰਦ ਕਰੋ",
+    "toast_auth_required_title": "ਪ੍ਰਮਾਣਿਕਤਾ ਦੀ ਲੋੜ ਹੈ",
+    "toast_auth_required_desc": "ਕਿਰਪਾ ਕਰਕੇ ਵਿਜ਼ਨ ਬੋਰਡ ਬਣਾਉਣ ਲਈ ਲੌਗ ਇਨ ਕਰੋ",
+    "toast_explicit_content": "ਅਸ਼ਲੀਲ ਸਮੱਗਰੀ",
+    "toast_explicit_content_desc": "ਅਸ਼ਲੀਲ ਸਮੱਗਰੀ ਦਾ ਪਤਾ ਲੱਗਾ।",
+    "toast_inappropriate_content": "ਅਣਉਚਿਤ ਸਮੱਗਰੀ",
+    "toast_inappropriate_content_desc": "ਤੁਹਾਡੇ ਟੈਕਸਟ ਵਿੱਚ ਅਣਉਚਿਤ ਭਾਸ਼ਾ ਸ਼ਾਮਲ ਹੈ। ",
+    "image": "ਚਿੱਤਰ",
+    "text_layer": "ਟੈਕਸਟ ਲੇਅਰ",
+    "canvas_asset": "ਕੈਨਵਸ ਸੰਪਤੀ",
+    "saved_upload": "ਸੁਰੱਖਿਅਤ ਕੀਤਾ ਅੱਪਲੋਡ",
+    "text_label": "ਟੈਕਸਟ",
+    "toast_no_empty_slot": "ਕੋਈ ਖਾਲੀ ਸਲਾਟ ਨਹੀਂ",
+    "toast_no_empty_slot_desc": "ਇਸ ਚਿੱਤਰ ਨੂੰ ਡੁਪਲੀਕੇਟ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਇੱਕ ਹੋਰ ਖਾਕਾ ਸਲਾਟ ਸ਼ਾਮਲ ਕਰੋ।",
+    "copy": "ਕਾਪੀ ਕਰੋ",
+    "toast_draft_restored": "ਡਰਾਫਟ ਰੀਸਟੋਰ ਕੀਤਾ ਗਿਆ",
+    "toast_draft_restored_desc": "ਤੁਹਾਡਾ ਆਖਰੀ ਇਨ-ਪ੍ਰਗਤੀ ਵਿਜ਼ਨ ਬੋਰਡ ਮੁੜ ਪ੍ਰਾਪਤ ਕੀਤਾ।",
+    "toast_unable_load_board": "ਬੋਰਡ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ",
+    "toast_unable_load_board_desc": "ਅਸੀਂ ਸੰਪਾਦਨ ਲਈ ਇਸ ਸੁਰੱਖਿਅਤ ਵਿਜ਼ਨ ਬੋਰਡ ਨੂੰ ਰੀਸਟੋਰ ਨਹੀਂ ਕਰ ਸਕੇ।",
+    "toast_safety_initializing": "ਸੁਰੱਖਿਆ ਪ੍ਰਣਾਲੀ ਸ਼ੁਰੂ ਹੋ ਰਹੀ ਹੈ",
+    "toast_safety_initializing_desc": "ਕਿਰਪਾ ਕਰਕੇ ਕੁਝ ਪਲ ਉਡੀਕ ਕਰੋ ਜਦੋਂ ਤੱਕ ਅਸੀਂ ਸੁਰੱਖਿਆ ਜਾਂਚਾਂ ਤਿਆਰ ਕਰਦੇ ਹਾਂ...",
+    "toast_title_inappropriate_desc": "ਤੁਹਾਡੇ ਵਿਜ਼ਨ ਬੋਰਡ ਦੇ ਸਿਰਲੇਖ ਵਿੱਚ ਅਣਉਚਿਤ ਭਾਸ਼ਾ ਸ਼ਾਮਲ ਹੈ। ",
+    "toast_desc_inappropriate_desc": "ਤੁਹਾਡੇ ਵਿਜ਼ਨ ਬੋਰਡ ਦੇ ਵਰਣਨ ਵਿੱਚ ਅਣਉਚਿਤ ਭਾਸ਼ਾ ਸ਼ਾਮਲ ਹੈ। ",
+    "toast_auth_save_desc": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਵਿਜ਼ਨ ਬੋਰਡ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਲੌਗ ਇਨ ਕਰੋ",
+    "toast_updated": "ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ!",
+    "toast_updated_desc": "ਵਿਜ਼ਨ ਬੋਰਡ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+    "toast_saved": "ਸੰਭਾਲਿਆ!",
+    "toast_saved_desc": "ਵਿਜ਼ਨ ਬੋਰਡ ਸਫਲਤਾਪੂਰਵਕ ਬਣਾਇਆ ਗਿਆ",
+    "toast_session_expired": "ਸੈਸ਼ਨ ਦੀ ਮਿਆਦ ਪੁੱਗ ਗਈ",
+    "toast_session_expired_desc": "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਵਿਜ਼ਨ ਬੋਰਡ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਦੁਬਾਰਾ ਲੌਗ ਇਨ ਕਰੋ",
+    "toast_error": "ਗਲਤੀ",
+    "toast_failed_save": "ਵਿਜ਼ਨ ਬੋਰਡ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨਾ ਅਸਫਲ ਰਿਹਾ"
+  },
+  "profile": {
+    "display_name": "ਡਿਸਪਲੇ ਨਾਮ",
+    "email": "ਈਮੇਲ ਪਤਾ",
+    "phone": "ਫ਼ੋਨ ਨੰਬਰ",
+    "bio": "ਜੀਵਨੀ"
+  },
+  "skills_passport": {
+    "title": "ਡਿਜੀਟਲ ਸਕਿੱਲ ਪਾਸਪੋਰਟ",
+    "verifiable": "ਰੁਜ਼ਗਾਰਦਾਤਾ ਪ੍ਰਮਾਣਿਤ",
+    "hero_title": "ਪ੍ਰਮਾਣਿਤ ਪ੍ਰਤਿਭਾ ਦਾ ਭਵਿੱਖ.",
+    "hero_desc": "ਸਮਰੱਥਾ ਦਾ ਤੁਹਾਡਾ ਸੁਰੱਖਿਅਤ, AI-ਪ੍ਰਮਾਣਿਤ ਪ੍ਰਮਾਣ ਪੱਤਰ। ",
+    "get_pdf": "ਪਾਸਪੋਰਟ PDF ਪ੍ਰਾਪਤ ਕਰੋ",
+    "share": "ਪਛਾਣ ਸਾਂਝੀ ਕਰੋ",
+    "global_readiness": "ਗਲੋਬਲ ਤਿਆਰੀ",
+    "plvi_band": "PLVI ਬੈਂਡ",
+    "secure_protocol": "ਸੁਰੱਖਿਅਤ ਟਰੱਸਟ ਪ੍ਰੋਟੋਕੋਲ",
+    "verification_live": "ਜਨਤਕ ਪੁਸ਼ਟੀਕਰਨ ਲਾਈਵ ਹੈ",
+    "tabs": {
+      "smart": "ਸਮਾਰਟ ਕੋਰਸ",
+      "other": "ਤਕਨੀਕੀ ਹੁਨਰ",
+      "certificates": "ਏਆਈ ਹੁਨਰ",
+      "projects": "ਡੋਮੇਨ ਹੁਨਰ"
+    },
+    "stats": {
+      "growth_delta": "ਵਿਕਾਸ ਡੈਲਟਾ",
+      "momentum": "ਮੋਮੈਂਟਮ ਸਕੋਰ",
+      "badges": "ਹੁਨਰ ਬੈਜ",
+      "trust": "ਟਰੱਸਟ ਰੇਟਿੰਗ"
+    },
+    "dna": {
+      "title": "ਯੋਗਤਾ ਡੀਐਨਏ",
+      "desc": "ਤੁਹਾਡੀਆਂ ਪ੍ਰਮਾਣਿਤ ਬੋਧਾਤਮਕ ਅਤੇ ਪੇਸ਼ੇਵਰ ਸ਼ਕਤੀਆਂ ਦਾ ਇੱਕ ਬਹੁ-ਆਯਾਮੀ ਟੁੱਟਣਾ।"
+    },
+    "proficiency": {
+      "title": "ਪ੍ਰਮਾਣਿਤ ਮੁਹਾਰਤ",
+      "gold_standard": "ਗੋਲਡ ਸਟੈਂਡਰਡ ਪ੍ਰਮਾਣਿਤ"
+    },
+    "timeline": {
+      "title": "ਸਮਾਂਰੇਖਾ",
+      "baseline": "ਬੇਸਲਾਈਨ",
+      "assessment": "ਮੁਲਾਂਕਣ"
+    },
+    "other_courses": {
+      "title": "ਹੋਰ ਇੰਸਟੀਚਿਊਟ ਕੋਰਸ",
+      "none": "ਕੋਈ ਬਾਹਰੀ ਕੋਰਸ ਨਹੀਂ ਮਿਲੇ।"
+    },
+    "certificates": {
+      "title": "ਸਰਟੀਫਿਕੇਟ ਹਾਸਲ ਕੀਤੇ",
+      "none": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਸਰਟੀਫਿਕੇਟ ਨਹੀਂ ਮਿਲੇ।"
+    },
+    "projects": {
+      "title": "ਪ੍ਰੋਜੈਕਟ ਸ਼ੋਅਕੇਸ",
+      "none": "ਅਜੇ ਤੱਕ ਕੋਈ ਵੀ ਪ੍ਰੋਜੈਕਟ ਪ੍ਰਦਰਸ਼ਿਤ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"
+    },
+    "standards": {
+      "understand": {
+        "title": "ਸਮਝੋ",
+        "desc": "ਪ੍ਰਸੰਗ, ਇਰਾਦੇ ਅਤੇ ਤਰਜੀਹਾਂ ਨੂੰ ਸਪਸ਼ਟ ਰੂਪ ਵਿੱਚ ਸਮਝਦਾ ਹੈ।"
+      },
+      "structure": {
+        "title": "ਢਾਂਚਾ",
+        "desc": "ਸੋਚ ਨੂੰ ਸਪਸ਼ਟ ਢਾਂਚੇ ਅਤੇ ਕਾਰਵਾਈ ਵਿੱਚ ਸੰਗਠਿਤ ਕਰਦਾ ਹੈ।"
+      },
+      "verify": {
+        "title": "ਪੁਸ਼ਟੀ ਕਰੋ",
+        "desc": "ਡਿਲੀਵਰੀ ਤੋਂ ਪਹਿਲਾਂ ਸ਼ੁੱਧਤਾ, ਗੁਣਵੱਤਾ ਅਤੇ ਸਬੂਤ ਦੀ ਜਾਂਚ ਕਰਦਾ ਹੈ."
+      },
+      "adapt": {
+        "title": "ADAP",
+        "desc": "ਪਰਿਵਰਤਨ, ਅਸਪਸ਼ਟਤਾ ਅਤੇ ਨਵੇਂ ਇਨਪੁਟਸ ਲਈ ਵਧੀਆ ਜਵਾਬ ਦਿੰਦਾ ਹੈ।"
+      },
+      "communicate": {
+        "title": "ਸੰਚਾਰ ਕਰੋ",
+        "desc": "ਸਪਸ਼ਟਤਾ, ਸੰਖੇਪਤਾ ਅਤੇ ਭਰੋਸੇ ਨਾਲ ਵਿਚਾਰ ਪ੍ਰਗਟ ਕਰਦਾ ਹੈ।"
+      },
+      "connect": {
+        "title": "ਕਨੈਕਟ ਕਰੋ",
+        "desc": "ਵਿਸ਼ਵਾਸ ਪੈਦਾ ਕਰਦਾ ਹੈ ਅਤੇ ਦੂਜਿਆਂ ਨਾਲ ਪ੍ਰਭਾਵਸ਼ਾਲੀ ਢੰਗ ਨਾਲ ਸਹਿਯੋਗ ਕਰਦਾ ਹੈ।"
+      },
+      "own": {
+        "title": "OWN",
+        "desc": "ਜ਼ਿੰਮੇਵਾਰੀ ਲੈਂਦਾ ਹੈ ਅਤੇ ਜਵਾਬਦੇਹੀ ਦੇ ਨਾਲ ਪਾਲਣਾ ਕਰਦਾ ਹੈ."
+      },
+      "create": {
+        "title": "ਬਣਾਓ",
+        "desc": "ਲਾਭਦਾਇਕ ਵਿਚਾਰ, ਹੱਲ ਅਤੇ ਸੁਧਾਰ ਤਿਆਰ ਕਰਦਾ ਹੈ।"
+      },
+      "lead": {
+        "title": "ਲੀਡ",
+        "desc": "ਪਹਿਲਕਦਮੀ, ਨਿਰਣੇ ਅਤੇ ਸ਼ਾਂਤ ਨਾਲ ਦੂਜਿਆਂ ਦੀ ਅਗਵਾਈ ਕਰਦਾ ਹੈ।"
+      },
+      "grow": {
+        "title": "ਵਧੋ",
+        "desc": "ਫੀਡਬੈਕ ਤੋਂ ਸਿੱਖਦਾ ਹੈ ਅਤੇ ਨਿਰੰਤਰ ਵਿਕਾਸ ਕਰਦਾ ਹੈ।"
+      }
+    },
+    "standards_title": "ਦਸ ਪੇਸ਼ੇਵਰ ਮਿਆਰ",
+    "standards_matrix": "ਪ੍ਰੋਫੈਸ਼ਨਲ ਸਟੈਂਡਰਡ ਮੈਟਰਿਕਸ",
+    "rating": "ਰੇਟਿੰਗ",
+    "institutional_registry": "ਸੰਸਥਾਗਤ ਰਜਿਸਟਰੀ",
+    "verified_records": "ਪ੍ਰਮਾਣਿਤ ਰਿਕਾਰਡ"
+  },
+  "quotients": {
+    "CRQ": {
+      "name": "ਬੋਧਾਤਮਕ ਤਰਕ",
+      "desc": "ਸਮੱਸਿਆ ਦਾ ਹੱਲ, ਆਲੋਚਨਾਤਮਕ ਸੋਚ, ਅਤੇ ਪੈਟਰਨ ਮਾਨਤਾ."
+    },
+    "SRQ": {
+      "name": "ਸਵੈ-ਨਿਯਮ",
+      "desc": "ਭਾਵਨਾਤਮਕ ਬੁੱਧੀ, ਅਨੁਸ਼ਾਸਨ, ਅਤੇ ਤਣਾਅ ਪ੍ਰਬੰਧਨ।"
+    },
+    "LQ": {
+      "name": "ਸਿੱਖਣ ਦੀ ਚੁਸਤੀ",
+      "desc": "ਜਲਦੀ ਸਿੱਖਣ ਅਤੇ ਨਵੀਆਂ ਸਥਿਤੀਆਂ ਦੇ ਅਨੁਕੂਲ ਹੋਣ ਦੀ ਸਮਰੱਥਾ."
+    },
+    "SIQ": {
+      "name": "ਸੋਸ਼ਲ ਇੰਟੈਲੀਜੈਂਸ",
+      "desc": "ਅੰਤਰ-ਵਿਅਕਤੀਗਤ ਹੁਨਰ, ਹਮਦਰਦੀ, ਅਤੇ ਸਹਿਯੋਗੀ ਮਾਨਸਿਕਤਾ।"
+    },
+    "PEQ": {
+      "name": "ਪੇਸ਼ੇਵਰ ਐਗਜ਼ੀਕਿਊਸ਼ਨ",
+      "desc": "ਡਿਲਿਵਰੀ ਸਮਰੱਥਾ, ਭਰੋਸੇਯੋਗਤਾ, ਅਤੇ ਤਕਨੀਕੀ ਮੁਹਾਰਤ."
+    },
+    "DAQ": {
+      "name": "ਡਿਜੀਟਲ ਅਤੇ ਏ.ਆਈ",
+      "desc": "ਡਿਜੀਟਲ ਟੂਲਜ਼ ਅਤੇ AI-ਸੰਚਾਲਿਤ ਵਰਕਫਲੋ ਦੇ ਨਾਲ ਪ੍ਰਵਾਹ।"
+    },
+    "SEQ": {
+      "name": "ਸਥਿਰਤਾ ਅਤੇ ਨੈਤਿਕਤਾ",
+      "desc": "ਨੈਤਿਕ ਅਭਿਆਸਾਂ ਅਤੇ ਵਾਤਾਵਰਣ ਪ੍ਰਤੀ ਜਾਗਰੂਕਤਾ ਪ੍ਰਤੀ ਵਚਨਬੱਧਤਾ।"
+    }
+  },
+  "community": {
+    "title": "ਭਾਈਚਾਰਾ",
+    "tabs": {
+      "discussions": "ਚਰਚਾਵਾਂ ਚਰਚਾਵਾਂ",
+      "my_posts": "ਮੇਰੀਆਂ ਪੋਸਟਾਂ",
+      "bookmarks": "ਬੁੱਕਮਾਰਕਸ"
+    },
+    "stats": {
+      "members": "ਕੁੱਲ ਮੈਂਬਰ",
+      "discussions": "ਚਰਚਾਵਾਂ",
+      "groups": "ਵਿਦਿਆਰਥੀ ਸਮੂਹ",
+      "active": "ਅੱਜ ਸਰਗਰਮ ਹੈ"
+    },
+    "badges": {
+      "official": "ਅਧਿਕਾਰੀ",
+      "best_answer": "ਵਧੀਆ ਜਵਾਬ",
+      "pinned": "ਪਿੰਨ ਕੀਤਾ"
+    },
+    "time": {
+      "just_now": "ਹੁਣੇ ਹੀ",
+      "ago": "ਪਹਿਲਾਂ",
+      "min_short": "m",
+      "hour_short": "h",
+      "day_short": "d"
+    },
+    "channels": {
+      "discussion": "ਚਰਚਾ",
+      "mentor": "ਸਲਾਹਕਾਰ",
+      "support": "ਸਪੋਰਟ"
+    },
+    "new_post": "ਨਵੀਂ ਪੋਸਟ",
+    "new_post_button": "ਇੱਕ ਚਰਚਾ ਸ਼ੁਰੂ ਕਰੋ",
+    "search": "ਚਰਚਾਵਾਂ ਖੋਜੋ...",
+    "sort_by": "ਦੁਆਰਾ ਕ੍ਰਮਬੱਧ",
+    "sort": {
+      "newest": "ਸਭ ਤੋਂ ਨਵਾਂ",
+      "popular": "ਪ੍ਰਸਿੱਧ",
+      "quality": "ਉੱਚ ਗੁਣਵੱਤਾ"
+    },
+    "load_more": "ਹੋਰ ਲੋਡ ਕਰੋ",
+    "loading": "ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "no_discussions": "ਕੋਈ ਚਰਚਾ ਨਹੀਂ ਮਿਲੀ।",
+    "comments": "ਟਿੱਪਣੀਆਂ",
+    "share_to_group": "ਗਰੁੱਪ ਵਿੱਚ ਸ਼ੇਅਰ ਕਰੋ",
+    "report_discussion": "ਰਿਪੋਰਟ ਚਰਚਾ",
+    "my_groups": "ਮੇਰੇ ਸਮੂਹ",
+    "no_groups": "ਕੋਈ ਸਮੂਹ ਉਪਲਬਧ ਨਹੀਂ ਹਨ",
+    "view_my_groups": "ਮੇਰੇ ਸਮੂਹ ਵੇਖੋ",
+    "create_group": "ਗਰੁੱਪ ਬਣਾਓ",
+    "top_contributors": "ਪ੍ਰਮੁੱਖ ਯੋਗਦਾਨੀ",
+    "new_discussion_title": "ਨਵੀਂ ਚਰਚਾ",
+    "post_title": "ਪੋਸਟ ਦਾ ਸਿਰਲੇਖ",
+    "category": "ਸ਼੍ਰੇਣੀ",
+    "channel": "ਚੈਨਲ",
+    "post_content_placeholder": "ਅੱਗੇ ਵਧੋ, ਆਪਣੀ ਕਹਾਣੀ ਸਾਂਝੀ ਕਰੋ ਜਾਂ ਕੋਈ ਸਵਾਲ ਪੁੱਛੋ...",
+    "create_poll": "ਇੱਕ ਪੋਲ ਬਣਾਓ",
+    "media_attachment": "ਮੀਡੀਆ ਅਟੈਚਮੈਂਟ",
+    "publish_discussion": "ਚਰਚਾ ਪ੍ਰਕਾਸ਼ਿਤ ਕਰੋ",
+    "report_content": "ਸਮੱਗਰੀ ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+    "share_to_groups_title": "ਸਮੂਹਾਂ ਵਿੱਚ ਸਾਂਝਾ ਕਰੋ",
+    "reactions": {
+      "like": "ਪਸੰਦ ਹੈ",
+      "heart": "ਪਿਆਰ",
+      "insight": "ਸੂਝਵਾਨ",
+      "care": "ਸਹਾਇਕ",
+      "celebrate": "ਹੁਸ਼ਿਆਰ"
+    },
+    "tips": {
+      "guidelines": {
+        "title": "ਭਾਈਚਾਰਕ ਸੁਝਾਅ",
+        "text": "ਵਿਚਾਰ ਵਟਾਂਦਰੇ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ ਅਤੇ ਅੰਕ ਅਤੇ ਬੈਜ ਕਮਾਉਣ ਵਿੱਚ ਦੂਜਿਆਂ ਦੀ ਮਦਦ ਕਰੋ। "
+      },
+      "quality": {
+        "title": "ਕੁਆਲਿਟੀ ਸਕੋਰ",
+        "text": "ਤੁਹਾਡਾ ਕੁਆਲਿਟੀ ਸਕੋਰ (QS) ਅੱਪਵੋਟਸ, ਦਿਲਾਂ ਅਤੇ ਟਿੱਪਣੀਆਂ ਨਾਲ ਵਧਦਾ ਹੈ। "
+      },
+      "mentor": {
+        "title": "ਸਲਾਹਕਾਰ ਚੈਨਲ",
+        "text": "ਕੋਈ ਕੈਰੀਅਰ ਜਾਂ ਅਕਾਦਮਿਕ ਸਵਾਲ ਹੈ? "
+      },
+      "support": {
+        "title": "ਸਹਿਯੋਗੀ ਚੈਨਲ",
+        "text": "ਹਾਵੀ ਮਹਿਸੂਸ ਕਰ ਰਹੇ ਹੋ? "
+      },
+      "groups": {
+        "title": "ਵਿਦਿਆਰਥੀ ਸਮੂਹ",
+        "text": "ਆਪਣੇ ਸਮੂਹ ਦੀ ਨਿੱਜੀ ਥਾਂ ਵਿੱਚ ਸਾਥੀਆਂ ਨਾਲ ਸਹਿਯੋਗ ਕਰਨ, ਸਰੋਤ ਸਾਂਝੇ ਕਰਨ ਅਤੇ ਰੀਅਲ ਟਾਈਮ ਵਿੱਚ ਗੱਲਬਾਤ ਕਰਨ ਲਈ ਇੱਕ ਸਟੱਡੀ ਗਰੁੱਪ ਬਣਾਓ ਜਾਂ ਉਸ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ।"
+      },
+      "pinned": {
+        "title": "ਪਿੰਨ ਕੀਤੀਆਂ ਪੋਸਟਾਂ",
+        "text": "ਪਿੰਨ ਕੀਤੀਆਂ ਪੋਸਟਾਂ ਕ੍ਰਮਬੱਧ ਕ੍ਰਮ ਦੀ ਪਰਵਾਹ ਕੀਤੇ ਬਿਨਾਂ ਚਰਚਾ ਫੀਡ ਦੇ ਸਿਖਰ 'ਤੇ ਰਹਿੰਦੀਆਂ ਹਨ। "
+      }
+    }
+  },
+  "my_courses_page": {
+    "continue_watching": "ਦੇਖਣਾ ਜਾਰੀ ਰੱਖੋ",
+    "pct_complete": "{{pct}}% ਪੂਰਾ",
+    "your_current_course": "ਤੁਹਾਡਾ ਮੌਜੂਦਾ ਕੋਰਸ",
+    "last_watched": "ਪਿਛਲੀ ਵਾਰ ਦੇਖਿਆ ਗਿਆ:",
+    "modules_count": "{{completed}}/{{total}} ਮੋਡੀਊਲ",
+    "completed": "ਪੂਰਾ ਹੋਇਆ",
+    "resume_course": "ਕੋਰਸ ਮੁੜ ਸ਼ੁਰੂ ਕਰੋ",
+    "your_course": "ਤੁਹਾਡਾ ਕੋਰਸ",
+    "stage_n": "ਪੜਾਅ {{n}}",
+    "progression": "ਤਰੱਕੀ",
+    "courses_count": "{{ਸੰਪੂਰਨ}}/{{ਕੁੱਲ}} ਕੋਰਸ",
+    "specialization_track": "ਵਿਸ਼ੇਸ਼ਤਾ ਟਰੈਕ",
+    "back_to_overview": "ਸੰਖੇਪ ਜਾਣਕਾਰੀ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "your_learning_journey": "ਤੁਹਾਡੀ ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ",
+    "specialized_courses_count": "{{count}} ਵਿਸ਼ੇਸ਼ ਕੋਰਸ",
+    "stage_progress": "ਪੜਾਅ ਦੀ ਤਰੱਕੀ",
+    "mastered_count": "{{count}} ਵਿੱਚ ਮੁਹਾਰਤ ਹਾਸਲ ਕੀਤੀ",
+    "remaining_count": "{{count}} ਬਾਕੀ",
+    "assessment_required": "ਮੁਲਾਂਕਣ ਦੀ ਲੋੜ ਹੈ: {{gate}}",
+    "assessment_required_desc": "ਅਗਲੇ ਪੜਾਅ ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ ਸਾਰੇ ਮੋਡੀਊਲ ਨੂੰ ਪੂਰਾ ਕਰੋ ਅਤੇ 70%+ ਪ੍ਰਾਪਤ ਕਰੋ",
+    "status_passed": "ਪਾਸ ਕੀਤਾ",
+    "status_locked": "ਤਾਲਾਬੰਦ",
+    "learning_journey": "ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ",
+    "programme": "ਸਮਾਰਟ ਪ੍ਰੋਗਰਾਮ",
+    "programme_desc": "ਮੁਹਾਰਤ ਲਈ ਇੱਕ ਢਾਂਚਾਗਤ ਮਾਰਗ ਦਾ ਅਨੁਭਵ ਕਰੋ। ",
+    "completion": "ਸੰਪੂਰਨਤਾ",
+    "human_intelligence_courses": "ਮਨੁੱਖੀ ਖੁਫੀਆ ਕੋਰਸ",
+    "readiness_tracks": "ਤਿਆਰੀ ਟਰੈਕ",
+    "stages": {
+      "1": {
+        "name": "ਸਮਰੱਥਾ",
+        "description": "ਕਿਸੇ ਵੀ ਵਾਤਾਵਰਣ ਵਿੱਚ ਆਪਣਾ ਸਰਵੋਤਮ ਪ੍ਰਦਰਸ਼ਨ ਕਰਨ ਲਈ ਬੁਨਿਆਦੀ ਹੁਨਰ ਅਤੇ ਸਰੋਤ ਬਣਾਓ।"
+      },
+      "2": {
+        "name": "ਸਮਰੱਥਾ",
+        "description": "ਆਪਣੇ ਚੁਣੇ ਹੋਏ ਖੇਤਰ ਵਿੱਚ ਉੱਤਮਤਾ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਮੁੱਖ ਯੋਗਤਾਵਾਂ ਅਤੇ ਤਕਨੀਕੀ ਮੁਹਾਰਤ ਦਾ ਵਿਕਾਸ ਕਰੋ।"
+      },
+      "3": {
+        "name": "ਲੀਡਰਸ਼ਿਪ",
+        "description": "ਟੀਮਾਂ ਦੀ ਅਗਵਾਈ ਕਰਨ ਅਤੇ ਅਰਥਪੂਰਨ ਤਬਦੀਲੀ ਨੂੰ ਚਲਾਉਣ ਲਈ ਮਾਨਸਿਕਤਾ ਅਤੇ ਦ੍ਰਿਸ਼ਟੀ ਨੂੰ ਵਿਕਸਿਤ ਕਰੋ।"
+      }
+    },
+    "tracks": {
+      "PIQ": {
+        "name": "ਪਰਸਨਲ ਇੰਟੈਲੀਜੈਂਸ ਕੋਟੀਐਂਟ",
+        "shortName": "PIQ",
+        "description": "ਮਾਨਸਿਕਤਾ, ਆਤਮ ਵਿਸ਼ਵਾਸ ਅਤੇ ਨਿੱਜੀ ਪ੍ਰਭਾਵ ਨੂੰ ਵਿਕਸਿਤ ਕਰੋ"
+      },
+      "AIQ": {
+        "name": "ਏਆਈ ਰੈਡੀਨੇਸ ਕੋਟੀਐਂਟ",
+        "shortName": "AIQ",
+        "description": "ਮਾਸਟਰ ਏਆਈ ਟੂਲਸ ਅਤੇ ਨਕਲੀ ਬੁੱਧੀ ਨਾਲ ਪ੍ਰਭਾਵਸ਼ਾਲੀ ਢੰਗ ਨਾਲ ਕੰਮ ਕਰਦੇ ਹਨ"
+      },
+      "SQ": {
+        "name": "ਸਥਿਰਤਾ ਭਾਗ",
+        "shortName": "SQ",
+        "description": "ਨੈਤਿਕ ਸੋਚ ਅਤੇ ਸਥਿਰਤਾ ਜਾਗਰੂਕਤਾ ਪੈਦਾ ਕਰੋ"
+      }
+    }
+  },
+  "course_player": {
+    "stages": {
+      "stage_1": "ਪੜਾਅ 1",
+      "stage_2": "ਪੜਾਅ 2",
+      "stage_3": "ਪੜਾਅ 3",
+      "piq_track": "PIQ ਟਰੈਕ PIQ ਟਰੈਕ",
+      "aiq_track": "AIQ ਟਰੈਕ AIQ ਟਰੈਕ",
+      "sq_track": "SQ ਟਰੈਕ SQ ਟਰੈਕ",
+      "capacity": "ਸਮਰੱਥਾ",
+      "capability": "ਸਮਰੱਥਾ",
+      "leadership": "ਲੀਡਰਸ਼ਿਪ",
+      "personal_intelligence": "ਨਿੱਜੀ ਖੁਫੀਆ ਜਾਣਕਾਰੀ",
+      "ai_readiness": "ਏਆਈ ਦੀ ਤਿਆਰੀ",
+      "sustainability": "ਸਥਿਰਤਾ",
+      "type_s1": "ਪੜਾਅ 1 ਸਮਰੱਥਾ",
+      "type_s2": "ਪੜਾਅ 2 ਸਮਰੱਥਾ",
+      "type_s3": "ਪੜਾਅ 3 ਲੀਡਰਸ਼ਿਪ",
+      "type_piq": "PIQ ਟਰੈਕ",
+      "type_aiq": "AIQ ਟਰੈਕ",
+      "type_sq": "SQ ਟਰੈਕ"
+    },
+    "step_locked_warning": "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਕਦਮ {{step}} ਨੂੰ ਪੂਰਾ ਕਰੋ!",
+    "preview": "ਝਲਕ",
+    "transcription": "ਪ੍ਰਤੀਲਿਪੀ",
+    "lesson_preview": "ਪਾਠ ਦੀ ਝਲਕ",
+    "lesson_preview_desc": "ਆਪਣੀ ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ ਨੂੰ ਜਾਰੀ ਰੱਖਣ ਲਈ ਇਸ ਪਾਠ ਨੂੰ ਦੇਖੋ।",
+    "five_ten_min": "5-10 ਮਿੰਟ",
+    "video_lesson": "ਵੀਡੀਓ ਸਬਕ",
+    "video_transcription": "ਵੀਡੀਓ ਪ੍ਰਤੀਲਿਪੀ",
+    "transcription_coming_soon": "ਵੀਡੀਓ ਸਮਗਰੀ ਦੀ ਪ੍ਰਕਿਰਿਆ ਹੋਣ ਤੋਂ ਬਾਅਦ ਟ੍ਰਾਂਸਕ੍ਰਿਪਸ਼ਨ ਇੱਥੇ ਉਪਲਬਧ ਹੋਵੇਗਾ।",
+    "transcription_desc": "ਇਹ ਵਿਸ਼ੇਸ਼ਤਾ ਤੁਹਾਨੂੰ ਵੀਡੀਓ ਸਮੱਗਰੀ ਦੇ ਨਾਲ ਪੜ੍ਹਨ ਦੀ ਆਗਿਆ ਦਿੰਦੀ ਹੈ, ਜਿਸ ਨਾਲ ਮੁੱਖ ਨੁਕਤਿਆਂ ਦੀ ਪਾਲਣਾ ਕਰਨਾ ਅਤੇ ਸਮੀਖਿਆ ਕਰਨਾ ਆਸਾਨ ਹੋ ਜਾਂਦਾ ਹੈ।",
+    "course_not_found": "ਕੋਰਸ ਨਹੀਂ ਮਿਲਿਆ",
+    "course_not_found_desc": "ਜਿਸ ਕੋਰਸ ਦੀ ਤੁਸੀਂ ਭਾਲ ਕਰ ਰਹੇ ਹੋ, ਉਹ ਨਹੀਂ ਲੱਭ ਸਕਿਆ।",
+    "back_to_courses": "ਕੋਰਸਾਂ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "back_to_overview": "ਸੰਖੇਪ ਜਾਣਕਾਰੀ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "completed": "ਪੂਰਾ ਹੋਇਆ",
+    "course_details": "ਕੋਰਸ ਦੇ ਵੇਰਵੇ",
+    "course_id": "ਕੋਰਸ ਆਈ.ਡੀ",
+    "type": "ਟਾਈਪ ਕਰੋ",
+    "duration": "ਮਿਆਦ",
+    "forty_five_min": "45 ਮਿੰਟ",
+    "start_learning_journey": "ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ ਸ਼ੁਰੂ ਕਰੋ",
+    "select_step_prompt": "ਕਿਰਪਾ ਕਰਕੇ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਸਿੱਖਣ ਦੇ ਪ੍ਰਵਾਹ ਵਿੱਚੋਂ ਇੱਕ ਪੜਾਅ ਚੁਣੋ।",
+    "active_session": "ਕਿਰਿਆਸ਼ੀਲ ਸੈਸ਼ਨ",
+    "content_coming_soon": "ਸਮੱਗਰੀ ਜਲਦੀ ਆ ਰਹੀ ਹੈ",
+    "step_preparing": "ਕਦਮ {{step}} ਸਮੱਗਰੀ ਤਿਆਰ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ।",
+    "complete_step": "ਪੂਰਾ ਕਦਮ",
+    "continue": "ਜਾਰੀ ਰੱਖੋ",
+    "unlock_next_course": "ਅਗਲਾ ਕੋਰਸ ਅਨਲੌਕ ਕਰੋ",
+    "progress": "ਤਰੱਕੀ",
+    "content_progress": "ਸਮੱਗਰੀ ਦੀ ਤਰੱਕੀ",
+    "steps_completed": "ਪੜਾਅ ਪੂਰੇ ਹੋਏ",
+    "course_completed": "ਕੋਰਸ ਪੂਰਾ ਹੋਇਆ",
+    "all_steps_validated": "ਸਾਰੇ ਕਦਮ ਪ੍ਰਮਾਣਿਤ ਕੀਤੇ ਗਏ",
+    "curriculum": "ਪਾਠਕ੍ਰਮ",
+    "congratulations": "ਵਧਾਈਆਂ! ",
+    "congratulations_desc": "ਤੁਸੀਂ ਇਸ ਪਾਠ ਲਈ ਸਾਰੇ 9 ਸਿੱਖਣ ਦੇ ਪੜਾਅ ਪੂਰੇ ਕਰ ਲਏ ਹਨ!",
+    "your_progress": "ਤੁਹਾਡੀ ਤਰੱਕੀ",
+    "nine_nine_steps": "9/9 ਕਦਮ",
+    "continue_to_next_lesson": "ਅਗਲੇ ਪਾਠ 'ਤੇ ਜਾਰੀ ਰੱਖੋ",
+    "learning_guidelines": "ਸਿਖਲਾਈ ਪ੍ਰੋਟੋਕੋਲ ਅਤੇ ਦਿਸ਼ਾ-ਨਿਰਦੇਸ਼",
+    "guideline_step": "ਆਪਣੀ ਪ੍ਰਗਤੀ ਨੂੰ ਪ੍ਰਮਾਣਿਤ ਕਰਨ ਅਤੇ ਅਗਲੇ ਪਾਠ ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ ਹਰ ਪੜਾਅ ਨੂੰ ਕ੍ਰਮਵਾਰ ਪੂਰਾ ਕਰੋ।",
+    "guideline_active": "ਸਰਗਰਮੀ ਨਾਲ ਰੁੱਝੇ ਰਹੋ. ",
+    "integrity_warning_title": "ਇਕਸਾਰਤਾ ਅਤੇ ਸੁਰੱਖਿਆ ਚੇਤਾਵਨੀ",
+    "warning_monitored": "ਰੀਅਲ-ਟਾਈਮ ਵਿੱਚ ਟੈਬ-ਸਵਿਚਿੰਗ, ਕਾਪੀ/ਪੇਸਟ, ਅਤੇ ਵਿੰਡੋ ਮਿਨੀਮਾਈਜ਼ੇਸ਼ਨ ਦੀ ਸਖਤੀ ਨਾਲ ਨਿਗਰਾਨੀ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।",
+    "warning_limit": "ਅਧਿਕਤਮ 3 ਚੇਤਾਵਨੀਆਂ ਦੀ ਆਗਿਆ ਹੈ। "
+  },
+  "my_assessments": {
+    "page_title": "ਮੇਰੇ ਮੁਲਾਂਕਣ",
+    "baseline_title": "ਬੇਸ ਲਾਈਨ ਟੈਸਟ - T1",
+    "baseline_short": "ਬੇਸ ਲਾਈਨ - T1",
+    "questions_count": "300 ਸਵਾਲ",
+    "duration_approx": "~45 ਮਿੰਟ",
+    "step": "ਕਦਮ",
+    "view_results": "ਨਤੀਜੇ ਵੇਖੋ",
+    "start_assessment": "ਮੁਲਾਂਕਣ ਸ਼ੁਰੂ ਕਰੋ",
+    "welcome_back": "ਦੁਬਾਰਾ ਜੀ ਆਇਆਂ ਨੂੰ, {{name}}! ",
+    "welcome_back_desc": "ਵਿਅਕਤੀਗਤ ਇਨਸਾਈਟਸ ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ ਆਪਣੇ ਬੇਸ ਲਾਈਨ ਮੁਲਾਂਕਣ ਨੂੰ ਪੂਰਾ ਕਰੋ।",
+    "skills_passport": "ਹੁਨਰ ਪਾਸਪੋਰਟ",
+    "detailed_results": "ਵਿਸਤ੍ਰਿਤ ਨਤੀਜੇ",
+    "readiness_profile": "ਤਿਆਰੀ ਪ੍ਰੋਫਾਈਲ",
+    "current_band": "ਮੌਜੂਦਾ ਬੈਂਡ: {{band}}",
+    "download_pdf": "ਵਿਸਤ੍ਰਿਤ PDF ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
+    "assessment_summary": "ਮੁਲਾਂਕਣ ਸੰਖੇਪ",
+    "assessment_summary_desc": "ਤੁਸੀਂ ਬੇਸ ਲਾਈਨ ਟੈਸਟ - T1 ਪੂਰਾ ਕਰ ਲਿਆ ਹੈ। ",
+    "category_assessment": "ਮੁਲਾਂਕਣ"
+  },
+  "common": {
+    "student": "ਵਿਦਿਆਰਥੀ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "back": "ਪਿੱਛੇ",
+    "loading": "ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "processing": "ਪ੍ਰਕਿਰਿਆ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
+    "verified": "ਪ੍ਰਮਾਣਿਤ",
+    "pending": "ਬਕਾਇਆ",
+    "retry": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+    "high": "ਉੱਚ",
+    "verified_progression": "ਪ੍ਰਮਾਣਿਤ ਤਰੱਕੀ",
+    "skill_acquisition_rate": "ਹੁਨਰ ਪ੍ਰਾਪਤੀ ਦਰ",
+    "competency_aligned": "ਯੋਗਤਾ ਇਕਸਾਰ",
+    "integrity_verified": "ਇਕਸਾਰਤਾ ਦੀ ਪੁਸ਼ਟੀ ਕੀਤੀ ਗਈ",
+    "success_export": "ਸਫਲਤਾਪੂਰਵਕ ਨਿਰਯਾਤ ਕੀਤਾ ਗਿਆ!",
+    "error_export": "ਨਿਰਯਾਤ ਅਸਫਲ ਰਿਹਾ। "
+  },
+  "assessments_dashboard": {
+    "badge": "ਮੁਲਾਂਕਣ ਯਾਤਰਾ",
+    "title": "ਮੁਲਾਂਕਣ ਕੇਂਦਰ",
+    "subtitle": "ਮੁਹਾਰਤ ਲਈ ਇੱਕ ਢਾਂਚਾਗਤ ਮਾਰਗ ਦਾ ਅਨੁਭਵ ਕਰੋ। ",
+    "reset_assessments": "ਮੁਲਾਂਕਣਾਂ ਨੂੰ ਰੀਸੈਟ ਕਰੋ",
+    "reset_confirm": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਤੌਰ 'ਤੇ ਸਾਰੇ 4 ਮੁਲਾਂਕਣਾਂ ਨੂੰ ਰੀਸੈਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ",
+    "error_user_not_found": "ਉਪਭੋਗਤਾ ਡੇਟਾ ਨਹੀਂ ਮਿਲਿਆ। ",
+    "error_id_not_found": "ਯੂਜ਼ਰ ਆਈਡੀ ਨਹੀਂ ਮਿਲੀ। ",
+    "success_reset": "ਸਾਰੇ 4 ਮੁਲਾਂਕਣਾਂ ਨੂੰ ਸਫਲਤਾਪੂਰਵਕ ਰੀਸੈਟ ਕਰੋ!",
+    "error_reset": "ਮੁਲਾਂਕਣਾਂ ਨੂੰ ਰੀਸੈਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ",
+    "error_generic": "ਮੁਲਾਂਕਣਾਂ ਨੂੰ ਰੀਸੈੱਟ ਕਰਨ ਦੌਰਾਨ ਇੱਕ ਤਰੁੱਟੀ ਉਤਪੰਨ ਹੋਈ।",
+    "guidelines_title": "ਮੁਲਾਂਕਣ ਪ੍ਰੋਟੋਕੋਲ ਅਤੇ ਦਿਸ਼ਾ-ਨਿਰਦੇਸ਼",
+    "dynamic_questions_title": "ਗਤੀਸ਼ੀਲ ਸਵਾਲ",
+    "dynamic_questions_desc": "ਹਰੇਕ ਪੜਾਅ ਵਿੱਚ ਸਾਰੇ 6 ਭਾਗਾਂ ਦਾ ਮੁਲਾਂਕਣ ਕਰਨ ਵਾਲੇ ਵਿਲੱਖਣ ਪ੍ਰਸ਼ਨ ਹੁੰਦੇ ਹਨ।",
+    "real_time_persistence_title": "ਰੀਅਲ-ਟਾਈਮ ਨਿਰੰਤਰਤਾ",
+    "real_time_persistence_desc": "ਜਵਾਬ ਅਸਲ-ਸਮੇਂ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਕੀਤੇ ਜਾਂਦੇ ਹਨ - ਜੇਕਰ ਡਿਸਕਨੈਕਟ ਕੀਤਾ ਜਾਂਦਾ ਹੈ ਤਾਂ ਕਿਸੇ ਵੀ ਸਮੇਂ ਮੁੜ-ਚਾਲੂ ਕਰੋ।",
+    "single_attempt_title": "ਸਿੰਗਲ ਕੋਸ਼ਿਸ਼",
+    "single_attempt_desc": "ਮੂਲ ਰੂਪ ਵਿੱਚ ਰੀਟੇਕ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ ਹੈ। ",
+    "integrity_monitoring_title": "ਇਕਸਾਰਤਾ ਨਿਗਰਾਨੀ",
+    "integrity_monitoring_desc": "ਸਕ੍ਰੀਨ ਰਿਕਾਰਡਿੰਗ, ਕਾਪੀ-ਪੇਸਟ ਅਤੇ ਟੈਬ-ਸਵਿਚਿੰਗ ਦੀ ਨਿਗਰਾਨੀ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।",
+    "performance": "ਤੁਹਾਡੀ ਕਾਰਗੁਜ਼ਾਰੀ",
+    "view_report": "ਪ੍ਰਦਰਸ਼ਨ ਰਿਪੋਰਟ ਵੇਖੋ",
+    "start_stage": "ਪੜਾਅ ਦਾ ਮੁਲਾਂਕਣ ਸ਼ੁਰੂ ਕਰੋ",
+    "verified": "ਪ੍ਰਮਾਣਿਤ",
+    "questions": "ਸ",
+    "stages": {
+      "T1": {
+        "title": "T1 - ਬੇਸਲਾਈਨ",
+        "subtitle": "ਫਾਊਂਡੇਸ਼ਨ",
+        "description": "ਸਾਰੇ ਛੇ ਭਾਗਾਂ ਵਿੱਚ ਆਪਣੀ ਬੁਨਿਆਦੀ ਸਮਝ ਅਤੇ ਬੇਸਲਾਈਨ ਯੋਗਤਾ ਨੂੰ ਸਥਾਪਿਤ ਕਰੋ।"
+      },
+      "T2": {
+        "title": "T2 - ਸਮਰੱਥਾ",
+        "subtitle": "ਵਾਧਾ",
+        "description": "ਬੋਧਾਤਮਕ ਅਤੇ ਭਾਵਨਾਤਮਕ ਡੋਮੇਨਾਂ ਵਿੱਚ ਵਿਕਾਸ ਅਤੇ ਵਿਕਾਸ ਲਈ ਆਪਣੀ ਸਮਰੱਥਾ ਨੂੰ ਮਾਪੋ।"
+      },
+      "T3": {
+        "title": "T3 - ਸਮਰੱਥਾ",
+        "subtitle": "ਲਾਗੂ ਹੁਨਰ",
+        "description": "ਉੱਨਤ ਚੁਣੌਤੀਆਂ ਦੇ ਨਾਲ ਆਪਣੀ ਲਾਗੂ ਸਮਰੱਥਾ ਅਤੇ ਪੇਸ਼ੇਵਰ ਤਿਆਰੀ ਦਾ ਮੁਲਾਂਕਣ ਕਰੋ।"
+      },
+      "T4": {
+        "title": "T4 - ਲੀਡਰਸ਼ਿਪ",
+        "subtitle": "ਮੁਹਾਰਤ",
+        "description": "ਯੋਗਤਾ ਦੇ ਸਾਰੇ ਮਾਪਾਂ ਵਿੱਚ ਆਪਣੀ ਲੀਡਰਸ਼ਿਪ ਸਮਰੱਥਾ ਅਤੇ ਮੁਹਾਰਤ ਦਾ ਪ੍ਰਦਰਸ਼ਨ ਕਰੋ।"
+      }
+    }
+  },
+  "baseline_test": {
+    "back": "ਪਿੱਛੇ",
+    "time_left": "ਬਾਕੀ ਸਮਾਂ",
+    "time_almost_up": "ਸਮਾਂ ਲਗਭਗ ਪੂਰਾ ਹੋ ਗਿਆ ਹੈ!",
+    "question_number": "ਸਵਾਲ {{ਮੌਜੂਦਾ}} / {{ਕੁੱਲ}}",
+    "wait_seconds": "{{seconds}}s ਉਡੀਕ ਕਰੋ",
+    "next_question": "ਅਗਲਾ ਸਵਾਲ",
+    "answer_all_questions": "ਸਾਰੇ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਦਿਓ",
+    "submit_test": "ਟੈਸਟ ਜਮ੍ਹਾਂ ਕਰੋ",
+    "submitting": "ਸਪੁਰਦ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "question_map": "ਸਵਾਲ ਦਾ ਨਕਸ਼ਾ",
+    "answered": "ਜਵਾਬ ਦਿੱਤਾ",
+    "remaining": "ਬਾਕੀ",
+    "clear_assessment_dev": "ਸਪਸ਼ਟ ਮੁਲਾਂਕਣ (ਦੇਵ)",
+    "clear_assessment_desc": "ਸਿਰਫ ਵਿਕਾਸ. ",
+    "auto_fill_dev": "⚡ ਆਟੋ-ਫਿਲ (ਦੇਵ)",
+    "back_navigation_disabled": "ਮੁਲਾਂਕਣ ਦੌਰਾਨ ਬੈਕ ਨੈਵੀਗੇਸ਼ਨ ਅਸਮਰੱਥ ਹੈ।",
+    "right_click_disabled": "ਮੁਲਾਂਕਣ ਦੌਰਾਨ ਸੱਜਾ-ਕਲਿੱਕ ਅਯੋਗ ਹੈ।",
+    "copy_paste_disabled": "ਕਾਪੀ ਜਾਂ ਪੇਸਟ ਕਰਨ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ ਹੈ।",
+    "screenshot_detected": "ਸਕ੍ਰੀਨਸ਼ੌਟ ਦੀ ਕੋਸ਼ਿਸ਼ ਦਾ ਪਤਾ ਲੱਗਾ!",
+    "navigated_away": "ਤੁਸੀਂ ਟੈਸਟ ਵਿੰਡੋ ਤੋਂ ਦੂਰ ਨੈਵੀਗੇਟ ਕੀਤਾ ਹੈ।",
+    "terminated_violations": "ਕਈ ਉਲੰਘਣਾਵਾਂ ਦੇ ਕਾਰਨ ਟੈਸਟ ਨੂੰ ਸਮਾਪਤ ਕੀਤਾ ਗਿਆ।",
+    "warning_violations": "ਚੇਤਾਵਨੀ {{count}}/{{max}}: {{message}}",
+    "one_minute_left": "ਸਿਰਫ਼ 1 ਮਿੰਟ ਬਾਕੀ!",
+    "time_up_submitting": "ਸਮਾਂ ਖਤਮ. ",
+    "time_up_ended": "ਸਮਾਂ ਖਤਮ. ",
+    "failed_submit": "ਮੁਲਾਂਕਣ ਸਪੁਰਦ ਕਰਨ ਵਿੱਚ ਅਸਫਲ।",
+    "confirm_restart": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਤੌਰ 'ਤੇ ਇਸ ਮੁਲਾਂਕਣ ਨੂੰ ਰੱਦ ਕਰਨਾ ਅਤੇ ਮੁੜ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ? ",
+    "failed_reset": "ਮੁਲਾਂਕਣ ਰੀਸੈਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ",
+    "answer_all_toast": "ਟੈਸਟ ਦੇਣ ਤੋਂ ਪਹਿਲਾਂ ਸਾਰੇ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਦਿਓ।",
+    "loading_test": "{{title}} ਨੂੰ ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "error_loading": "ਮੁਲਾਂਕਣ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਫਲ। ",
+    "back_to_assessments": "ਮੁਲਾਂਕਣਾਂ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "exit_warning_title": "ਅਜੇ ਨਾ ਛੱਡੋ!",
+    "exit_warning_desc": "ਜਦੋਂ ਮੁਲਾਂਕਣ ਚੱਲ ਰਿਹਾ ਹੋਵੇ ਤਾਂ ਪਿੱਛੇ ਨੈਵੀਗੇਸ਼ਨ ਅਸਮਰੱਥ ਹੈ। ",
+    "leave_assessment": "ਮੁਲਾਂਕਣ ਛੱਡੋ",
+    "continue_assessment": "ਮੁਲਾਂਕਣ ਜਾਰੀ ਰੱਖੋ",
+    "baseline_established": "ਬੇਸਲਾਈਨ ਸਥਾਪਿਤ ਕੀਤੀ ਗਈ",
+    "assessment_complete": "{{name}} ਮੁਲਾਂਕਣ ਪੂਰਾ ਹੋਇਆ",
+    "result_id": "ਨਤੀਜਾ ID: {{id}}",
+    "overall_score": "ਕੁੱਲ ਸਕੋਰ",
+    "proficiency_level": "ਮੁਹਾਰਤ ਦਾ ਪੱਧਰ",
+    "quotient_breakdown": "ਭਾਗ-ਅਧਾਰਿਤ ਵਿਗਾੜ",
+    "performance": "ਪ੍ਰਦਰਸ਼ਨ",
+    "correct": "ਸਹੀ",
+    "download_report": "ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
+    "continue_journey": "ਮੇਰੀ ਯਾਤਰਾ ਜਾਰੀ ਰੱਖੋ",
+    "go_to_dashboard": "ਡੈਸ਼ਬੋਰਡ 'ਤੇ ਜਾਓ",
+    "all_assessments": "ਸਾਰੇ ਮੁਲਾਂਕਣ",
+    "processing_profile": "ਤੁਹਾਡੇ ਪ੍ਰੋਫਾਈਲ 'ਤੇ ਪ੍ਰਕਿਰਿਆ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
+    "badge_unlocked": "ਬੈਜ ਅਨਲੌਕ ਕੀਤਾ ਗਿਆ: {{title}}!",
+    "stage_titles": {
+      "T1": "ਬੇਸ ਲਾਈਨ ਟੈਸਟ",
+      "T2": "ਸਮਰੱਥਾ ਟੈਸਟ",
+      "T3": "ਸਮਰੱਥਾ ਟੈਸਟ",
+      "T4": "ਲੀਡਰਸ਼ਿਪ ਟੈਸਟ"
+    },
+    "stage_names": {
+      "T1": "ਬੇਸਲਾਈਨ",
+      "T2": "ਸਮਰੱਥਾ",
+      "T3": "ਸਮਰੱਥਾ",
+      "T4": "ਲੀਡਰਸ਼ਿਪ"
+    },
+    "bands": {
+      "Advanced": "ਉੱਨਤ",
+      "Strong": "ਮਜ਼ਬੂਤ",
+      "Progressing": "ਤਰੱਕੀ ਹੋ ਰਹੀ ਹੈ",
+      "Developing": "ਵਿਕਾਸ ਕਰ ਰਿਹਾ ਹੈ",
+      "Emerging": "ਉਭਰ ਰਿਹਾ ਹੈ"
+    },
+    "quotients": {
+      "CRQ": {
+        "name": "ਬੋਧਾਤਮਕ ਤਰਕ",
+        "fullName": "ਸੰਵੇਦਨਾਤਮਕ ਤਰਕ ਦਾ ਹਿੱਸਾ",
+        "desc": "ਆਲੋਚਨਾਤਮਕ ਸੋਚ ਅਤੇ ਤਰਕਸ਼ੀਲ ਤਰਕ"
+      },
+      "SRQ": {
+        "name": "ਸਵੈ-ਨਿਯਮ ਅਤੇ ਡਰਾਈਵ",
+        "fullName": "ਸਵੈ-ਨਿਯੰਤ੍ਰਣ ਅਤੇ ਡ੍ਰਾਈਵ ਭਾਗ",
+        "desc": "ਪ੍ਰੇਰਣਾ, ਲਚਕਤਾ ਅਤੇ ਭਾਵਨਾਤਮਕ ਨਿਯੰਤਰਣ"
+      },
+      "LQ": {
+        "name": "ਸਿੱਖਣ ਦੀ ਚੁਸਤੀ",
+        "fullName": "ਸਿੱਖਣ ਦੀ ਚੁਸਤੀ ਮਾਤਰਾ",
+        "desc": "ਅਨੁਕੂਲਤਾ ਅਤੇ ਨਿਰੰਤਰ ਸਿਖਲਾਈ"
+      },
+      "SIQ": {
+        "name": "ਸਮਾਜਿਕ ਪਰਸਪਰ ਕ੍ਰਿਆ",
+        "fullName": "ਸਮਾਜਿਕ ਪਰਸਪਰ ਕ੍ਰਿਆਵਾਂ ਦਾ ਹਿੱਸਾ",
+        "desc": "ਸਹਿਯੋਗ, ਹਮਦਰਦੀ ਅਤੇ ਸੰਚਾਰ"
+      },
+      "PEQ": {
+        "name": "ਪੇਸ਼ੇਵਰ ਐਗਜ਼ੀਕਿਊਸ਼ਨ",
+        "fullName": "ਪ੍ਰੋਫੈਸ਼ਨਲ ਐਗਜ਼ੀਕਿਊਸ਼ਨ ਕੋਟੀਐਂਟ",
+        "desc": "ਕੰਮ ਦੀ ਨੈਤਿਕਤਾ, ਭਰੋਸੇਯੋਗਤਾ ਅਤੇ ਸਪੁਰਦਗੀ"
+      },
+      "DAQ": {
+        "name": "ਡਿਜੀਟਲ ਅਤੇ AI ਸਾਖਰਤਾ",
+        "fullName": "ਡਿਜੀਟਲ ਅਤੇ AI ਸਾਖਰਤਾ ਭਾਗ",
+        "desc": "ਤਕਨੀਕੀ ਮੁਹਾਰਤ ਅਤੇ ਏਆਈ ਦੀ ਤਿਆਰੀ"
+      }
+    }
+  },
+  "toolkit": {
+    "hero_badge": "ਇੰਟੈਲੀਜੈਂਸ ਸੂਟ",
+    "hero_title": "ਸਮਾਰਟ ਟੂਲਕਿੱਟ",
+    "hero_subtitle": "ਤੁਹਾਡੇ ਵਿਕਾਸ ਲਈ ਤਿਆਰ ਕੀਤੇ ਗਏ ਕਰੀਅਰ ਇੰਟੈਲੀਜੈਂਸ, ਤੰਦਰੁਸਤੀ ਦੇ ਸਰੋਤਾਂ, ਅਤੇ ਸਿੱਖਣ ਦੇ ਸਾਧਨਾਂ ਦੇ ਸਾਡੇ ਤਿਆਰ ਕੀਤੇ ਭੰਡਾਰ ਦੀ ਪੜਚੋਲ ਕਰੋ।",
+    "launch_cta": "ਆਪਣੀ ਟੂਲਕਿੱਟ ਤੋਂ ਲਾਂਚ ਕਰੋ",
+    "usage_title": "ਟੂਲਕਿੱਟ ਵਰਤੋਂ ਅਤੇ ਸਰੋਤ",
+    "usage_items": {
+      "instant_access": {
+        "title": "ਤੁਰੰਤ ਪਹੁੰਚ",
+        "desc": "ਬਿਨਾਂ ਕਿਸੇ ਸ਼ਰਤਾਂ ਦੇ ਤੁਰੰਤ ਸਾਰੇ ਪੇਸ਼ੇਵਰ ਸਾਧਨਾਂ ਦੀ ਪੜਚੋਲ ਕਰੋ।"
+      },
+      "ai_enhanced": {
+        "title": "AI ਵਧਾਇਆ ਗਿਆ",
+        "desc": "ਆਪਣੇ ਕਰੀਅਰ ਅਤੇ ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ ਲਈ ਅਤਿ-ਆਧੁਨਿਕ ਬੁੱਧੀ ਦਾ ਲਾਭ ਉਠਾਓ।"
+      },
+      "secure_access": {
+        "title": "ਸੁਰੱਖਿਅਤ ਪਹੁੰਚ",
+        "desc": "ਤੁਹਾਡੇ ਟੂਲ, ਸਰੋਤ, ਅਤੇ ਸਿੱਖਣ ਦੀ ਪ੍ਰਗਤੀ ਇੱਕ ਸੁਰੱਖਿਅਤ ਥਾਂ 'ਤੇ ਸੰਗਠਿਤ ਹਨ।"
+      },
+      "constant_updates": {
+        "title": "ਲਗਾਤਾਰ ਅੱਪਡੇਟ",
+        "desc": "ਅਸੀਂ ਪੇਸ਼ੇਵਰ ਤੌਰ 'ਤੇ ਸਫਲ ਹੋਣ ਵਿੱਚ ਤੁਹਾਡੀ ਮਦਦ ਕਰਨ ਲਈ ਨਿਯਮਿਤ ਤੌਰ 'ਤੇ ਨਵੇਂ ਟੂਲ ਸ਼ਾਮਲ ਕਰ ਰਹੇ ਹਾਂ।"
+      }
+    },
+    "sections": {
+      "career_agent": {
+        "title": "ਕਰੀਅਰ ਏਜੰਟ",
+        "description": "AI-ਸੰਚਾਲਿਤ ਕਰੀਅਰ ਇੰਟੈਲੀਜੈਂਸ ਇੰਜਣ। ",
+        "badge": "AI ਦੁਆਰਾ ਸੰਚਾਲਿਤ",
+        "cta": "ਕਰੀਅਰ ਏਜੰਟ ਲਾਂਚ ਕਰੋ",
+        "meta": "ਕਰੀਅਰ ਇੰਟੈਲੀਜੈਂਸ",
+        "detail": "ਭੂਮਿਕਾ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ · ਹੁਨਰ ਅੰਤਰ · ਰੋਡਮੈਪ · ਪ੍ਰਮਾਣੀਕਰਣ"
+      },
+      "resume_builder": {
+        "title": "ਸਮਾਰਟ ਏਆਈ ਰੈਜ਼ਿਊਮੇ ਬਿਲਡਰ",
+        "description": "ਕ੍ਰਾਫਟ ATS-ਅਨੁਕੂਲ ਰੈਜ਼ਿਊਮੇ ਜੋ ਵੱਖਰੇ ਹਨ। ",
+        "badge": "ਪੇਸ਼ੇਵਰ",
+        "cta": "ਰੈਜ਼ਿਊਮੇ ਬਿਲਡਰ ਖੋਲ੍ਹੋ",
+        "meta": "ATS + AI ਲਿਖਣਾ",
+        "detail": "ਗਾਈਡ ਕੀਤੇ AI ਸਮਰਥਨ ਨਾਲ ਪਾਲਿਸ਼ਡ ਰੈਜ਼ਿਊਮੇ ਬਣਾਓ"
+      },
+      "dictionary": {
+        "title": "ਜਨਰਲ ਡਿਕਸ਼ਨਰੀ",
+        "description": "ਸਾਡੇ ਇੰਟਰਐਕਟਿਵ ਡਿਕਸ਼ਨਰੀ ਦੇ ਨਾਲ ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਵਿੱਚ ਮਾਸਟਰ ਕਰੋ। ",
+        "badge": "ਹਵਾਲਾ",
+        "cta": "ਸ਼ਬਦਕੋਸ਼ ਬ੍ਰਾਊਜ਼ ਕਰੋ",
+        "meta": "ਪਰਿਭਾਸ਼ਾਵਾਂ + ਆਡੀਓ",
+        "detail": "ਖੋਜ ਅਰਥ, ਉਚਾਰਨ, ਅਤੇ ਸ਼ਬਦਾਵਲੀ ਮਦਦ"
+      },
+      "library": {
+        "title": "ਲਾਇਬ੍ਰੇਰੀ",
+        "description": "ਗਿਆਨ ਦੇ ਇੱਕ ਕਿਉਰੇਟਿਡ ਭੰਡਾਰ ਨੂੰ ਅਨਲੌਕ ਕਰੋ। ",
+        "badge": "ਸਰੋਤ",
+        "cta": "ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਪੜਚੋਲ ਕਰੋ",
+        "meta": "ਕਿਤਾਬਾਂ + ਲੇਖ",
+        "detail": "ਸਿੱਖਣ ਅਤੇ ਕਰੀਅਰ ਦੇ ਵਾਧੇ ਲਈ ਕਿਉਰੇਟਿਡ ਰੀਡਿੰਗ ਤੱਕ ਪਹੁੰਚ ਕਰੋ"
+      },
+      "notes": {
+        "title": "ਮੇਰੇ ਨੋਟਸ",
+        "description": "ਆਪਣੇ ਵਿਚਾਰਾਂ ਨੂੰ ਕੈਪਚਰ ਕਰੋ, ਸੰਗਠਿਤ ਕਰੋ ਅਤੇ ਸਿੰਕ ਕਰੋ। ",
+        "badge": "ਉਤਪਾਦਕਤਾ",
+        "cta": "ਮੇਰੇ ਨੋਟਸ ਖੋਲ੍ਹੋ",
+        "meta": "ਕਲਾਊਡ ਸਿੰਕ + ਐਡੀਟਰ",
+        "detail": "ਵਰਗੀਕਰਨ ਅਤੇ ਖੋਜ ਦੇ ਨਾਲ ਰਿਚ ਟੈਕਸਟ ਨੋਟਸ"
+      }
+    }
+  },
+  "skills_vault": {
+    "hero_badge": "ਸੁਰੱਖਿਅਤ ਪੇਸ਼ੇਵਰ ਵਾਲਟ",
+    "hero_title": "ਹੁਨਰ ਵਾਲਟ",
+    "hero_subtitle": "ਇੱਕ ਸਿੰਗਲ, ਉੱਚ-ਸੁਰੱਖਿਆ ਪੇਸ਼ੇਵਰ ਵਾਲਟ ਵਿੱਚ ਆਪਣੇ ਸਰਟੀਫਿਕੇਟ, ਬੈਜ, ਕੋਰਸ ਦੀ ਤਰੱਕੀ, ਅਤੇ ਮੁੱਖ ਸਿਖਲਾਈ ਫਲੈਸ਼ਕਾਰਡਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ।",
+    "tabs": {
+      "overview": "ਸੰਖੇਪ ਜਾਣਕਾਰੀ",
+      "certificates": "ਸਰਟੀਫਿਕੇਟ ਸਰਟੀਫਿਕੇਟ ਸਰਟੀਫਿਕੇਟ",
+      "badges": "ਬੈਜ",
+      "courses": "ਕੋਰਸ ਕੋਰਸ",
+      "flashcards": "ਫਲੈਸ਼ਕਾਰਡਸ"
+    },
+    "overview": {
+      "stats": {
+        "certificates": "ਸਰਟੀਫਿਕੇਟ",
+        "badges": "ਬੈਜ ਕਮਾਏ ਗਏ",
+        "courses": "ਕੋਰਸ",
+        "assessments": "ਮੁਲਾਂਕਣ"
+      },
+      "title": "ਤੁਹਾਡੇ ਹੁਨਰ ਵਾਲਟ ਵਿੱਚ ਕੀ ਹੈ?",
+      "subtitle": "ਤੁਹਾਡਾ ਹੁਨਰ ਵਾਲਟ ਇੱਕ ਕੇਂਦਰੀਕ੍ਰਿਤ ਹੱਬ ਹੈ ਜੋ ਤੁਹਾਡੀਆਂ ਸਾਰੀਆਂ ਪੇਸ਼ੇਵਰ ਪ੍ਰਾਪਤੀਆਂ, ਸਿੱਖਣ ਦੀ ਪ੍ਰਗਤੀ, ਅਤੇ ਮੁੱਖ ਸਰੋਤਾਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਰੂਪ ਨਾਲ ਸਟੋਰ ਅਤੇ ਪ੍ਰਦਰਸ਼ਿਤ ਕਰਦਾ ਹੈ।",
+      "items": {
+        "certificates": {
+          "title": "ਸਰਟੀਫਿਕੇਟ",
+          "desc": "ਪ੍ਰੋਗ੍ਰਾਮ ਦੇ ਮੀਲਪੱਥਰ - ਸਮਰੱਥਾ, ਸਮਰੱਥਾ, ਲੀਡਰਸ਼ਿਪ, ਅਤੇ ਮਾਸਟਰ ਡਿਪਲੋਮਾ ਨੂੰ ਪੂਰਾ ਕਰਨ 'ਤੇ ਜਾਰੀ ਕੀਤੇ ਗਏ ਪ੍ਰਮਾਣਿਤ ਪੇਸ਼ੇਵਰ ਪ੍ਰਮਾਣ ਪੱਤਰ।"
+        },
+        "badges": {
+          "title": "ਬੈਜ ਅਤੇ ਪ੍ਰਾਪਤੀਆਂ",
+          "desc": "ਕੋਰਸ ਦੀਆਂ ਗਤੀਵਿਧੀਆਂ, ਮੁਲਾਂਕਣਾਂ, ਅਤੇ ਰੁਝੇਵਿਆਂ ਦੁਆਰਾ ਪ੍ਰਾਪਤ ਕੀਤੇ ਮਾਈਕਰੋ-ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ - ਹਰ ਇੱਕ ਪ੍ਰਮਾਣਿਤ ਅਤੇ ਸਾਂਝਾ ਕਰਨ ਯੋਗ।"
+        },
+        "courses": {
+          "title": "ਕੋਰਸ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ ਕੋਰਸ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ",
+          "desc": "SMAART ਪਾਠਕ੍ਰਮ ਵਿੱਚ ਤੁਹਾਡੇ ਸਾਰੇ ਦਾਖਲ ਕੀਤੇ ਕੋਰਸਾਂ, ਪੂਰੇ ਕੀਤੇ ਗਏ ਮੋਡਿਊਲਾਂ ਅਤੇ ਸਮੁੱਚੀ ਪ੍ਰਗਤੀ ਦਾ ਇੱਕ ਡੈਸ਼ਬੋਰਡ ਦ੍ਰਿਸ਼।"
+        },
+        "flashcards": {
+          "title": "ਫਲੈਸ਼ਕਾਰਡ ਅਤੇ ਮੁੱਖ ਨਿਯਮ",
+          "desc": "ਤੁਹਾਡੀ ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ ਤੋਂ ਛੇ ਮੁੱਖ ਭਾਗਾਂ ਅਤੇ ਹੋਰ ਜ਼ਰੂਰੀ ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਲਈ ਤੁਰੰਤ-ਸੰਦਰਭ ਕਾਰਡ।"
+        }
+      }
+    },
+    "certificates": {
+      "title": "ਪੇਸ਼ੇਵਰ ਪ੍ਰਮਾਣ ਪੱਤਰ",
+      "desc": "ਤੁਹਾਡੇ ਪ੍ਰਮਾਣਿਤ SMAART ਇੰਸਟੀਚਿਊਟ ਪ੍ਰਮਾਣੀਕਰਣ",
+      "download_centre": "ਕੇਂਦਰ ਡਾਊਨਲੋਡ ਕਰੋ",
+      "verification_title": "ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ ਪੁਸ਼ਟੀਕਰਨ",
+      "verification_desc": "ਕਿਸੇ ਵੀ SMAART ਸਰਟੀਫਿਕੇਟ ਦੀ ਵਿਲੱਖਣ ID ਜਾਂ QR ਕੋਡ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਪੁਸ਼ਟੀ ਕਰੋ।",
+      "names": {
+        "capacity": "ਸਮਰੱਥਾ ਅਤੇ ਕੰਮ ਦੀ ਤਿਆਰੀ ਵਿੱਚ ਸਰਟੀਫਿਕੇਟ",
+        "capability": "ਅਪਲਾਈਡ ਸਮਰੱਥਾ ਵਿੱਚ ਐਡਵਾਂਸਡ ਸਰਟੀਫਿਕੇਟ",
+        "leadership": "ਰੁਜ਼ਗਾਰਯੋਗਤਾ ਅਤੇ ਲੀਡਰਸ਼ਿਪ ਵਿੱਚ ਡਿਪਲੋਮਾ",
+        "combined": "ਵਿਆਪਕ ਤਿਆਰੀ ਵਿੱਚ ਮਾਸਟਰ ਡਿਪਲੋਮਾ"
+      },
+      "levels": {
+        "capacity": "ਪੱਧਰ 1",
+        "capability": "ਪੱਧਰ 2",
+        "leadership": "ਪੱਧਰ 3",
+        "combined": "ਮਾਸਟਰ"
+      }
+    },
+    "courses": {
+      "overview": "ਕੋਰਸ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ",
+      "go_to_courses": "ਕੋਰਸਾਂ 'ਤੇ ਜਾਓ",
+      "modules": "ਮੋਡੀਊਲ",
+      "self_paced": "ਸਵੈ-ਰਫ਼ਤਾਰ",
+      "duration": "{{ਅਵਧੀ}}",
+      "no_courses_title": "ਕੋਈ ਦਾਖਲਾ ਕੋਰਸ ਨਹੀਂ",
+      "no_courses_desc": "ਤੁਸੀਂ ਕਿਸੇ ਵੀ ਕੋਰਸ ਵਿੱਚ ਦਾਖਲਾ ਨਹੀਂ ਲਿਆ ਹੈ। ",
+      "browse_btn": "ਕੋਰ ਪ੍ਰੋਗਰਾਮ ਬ੍ਰਾਊਜ਼ ਕਰੋ"
+    },
+    "flashcards": {
+      "title": "ਕੁੰਜੀ ਫਲੈਸ਼ਕਾਰਡ",
+      "desc": "ਤਤਕਾਲ-ਸੰਦਰਭ ਕਾਰਡ ਛੇ ਕੋਰ SMAART ਭਾਗਾਂ ਅਤੇ ਜ਼ਰੂਰੀ ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਨੂੰ ਕਵਰ ਕਰਦੇ ਹਨ।",
+      "more_desc": "ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਵਿੱਚ ਮੁਹਾਰਤ ਹਾਸਲ ਕਰਨ ਵਿੱਚ ਤੁਹਾਡੀ ਮਦਦ ਕਰਨ ਲਈ ਹਰੇਕ ਕੋਰਸ ਮੋਡੀਊਲ ਵਿੱਚ ਹੋਰ ਫਲੈਸ਼ਕਾਰਡ ਉਪਲਬਧ ਹਨ।",
+      "explore_btn": "ਕੋਰਸ ਫਲੈਸ਼ਕਾਰਡਸ ਦੀ ਪੜਚੋਲ ਕਰੋ",
+      "category": {
+        "Quotient": "ਭਾਗ"
+      },
+      "tap_reveal": "ਪ੍ਰਗਟ ਕਰਨ ਲਈ ਟੈਪ ਕਰੋ",
+      "flip_back": "ਵਾਪਸ ਫਲਿੱਪ ਕਰੋ",
+      "cards": {
+        "crq": {
+          "term": "ਬੋਧਾਤਮਕ ਤਰਕ (CRQ)",
+          "definition": "ਅਰਥਪੂਰਨ ਸਿੱਟੇ ਕੱਢਣ ਅਤੇ ਗੁੰਝਲਦਾਰ ਸਮੱਸਿਆਵਾਂ ਨੂੰ ਹੱਲ ਕਰਨ ਲਈ ਜਾਣਕਾਰੀ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ, ਸੰਸ਼ਲੇਸ਼ਣ ਅਤੇ ਮੁਲਾਂਕਣ ਕਰਨ ਦੀ ਯੋਗਤਾ।"
+        },
+        "srq": {
+          "term": "ਸਵੈ-ਨਿਯਮ (SRQ)",
+          "definition": "ਵੱਖ-ਵੱਖ ਸਥਿਤੀਆਂ ਅਤੇ ਟੀਚਿਆਂ ਵੱਲ ਪ੍ਰਭਾਵਸ਼ਾਲੀ ਢੰਗ ਨਾਲ ਭਾਵਨਾਵਾਂ, ਵਿਚਾਰਾਂ ਅਤੇ ਵਿਹਾਰਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰਨ ਦੀ ਸਮਰੱਥਾ।"
+        },
+        "lq": {
+          "term": "ਸਿੱਖਣ ਦੀ ਚੁਸਤੀ (LQ)",
+          "definition": "ਤਜਰਬੇ ਤੋਂ ਸਿੱਖਣ ਦੀ ਇੱਛਾ ਅਤੇ ਯੋਗਤਾ ਅਤੇ ਫਿਰ ਉਹਨਾਂ ਸਬਕ ਨੂੰ ਨਵੀਆਂ ਅਤੇ ਪਹਿਲੀ ਵਾਰ ਦੀਆਂ ਸਥਿਤੀਆਂ ਵਿੱਚ ਲਾਗੂ ਕਰਨਾ।"
+        },
+        "siq": {
+          "term": "ਸਮਾਜਿਕ ਪਰਸਪਰ ਪ੍ਰਭਾਵ (SIQ)",
+          "definition": "ਭਾਵਨਾਤਮਕ ਬੁੱਧੀ, ਹਮਦਰਦੀ ਅਤੇ ਪ੍ਰਭਾਵਸ਼ਾਲੀ ਸੰਚਾਰ ਨਾਲ ਸਮਾਜਿਕ ਵਾਤਾਵਰਣ ਨੂੰ ਨੈਵੀਗੇਟ ਕਰਨ ਦਾ ਹੁਨਰ।"
+        },
+        "peq": {
+          "term": "ਪ੍ਰੋਫੈਸ਼ਨਲ ਐਗਜ਼ੀਕਿਊਸ਼ਨ (PEQ)",
+          "definition": "ਜਵਾਬਦੇਹੀ, ਸ਼ੁੱਧਤਾ, ਅਤੇ ਹਿੱਸੇਦਾਰ ਸਥਿਤੀ ਦੇ ਨਾਲ ਪੇਸ਼ੇਵਰ ਨਤੀਜੇ ਪ੍ਰਦਾਨ ਕਰਨ ਦੀ ਯੋਗਤਾ."
+        },
+        "daq": {
+          "term": "ਡਿਜੀਟਲ ਅਤੇ AI ਸਾਖਰਤਾ (DAQ)",
+          "definition": "ਉਤਪਾਦਕਤਾ ਅਤੇ ਨਵੀਨਤਾ ਨੂੰ ਵਧਾਉਣ ਲਈ ਡਿਜੀਟਲ ਟੂਲਸ ਅਤੇ ਆਰਟੀਫਿਸ਼ੀਅਲ ਇੰਟੈਲੀਜੈਂਸ ਦਾ ਲਾਭ ਉਠਾਉਣ ਦੀ ਯੋਗਤਾ।"
+        }
+      }
+    },
+    "student": "ਵਿਦਿਆਰਥੀ"
+  },
+  "badge_gallery": {
+    "achievements_cabinet": "ਪ੍ਰਾਪਤੀਆਂ ਕੈਬਨਿਟ",
+    "no_achievements": "ਕੋਈ ਪ੍ਰਾਪਤੀਆਂ ਉਪਲਬਧ ਨਹੀਂ ਹਨ",
+    "verified": "ਪ੍ਰਮਾਣਿਤ",
+    "verified_credential": "ਪ੍ਰਮਾਣਿਤ ਪ੍ਰਮਾਣ ਪੱਤਰ",
+    "unlocked": "ਅਨਲੌਕ ਕੀਤਾ",
+    "view": "ਦੇਖੋ",
+    "recipient": "ਪ੍ਰਾਪਤਕਰਤਾ",
+    "xp_credit": "XP ਕ੍ਰੈਡਿਟ",
+    "earned_date": "ਕਮਾਈ ਦੀ ਮਿਤੀ",
+    "verification_code": "ਪੁਸ਼ਟੀਕਰਨ ਕੋਡ",
+    "share_credential": "ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ ਸਾਂਝਾ ਕਰੋ",
+    "download_certificate": "ਸਰਟੀਫਿਕੇਟ ਡਾਊਨਲੋਡ ਕਰੋ",
+    "verify_badge": "ਬੈਜ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+    "categories": {
+      "all": "ਸਾਰੀਆਂ ਸ਼੍ਰੇਣੀਆਂ",
+      "capability": "ਸਮਰੱਥਾ",
+      "capacity": "ਸਮਰੱਥਾ",
+      "leadership": "ਲੀਡਰਸ਼ਿਪ"
+    },
+    "fallback": {
+      "module_master": {
+        "title": "ਮੋਡੀਊਲ ਮਾਸਟਰ",
+        "desc": "ਕੋਰਸ ਮੋਡੀਊਲ ਨੂੰ ਸਫਲਤਾਪੂਰਵਕ ਪੂਰਾ ਕਰਨ ਲਈ ਸਨਮਾਨਿਤ ਕੀਤਾ ਗਿਆ।"
+      },
+      "course_conqueror": {
+        "title": "ਕੋਰਸ ਜੇਤੂ",
+        "desc": "ਪੂਰੇ ਕੋਰਸ ਨੂੰ ਸਫਲਤਾਪੂਰਵਕ ਪੂਰਾ ਕਰਨ ਲਈ ਸਨਮਾਨਿਤ ਕੀਤਾ ਗਿਆ।"
+      }
+    }
+  },
+  "career_agent": {
+    "loading_title": "ਖੁਫੀਆ ਜਾਣਕਾਰੀ ਦਾ ਸਮਕਾਲੀਕਰਨ...",
+    "loading_subtitle": "ਆਪਣੇ ਕੈਰੀਅਰ ਦੇ ਟ੍ਰੈਜੈਕਟਰੀ ਨੂੰ ਮੈਪ ਕਰਨਾ",
+    "panels": {
+      "direction": "ਦਿਸ਼ਾ ਸੰਖੇਪ ਜਾਣਕਾਰੀ",
+      "roledetail": "ਰੋਲ ਵਿਸਤ੍ਰਿਤ ਦ੍ਰਿਸ਼",
+      "market": "ਮਾਰਕੀਟ Intel",
+      "skills": "ਹੁਨਰ ਡੀਐਨਏ",
+      "roadmap": "ਕਰੀਅਰ ਰੋਡਮੈਪ",
+      "certs": "ਪ੍ਰਮਾਣੀਕਰਣ",
+      "future": "ਭਵਿੱਖ ਦਾ ਸਕੋਪ",
+      "ai": "AI ਲਾਗੂ ਕਰਨਾ",
+      "interview": "ਇੰਟਰਵਿਊ ਦੀ ਤਿਆਰੀ",
+      "resume": "ਸੁਝਾਅ ਮੁੜ ਸ਼ੁਰੂ ਕਰੋ",
+      "projects": "ਪ੍ਰੋਜੈਕਟ ਸਪੇਸ"
+    },
+    "selection": {
+      "title": "ਮਾਰਗ ਸ਼ੁੱਧਤਾ ਚੋਣ",
+      "subtitle": "ਹਰੇਕ ਖੇਤਰ ਲਈ ਆਪਣੀ ਦਿਲਚਸਪੀ ਦੇ ਪੱਧਰ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ।",
+      "primary_path": "ਪ੍ਰਾਇਮਰੀ ਮਾਰਗ",
+      "secondary_path": "ਸੈਕੰਡਰੀ ਮਾਰਗ",
+      "tertiary_path": "ਤੀਜਾ ਮਾਰਗ",
+      "roles": "ਭੂਮਿਕਾਵਾਂ:",
+      "no_roles": "ਕੋਈ ਖਾਸ ਭੂਮਿਕਾਵਾਂ ਸੂਚੀਬੱਧ ਨਹੀਂ ਹਨ",
+      "interested": "ਦਿਲਚਸਪੀ ਹੈ",
+      "not_interested": "ਦਿਲਚਸਪੀ ਨਹੀਂ ਹੈ",
+      "confirm": "ਚੋਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਲਾਕ ਇਨ ਕਰੋ"
+    },
+    "welcome": {
+      "path_confirmed": "ਮਾਰਗ ਦੀ ਪੁਸ਼ਟੀ ਕੀਤੀ ਗਈ",
+      "title": "ਤੁਹਾਡੀ ਯਾਤਰਾ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ",
+      "desc_multiple": "ਤੁਸੀਂ ਆਪਣੇ ਚੁਣੇ ਹੋਏ ਕੈਰੀਅਰ ਦੇ ਮਾਰਗਾਂ ਵਿੱਚ ਸਫਲਤਾਪੂਰਵਕ ਲਾਕ ਕਰ ਲਿਆ ਹੈ। ",
+      "desc_single_start": "ਤੁਸੀਂ ਲਾਕ ਇਨ ਕੀਤਾ ਹੈ",
+      "desc_single_end": "ਤੁਹਾਡੇ ਕੈਰੀਅਰ ਦੇ ਮਾਰਗ ਦੇ ਰੂਪ ਵਿੱਚ. ",
+      "closing": "ਆਪਣੇ ਆਪ ਬੰਦ ਹੋ ਰਿਹਾ ਹੈ..."
+    },
+    "header": {
+      "title_start": "ਕੈਰੀਅਰ",
+      "title_span": "ਬੁੱਧੀ",
+      "title_end": "ਰਿਪੋਰਟ",
+      "candidate": "ਉਮੀਦਵਾਰ:",
+      "back": "← ਡੈਸ਼ਬੋਰਡ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+      "path_locked": "ਪਾਥ ਲਾਕ ਇਨ",
+      "lock_path": "ਇਸ ਮਾਰਗ ਨੂੰ ਲਾਕ ਕਰੋ",
+      "new_analysis": "ਨਵਾਂ ਵਿਸ਼ਲੇਸ਼ਣ"
+    },
+    "overview": {
+      "overall_match": "ਸਮੁੱਚਾ ਮੈਚ",
+      "alignment_prob": "ਅਲਾਈਨਮੈਂਟ ਸੰਭਾਵਨਾ",
+      "prep_time": "ਤਿਆਰੀ ਦਾ ਸਮਾਂ",
+      "reach_green": "ਗ੍ਰੀਨ ਜ਼ੋਨ ਤੱਕ ਪਹੁੰਚਣ ਲਈ",
+      "market_demand": "ਮਾਰਕੀਟ ਦੀ ਮੰਗ",
+      "hiring_velocity": "ਹਾਇਰਿੰਗ ਵੇਲੋਸਿਟੀ",
+      "role_function": "ਇਹ ਰੋਲ ਕੀ ਕਰਦਾ ਹੈ",
+      "no_description": "ਕੋਈ ਵੇਰਵਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।",
+      "ml_fit_score": "ML FIT ਸਕੋਰ",
+      "ai_evolution": "ਏਆਈ ਈਵੇਲੂਸ਼ਨ",
+      "ai_pending": "AI ਮੁਲਾਂਕਣ ਲੰਬਿਤ ਹੈ।",
+      "who_consider": "ਕਿਸਨੂੰ ਵਿਚਾਰਨਾ ਚਾਹੀਦਾ ਹੈ",
+      "preparing_role": "ਇਸ ਭੂਮਿਕਾ ਦੀ ਤਿਆਰੀ...",
+      "market_signal": "📍 ਟੀਅਰ-1 ਇੰਡੀਆ ਮਾਰਕੀਟ ਸਿਗਨਲ",
+      "typical_employers": "ਆਮ ਰੁਜ਼ਗਾਰਦਾਤਾ",
+      "common_entry": "ਆਮ ਇੰਦਰਾਜ਼"
+    },
+    "direction": {
+      "desc": "ਤੁਹਾਡੀ ਚੁਣੀ ਗਈ ਕੈਰੀਅਰ ਦੀ ਦਿਸ਼ਾ ਅਤੇ ਇਸ ਵਿੱਚ ਸਾਰੀਆਂ ਭੂਮਿਕਾਵਾਂ — SMAART ਕਰੀਅਰ ਏਜੰਟ ਡੇਟਾਬੇਸ ਤੋਂ ਪ੍ਰਾਪਤ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ।"
+    },
+    "roledetail": {
+      "desc_start": "ਸਮੀਖਿਆ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ",
+      "desc_end": "- ਪੁਸ਼ਟੀ ਕਰੋ ਕਿ ਕੀ ਇਹ ਤੁਹਾਡੇ ਕਰੀਅਰ ਦਾ ਮਾਰਗ ਹੈ।"
+    },
+    "market": {
+      "title": "ਮਾਰਕੀਟ ਇੰਟੈਲੀਜੈਂਸ",
+      "desc_start": "ਲਈ ਭੂਮਿਕਾਵਾਂ ਦਿਖਾ ਰਿਹਾ ਹੈ",
+      "desc_end": "- ਇਸਦੇ ਮਾਰਕੀਟ ਡੇਟਾ ਨੂੰ ਦੇਖਣ ਲਈ ਹੇਠਾਂ ਇੱਕ ਭੂਮਿਕਾ ਚੁਣੋ।"
+    },
+    "skills": {
+      "title": "ਹੁਨਰ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ"
+    },
+    "roadmap": {
+      "title": "ਸਮਾਰਟ ਕੈਰੀਅਰ ਇੰਟੈਲੀਜੈਂਸ",
+      "desc_start": "ਲਈ ਤੁਹਾਡਾ ਵਿਅਕਤੀਗਤ ਪ੍ਰਵੇਗ ਮਾਰਗ",
+      "desc_end": ", ਤੁਹਾਡੇ ਵਿਦਿਅਕ ਪਿਛੋਕੜ ਅਤੇ ਹੁਨਰ ਪ੍ਰੋਫਾਈਲ ਨਾਲ ਮੇਲ ਖਾਂਦਾ ਹੈ।"
+    },
+    "future": {
+      "title": "ਭਵਿੱਖ ਦੀ ਚਾਲ ਅਤੇ ਵਿਕਾਸ",
+      "desc_start": "ਤਨਖ਼ਾਹ ਦੀ ਤਰੱਕੀ, ਭੂਮਿਕਾ ਦਾ ਵਿਕਾਸ, ਅਤੇ ਇਹ ਮਾਰਗ ਕਿਸ ਦੇ ਅਨੁਕੂਲ ਹੈ — ਦੇ ਆਧਾਰ 'ਤੇ"
+    },
+    "ai": {
+      "title": "ਭੂਮਿਕਾ ਵਿੱਚ AI ਲਾਗੂ ਕਰਨਾ",
+      "desc_start": "AI ਕਿਵੇਂ ਮੁੜ ਆਕਾਰ ਦੇ ਰਿਹਾ ਹੈ",
+      "desc_end": "- ਐਕਸਪੋਜ਼ਰ ਵਿਸ਼ਲੇਸ਼ਣ, AI-ਦੇਸੀ ਹੁਨਰ, ਅਤੇ ਜੋ ਅਟੱਲ ਤੌਰ 'ਤੇ ਮਨੁੱਖੀ ਰਹਿੰਦਾ ਹੈ।"
+    },
+    "projects": {
+      "title": "ਪ੍ਰੋਜੈਕਟ ਸਪੇਸ",
+      "desc_start": "ਉੱਚ-ਪ੍ਰਭਾਵ ਵਾਲੇ ਬਲੂਪ੍ਰਿੰਟ ਬਿਲਡ ਜੋ ਤੁਹਾਡੇ ਹੁਨਰ ਨੂੰ ਸਾਬਤ ਕਰਦੇ ਹਨ",
+      "unlocked": "ਅਨਲੌਕ ਕੀਤਾ"
+    },
+    "interview": {
+      "title": "ਇੰਟਰਵਿਊ ਦੀ ਤਿਆਰੀ",
+      "desc_start": "ਲਈ ਤਿਆਰ ਕੀਤੇ ਸਰੋਤ ਅਤੇ ਸਵਾਲ",
+      "desc_end": "- ਯੋਗਤਾ, ਡੋਮੇਨ, ਤਕਨੀਕੀ ਅਤੇ HR ਦੌਰ।"
+    },
+    "resume": {
+      "title": "ਸੁਝਾਅ ਮੁੜ ਸ਼ੁਰੂ ਕਰੋ",
+      "desc_start": "ਲਈ ਇੱਕ ਮਜ਼ਬੂਤ, ATS-ਤਿਆਰ ਰੈਜ਼ਿਊਮੇ ਬਣਾਓ",
+      "desc_end": "— ਬਣਤਰ, ਕੀਵਰਡਸ, ਅਤੇ ਇੱਕ AI ਜਨਰੇਟਰ।"
+    },
+    "certs": {
+      "title": "ਪ੍ਰਮਾਣੀਕਰਣ"
+    },
+    "placeholders": {
+      "processed_v7": "ਇਹ ਇੰਟੈਲੀਜੈਂਸ ਵੈਕਟਰ ਵਰਤਮਾਨ ਵਿੱਚ v7 ਵਿਸ਼ਲੇਸ਼ਣ ਇੰਜਣ ਦੁਆਰਾ ਸੰਸਾਧਿਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।"
+    }
+  },
+  "notifications": {
+    "title": "ਸੂਚਨਾਵਾਂ",
+    "unread_count": "{{count}} ਅਣਪੜ੍ਹੀਆਂ ਸੂਚਨਾਵਾਂ",
+    "all_caught_up": "ਸਾਰੇ ਫੜੇ ਗਏ!",
+    "ws": {
+      "live_updates": "'ਤੇ ਲਾਈਵ ਅੱਪਡੇਟ",
+      "connecting": "ਜੁੜ ਰਿਹਾ ਹੈ",
+      "offline": "ਰੀਅਲਟਾਈਮ ਔਫਲਾਈਨ"
+    },
+    "actions": {
+      "refresh": "ਤਾਜ਼ਾ ਕਰੋ",
+      "mark_all_read": "ਸਭ ਨੂੰ ਪੜ੍ਹਿਆ ਹੋਇਆ ਚਿੰਨ੍ਹਿਤ ਕਰੋ",
+      "clear_all": "ਸਭ ਸਾਫ਼ ਕਰੋ",
+      "mark_as_read": "ਪੜ੍ਹੇ ਵਜੋਂ ਨਿਸ਼ਾਨਦੇਹੀ ਕਰੋ",
+      "delete": "ਮਿਟਾਓ",
+      "load_more": "ਹੋਰ ਸੂਚਨਾਵਾਂ ਲੋਡ ਕਰੋ"
+    },
+    "filters": {
+      "all": "ਸਾਰੇ",
+      "unread": "ਨਾ ਪੜ੍ਹਿਆ"
+    },
+    "summary": {
+      "welcome": "ਦੁਬਾਰਾ ਜੀ ਆਇਆਂ ਨੂੰ, {{name}}!",
+      "subtitle": "ਇਹ ਤੁਹਾਡਾ ਰੋਜ਼ਾਨਾ ਸੰਖੇਪ ਹੈ",
+      "current_session": "ਮੌਜੂਦਾ ਸੈਸ਼ਨ: {{time}}",
+      "last_login": "ਆਖਰੀ ਲਾਗਇਨ",
+      "first_login": "ਪਹਿਲੀ ਲਾਗਇਨ!",
+      "badges_earned": "ਬੈਜ ਕਮਾਏ ਗਏ",
+      "today_sessions": "ਅੱਜ ਦੇ ਸੈਸ਼ਨ",
+      "sessions_completed": "{{count}} ਪੂਰਾ ਹੋਇਆ",
+      "enrolled_courses": "ਦਾਖਲਾ ਕੋਰਸ"
+    },
+    "empty": {
+      "no_unread": "ਕੋਈ ਅਣਪੜ੍ਹੀਆਂ ਸੂਚਨਾਵਾਂ ਨਹੀਂ ਹਨ",
+      "no_notifications": "ਅਜੇ ਤੱਕ ਕੋਈ ਸੂਚਨਾਵਾਂ ਨਹੀਂ ਹਨ",
+      "unread_desc": "ਤੁਸੀਂ ਸਭ ਨੂੰ ਸਮਝ ਲਿਆ ਹੈ! ",
+      "notifications_desc": "ਜਦੋਂ ਤੁਸੀਂ ਸੂਚਨਾਵਾਂ ਪ੍ਰਾਪਤ ਕਰਦੇ ਹੋ, ਉਹ ਇੱਥੇ ਦਿਖਾਈ ਦੇਣਗੇ। "
+    },
+    "groups": {
+      "today": "ਅੱਜ",
+      "yesterday": "ਕੱਲ੍ਹ"
+    },
+    "time": {
+      "just_now": "ਹੁਣੇ ਹੀ",
+      "year": "{{count}} ਸਾਲ ਪਹਿਲਾਂ",
+      "year_plural": "{{count}} ਸਾਲ ਪਹਿਲਾਂ",
+      "month": "{{count}} ਮਹੀਨਾ ਪਹਿਲਾਂ",
+      "month_plural": "{{count}} ਮਹੀਨੇ ਪਹਿਲਾਂ",
+      "week": "{{count}} ਹਫ਼ਤਾ ਪਹਿਲਾਂ",
+      "week_plural": "{{count}} ਹਫ਼ਤੇ ਪਹਿਲਾਂ",
+      "day": "{{count}} ਦਿਨ ਪਹਿਲਾਂ",
+      "day_plural": "{{count}} ਦਿਨ ਪਹਿਲਾਂ",
+      "hour": "{{count}} ਘੰਟਾ ਪਹਿਲਾਂ",
+      "hour_plural": "{{count}} ਘੰਟੇ ਪਹਿਲਾਂ",
+      "minute": "{{count}} ਮਿੰਟ ਪਹਿਲਾਂ",
+      "minute_plural": "{{count}} ਮਿੰਟ ਪਹਿਲਾਂ"
+    },
+    "types": {
+      "badge": "ਬੈਜ",
+      "assessment": "ਮੁਲਾਂਕਣ",
+      "course": "ਕੋਰਸ",
+      "achievement": "ਪ੍ਰਾਪਤੀਆਂ",
+      "community": "ਭਾਈਚਾਰਾ",
+      "coaching": "ਕੋਚਿੰਗ",
+      "support": "ਸਪੋਰਟ",
+      "task": "ਕਾਰਜ",
+      "certificate": "ਸਰਟੀਫਿਕੇਟ",
+      "system": "ਸਿਸਟਮ"
+    }
+  },
+  "settings_page": {
+    "profile_desc": "ਆਪਣੀ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ",
+    "notifications_desc": "ਸੂਚਨਾ ਤਰਜੀਹਾਂ ਨੂੰ ਕੌਂਫਿਗਰ ਕਰੋ",
+    "privacy_desc": "ਆਪਣੀਆਂ ਗੋਪਨੀਯਤਾ ਸੈਟਿੰਗਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ",
+    "customisation_desc": "ਥੀਮ, ਭਾਸ਼ਾ ਅਤੇ ਖੇਤਰੀ ਸੈਟਿੰਗਾਂ ਨੂੰ ਅਨੁਕੂਲਿਤ ਕਰੋ",
+    "help_desc": "ਮਦਦ ਪ੍ਰਾਪਤ ਕਰੋ ਅਤੇ ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+    "display_name": "ਡਿਸਪਲੇ ਨਾਮ",
+    "enter_display_name": "ਆਪਣਾ ਡਿਸਪਲੇ ਨਾਮ ਦਰਜ ਕਰੋ",
+    "email_address": "ਈਮੇਲ ਪਤਾ",
+    "enter_email": "ਆਪਣੀ ਈਮੇਲ ਦਰਜ ਕਰੋ",
+    "email_cannot_change": "ਈਮੇਲ ਪਤਾ ਬਦਲਿਆ ਨਹੀਂ ਜਾ ਸਕਦਾ।",
+    "phone_number": "ਫ਼ੋਨ ਨੰਬਰ",
+    "enter_phone_number": "ਆਪਣਾ ਫ਼ੋਨ ਨੰਬਰ ਦਾਖਲ ਕਰੋ",
+    "bio": "ਬਾਇਓ",
+    "tell_about_yourself": "ਸਾਨੂੰ ਆਪਣੇ ਬਾਰੇ ਦੱਸੋ",
+    "change_password": "ਪਾਸਵਰਡ ਬਦਲੋ",
+    "update_password_desc": "ਆਪਣੇ ਖਾਤੇ ਦਾ ਪਾਸਵਰਡ ਅੱਪਡੇਟ ਕਰੋ",
+    "change": "ਬਦਲੋ",
+    "email_notifications": "ਈਮੇਲ ਸੂਚਨਾਵਾਂ",
+    "email_notifications_desc": "ਈਮੇਲ ਰਾਹੀਂ ਅੱਪਡੇਟ ਪ੍ਰਾਪਤ ਕਰੋ",
+    "push_notifications": "ਪੁਸ਼ ਸੂਚਨਾਵਾਂ",
+    "push_notifications_desc": "ਆਪਣੀ ਡਿਵਾਈਸ 'ਤੇ ਪੁਸ਼ ਸੂਚਨਾਵਾਂ ਪ੍ਰਾਪਤ ਕਰੋ",
+    "community_activity": "ਭਾਈਚਾਰਕ ਗਤੀਵਿਧੀ",
+    "community_activity_desc": "ਭਾਈਚਾਰਕ ਚਰਚਾਵਾਂ ਤੋਂ ਅੱਪਡੇਟ",
+    "two_factor_auth": "ਦੋ-ਕਾਰਕ ਪ੍ਰਮਾਣਿਕਤਾ",
+    "two_factor_desc": "ਸੁਰੱਖਿਆ ਦੀ ਇੱਕ ਵਾਧੂ ਪਰਤ ਸ਼ਾਮਲ ਕਰੋ",
+    "enable": "ਯੋਗ ਕਰੋ",
+    "security_guidelines": "ਸਮਾਰਟ ਸੁਰੱਖਿਆ ਅਤੇ ਗੋਪਨੀਯਤਾ ਦਿਸ਼ਾ-ਨਿਰਦੇਸ਼",
+    "guideline_1_title": "ਬੋਧਾਤਮਕ ਅਤੇ EQ ਡਾਟਾ ਸੁਰੱਖਿਆ:",
+    "guideline_1_desc": "ਤੁਹਾਡੇ ਬੇਸਲਾਈਨ ਕੋਐਂਟ ਟੈਸਟ ਸਕੋਰ, EQ ਜਵਾਬ ਡੇਟਾ, ਅਤੇ AI ਕੈਰੀਅਰ ਕੋਚਿੰਗ ਸਵਾਲਾਂ ਨੂੰ ਏਨਕ੍ਰਿਪਟ ਕੀਤਾ ਗਿਆ ਹੈ ਅਤੇ ਤੁਹਾਡੇ ਸਿਖਲਾਈ ਰੋਡਮੈਪ ਨੂੰ ਵਿਅਕਤੀਗਤ ਬਣਾਉਣ ਲਈ ਸਖਤੀ ਨਾਲ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ।",
+    "guideline_2_title": "ਅਕਾਦਮਿਕ ਰਿਕਾਰਡ ਦੀ ਗੁਪਤਤਾ:",
+    "guideline_2_desc": "ਤੁਹਾਡੇ ਕੋਰਸ ਦੀ ਪ੍ਰਗਤੀ, ਬੈਜ, ਅਤੇ ਪ੍ਰਮਾਣਿਤ ਹੁਨਰ ਪ੍ਰਮਾਣ-ਪੱਤਰ ਨਿਜੀ ਰੱਖੇ ਜਾਂਦੇ ਹਨ ਅਤੇ ਸਿਰਫ਼ ਤੁਹਾਡੇ ਅਤੇ ਅਧਿਕਾਰਤ ਸੰਸਥਾਗਤ ਪ੍ਰਬੰਧਕਾਂ ਲਈ ਪਹੁੰਚਯੋਗ ਹੁੰਦੇ ਹਨ।",
+    "guideline_3_title": "ਖਾਤਾ ਇਕਸਾਰਤਾ:",
+    "guideline_3_desc": "ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਸੀਂ ਪ੍ਰਮਾਣ ਪੱਤਰਾਂ ਨੂੰ ਸਾਂਝਾ ਨਹੀਂ ਕਰਦੇ ਹੋ। ",
+    "guideline_4_title": "ਭਾਈਚਾਰਾ ਅਤੇ ਸਾਂਝਾਕਰਨ:",
+    "guideline_4_desc": "ਜਦੋਂ ਕਿ ਪੀਅਰ ਗਰੁੱਪ ਚੈਟ ਅਤੇ ਜਨਤਕ ਫੋਰਮ ਦੀਆਂ ਚਰਚਾਵਾਂ ਦੂਜੇ ਵਿਦਿਆਰਥੀ ਮੈਂਬਰਾਂ ਨੂੰ ਦਿਖਾਈ ਦਿੰਦੀਆਂ ਹਨ, ਤੁਹਾਡਾ ਸਾਰਾ ਮੁਲਾਂਕਣ ਡੇਟਾ ਸਖ਼ਤੀ ਨਾਲ ਗੁਪਤ ਰਹਿੰਦਾ ਹੈ।",
+    "theme": "ਥੀਮ",
+    "light": "ਚਾਨਣ",
+    "dark": "ਹਨੇਰਾ",
+    "timezone": "ਸਮਾਂ ਖੇਤਰ",
+    "date_format": "ਮਿਤੀ ਫਾਰਮੈਟ",
+    "faq": "FAQ",
+    "faq_desc": "ਆਮ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਲੱਭੋ",
+    "contact_support": "ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+    "contact_support_desc": "ਸਾਡੀ ਸਹਾਇਤਾ ਟੀਮ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+    "report_bug": "ਇੱਕ ਬੱਗ ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+    "report_bug_desc": "ਸਮੱਸਿਆਵਾਂ ਦੀ ਰਿਪੋਰਟ ਕਰਕੇ ਸਾਡੀ ਮਦਦ ਕਰੋ",
+    "documentation": "ਦਸਤਾਵੇਜ਼ੀਕਰਨ",
+    "documentation_desc": "ਸਾਡੇ ਉਪਭੋਗਤਾ ਗਾਈਡ ਅਤੇ ਟਿਊਟੋਰਿਅਲ ਪੜ੍ਹੋ",
+    "back_to_help": "← ਮਦਦ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "user_documentation": "ਉਪਭੋਗਤਾ ਦਸਤਾਵੇਜ਼",
+    "getting_started": "ਸ਼ੁਰੂ ਕਰਨਾ",
+    "getting_started_desc": "SMAART Institute ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ! ",
+    "core_frameworks": "ਕੋਰ ਫਰੇਮਵਰਕ",
+    "career_architecture_map": "ਕਰੀਅਰ ਆਰਕੀਟੈਕਚਰ ਦਾ ਨਕਸ਼ਾ™",
+    "career_architecture_map_desc": "ਜੀਵਨ ਭਰ ਦੇ ਕਰੀਅਰ ਦੇ ਵਿਕਾਸ ਲਈ ਇੱਕ ਬਹੁ-ਪੜਾਅ ਦਾ ਮਾਡਲ, ਰਵਾਇਤੀ ਲੀਨੀਅਰ ਕੈਰੀਅਰ ਮਾਰਗਾਂ ਤੋਂ ਅੱਗੇ ਵਧਣਾ।",
+    "capability_framework": "ਸਮਰੱਥਾ ਫਰੇਮਵਰਕ™",
+    "capability_framework_desc": "ਵਿਆਪਕ ਪੇਸ਼ੇਵਰ ਸਮਰੱਥਾ ਨੂੰ ਬਣਾਉਣ ਲਈ ਨਿਰਣੇ ਅਤੇ ਅਨੁਕੂਲਤਾ ਦੇ ਨਾਲ ਤਕਨੀਕੀ ਹੁਨਰ ਨੂੰ ਸੰਤੁਲਿਤ ਕਰਦਾ ਹੈ।",
+    "navigation_guide": "ਨੇਵੀਗੇਸ਼ਨ ਗਾਈਡ",
+    "nav_dashboard": "ਡੈਸ਼ਬੋਰਡ:",
+    "nav_dashboard_desc": "ਤੁਹਾਡੀ ਤਰੱਕੀ ਅਤੇ ਆਉਣ ਵਾਲੇ ਕੰਮਾਂ ਦੀ ਸੰਖੇਪ ਜਾਣਕਾਰੀ।",
+    "nav_skills_vault": "ਹੁਨਰ ਵਾਲਟ:",
+    "nav_skills_vault_desc": "ਤੁਹਾਡੇ ਪ੍ਰਮਾਣਿਤ ਹੁਨਰ ਅਤੇ ਪ੍ਰਾਪਤੀਆਂ ਦਾ ਭੰਡਾਰ।",
+    "nav_vision_board": "ਵਿਜ਼ਨ ਬੋਰਡ:",
+    "nav_vision_board_desc": "ਆਪਣੇ ਲੰਬੇ ਸਮੇਂ ਦੇ ਕਰੀਅਰ ਦੀਆਂ ਇੱਛਾਵਾਂ ਦੀ ਕਲਪਨਾ ਕਰੋ ਅਤੇ ਟ੍ਰੈਕ ਕਰੋ।",
+    "nav_community": "ਭਾਈਚਾਰਾ:",
+    "nav_community_desc": "ਆਪਣੇ ਖੇਤਰ ਵਿੱਚ ਸਾਥੀਆਂ ਅਤੇ ਸਲਾਹਕਾਰਾਂ ਨਾਲ ਜੁੜੋ।",
+    "need_more_help": "ਹੋਰ ਮਦਦ ਦੀ ਲੋੜ ਹੈ?",
+    "need_more_help_desc": "ਜੇਕਰ ਤੁਹਾਨੂੰ ਉਹ ਨਹੀਂ ਮਿਲਦਾ ਜੋ ਤੁਸੀਂ ਲੱਭ ਰਹੇ ਹੋ, ਤਾਂ ਕਿਰਪਾ ਕਰਕੇ ਸਾਡੀ ਸਮਰਪਿਤ ਟੀਮ ਤੱਕ ਪਹੁੰਚਣ ਲਈ \"ਸੰਪਰਕ ਸਹਾਇਤਾ\" ਵਿਕਲਪ ਦੀ ਵਰਤੋਂ ਕਰੋ।",
+    "faq_q1": "SMAART ਕਰੀਅਰ ਆਰਕੀਟੈਕਚਰ ਮੈਪ™ ਕੀ ਹੈ?",
+    "faq_a1": "ਇੱਕ ਆਧੁਨਿਕ ਸੰਦਰਭ ਮਾਡਲ ਜੋ ਕਰੀਅਰ ਨੂੰ ਇੱਕ ਬਹੁ-ਪੜਾਅ ਨਿਰੰਤਰਤਾ ਦੇ ਰੂਪ ਵਿੱਚ ਤਿਆਰ ਕਰਦਾ ਹੈ, ਵਿਅਕਤੀਆਂ ਨੂੰ ਲੰਬੇ ਕੰਮ ਕਰਨ ਵਾਲੇ ਜੀਵਨ ਅਤੇ ਵਾਰ-ਵਾਰ ਤਬਦੀਲੀਆਂ ਵਿੱਚ ਨੈਵੀਗੇਟ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।",
+    "faq_q2": "ਏਕੀਕ੍ਰਿਤ ਸਮਰੱਥਾ ਫਰੇਮਵਰਕ™ ਕੀ ਹੈ?",
+    "faq_a2": "ਸਾਡਾ ਮਲਕੀਅਤ ਵਾਲਾ ਢਾਂਚਾ ਜੋ ਸੰਪੂਰਨ ਪੇਸ਼ੇਵਰ ਸਮਰੱਥਾ ਨੂੰ ਬਣਾਉਣ ਲਈ ਹੁਨਰ (ਲਾਗੂ ਯੋਗਤਾ), ਨਿਰਣਾ (ਫੈਸਲਾ ਗੁਣਵੱਤਾ), ਅਤੇ ਅਨੁਕੂਲਤਾ (ਪ੍ਰਭਾਵਸ਼ੀਲਤਾ) ਨੂੰ ਜੋੜਦਾ ਹੈ।",
+    "faq_q3": "ਕੰਮ ਦੀ ਸੂਝ ਦਾ ਭਵਿੱਖ ਕੀ ਹੈ?",
+    "faq_a3": "ਬੁੱਧੀਮਾਨ ਆਟੋਮੇਸ਼ਨ, ਨੌਕਰੀ ਦੀ ਪੁਨਰਗਠਨ, ਅਤੇ ਭੂਮਿਕਾ-ਅਧਾਰਿਤ ਤੋਂ ਹੁਨਰ-ਅਧਾਰਿਤ ਕੰਮ ਵਿੱਚ ਤਬਦੀਲੀ ਵਰਗੇ ਰੁਝਾਨਾਂ ਦਾ ਖੋਜ-ਬੈਕਡ ਵਿਸ਼ਲੇਸ਼ਣ।",
+    "faq_q4": "ਮੈਂ ਰੋਜ਼ਗਾਰ ਤਿਆਰੀ ਰਿਪੋਰਟ 2026 ਤੱਕ ਕਿਵੇਂ ਪਹੁੰਚ ਕਰ ਸਕਦਾ/ਸਕਦੀ ਹਾਂ?",
+    "faq_a4": "ਇਹ ਰਿਪੋਰਟ ਸਾਡੇ ਸੰਸਥਾਗਤ ਭਾਈਵਾਲਾਂ ਅਤੇ ਗਾਹਕਾਂ ਲਈ ਉਪਲਬਧ ਹੈ, ਜੋ ਕਿ ਹੁਨਰਾਂ ਅਤੇ ਸਮਰੱਥਾਵਾਂ ਦੀ ਬਦਲਦੀ ਮੰਗ ਵਿੱਚ ਡੂੰਘੀ ਗੋਤਾਖੋਰੀ ਦੀ ਪੇਸ਼ਕਸ਼ ਕਰਦੀ ਹੈ।",
+    "profile_success": "ਪ੍ਰੋਫਾਈਲ ਸਫਲਤਾਪੂਰਵਕ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+    "profile_failed": "ਪ੍ਰੋਫਾਈਲ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ",
+    "language_success": "ਭਾਸ਼ਾ ਅਤੇ ਖੇਤਰ ਸੈਟਿੰਗਾਂ ਅੱਪਡੇਟ ਕੀਤੀਆਂ ਗਈਆਂ",
+    "language_failed": "ਸੈਟਿੰਗਾਂ ਨੂੰ ਅੱਪਡੇਟ ਕਰਨਾ ਅਸਫਲ ਰਿਹਾ",
+    "connection_error": "ਕਨੈਕਸ਼ਨ ਗੜਬੜ। ",
+    "save_changes": "ਤਬਦੀਲੀਆਂ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ"
+  },
+  "library": {
+    "search_placeholder": "ਸਿਰਲੇਖ, ਲੇਖਕ, ਜਾਂ ਵਿਸ਼ੇ ਦੁਆਰਾ ਖੋਜੋ...",
+    "preview": "ਝਲਕ",
+    "no_books": "ਕੋਈ ਕਿਤਾਬਾਂ ਨਹੀਂ ਮਿਲੀਆਂ",
+    "no_books_desc": "ਆਪਣੇ ਖੋਜ ਸ਼ਬਦਾਂ ਨੂੰ ਵਿਵਸਥਿਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+    "categories": {
+      "all": "ਸਾਰੀਆਂ ਕਿਤਾਬਾਂ",
+      "business": "ਵਪਾਰ",
+      "psychology": "ਮਨੋਵਿਗਿਆਨ",
+      "technology": "ਤਕਨਾਲੋਜੀ"
+    }
+  },
+  "my_notes": {
+    "toast": {
+      "empty_title": "ਖਾਲੀ ਨੋਟ",
+      "empty_desc": "ਕਿਰਪਾ ਕਰਕੇ ਕੋਈ ਸਿਰਲੇਖ ਜਾਂ ਸਮੱਗਰੀ ਸ਼ਾਮਲ ਕਰੋ।",
+      "created_title": "ਨੋਟ ਬਣਾਇਆ ਗਿਆ",
+      "updated_title": "ਨੋਟ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+      "saved_cloud": "ਤੁਹਾਡਾ ਨੋਟ ਕਲਾਉਡ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ ਹੈ।",
+      "error_title": "ਗਲਤੀ",
+      "failed_save": "ਡਾਟਾਬੇਸ ਵਿੱਚ ਨੋਟ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ।",
+      "deleted_title": "ਨੋਟ ਮਿਟਾਇਆ ਗਿਆ",
+      "deleted_desc": "ਨੋਟ ਤੁਹਾਡੇ ਖਾਤੇ ਤੋਂ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ।",
+      "failed_delete": "ਨੋਟ ਮਿਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ।"
+    },
+    "note_types": {
+      "untitled": "ਬਿਨਾਂ ਸਿਰਲੇਖ ਵਾਲਾ ਨੋਟ",
+      "general_course": "ਜਨਰਲ ਕੋਰਸ ਨੋਟਸ",
+      "general_note": "ਆਮ ਨੋਟ",
+      "course_prefix": "ਕੋਰਸ: {{courseId}}"
+    },
+    "colors": {
+      "yellow": "ਪੀਲਾ",
+      "blue": "ਨੀਲਾ",
+      "green": "ਹਰਾ",
+      "purple": "ਜਾਮਨੀ",
+      "rose": "ਗੁਲਾਬ"
+    },
+    "header": {
+      "badge": "ਨਿੱਜੀ ਉਤਪਾਦਕਤਾ",
+      "title_my": "ਮੇਰੀ",
+      "title_notes": "ਨੋਟਸ",
+      "description": "ਇੱਕ ਸੁਰੱਖਿਅਤ, ਕਲਾਉਡ-ਸਿੰਕ ਕੀਤੇ ਵਰਕਸਪੇਸ ਵਿੱਚ ਆਪਣੇ ਵਿਚਾਰਾਂ, ਕੋਰਸ ਦੀਆਂ ਸੂਝਾਂ ਅਤੇ ਨਿੱਜੀ ਸਫਲਤਾਵਾਂ ਨੂੰ ਸੰਗਠਿਤ ਕਰੋ।",
+      "search_placeholder": "ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਖੋਜੋ...",
+      "new_note": "ਨਵਾਂ ਨੋਟ ਨਵਾਂ ਨੋਟ"
+    },
+    "grid": {
+      "create_new": "ਨਵਾਂ ਨੋਟ ਬਣਾਓ",
+      "delete_tooltip": "ਨੋਟ ਮਿਟਾਓ",
+      "no_notes_matching": "\"{{query}}\" ਨਾਲ ਮੇਲ ਖਾਂਦਾ ਕੋਈ ਨੋਟ ਨਹੀਂ ਮਿਲਿਆ"
+    },
+    "editor": {
+      "edit_title": "ਨੋਟ ਸੰਪਾਦਿਤ ਕਰੋ",
+      "new_title": "ਨਵਾਂ ਨੋਟ",
+      "placeholder_title": "ਸਿਰਲੇਖ",
+      "placeholder_content": "ਟਾਈਪ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰੋ...",
+      "last_edited": "ਆਖਰੀ ਸੰਪਾਦਨ: {{date}}",
+      "save_note": "ਨੋਟ ਸੇਵ ਕਰੋ"
+    }
+  },
+  "landing": {
+    "navbar": {
+      "services": "ਸੇਵਾਵਾਂ",
+      "how_it_works": "ਇਹ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ",
+      "testimonials": "ਪ੍ਰਸੰਸਾ ਪੱਤਰ",
+      "faq": "FAQ",
+      "verify_certificate": "ਸਰਟੀਫਿਕੇਟ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "contact": "ਸੰਪਰਕ ਕਰੋ",
+      "login": "ਲੌਗ ਇਨ ਕਰੋ",
+      "enquiry": "ਪੁੱਛਗਿੱਛ"
+    },
+    "hero": {
+      "badge": "ਸਕਿਲਜ਼ ਪਾਸਪੋਰਟ ਏਕੀਕਰਣ ਲਾਈਵ",
+      "title_main": "ਇੱਕ ਏਕੀਕ੍ਰਿਤ",
+      "title_sub": "ਰੁਜ਼ਗਾਰਯੋਗਤਾ ਅਤੇ ਪ੍ਰਭਾਵ ਈਕੋਸਿਸਟਮ",
+      "title_desc": "ਕੰਮ ਦੀ ਬਦਲਦੀ ਦੁਨੀਆਂ ਲਈ।",
+      "description": "ਸਾਡੇ ਵਿਆਪਕ ਏਆਈ ਕਰੀਅਰ ਕੋਚ ਨਾਲ ਆਪਣੀ ਪੂਰੀ ਸਮਰੱਥਾ ਨੂੰ ਅਨਲੌਕ ਕਰੋ। ",
+      "get_started": "ਸ਼ੁਰੂ ਕਰੋ",
+      "book_demo": "ਇੱਕ ਡੈਮੋ ਬੁੱਕ ਕਰੋ",
+      "learn_more": "ਹੋਰ ਜਾਣੋ ਹੋਰ ਜਾਣੋ"
+    },
+    "marquee": {
+      "trusted_by": "ਪ੍ਰਮੁੱਖ ਸੰਸਥਾਵਾਂ ਦੁਆਰਾ ਭਰੋਸੇਯੋਗ"
+    },
+    "services": {
+      "title": "ਲਈ ਬਿਲਡਿੰਗ ਸਮਰੱਥਾ",
+      "title_highlight": "ਕੰਮ ਦੀ ਬਦਲਦੀ ਦੁਨੀਆਂ",
+      "subtitle": "ਅਸੀਂ ਯੋਗਤਾਵਾਂ ਵਿਕਸਿਤ ਕਰਦੇ ਹਾਂ ਜੋ ਰੁਜ਼ਗਾਰਯੋਗਤਾ, ਕਰੀਅਰ ਦੀ ਤਰੱਕੀ, ਅਤੇ ਨਿਰੰਤਰ ਕਰੀਅਰ ਦੀ ਲੰਬੀ ਉਮਰ ਨੂੰ ਸਮਰੱਥ ਬਣਾਉਂਦੇ ਹਨ।",
+      "card_work_ready_title": "ਕੰਮ ਲਈ ਤਿਆਰ ਅਤੇ ਅਨੁਕੂਲ ਸਮਰੱਥਾ",
+      "card_work_ready_desc": "ਅਸੀਂ ਅਜਿਹੀਆਂ ਯੋਗਤਾਵਾਂ ਵਿਕਸਿਤ ਕਰਦੇ ਹਾਂ ਜੋ ਰੁਜ਼ਗਾਰਯੋਗਤਾ, ਕਰੀਅਰ ਦੀ ਤਰੱਕੀ, ਅਤੇ ਨਿਰੰਤਰ ਕਰੀਅਰ ਦੀ ਲੰਬੀ ਉਮਰ ਨੂੰ ਸਮਰੱਥ ਬਣਾਉਂਦੇ ਹਨ - ਵਿਕਾਸ ਅਤੇ ਪਰਿਵਰਤਨ ਦੁਆਰਾ ਕੰਮ ਵਿੱਚ ਦਾਖਲੇ ਤੋਂ ਵਿਅਕਤੀਆਂ ਦਾ ਸਮਰਥਨ ਕਰਦੇ ਹਾਂ।",
+      "card_work_ready_features": [
+        "ਰੁਜ਼ਗਾਰਯੋਗਤਾ",
+        "ਕਰੀਅਰ ਦੀ ਤਰੱਕੀ",
+        "ਨਿਰੰਤਰ ਲੰਬੀ ਉਮਰ"
+      ],
+      "card_impact_title": "ਪ੍ਰਭਾਵ-ਮੁਖੀ ਸਮਰੱਥਾ",
+      "card_impact_desc": "ਅਸੀਂ ਨਵੀਨਤਾ, ਉੱਦਮਤਾ, ਅਤੇ ਟਿਕਾਊ ਮੁੱਲ ਸਿਰਜਣ ਲਈ ਸਮਰੱਥਾਵਾਂ ਵਿਕਸਿਤ ਕਰਦੇ ਹਾਂ - ਵਿਅਕਤੀਆਂ ਅਤੇ ਸੰਸਥਾਵਾਂ ਨੂੰ ਸਥਾਈ ਆਰਥਿਕ ਅਤੇ ਸਮਾਜਿਕ ਪ੍ਰਭਾਵ ਪੈਦਾ ਕਰਨ ਦੇ ਯੋਗ ਬਣਾਉਂਦੇ ਹਾਂ।",
+      "card_impact_features": [
+        "ਨਵੀਨਤਾ",
+        "ਉੱਦਮਤਾ",
+        "ਮੁੱਲ ਸਿਰਜਣਾ ਮੁੱਲ ਸਿਰਜਣਾ"
+      ],
+      "card_map_title": "SMAART ਕਰੀਅਰ ਆਰਕੀਟੈਕਚਰ ਦਾ ਨਕਸ਼ਾ™",
+      "card_map_desc": "ਕਰੀਅਰਾਂ ਲਈ ਇੱਕ ਆਧੁਨਿਕ ਸੰਦਰਭ ਮਾਡਲ, ਉਹਨਾਂ ਨੂੰ ਇੱਕ ਸਿੰਗਲ ਪਰਿਵਰਤਨ ਦੀ ਬਜਾਏ ਇੱਕ ਬਹੁ-ਪੜਾਅ ਨਿਰੰਤਰਤਾ ਵਜੋਂ ਤਿਆਰ ਕਰਦਾ ਹੈ, ਲੰਬੇ ਕਰੀਅਰ ਅਤੇ ਤਕਨੀਕੀ ਤਬਦੀਲੀ ਨੂੰ ਦਰਸਾਉਂਦਾ ਹੈ।",
+      "card_map_features": [
+        "ਬਹੁ-ਪੜਾਅ ਨਿਰੰਤਰਤਾ",
+        "ਤਕਨੀਕੀ ਤਬਦੀਲੀ",
+        "ਵਾਰ-ਵਾਰ ਪਰਿਵਰਤਨ"
+      ],
+      "learn_more_btn": "ਜਿਆਦਾ ਜਾਣੋ"
+    },
+    "deep_dive": {
+      "section1_badge": "ਪੇਸ਼ੇਵਰ ਅਤੇ ਤਕਨੀਕੀ ਸਮਰੱਥਾ™",
+      "section1_title": "ਕੈਂਪਸ ਟੂ ਕਰੀਅਰ™",
+      "section1_desc": "ਕਰਮਚਾਰੀਆਂ ਵਿੱਚ ਦਾਖਲੇ ਲਈ ਸਿਖਿਆਰਥੀਆਂ ਨੂੰ ਤਿਆਰ ਕਰਨਾ ਅਤੇ ਉਹਨਾਂ ਦੀ ਯੋਗਤਾ ਨੂੰ ਪੇਸ਼ੇਵਰ ਅਭਿਆਸ ਨਾਲ ਜੋੜਨਾ। ",
+      "point1_title": "ਅਭਿਆਸ-ਅਲਾਈਨਡ ਲਰਨਿੰਗ",
+      "point1_desc": "ਅਸਲ-ਸੰਸਾਰ ਸਿਮੂਲੇਸ਼ਨ ਅਤੇ ਉਦਯੋਗ-ਸਟੈਂਡਰਡ ਟੂਲ ਜੋ ਅਸਲ ਕੰਮ ਦੇ ਵਾਤਾਵਰਣ ਨੂੰ ਦਰਸਾਉਂਦੇ ਹਨ।",
+      "point2_title": "ਰੁਜ਼ਗਾਰ ਫੋਕਸ",
+      "point2_desc": "ਪ੍ਰਮਾਣਿਤ ਸਮਰੱਥਾ ਸਬੂਤ ਦੇ ਨਾਲ ਅਰਥਪੂਰਨ ਸ਼ੁਰੂਆਤੀ-ਕੈਰੀਅਰ ਦੀਆਂ ਭੂਮਿਕਾਵਾਂ ਲਈ ਸਿੱਧੇ ਰਸਤੇ।",
+      "section2_badge": "ਨਵੀਨਤਾ ਅਤੇ ਪ੍ਰਭਾਵ ਸਮਰੱਥਾ™",
+      "section2_title": "ਜੀਵਨ ਲਈ ਕੈਰੀਅਰ™",
+      "section2_desc": "ਲੰਬੇ ਸਮੇਂ ਦੀ ਤਰੱਕੀ, ਲੀਡਰਸ਼ਿਪ ਤਬਦੀਲੀ, ਅਤੇ ਨਵੀਨਤਾ ਦੁਆਰਾ ਮੁੱਲ ਬਣਾਉਣ ਦੀ ਯੋਗਤਾ ਦਾ ਸਮਰਥਨ ਕਰਨਾ। ",
+      "point3_title": "ਲੀਡਰਸ਼ਿਪ ਤਬਦੀਲੀ",
+      "point3_desc": "ਵਿਅਕਤੀਗਤ ਯੋਗਦਾਨ ਪਾਉਣ ਵਾਲੇ ਤੋਂ ਉੱਨਤ ਫੈਸਲੇ ਲੈਣ ਦੇ ਹੁਨਰ ਦੇ ਨਾਲ ਰਣਨੀਤਕ ਨੇਤਾ ਵੱਲ ਵਧਣਾ।",
+      "point4_title": "ਮੁੱਲ ਸਿਰਜਣਾ",
+      "point4_desc": "ਨਵੀਂ ਆਰਥਿਕਤਾ ਲਈ ਉੱਦਮੀ ਹੁਨਰ ਅਤੇ ਨਵੀਨਤਾ ਫਰੇਮਵਰਕ।",
+      "analysis_view": "ਪੇਸ਼ੇਵਰ ਅਤੇ ਤਕਨੀਕੀ ਸਮਰੱਥਾ ਦ੍ਰਿਸ਼",
+      "analysis_live": "ਲਾਈਵ ਏਆਈ ਵਿਸ਼ਲੇਸ਼ਣ",
+      "analytics_view": "ਲੀਡਰਸ਼ਿਪ ਅਤੇ ਇਨੋਵੇਸ਼ਨ ਵਿਸ਼ਲੇਸ਼ਣ"
+    },
+    "how_it_works": {
+      "title": "ਸਮਾਰਟ ਏਕੀਕ੍ਰਿਤ",
+      "title_highlight": "ਸਮਰੱਥਾ ਫਰੇਮਵਰਕ™",
+      "subtitle": "ਆਧੁਨਿਕ ਕੰਮ ਲਈ ਸਮਰੱਥਾ ਕਿਵੇਂ ਬਣਾਈ ਜਾਂਦੀ ਹੈ। ",
+      "step1_title": "ਹੁਨਰ",
+      "step1_desc": "ਲਾਗੂ ਯੋਗਤਾ. ",
+      "step2_title": "ਨਿਰਣਾ",
+      "step2_desc": "ਅਸਲ ਸਥਿਤੀਆਂ ਵਿੱਚ ਫੈਸਲੇ ਦੀ ਗੁਣਵੱਤਾ। ",
+      "step3_title": "ਅਨੁਕੂਲਤਾ ਅਨੁਕੂਲਤਾ",
+      "step3_desc": "ਹਾਲਾਤ ਬਦਲਦੇ ਹੀ ਪ੍ਰਭਾਵਸ਼ੀਲਤਾ। ",
+      "unlocked": "ਅਨਲੌਕ ਕੀਤਾ",
+      "locked": "ਤਾਲਾਬੰਦ"
+    },
+    "passport": {
+      "title": "ਸਮਾਰਟ ਸਮਰੱਥਾ ਅਤੇ",
+      "title_highlight": "ਹੁਨਰ ਪਾਸਪੋਰਟ™",
+      "desc": "ਸਮਰੱਥਾ ਵਿਕਾਸ ਅਤੇ ਤਰੱਕੀ ਦਾ ਇੱਕ ਪ੍ਰਮਾਣਿਤ, ਜੀਵਨ ਭਰ ਦਾ ਰਿਕਾਰਡ। ",
+      "features": [
+        "ਪ੍ਰਮਾਣਿਤ ਸਮਰੱਥਾ ਪ੍ਰੋਫਾਈਲ",
+        "ਯੂਨੀਵਰਸਲ ਪੋਰਟੇਬਿਲਟੀ",
+        "ਸਬੂਤ-ਆਧਾਰਿਤ ਤਰੱਕੀ"
+      ],
+      "btn": "ਆਪਣਾ ਹੁਨਰ ਪਾਸਪੋਰਟ ਪ੍ਰਾਪਤ ਕਰੋ",
+      "badge": "ਸਮਰੱਥਾ ਅਤੇ ਹੁਨਰ ਰਿਕਾਰਡ",
+      "verified": "ਪ੍ਰਮਾਣਿਤ",
+      "issued_by": "ਦੁਆਰਾ ਜਾਰੀ ਕੀਤਾ ਗਿਆ"
+    },
+    "testimonials": {
+      "title": "ਪ੍ਰਭਾਵ ਅਤੇ",
+      "title_highlight": "ਮੁੱਲ",
+      "subtitle": "SMAART ਵੈਲਿਊਜ਼ ਫਰੇਮਵਰਕ ਦੁਆਰਾ ਮਾਰਗਦਰਸ਼ਿਤ",
+      "quote1": "ਪ੍ਰਭਾਵ ਨੂੰ ਸਮਰੱਥਾ ਅਤੇ ਤਰੱਕੀ ਦੁਆਰਾ ਮਾਪਿਆ ਜਾਂਦਾ ਹੈ, ਨਾ ਕਿ ਸਿਰਫ਼ ਗਤੀਵਿਧੀ ਦੁਆਰਾ। ",
+      "author1": "ਸਿਸਟਮ ਸੋਚ",
+      "role1": "ਕੋਰ ਮੁੱਲ ਕੋਰ ਮੁੱਲ ਕੋਰ ਮੁੱਲ",
+      "quote2": "ਅਸਲ-ਸੰਸਾਰ ਦੇ ਨਤੀਜਿਆਂ 'ਤੇ ਫੋਕਸ ਕਰੋ ਜੋ ਜੀਵਨ ਅਤੇ ਆਰਥਿਕਤਾ ਨੂੰ ਬਿਹਤਰ ਬਣਾਉਂਦੇ ਹਨ। ",
+      "author2": "ਮਾਪਣਯੋਗ ਪ੍ਰਭਾਵ",
+      "role2": "ਕੋਰ ਮੁੱਲ",
+      "quote3": "ਕੰਮ ਦੇ ਪੁਨਰਗਠਿਤ ਸੰਸਾਰ ਦੀ ਤਿਆਰੀ ਲਈ ਨਿਰੰਤਰ ਵਿਕਾਸ ਅਤੇ ਲਚਕਤਾ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ।",
+      "author3": "ਅਨੁਕੂਲਤਾ",
+      "role3": "ਕੋਰ ਮੁੱਲ"
+    },
+    "pricing": {
+      "title": "ਭਾਈਵਾਲੀ",
+      "subtitle": "ਅਸੀਂ ਈਕੋਸਿਸਟਮ-ਵਿਆਪਕ ਪ੍ਰਭਾਵ ਨੂੰ ਚਲਾਉਣ ਲਈ ਲੰਬੇ ਸਮੇਂ ਦੀ, ਸੰਸਥਾਗਤ ਭਾਈਵਾਲੀ ਬਣਾਉਂਦੇ ਹਾਂ।",
+      "popular": "ਸਭ ਤੋਂ ਮਸ਼ਹੂਰ",
+      "plan1_title": "ਯੂਨੀਵਰਸਿਟੀਆਂ ਅਤੇ ਕਾਲਜ",
+      "plan1_price": "ਅਕਾਦਮਿਕ",
+      "plan1_desc": "ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਰੁਜ਼ਗਾਰ ਯੋਗਤਾ ਨੂੰ ਵਧਾਉਣ ਅਤੇ ਪਾਠਕ੍ਰਮ ਨੂੰ ਉਦਯੋਗ ਦੀਆਂ ਲੋੜਾਂ ਨਾਲ ਜੋੜਨ ਲਈ ਸਾਡੇ ਨਾਲ ਭਾਈਵਾਲ ਬਣੋ।",
+      "plan1_features": [
+        "ਪਾਠਕ੍ਰਮ ਅਲਾਈਨਮੈਂਟ",
+        "ਵਿਦਿਆਰਥੀ ਰੁਜ਼ਗਾਰਯੋਗਤਾ",
+        "ਫੈਕਲਟੀ ਵਿਕਾਸ"
+      ],
+      "plan1_cta": "ਸਾਡੇ ਨਾਲ ਸਾਥੀ",
+      "plan2_title": "ਰੁਜ਼ਗਾਰਦਾਤਾ ਅਤੇ ਕਰਮਚਾਰੀ",
+      "plan2_price": "ਉਦਯੋਗ",
+      "plan2_desc": "ਕੰਮ ਲਈ ਤਿਆਰ ਪ੍ਰਤਿਭਾ ਦੀ ਇੱਕ ਪਾਈਪਲਾਈਨ ਤੱਕ ਪਹੁੰਚ ਕਰੋ ਅਤੇ ਆਪਣੇ ਮੌਜੂਦਾ ਕਰਮਚਾਰੀਆਂ ਨੂੰ ਉੱਚਾ ਚੁੱਕੋ।",
+      "plan2_features": [
+        "ਪ੍ਰਤਿਭਾ ਪਾਈਪਲਾਈਨ",
+        "ਵਰਕਫੋਰਸ ਅਪਸਕਿਲਿੰਗ",
+        "ਸਮਰੱਥਾ ਫਰੇਮਵਰਕ",
+        "ਭਰਤੀ ਹੱਲ"
+      ],
+      "plan2_cta": "ਪ੍ਰਤਿਭਾ ਨੂੰ ਹਾਇਰ ਕਰੋ",
+      "plan3_title": "ਸਰਕਾਰ ਅਤੇ ਸੀ.ਐਸ.ਆਰ",
+      "plan3_price": "ਪ੍ਰਭਾਵ",
+      "plan3_desc": "ਸਮਾਜਿਕ ਅਤੇ ਆਰਥਿਕ ਪ੍ਰਭਾਵ ਨੂੰ ਚਲਾਉਣ ਲਈ ਵੱਡੇ ਪੱਧਰ 'ਤੇ ਹੁਨਰੀ ਪਹਿਲਕਦਮੀਆਂ 'ਤੇ ਸਹਿਯੋਗ ਕਰੋ।",
+      "plan3_features": [
+        "ਵੱਡੇ ਪੈਮਾਨੇ ਦੀ ਹੁਨਰ",
+        "ਸਮਾਜਿਕ ਪ੍ਰਭਾਵ",
+        "ਆਰਥਿਕ ਵਿਕਾਸ",
+        "ਨੀਤੀ ਸਹਾਇਤਾ"
+      ],
+      "plan3_cta": "ਸਹਿਯੋਗ ਕਰੋ"
+    },
+    "faq": {
+      "title": "ਇਨਸਾਈਟਸ ਅਤੇ",
+      "title_highlight": "ਫਰੇਮਵਰਕ",
+      "subtitle": "ਕੰਮ ਦੇ ਭਵਿੱਖ ਨੂੰ ਸਮਝਣਾ.",
+      "q1": "SMAART ਕਰੀਅਰ ਆਰਕੀਟੈਕਚਰ ਮੈਪ™ ਕੀ ਹੈ?",
+      "a1": "ਇੱਕ ਆਧੁਨਿਕ ਸੰਦਰਭ ਮਾਡਲ ਜੋ ਕਰੀਅਰ ਨੂੰ ਇੱਕ ਬਹੁ-ਪੜਾਅ ਨਿਰੰਤਰਤਾ ਦੇ ਰੂਪ ਵਿੱਚ ਤਿਆਰ ਕਰਦਾ ਹੈ, ਵਿਅਕਤੀਆਂ ਨੂੰ ਲੰਬੇ ਕੰਮ ਕਰਨ ਵਾਲੇ ਜੀਵਨ ਅਤੇ ਵਾਰ-ਵਾਰ ਤਬਦੀਲੀਆਂ ਵਿੱਚ ਨੈਵੀਗੇਟ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।",
+      "q2": "ਏਕੀਕ੍ਰਿਤ ਸਮਰੱਥਾ ਫਰੇਮਵਰਕ™ ਕੀ ਹੈ?",
+      "a2": "ਸਾਡਾ ਮਲਕੀਅਤ ਵਾਲਾ ਢਾਂਚਾ ਜੋ ਸੰਪੂਰਨ ਪੇਸ਼ੇਵਰ ਸਮਰੱਥਾ ਨੂੰ ਬਣਾਉਣ ਲਈ ਹੁਨਰ (ਲਾਗੂ ਯੋਗਤਾ), ਨਿਰਣਾ (ਫੈਸਲਾ ਗੁਣਵੱਤਾ), ਅਤੇ ਅਨੁਕੂਲਤਾ (ਪ੍ਰਭਾਵਸ਼ੀਲਤਾ) ਨੂੰ ਜੋੜਦਾ ਹੈ।",
+      "q3": "ਕੰਮ ਦੀ ਸੂਝ ਦਾ ਭਵਿੱਖ ਕੀ ਹੈ?",
+      "a3": "ਬੁੱਧੀਮਾਨ ਆਟੋਮੇਸ਼ਨ, ਨੌਕਰੀ ਦੀ ਪੁਨਰਗਠਨ, ਅਤੇ ਭੂਮਿਕਾ-ਅਧਾਰਿਤ ਤੋਂ ਹੁਨਰ-ਅਧਾਰਿਤ ਕੰਮ ਵਿੱਚ ਤਬਦੀਲੀ ਵਰਗੇ ਰੁਝਾਨਾਂ ਦਾ ਖੋਜ-ਬੈਕਡ ਵਿਸ਼ਲੇਸ਼ਣ।",
+      "q4": "ਮੈਂ ਰੋਜ਼ਗਾਰ ਤਿਆਰੀ ਰਿਪੋਰਟ 2026 ਤੱਕ ਕਿਵੇਂ ਪਹੁੰਚ ਕਰ ਸਕਦਾ/ਸਕਦੀ ਹਾਂ?",
+      "a4": "ਇਹ ਰਿਪੋਰਟ ਸਾਡੇ ਸੰਸਥਾਗਤ ਭਾਈਵਾਲਾਂ ਅਤੇ ਗਾਹਕਾਂ ਲਈ ਉਪਲਬਧ ਹੈ, ਜੋ ਕਿ ਹੁਨਰਾਂ ਅਤੇ ਸਮਰੱਥਾਵਾਂ ਦੀ ਬਦਲਦੀ ਮੰਗ ਵਿੱਚ ਡੂੰਘੀ ਗੋਤਾਖੋਰੀ ਦੀ ਪੇਸ਼ਕਸ਼ ਕਰਦੀ ਹੈ।"
+    },
+    "verify": {
+      "badge": "ਅਧਿਕਾਰਤ ਰਿਕਾਰਡ",
+      "title": "ਸਰਟੀਫਿਕੇਟ",
+      "title_highlight": "ਪੁਸ਼ਟੀਕਰਨ",
+      "desc": "ਸਮਾਰਟ ਇੰਸਟੀਚਿਊਟ ਪ੍ਰਮਾਣ ਪੱਤਰਾਂ ਦੀ ਪ੍ਰਮਾਣਿਕਤਾ ਦੀ ਤੁਰੰਤ ਪੁਸ਼ਟੀ ਕਰੋ। ",
+      "f1_title": "ਛੇੜਛਾੜ ਦਾ ਸਬੂਤ",
+      "f1_info": "ਬਲਾਕਚੈਨ ਸੁਰੱਖਿਅਤ",
+      "f1_sub": "ਅਟੱਲ ਤਸਦੀਕ ਰਿਕਾਰਡ",
+      "f2_title": "ਤੁਰੰਤ ਜਾਂਚ",
+      "f2_info": "ਰੀਅਲ-ਟਾਈਮ ਪ੍ਰਮਾਣਿਕਤਾ",
+      "f2_sub": "ਸਕਿੰਟਾਂ ਵਿੱਚ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "f3_title": "ਗਲੋਬਲ ਪਹੁੰਚ",
+      "f3_info": "ਕੇਂਦਰੀਕ੍ਰਿਤ ਰਜਿਸਟਰੀ",
+      "f3_sub": "ਕਿਤੇ ਵੀ, ਕਿਸੇ ਵੀ ਸਮੇਂ ਪਹੁੰਚ ਕਰੋ",
+      "card_title": "ਪ੍ਰਮਾਣ-ਪੱਤਰ ਜਾਂਚ",
+      "tab_manual": "ਮੈਨੁਅਲ ਆਈ.ਡੀ",
+      "tab_scan": "QR ਸਕੈਨ ਕਰੋ",
+      "scan_title": "ਇੱਕ QR ਕੋਡ ਚਿੱਤਰ ਚੁਣੋ",
+      "scan_desc": "ਆਪਣੀ ਗੈਲਰੀ ਜਾਂ ਫਾਈਲਾਂ ਤੋਂ ਸਰਟੀਫਿਕੇਟ ਦੀ ਇੱਕ ਫੋਟੋ ਚੁਣੋ",
+      "btn_choose": "ਚਿੱਤਰ ਚੁਣੋ",
+      "input_label": "ਸਰਟੀਫਿਕੇਟ ਪਛਾਣਕਰਤਾ",
+      "placeholder": "ਜਿਵੇਂ ਕਿ ",
+      "btn_auth": "ਹੁਣੇ ਪ੍ਰਮਾਣਿਤ ਕਰੋ",
+      "btn_verifying": "ਸੁਨੇਹਾ ਪ੍ਰਸਾਰਿਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+      "failed_title": "ਪੁਸ਼ਟੀਕਰਨ ਅਸਫਲ ਰਿਹਾ",
+      "btn_try": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+      "valid_title": "ਵੈਧ ਸਰਟੀਫਿਕੇਟ",
+      "issue_title": "ਸਮੱਸਿਆ ਦਾ ਪਤਾ ਲੱਗਾ",
+      "recipient": "ਪ੍ਰਾਪਤਕਰਤਾ",
+      "credential": "ਪ੍ਰਮਾਣ-ਪੱਤਰ",
+      "issued": "ਜਾਰੀ ਕੀਤਾ",
+      "band": "ਬੈਂਡ"
+    },
+    "contact": {
+      "badge": "ਸੰਪਰਕ ਵਿੱਚ ਰਹੋ",
+      "title": "ਨਾਲ ਜੁੜੋ",
+      "title_highlight": "ਸਮਾਰਟ ਇੰਸਟੀਚਿਊਟ",
+      "desc": "ਆਪਣੀ ਸੰਸਥਾ ਨੂੰ ਬਦਲਣ ਲਈ ਤਿਆਰ ਹੋ? ",
+      "email_title": "ਸਾਨੂੰ ਈਮੇਲ ਕਰੋ",
+      "email_sub": "24 ਘੰਟਿਆਂ ਦੇ ਅੰਦਰ ਜਵਾਬ",
+      "call_title": "ਸਾਨੂੰ ਕਾਲ ਕਰੋ",
+      "call_sub": "ਸੋਮ-ਸ਼ੁੱਕਰ ਸਵੇਰੇ 9 ਵਜੇ ਤੋਂ ਸ਼ਾਮ 6 ਵਜੇ ਤੱਕ",
+      "visit_title": "ਸਾਡੇ ਨਾਲ ਮੁਲਾਕਾਤ ਕਰੋ",
+      "visit_sub": "600034, ਭਾਰਤ",
+      "form_title": "ਸਾਨੂੰ ਇੱਕ ਸੁਨੇਹਾ ਭੇਜੋ",
+      "form_subtitle": "ਆਪਣੀ ਸੰਸਥਾ ਦੀਆਂ ਲੋੜਾਂ ਬਾਰੇ ਸਾਨੂੰ ਦੱਸੋ।",
+      "label_name": "ਪੂਰਾ ਨਾਮ",
+      "label_institution": "ਸੰਸਥਾ",
+      "label_email": "ਈਮੇਲ ਪਤਾ",
+      "label_phone": "ਫ਼ੋਨ ਨੰਬਰ",
+      "label_query": "ਅਸੀਂ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦੇ ਹਾਂ?",
+      "placeholder_name": "ਜੌਹਨ ਸਮਿਥ",
+      "placeholder_institution": "ਉੱਤਮਤਾ ਦੀ ਯੂਨੀਵਰਸਿਟੀ",
+      "placeholder_email": "john.smith@edu.com",
+      "placeholder_phone": "+91-0000000000",
+      "placeholder_query": "ਮੈਂ ਆਪਣੇ ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਸਮਾਰਟ ਇੰਸਟੀਚਿਊਟ ਨੂੰ ਲਾਗੂ ਕਰਨ ਵਿੱਚ ਦਿਲਚਸਪੀ ਰੱਖਦਾ ਹਾਂ...",
+      "btn_send": "ਜਾਂਚ ਭੇਜੋ",
+      "btn_sending": "ਸੁਨੇਹਾ ਪ੍ਰਸਾਰਿਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+      "success_title": "ਸੁਨੇਹਾ ਪ੍ਰਾਪਤ ਹੋਇਆ!",
+      "success_desc": "ਪਹੁੰਚਣ ਲਈ ਤੁਹਾਡਾ ਧੰਨਵਾਦ। ",
+      "btn_another": "ਇੱਕ ਹੋਰ ਜਾਂਚ ਭੇਜੋ"
+    },
+    "newsletter": {
+      "title": "ਕਰਵ ਤੋਂ ਅੱਗੇ ਰਹੋ",
+      "desc": "ਤੁਹਾਡੇ ਇਨਬਾਕਸ ਵਿੱਚ ਪ੍ਰਦਾਨ ਕੀਤੇ ਗਏ ਕੰਮ ਦੀਆਂ ਸੂਝਾਂ, ਕਰੀਅਰ ਦੇ ਰੁਝਾਨਾਂ ਅਤੇ ਸਮਰੱਥਾ ਨਿਰਮਾਣ ਦੀਆਂ ਰਣਨੀਤੀਆਂ ਦਾ ਵਿਸ਼ੇਸ਼ ਭਵਿੱਖ ਪ੍ਰਾਪਤ ਕਰੋ।",
+      "placeholder": "ਆਪਣੀ ਈਮੇਲ ਦਰਜ ਕਰੋ",
+      "btn": "ਹੁਣੇ ਸਬਸਕ੍ਰਾਈਬ ਕਰੋ",
+      "no_spam": "ਕੋਈ ਸਪੈਮ ਨਹੀਂ, ਕਿਸੇ ਵੀ ਸਮੇਂ ਗਾਹਕੀ ਰੱਦ ਕਰੋ।",
+      "toast_title": "ਸਬਸਕ੍ਰਾਈਬ ਕੀਤਾ!",
+      "toast_desc": "ਤੁਹਾਨੂੰ ਸਾਡੀ ਅੰਦਰੂਨੀ ਸੂਚੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ ਹੈ।"
+    },
+    "footer": {
+      "desc": "ਇੱਕ ਏਕੀਕ੍ਰਿਤ ਰੁਜ਼ਗਾਰਯੋਗਤਾ ਅਤੇ ਪ੍ਰਭਾਵ ਈਕੋਸਿਸਟਮ। ",
+      "links_title": "ਤੇਜ਼ ਲਿੰਕ",
+      "legal_title": "ਕਾਨੂੰਨੀ",
+      "contact_title": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+      "visit_text": "ਨੰਗਮਬੱਕਮ, ਚੇਨਈ 600034, ਭਾਰਤ",
+      "copyright": "ਸਾਰੇ ਅਧਿਕਾਰ ਰਾਖਵੇਂ ਹਨ।",
+      "back_to_top": "ਸਿਖਰ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+      "privacy_policy": "ਗੋਪਨੀਯਤਾ ਨੀਤੀ",
+      "terms_of_service": "ਸੇਵਾ ਦੀਆਂ ਸ਼ਰਤਾਂ",
+      "cookie_policy": "ਕੂਕੀ ਨੀਤੀ",
+      "data_protection": "ਡਾਟਾ ਸੁਰੱਖਿਆ"
+    },
+    "stats": {
+      "partner_institutions": "ਸਹਿਭਾਗੀ ਸੰਸਥਾਵਾਂ",
+      "students_assessed": "ਵਿਦਿਆਰਥੀਆਂ ਦਾ ਮੁਲਾਂਕਣ ਕੀਤਾ ਗਿਆ",
+      "placement_rate": "ਪਲੇਸਮੈਂਟ ਦਰ",
+      "corporate_partners": "ਕਾਰਪੋਰੇਟ ਭਾਈਵਾਲ"
+    }
+  }
+}

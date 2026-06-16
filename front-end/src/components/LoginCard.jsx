@@ -13,6 +13,7 @@ import ForgotPasswordModal from "./auth/ForgotPasswordModal";
 import FirstLoginPasswordModal from "./auth/FirstLoginPasswordModal";
 import { resetUserIdCache } from "@/features/visionBoard/services/visionBoardProApi";
 import useUser from "@/hooks/useUser";
+import InstitutionSelectModal from "./auth/InstitutionSelectModal";
 
 const LoginCard = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const LoginCard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(true);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
+  const [isInstitutionSelectOpen, setIsInstitutionSelectOpen] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -154,6 +156,7 @@ const LoginCard = () => {
     if (targetInstitution) {
       setSelectedInstitution(targetInstitution);
       setShowInstitutionSelector(false);
+      setIsInstitutionSelectOpen(false);
 
       // CRITICAL FIX: If we are on an institution-specific page or the login page, 
       // sync the URL so the parent component (like Institution.jsx) updates its video/data
@@ -164,9 +167,7 @@ const LoginCard = () => {
   };
 
   const handleChangeInstitution = () => {
-    sessionStorage.removeItem("selectedInstitution");
-    setSelectedInstitution(null);
-    setShowInstitutionSelector(true);
+    setIsInstitutionSelectOpen(true);
   };
 
   const handleOtpSuccess = (data) => {
@@ -542,6 +543,13 @@ const LoginCard = () => {
         email={passwordChangeData.email}
         fullName={passwordChangeData.fullName}
         onSuccess={handlePasswordChangeSuccess}
+      />
+
+      {/* Institution Selection Modal */}
+      <InstitutionSelectModal
+        isOpen={isInstitutionSelectOpen}
+        onClose={() => setIsInstitutionSelectOpen(false)}
+        onInstitutionSelected={handleInstitutionSelected}
       />
     </div>
   );
