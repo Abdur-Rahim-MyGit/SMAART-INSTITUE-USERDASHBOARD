@@ -84,6 +84,28 @@ const studentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'CoachSession'
   }],
+  degree: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CollegeDegree'
+  },
+  academic: {
+    degreeLevel: {
+      type: String,
+      default: ''
+    },
+    domain: {
+      type: String,
+      default: ''
+    },
+    degreeGroup: {
+      type: String,
+      default: ''
+    },
+    specialisation: {
+      type: String,
+      default: ''
+    }
+  },
   status: {
     type: String,
     enum: ['pending', 'active', 'inactive', 'suspended', 'graduated'],
@@ -133,7 +155,7 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-// Hard 3-hour session expiry — set on login, checked on every request
+  // Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null
@@ -150,6 +172,14 @@ const studentSchema = new mongoose.Schema({
     xp: { type: Number, default: 0 },
     category: String,
     earnedAt: { type: Date, default: Date.now }
+  }],
+  pushSubscriptions: [{
+    endpoint: String,
+    expirationTime: Date,
+    keys: {
+      p256dh: String,
+      auth: String
+    }
   }]
 }, {
   timestamps: true
@@ -171,12 +201,18 @@ studentSchema.methods.matchPassword = async function (enteredPassword) {
 studentSchema.pre('save', async function (next) {
   if (!this.studentId) {
     try {
+      const College = mongoose.model('College');
+      const collegeDoc = await College.findById(this.college);
+      const collegeNumber = collegeDoc?.collegeNumber || '00';
+      const currentYear = new Date().getFullYear().toString().slice(-2);
+      const counterId = `studentId_${collegeNumber}_${currentYear}`;
+
       const counter = await Counter.findByIdAndUpdate(
-        { _id: 'studentId' },
+        { _id: counterId },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }
       );
-      this.studentId = `STU${String(counter.seq).padStart(5, '0')}`;
+      this.studentId = `STU${collegeNumber}${currentYear}${String(counter.seq).padStart(5, '0')}`;
     } catch (error) {
       return next(error);
     }

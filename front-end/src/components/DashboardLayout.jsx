@@ -548,6 +548,10 @@ const DashboardLayout = () => {
     { code: 'en', name: 'English', native: 'English', shortLabel: 'EN' },
     { code: 'hi', name: 'Hindi', native: 'हिन्दी', shortLabel: 'HI' },
     { code: 'ta', name: 'Tamil', native: 'தமிழ்', shortLabel: 'TA' },
+    { code: 'te', name: 'Telugu', native: 'తెలుగు', shortLabel: 'TE' },
+    { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ', shortLabel: 'KN' },
+    { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
+    { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
     { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
   ];

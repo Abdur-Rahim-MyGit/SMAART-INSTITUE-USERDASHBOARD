@@ -4,7 +4,26 @@ const TaskSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: false
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    targetAudience: {
+        type: String,
+        default: 'all'
+    },
+    college: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'College'
+    },
+    assignedTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    department: {
+        type: String
     },
     title: {
         type: String,

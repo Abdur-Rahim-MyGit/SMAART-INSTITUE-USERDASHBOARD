@@ -158,6 +158,8 @@ const ModernVideoPlayer = ({
                 transcriptUrl={resolveLessonTranscriptUrl(currentDay)}
                 transcriptText={currentDay?.transcriptText || currentDay?.captions}
                 onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+                videoUrl={currentDay?.videoUrl}
+                courseCode={courseData?.courseCode || courseData?.id}
               />
             </div>
           </div>

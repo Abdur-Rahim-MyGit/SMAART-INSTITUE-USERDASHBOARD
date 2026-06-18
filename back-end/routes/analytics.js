@@ -4,7 +4,8 @@ const { protect, authorize } = require('../middleware/auth');
 const {
   getStudentAnalytics,
   getCollegeAnalytics,
-  getAdminAnalytics
+  getAdminAnalytics,
+  getCalendarEvents
 } = require('../controllers/analyticsController');
 
 // All routes are protected by default
@@ -18,5 +19,8 @@ router.get('/college', authorize('college_admin', 'teacher', 'admin'), getColleg
 
 // Global system-wide analytics (Accessible by system admins only)
 router.get('/admin', authorize('admin'), getAdminAnalytics);
+
+// Calendar events (Accessible by all protected users)
+router.get('/calendar-events', getCalendarEvents);
 
 module.exports = router;

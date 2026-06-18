@@ -23,7 +23,7 @@ import {
 import { announcementsAPI } from "@/services/announcementsApi";
 
 // ── Component ─────────────────────────────────────────────────────────────────
-const NoticesFeed = ({ currentUser }) => {
+const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
   const { t } = useTranslation();
 
   const timeAgo = (dateString) => {
@@ -61,6 +61,7 @@ const NoticesFeed = ({ currentUser }) => {
   // ── Fetch from backend (only re-runs when dateFilter changes) ──────────────
   const fetchAnnouncements = async (dFilter) => {
     setLoading(true);
+    if (onLoadingChange) onLoadingChange(true);
     try {
       const params = dFilter !== "all" ? { dateFilter: dFilter } : {};
       const res = await announcementsAPI.getAnnouncements(params);
@@ -77,12 +78,13 @@ const NoticesFeed = ({ currentUser }) => {
       console.error("[NoticesFeed] fetch error:", err);
     } finally {
       setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
     }
   };
 
   useEffect(() => {
     fetchAnnouncements(dateFilter);
-  }, [dateFilter]);
+  }, [dateFilter, refreshTrigger]);
 
   const handleReact = async (id, emoji) => {
     try {
@@ -432,7 +434,7 @@ const NoticesFeed = ({ currentUser }) => {
                       <>
                         <span className="text-gray-305 dark:text-slate-700">•</span>
                         <span
-                           className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
+                          className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
                             }`}
                         >
                           <Calendar className="w-3 h-3" />
