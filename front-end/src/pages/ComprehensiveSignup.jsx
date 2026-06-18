@@ -533,8 +533,7 @@ const ComprehensiveSignup = () => {
   const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
   const selectClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
   const textareaClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
-  const yearOptions = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => 2010 + i);
-  const expectedYearOptions = Array.from({ length: (new Date().getFullYear() + 5) - 2010 + 1 }, (_, i) => 2010 + i);
+  const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
   const sectorOptions = excelData.sectors.length > 0
@@ -666,7 +665,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
                       <div className="relative">
-                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} min="1900-01-01" max={new Date(new Date().setFullYear(new Date().getFullYear() - 15)).toISOString().split('T')[0]} />
+                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <User className="w-4 h-4 text-slate-400" />
                         </div>

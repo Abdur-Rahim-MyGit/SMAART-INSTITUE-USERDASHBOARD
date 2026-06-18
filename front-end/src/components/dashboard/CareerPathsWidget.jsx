@@ -47,21 +47,31 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
                 key={path.id || idx}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -6, scale: 1.015 }}
                 transition={{ delay: idx * 0.08, duration: 0.4, ease: "easeOut" }}
-                className="relative group bg-white dark:bg-[#002147] rounded-2xl border border-slate-200/80 dark:border-[#1a3884]/20 shadow-sm hover:shadow-lg hover:border-[#1a3884]/40 dark:hover:border-[#1a3884]/50 transition-all duration-300 overflow-hidden flex flex-col"
+                className="relative group bg-white dark:bg-[#002147] rounded-2xl border border-slate-200/80 dark:border-[#1a3884]/20 shadow-sm hover:shadow-xl hover:shadow-[#1a3884]/10 hover:border-[#1a3884]/40 dark:hover:border-[#1a3884]/50 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
                 {/* Top accent line */}
-                <div className="h-0.5 w-full bg-gradient-to-r from-[#1a3884] to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <motion.div 
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="h-1 w-full bg-gradient-to-r from-[#1a3884] via-blue-500 to-cyan-400 origin-left" 
+                />
 
                 <div className="p-5 flex flex-col flex-1">
                   {/* Icon + Title */}
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/30 flex items-center justify-center shrink-0 group-hover:border-[#1a3884]/50 group-hover:bg-blue-50 dark:group-hover:bg-[#1a3884]/20 transition-all duration-300">
+                    <motion.div 
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/30 flex items-center justify-center shrink-0 group-hover:border-[#1a3884]/50 group-hover:bg-blue-50 dark:group-hover:bg-[#1a3884]/20 transition-all duration-300"
+                    >
                       {path.locked
                         ? <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                         : <IconComponent className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                       }
-                    </div>
+                    </motion.div>
                     <div className="flex-1 min-w-0">
                       {['primary', 'secondary', 'tertiary'].includes(path.id) && (
                         <div className="mb-1.5">

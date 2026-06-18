@@ -186,8 +186,9 @@ const LearningProgress = memo(() => {
             const tod = isToday(d);
             const dotColor = getPriorityColorForDay(d);
             return (
-              <button
+              <motion.button
                 key={d}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setSelectedDate(new Date(year, month, d))}
                 className={`relative mx-auto w-7 h-7 rounded-lg text-[11px] font-semibold transition-all duration-150 flex items-center justify-center select-none
                   ${sel
@@ -199,9 +200,12 @@ const LearningProgress = memo(() => {
               >
                 {d}
                 {dotColor && !sel && (
-                  <span className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                  <motion.span 
+                    layoutId={`dot-${d}`}
+                    className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}`} 
+                  />
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -325,7 +329,8 @@ const LearningProgress = memo(() => {
               </button> */}
             </div>
           ) : (
-            selectedTodos.map(todo => {
+            <AnimatePresence mode="popLayout">
+            {selectedTodos.map(todo => {
               const priorityColors = {
                 high: "border-l-rose-500 bg-rose-500/5 dark:bg-rose-500/10",
                 medium: "border-l-amber-500 bg-amber-500/5 dark:bg-amber-500/10",
@@ -337,6 +342,7 @@ const LearningProgress = memo(() => {
                   layout
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -15, scale: 0.95 }}
                   className={`flex items-center gap-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-[#002A5C]/60 border border-slate-100 dark:border-[#1a3884]/15 border-l-3 ${priorityColors[todo.priority || "medium"]
                     } group hover:border-[#1a3884]/25 transition-all`}
                 >
@@ -381,7 +387,8 @@ const LearningProgress = memo(() => {
                   )}
                 </motion.div>
               );
-            })
+            })}
+            </AnimatePresence>
           )}
         </div>
       </div>

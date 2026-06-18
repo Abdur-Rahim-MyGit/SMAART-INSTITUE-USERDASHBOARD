@@ -79,14 +79,16 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               transition={{ delay: 0.5, duration: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10"
             >
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   const element = document.getElementById('services');
                   if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-[#C0C0C0]/50"
+                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] w-full sm:w-auto overflow-hidden border border-[#C0C0C0]/50"
               >
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -95,15 +97,17 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                   {t("landing.hero.get_started")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onLoginClick}
-                className="group px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-200 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-200 backdrop-blur-sm"
+                className="group px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-200 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-200 backdrop-blur-sm"
               >
                 <Play className="w-4 h-4 fill-current" />
                 {t("landing.hero.book_demo")}
-              </button>
+              </motion.button>
             </motion.div>
 
             {/* Feature checkmarks */}
@@ -146,8 +150,9 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             {/* Floating Info Cards */}
             <motion.div
               animate={{ y: [0, -10, 0] }}
+              whileHover={{ scale: 1.05, rotate: -2, transition: { duration: 0.2 } }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-8 -left-8 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
+              className="absolute -bottom-8 -left-8 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#1a3884]/20 flex items-center justify-center text-[#1a3884] dark:text-[#67e8f5]">
@@ -162,8 +167,9 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
 
             <motion.div
               animate={{ y: [0, 10, 0] }}
+              whileHover={{ scale: 1.05, rotate: 2, transition: { duration: 0.2 } }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -top-6 -right-6 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
+              className="absolute -top-6 -right-6 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#C0C0C0]/20 flex items-center justify-center text-[#C0C0C0]">
