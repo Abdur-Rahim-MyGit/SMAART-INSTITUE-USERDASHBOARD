@@ -91,14 +91,14 @@ const SkillsVault = () => {
 
     courses.forEach(course => {
         const courseIdStr = String(course._id || '');
-        const enrollment = enrollmentProgress.find(e => 
-            (e.courseCode && e.courseCode === course.courseCode) || 
+        const enrollment = enrollmentProgress.find(e =>
+            (e.courseCode && e.courseCode === course.courseCode) ||
             String(e.courseId) === courseIdStr
         );
-        
-        const isCompleted = completedCourses.includes(course.courseCode) || 
-                            completedCourses.includes(course.courseNumber) || 
-                            completedCourses.includes(courseIdStr);
+
+        const isCompleted = completedCourses.includes(course.courseCode) ||
+            completedCourses.includes(course.courseNumber) ||
+            completedCourses.includes(courseIdStr);
 
         // Show flashcards if the user is enrolled in the course or has completed it.
         const isEnrolled = !!enrollment;
@@ -128,7 +128,7 @@ const SkillsVault = () => {
             if (lf.stepE_FlashCard && Array.isArray(lf.stepE_FlashCard.cards)) {
                 lf.stepE_FlashCard.cards.forEach(addCard);
             }
-            
+
             // Fallback for general values inside learningFlow
             Object.values(lf).forEach(step => {
                 if (step && typeof step === 'object') {
@@ -171,7 +171,7 @@ const SkillsVault = () => {
                         }
                     });
                 }
-                
+
                 // standard days structure
                 if (module.days && Array.isArray(module.days)) {
                     module.days.forEach(day => {
@@ -285,11 +285,10 @@ const SkillsVault = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[12px] font-bold whitespace-nowrap transition-all ${
-                                    isActive
-                                        ? "bg-[#1a3884] text-white shadow-sm"
-                                        : "border border-[#d8e6f7] bg-white text-slate-500 hover:border-[#1a3884]/30 hover:text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-slate-400 dark:hover:text-blue-300"
-                                }`}
+                                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[12px] font-bold whitespace-nowrap transition-all ${isActive
+                                    ? "bg-[#1a3884] text-white shadow-sm"
+                                    : "border border-[#d8e6f7] bg-white text-slate-500 hover:border-[#1a3884]/30 hover:text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-slate-400 dark:hover:text-blue-300"
+                                    }`}
                             >
                                 <Icon className="h-3.5 w-3.5" />
                                 {t(`skills_vault.tabs.${tab.id}`, tab.label)}
@@ -360,7 +359,7 @@ const SkillsVault = () => {
                                             onClick={() => navigate("/dashboard/certificate")}
                                             className="flex items-center justify-center gap-1.5 rounded-xl bg-[#1a3884] px-5 py-2.5 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
                                         >
-                                            <Download className="h-4 w-4" /> Download Centre
+                                            <Download className="h-4 w-4" /> Download Certificates
                                         </button>
                                     </div>
 
@@ -449,7 +448,7 @@ const SkillsVault = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {filteredFlashcards.length > 0 ? (
                                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                         {filteredFlashcards.map((card, i) => (

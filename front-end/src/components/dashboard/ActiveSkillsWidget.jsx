@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Zap, Layers, Map, Target, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import CertificateModal from '../CertificateModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ActiveSkillsWidget = ({ userEmail, paths }) => {
     const { theme } = useTheme();
@@ -77,7 +78,9 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
     useEffect(() => {
         if (validPaths.length === 0) return;
-        const currentPath = validPaths[activeTab];
+        if (activeTab === 0) return; // 'All' tab selected
+        
+        const currentPath = validPaths[activeTab - 1];
         if (!currentPath) return;
 
         const cacheKey = currentPath.title || currentPath.id;
@@ -135,11 +138,13 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
         return <div className="w-full h-48 bg-slate-100 dark:bg-[#002147] rounded-2xl animate-pulse mb-6" />;
     }
 
-    const currentPath = validPaths[activeTab];
+    const currentPath = activeTab === 0 ? null : validPaths[activeTab - 1];
     const pathSkillSet = currentPath ? roleSkillsCache[currentPath.title || currentPath.id] : null;
 
     let displayedSkills = [];
-    if (pathSkillSet && pathSkillSet.size > 0) {
+    if (activeTab === 0) {
+        displayedSkills = userSkills;
+    } else if (pathSkillSet && pathSkillSet.size > 0) {
         const pathSkillsArray = Array.from(pathSkillSet).map(s => s.toLowerCase().trim());
         displayedSkills = userSkills.filter(s => {
             const userSkillName = s.skillName.toLowerCase().trim();
@@ -150,7 +155,10 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     return (
-        <div className="w-full mb-6 rounded-2xl overflow-hidden shadow-sm group/widget"
+        <motion.div className="w-full mb-6 rounded-2xl overflow-hidden shadow-sm group/widget"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             style={{
                 background: isDark ? 'var(--navy)' : '#ffffff',
                 border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0'
@@ -182,9 +190,10 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                 {/* Pathway Tabs */}
                 <div className="flex p-1 rounded-xl w-full lg:w-auto overflow-x-auto no-scrollbar"
                     style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f1f5f9' }}>
-                    {validPaths.map((path, idx) => {
+                    {[{ id: 'all' }, ...validPaths].map((path, idx) => {
                         const isActive = activeTab === idx;
-                        const label = path.id === 'primary' ? 'Primary Path' :
+                        const label = path.id === 'all' ? 'All Active' :
+                            path.id === 'primary' ? 'Primary Path' :
                             path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path';
 
                         return (
@@ -275,7 +284,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                     <div ref={scrollContainerRef} onScroll={checkScrollLimits} className="flex overflow-x-auto gap-3 pb-3 no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                         {displayedSkills.map((skill, idx) => (
                             <SkillDashboardCard
-                                key={`${currentPath.id}-${idx}`}
+                                key={`skill-${idx}`}
                                 skill={skill}
                                 isDark={isDark}
                                 onMarkDone={() => setCertModal({ skillName: skill.skillName })}
@@ -296,12 +305,15 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                             No active skills in this pathway.
                         </p>
                         <p className="text-[0.7rem] mt-1 px-4" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>
-                            Jump into the Career Roadmap for <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> to start mastering new skills!
+                            {activeTab === 0 
+                                ? "Jump into your Career Roadmap to start mastering new skills!" 
+                                : <>Jump into the Career Roadmap for <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> to start mastering new skills!</>
+                            }
                         </p>
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -314,8 +326,10 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
     const color = colors[colorIndex];
 
     return (
-        <div
+        <motion.div
             title={skill.skillName}
+            whileHover={{ y: -5, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             style={{
                 background: isDark ? '#002A5C' : '#ffffff',
                 border: isHovered
@@ -323,8 +337,6 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
                     : (isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid #e2e8f0'),
                 borderRadius: '12px',
                 padding: '1rem',
-                transition: 'all 0.3s ease',
-                transform: isHovered ? 'translateY(-2px)' : 'none',
                 boxShadow: isHovered ? '0 12px 24px -6px rgba(0,0,0,0.08)' : '0 4px 6px -1px rgba(0,0,0,0.02)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -374,8 +386,9 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
                 </div>
             </div>
 
-            <button
+            <motion.button
                 onClick={(e) => { e.stopPropagation(); onMarkDone(); }}
+                whileTap={{ scale: 0.95 }}
                 style={{
                     width: '100%',
                     padding: '0.4rem',
@@ -394,8 +407,8 @@ const SkillDashboardCard = ({ skill, onMarkDone, isDark }) => {
                 }}
             >
                 Mark Done
-            </button>
-        </div>
+            </motion.button>
+        </motion.div>
     );
 };
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert, StickyNote } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert, StickyNote, Fingerprint, GraduationCap, ShieldCheck, Activity } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
@@ -1067,15 +1067,15 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-transparent overflow-hidden transition-colors duration-500 relative min-h-[calc(100vh-130px)] p-[2rem]">
+    <div className="flex flex-col bg-transparent overflow-hidden transition-colors duration-500 relative min-h-[calc(100vh-130px)] pt-4 px-4 sm:px-6 lg:px-8 pb-8">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-900/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none" />
 
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-transparent border-b border-[#d8e6f7] dark:border-[#1a3884]/20 mb-6">
-          <div className="w-full px-0 py-4">
+        <div className="bg-transparent border-b border-[#d8e6f7] dark:border-[#1a3884]/20 mb-2">
+          <div className="w-full px-0 py-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-wrap items-center gap-3 sm:gap-5">
                 <button
@@ -1106,7 +1106,7 @@ const CoursePlayer = () => {
         </div>
 
         {/* Main Content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="pt-2 sm:pt-4">
           <div className={showIntro ? "flex justify-center" : "grid grid-cols-1 lg:grid-cols-3 gap-6"}>
             {/* Left Column - Video and Content */}
             <div className={showIntro ? "max-w-3xl w-full" : "lg:col-span-2"}>
@@ -1138,21 +1138,26 @@ const CoursePlayer = () => {
                   {showIntro ? (
                     <motion.div
                       key="intro-screen"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.05 }}
-                      className="p-6 bg-white dark:bg-[#002147] rounded-2xl border border-gray-200 dark:border-white/10 shadow-xl overflow-hidden relative transition-colors duration-300"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      className="p-8 sm:p-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl border border-slate-200/50 dark:border-white/10 shadow-[0_20px_50px_rgba(13,31,78,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative transition-all duration-500"
                     >
-                      <div className="absolute top-0 left-0 w-full h-1 bg-[#1a3884]" />
+                      {/* Decorative Background Elements */}
+                      <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-br from-[#1a3884]/10 to-[#4c6ef5]/10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
+                      <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-gradient-to-tr from-violet-500/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none -ml-16 -mb-16" />
 
-                      <div className="text-center mb-6">
-                        <div className="w-14 h-14 bg-[#1a3884]/10 dark:bg-blue-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
+                      <div className="text-center mb-8 relative z-10">
+                        {/* Premium Category Tag */}
+                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a3884]/5 dark:bg-blue-950/40 text-[#1a3884] dark:text-blue-400 text-[10px] font-black uppercase tracking-wider mb-4 border border-[#1a3884]/10 dark:border-blue-900/30">
+                          <Sparkles className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400 animate-pulse" />
+                          {t(stageKey)}
                         </div>
-                        <h1 className="text-2xl font-bold text-[#002147] dark:text-white mb-2">
+
+                        <h1 className="text-2xl sm:text-3xl md:text-3.5xl font-black text-[#002147] dark:text-white tracking-tight mb-3 leading-tight">
                           {course.title}
                         </h1>
-                        <p className="text-sm text-gray-500 dark:text-slate-350 font-medium">
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-slate-350 font-semibold max-w-xl mx-auto leading-relaxed">
                           {course.subtitle}
                         </p>
                       </div>
@@ -1163,87 +1168,134 @@ const CoursePlayer = () => {
                           initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.15, duration: 0.5 }}
-                          className="mb-6 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 shadow-lg relative group"
+                          className="mb-8 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 shadow-lg relative group"
                         >
                           <img
                             src={dbCourse.banner || course.banner}
                             alt={course.title}
-                            className="w-full h-48 sm:h-64 object-cover transform group-hover:scale-103 transition-transform duration-700"
+                            className="w-full h-48 sm:h-64 object-cover transform group-hover:scale-[1.02] transition-transform duration-700"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
                         </motion.div>
                       )}
 
-                      <div className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl p-5 mb-6 border border-gray-200 dark:border-white/10 transition-colors duration-300">
-                        <h3 className="text-xs font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
-                          {t("course_player.course_details")}
-                        </h3>
-
+                      <div className="space-y-6 relative z-10">
+                        {/* Details Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.course_id")}</p>
-                            <p className="text-sm font-bold text-[#002147] dark:text-white">{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</p>
+                          {/* Card 1: ID */}
+                          <div className="p-4 bg-slate-50/50 dark:bg-[#002A5C]/40 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center gap-3.5 hover:border-slate-300 dark:hover:border-white/10 hover:shadow-sm transition-all duration-300">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center text-[#1a3884] dark:text-blue-400 shrink-0">
+                              <Fingerprint className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t("course_player.course_id")}</p>
+                              <p className="text-[14px] font-black text-[#002147] dark:text-white">{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</p>
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.type")}</p>
-                            <p className="text-sm font-bold text-[#002147] dark:text-white">{formattedDisplayType}</p>
+
+                          {/* Card 2: Type */}
+                          <div className="p-4 bg-slate-50/50 dark:bg-[#002A5C]/40 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center gap-3.5 hover:border-slate-300 dark:hover:border-white/10 hover:shadow-sm transition-all duration-300">
+                            <div className="w-10 h-10 rounded-xl bg-violet-500/10 dark:bg-violet-400/10 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
+                              <GraduationCap className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t("course_player.type")}</p>
+                              <p className="text-[14px] font-black text-[#002147] dark:text-white">{formattedDisplayType}</p>
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.duration")}</p>
-                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t("course_player.forty_five_min")}</p>
+
+                          {/* Card 3: Duration */}
+                          <div className="p-4 bg-slate-50/50 dark:bg-[#002A5C]/40 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center gap-3.5 hover:border-slate-300 dark:hover:border-white/10 hover:shadow-sm transition-all duration-300">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                              <Clock className="w-5 h-5" />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t("course_player.duration")}</p>
+                              <p className="text-[14px] font-black text-[#002147] dark:text-white">{t("course_player.forty_five_min")}</p>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-white/10 space-y-5 text-left">
-                          {/* Guidelines */}
-                          <div className="space-y-2.5">
-                            <h4 className="text-xs font-bold uppercase tracking-widest text-[#1a3884] dark:text-blue-400 flex items-center gap-2">
-                              <BookOpen className="w-3.5 h-3.5" />
-                              {t("course_player.learning_guidelines", "Learning Protocol & Guidelines")}
-                            </h4>
-                            <ul className="space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-200 font-medium">
-                              <li className="flex items-start gap-2.5">
-                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0" />
-                                <span>{t("course_player.guideline_step", "Complete each step sequentially to validate your progress and unlock the next lesson.")}</span>
-                              </li>
-                              <li className="flex items-start gap-2.5">
-                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0" />
-                                <span>{t("course_player.guideline_active", "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.")}</span>
-                              </li>
-                            </ul>
+                        {/* Guidelines Section */}
+                        <div className="space-y-4 text-left border-t border-slate-100 dark:border-white/5 pt-6">
+                          <h4 className="text-xs font-black uppercase tracking-widest text-[#1a3884] dark:text-blue-400 flex items-center gap-2 mb-4">
+                            <BookOpen className="w-4 h-4" />
+                            {t("course_player.learning_guidelines", "Learning Protocol & Guidelines")}
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50/60 dark:bg-slate-800/10 border border-slate-100 dark:border-white/5 hover:bg-slate-100/50 dark:hover:bg-slate-800/20 transition-all duration-300">
+                              <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center text-[#1a3884] dark:text-blue-400 shrink-0">
+                                <Target className="w-4.5 h-4.5" />
+                              </div>
+                              <div className="space-y-0.5">
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Step-by-step progress</p>
+                                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
+                                  {t("course_player.guideline_step", "Complete each step sequentially to validate your progress and unlock the next lesson.")}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50/60 dark:bg-slate-800/10 border border-slate-100 dark:border-white/5 hover:bg-slate-100/50 dark:hover:bg-slate-800/20 transition-all duration-300">
+                              <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center text-[#1a3884] dark:text-blue-400 shrink-0">
+                                <Activity className="w-4.5 h-4.5" />
+                              </div>
+                              <div className="space-y-0.5">
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Engagement monitor</p>
+                                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
+                                  {t("course_player.guideline_active", "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.")}
+                                </p>
+                              </div>
+                            </div>
                           </div>
+                        </div>
 
-                          {/* Warnings */}
-                          <div className="space-y-2.5 pt-1.5">
-                            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                              <ShieldAlert className="w-3.5 h-3.5" />
-                              {t("course_player.integrity_warning_title", "Integrity & Security Warning")}
-                            </h4>
-                            <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 p-3.5 dark:bg-amber-500/8">
-                              <ul className="space-y-2 text-xs text-amber-800 dark:text-amber-300 font-semibold leading-relaxed">
-                                <li className="flex items-start gap-2">
-                                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-                                  <span>{t("course_player.warning_monitored", "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.")}</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-650 dark:text-amber-400" />
-                                  <span>{t("course_player.warning_limit", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}</span>
-                                </li>
-                              </ul>
+                        {/* Warning Alert Panel */}
+                        <div className="rounded-2xl border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/[0.02] dark:bg-amber-950/10 p-5 relative overflow-hidden text-left">
+                          <div className="flex items-center justify-between mb-4 border-b border-amber-500/10 pb-3">
+                            <div className="flex items-center gap-2">
+                              <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                              <span className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                                {t("course_player.integrity_warning_title", "Integrity & Security Warning")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                              <span className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Live Monitor</span>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex gap-3">
+                              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <p className="text-xs font-semibold text-amber-800/95 dark:text-amber-300/90 leading-relaxed">
+                                {t("course_player.warning_monitored", "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.")}
+                              </p>
+                            </div>
+                            <div className="flex gap-3">
+                              <AlertTriangle className="w-4 h-4 text-amber-650 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <p className="text-xs font-semibold text-amber-800/95 dark:text-amber-300/90 leading-relaxed">
+                                {t("course_player.warning_limit", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}
+                              </p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex justify-center">
-                        <button
+                      {/* Call to Action Button */}
+                      <div className="flex flex-col items-center gap-3 mt-10 relative z-10">
+                        <motion.button
+                          whileHover={{ scale: 1.02, translateY: -2 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={handleStartCourse}
-                          className="group flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#1a3884] to-[#112b6b] hover:from-[#112b6b] hover:to-[#002147] text-white rounded-2xl font-black text-sm transition-all duration-300 shadow-xl shadow-[#1a3884]/30 hover:shadow-[#1a3884]/40 transform hover:-translate-y-1 active:scale-95"
+                          className="group relative flex items-center justify-center gap-3 px-12 py-4 bg-gradient-to-r from-[#1a3884] via-[#2a50b3] to-[#4c6ef5] hover:from-[#112b6b] hover:via-[#1a3884] hover:to-[#2b5a9e] text-white rounded-2xl font-black text-sm transition-all duration-300 shadow-[0_10px_30px_rgba(26,56,132,0.25)] hover:shadow-[0_15px_35px_rgba(26,56,132,0.35)] overflow-hidden"
                         >
-                          {t("course_player.start_learning_journey")}
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-                        </button>
+                          <span>{t("course_player.start_learning_journey")}</span>
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
+                        </motion.button>
+                        
+                        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mt-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          Secure session protocol initialized.
+                        </p>
                       </div>
                     </motion.div>
                   ) : !activeStep ? (

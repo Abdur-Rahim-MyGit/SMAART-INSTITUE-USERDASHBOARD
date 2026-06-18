@@ -56,11 +56,11 @@ const MyCoursesHeroBanner = ({
       <button
         type="button"
         onClick={onPrimaryAction}
-        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
+        className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] hover:from-[#112b6b] hover:to-[#2a50b3] dark:from-blue-600 dark:to-indigo-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
       >
-        {mode !== "assessment" && <RiPlayFill size={16} />}
-        {primaryLabel || "Continue"}
-        <RiArrowRightSLine size={16} stroke={1.5} />
+        {mode !== "assessment" && <RiPlayFill size={14} className="animate-pulse" />}
+        <span>{primaryLabel || "Continue"}</span>
+        <RiArrowRightSLine size={14} stroke={2} className="group-hover:translate-x-0.5 transition-transform" />
       </button>
     </div>
   );

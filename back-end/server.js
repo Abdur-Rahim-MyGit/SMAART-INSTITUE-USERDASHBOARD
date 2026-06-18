@@ -106,24 +106,44 @@ app.use(require('./middleware/sanitizeMongo'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB Connection
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
+const connectWithFallback = async () => {
+  const primaryURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
+  const fallbackURI = 'mongodb://127.0.0.1:27017/minds';
+  
+  const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 50,
+    minPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    retryWrites: true,
+    retryReads: true
+  };
 
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxPoolSize: 50, // Increase max connection pool size for high concurrency
-  minPoolSize: 10, // Maintain a minimum of 10 connections for faster initial response
-  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s waiting for a server
-  socketTimeoutMS: 45000, // Close idle sockets after 45s
-  retryWrites: true, // Automatically retry write operations upon transient network errors
-  retryReads: true // Automatically retry read operations
-})
-  .then(() => logger.info('✅ MongoDB connected successfully'))
-  .catch((err) => {
-    logger.error('❌ MongoDB connection error:', err);
-    process.exit(1);
-  });
+  try {
+    await mongoose.connect(primaryURI, options);
+    logger.info('✅ MongoDB connected successfully');
+  } catch (err) {
+    logger.error('❌ Primary MongoDB connection error:', err.message);
+    if (primaryURI !== fallbackURI) {
+      logger.info(`🔄 Attempting to connect to fallback MongoDB at ${fallbackURI}`);
+      try {
+        await mongoose.connect(fallbackURI, options);
+        logger.info('✅ Fallback MongoDB connected successfully');
+      } catch (fallbackErr) {
+        logger.error('❌ Fallback MongoDB connection error:', fallbackErr.message);
+        // Don't exit process if we can run without DB, or exit if DB is strictly required.
+        // As per plan, we keep process.exit(1) if both fail.
+        process.exit(1);
+      }
+    } else {
+      process.exit(1);
+    }
+  }
+};
+
+connectWithFallback();
 
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
