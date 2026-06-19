@@ -10,9 +10,11 @@ import { API_BASE_URL, apiCall } from "@/services/api";
 import FileUpload from "@/components/FileUpload";
 import logoWhite from "@/assets/white.png";
 import logoGold from "@/assets/blue.png"; // Using blue.png as proxy for logo if needed, but the ref has white/blue theme
+import { useUser } from "@/contexts/UserContextFixed";
 
 const ComprehensiveSignup = () => {
   const navigate = useNavigate();
+  const { user, updateUser } = useUser();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -47,7 +49,15 @@ const ComprehensiveSignup = () => {
     }
 
     if (email) {
-      setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || "", institution: "" }));
+      setPersonalDetails(prev => ({
+        ...prev,
+        email,
+        fullName: fullName || prev.fullName,
+        mobileNumber: userData?.mobileNumber || "",
+        institution: "",
+        profilePhoto: userData?.profileImage || prev.profilePhoto,
+        educationLevel: userData?.academic?.degreeLevel || userData?.educationLevel || prev.educationLevel || ""
+      }));
       setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!userData?.mobileNumber }));
     }
 
@@ -59,6 +69,48 @@ const ComprehensiveSignup = () => {
       } catch { setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution })); setPreFilledFields(prev => ({ ...prev, institution: true })); }
     }
     if (userData?.department) { setPersonalDetails(prev => ({ ...prev, department: userData.department })); setPreFilledFields(prev => ({ ...prev, department: true })); }
+
+    const fetchLatestDetails = async () => {
+      if (email) {
+        try {
+          const regData = await apiCall(`/users/register-details/${email}`);
+          if (regData) {
+            updateUser({
+              ...regData,
+              profileImage: regData.profilePhoto || regData.profileImage || userData?.profileImage
+            });
+            setPersonalDetails(prev => ({
+              ...prev,
+              fullName: regData.fullName || prev.fullName,
+              gender: regData.gender || prev.gender,
+              mobileNumber: regData.mobileNumber || regData.mobile || prev.mobileNumber,
+              institution: regData.institution || (regData.college?.collegeName) || prev.institution,
+              department: regData.department || prev.department,
+              dob: regData.dob ? new Date(regData.dob).toISOString().split('T')[0] : prev.dob,
+              profilePhoto: regData.profilePhoto || regData.profileImage || userData?.profileImage || prev.profilePhoto,
+              educationLevel: regData.academic?.degreeLevel || userData?.academic?.degreeLevel || regData.educationLevel || prev.educationLevel || "",
+              address: {
+                street: regData.address?.street || prev.address?.street || "",
+                city: regData.address?.city || prev.address?.city || "",
+                state: regData.address?.state || prev.address?.state || "",
+                country: regData.address?.country || prev.address?.country || ""
+              }
+            }));
+            setPreFilledFields(prev => ({
+              ...prev,
+              email: true,
+              fullName: !!regData.fullName,
+              mobileNumber: !!(regData.mobileNumber || regData.mobile),
+              institution: !!(regData.institution || regData.college?.collegeName),
+              department: !!regData.department
+            }));
+          }
+        } catch (err) {
+          console.error("Error fetching latest user registration details on mount:", err);
+        }
+      }
+    };
+    fetchLatestDetails();
   }, [navigate]);
 
   const [excelData, setExcelData] = useState({ sectors: [], roles: [] });
@@ -127,7 +179,7 @@ const ComprehensiveSignup = () => {
     fetchExcelData();
   }, []);
 
-  const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null });
+  const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "" } });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
@@ -168,9 +220,6 @@ const ComprehensiveSignup = () => {
 
   const validatePersonalDetails = () => {
     if (!personalDetails.profilePhoto) { toast.error("Profile Photo is required"); return false; }
-    if (!personalDetails.educationLevel) { toast.error("Education Level is required"); return false; }
-    if (personalDetails.educationLevel === "Other" && !personalDetails.customDomain?.trim()) { toast.error("Please specify your domain"); return false; }
-    if (!personalDetails.nickname?.trim()) { toast.error("Nick name is required"); return false; }
     if (!personalDetails.dob) { toast.error("Date of Birth is required"); return false; }
     const dobDate = new Date(personalDetails.dob);
     const today = new Date();
@@ -180,11 +229,11 @@ const ComprehensiveSignup = () => {
     if (dobDate > today) { toast.error("Date of Birth cannot be in the future"); return false; }
     if (!personalDetails.gender) { toast.error("Gender is required"); return false; }
     if (!personalDetails.yearOfStudy) { toast.error("Year of Study is required"); return false; }
-    const currentYear = new Date().getFullYear();
-    if (parseInt(personalDetails.yearOfStudy) > currentYear) { toast.error("Year of Study cannot be in the future"); return false; }
     if (!personalDetails.yearOfPassing) { toast.error("Year of Passing is required"); return false; }
-    if (parseInt(personalDetails.yearOfPassing) <= parseInt(personalDetails.yearOfStudy)) { toast.error("Year of Passing must be greater than Year of Study"); return false; }
-    if (!personalDetails.department?.trim()) { toast.error("Department is required"); return false; }
+    if (!personalDetails.address?.street?.trim()) { toast.error("Street Address is required"); return false; }
+    if (!personalDetails.address?.city?.trim()) { toast.error("City is required"); return false; }
+    if (!personalDetails.address?.state?.trim()) { toast.error("State is required"); return false; }
+    if (!personalDetails.address?.country?.trim()) { toast.error("Country is required"); return false; }
     return true;
   };
 
@@ -217,12 +266,13 @@ const ComprehensiveSignup = () => {
       if (!h.institutionName?.trim()) { toast.error(`Higher Ed ${i + 1}: Institution Name is required`); return false; }
       if (!h.university?.trim()) { toast.error(`Higher Ed ${i + 1}: University is required`); return false; }
       if (!h.yearOfPassing) { toast.error(`Higher Ed ${i + 1}: Year of Passing is required`); return false; }
-      if (!h.cgpaPercentage) { toast.error(`Higher Ed ${i + 1}: CGPA/Percentage is required`); return false; }
-      // PERCENTAGE CHECK (Assume percentage if > 10 or generic check)
-      const val = parseFloat(h.cgpaPercentage);
-      if (isNaN(val) || val < 0 || val > 100) { toast.error(`Higher Ed ${i + 1}: CGPA/Percentage must be between 0 and 100`); return false; }
       if (!h.degreeStatus) { toast.error(`Higher Ed ${i + 1}: Degree Status is required`); return false; }
-      if (!h.certificate) { toast.error(`Higher Ed ${i + 1}: Certificate upload is required`); return false; }
+      if (h.degreeStatus !== "pursuing") {
+        if (!h.cgpaPercentage) { toast.error(`Higher Ed ${i + 1}: CGPA/Percentage is required`); return false; }
+        const val = parseFloat(h.cgpaPercentage);
+        if (isNaN(val) || val < 0 || val > 100) { toast.error(`Higher Ed ${i + 1}: CGPA/Percentage must be between 0 and 100`); return false; }
+        if (!h.certificate) { toast.error(`Higher Ed ${i + 1}: Certificate upload is required`); return false; }
+      }
     }
     return true;
   };
@@ -324,6 +374,14 @@ const ComprehensiveSignup = () => {
         }),
       });
       console.log(`[ComprehensiveSignup] Section '${sectionName}' saved successfully`);
+      if (sectionName === 'personalDetails' && sectionData) {
+        updateUser({
+          fullName: sectionData.fullName,
+          gender: sectionData.gender,
+          mobileNumber: sectionData.mobileNumber,
+          profileImage: sectionData.profilePhoto
+        });
+      }
     } catch (error) {
       console.error(`[ComprehensiveSignup] Failed to save section '${sectionName}':`, error);
       // Silent fail - don't block the user, data will be saved at final submit
@@ -459,7 +517,9 @@ const ComprehensiveSignup = () => {
         const currentUser = JSON.parse(currentUserStr);
         currentUser.hasRegistration = true;
         currentUser.registrationCompleted = true;
+        currentUser.profileImage = personalDetails.profilePhoto || currentUser.profileImage;
         sessionStorage.setItem("user", JSON.stringify(currentUser));
+        updateUser(currentUser);
       }
 
       setTimeout(() => {
@@ -473,7 +533,7 @@ const ComprehensiveSignup = () => {
   const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
   const selectClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
   const textareaClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
-  const yearOptions = Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => 2010 + i);
+  const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
   const sectorOptions = excelData.sectors.length > 0
@@ -599,16 +659,13 @@ const ComprehensiveSignup = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Nick Name *</Label>
-                      <div className="relative">
-                        <Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-slate-200/50 rounded-full flex items-center justify-center text-slate-600 text-[10px] font-bold border border-slate-200">+</div>
-                      </div>
+                      <Label className="text-sm text-slate-500 font-medium">Nick Name</Label>
+                      <Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} />
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
                       <div className="relative">
-                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} min="1900-01-01" max={new Date(new Date().setFullYear(new Date().getFullYear() - 15)).toISOString().split('T')[0]} />
+                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <User className="w-4 h-4 text-slate-400" />
                         </div>
@@ -632,11 +689,17 @@ const ComprehensiveSignup = () => {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Current Year of Study *</Label>
-                      <select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
+                      <select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}>
+                        <option value="">Select Year</option>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                      </select>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Year of Passing (Expected) *</Label>
-                      <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
+                      <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{expectedYearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Mobile Number</Label>
@@ -661,24 +724,95 @@ const ComprehensiveSignup = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Chosen Career Domain *</Label>
+                      <Label className="text-sm text-slate-500 font-medium">Degree Level</Label>
                       <div className="relative">
-                        <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value, customDomain: '' })} className={selectClass}>
-                          <option value="">Select Domain</option>
-                          {sectorOptions.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        <Input value={user?.academic?.degreeLevel || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <GraduationCap className="w-4 h-4 text-slate-400" />
+                        </div>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Department *</Label>
+                      <Label className="text-sm text-slate-500 font-medium">Domain</Label>
                       <div className="relative">
-                        <Input value={personalDetails.department} disabled={preFilledFields.department} onChange={(e) => setPersonalDetails({ ...personalDetails, department: e.target.value })} className={inputClass} />
+                        <Input value={user?.academic?.domain || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Target className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Degree Group</Label>
+                      <div className="relative">
+                        <Input value={user?.academic?.degreeGroup || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Award className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Specialization</Label>
+                      <div className="relative">
+                        <Input value={user?.academic?.specialisation || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <Briefcase className="w-4 h-4 text-slate-400" />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Address Section */}
+                  <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400">
+                      <Home className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                      <h3 className="text-lg font-bold tracking-tight">Address</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      <div className="md:col-span-2 space-y-1">
+                        <Label className="text-sm text-slate-500 font-medium">Street *</Label>
+                        <Input
+                          value={personalDetails.address?.street || ""}
+                          onChange={(e) => setPersonalDetails({
+                            ...personalDetails,
+                            address: { ...personalDetails.address, street: e.target.value }
+                          })}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                      <div className="space-y-1">
+                        <Label className="text-sm text-slate-500 font-medium">City *</Label>
+                        <Input
+                          value={personalDetails.address?.city || ""}
+                          onChange={(e) => setPersonalDetails({
+                            ...personalDetails,
+                            address: { ...personalDetails.address, city: e.target.value }
+                          })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-sm text-slate-500 font-medium">State *</Label>
+                        <Input
+                          value={personalDetails.address?.state || ""}
+                          onChange={(e) => setPersonalDetails({
+                            ...personalDetails,
+                            address: { ...personalDetails.address, state: e.target.value }
+                          })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-sm text-slate-500 font-medium">Country *</Label>
+                        <Input
+                          value={personalDetails.address?.country || ""}
+                          onChange={(e) => setPersonalDetails({
+                            ...personalDetails,
+                            address: { ...personalDetails.address, country: e.target.value }
+                          })}
+                          className={inputClass}
+                        />
                       </div>
                     </div>
                   </div>
@@ -813,10 +947,47 @@ const ComprehensiveSignup = () => {
 
                         <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
                         <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                        <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                        <div><Label>CGPA / Percentage*</Label><Input type="number" max="100" value={item.cgpaPercentage} onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                        <div><Label>Status *</Label><select value={item.degreeStatus} onChange={(e) => { const n = [...higherEducation]; n[index].degreeStatus = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="pursuing">Pursuing</option><option value="completed">Completed</option></select></div>
-                        <div className="md:col-span-2"><Label>Upload Certificate *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} /></div>
+                        <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{expectedYearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                        <div>
+                          <Label className={item.degreeStatus === 'pursuing' ? "opacity-60" : ""}>CGPA / Percentage{item.degreeStatus !== 'pursuing' && ' *'}</Label>
+                          <Input
+                            type="number"
+                            max="100"
+                            value={item.cgpaPercentage || ""}
+                            disabled={item.degreeStatus === 'pursuing'}
+                            onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }}
+                            className={inputClass + (item.degreeStatus === 'pursuing' ? " opacity-60 cursor-not-allowed" : "")}
+                          />
+                        </div>
+                        <div>
+                          <Label>Status *</Label>
+                          <select
+                            value={item.degreeStatus}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = [...higherEducation];
+                              n[index].degreeStatus = val;
+                              if (val === 'pursuing') {
+                                n[index].cgpaPercentage = '';
+                                n[index].certificate = null;
+                              }
+                              setHigherEducation(n);
+                            }}
+                            className={selectClass}
+                          >
+                            <option value="">Select</option>
+                            <option value="pursuing">Pursuing</option>
+                            <option value="completed">Completed</option>
+                          </select>
+                        </div>
+                        <div className="md:col-span-2">
+                          <Label className={item.degreeStatus === 'pursuing' ? "opacity-60" : ""}>Upload Certificate{item.degreeStatus !== 'pursuing' && ' *'}</Label>
+                          <FileUpload
+                            value={item.certificate}
+                            disabled={item.degreeStatus === 'pursuing'}
+                            onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1169,7 +1340,7 @@ const ComprehensiveSignup = () => {
                           <Trash2 size={18} />
                         </button>
                       )}
-                      <h3 className="font-semibold mb-4 text-[#1a3884]">Cert #{index + 1}</h3>
+                      <h3 className="font-semibold mb-4 text-[#1a3884]">Certificate #{index + 1}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
                         <div className="md:col-span-2 p-4 rounded-2xl border border-slate-200 bg-slate-50/30">
                           <div className="grid md:grid-cols-2 gap-6 items-center">

@@ -294,8 +294,8 @@ const AssessmentsDashboard = () => {
                     >
                         <div className="flex-1">
                             <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                {t("assessments_dashboard.title", "Assessments")}{" "}
-                                <span className="text-[#1a3884] dark:text-blue-300">Centre</span>
+                                {t("assessments_dashboard.title_main", "Assessments")}{" "}
+                                <span className="text-[#1a3884] dark:text-blue-300">{t("assessments_dashboard.title_sub", "Centre")}</span>
                             </h1>
                             <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
                                 {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
@@ -394,47 +394,33 @@ const AssessmentsDashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Protocol & Guidelines section inside modal */}
-                                <div className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#1a3884] dark:text-blue-300">
-                                        {t("assessments_dashboard.guidelines_title", "Assessment Protocol & Guidelines")}
-                                    </h4>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {[
-                                            {
-                                                key: "dynamic_questions",
-                                                title: "DYNAMIC QUESTIONS",
-                                                desc: "Each stage contains unique questions assessing all 6 quotients.",
-                                            },
-                                            {
-                                                key: "real_time_persistence",
-                                                title: "REAL-TIME PERSISTENCE",
-                                                desc: "Answers are saved in real-time - resume anytime if disconnected.",
-                                            },
-                                            {
-                                                key: "single_attempt",
-                                                title: "SINGLE ATTEMPT",
-                                                desc: "Retakes are not allowed by default. Contact admin for exceptions.",
-                                            },
-                                            {
-                                                key: "integrity_monitoring",
-                                                title: "INTEGRITY MONITORING",
-                                                desc: "Screen recording, copy-paste and tab-switching are monitored.",
-                                            },
-                                        ].map((item) => (
-                                            <div key={item.key} className="flex gap-3 rounded-xl border border-[#d8e6f7] bg-[#F8FAFC] p-3.5 dark:border-white/10 dark:bg-slate-800/30">
-                                                <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884] dark:bg-blue-400" />
-                                                <div>
-                                                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-700 dark:text-slate-300 mb-0.5">
-                                                        {t(`assessments_dashboard.${item.key}_title`, item.title)}
-                                                    </p>
-                                                    <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                                                        {t(`assessments_dashboard.${item.key}_desc`, item.desc)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
+
+                                {/* Integrity & Security Warning */}
+                                <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-950/10">
+                                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-[0.2em] mb-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                        {t("assessments_dashboard.integrity_warning_title", "Integrity & Security Warning")}
+                                    </div>
+                                    <div className="space-y-2.5">
+                                        <div className="flex gap-2.5 items-start">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600 dark:text-amber-550 shrink-0 mt-0.5 fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <p className="text-[12px] font-bold leading-relaxed text-amber-900 dark:text-amber-300">
+                                                {t("assessments_dashboard.integrity_warning_1", "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.")}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2.5 items-start">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600 dark:text-amber-550 shrink-0 mt-0.5 fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <p className="text-[12px] font-bold leading-relaxed text-amber-900 dark:text-amber-300">
+                                                {t("assessments_dashboard.integrity_warning_2", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -578,26 +564,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         <InfoChip icon={Clock} label={durationLabel} />
                     </div>
 
-                    {completed && score !== undefined && stageData?.attemptCount > 0 && (
-                        <div className="mb-4 rounded-[14px] border border-[#d8e6f7] bg-[#F8FAFC] p-3.5 dark:border-white/10 dark:bg-slate-800/50">
-                            <div className="mb-2 flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">
-                                    {completed ? t("assessments_dashboard.performance", "Your Performance") : t("assessments_dashboard.highest_score", "Highest Attempt Score")}
-                                </span>
-                                <span className={`text-lg font-black ${completed ? 'text-[#1a3884] dark:text-white' : 'text-amber-600 dark:text-amber-450'}`}>
-                                    {score}<span className="ml-0.5 text-xs text-slate-500">%</span>
-                                </span>
-                            </div>
-                            <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden dark:bg-[#003170]">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${score}%` }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.4 + index * 0.08 }}
-                                    className={`h-full rounded-full ${completed ? 'bg-[#1a3884]' : 'bg-amber-500'}`}
-                                />
-                            </div>
-                        </div>
-                    )}
+
 
                     <button
                         onClick={(event) => {

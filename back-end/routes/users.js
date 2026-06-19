@@ -233,6 +233,8 @@ router.post('/register-details', upload.fields([
       fullName,
       mobileNumber,
       password,
+      profilePhoto: parsedPersonalDetails?.profilePhoto || (files['profilePhoto'] ? files['profilePhoto'][0].filename : ''),
+      educationLevel: parsedPersonalDetails?.educationLevel || '',
 
       // Personal Details
       nickname: parsedPersonalDetails?.nickname || '',
@@ -329,23 +331,34 @@ router.post('/register-details', upload.fields([
 
     // Mark registration as completed
     user.registrationCompleted = true;
+
+    // Sync profilePhoto to User and Student models
+    const resolvedPhoto = registrationPayload.profilePhoto || parsedPersonalDetails?.profilePhoto;
+    if (resolvedPhoto) {
+      user.profileImage = resolvedPhoto;
+    }
     await user.save();
 
-    // Sync academic details to Student document
+    // Sync academic details and profileImage to Student document
     try {
       const student = await Student.findOne(emailQuery);
-      if (student && mappedHigherEducation && mappedHigherEducation.length > 0) {
-        const he = mappedHigherEducation[0];
-        student.academic = {
-          degreeLevel: he.qualificationLevel || '',
-          domain: he.degree || '',
-          degreeGroup: he.degreeFullName || '',
-          specialisation: he.specialization || ''
-        };
+      if (student) {
+        if (resolvedPhoto) {
+          student.profileImage = resolvedPhoto;
+        }
+        if (mappedHigherEducation && mappedHigherEducation.length > 0) {
+          const he = mappedHigherEducation[0];
+          student.academic = {
+            degreeLevel: he.qualificationLevel || '',
+            domain: he.degree || '',
+            degreeGroup: he.degreeFullName || '',
+            specialisation: he.specialization || ''
+          };
+        }
         await student.save();
       }
     } catch (err) {
-      console.warn('Student academic sync in register-details failed:', err.message);
+      console.warn('Student academic/profileImage sync in register-details failed:', err.message);
     }
 
     res.status(201).json({
@@ -416,10 +429,14 @@ router.patch('/register-section', async (req, res) => {
     const sectionMapping = {
       'profilePhoto': async () => {
         registration.profilePhoto = data.profilePhoto || registration.profilePhoto;
-        // Sync to User model for immediate feedback in /auth/me
+        // Sync to User and Student models for immediate feedback
         if (user) {
           user.profileImage = registration.profilePhoto;
           await user.save();
+        }
+        if (student) {
+          student.profileImage = registration.profilePhoto;
+          await student.save();
         }
       },
       'personalDetails': async () => {
@@ -438,6 +455,10 @@ router.patch('/register-section', async (req, res) => {
         registration.dateFormat = data.dateFormat || registration.dateFormat;
         registration.notificationPrefs = data.notificationPrefs || registration.notificationPrefs;
 
+        if (data.profilePhoto) {
+          registration.profilePhoto = data.profilePhoto;
+        }
+
         if (data.address) {
           registration.address = {
             street: data.address.street || registration.address?.street || '',
@@ -454,6 +475,7 @@ router.patch('/register-section', async (req, res) => {
           if (data.bio) user.bio = data.bio;
           if (data.timezone) user.timezone = data.timezone;
           if (data.dateFormat) user.dateFormat = data.dateFormat;
+          if (data.profilePhoto) user.profileImage = data.profilePhoto;
           if (data.institution) {
             const college = await College.findOne({
               collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
@@ -470,6 +492,7 @@ router.patch('/register-section', async (req, res) => {
           if (data.bio) student.bio = data.bio;
           if (data.dob) student.dateOfBirth = data.dob;
           if (data.gender) student.gender = data.gender.toLowerCase();
+          if (data.profilePhoto) student.profileImage = data.profilePhoto;
           if (data.institution) {
             const college = await College.findOne({
               collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }

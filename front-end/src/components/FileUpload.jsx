@@ -10,7 +10,8 @@ const FileUpload = ({
     onChange,
     accept = ".pdf,.jpg,.png,.jpeg",
     maxSizeMB = 5,
-    helperText = "Supported formats: PDF, JPG, PNG"
+    helperText = "Supported formats: PDF, JPG, PNG",
+    disabled = false
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -96,17 +97,19 @@ const FileUpload = ({
             {label && <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{label}</label>}
 
             <div
-                className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
-                    ? "border-[#1a3884] bg-blue-50 dark:bg-blue-900/10"
-                    : value
-                        ? "border-green-500/50 bg-green-50/50 dark:bg-green-500/5"
-                        : "border-slate-300 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-blue-400/50"
+                className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${disabled
+                    ? "border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-900/20 opacity-50 cursor-not-allowed"
+                    : isDragging
+                        ? "border-[#1a3884] bg-blue-50 dark:bg-blue-900/10"
+                        : value
+                            ? "border-green-500/50 bg-green-50/50 dark:bg-green-500/5"
+                            : "border-slate-300 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-blue-400/50"
                     }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => !value && fileInputRef.current?.click()}
+                onDragEnter={disabled ? undefined : handleDrag}
+                onDragLeave={disabled ? undefined : handleDrag}
+                onDragOver={disabled ? undefined : handleDrag}
+                onDrop={disabled ? undefined : handleDrop}
+                onClick={() => !disabled && !value && fileInputRef.current?.click()}
             >
                 <input
                     ref={fileInputRef}
@@ -114,7 +117,7 @@ const FileUpload = ({
                     className="hidden"
                     accept={accept}
                     onChange={handleChange}
-                    disabled={isUploading || !!value}
+                    disabled={disabled || isUploading || !!value}
                 />
 
                 <div className="p-6 flex flex-col items-center justify-center min-h-[120px]">

@@ -548,6 +548,10 @@ const DashboardLayout = () => {
     { code: 'en', name: 'English', native: 'English', shortLabel: 'EN' },
     { code: 'hi', name: 'Hindi', native: 'हिन्दी', shortLabel: 'HI' },
     { code: 'ta', name: 'Tamil', native: 'தமிழ்', shortLabel: 'TA' },
+    { code: 'te', name: 'Telugu', native: 'తెలుగు', shortLabel: 'TE' },
+    { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ', shortLabel: 'KN' },
+    { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
+    { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
     { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
   ];
@@ -1292,7 +1296,7 @@ const DashboardLayout = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="relative max-w-3xl bg-white dark:bg-[#002147] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/10"
+              className="relative max-w-md w-full bg-white dark:bg-[#002147] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/10"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
@@ -1315,7 +1319,7 @@ const DashboardLayout = () => {
 
               {/* Modal Body */}
               <div className="p-6 max-h-[80vh] overflow-y-auto">
-                <StreaksWidget />
+                <StreaksWidget isModal={true} />
               </div>
             </motion.div>
           </div>

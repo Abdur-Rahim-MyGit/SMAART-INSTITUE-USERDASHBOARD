@@ -4,15 +4,21 @@ import { useTranslation } from "react-i18next";
 
 // FeaturePoint Component with enhanced styling
 const FeaturePoint = ({ icon: Icon, title, desc }) => (
-    <div className="flex gap-4 group">
+    <motion.div 
+        whileHover={{ x: 5, scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        className="flex gap-4 group cursor-pointer"
+    >
         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#1a3884]/10 dark:bg-white/5 flex items-center justify-center border border-[#1a3884]/20 dark:border-white/10 group-hover:bg-[#1a3884] dark:group-hover:bg-[#C0C0C0] transition-colors duration-300">
-            <Icon className="w-6 h-6 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors duration-300" />
+            <motion.div whileHover={{ scale: 1.2, rotate: 5 }} transition={{ type: "spring" }}>
+                <Icon className="w-6 h-6 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors duration-300" />
+            </motion.div>
         </div>
         <div>
             <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#1a3884] dark:group-hover:text-[#C0C0C0] transition-colors">{title}</h4>
             <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed">{desc}</p>
         </div>
-    </div>
+    </motion.div>
 );
 
 const FeatureDeepDive = () => {
@@ -43,7 +49,11 @@ const FeatureDeepDive = () => {
                             </div>
                         </div>
                         {/* Floating Element */}
-                        <div className="absolute -bottom-6 -right-6 bg-white dark:bg-[#001c3d] p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-xl max-w-xs backdrop-blur-md">
+                        <motion.div 
+                            whileHover={{ scale: 1.05, rotate: -2 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                            className="absolute -bottom-6 -right-6 bg-white dark:bg-[#001c3d] p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-xl max-w-xs backdrop-blur-md cursor-pointer z-10"
+                        >
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                 <span className="text-xs font-bold text-gray-900 dark:text-white">
@@ -53,7 +63,7 @@ const FeatureDeepDive = () => {
                             <div className="h-1.5 w-32 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden">
                                 <div className="h-full w-[75%] bg-[#1a3884] dark:bg-[#C0C0C0]" />
                             </div>
-                        </div>
+                        </motion.div>
                     </motion.div>
 
                     <motion.div

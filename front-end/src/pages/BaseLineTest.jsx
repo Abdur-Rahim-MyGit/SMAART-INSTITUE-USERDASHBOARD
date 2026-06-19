@@ -538,9 +538,9 @@ const BaseLineTest = () => {
   };
   const prevQ = () => { /* Disabled as per user request */ };
 
-  const submit = useCallback(async ({ reason = "manual", redirectAfterSubmit = false, forceTimeoutCompletion = false } = {}) => {
+  const submit = useCallback(async ({ reason = "manual", redirectAfterSubmit = false, forceTimeoutCompletion = false, forcePassDev = false, forceFailDev = false } = {}) => {
     if (!resultId || submitting || submitted) return;
-    if (reason === "manual" && !allQuestionsAnswered) {
+    if (reason === "manual" && !allQuestionsAnswered && !forcePassDev && !forceFailDev) {
       toast.warning(t("baseline_test.answer_all_toast", "Answer all questions before submitting the test."));
       return;
     }
@@ -557,7 +557,9 @@ const BaseLineTest = () => {
 
       const response = await assessmentApi.submitAssessment(resultId, assessmentToken, {
         submissionReason: reason,
-        completeMissingAnswers: forceTimeoutCompletion || reason === "violation",
+        completeMissingAnswers: forceTimeoutCompletion || reason === "violation" || forcePassDev || forceFailDev,
+        forcePassDev,
+        forceFailDev,
       });
 
       if (response.success) {
@@ -1012,37 +1014,42 @@ const BaseLineTest = () => {
 
 
               {/* DEV: Auto Answer */}
-              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity">
+              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
                   onClick={async () => {
                     try {
                       const btn = document.activeElement;
-                      btn.innerText = "⚡ Running...";
+                      btn.innerText = "⚡ Passing...";
                       btn.disabled = true;
-
-                      const unanswered = questions.filter(q => !selectedAnswers[q._id]);
-                      const batchSize = 10;
-                      for (let i = 0; i < unanswered.length; i += batchSize) {
-                        const batch = unanswered.slice(i, i + batchSize);
-                        await Promise.all(batch.map(q => {
-                          const val = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)];
-                          return assessmentApi.saveAnswer(resultId, q._id, val, q.questionText, assessmentToken);
-                        }));
-                        const newAnswers = {};
-                        batch.forEach(q => { newAnswers[q._id] = 'RANDOM'; });
-                        setSelectedAnswers(prev => ({ ...prev, ...newAnswers }));
-                      }
-                      await submit({ reason: "manual", redirectAfterSubmit: false });
+                      await submit({ reason: "manual", redirectAfterSubmit: false, forcePassDev: true });
                     } catch (err) {
-                      console.error("Fast submit failed:", err);
+                      console.error("Pass dev failed:", err);
                     } finally {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-slate-200 dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-slate-300 dark:hover:bg-[#002A5C] transition-colors"
+                  className="w-full py-2 bg-[#10b981]/20 dark:bg-[#10b981]/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-[#10b981]/30 dark:hover:bg-[#10b981]/20 transition-colors"
                 >
-                  {t("baseline_test.auto_fill_dev", "⚡ Auto-Fill (Dev)")}
+                  {t("baseline_test.pass_dev", "⚡ Pass 70% (Dev)")}
+                </button>
+                <button
+                  disabled={submitting || interactionLocked || timeExpired}
+                  onClick={async () => {
+                    try {
+                      const btn = document.activeElement;
+                      btn.innerText = "⚡ Failing...";
+                      btn.disabled = true;
+                      await submit({ reason: "manual", redirectAfterSubmit: false, forceFailDev: true });
+                    } catch (err) {
+                      console.error("Fail dev failed:", err);
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  }}
+                  className="w-full py-2 bg-rose-500/20 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-rose-500/30 dark:hover:bg-rose-500/20 transition-colors"
+                >
+                  {t("baseline_test.fail_dev", "⚡ Fail (Dev)")}
                 </button>
               </div>
             </div>

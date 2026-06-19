@@ -21,12 +21,13 @@ const ServiceCard = ({ service, index }) => {
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -8, scale: 1.02 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.2, duration: 0.5 }}
       onMouseMove={handleMouseMove}
       className="group relative rounded-2xl p-8 overflow-hidden flex flex-col transition-all duration-300
                  bg-white/80 dark:bg-dark-card/30 backdrop-blur-md border border-gray-100 dark:border-white/5 
-                 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 hover:shadow-2xl hover:-translate-y-2
+                 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 hover:shadow-2xl
                  hover:bg-white dark:hover:bg-[#002147]/60"
     >
       {/* Spotlight Effect */}
@@ -45,7 +46,7 @@ const ServiceCard = ({ service, index }) => {
 
       <div className="relative z-10 flex flex-col h-full">
         {/* Icon with refined gradient */}
-        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#0d2150] flex items-center justify-center mb-8 shadow-lg shadow-[#1a3884]/20 group-hover:scale-110 transition-transform duration-300 text-white border border-[#C0C0C0]/30`}>
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#0d2150] flex items-center justify-center mb-8 shadow-lg shadow-[#1a3884]/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 text-white border border-[#C0C0C0]/30`}>
           {service.icon}
         </div>
 

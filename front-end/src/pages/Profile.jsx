@@ -383,7 +383,7 @@ const Profile = () => {
 
             // New Comprehensive Fields
             gender: user.gender || reg.gender || "",
-            educationLevel: reg.educationLevel || "",
+            educationLevel: reg.academic?.degreeLevel || user?.academic?.degreeLevel || reg.educationLevel || "",
             nickname: reg.nickname || "",
             tenthDetails: reg.tenthDetails || null,
             twelfthDetails: reg.twelfthDetails || null,
@@ -1275,6 +1275,7 @@ const Profile = () => {
                             <ModalInput label="Phone Number" value={editFormData.mobileNumber} onChange={(val) => setEditFormData({ ...editFormData, mobileNumber: val })} />
                             <ModalInput label="Date of Birth" type="date" value={editFormData.dob} onChange={(val) => setEditFormData({ ...editFormData, dob: val })} />
                             <ModalSelect label="Gender" value={editFormData.gender} options={['Male', 'Female', 'Other']} onChange={(val) => setEditFormData({ ...editFormData, gender: val })} />
+                            <ModalInput label="Education Level" value={editFormData.educationLevel} onChange={(val) => setEditFormData({ ...editFormData, educationLevel: val })} />
                             <ModalInput label="Department" value={editFormData.department} onChange={(val) => setEditFormData({ ...editFormData, department: val })} />
                           </div>
                         )}
@@ -1613,7 +1614,7 @@ const GoalItem = ({ label, value }) => {
   );
 };
 
-const ModalInput = ({ label, value, onChange, type = "text" }) => {
+const ModalInput = ({ label, value, onChange, type = "text", disabled = false }) => {
   const { t } = useTranslation();
   return (
     <div className="space-y-1.5">
@@ -1622,7 +1623,8 @@ const ModalInput = ({ label, value, onChange, type = "text" }) => {
         type={type}
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
+        disabled={disabled}
+        className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
         placeholder={`${t("profile_page.enter")} ${label}`}
       />
     </div>

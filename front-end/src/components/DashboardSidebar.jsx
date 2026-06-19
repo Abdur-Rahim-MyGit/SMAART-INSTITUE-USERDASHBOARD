@@ -11,6 +11,7 @@ import {
   IconBolt as Zap,
   IconBrain as Brain,
   IconWallet as Wallet,
+  IconBriefcase as Briefcase,
   IconLayoutDashboard as LayoutDashboard,
   IconSettings as Settings,
   IconHelpCircle as HelpCircle,
@@ -45,6 +46,7 @@ const menuItems = [
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Wallet, label: "Skills Vault", path: "/dashboard/skills-vault" },
   { icon: Users, label: "Community", path: "/dashboard/community" },
+  { icon: Briefcase, label: "Placement", path: "/dashboard/placement" },
   { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
   { icon: ListTodo, label: "To-Do & Calendar", path: "/dashboard/todos" },
 ];
@@ -229,6 +231,7 @@ const DashboardSidebar = () => {
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
               { label: 'Skills Vault', path: '/dashboard/skills-vault' },
+              { label: 'Placement', path: '/dashboard/placement' },
               { label: 'Wallet', path: '/dashboard/smaart-wallet' },
               { label: 'Help', path: null, isHelp: true },
             ].map((item) => {
@@ -536,6 +539,10 @@ const DashboardSidebar = () => {
                       { code: 'en', name: 'English' },
                       { code: 'hi', name: 'Hindi (हिन्दी)' },
                       { code: 'ta', name: 'Tamil (தமிழ்)' },
+                      { code: 'te', name: 'Telugu (తెలుగు)' },
+                      { code: 'kn', name: 'Kannada (ಕನ್ನಡ)' },
+                      { code: 'ml', name: 'Malayalam (മലയാളം)' },
+                      { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)' },
                       { code: 'ur', name: 'Urdu (اردو)' },
                       { code: 'fr', name: 'French (Français)' }
                     ].map((lang) => (

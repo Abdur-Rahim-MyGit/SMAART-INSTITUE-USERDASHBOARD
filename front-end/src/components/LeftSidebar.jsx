@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   IconLayoutDashboard as LayoutDashboard,
   IconTrendingUp as TrendingUp,
+  IconBriefcase as Briefcase,
   IconBook2 as BookOpen,
   IconClipboardCheck as ClipboardCheck,
   IconTool as Wrench,
@@ -71,6 +72,7 @@ const menuGroups = [
       { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
       { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
       { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
+      { icon: Briefcase, label: "sidebar.placement", path: "/dashboard/placement", badge: null },
       { icon: TrendingUp, label: "sidebar.performance", path: "/dashboard/performance", badge: null },
     ]
   },
@@ -438,6 +440,10 @@ const LeftSidebar = () => {
                                       { code: 'en', name: 'English' },
                                       { code: 'hi', name: 'Hindi (हिन्दी)' },
                                       { code: 'ta', name: 'Tamil (தமிழ்)' },
+                                      { code: 'te', name: 'Telugu (తెలుగు)' },
+                                      { code: 'kn', name: 'Kannada (ಕನ್ನಡ)' },
+                                      { code: 'ml', name: 'Malayalam (മലയാളം)' },
+                                      { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)' },
                                       { code: 'ur', name: 'Urdu (اردو)' },
                                       { code: 'fr', name: 'French (Français)' }
                                     ].map((lang) => (
