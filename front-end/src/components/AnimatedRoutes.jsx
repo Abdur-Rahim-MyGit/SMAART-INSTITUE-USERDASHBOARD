@@ -16,6 +16,8 @@ const DashboardHome = lazy(() => import('@/pages/DashboardHome'));
 const MyCourses = lazy(() => import('@/pages/MyCourses'));
 const MyNotes = lazy(() => import('@/pages/MyNotes'));
 const TodoTracker = lazy(() => import('@/pages/TodoTracker'));
+const Placement = lazy(() => import('@/pages/Placement'));
+const PlacementDetail = lazy(() => import('@/pages/PlacementDetail'));
 const MyAssessments = lazy(() => import('@/pages/MyAssessments'));
 const SkillsPassport = lazy(() => import('@/pages/SkillsPassport'));
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -128,6 +130,8 @@ const AnimatedRoutes = () => {
                         {/* Notes */}
                         <Route path="/dashboard/notes" element={<MyNotes />} />
                         <Route path="/dashboard/todos" element={<TodoTracker />} />
+                        <Route path="/dashboard/placement" element={<Placement />} />
+                        <Route path="/dashboard/placement/:source/:id" element={<PlacementDetail />} />
 
                         {/* Assessments */}
                         <Route path="/my-assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />

@@ -7,6 +7,7 @@
     "results": "Results",
     "assessments": "Assessments",
     "toolkit": "Toolkit",
+    "placement": "Placement",
     "performance": "Performance",
     "skills_vault": "Skills Vault",
     "badges": "My Badges",
@@ -726,7 +727,8 @@
   },
   "assessments_dashboard": {
     "badge": "Assessment Journey",
-    "title": "Assessments Centre",
+    "title_main": "Assessments",
+    "title_sub": "Centre",
     "subtitle": "Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights.",
     "reset_assessments": "Reset Assessments",
     "reset_confirm": "Are you sure you want to reset all 4 assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline.",

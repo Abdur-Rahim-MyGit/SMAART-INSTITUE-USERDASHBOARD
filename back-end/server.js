@@ -165,7 +165,11 @@ app.use('/api/courseEnrollments', require('./routes/courseEnrollments'));
 app.use('/api/questionBanks', require('./routes/questionBanks'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/todos', require('./routes/todos'));
+app.use('/api/placements', require('./routes/placements'));
 app.use('/api/analytics', require('./routes/analytics'));
+
+// Job Applications
+app.use('/api/job-applications', require('./routes/jobApplications'));
 
 
 // People Management Routes
