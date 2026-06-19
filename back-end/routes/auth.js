@@ -919,13 +919,15 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // === SINGLE SESSION ENFORCEMENT ===
     // Check if user is already logged in on another device
 
-    // Only check if there's an ACTUAL session ID (not null, not undefined, not empty string)
+    // Only check if there's an ACTUAL session ID (not null, not undefined, not empty string) and it hasn't expired
     const hasActiveSession = freshUser?.currentSessionId &&
       typeof freshUser.currentSessionId === 'string' &&
-      freshUser.currentSessionId.trim() !== '';
+      freshUser.currentSessionId.trim() !== '' &&
+      (freshUser.sessionExpiresAt ? new Date(freshUser.sessionExpiresAt) > new Date() : true);
 
     console.log(`[Auth] Session check for ${user._id}:`, {
       currentSessionId: freshUser?.currentSessionId || null,
+      sessionExpiresAt: freshUser?.sessionExpiresAt || null,
       hasActiveSession,
       forceLogout: !!forceLogout
     });

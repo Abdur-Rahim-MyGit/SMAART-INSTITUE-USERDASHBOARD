@@ -1,38 +1,59 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
-  MapPin,
-  Calendar,
-  Clock,
-  ChevronRight,
-  Edit2,
-  Mail,
-  Phone,
-  Building,
-  GraduationCap,
-  BookOpen,
-  Award,
-  FileText,
-  User,
-  Users,
-  Briefcase,
-
-  Plus,
-  X,
-  Camera,
-  Save,
-  Loader2,
-  Rocket,
-  Trash2,
-  Trash,
-  MapPinHouse,
-  Upload,
-  Shield,
-  QrCode,
-  CheckCircle2,
-  Link as LinkIcon,
-  ArrowLeft
-} from "lucide-react";
+  IconMapPin,
+  IconCalendar,
+  IconClock,
+  IconChevronRight,
+  IconPencil,
+  IconPencil as Edit2,
+  IconMail,
+  IconPhone,
+  IconBuilding,
+  IconBuilding as Building,
+  IconSchool,
+  IconSchool as GraduationCap,
+  IconBook,
+  IconAward,
+  IconAward as Award,
+  IconFileText,
+  IconFileText as FileText,
+  IconUser,
+  IconUsers,
+  IconUsers as Users,
+  IconBriefcase,
+  IconBriefcase as Briefcase,
+  IconPlus,
+  IconPlus as Plus,
+  IconX,
+  IconX as X,
+  IconCamera,
+  IconCamera as Camera,
+  IconDeviceFloppy,
+  IconDeviceFloppy as Save,
+  IconLoader2,
+  IconLoader2 as Loader2,
+  IconRocket,
+  IconRocket as Rocket,
+  IconTrash,
+  IconTrash as Trash2,
+  IconMapPin as IconMapPinHouse,
+  IconUpload,
+  IconUpload as Upload,
+  IconShield,
+  IconShield as Shield,
+  IconQrcode,
+  IconQrcode as QrCode,
+  IconCircleCheck,
+  IconCircleCheck as CheckCircle2,
+  IconLink,
+  IconLink as LinkIcon,
+  IconArrowLeft,
+  IconId,
+  IconGenderBigender,
+  IconCertificate,
+  IconTargetArrow,
+} from "@tabler/icons-react";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -652,7 +673,7 @@ const Profile = () => {
                   className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                    <ArrowLeft className="h-4 w-4" />
+                    <IconArrowLeft stroke={1.5} className="h-4 w-4" />
                   </div>
                   {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
                 </button>
@@ -688,7 +709,7 @@ const Profile = () => {
                     onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
                   >
-                    <Camera className="w-4 h-4" />
+                    <IconCamera stroke={1.5} className="w-4 h-4" />
                   </button>
                   <input 
                     type="file"
@@ -717,11 +738,11 @@ const Profile = () => {
 
                   <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-6 mt-4">
                     <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
-                      <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
+                       <IconMapPin stroke={1.5} className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
                       <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.address || t("profile_page.not_specified")}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
-                      <Building className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
+                       <IconBuilding stroke={1.5} className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
                       <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || t("profile_page.institution_not_set")}</span>
                     </div>
                   </div>
@@ -729,11 +750,11 @@ const Profile = () => {
                   <div className="mt-5 flex justify-center md:justify-start">
                     <button
                       onClick={() => navigate('/dashboard/skills-passport')}
-                      className="group flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] duration-300"
+                      className="group flex items-center gap-2 bg-gradient-to-r from-[#1a3884] to-[#2d4fa0] hover:from-[#112b6b] hover:to-[#1a3884] text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] duration-300"
                     >
-                      <Award className="w-4.5 h-4.5" />
+                      <IconAward stroke={1.5} className="w-4 h-4" />
                       <span>{t("profile_page.view_skills_passport", "View Skills Passport")}</span>
-                      <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                      <IconChevronRight stroke={1.5} className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -751,8 +772,8 @@ const Profile = () => {
                   <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                     <div className="flex justify-between items-center mb-8">
                       <div className="flex gap-2 items-center">
-                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
-                          <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                          <IconUser stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.personal_information")}</h3>
                       </div>
@@ -766,9 +787,9 @@ const Profile = () => {
                           educationLevel: formData.educationLevel,
                           department: formData.department
                         })}
-                        className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        className="bg-[#f0f4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/20 dark:border-[#1a3884]/30 hover:bg-[#e0eaff] dark:hover:bg-[#1a3884]/30 text-[#1a3884] dark:text-blue-300 px-4 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all shadow-none"
                       >
-                        {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
+                        {t("profile_page.edit")} <IconPencil stroke={1.5} className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-white/10" />
@@ -789,8 +810,8 @@ const Profile = () => {
                   <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                     <div className="flex justify-between items-center mb-8">
                       <div className="flex gap-2 items-center">
-                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
-                          <MapPinHouse className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                          <IconMapPinHouse stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.address")}</h3>
                       </div>
@@ -801,9 +822,9 @@ const Profile = () => {
                           state: formData.state,
                           country: formData.country
                         })}
-                        className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        className="bg-[#f0f4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/20 dark:border-[#1a3884]/30 hover:bg-[#e0eaff] dark:hover:bg-[#1a3884]/30 text-[#1a3884] dark:text-blue-300 px-4 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all"
                       >
-                        {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
+                        {t("profile_page.edit")} <IconPencil stroke={1.5} className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-white/10" />
@@ -820,8 +841,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex justify-between items-center mb-8">
                         <div className="flex gap-2 items-center">
-                          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
-                            <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <GraduationCap className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.educational_history")}</h3>
                         </div>
@@ -907,8 +928,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
-                            <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <Briefcase className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.work_experience")}</h3>
                         </div>
@@ -928,7 +949,7 @@ const Profile = () => {
                               </h4>
                               <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.role || exp.title}</p>
                               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                                <Clock className="w-3 h-3" />
+                                <IconClock stroke={1.5} className="w-3 h-3" />
                                 <span>{exp.duration || t("profile_page.not_set")}</span>
                               </div>
                               {exp.description && (
@@ -946,8 +967,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
-                            <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <FileText className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.projects")}</h3>
                         </div>
@@ -979,8 +1000,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
-                            <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <Award className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.certifications")}</h3>
                         </div>
@@ -1044,8 +1065,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6 min-w-0">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl flex-shrink-0">
-                            <Users className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl flex-shrink-0">
+                            <Users className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">{t("profile_page.extracurricular")}</h3>
                         </div>
@@ -1092,8 +1113,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
-                            <Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <Building className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_preferences")}</h3>
                         </div>
@@ -1131,8 +1152,8 @@ const Profile = () => {
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-cyan-50 dark:bg-cyan-900/30 rounded-xl">
-                            <Rocket className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <Rocket className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_goals")}</h3>
                         </div>
@@ -1574,10 +1595,10 @@ const Profile = () => {
 const InfoField = ({ label, value }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col min-w-0">
-      <span className="text-gray-400 dark:text-slate-400 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
-      <span className="text-gray-900 dark:text-white text-sm sm:text-base font-semibold break-words" title={value}>
-        {value || t("profile_page.not_set")}
+    <div className="flex flex-col min-w-0 group">
+      <span className="text-[#1a3884]/50 dark:text-slate-500 text-[10px] uppercase font-black tracking-[0.15em] mb-1.5">{label}</span>
+      <span className="text-[#0d1f4e] dark:text-white text-sm font-semibold break-words leading-snug" title={value}>
+        {value || <span className="text-slate-400 dark:text-slate-500 font-normal italic text-xs">{t("profile_page.not_set")}</span>}
       </span>
     </div>
   );
