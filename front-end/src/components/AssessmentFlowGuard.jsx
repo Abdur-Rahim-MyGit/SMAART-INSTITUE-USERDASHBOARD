@@ -215,6 +215,12 @@ const AssessmentFlowGuard = ({ children }) => {
           }
         }
 
+        if (location.pathname.startsWith('/dashboard/placement')) {
+          setAssessmentData({ skipped: true });
+          setLoading(false);
+          return;
+        }
+
         // Skip for non-students
         if (parsedUser.role !== 'student') {
           setAssessmentData({ skipped: true });
@@ -319,6 +325,7 @@ const AssessmentFlowGuard = ({ children }) => {
       if (path.includes('/notifications')) return "Notifications";
       if (path.includes('/help')) return "Help";
       if (path.includes('/support') || path.includes('/tickets')) return "Support";
+      if (path.includes('/placement')) return "Placement";
       if (path.includes('/reports')) return "Reports";
       if (path.includes('/career-agent/dashboard')) return "Career Directions";
       return "DashBoard";

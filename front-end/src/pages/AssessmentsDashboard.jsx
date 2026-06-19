@@ -294,8 +294,8 @@ const AssessmentsDashboard = () => {
                     >
                         <div className="flex-1">
                             <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                {t("assessments_dashboard.title", "Assessments")}{" "}
-                                <span className="text-[#1a3884] dark:text-blue-300">Centre</span>
+                                {t("assessments_dashboard.title_main", "Assessments")}{" "}
+                                <span className="text-[#1a3884] dark:text-blue-300">{t("assessments_dashboard.title_sub", "Centre")}</span>
                             </h1>
                             <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
                                 {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}

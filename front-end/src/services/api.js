@@ -482,4 +482,47 @@ export const todosAPI = {
   },
 };
 
+// Placement API Functions
+export const placementsAPI = {
+  getJobs: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiCall(query ? `/placements/jobs?${query}` : '/placements/jobs');
+  },
+  getJob: async (source, id) => {
+    return apiCall(`/placements/jobs/${encodeURIComponent(source)}/${encodeURIComponent(id)}`, {
+      timeout: 12000,
+    });
+  },
+  // Check if current user has applied for this job
+  // Use the placements applications endpoint which is the source used by the placements apply flow
+  hasApplied: async (source, id) => {
+    const query = new URLSearchParams({ job: id, jobSource: source }).toString();
+    return apiCall(`/placements/applications?${query}`);
+  },
+  listApplications: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiCall(query ? `/placements/applications?${query}` : '/placements/applications');
+  },
+  deleteApplication: async (applicationId) => {
+    return apiCall(`/placements/applications/${encodeURIComponent(applicationId)}`, { method: 'DELETE' });
+  },
+  applyJob: async (source, id, payload) => {
+    // If payload is FormData (file upload), pass it through directly so apiCall can omit JSON headers
+    const body = payload instanceof FormData ? payload : JSON.stringify(payload);
+    return apiCall(`/placements/jobs/${encodeURIComponent(source)}/${encodeURIComponent(id)}/apply`, {
+      method: 'POST',
+      body,
+    });
+  },
+};
+
+// Users API
+export const usersAPI = {
+  // Get profile for current authenticated user
+  getProfile: async () => {
+    // Prefer server session validation endpoint which returns up-to-date user+registration
+    return apiCall('/auth/me', { method: 'GET' });
+  }
+};
+
 export default apiCall;
