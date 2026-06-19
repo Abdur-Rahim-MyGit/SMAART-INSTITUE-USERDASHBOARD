@@ -85,8 +85,32 @@ const PlacementDetail = () => {
   const [loading, setLoading] = useState(!location.state?.job);
   const [applyOpen, setApplyOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
-  const [applicationId, setApplicationId] = useState(null);
+  const [hasApplied, setHasApplied] = useState(() => {
+    try {
+      const key = `applied:${source}:${id}`;
+      const raw = sessionStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (Date.now() - (parsed.ts || 0) < 24 * 60 * 60 * 1000)) {
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  });
+  const [applicationId, setApplicationId] = useState(() => {
+    try {
+      const key = `applied:${source}:${id}`;
+      const raw = sessionStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (Date.now() - (parsed.ts || 0) < 24 * 60 * 60 * 1000)) {
+          return parsed.applicationId || null;
+        }
+      }
+    } catch (_) {}
+    return null;
+  });
   const [withdrewConfirmOpen, setWithdrewConfirmOpen] = useState(false);
   const [withdrewPending, setWithdrewPending] = useState(false);
   const [applicationForm, setApplicationForm] = useState(() => {
@@ -107,14 +131,39 @@ const PlacementDetail = () => {
   });
 
   useEffect(() => {
-    const loadJob = async () => {
-      setLoading(true);
+    let active = true;
+
+    const loadJobAndStatus = async () => {
+      const needsFullLoad = !job || job._id !== id || job.sourceCollection !== source;
+      if (needsFullLoad) {
+        setLoading(true);
+      }
+
       try {
-        const response = await placementsAPI.getJob(source, id);
-        setJob(response?.data || null);
-        // Check if user already applied. Be tolerant to different response shapes.
-        try {
-          const applied = await placementsAPI.hasApplied(source, id);
+        const [jobResp, appliedResp] = await Promise.allSettled([
+          placementsAPI.getJob(source, id),
+          placementsAPI.hasApplied(source, id)
+        ]);
+
+        if (!active) return;
+
+        // 1. Handle Job Response
+        if (jobResp.status === 'fulfilled') {
+          setJob(jobResp.value?.data || null);
+        } else {
+          console.error("Failed to load job details:", jobResp.reason);
+          if (needsFullLoad) {
+            toast({
+              title: "Could not load job",
+              description: jobResp.reason?.message || "Please try again in a moment.",
+              variant: "destructive",
+            });
+          }
+        }
+
+        // 2. Handle Applied Status Response
+        if (appliedResp.status === 'fulfilled') {
+          const applied = appliedResp.value;
           try { if (process.env.NODE_ENV !== 'production') console.debug('hasApplied response:', applied); } catch (_) {}
 
           let apps = [];
@@ -126,41 +175,55 @@ const PlacementDetail = () => {
 
           if (apps.length > 0) {
             setHasApplied(true);
-            setApplicationId(apps[0]._id || apps[0].id || null);
-          } else {
-            // Fallback: check a short-lived session marker written after apply
+            const possibleId = apps[0]._id || apps[0].id || null;
+            setApplicationId(possibleId);
+            
+            // Keep local storage cache in sync
             try {
               const key = `applied:${source}:${id}`;
-              const raw = sessionStorage.getItem(key);
-              if (raw) {
-                const parsed = JSON.parse(raw);
-                if (parsed && parsed.applicationId && (Date.now() - (parsed.ts || 0) < 24 * 60 * 60 * 1000)) {
-                  setHasApplied(true);
-                  setApplicationId(parsed.applicationId);
-                } else {
-                  sessionStorage.removeItem(key);
-                }
-              }
+              sessionStorage.setItem(key, JSON.stringify({ applicationId: possibleId, ts: Date.now() }));
+            } catch (_) {}
+          } else {
+            // No application found on the server
+            setHasApplied(false);
+            setApplicationId(null);
+            
+            // Clear local storage cache since the server says they haven't applied
+            try {
+              const key = `applied:${source}:${id}`;
+              sessionStorage.removeItem(key);
             } catch (_) {}
           }
-        } catch (e) {
-          console.warn('hasApplied check failed:', e?.message || e);
+        } else {
+          console.warn('hasApplied check failed on server:', appliedResp.reason);
+          // If server check fails (network error, timeout, server select issue),
+          // DO NOT reset hasApplied to false! Trust our local storage state.
+          try {
+            const key = `applied:${source}:${id}`;
+            const raw = sessionStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed && (Date.now() - (parsed.ts || 0) < 24 * 60 * 60 * 1000)) {
+                setHasApplied(true);
+                setApplicationId(parsed.applicationId || null);
+              }
+            }
+          } catch (_) {}
         }
       } catch (error) {
-        console.error("Failed to load job details:", error);
-        toast({
-          title: "Could not load job",
-          description: error.message || "Please try again in a moment.",
-          variant: "destructive",
-        });
+        console.error("General error in loadJobAndStatus:", error);
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
-    if (!job || job._id !== id || job.sourceCollection !== source) {
-      loadJob();
-    }
+    loadJobAndStatus();
+
+    return () => {
+      active = false;
+    };
   }, [id, source]);
 
   const details = useMemo(() => {
@@ -386,7 +449,7 @@ const PlacementDetail = () => {
                   >
                       {hasApplied ? 'Applied' : 'Apply'}
                   </button>
-                  {hasApplied && applicationId && (
+                  {hasApplied && (
                     <>
                       <button
                         onClick={() => setWithdrewConfirmOpen(true)}
@@ -406,9 +469,25 @@ const PlacementDetail = () => {
                                   if (withdrewPending) return;
                                   try {
                                     setWithdrewPending(true);
-                                    await placementsAPI.deleteApplication(applicationId);
+                                    let appId = applicationId;
+                                    if (!appId) {
+                                      const list = await placementsAPI.listApplications({ job: id, jobSource: source });
+                                      const apps = list && list.success && Array.isArray(list.data) ? list.data : (Array.isArray(list) ? list : []);
+                                      if (apps.length > 0) {
+                                        appId = apps[0]._id || apps[0].id || null;
+                                        setApplicationId(appId);
+                                      }
+                                    }
+                                    if (!appId) {
+                                      throw new Error("Could not find the application details to withdraw.");
+                                    }
+                                    await placementsAPI.deleteApplication(appId);
                                     setHasApplied(false);
                                     setApplicationId(null);
+                                    try {
+                                      const key = `applied:${source}:${id}`;
+                                      sessionStorage.removeItem(key);
+                                    } catch (_) {}
                                     toast({ title: 'Application withdrawn', description: 'Your application has been removed.' });
                                     setWithdrewConfirmOpen(false);
                                   } catch (err) {
