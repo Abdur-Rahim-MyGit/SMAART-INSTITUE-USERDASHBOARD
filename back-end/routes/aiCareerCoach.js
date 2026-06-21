@@ -21,6 +21,7 @@ router.get('/recommendations', authMiddleware, aiCareerCoachController.getCareer
 router.post('/skill-gap', authMiddleware, aiLimiter, aiCareerCoachController.analyzeSkillGap);
 router.post('/learning-plan', authMiddleware, aiLimiter, aiCareerCoachController.generateLearningPlan);
 router.post('/resume', authMiddleware, aiLimiter, aiCareerCoachController.generateResume);
+router.post('/generate-summary', authMiddleware, aiLimiter, aiCareerCoachController.generateProfessionalSummary);
 
 // Chat Features
 router.post('/chat', authMiddleware, aiLimiter, aiCareerCoachController.chat);

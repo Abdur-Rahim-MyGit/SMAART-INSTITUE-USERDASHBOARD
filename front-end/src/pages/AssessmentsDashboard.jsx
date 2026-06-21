@@ -272,45 +272,57 @@ const AssessmentsDashboard = () => {
             <main>
                 <div className="mx-auto max-w-7xl space-y-6 p-8">
 
-                    {/* Back Button - Mobile Only */}
-                    <div className="mb-4 md:hidden">
-                        <button
-                            onClick={() => navigate("/dashboard")}
-                            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
-                        >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                                <ArrowLeft stroke={1.5} className="h-4 w-4" />
-                            </div>
-                            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-                        </button>
-                    </div>
-
-                    {/* Clean header matching My Courses style */}
+                    {/* Consolidated Premium Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                        className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col xl:flex-row gap-6 justify-between"
                     >
-                        <div className="flex-1">
-                            <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                {t("assessments_dashboard.title_main", "Assessments")}{" "}
-                                <span className="text-[#1a3884] dark:text-blue-300">{t("assessments_dashboard.title_sub", "Centre")}</span>
-                            </h1>
-                            <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-                                {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
-                            </p>
+                        <div className="flex flex-col sm:flex-row gap-4 sm:items-center xl:items-start flex-1">
+                            <button
+                                onClick={() => navigate("/dashboard")}
+                                className="group flex items-center gap-2 px-3 py-2 text-[#112b6b] dark:text-slate-300 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 w-fit shrink-0 mt-1"
+                            >
+                                <ArrowLeft stroke={2} className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                                {t("my_courses_page.back_to_dashboard", "Back")}
+                            </button>
+                            <div className="hidden sm:block w-px h-12 bg-slate-200 dark:bg-white/10 shrink-0"></div>
+                            <div className="flex-1">
+                                <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                                    {t("assessments_dashboard.title_main", "Assessments")}{" "}
+                                    <span className="text-[#1a3884] dark:text-blue-300">{t("assessments_dashboard.title_sub", "Centre")}</span>
+                                </h1>
+                                <p className="mt-1.5 text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                                    {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-3 md:pt-0 md:pl-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 xl:border-l border-slate-200 dark:border-white/10 xl:pl-6 shrink-0">
+                            {/* Metric Badges */}
+                            <div className="flex items-center gap-3">
+                                {METRICS.map((metric, idx) => (
+                                    <div key={idx} className="flex flex-col bg-slate-50 dark:bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-white/5">
+                                        <div className="flex items-center gap-1.5 text-[#1a3884] dark:text-blue-400 mb-0.5">
+                                            <metric.icon stroke={2} className="w-3.5 h-3.5" />
+                                            <span className="text-sm font-black leading-none">{metric.value}</span>
+                                        </div>
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{metric.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="hidden sm:block w-px h-10 bg-slate-200 dark:bg-white/10"></div>
+                            
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleResetAll}
-                                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-[12px] font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400"
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-xs font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 w-full sm:w-auto"
                             >
                                 <RotateCcw stroke={1.5} className="h-3.5 w-3.5" />
-                                {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
+                                {t("assessments_dashboard.reset_assessments", "Reset")}
                             </motion.button>
                         </div>
                     </motion.div>

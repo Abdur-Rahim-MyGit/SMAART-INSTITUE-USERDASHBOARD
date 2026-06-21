@@ -233,6 +233,29 @@ Please write the resume as if you are me. Ensure my name "${profile.fullName}" i
     }
 
     /**
+     * Generate professional summary
+     */
+    async generateProfessionalSummary(resumeData, targetRole) {
+        const systemPrompt = `You are an elite Professional Resume Writer. Your task is to write a compelling, concise 3-4 sentence professional summary for the user's resume.
+        
+IMPORTANCE: The summary must focus on their actual experience and skills. Do NOT invent information. It should be written in the first person (without using "I") or third person, as is standard for modern resumes.
+
+DATA PROVIDED:
+- TARGET ROLE: ${targetRole || 'Professional'}
+- EXPERIENCE: ${(resumeData.experience || []).length > 0 ? resumeData.experience.map(e => `${e.jobTitle} at ${e.company} (${e.duration})`).join(', ') : 'Not specified'}
+- EDUCATION: ${(resumeData.education || []).length > 0 ? resumeData.education.map(e => `${e.degree} at ${e.school}`).join(', ') : 'Not specified'}
+- SKILLS: Technical: ${resumeData.skills?.technical || 'None'}, Soft: ${resumeData.skills?.soft || 'None'}
+
+RULES:
+- Return ONLY the summary paragraph. Do not include titles, labels like "Professional Summary:", or quotes.
+- Keep it punchy, impactful, and exactly 3 to 4 sentences long.`;
+
+        const userMessage = `Please write a professional summary for my resume targeting the role of "${targetRole || 'Professional'}".`;
+
+        return this.chat([{ role: 'user', content: userMessage }], systemPrompt);
+    }
+
+    /**
      * Answer career questions
      */
     async answerCareerQuestion(question, context = {}, history = []) {

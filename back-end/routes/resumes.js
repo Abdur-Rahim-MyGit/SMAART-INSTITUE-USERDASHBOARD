@@ -266,4 +266,33 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
+// @desc    Duplicate a resume (creates a copy for the same user)
+// @route   POST /api/resumes/:id/duplicate
+// @access  Private
+router.post('/:id/duplicate', protect, async (req, res) => {
+  try {
+    const original = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!original) {
+      return res.status(404).json({ success: false, message: 'Resume not found' });
+    }
+
+    const copy = original.toObject();
+    delete copy._id;
+    delete copy.createdAt;
+    delete copy.updatedAt;
+    delete copy.verification; // fresh copy has no export history
+
+    copy.versionName = `${original.versionName || 'My Resume'} (Copy)`;
+    copy.atsScore    = original.atsScore || 0;
+    copy.targetRole  = original.targetRole || '';
+    copy.userId      = req.user._id;
+
+    const newResume = await Resume.create(copy);
+    res.status(201).json({ success: true, data: newResume });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;
+
