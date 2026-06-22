@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -9,6 +9,8 @@ import ActiveSkillsWidget from "@/components/dashboard/ActiveSkillsWidget";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
+import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
+import { isCapacityDevUnlock, compareCourseIds } from "@/utils/courseUnlock";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
@@ -18,6 +20,24 @@ const DashboardHome = () => {
   const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
   const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
+  const { userProgress, loading: progressLoading, refresh: refreshProgress } = useSmaartCourseProgress(user?._id || user?.id);
+
+  const pendingAssessment = useMemo(() => {
+    if (!userProgress || progressLoading) return null;
+    const completed = userProgress.completedCourses || [];
+    const passed = userProgress.assessmentsPassed || [];
+    
+    // Check baseline T1
+    if (!passed.includes("T1") && !isCapacityDevUnlock()) return "T1";
+    // Check Stage 1 -> T2
+    if (completed.some(c => compareCourseIds(c, "S10")) && !passed.includes("T2")) return "T2";
+    // Check Stage 2 -> T3
+    if (completed.some(c => compareCourseIds(c, "S19")) && !passed.includes("T3")) return "T3";
+    // Check Stage 3 -> T4
+    if (completed.some(c => compareCourseIds(c, "S25")) && !passed.includes("T4")) return "T4";
+    
+    return null;
+  }, [userProgress, progressLoading]);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -132,6 +152,7 @@ const DashboardHome = () => {
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
+              pendingAssessment={pendingAssessment}
               paths={(() => {
                 const incomplete = (list) => (list || []).filter(c => (c.progress || 0) < 100);
                 // 1. In-progress enrolled courses (progress > 0 and < 100) — highest priority
@@ -143,7 +164,7 @@ const DashboardHome = () => {
                 // 4. All done — show last completed
                 return enrolledCourses?.length > 0 ? enrolledCourses : paths;
               })()}
-              pathsLoading={pathsLoading}
+              pathsLoading={pathsLoading || progressLoading}
             />
 
             {/* College Banners */}
