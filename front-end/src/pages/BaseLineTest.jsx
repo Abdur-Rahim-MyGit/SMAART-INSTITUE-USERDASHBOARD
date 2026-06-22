@@ -31,8 +31,11 @@ import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
 import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
-import useActivityRestrictions from "@/hooks/useActivityRestrictions";
-import ActivityWarningModal from "@/components/ActivityWarningModal";
+import useProctoringEngine from "@/hooks/useProctoringEngine";
+import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
+import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
+import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningModal";
+import AttentionCheck from "@/components/proctoring/AttentionCheck";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -176,6 +179,8 @@ const BaseLineTest = () => {
   const [assessmentToken, setAssessmentToken] = useState(null); // Dedicated session JWT
   // Attempt tracking for retry system (T2-T4+)
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
+  const [setupCompleted, setSetupCompleted] = useState(false);
+  const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -626,7 +631,7 @@ const BaseLineTest = () => {
   };
 
   useEffect(() => {
-    if (loading || submitted || !resultId) return;
+    if (loading || submitted || !resultId || !setupCompleted) return;
 
     let persistedStartTime = Number(localStorage.getItem(timerStartStorageKey));
     if (!Number.isFinite(persistedStartTime) || persistedStartTime <= 0 || persistedStartTime > Date.now()) {
@@ -680,16 +685,34 @@ const BaseLineTest = () => {
     t
   ]);
 
-  // Proctoring Logic - Anti-Cheat (using useActivityRestrictions)
+  // Proctoring Logic - Anti-Cheat (using useProctoringEngine)
   const {
     warningsCount,
     maxWarnings,
     isWarningVisible,
     lastViolationType,
-    acknowledgeWarning
-  } = useActivityRestrictions({
+    acknowledgeWarning,
+    isCameraActive,
+    isFaceDetected,
+    faceCount,
+    cameraError,
+    stream,
+    isFullScreen,
+    fullscreenCountdown,
+    requestFullscreen,
+    showAttentionCheck,
+    passAttentionCheck,
+    failAttentionCheck,
+    verificationStatus,
+    similarityScore
+  } = useProctoringEngine({
+    resultId: resultId,
     assessmentId: assessment?._id,
-    isActive: !loading && !submitted && !error && !!assessment
+    isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
+    registeredFaceDescriptor,
+    onLockout: useCallback(async () => {
+      await submit({ reason: "violation", redirectAfterSubmit: true, forceTimeoutCompletion: true });
+    }, [submit])
   });
 
   useEffect(() => {
@@ -812,6 +835,15 @@ const BaseLineTest = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
+      {!submitted && !loading && !error && !setupCompleted && (
+        <ProctoringSetup
+          onComplete={({ faceDescriptor }) => {
+            setRegisteredFaceDescriptor(faceDescriptor);
+            setSetupCompleted(true);
+          }}
+          assessmentTitle={translatedTitle}
+        />
+      )}
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {!submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
@@ -1352,13 +1384,38 @@ const BaseLineTest = () => {
       />
 
       {/* Activity Restriction Warning Modal */}
-      <ActivityWarningModal
+      <ProctoringWarningModal
         isOpen={isWarningVisible}
         warningsCount={warningsCount}
         maxWarnings={maxWarnings}
-        lastViolationType={lastViolationType}
+        violationType={lastViolationType}
         onAcknowledge={acknowledgeWarning}
       />
+
+      {/* Proctoring Overlay (Webcam PiP) */}
+      {!submitted && !loading && !error && setupCompleted && (
+        <ProctoringOverlay
+          stream={stream}
+          isCameraActive={isCameraActive}
+          isFaceDetected={isFaceDetected}
+          faceCount={faceCount}
+          warningsCount={warningsCount}
+          maxWarnings={maxWarnings}
+          isFullScreen={isFullScreen}
+          fullscreenCountdown={fullscreenCountdown}
+          onRequestFullscreen={requestFullscreen}
+          verificationStatus={verificationStatus}
+          similarityScore={similarityScore}
+        />
+      )}
+
+      {/* Attention Check popup */}
+      {showAttentionCheck && (
+        <AttentionCheck
+          onPass={passAttentionCheck}
+          onFail={failAttentionCheck}
+        />
+      )}
 
       <style dangerouslySetInnerHTML={{
         __html: `

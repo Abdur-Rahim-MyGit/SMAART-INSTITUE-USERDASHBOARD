@@ -112,4 +112,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ["@vladmandic/face-api"],
+  },
 }));

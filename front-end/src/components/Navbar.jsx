@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Sun, Moon, Globe2, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { IconSun, IconMoon, IconWorld } from "@tabler/icons-react";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -138,9 +139,9 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                   aria-label="Toggle theme"
                 >
                   {theme === 'dark' ? (
-                    <Sun className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                    <IconSun stroke={1.5} className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                   ) : (
-                    <Moon className="w-5 h-5 text-[#1a3884]" />
+                    <IconMoon stroke={1.5} className="w-5 h-5 text-[#1a3884]" />
                   )}
                 </button>
 
@@ -151,7 +152,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                     className="flex items-center gap-1.5 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all text-[#1a3884] dark:text-slate-200"
                     aria-label="Select Language"
                   >
-                    <Globe2 className="w-5 h-5 hover:rotate-[15deg] transition-transform duration-300" />
+                    <IconWorld stroke={1.5} className="w-5 h-5 hover:rotate-[15deg] transition-transform duration-300" />
                     <span className="text-xs font-bold tracking-wider mt-[1px]">
                       {activeLanguage.shortLabel}
                     </span>
@@ -227,9 +228,9 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
-                <Sun className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+                <IconSun stroke={1.5} className="w-6 h-6 text-yellow-500 fill-yellow-500" />
               ) : (
-                <Moon className="w-6 h-6 text-[#1a3884]" />
+                <IconMoon stroke={1.5} className="w-6 h-6 text-[#1a3884]" />
               )}
             </button>
 

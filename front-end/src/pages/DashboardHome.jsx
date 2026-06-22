@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
@@ -145,10 +146,20 @@ const DashboardHome = () => {
         )}
 
         {/* Dashboard Layout */}
-        <div className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, staggerChildren: 0.15 }}
+          className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
+        >
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
-          <div className="w-full space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full space-y-6"
+          >
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
@@ -169,25 +180,35 @@ const DashboardHome = () => {
 
             {/* College Banners */}
             <CollegeBanners />
-          </div>
+          </motion.div>
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
           <div className="flex flex-col xl:flex-row gap-6">
             {/* ── LEFT: Career Pathways ── */}
-            <div className="flex-1 min-w-0 flex flex-col gap-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              className="flex-1 min-w-0 flex flex-col gap-6"
+            >
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
               <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
-            </div>
+            </motion.div>
 
             {/* ── RIGHT: Calendar + Tasks ── */}
-            <div className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+              className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
+            >
               <div className="sticky top-24">
                 <LearningProgress />
               </div>
-            </div>
+            </motion.div>
           </div>
 
-        </div>
+        </motion.div>
       </PageTransition>
     </ErrorBoundary>
   );

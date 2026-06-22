@@ -19,6 +19,7 @@ import {
   isCapacityDevUnlock,
   hasPassedBaseline,
   resolveStaticCourseTitle,
+  compareCourseIds,
 } from "@/utils/courseUnlock";
 
 /* ─── Single My Courses hero (assessment → in-progress → completed) ─── */
@@ -27,15 +28,20 @@ const MyCoursesHeroBanner = ({
   course,
   onPrimaryAction,
   primaryLabel,
+  pendingAssessment,
 }) => {
   const { t } = useTranslation();
 
-  const rawTitle =
-    mode === "assessment"
-      ? t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment")
-      : course?.title || t("my_courses_page.your_current_course");
+  let rawTitle = course?.title || t("my_courses_page.your_current_course");
+  
+  if (mode?.startsWith("assessment")) {
+    if (pendingAssessment === "T1") rawTitle = t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment");
+    else if (pendingAssessment === "T2") rawTitle = "Complete your T2 Intermediate Assessment";
+    else if (pendingAssessment === "T3") rawTitle = "Complete your T3 Advanced Assessment";
+    else if (pendingAssessment === "T4") rawTitle = "Complete your T4 Final Assessment";
+  }
 
-  const displayTitle =
+  const displayTitle = mode?.startsWith("assessment") ? rawTitle :
     resolveStaticCourseTitle(rawTitle) ||
     resolveStaticCourseTitle(course?.id) ||
     resolveStaticCourseTitle(course?.courseCode) ||
@@ -43,10 +49,10 @@ const MyCoursesHeroBanner = ({
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-      {(mode === "in_progress" || mode === "assessment" || mode === "completed") && (
+      {(mode === "in_progress" || mode?.startsWith("assessment") || mode === "completed") && (
           <div className="flex flex-col text-left">
              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                {mode === "assessment" ? "Next Step" : "Continue Learning"}
+                {mode?.startsWith("assessment") ? "Next Step" : "Continue Learning"}
              </span>
              <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white truncate max-w-[200px] md:max-w-[250px]" title={displayTitle}>
                 {displayTitle}
@@ -56,11 +62,11 @@ const MyCoursesHeroBanner = ({
       <button
         type="button"
         onClick={onPrimaryAction}
-        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
+        className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] hover:from-[#112b6b] hover:to-[#2a50b3] dark:from-blue-600 dark:to-indigo-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
       >
-        {mode !== "assessment" && <RiPlayFill size={16} />}
-        {primaryLabel || "Continue"}
-        <RiArrowRightSLine size={16} stroke={1.5} />
+        {!mode?.startsWith("assessment") && <RiPlayFill size={16} className="animate-pulse" />}
+        <span>{primaryLabel || "Continue"}</span>
+        <RiArrowRightSLine size={16} stroke={2} className="group-hover:translate-x-0.5 transition-transform" />
       </button>
     </div>
   );
@@ -98,15 +104,32 @@ const MyCourses = () => {
       : null;
   }, [inProgressCourses, nextCourse, enrolledCourses]);
 
+  const pendingAssessment = useMemo(() => {
+    if (!userProgress || progressLoading) return null;
+    const completed = userProgress.completedCourses || [];
+    const passed = userProgress.assessmentsPassed || [];
+    
+    // Check baseline T1
+    if (!passed.includes("T1") && !isCapacityDevUnlock()) return "T1";
+    // Check Stage 1 -> T2
+    if (completed.some(c => compareCourseIds(c, "S10")) && !passed.includes("T2")) return "T2";
+    // Check Stage 2 -> T3
+    if (completed.some(c => compareCourseIds(c, "S19")) && !passed.includes("T3")) return "T3";
+    // Check Stage 3 -> T4
+    if (completed.some(c => compareCourseIds(c, "S25")) && !passed.includes("T4")) return "T4";
+    
+    return null;
+  }, [userProgress, progressLoading]);
+
   const heroMode = useMemo(() => {
     if (progressLoading || pathsLoading) return null;
-    const t1Done = hasPassedBaseline(userProgress);
 
-    if (!t1Done) return "assessment";
+    if (pendingAssessment) return `assessment_${pendingAssessment}`;
+    
     if (!activePath) return null;
     if ((activePath.progress || 0) >= 100) return "completed";
     return "in_progress";
-  }, [progressLoading, pathsLoading, userProgress, activePath]);
+  }, [progressLoading, pathsLoading, pendingAssessment, activePath]);
 
   useEffect(() => {
     enableCapacityDevUnlock();
@@ -171,15 +194,19 @@ const MyCourses = () => {
   };
 
   const primaryLabel =
-    heroMode === "assessment"
-      ? t("my_courses_page.start_t1", "Start T1 Assessment")
+    heroMode?.startsWith("assessment")
+      ? `Start ${pendingAssessment} Assessment`
       : heroMode === "completed"
         ? t("my_courses_page.explore_courses", "Explore courses")
         : t("my_courses_page.resume_course");
 
   const handlePrimaryClick = () => {
-    if (heroMode === "assessment") {
-      handleStartBaseline();
+    if (heroMode?.startsWith("assessment")) {
+      if (pendingAssessment === "T1") {
+        navigate("/dashboard/assessments/baseline");
+      } else {
+        navigate(`/assessment/${pendingAssessment}`);
+      }
       return;
     }
     if (activePath?.navigateTo) {
@@ -190,12 +217,13 @@ const MyCourses = () => {
     if (id) navigate(`/dashboard/courses/${id}/player`);
   };
 
-  const continueWatchingEl = heroMode && heroMode !== "assessment" ? (
+  const continueWatchingEl = heroMode ? (
     <MyCoursesHeroBanner
       mode={heroMode}
       course={activePath}
       onPrimaryAction={handlePrimaryClick}
       primaryLabel={primaryLabel}
+      pendingAssessment={pendingAssessment}
     />
   ) : null;
 
