@@ -117,6 +117,17 @@ const LeftSidebar = () => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
 
+  const displayMenuGroups = [...menuGroups];
+  if (user && (user.role === 'admin' || user.role === 'Admin')) {
+    displayMenuGroups.push({
+      title: "Admin Options",
+      items: [
+        { icon: BookOpen, label: "Course Management", path: "/dashboard/admin/courses" },
+        { icon: ShieldCheck, label: "Proctoring Reviews", path: "/dashboard/admin/proctoring" }
+      ]
+    });
+  }
+
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const hoverTimeoutRef = useRef(null);
 
@@ -369,7 +380,7 @@ const LeftSidebar = () => {
 
             {/* Mobile Menu Items */}
             <div className="flex-1 overflow-y-auto py-4 px-3">
-              {menuGroups.map((group, groupIndex) => (
+              {displayMenuGroups.map((group, groupIndex) => (
                 <div key={group.title} className="mb-6">
                   <p className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
                     {t(group.title)}
@@ -534,7 +545,7 @@ const LeftSidebar = () => {
 
         {/* Menu Items */}
         <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          {menuGroups.map((group) => (
+          {displayMenuGroups.map((group) => (
             <div key={group.title} className="mb-3">
               {/* Group Title */}
               <AnimatePresence mode="wait">

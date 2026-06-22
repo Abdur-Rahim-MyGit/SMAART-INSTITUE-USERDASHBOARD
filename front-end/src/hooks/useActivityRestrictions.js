@@ -23,6 +23,9 @@ export const useActivityRestrictions = ({ assessmentId = null, courseId = null, 
     const warningsCountRef = useRef(0);
     const inactivityTimerRef = useRef(null);
 
+    // Stable ref to triggerLockout to break TDZ initialization loops
+    const triggerLockoutRef = useRef(null);
+
     useEffect(() => {
         isActiveRef.current = isActive;
     }, [isActive]);
@@ -51,6 +54,9 @@ export const useActivityRestrictions = ({ assessmentId = null, courseId = null, 
         }
     }, [assessmentId, courseId, navigate]);
 
+    // Sync ref
+    triggerLockoutRef.current = triggerLockout;
+
     // Helper to log violation to the backend
     const reportViolation = useCallback(async (eventType) => {
         if (!isActiveRef.current || hasLockedOutRef.current) return;
@@ -74,7 +80,9 @@ export const useActivityRestrictions = ({ assessmentId = null, courseId = null, 
                 warningsCountRef.current = newCount;
 
                 if (newCount >= 4) {
-                    await triggerLockout();
+                    if (triggerLockoutRef.current) {
+                        await triggerLockoutRef.current();
+                    }
                 } else {
                     setIsWarningVisible(true);
                 }
@@ -82,7 +90,7 @@ export const useActivityRestrictions = ({ assessmentId = null, courseId = null, 
         } catch (error) {
             console.error('Error reporting activity violation:', error);
         }
-    }, [assessmentId, courseId, triggerLockout]);
+    }, [assessmentId, courseId]);
 
     // Reset inactivity timer
     const resetInactivityTimer = useCallback(() => {

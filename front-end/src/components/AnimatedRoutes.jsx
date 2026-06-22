@@ -61,6 +61,7 @@ const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 const Legal = lazy(() => import('@/pages/Legal'));
 const AdminCourses = lazy(() => import('@/pages/AdminCourses'));
 const AdminCourseForm = lazy(() => import('@/pages/AdminCourseForm'));
+const AdminProctoringDashboard = lazy(() => import('@/pages/ProctoringDashboard'));
 
 
 // Career Agent (Integrated from Career-Agent standalone system)
@@ -188,6 +189,7 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/admin/courses" element={<AdminCourses />} />
                         <Route path="/dashboard/admin/courses/create" element={<AdminCourseForm />} />
                         <Route path="/dashboard/admin/courses/edit/:id" element={<AdminCourseForm />} />
+                        <Route path="/dashboard/admin/proctoring" element={<AdminProctoringDashboard />} />
 
                         {/* Profile */}
                         <Route path="/onboarding" element={<AddDetails />} />

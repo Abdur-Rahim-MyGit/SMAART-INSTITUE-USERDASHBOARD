@@ -631,6 +631,15 @@ router.get('/_debug/state/:email', async (req, res) => {
   }
 });
 
+// Temporary debug dump
+router.get('/_debug_dump/:email', async (req, res) => {
+  const email = req.params.email;
+  const user = await User.findOne({ email });
+  const student = await Student.findOne({ email });
+  const registration = await Registration.findOne({ email });
+  res.json({ user, student, registration });
+});
+
 // Login endpoint
 router.post('/login', async (req, res) => {
   try {

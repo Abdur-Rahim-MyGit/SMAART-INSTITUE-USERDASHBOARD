@@ -1,0 +1,300 @@
+{
+  "userId": "6a2d11418aed41b1131a048d",
+  "richProfile": {
+    "fullName": "Dharsini J",
+    "email": "vumakumar@gmail.com",
+    "mobile": "9445150351",
+    "studentId": "STU012600001",
+    "education": "Computer Science & IT in Data Science at SETHU ",
+    "skills": [
+      "Agriculture, Food Technology & Rural Development",
+      "Artificial Intelligence, Machine Learning & Data Science",
+      "Creative Industries, Design & Architecture"
+    ],
+    "experience": "Academic Batch: 2023-2027",
+    "projects": "None",
+    "goals": "Short-term: MMMM, Medium: MMMM, Long: MMMM",
+    "interests": [
+      "Agriculture, Food Technology & Rural Development",
+      "Artificial Intelligence, Machine Learning & Data Science",
+      "Creative Industries, Design & Architecture"
+    ],
+    "certificates": "None",
+    "department": "IT ",
+    "rollNumber": "23IT075",
+    "college": "SRM",
+    "batch": "2023-2027",
+    "targetRole": "Business Analyst / MIS Analyst",
+    "experienceLevel": "Beginner"
+  },
+  "studentDoc": {
+    "academic": {
+      "degreeGroup": "",
+      "degreeLevel": "",
+      "domain": "",
+      "specialisation": ""
+    },
+    "activeVisionBoardId": null,
+    "accountLockedUntil": null,
+    "_id": "6a2d11418aed41b1131a048d",
+    "fullName": "Dharsini J",
+    "email": "vumakumar@gmail.com",
+    "mobile": "9445150351",
+    "userPassword": "Dharsini@123",
+    "role": "student",
+    "college": {
+      "address": {
+        "street": "SRM Nagar, Kattankulathur - 603203, Chengalpattu District, Tamil Nadu, India",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "531231",
+        "country": "India"
+      },
+      "coordinatorInfo": {
+        "name": "Abdul Kadhar",
+        "designation": "Principal",
+        "email": "abdulkadhar@gmail.com",
+        "mobile": "9344625458"
+      },
+      "subscriptionPlan": {
+        "addons": {
+          "aiq": true,
+          "piq": true,
+          "sq": true,
+          "britishCouncil": false
+        },
+        "plan": "Smaart Complete"
+      },
+      "_id": "69a0118ddd2dc157b475ad2a",
+      "collegeName": "SRM",
+      "institutionType": "Private University",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1781072732/smaart-minds/images/xfmrqixzltzvokukhprf.png",
+      "email": "srmuniversity@gmail.com",
+      "website": "srmuni.com",
+      "contactNumber": "9840881766",
+      "onboardingDate": "2026-02-26T00:00:00.000Z",
+      "affiliatedUniversity": "SRM University",
+      "registrationNumber": "312312312321",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "42134234234234",
+      "panNumber": "42342342432",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097889/smaart-minds/documents/wwuyut6yujqfs5e66nc3",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097894/smaart-minds/documents/v2xqhybnytlvb7iamstd",
+      "ndaDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097898/smaart-minds/documents/t1l0hj5ggonlkn6qvqap",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-02-26T00:00:00.000Z",
+      "validityEndDate": "2027-02-26T00:00:00.000Z",
+      "status": "Active",
+      "numberOfDepartments": 2,
+      "departments": [
+        {
+          "name": "Bachelor of Technology - Information Technology (IT)",
+          "code": "BTech-ITI",
+          "totalYears": 4,
+          "level": "Undergraduate (UG)",
+          "domain": "Engineering & Technology",
+          "degreeGroup": "Bachelor of Technology",
+          "specialization": "Information Technology (IT)",
+          "_id": "6a2fe04fb2bd94ab1dabb0c5"
+        },
+        {
+          "name": "Bachelor of Engineering - Computer Science",
+          "code": "BE-CS",
+          "totalYears": 4,
+          "level": "Undergraduate (UG)",
+          "domain": "Engineering & Technology",
+          "degreeGroup": "Bachelor of Engineering",
+          "specialization": "Computer Science",
+          "_id": "6a2fe04fb2bd94ab1dabb0c6"
+        }
+      ],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-02-26T09:25:33.374Z",
+      "updatedAt": "2026-06-15T11:21:51.050Z",
+      "collegeCode": "CLG0126",
+      "__v": 0,
+      "collegeAdmin": "69a0118ddd2dc157b475ad2d",
+      "chairmanVideo": "",
+      "universityType": "Private",
+      "validityDuration": 1,
+      "collegeAdminPassword": "",
+      "collegeNumber": "01"
+    },
+    "rollNumber": "23IT075",
+    "section": "A",
+    "department": "",
+    "batch": "2023-2027",
+    "enrolledCourses": [],
+    "status": "active",
+    "idProof": "",
+    "certificates": [],
+    "degree": "69cfac8d57f80d08bc127ba9",
+    "assessments": [],
+    "admissionDate": "2026-06-13T08:13:53.818Z",
+    "loginHistory": [],
+    "createdAt": "2026-06-13T08:13:53.823Z",
+    "updatedAt": "2026-06-21T10:55:45.745Z",
+    "studentId": "STU012600001",
+    "__v": 1,
+    "lastOtpSentAt": "2026-06-13T13:00:50.713Z",
+    "otpAttempts": 0,
+    "badges": [],
+    "coachingSessions": [],
+    "currentSessionId": "bfb35287-006c-438a-a29b-4f60b8ca840c",
+    "isAssessmentCompleted": false,
+    "isFirstLogin": false,
+    "isRegistered": false,
+    "lastLogin": "2026-06-21T10:55:45.742Z",
+    "mustChangePassword": false,
+    "passwordChangedAt": "2026-06-13T13:02:03.061Z",
+    "pushSubscriptions": [],
+    "sessionExpiresAt": "2026-06-21T13:55:45.691Z",
+    "settings": {
+      "profile": {
+        "displayName": "Dharsini J",
+        "email": "vumakumar@gmail.com",
+        "bio": "",
+        "phone": "9445150351"
+      },
+      "notifications": {
+        "emailNotifications": true,
+        "pushNotifications": true,
+        "assessmentReminders": true,
+        "courseUpdates": true,
+        "coachSessionReminders": true,
+        "communityActivity": true
+      },
+      "privacy": {
+        "profileVisibility": "everyone",
+        "twoFactorEnabled": false
+      },
+      "appearance": {
+        "theme": "light",
+        "accentColor": "#1a3884"
+      },
+      "language": {
+        "preferredLanguage": "English (US)",
+        "timezone": "Asia/Kolkata (GMT+5:30)",
+        "dateFormat": "DD/MM/YYYY"
+      }
+    },
+    "dateOfBirth": "2005-06-02T00:00:00.000Z",
+    "gender": "female"
+  },
+  "registrationDoc": {
+    "notificationPrefs": {
+      "email": true,
+      "push": true,
+      "assessments": true,
+      "courses": true,
+      "coaching": true,
+      "community": true
+    },
+    "tenthDetails": {
+      "schoolName": "CEOA SCHOOL ",
+      "yearOfPassing": "2019",
+      "percentage": "90",
+      "marksheet": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1781355946/registrations/unknown/file_1781355937748_56763ebf.png"
+    },
+    "twelfthDetails": {
+      "schoolName": "CEOA ",
+      "stream": "Science",
+      "yearOfPassing": "2020",
+      "percentage": "90",
+      "marksheet": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1781356009/registrations/unknown/file_1781356005929_67d5548d.png"
+    },
+    "sectorPreferences": {
+      "preferredSectors": [
+        "Agriculture, Food Technology & Rural Development",
+        "Artificial Intelligence, Machine Learning & Data Science",
+        "Creative Industries, Design & Architecture"
+      ],
+      "secondarySectors": []
+    },
+    "careerGoals": {
+      "shortTerm": "MMMM",
+      "mediumTerm": "MMMM",
+      "longTerm": "MMMM"
+    },
+    "personalDevelopmentGoals": {
+      "shortTerm": "MMMM",
+      "mediumTerm": "MMMMM",
+      "longTerm": "MMMMM"
+    },
+    "streakData": {
+      "streakCycleDay": 0,
+      "streakCyclesCompleted": 0,
+      "streakStartDate": null,
+      "lastStreakDate": "",
+      "streakActive": false,
+      "totalStreakDays": 0,
+      "streakHistory": [],
+      "sundayHolidays": []
+    },
+    "_id": "6a2d558025710b79c59aabed",
+    "userId": "6a2d11418aed41b1131a048d",
+    "fullName": "Dharsini J",
+    "email": "vumakumar@gmail.com",
+    "mobileNumber": "9445150351",
+    "bio": "",
+    "timezone": "Asia/Kolkata",
+    "dateFormat": "DD/MM/YYYY",
+    "status": "pending",
+    "currentSessionId": null,
+    "sessionExpiresAt": null,
+    "lastLogin": null,
+    "previousLogin": null,
+    "higherEducation": [
+      {
+        "id": "1781355724159",
+        "qualificationLevel": "Undergraduate (UG)",
+        "degree": "Computer Science & IT",
+        "degreeFullName": "Bachelor of Computer Applications",
+        "specialization": "Data Science",
+        "institutionName": "SETHU ",
+        "university": "ANNA ",
+        "yearOfPassing": "2026",
+        "cgpaPercentage": "90",
+        "degreeStatus": "pursuing",
+        "certificate": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1781356077/registrations/unknown/file_1781356071423_611ab408.png"
+      }
+    ],
+    "extracurricular": [
+      {
+        "id": "1781355724159",
+        "activityType": "Leadership roles",
+        "level": "College",
+        "description": "HII BRUHN",
+        "achievements": "HELLOO"
+      }
+    ],
+    "jobPreferences": [
+      {
+        "id": "1781355724159",
+        "preferredRole": "Business Analyst / MIS Analyst",
+        "jobType": "full-time",
+        "willingToRelocate": "yes",
+        "expectedSalary": "12-18 LPA"
+      }
+    ],
+    "workExperience": [],
+    "projects": [],
+    "certificates": [],
+    "submissionDate": "2026-06-13T13:05:04.860Z",
+    "createdAt": "2026-06-13T13:05:04.861Z",
+    "updatedAt": "2026-06-13T13:23:27.406Z",
+    "nickname": "Dharsini",
+    "dob": "2005-06-02T00:00:00.000Z",
+    "gender": "female",
+    "institution": "SRM",
+    "department": "IT ",
+    "yearOfStudy": "2025",
+    "yearOfPassing": "2026",
+    "educationLevel": "Technology, Software & Digital Products",
+    "__v": 3
+  }
+}
