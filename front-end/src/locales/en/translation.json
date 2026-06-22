@@ -1017,6 +1017,8 @@
       "desc": "Quick-reference cards covering the six core SMAART quotients and essential professional terminology.",
       "more_desc": "More flashcards are available within each course module to help you master professional terminology.",
       "explore_btn": "Explore Course Flashcards",
+      "all_categories": "All Categories",
+      "no_cards_found": "No flashcards found for this category.",
       "category": {
         "Quotient": "Quotient"
       },

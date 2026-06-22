@@ -821,7 +821,21 @@ const VisionBoardGalleryPro = () => {
         >
             <div className="flex flex-col">
                 <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                    Vision Board <span className="text-[#1a3884] dark:text-blue-300">Gallery</span>
+                  {(() => {
+                    const title = t("vision_board.gallery_title", "Vision Board Gallery");
+                    const lastSpaceIndex = title.lastIndexOf(" ");
+                    if (lastSpaceIndex !== -1) {
+                      return (
+                        <>
+                          {title.substring(0, lastSpaceIndex)}{" "}
+                          <span className="text-[#1a3884] dark:text-blue-300">
+                            {title.substring(lastSpaceIndex + 1)}
+                          </span>
+                        </>
+                      );
+                    }
+                    return title;
+                  })()}
                 </h1>
                 <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
                     {t("vision_board.gallery_subtitle")}

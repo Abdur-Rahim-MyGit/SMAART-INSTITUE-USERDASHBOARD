@@ -7,6 +7,7 @@
     "results": "Résultats",
     "assessments": "Évaluations",
     "toolkit": "Boîte à outils",
+    "placement": "Placement",
     "performance": "Performance",
     "skills_vault": "Coffre-fort de compétences",
     "badges": "Mes Badges",
@@ -1009,6 +1010,8 @@
       "desc": "Cartes de référence rapide couvrant les six quotients SMAART fondamentaux et la terminologie professionnelle essentielle.",
       "more_desc": "Plus de cartes mémoire sont disponibles dans chaque module de cours pour vous aider à maîtriser la terminologie professionnelle.",
       "explore_btn": "Explorer les Cartes mémoire du Cours",
+      "all_categories": "Toutes les catégories",
+      "no_cards_found": "Aucune carte mémoire trouvée pour cette catégorie.",
       "category": {
         "Quotient": "Quotient"
       },

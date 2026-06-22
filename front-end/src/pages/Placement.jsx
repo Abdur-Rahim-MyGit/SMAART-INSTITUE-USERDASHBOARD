@@ -69,6 +69,28 @@ const formatStatus = (value) => {
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+const getStatusTextColor = (status) => {
+  const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
+  switch (norm) {
+    case 'applied':
+      return "text-blue-600 dark:text-blue-400";
+    case 'under review':
+      return "text-amber-600 dark:text-amber-400";
+    case 'declined':
+      return "text-slate-500 dark:text-slate-400";
+    case 'shortlisted':
+      return "text-purple-600 dark:text-purple-400";
+    case 'hold':
+      return "text-orange-600 dark:text-orange-400";
+    case 'selected':
+      return "text-emerald-600 dark:text-emerald-400";
+    case 'rejected':
+      return "text-rose-600 dark:text-rose-400";
+    default:
+      return "text-slate-600 dark:text-slate-400";
+  }
+};
+
 const Placement = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -530,7 +552,9 @@ const Placement = () => {
                       </div>
 
                       <div className="mt-auto pt-5 flex items-center justify-center gap-3">
-                        <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 uppercase">STATUS : {String(statusLabel).toLowerCase()}</div>
+                        <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold uppercase text-black dark:text-white">
+                          STATUS : <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
+                        </div>
                         <button
                           onClick={() => openConfirm(app._id || app.id, title)}
                           className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100"
