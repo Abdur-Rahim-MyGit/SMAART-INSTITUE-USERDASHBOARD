@@ -1,12 +1,12 @@
 import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, ArrowRight, TrendingUp } from "lucide-react";
+import { BookOpen, ArrowRight, TrendingUp, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ANIMATION_DELAYS, ANIMATION_DURATIONS } from "@/constants/dashboard";
 import { resolveStaticCourseTitle, compareCourseIds } from "@/utils/courseUnlock";
 
-const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
+const HeroSection = memo(({ userName, paths = [], pathsLoading = false, pendingAssessment = null }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -37,6 +37,47 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
   const displayProgress = activePath
     ? Math.max(enrollmentProgress, liveProgress)
     : (storedProgress || averageProgress);
+
+  // Override if there is a pending assessment
+  const assessmentDetails = useMemo(() => {
+    if (!pendingAssessment) return null;
+    
+    let title = `${pendingAssessment} Assessment`;
+    let btnLabel = `Start ${pendingAssessment} Assessment`;
+    let navPath = `/assessment/${pendingAssessment}`;
+    
+    if (pendingAssessment === "T1") {
+      title = t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment");
+      btnLabel = "Start T1 Assessment";
+      navPath = "/dashboard/assessments/baseline";
+    } else if (pendingAssessment === "T2") {
+      title = "Complete your T2 Intermediate Assessment";
+      btnLabel = "Start T2 Assessment";
+      navPath = "/assessment/T2";
+    } else if (pendingAssessment === "T3") {
+      title = "Complete your T3 Advanced Assessment";
+      btnLabel = "Start T3 Assessment";
+      navPath = "/assessment/T3";
+    } else if (pendingAssessment === "T4") {
+      title = "Complete your T4 Final Assessment";
+      btnLabel = "Start T4 Assessment";
+      navPath = "/assessment/T4";
+    }
+    
+    return { title, btnLabel, navPath };
+  }, [pendingAssessment, t]);
+
+  const finalTitle = assessmentDetails ? assessmentDetails.title : displayTitle;
+  const finalProgress = pendingAssessment ? 0 : displayProgress;
+  const finalBtnLabel = assessmentDetails ? assessmentDetails.btnLabel : t("dashboard.continue_learning", "Continue Learning");
+  
+  const handleCTA = () => {
+    if (assessmentDetails) {
+      navigate(assessmentDetails.navPath);
+    } else {
+      navigate(activePath?.navigateTo || "/dashboard/courses");
+    }
+  };
 
   return (
     <motion.div
@@ -82,12 +123,12 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
             {/* Overall Progress */}
             <div className="hidden sm:flex flex-col gap-1.5 min-w-[160px] max-w-[220px]">
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate" title={displayTitle}>
-                  <TrendingUp className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{displayTitle}</span>
+                <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate" title={finalTitle}>
+                  {pendingAssessment ? <Award className="w-3 h-3 shrink-0 text-amber-500 animate-pulse" /> : <TrendingUp className="w-3 h-3 shrink-0" />}
+                  <span className="truncate">{finalTitle}</span>
                 </span>
                 <span className="text-sm font-extrabold text-[#1a3884] dark:text-blue-400 shrink-0">
-                  {pathsLoading ? "—" : `${displayProgress}%`}
+                  {pathsLoading ? "—" : `${finalProgress}%`}
                 </span>
               </div>
               <div className="h-1.5 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
@@ -96,7 +137,7 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
                 ) : (
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${displayProgress}%` }}
+                    animate={{ width: `${finalProgress}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                     className="h-full rounded-full shadow-[0_0_8px_rgba(26,56,132,0.3)]"
                     style={{ background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
@@ -115,11 +156,11 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
               transition={{ delay: 0.3, duration: 0.4 }}
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate(activePath?.navigateTo || "/dashboard/courses")}
+              onClick={handleCTA}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#132c6b] dark:bg-[#1a3884] dark:hover:bg-[#112558] text-white rounded-xl text-xs font-bold shadow-md shadow-[#1a3884]/20 transition-colors whitespace-nowrap"
             >
-              <BookOpen className="w-3.5 h-3.5 shrink-0" />
-              {t("dashboard.continue_learning", "Continue Learning")}
+              {pendingAssessment ? <Award className="w-3.5 h-3.5 shrink-0 text-amber-300" /> : <BookOpen className="w-3.5 h-3.5 shrink-0" />}
+              {finalBtnLabel}
               <ArrowRight className="w-3 h-3" />
             </motion.button>
           </div>
@@ -129,11 +170,11 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
         <div className="sm:hidden flex items-center gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-white/10">
           <div className="flex-1 min-w-0">
             <div className="flex justify-between mb-1 gap-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate" title={displayTitle}>
-                {displayTitle}
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate" title={finalTitle}>
+                {finalTitle}
               </span>
               <span className="text-xs font-extrabold text-[#1a3884] dark:text-blue-400 shrink-0">
-                {pathsLoading ? "—" : `${displayProgress}%`}
+                {pathsLoading ? "—" : `${finalProgress}%`}
               </span>
             </div>
             <div className="h-1.5 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
@@ -142,7 +183,7 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
               ) : (
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${displayProgress}%` }}
+                  animate={{ width: `${finalProgress}%` }}
                   transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                   className="h-full rounded-full"
                   style={{ background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
@@ -151,11 +192,11 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
             </div>
           </div>
           <button
-            onClick={() => navigate(activePath?.navigateTo || "/dashboard/courses")}
+            onClick={handleCTA}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a3884] text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap shrink-0"
           >
-            <BookOpen className="w-3 h-3" />
-            Continue
+            {pendingAssessment ? <Award className="w-3 h-3 text-amber-300" /> : <BookOpen className="w-3 h-3" />}
+            {pendingAssessment ? `Start ${pendingAssessment}` : "Continue"}
           </button>
         </div>
       </div>
