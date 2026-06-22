@@ -4,6 +4,7 @@ import {
   IconBriefcase as Briefcase,
   IconBuilding as Building,
   IconCalendarDue as CalendarDue,
+  IconClock as Clock,
   IconMapPin as MapPin,
   IconRefresh as Refresh,
   IconSearch as Search,
@@ -67,6 +68,28 @@ const getCompanyLogo = (job) => {
 const formatStatus = (value) => {
   if (!value) return "Open";
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+/**
+ * Returns a LinkedIn-style "Posted X ago" label.
+ * Calculation is purely client-side from the existing createdAt timestamp.
+ */
+const getPostedAgo = (createdAt) => {
+  if (!createdAt) return null;
+  const posted = new Date(createdAt);
+  if (Number.isNaN(posted.getTime())) return null;
+  const diffMs = Date.now() - posted.getTime();
+  if (diffMs < 0) return null; // future date — don't show
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Posted Today";
+  if (days === 1) return "Posted 1 day ago";
+  if (days < 7) return `Posted ${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "Posted 1 week ago";
+  if (weeks < 5) return `Posted ${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return "Posted 1 month ago";
+  return `Posted ${months} months ago`;
 };
 
 const Placement = () => {
@@ -406,6 +429,14 @@ const Placement = () => {
                           <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                           <span className="truncate">{job.displayLocation || 'Remote'}</span>
                         </div>
+                        {getPostedAgo(job.displayCreatedAt || job.createdAt) && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 shrink-0 text-slate-400" />
+                            <span className="text-slate-400 text-xs font-semibold">
+                              {getPostedAgo(job.displayCreatedAt || job.createdAt)}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
                           <span>{formatDate(job.displayDeadline)}</span>
