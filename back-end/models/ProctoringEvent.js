@@ -5,7 +5,7 @@ const ProctoringEventSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   eventType: { 
     type: String, 
-    enum: ['tab_switch', 'minimize', 'fullscreen_exit', 'face_absent', 'multiple_faces', 'attention_check_fail', 'inactivity', 'identity_verified'], 
+    enum: ['tab_switch', 'minimize', 'fullscreen_exit', 'face_absent', 'multiple_faces', 'attention_check_fail', 'inactivity', 'identity_verified', 'face_mismatch', 'face_covered', 'face_registered'], 
     required: true 
   },
   severity: { type: String, enum: ['info', 'low', 'medium', 'high', 'critical'], default: 'low' },

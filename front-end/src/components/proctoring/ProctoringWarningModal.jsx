@@ -4,7 +4,9 @@ import {
   RiAlertLine,
   RiTimeLine,
   RiCameraLine,
-  RiWindowLine
+  RiWindowLine,
+  RiUserUnfollowLine,
+  RiEyeOffLine
 } from '@remixicon/react';
 
 const VIOLATION_DETAILS = {
@@ -24,13 +26,13 @@ const VIOLATION_DETAILS = {
     icon: <RiTimeLine className="text-red-500 w-12 h-12" />
   },
   face_absent: {
-    title: 'Candidate Face Not Detected',
-    description: 'Your face went out of view or was blocked. Ensure your webcam has clear visibility and your face remains centered.',
+    title: 'Face Not Detected',
+    description: 'Please position your face in front of the camera.',
     icon: <RiCameraLine className="text-red-500 w-12 h-12" />
   },
   multiple_faces: {
-    title: 'Multiple Persons Detected',
-    description: 'More than one face was detected in the camera frame. The assessment must be taken individually.',
+    title: 'Multiple Faces Detected',
+    description: 'Only one person is allowed during the exam.',
     icon: <RiAlertLine className="text-red-500 w-12 h-12" />
   },
   fullscreen_exit: {
@@ -42,6 +44,16 @@ const VIOLATION_DETAILS = {
     title: 'Liveness Verification Missed',
     description: 'You failed to acknowledge the periodic liveness check popup in time.',
     icon: <RiTimeLine className="text-red-500 w-12 h-12" />
+  },
+  face_mismatch: {
+    title: 'Identity Mismatch',
+    description: 'The face detected does not match the registered candidate. Ensure only the registered person is in front of the camera.',
+    icon: <RiUserUnfollowLine className="text-red-500 w-12 h-12" />
+  },
+  face_covered: {
+    title: 'Face Obstructed',
+    description: 'Your face is not clearly visible. Remove any obstruction and look directly at the camera.',
+    icon: <RiEyeOffLine className="text-red-500 w-12 h-12" />
   }
 };
 

@@ -19,8 +19,12 @@ const calculateRiskScore = (violationsByType) => {
     fullscreen_exit: 20,
     face_absent: 15,
     multiple_faces: 25,
+    face_mismatch: 30,      // High risk — different person
+    face_covered: 10,       // Low risk — obstruction
     attention_check_fail: 35,
-    inactivity: 10
+    inactivity: 10,
+    face_registered: 0,     // Info event — no risk contribution
+    identity_verified: 0    // Info event — no risk contribution
   };
   
   Object.keys(violations).forEach(type => {
@@ -102,19 +106,34 @@ exports.logEvent = async (req, res) => {
 
     await event.save();
 
-    // Increment violation counts on session
-    session.totalViolations += 1;
+    // Info-only events (face_registered, identity_verified) don't count as violations
+    const infoOnlyEvents = ['face_registered', 'identity_verified'];
     
-    // Update map counters
-    const currentCount = session.violationsByType.get(eventType) || 0;
-    session.violationsByType.set(eventType, currentCount + 1);
+    if (infoOnlyEvents.includes(eventType)) {
+      // Mark face registration on session
+      if (eventType === 'face_registered') {
+        session.faceRegistered = true;
+        session.faceRegisteredAt = new Date();
+      }
+      if (eventType === 'identity_verified') {
+        session.identityVerified = true;
+        session.identityVerifiedAt = new Date();
+      }
+    } else {
+      // Increment violation counts on session
+      session.totalViolations += 1;
+      
+      // Update map counters
+      const currentCount = session.violationsByType.get(eventType) || 0;
+      session.violationsByType.set(eventType, currentCount + 1);
 
-    // Re-calculate risk score
-    session.riskScore = calculateRiskScore(session.violationsByType);
+      // Re-calculate risk score
+      session.riskScore = calculateRiskScore(session.violationsByType);
 
-    // Auto-flag session if risk score gets high
-    if (session.riskScore >= 60 && session.status === 'active') {
-      session.status = 'flagged';
+      // Auto-flag session if risk score gets high
+      if (session.riskScore >= 60 && session.status === 'active') {
+        session.status = 'flagged';
+      }
     }
 
     await session.save();

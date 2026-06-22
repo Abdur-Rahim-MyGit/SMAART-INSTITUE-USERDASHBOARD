@@ -17,6 +17,11 @@ const ProctoringSessionSchema = new mongoose.Schema({
   totalViolations: { type: Number, default: 0 },
   violationsByType: { type: Map, of: Number, default: {} },
   riskScore: { type: Number, default: 0 }, // 0-100 composite score calculated on backend
+  faceRegistered: { type: Boolean, default: false },
+  faceRegisteredAt: { type: Date },
+  faceVerificationPassRate: { type: Number, default: 0 }, // 0-1 ratio of verified checks vs total
+  totalFaceChecks: { type: Number, default: 0 },
+  faceChecksPassed: { type: Number, default: 0 },
   startedAt: { type: Date, default: Date.now },
   completedAt: { type: Date }
 }, { timestamps: true });
