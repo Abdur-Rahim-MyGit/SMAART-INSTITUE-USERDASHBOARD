@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   RiCameraLine,
@@ -7,9 +7,17 @@ import {
   RiShieldCheckLine,
   RiInformationLine,
   RiFullscreenLine,
-  RiArrowRightLine
+  RiArrowRightLine,
+  RiUserSmileLine,
+  RiLoader4Line
 } from '@remixicon/react';
-import { detectFaces } from '@/services/faceDetectionService';
+import * as faceapi from '@vladmandic/face-api';
+import {
+  loadModels,
+  registerFace,
+  detectFaces,
+  isReady as isModelsReady
+} from '@/services/faceVerificationService';
 
 export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const [step, setStep] = useState(1);
@@ -17,16 +25,24 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const [networkLatency, setNetworkLatency] = useState(null);
   const [networkState, setNetworkState] = useState('checking'); // 'checking' | 'good' | 'poor'
   const [consentGranted, setConsentGranted] = useState(false);
-  const [faceDetected, setFaceDetected] = useState(false);
-  const [isFaceChecking, setIsFaceChecking] = useState(false);
   const [isFullScreenActive, setIsFullScreenActive] = useState(false);
+
+  // Face Registration State
+  const [modelLoadProgress, setModelLoadProgress] = useState(0);
+  const [modelLoadState, setModelLoadState] = useState('idle'); // 'idle' | 'loading' | 'loaded' | 'error'
+  const [registrationState, setRegistrationState] = useState('idle');
+  // 'idle' | 'detecting' | 'face_found' | 'registering' | 'registered' | 'error'
+  const [registrationProgress, setRegistrationProgress] = useState({ current: 0, total: 5 });
+  const [registrationConfidence, setRegistrationConfidence] = useState(0);
+  const [registeredDescriptor, setRegisteredDescriptor] = useState(null);
   const [faceCheckError, setFaceCheckError] = useState(null);
-  const [showSkipOption, setShowSkipOption] = useState(false);
-  
+  const [faceStableCount, setFaceStableCount] = useState(0);
+
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const localStreamRef = useRef(null);
   const faceCheckIntervalRef = useRef(null);
-  const skipTimeoutRef = useRef(null);
+  const faceStableCountRef = useRef(0);
 
   // 1. Run network speed checks
   useEffect(() => {
@@ -34,8 +50,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       const checkNetwork = async () => {
         const start = Date.now();
         try {
-          // Send a tiny request to verify latency
-          await fetch('/api/security/warning-status?assessmentId=test', { signal: AbortSignal.timeout(3000) }).catch(() => {});
+          await fetch('/api/auth/me', { signal: AbortSignal.timeout(3000) }).catch(() => {});
           const latency = Date.now() - start;
           setNetworkLatency(latency);
           setNetworkState(latency < 350 ? 'good' : 'poor');
@@ -53,7 +68,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setCameraState('checking');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 320, height: 240, frameRate: { ideal: 15 } }
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } }
       });
       localStreamRef.current = stream;
       if (videoRef.current) {
@@ -67,77 +82,188 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     }
   };
 
-  // Run face check in Step 3
-  const startFaceTracking = () => {
-    if (!videoRef.current || !localStreamRef.current) return;
-    setIsFaceChecking(true);
-    setFaceDetected(false);
-    setFaceCheckError(null);
-    setShowSkipOption(false);
+  // Load AI Models when entering step 3
+  const loadAIModels = useCallback(async () => {
+    if (isModelsReady()) {
+      setModelLoadState('loaded');
+      setModelLoadProgress(100);
+      return;
+    }
 
-    let checkCount = 0;
+    setModelLoadState('loading');
+    setModelLoadProgress(0);
+
+    try {
+      await loadModels((progress) => {
+        setModelLoadProgress(progress);
+      });
+      setModelLoadState('loaded');
+      console.log('[ProctoringSetup] ✅ AI models loaded successfully');
+    } catch (err) {
+      console.error('[ProctoringSetup] Model loading failed:', err);
+      setModelLoadState('error');
+      setFaceCheckError('Failed to load AI models. Please check your connection and try again.');
+    }
+  }, []);
+
+  const clearCanvas = useCallback(() => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
+  const drawFaceFeedback = useCallback((faces) => {
+    if (!canvasRef.current || !videoRef.current) return;
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const displaySize = { width: video.clientWidth, height: video.clientHeight };
+    if (displaySize.width === 0 || displaySize.height === 0) return;
+
+    faceapi.matchDimensions(canvas, displaySize);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!faces || faces.length === 0) return;
+
+    const resizedDetections = faceapi.resizeResults(faces.map(f => f.detection), displaySize);
+    const resizedLandmarks = faces.map(f => faceapi.resizeResults(f.landmarks, displaySize));
+
+    resizedDetections.forEach(detection => {
+      const box = detection.box;
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(box.x, box.y, box.width, box.height);
+    });
+
+    resizedLandmarks.forEach(landmarks => {
+      ctx.fillStyle = '#10b981';
+      const points = landmarks.positions;
+      points.forEach(pt => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 2, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+    });
+  }, []);
+
+  // Run multi-frame face registration
+  const startFaceRegistration = useCallback(async () => {
+    if (!videoRef.current) return;
+
+    setRegistrationState('registering');
+    setRegistrationProgress({ current: 0, total: 5 });
+    setFaceCheckError(null);
+
+    try {
+      const result = await registerFace(videoRef.current, {
+        frameCount: 5,
+        intervalMs: 600,
+        onFrameCaptured: (frameIndex, totalFrames, descriptor, face) => {
+          setRegistrationProgress({ current: frameIndex, total: totalFrames });
+          if (face) {
+            drawFaceFeedback([face]);
+          }
+        },
+        onError: (err) => {
+          console.warn('[ProctoringSetup] Registration frame issue:', err);
+        }
+      });
+
+      setRegisteredDescriptor(result.descriptor);
+      setRegistrationConfidence(result.confidence);
+      setRegistrationState('registered');
+      clearCanvas();
+
+      console.log(`[ProctoringSetup] ✅ Face registered: ${result.framesCaptured} frames, confidence: ${(result.confidence * 100).toFixed(1)}%`);
+    } catch (err) {
+      console.error('[ProctoringSetup] Face registration failed:', err);
+      setRegistrationState('error');
+      setFaceCheckError(err.message || 'Face registration failed. Please try again.');
+      clearCanvas();
+    }
+  }, [drawFaceFeedback, clearCanvas]);
+
+  // Start face detection scanning (pre-registration)
+  const startFaceScanning = useCallback(() => {
+    if (!videoRef.current || !localStreamRef.current) return;
+
+    setRegistrationState('detecting');
+    setFaceCheckError(null);
+    faceStableCountRef.current = 0;
 
     faceCheckIntervalRef.current = setInterval(async () => {
       if (!videoRef.current) return;
+
       try {
-        const res = await detectFaces(videoRef.current);
-        
-        if (res.error) {
-          console.warn('[ProctoringSetup] Face check warning:', res.error);
-          checkCount++;
-          if (checkCount > 4) {
-            setFaceCheckError('Camera interface calibrating. Please wait...');
-          }
-          return;
+        const result = await detectFaces(videoRef.current);
+
+        if (result.error) {
+          return; // Skip frame
         }
 
-        if (res.isFacePresent) {
-          if (res.faceCount === 1) {
-            setFaceDetected(true);
-            setFaceCheckError(null);
+        if (result.faceCount === 1 && result.faces[0].hasDescriptor) {
+          faceStableCountRef.current += 1;
+          setFaceStableCount(faceStableCountRef.current);
+          setFaceCheckError(null);
+          drawFaceFeedback(result.faces);
+
+          // Face stable for 2+ consecutive checks (~1.6 seconds) → ready to register
+          if (faceStableCountRef.current >= 2 && registrationState !== 'registering' && registrationState !== 'registered') {
+            // Auto-start registration
             clearInterval(faceCheckIntervalRef.current);
             faceCheckIntervalRef.current = null;
-            setIsFaceChecking(false);
-          } else {
-            setFaceCheckError('Multiple faces detected. Please ensure only you are in frame.');
+            startFaceRegistration();
           }
-        } else {
-          setFaceCheckError('No face detected. Ensure your face is fully lit and centered.');
+        } else if (result.faceCount === 0) {
+          faceStableCountRef.current = 0;
+          setFaceStableCount(0);
+          setFaceCheckError('No face detected. Ensure your face is clearly visible and well-lit.');
+          clearCanvas();
+        } else if (result.faceCount > 1) {
+          faceStableCountRef.current = 0;
+          setFaceStableCount(0);
+          setFaceCheckError('Multiple faces detected. Only you should be in frame.');
+          drawFaceFeedback(result.faces);
         }
       } catch (err) {
-        console.error('[ProctoringSetup] Face tracking failed:', err);
+        console.error('[ProctoringSetup] Face scanning error:', err);
       }
-    }, 1500);
+    }, 800);
+  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
 
-    // Show skip bypass option after 8 seconds of scanning
-    skipTimeoutRef.current = setTimeout(() => {
-      setShowSkipOption(true);
-    }, 8000);
-  };
-
+  // Step 3: Load models then start scanning
   useEffect(() => {
     if (step === 3) {
+      // Bind video stream
       if (localStreamRef.current && videoRef.current) {
         videoRef.current.srcObject = localStreamRef.current;
         videoRef.current.play().catch(err => console.warn('Video playback failed:', err));
       }
-      startFaceTracking();
+
+      // Load AI models first, then start scanning
+      const init = async () => {
+        await loadAIModels();
+        // Only start scanning if models loaded successfully
+        if (isModelsReady()) {
+          startFaceScanning();
+        }
+      };
+      init();
     } else {
+      // Cleanup
       if (faceCheckIntervalRef.current) {
         clearInterval(faceCheckIntervalRef.current);
         faceCheckIntervalRef.current = null;
       }
-      if (skipTimeoutRef.current) {
-        clearTimeout(skipTimeoutRef.current);
-        skipTimeoutRef.current = null;
-      }
-      setIsFaceChecking(false);
     }
     return () => {
-      if (faceCheckIntervalRef.current) clearInterval(faceCheckIntervalRef.current);
-      if (skipTimeoutRef.current) clearTimeout(skipTimeoutRef.current);
+      if (faceCheckIntervalRef.current) {
+        clearInterval(faceCheckIntervalRef.current);
+        faceCheckIntervalRef.current = null;
+      }
     };
-  }, [step]);
+  }, [step, loadAIModels, startFaceScanning]);
 
   // Monitor Fullscreen Status
   useEffect(() => {
@@ -163,7 +289,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       setStep(2);
     } else if (step === 2 && consentGranted) {
       setStep(3);
-    } else if (step === 3 && faceDetected) {
+    } else if (step === 3 && registrationState === 'registered') {
       setStep(4);
     }
   };
@@ -177,13 +303,42 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     if (faceCheckIntervalRef.current) {
       clearInterval(faceCheckIntervalRef.current);
     }
-    
-    // Check fullscreen again or force it
+
+    // Check fullscreen
     if (!isFullScreenActive) {
       triggerFullscreen();
     }
-    
-    onComplete();
+
+    // Pass the registered face descriptor to the parent
+    onComplete({ faceDescriptor: registeredDescriptor });
+  };
+
+  // Retry registration (reset state and rescan)
+  const retryRegistration = () => {
+    setRegistrationState('idle');
+    setRegisteredDescriptor(null);
+    setRegistrationConfidence(0);
+    setFaceCheckError(null);
+    faceStableCountRef.current = 0;
+    setFaceStableCount(0);
+
+    if (isModelsReady()) {
+      startFaceScanning();
+    }
+  };
+
+  // ─── Render ────────────────────────────────────────────────────────
+
+  // Helper: render face registration progress text
+  const getRegistrationStatusText = () => {
+    if (modelLoadState === 'loading') return 'Loading AI Models...';
+    if (modelLoadState === 'error') return 'Model loading failed';
+    if (registrationState === 'detecting') return 'Detecting your face...';
+    if (registrationState === 'face_found') return 'Face found! Hold still...';
+    if (registrationState === 'registering') return `Registering identity (${registrationProgress.current}/${registrationProgress.total})`;
+    if (registrationState === 'registered') return 'Face Registered Successfully';
+    if (registrationState === 'error') return 'Registration failed';
+    return 'Preparing...';
   };
 
   return (
@@ -219,7 +374,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Step Contents */}
-        <div className="min-h-[220px]">
+        <div className="min-h-[280px]">
           {/* STEP 1: Camera & Hardware Checks */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
@@ -239,7 +394,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Webcam Access</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Required for liveness validation</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Required for identity verification</p>
                     </div>
                   </div>
                   {cameraState === 'allowed' ? (
@@ -299,13 +454,13 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                 <RiShieldCheckLine className="text-[#1a3884] dark:text-cyan-400" /> Security Compliance Consent
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
-                By ticking the consent statement below, you acknowledge that this assessment utilizes AI Proctoring constraints. Dynamic snapshots, liveness indicators, and screen focus are continuously logged under the Digital Personal Data Protection Act (DPDPA 2023). All session records are securely processed and auto-purged within 30 days of attempt completion.
+                By ticking the consent statement below, you acknowledge that this assessment utilizes AI Proctoring with face verification. Your face will be registered at the start and continuously verified throughout the assessment. Dynamic snapshots, liveness indicators, and screen focus are continuously logged under the Digital Personal Data Protection Act (DPDPA 2023). All session records are securely processed and auto-purged within 30 days of attempt completion.
               </p>
 
               <div className="bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40 rounded-2xl p-4 flex gap-3 items-start">
                 <RiInformationLine size={20} className="text-[#1a3884] dark:text-cyan-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <strong>Strict Actions:</strong> Minimizing window focus, opening browser DevTools, exiting fullscreen mode, or looking away from the screen for prolonged periods will trigger warnings and can lead to immediate lockout disqualification.
+                  <strong>Strict Actions:</strong> Minimizing window focus, opening browser DevTools, exiting fullscreen mode, or showing a different face will trigger warnings and can lead to immediate lockout disqualification.
                 </div>
               </div>
 
@@ -317,62 +472,138 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="w-4 h-4 rounded mt-0.5 accent-[#1a3884] dark:accent-cyan-400"
                 />
                 <span className="text-xs text-slate-700 dark:text-slate-300">
-                  I consent to identity validation and agree to the integrity checks.
+                  I consent to face registration, identity verification, and agree to the integrity checks.
                 </span>
               </label>
             </motion.div>
           )}
 
-          {/* STEP 3: Face & Liveness Setup */}
+          {/* STEP 3: Face Registration */}
           {step === 3 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 flex flex-col items-center">
               <h3 className="text-lg font-bold text-center self-start flex items-center gap-2 text-slate-900 dark:text-white">
-                <RiCheckLine className="text-[#1a3884] dark:text-cyan-400" /> Liveness Verification
+                <RiUserSmileLine className="text-[#1a3884] dark:text-cyan-400" /> Face Registration
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-350 text-left self-start">
-                Look straight into the camera. The AI will calibrate and verify face tracking is stable.
+                Look straight into the camera. The AI will capture your face identity and verify you throughout the assessment.
               </p>
 
-              <div className="relative w-48 h-36 bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-[#1a3884]/30 shadow-lg">
-                <video ref={videoRef} width={320} height={240} className="w-full h-full object-cover scale-x-[-1]" muted playsInline />
+              {/* Video + Registration UI */}
+              <div className="relative w-56 h-42 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-[#1a3884]/30 shadow-lg">
+                <video
+                  ref={videoRef}
+                  width={640}
+                  height={480}
+                  className="w-full h-full object-cover scale-x-[-1]"
+                  muted
+                  playsInline
+                />
                 
-                {/* Bounding box or scanning overlay */}
-                <div className="absolute inset-0 border-2 border-dashed border-cyan-400/50 rounded-2xl animate-pulse" />
+                <canvas
+                  ref={canvasRef}
+                  className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1]"
+                />
                 
-                {isFaceChecking && (
-                  <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center">
-                    <span className="text-xs text-cyan-300 font-medium animate-pulse">Scanning for Face...</span>
+                {/* Scanning overlay */}
+                {registrationState === 'detecting' && (
+                  <div className="absolute inset-0 border-2 border-dashed border-cyan-400/50 rounded-2xl animate-pulse" />
+                )}
+
+                {/* Registration progress overlay */}
+                {registrationState === 'registering' && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center gap-2">
+                      <RiLoader4Line size={16} className="text-cyan-400 animate-spin" />
+                      <span className="text-xs text-white font-bold">
+                        Capturing {registrationProgress.current}/{registrationProgress.total}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Success overlay */}
+                {registrationState === 'registered' && (
+                  <div className="absolute inset-0 border-2 border-emerald-400 rounded-2xl">
+                    <div className="absolute bottom-0 inset-x-0 bg-emerald-500/90 backdrop-blur-sm py-1.5 flex items-center justify-center gap-1.5">
+                      <RiCheckLine size={14} className="text-white" />
+                      <span className="text-[10px] text-white font-bold uppercase tracking-wider">Registered</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Model loading overlay */}
+                {modelLoadState === 'loading' && (
+                  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center">
+                    <RiLoader4Line size={24} className="text-cyan-400 animate-spin mb-2" />
+                    <span className="text-xs text-cyan-300 font-bold">Loading AI Models</span>
+                    <div className="w-32 h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                      <motion.div
+                        className="h-full bg-cyan-400 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${modelLoadProgress}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-1">{modelLoadProgress}%</span>
                   </div>
                 )}
               </div>
 
-              {faceDetected ? (
-                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full flex items-center gap-1.5 mt-2 border border-emerald-100 dark:border-emerald-500/25">
-                  <RiCheckLine size={16} /> Face Calibration Successful
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2 mt-2 w-full">
-                  <div className="text-xs text-slate-500 dark:text-slate-400 animate-pulse text-center font-medium">
-                    {faceCheckError || 'Please center your face inside the camera area.'}
-                  </div>
-                  {showSkipOption && (
+              {/* Status Badge */}
+              <AnimatePresence mode="wait">
+                {registrationState === 'registered' ? (
+                  <motion.div
+                    key="registered"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full flex items-center gap-1.5 border border-emerald-100 dark:border-emerald-500/25">
+                      <RiCheckLine size={16} /> Face Registered Successfully
+                    </div>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                      Confidence: {(registrationConfidence * 100).toFixed(0)}% • {registrationProgress.current} frames captured
+                    </span>
+                  </motion.div>
+                ) : registrationState === 'error' ? (
+                  <motion.div
+                    key="error"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex flex-col items-center gap-2 w-full"
+                  >
+                    <div className="text-xs text-red-500 dark:text-red-400 font-medium text-center">
+                      {faceCheckError || 'Registration failed. Please try again.'}
+                    </div>
                     <button
-                      onClick={() => {
-                        setFaceDetected(true);
-                        setFaceCheckError(null);
-                        setIsFaceChecking(false);
-                        if (faceCheckIntervalRef.current) {
-                          clearInterval(faceCheckIntervalRef.current);
-                          faceCheckIntervalRef.current = null;
-                        }
-                      }}
-                      className="mt-1 px-4 py-1.5 border border-[#1a3884]/30 text-[#1a3884] hover:bg-[#1a3884]/5 dark:text-cyan-400 dark:border-cyan-400/30 dark:hover:bg-cyan-400/5 rounded-xl text-xs font-bold transition-all active:scale-95"
+                      onClick={retryRegistration}
+                      className="px-4 py-1.5 border border-[#1a3884]/30 text-[#1a3884] hover:bg-[#1a3884]/5 dark:text-cyan-400 dark:border-cyan-400/30 dark:hover:bg-cyan-400/5 rounded-xl text-xs font-bold transition-all active:scale-95"
                     >
-                      Bypass Face Check (Soft Setup)
+                      Retry Registration
                     </button>
-                  )}
-                </div>
-              )}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="scanning"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col items-center gap-1.5 w-full"
+                  >
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-center animate-pulse">
+                      {faceCheckError || getRegistrationStatusText()}
+                    </div>
+                    {registrationState === 'detecting' && faceStableCount > 0 && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-500 font-medium">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Face detected — hold still...
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
 
@@ -418,12 +649,12 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               disabled={
                 (step === 1 && cameraState !== 'allowed') ||
                 (step === 2 && !consentGranted) ||
-                (step === 3 && !faceDetected)
+                (step === 3 && registrationState !== 'registered')
               }
               className={`px-6 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
                 ((step === 1 && cameraState === 'allowed') ||
                  (step === 2 && consentGranted) ||
-                 (step === 3 && faceDetected))
+                 (step === 3 && registrationState === 'registered'))
                   ? 'bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'
                   : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent'
               }`}
