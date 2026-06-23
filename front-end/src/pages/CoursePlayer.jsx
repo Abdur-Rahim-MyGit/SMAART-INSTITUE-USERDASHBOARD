@@ -27,7 +27,8 @@ import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
 import { markCourseCompleted } from "@/utils/courseProgressStorage";
 import Confetti from 'react-confetti';
 import { HexBadgeSVG, resolveColors } from "@/components/badges/BadgeCard";
-import { compareCourseIds, resolveStaticCourseTitle } from "@/utils/courseUnlock";
+import { compareCourseIds, resolveStaticCourseTitle, canAccessCourse } from "@/utils/courseUnlock";
+import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
 
 const getCourseCategory = (courseId) => {
   const cid = String(courseId || '').toUpperCase();
@@ -124,6 +125,7 @@ const getStageAndTrackInfo = (courseId) => {
 const CoursePlayer = () => {
   const { courseId } = useParams();
   const { user: currentUser } = useUser();
+  const { userProgress, loading: globalProgressLoading } = useSmaartCourseProgress(currentUser?._id || currentUser?.id);
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
@@ -162,6 +164,17 @@ const CoursePlayer = () => {
   const [taskResultsByDay, setTaskResultsByDay] = useState({});
   const [dbCourse, setDbCourse] = useState(null);
   const staticCourse = getCourseById(courseId);
+
+  // Route progression/unlock gating check
+  useEffect(() => {
+    if (!loading && !globalProgressLoading && dbCourse && userProgress) {
+      const allowed = canAccessCourse(dbCourse.courseCode || courseId, userProgress, dbCourse);
+      if (!allowed) {
+        toast.error("This course is locked. Please complete the prerequisites first.");
+        navigate("/dashboard/courses");
+      }
+    }
+  }, [loading, globalProgressLoading, dbCourse, userProgress, courseId, navigate]);
 
   const { stageKey, stageNameKey, typeKey } = useMemo(() => {
     const courseCode = dbCourse?.courseCode || courseId || '';

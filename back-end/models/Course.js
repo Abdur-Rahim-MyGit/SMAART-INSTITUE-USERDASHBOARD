@@ -235,6 +235,10 @@ const courseSchema = new mongoose.Schema({
     sparse: true,
     index: true,
   },
+  unlockAfterCourseNumber: {
+    type: String,
+    trim: true,
+  },
   /** 8-step learning flow from admin course builder */
   learningFlow: {
     type: mongoose.Schema.Types.Mixed,
