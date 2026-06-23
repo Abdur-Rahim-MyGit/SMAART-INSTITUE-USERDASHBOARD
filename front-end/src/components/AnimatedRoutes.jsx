@@ -33,6 +33,7 @@ const VisionBoardView = lazy(() => import('@/features/visionBoard/pages/VisionBo
 const MindCareSessions = lazy(() => import('@/pages/MindCareSessions'));
 const GeneralDictionary = lazy(() => import('@/pages/GeneralDictionary'));
 const SMAArtToolkit = lazy(() => import('@/pages/SMAArtToolkit'));
+const CGPACalculator = lazy(() => import('@/pages/CGPACalculator'));
 const Community = lazy(() => import('@/pages/Community'));
 const StudentGroups = lazy(() => import('@/pages/StudentGroups'));
 const GroupChat = lazy(() => import('@/pages/GroupChat'));
@@ -157,6 +158,7 @@ const AnimatedRoutes = () => {
                         {/* Toolkit */}
                         <Route path="/smaart-toolkit" element={<SMAArtToolkit />} />
                         <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
+                        <Route path="/dashboard/cgpa-calculator" element={<CGPACalculator />} />
 
                         {/* Skills Vault */}
                         <Route path="/skills-vault" element={<SkillsVault />} />

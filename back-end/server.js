@@ -168,6 +168,7 @@ app.use('/api/notes', require('./routes/notes'));
 app.use('/api/todos', require('./routes/todos'));
 app.use('/api/placements', require('./routes/placements'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/cgpa', require('./routes/cgpaRoutes'));
 
 // Job Applications
 app.use('/api/job-applications', require('./routes/jobApplications'));

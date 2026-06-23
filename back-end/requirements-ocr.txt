@@ -1,0 +1,16 @@
+# PaddleOCR runtime for the backend /api/ocr/paddle endpoint.
+#
+# IMPORTANT:
+# PaddlePaddle currently has no Windows wheel for Python 3.14. If your pip path
+# shows pythoncore-3.14, install Python 3.12 and create a separate OCR venv:
+#
+#   py -3.12 -m venv .venv-ocr
+#   .\.venv-ocr\Scripts\python.exe -m pip install --upgrade pip
+#   .\.venv-ocr\Scripts\python.exe -m pip install -r requirements-ocr.txt
+#
+# Then point the backend to that interpreter:
+#
+#   set PADDLE_OCR_PYTHON=%CD%\.venv-ocr\Scripts\python.exe
+#
+paddlepaddle>=3.0.0,<4.0.0
+paddleocr>=3.0.0,<4.0.0
