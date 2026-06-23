@@ -176,7 +176,7 @@ export const useLearningPaths = (userId) => {
                     icon: getIconForCourse(course.category),
                     color: getColorForCourse(course.category),
                     enrollmentId: enrollment._id,
-                    navigateTo: `/dashboard/courses/${course._id}/player`
+                    navigateTo: `/dashboard/courses/${course.courseCode || course.courseNumber || course._id}/player`
                   };
                 } catch (err) {
                   console.error('Error fetching course details:', err);
@@ -242,7 +242,7 @@ export const useLearningPaths = (userId) => {
                   progress: e.progress || 0,
                   status: e.status,
                   stages,
-                  navigateTo: `/dashboard/courses/${course._id}/player`
+                  navigateTo: `/dashboard/courses/${course.courseCode || course.courseNumber || course._id}/player`
                 };
               })
               .filter(Boolean)
@@ -296,7 +296,7 @@ export const useLearningPaths = (userId) => {
               title: dbMatch?.title || nextStatic.title,
               subtitle: dbMatch?.description || nextStatic.subtitle,
               progress: 0,
-              navigateTo: dbMatch ? `/dashboard/courses/${dbMatch._id}/player` : '/dashboard/courses',
+              navigateTo: dbMatch ? `/dashboard/courses/${dbMatch.courseCode || dbMatch.courseNumber || dbMatch._id}/player` : '/dashboard/courses',
             });
           } catch {
             setNextCourse({

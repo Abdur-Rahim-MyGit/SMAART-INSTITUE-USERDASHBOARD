@@ -19,6 +19,8 @@ import FiveModuleRoadmap from "@/components/FiveModuleRoadmap";
 import ModernVideoPlayer from "@/components/ModernVideoPlayer";
 import LearningFlowPlayer from "@/components/LearningFlowPlayer";
 import { LEARNING_FLOW_DATA } from "@/data/learningFlowData";
+import { canAccessCourse } from "@/utils/courseUnlock";
+import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -95,6 +97,7 @@ const IntroScreen = ({ lines, onFinish }) => {
 const ModuleViewPage = () => {
   const playerRef = useRef(null);
   const { user: currentUser, loading: userLoading } = useUser();
+  const { userProgress, loading: progressLoading } = useSmaartCourseProgress(currentUser?._id || currentUser?.id);
   const { courseId, moduleId, dayId } = useParams();
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState(moduleId ? parseInt(moduleId) : null);
@@ -294,6 +297,17 @@ const ModuleViewPage = () => {
 
     fetchData();
   }, [courseId, currentUser]);
+
+  // Course unlock gating guard
+  useEffect(() => {
+    if (!loading && !progressLoading && courseData && userProgress) {
+      const allowed = canAccessCourse(courseData.courseCode || courseId, userProgress, courseData);
+      if (!allowed) {
+        toast.error("This course is locked. Please complete the prerequisites first.");
+        navigate("/dashboard/courses");
+      }
+    }
+  }, [loading, progressLoading, courseData, userProgress, courseId, navigate]);
 
   // --- ROUTE GUARD EFFECT ---
   // Strictly enforce sequential progression on mount and URL changes

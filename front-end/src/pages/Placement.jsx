@@ -70,7 +70,6 @@ const formatStatus = (value) => {
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-<<<<<<< HEAD
 const getStatusTextColor = (status) => {
   const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
   switch (norm) {
@@ -91,7 +90,7 @@ const getStatusTextColor = (status) => {
     default:
       return "text-slate-600 dark:text-slate-400";
   }
-=======
+}
 /**
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.
@@ -112,7 +111,6 @@ const getPostedAgo = (createdAt) => {
   const months = Math.floor(days / 30);
   if (months === 1) return "Posted 1 month ago";
   return `Posted ${months} months ago`;
->>>>>>> 381ae7d92a2b132e29c67479eaa6f2eb15c1e401
 };
 
 const Placement = () => {
@@ -318,60 +316,60 @@ const Placement = () => {
           </div>
         </motion.div>
 
-  {/* Tabs: Jobs | Job Status */}
-  <div className="mt-4 flex items-center gap-3">
-    <button
-      onClick={() => setActiveTab('jobs')}
-      className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'jobs' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
-    >
-      Jobs
-    </button>
-    <button
-      onClick={() => setActiveTab('status')}
-      className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'status' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
-    >
-      Job Status
-    </button>
-  </div>
+        {/* Tabs: Jobs | Job Status */}
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            onClick={() => setActiveTab('jobs')}
+            className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'jobs' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
+          >
+            Jobs
+          </button>
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'status' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
+          >
+            Job Status
+          </button>
+        </div>
 
-  {activeTab === 'jobs' && (
-    <div className="mb-5 mt-3 flex items-center justify-between gap-3">
-      {/* Left: search box */}
-      <div className="relative flex-1 mr-4">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Search roles, companies, skills"
-          className="h-10 w-full rounded-xl border border-[#d8e6f7] bg-white pl-9 pr-3 text-sm font-medium text-black outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-white dark:text-black"
-        />
-      </div>
+        {activeTab === 'jobs' && (
+          <div className="mb-5 mt-3 flex items-center justify-between gap-3">
+            {/* Left: search box */}
+            <div className="relative flex-1 mr-4">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search roles, companies, skills"
+                className="h-10 w-full rounded-xl border border-[#d8e6f7] bg-white pl-9 pr-3 text-sm font-medium text-black outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-white dark:text-black"
+              />
+            </div>
 
-      {/* Right: filters dropdowns */}
-      <div className="flex items-center gap-3">
-        <select
-          value={sourceFilter}
-          onChange={(e) => setSourceFilter(e.target.value)}
-          className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
-        >
-          <option value="all">All jobs ({jobs.length})</option>
-          <option value="smaartjobpostings">SMAART ({sourceCounts.smaartjobpostings || 0})</option>
-          <option value="jobpostings">College ({sourceCounts.jobpostings || 0})</option>
-        </select>
+            {/* Right: filters dropdowns */}
+            <div className="flex items-center gap-3">
+              <select
+                value={sourceFilter}
+                onChange={(e) => setSourceFilter(e.target.value)}
+                className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+              >
+                <option value="all">All jobs ({jobs.length})</option>
+                <option value="smaartjobpostings">SMAART ({sourceCounts.smaartjobpostings || 0})</option>
+                <option value="jobpostings">College ({sourceCounts.jobpostings || 0})</option>
+              </select>
 
-        <select
-          value={jobType}
-          onChange={(e) => setJobType(e.target.value)}
-          className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
-        >
-          <option value="all">All types</option>
-          <option value="full-time">Full-Time</option>
-          <option value="part-time">Part-Time</option>
-          <option value="internship">Internship</option>
-        </select>
-      </div>
-    </div>
-  )}
+              <select
+                value={jobType}
+                onChange={(e) => setJobType(e.target.value)}
+                className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+              >
+                <option value="all">All types</option>
+                <option value="full-time">Full-Time</option>
+                <option value="part-time">Part-Time</option>
+                <option value="internship">Internship</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'jobs' && (
           <>
