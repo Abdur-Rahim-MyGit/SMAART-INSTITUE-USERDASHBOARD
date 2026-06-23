@@ -11,6 +11,7 @@ import {
   IconTool as Wrench,
   IconChevronDown as ChevronDown,
   IconChevronUp as ChevronUp,
+  IconCalculator as Calculator,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -83,6 +84,19 @@ const toolkitSections = [
     cta: "Open My Notes",
     meta: "Cloud Sync + Editor",
     detail: "Rich text notes with tagging, categorization, and full-text search — always in sync across devices.",
+  },
+  {
+    id: 10,
+    title: "CGPA Calculator",
+    description:
+      "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results.",
+    icon: Calculator,
+    path: "/dashboard/cgpa-calculator",
+    badge: "Academic",
+    badgeColor: "#1a3884",
+    cta: "Open Calculator",
+    meta: "Smart Paste + 3 Methods",
+    detail: "Instantly compare multiple grading standards without manual math.",
   },
   // {
   //   id: 9,

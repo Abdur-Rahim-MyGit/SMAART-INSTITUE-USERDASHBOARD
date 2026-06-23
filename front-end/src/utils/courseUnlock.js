@@ -79,6 +79,16 @@ const strictCourseUnlockedInStage = (courseId, stage, userProgress) => {
   if (!strictStageUnlocked(stage, userProgress)) return false;
 
   const courseIndex = stage.courses.findIndex((c) => compareCourseIds(c.id, courseId));
+  if (courseIndex < 0) return false;
+  const course = stage.courses[courseIndex];
+
+  if (course && course.unlockAfterCourseNumber) {
+    const completed = userProgress?.completedCourses || [];
+    if (!completed.some(comp => compareCourseIds(comp, course.unlockAfterCourseNumber))) {
+      return false;
+    }
+  }
+
   if (courseIndex <= 0) return true;
 
   const previousCourse = stage.courses[courseIndex - 1];
@@ -90,6 +100,16 @@ const strictCourseUnlockedInTrack = (courseId, track, userProgress) => {
   if (!strictTrackUnlocked(track, userProgress)) return false;
 
   const courseIndex = track.courses.findIndex((c) => compareCourseIds(c.id, courseId));
+  if (courseIndex < 0) return false;
+  const course = track.courses[courseIndex];
+
+  if (course && course.unlockAfterCourseNumber) {
+    const completed = userProgress?.completedCourses || [];
+    if (!completed.some(comp => compareCourseIds(comp, course.unlockAfterCourseNumber))) {
+      return false;
+    }
+  }
+
   if (courseIndex <= 0) return true;
 
   const previousCourse = track.courses[courseIndex - 1];
@@ -103,15 +123,25 @@ export const isStageUnlocked = (stage, userProgress) =>
 export const isTrackUnlocked = (track, userProgress) =>
   ENFORCE_PROGRESSION_GATES ? strictTrackUnlocked(track, userProgress) : true;
 
-export const isCourseUnlockedInStage = (courseId, stage, userProgress) =>
-  ENFORCE_PROGRESSION_GATES
-    ? strictCourseUnlockedInStage(courseId, stage, userProgress)
-    : true;
+export const isCourseUnlockedInStage = (courseId, stage, userProgress) => {
+  if (!ENFORCE_PROGRESSION_GATES) return true;
+  if (stage && typeof stage.id === 'string') {
+    return strictCourseUnlockedInTrack(courseId, stage, userProgress);
+  }
+  return strictCourseUnlockedInStage(courseId, stage, userProgress);
+};
 
 /** Whether the learner may open this course (e.g. resume banner). */
-export const canAccessCourse = (courseId, userProgress) => {
+export const canAccessCourse = (courseId, userProgress, dbCourse = null) => {
   if (!courseId) return false;
   if (!ENFORCE_PROGRESSION_GATES) return true;
+
+  if (dbCourse && dbCourse.unlockAfterCourseNumber) {
+    const completed = userProgress?.completedCourses || [];
+    if (!completed.some(comp => compareCourseIds(comp, dbCourse.unlockAfterCourseNumber))) {
+      return false;
+    }
+  }
 
   // Stage 1 courses can be accessed without passing T1 baseline
   const isStage1Course = STAGES.find(s => s.id === 1)?.courses.some((c) => compareCourseIds(c.id, courseId));
@@ -119,13 +149,21 @@ export const canAccessCourse = (courseId, userProgress) => {
 
   for (const stage of STAGES) {
     if (stage.courses.some((c) => compareCourseIds(c.id, courseId))) {
-      return strictCourseUnlockedInStage(courseId, stage, userProgress);
+      const stageCourses = stage.courses.map(c => 
+        compareCourseIds(c.id, courseId) && dbCourse ? { ...c, ...dbCourse } : c
+      );
+      const stageWithDb = { ...stage, courses: stageCourses };
+      return strictCourseUnlockedInStage(courseId, stageWithDb, userProgress);
     }
   }
 
   for (const track of TRACKS) {
     if (track.courses.some((c) => compareCourseIds(c.id, courseId))) {
-      return strictCourseUnlockedInTrack(courseId, track, userProgress);
+      const trackCourses = track.courses.map(c => 
+        compareCourseIds(c.id, courseId) && dbCourse ? { ...c, ...dbCourse } : c
+      );
+      const trackWithDb = { ...track, courses: trackCourses };
+      return strictCourseUnlockedInTrack(courseId, trackWithDb, userProgress);
     }
   }
 

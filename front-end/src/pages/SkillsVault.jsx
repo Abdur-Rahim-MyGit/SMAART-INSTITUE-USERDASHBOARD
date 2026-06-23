@@ -199,7 +199,7 @@ const SkillsVault = () => {
     const uniqueFlashcardCategories = ['all', ...new Set(allFlashcards.map(c => c.category || 'Course Concept'))];
     const flashcardFilterOptions = uniqueFlashcardCategories.map(cat => ({
         id: cat,
-        label: cat === 'all' ? 'All Categories' : cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+        label: cat === 'all' ? t("skills_vault.flashcards.all_categories", "All Categories") : cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
     }));
 
     const filteredFlashcards = allFlashcards.filter(card => {
@@ -241,10 +241,24 @@ const SkillsVault = () => {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                Skills <span className="text-[#1a3884] dark:text-blue-300">Vault</span>
+                              {(() => {
+                                const title = t("skills_vault.hero_title", "Skills Vault");
+                                const lastSpaceIndex = title.lastIndexOf(" ");
+                                if (lastSpaceIndex !== -1) {
+                                  return (
+                                    <>
+                                      {title.substring(0, lastSpaceIndex)}{" "}
+                                      <span className="text-[#1a3884] dark:text-blue-300">
+                                        {title.substring(lastSpaceIndex + 1)}
+                                      </span>
+                                    </>
+                                  );
+                                }
+                                return title;
+                              })()}
                             </h1>
                             <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                                Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.
+                                {t("skills_vault.hero_subtitle", "Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.")}
                             </p>
                         </div>
 
@@ -257,7 +271,7 @@ const SkillsVault = () => {
                                 </div>
                                 <div className="flex flex-col justify-center">
                                     <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{certificateTypes.length}</p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">Certificates</p>
+                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.certificates", "Certificates")}</p>
                                 </div>
                             </div>
                             {/* Badges Stat */}
@@ -269,7 +283,7 @@ const SkillsVault = () => {
                                     <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">
                                         {earnedBadgesCount > 0 ? earnedBadgesCount : badges.length}
                                     </p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">Badges Earned</p>
+                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.badges", "Badges Earned")}</p>
                                 </div>
                             </div>
                         </div>
@@ -312,18 +326,18 @@ const SkillsVault = () => {
                             <div className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
                                 <div className="mb-6">
                                     <h3 className="text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                        What&apos;s in your Skills Vault?
+                                        {t("skills_vault.overview.title", "What's in your Skills Vault?")}
                                     </h3>
                                     <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                                        Your centralized hub that securely stores and showcases all your professional achievements.
+                                        {t("skills_vault.overview.subtitle", "Your centralized hub that securely stores and showcases all your professional achievements.")}
                                     </p>
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     {[
-                                        { key: "certificates", icon: Award, title: "Certificates", desc: "Verified credentials issued upon completing programme milestones." },
-                                        { key: "badges", icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities and engagement." },
-                                        { key: "courses", icon: BookOpen, title: "Course Overview", desc: "A dashboard view of your enrolled courses and overall progress." },
-                                        { key: "flashcards", icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for quotients and essential terminology." },
+                                        { key: "certificates", icon: Award, title: t("skills_vault.overview.items.certificates.title", "Certificates"), desc: t("skills_vault.overview.items.certificates.desc", "Verified credentials issued upon completing programme milestones.") },
+                                        { key: "badges", icon: Trophy, title: t("skills_vault.overview.items.badges.title", "Badges & Achievements"), desc: t("skills_vault.overview.items.badges.desc", "Micro-credentials earned through course activities and engagement.") },
+                                        { key: "courses", icon: BookOpen, title: t("skills_vault.overview.items.courses.title", "Course Overview"), desc: t("skills_vault.overview.items.courses.desc", "A dashboard view of your enrolled courses and overall progress.") },
+                                        { key: "flashcards", icon: Zap, title: t("skills_vault.overview.items.flashcards.title", "Flashcards & Key Terms"), desc: t("skills_vault.overview.items.flashcards.desc", "Quick-reference cards for quotients and essential terminology.") },
                                     ].map((item, i) => (
                                         <div key={i} className="flex gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-colors hover:border-[#1a3884]/30 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50">
                                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
@@ -348,18 +362,18 @@ const SkillsVault = () => {
                                             <div className="flex items-center gap-2">
                                                 <Award className="h-5 w-5 text-[#eab308]" />
                                                 <h3 className="text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                                    Professional Credentials
+                                                    {t("skills_vault.certificates.title", "Professional Credentials")}
                                                 </h3>
                                             </div>
                                             <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                                                Your verified SMAART Institute certifications
+                                                {t("skills_vault.certificates.desc", "Your verified SMAART Institute certifications")}
                                             </p>
                                         </div>
                                         <button
                                             onClick={() => navigate("/dashboard/certificate")}
                                             className="flex items-center justify-center gap-1.5 rounded-xl bg-[#1a3884] px-5 py-2.5 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
                                         >
-                                            <Download className="h-4 w-4" /> Download Certificates
+                                            <Download className="h-4 w-4" /> {t("skills_vault.certificates.download_centre", "Download Certificates")}
                                         </button>
                                     </div>
 
@@ -399,11 +413,11 @@ const SkillsVault = () => {
                                         <div className="flex items-center gap-2">
                                             <Shield className="h-4 w-4 text-emerald-500" />
                                             <h3 className="text-[15px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                                Credential Verification
+                                                {t("skills_vault.certificates.verification_title", "Credential Verification")}
                                             </h3>
                                         </div>
                                         <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-                                            Verify any SMAART certificate using its unique ID or QR code.
+                                            {t("skills_vault.certificates.verification_desc", "Verify any SMAART certificate using its unique ID or QR code.")}
                                         </p>
                                     </div>
                                     <div className="p-3">
@@ -428,7 +442,7 @@ const SkillsVault = () => {
                                 <div className="flex items-center justify-between flex-wrap gap-4 px-1">
                                     <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
                                         <h3 className="text-[13.5px] font-extrabold uppercase tracking-wider text-[#002147] dark:text-white">
-                                            Key Flashcards
+                                            {t("skills_vault.flashcards.title", "Key Flashcards")}
                                         </h3>
                                     </div>
                                     <div className="flex w-full items-center gap-3 sm:w-auto">
@@ -459,7 +473,7 @@ const SkillsVault = () => {
                                     <div className="text-center py-12 bg-white dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-white/5">
                                         <Zap className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
                                         <h3 className="text-[14px] font-semibold text-slate-500 dark:text-slate-400 mb-2">
-                                            No flashcards found for this category.
+                                            {t("skills_vault.flashcards.no_cards_found", "No flashcards found for this category.")}
                                         </h3>
                                     </div>
                                 )}
@@ -475,6 +489,7 @@ const SkillsVault = () => {
 
 /* ── Flashcard Card Component ── */
 const FlashcardItem = ({ card, index }) => {
+    const { t } = useTranslation();
     const [flipped, setFlipped] = useState(false);
 
     return (
@@ -507,7 +522,7 @@ const FlashcardItem = ({ card, index }) => {
                         </h4>
                     </div>
                     <div className="flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-400">
-                        <Zap className="h-3 w-3" /> Tap to reveal
+                        <Zap className="h-3 w-3" /> {t("skills_vault.flashcards.tap_reveal", "Tap to reveal")}
                     </div>
                 </motion.div>
 
@@ -521,7 +536,7 @@ const FlashcardItem = ({ card, index }) => {
                         {card.definition}
                     </p>
                     <div className="mt-4 border-t border-white/10 pt-3 text-center text-[9px] font-bold uppercase tracking-wider text-blue-300/50">
-                        Flip Back
+                        {t("skills_vault.flashcards.flip_back", "Flip Back")}
                     </div>
                 </motion.div>
             </div>

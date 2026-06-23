@@ -14,6 +14,22 @@ front-end/.env
 node_modules/
 package-lock.json
 
+# Python OCR runtime / PaddleOCR model cache
+.venv-ocr/
+.venv/
+venv/
+back-end/.venv-ocr/
+back-end/.venv/
+back-end/venv/
+back-end/.paddlex-cache/
+__pycache__/
+back-end/__pycache__/
+back-end/services/__pycache__/
+.paddleocr/
+paddleocr/
+PaddleOCR/
+*.pyc
+
 # Build outputs
 dist/
 build/

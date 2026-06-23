@@ -100,7 +100,7 @@ export default defineConfig(({ mode }) => ({
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024
       },
       devOptions: {
-        enabled: true
+        enabled: false
       }
     }),
   ].filter(Boolean),
@@ -111,5 +111,8 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  optimizeDeps: {
+    include: ["@vladmandic/face-api"],
   },
 }));

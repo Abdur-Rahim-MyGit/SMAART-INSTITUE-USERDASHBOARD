@@ -15,12 +15,130 @@ router.use(protect);
 
 const axios = require('axios');
 const FormData = require('form-data');
+const { execFile } = require('child_process');
+const fs = require('fs/promises');
+const fsSync = require('fs');
+const os = require('os');
+const path = require('path');
 
 // OCR.space API configuration
 // SECURITY: no hardcoded fallback key — the previous literal was committed to
 // source and must be rotated. Read strictly from the environment.
 const OCR_API_KEY = process.env.OCR_SPACE_API_KEY;
 const OCR_API_URL = 'https://api.ocr.space/parse/image';
+const PADDLE_OCR_SCRIPT = path.join(__dirname, '..', 'services', 'paddleOcr.py');
+const resolvePaddlePython = () => {
+  const localVenvPython = path.join(__dirname, '..', '.venv-ocr', 'Scripts', 'python.exe');
+  if (process.env.PADDLE_OCR_PYTHON) return process.env.PADDLE_OCR_PYTHON;
+  if (fsSync.existsSync(localVenvPython)) return localVenvPython;
+  return process.env.PYTHON || 'python';
+};
+
+const stripDataUriPrefix = (imageData) => imageData.replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, '');
+
+const runPaddleOcr = (imagePath) => new Promise((resolve, reject) => {
+  const startedAt = Date.now();
+  const pythonPath = resolvePaddlePython();
+  console.log(`[PaddleOCR] Starting with Python: ${pythonPath}`);
+
+  execFile(
+    pythonPath,
+    [PADDLE_OCR_SCRIPT, imagePath],
+    {
+      timeout: 180000,
+      maxBuffer: 20 * 1024 * 1024,
+      windowsHide: true,
+    },
+    (error, stdout, stderr) => {
+      const durationMs = Date.now() - startedAt;
+      console.log(`[PaddleOCR] Finished in ${durationMs}ms`);
+
+      if (error?.killed || error?.signal === 'SIGTERM') {
+        const wrappedError = new Error('PaddleOCR timed out before finishing. Try a smaller/clearer screenshot or wait for model warm-up.');
+        wrappedError.statusCode = 504;
+        wrappedError.details = stderr ? { stderr: stderr.slice(-4000) } : undefined;
+        reject(wrappedError);
+        return;
+      }
+
+      let payload = null;
+      try {
+        payload = JSON.parse(stdout);
+      } catch (parseError) {
+        const wrappedError = new Error(stderr || stdout || parseError.message);
+        wrappedError.statusCode = error ? 503 : 500;
+        reject(wrappedError);
+        return;
+      }
+
+      if (error || !payload.success) {
+        const wrappedError = new Error(payload.error || stderr || error?.message || 'PaddleOCR failed');
+        wrappedError.statusCode = payload.errorCode === 'PADDLEOCR_NOT_INSTALLED' ? 503 : 500;
+        wrappedError.details = payload;
+        reject(wrappedError);
+        return;
+      }
+
+      resolve(payload);
+    }
+  );
+});
+
+/**
+ * POST /api/ocr/paddle
+ * Extract text and word boxes from an image using local PaddleOCR.
+ */
+router.post('/paddle', async (req, res) => {
+  let tempDir = null;
+
+  try {
+    const { imageData } = req.body;
+
+    if (!imageData || typeof imageData !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing imageData in request body',
+      });
+    }
+
+    const cleanBase64 = stripDataUriPrefix(imageData);
+    const imageBuffer = Buffer.from(cleanBase64, 'base64');
+
+    if (!imageBuffer.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid imageData',
+      });
+    }
+
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'smaart-paddle-'));
+    const imagePath = path.join(tempDir, 'result-image.png');
+    await fs.writeFile(imagePath, imageBuffer);
+
+    const result = await runPaddleOcr(imagePath);
+
+    return res.json({
+      success: true,
+      provider: 'paddleocr',
+      text: result.text || '',
+      words: result.words || [],
+      confidence: result.confidence || 0,
+      rawLineCount: result.rawLineCount || 0,
+    });
+  } catch (error) {
+    console.error('[PaddleOCR Route] Error:', error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      provider: 'paddleocr',
+      error: error.message || 'Failed to extract text with PaddleOCR',
+      details: error.details,
+    });
+  } finally {
+    if (tempDir) {
+      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    }
+  }
+});
 
 /**
  * POST /api/ocr/extract

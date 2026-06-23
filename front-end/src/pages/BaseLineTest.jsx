@@ -181,6 +181,7 @@ const BaseLineTest = () => {
   // Attempt tracking for retry system (T2-T4+)
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
+  const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -702,11 +703,14 @@ const BaseLineTest = () => {
     requestFullscreen,
     showAttentionCheck,
     passAttentionCheck,
-    failAttentionCheck
+    failAttentionCheck,
+    verificationStatus,
+    similarityScore
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
+    registeredFaceDescriptor,
     onLockout: useCallback(async () => {
       await submit({ reason: "violation", redirectAfterSubmit: true, forceTimeoutCompletion: true });
     }, [submit])
@@ -834,7 +838,10 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={() => setSetupCompleted(true)}
+          onComplete={({ faceDescriptor }) => {
+            setRegisteredFaceDescriptor(faceDescriptor);
+            setSetupCompleted(true);
+          }}
           assessmentTitle={translatedTitle}
         />
       )}
@@ -1407,6 +1414,8 @@ const BaseLineTest = () => {
           isFullScreen={isFullScreen}
           fullscreenCountdown={fullscreenCountdown}
           onRequestFullscreen={requestFullscreen}
+          verificationStatus={verificationStatus}
+          similarityScore={similarityScore}
         />
       )}
 
