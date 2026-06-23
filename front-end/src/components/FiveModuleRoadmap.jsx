@@ -6,6 +6,14 @@ import FloatingNotes from "@/components/FloatingNotes";
 import blueLogo from "@/assets/blue.png";
 import { Link } from "react-router-dom";
 
+// Get current user ID from sessionStorage for user-scoped localStorage keys
+const getUserId = () => {
+  try {
+    const u = JSON.parse(sessionStorage.getItem('user') || 'null');
+    return u?._id || u?.id || 'anon';
+  } catch { return 'anon'; }
+};
+
 const StarIcon = ({ color }) => (
   <svg 
     viewBox="0 0 24 24" 
@@ -39,7 +47,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
 
   const [localProgress, setLocalProgress] = useState(() => {
     try {
-      const saved = localStorage.getItem('smaart_demo_progress');
+      const saved = localStorage.getItem(`${getUserId()}_smaart_demo_progress`);
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -61,7 +69,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
   const actualActiveLevel = displayModules.find(m => m.progress < 100)?.level || 10;
   
   const [visualActiveLevel, setVisualActiveLevel] = useState(() => {
-    const lastActive = parseInt(localStorage.getItem('smaart_last_active') || '1', 10);
+    const lastActive = parseInt(localStorage.getItem(`${getUserId()}_smaart_last_active`) || '1', 10);
     return Math.min(lastActive, actualActiveLevel); // Start from what they saw last
   });
 
@@ -89,7 +97,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       // 3. Trigger the unlock sequence state exactly when the camera arrives
       const unlockTimer = setTimeout(() => {
         setVisualActiveLevel(actualActiveLevel);
-        localStorage.setItem('smaart_last_active', actualActiveLevel.toString());
+        localStorage.setItem(`${getUserId()}_smaart_last_active`, actualActiveLevel.toString());
       }, 1600);
 
       return () => { clearTimeout(scrollTimer); clearTimeout(unlockTimer); };
@@ -97,14 +105,14 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       // Normal map load, just center on current
       ele.scrollLeft = Math.max(0, (250 + (actualActiveLevel - 1) * 350) - (window.innerWidth / 2));
       setVisualActiveLevel(actualActiveLevel);
-      localStorage.setItem('smaart_last_active', actualActiveLevel.toString());
+      localStorage.setItem(`${getUserId()}_smaart_last_active`, actualActiveLevel.toString());
     }
   }, [actualActiveLevel, visualActiveLevel]);
 
   const handleModuleClick = (module) => {
     const newProgress = { ...localProgress, [module.level]: 100 };
     setLocalProgress(newProgress);
-    localStorage.setItem('smaart_demo_progress', JSON.stringify(newProgress));
+    localStorage.setItem(`${getUserId()}_smaart_demo_progress`, JSON.stringify(newProgress));
     
     if (onModuleSelect) {
       onModuleSelect(module);

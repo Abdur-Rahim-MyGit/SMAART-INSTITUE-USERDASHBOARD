@@ -380,6 +380,7 @@ const Placement = () => {
                   const rawStatus = (job.displayStatus || job.status || "").toString().toLowerCase();
                   const isClosed = rawStatus.includes("closed");
                   const applyLabel = isClosed ? "Closed" : "View";
+                  const postedLabel = getPostedAgo(job.displayCreatedAt || job.createdAt);
 
                   return (
                     <motion.article
@@ -429,11 +430,11 @@ const Placement = () => {
                           <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                           <span className="truncate">{job.displayLocation || 'Remote'}</span>
                         </div>
-                        {getPostedAgo(job.displayCreatedAt || job.createdAt) && (
+                        {postedLabel && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 shrink-0 text-slate-400" />
                             <span className="text-slate-400 text-xs font-semibold">
-                              {getPostedAgo(job.displayCreatedAt || job.createdAt)}
+                              {postedLabel}
                             </span>
                           </div>
                         )}

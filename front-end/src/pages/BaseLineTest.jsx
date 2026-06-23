@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
 import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
+import { STAGE_COURSE_MAP } from "@/config/courseConfig";
 import useProctoringEngine from "@/hooks/useProctoringEngine";
 import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
 import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
@@ -1312,8 +1313,7 @@ const BaseLineTest = () => {
                   <button
                     onClick={() => {
                       if (stageKey === 'T1') navigate("/dashboard/courses");
-                      else if (stageKey === 'T2') navigate("/dashboard/courses/S11/player");
-                      else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player");
+                      else if (STAGE_COURSE_MAP[stageKey]) navigate(`/dashboard/courses/${STAGE_COURSE_MAP[stageKey]}/player`);
                       else navigate("/dashboard/skills-passport");
                     }}
                     className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"

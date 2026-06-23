@@ -12,6 +12,12 @@ import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 const UserContext = createContext(null);
 
 const clearCareerAgentStorage = () => {
+  let userId = 'anon';
+  try {
+    const u = JSON.parse(sessionStorage.getItem('user') || 'null');
+    if (u) userId = u._id || u.id || 'anon';
+  } catch {}
+
   const explicitKeys = [
     'smaart_student_name',
     'smaart_student_email',
@@ -34,13 +40,26 @@ const clearCareerAgentStorage = () => {
     'smaart_demo_progress',
     'smaart_capacity_dev_unlocked'
   ];
-  explicitKeys.forEach((key) => localStorage.removeItem(key));
+
+  explicitKeys.forEach((key) => {
+    localStorage.removeItem(key);
+    if (userId !== 'anon') {
+      localStorage.removeItem(`${userId}_${key}`);
+    }
+    // Also scan all keys to be absolutely thorough
+    Object.keys(localStorage).forEach((k) => {
+      if (k.endsWith(`_${key}`)) {
+        localStorage.removeItem(k);
+      }
+    });
+  });
 
   // Dynamically clear specific prefixes to prevent cross-user data bleed
   Object.keys(localStorage).forEach(key => {
     if (key.startsWith('course-notes-') || 
         key.startsWith('passport_demo_') || 
-        key.startsWith('note_color_')) {
+        key.startsWith('note_color_') ||
+        key.endsWith('_communityLastSeenCount')) {
       localStorage.removeItem(key);
     }
   });
@@ -55,7 +74,7 @@ export const UserProvider = ({ children }) => {
 
     const token = sessionStorage.getItem('token');
     if (!token) {
-      console.log('[UserContext] No token found, skipping background fetch');
+      if (import.meta.env.DEV) console.log('[UserContext] No token found, skipping background fetch');
       return;
     }
 
@@ -90,10 +109,10 @@ export const UserProvider = ({ children }) => {
           return updated;
         });
       } else {
-        console.log('[UserContext] Background fetch failed, using cached data');
+        if (import.meta.env.DEV) console.log('[UserContext] Background fetch failed, using cached data');
       }
     } catch (error) {
-      console.error("Error fetching user details:", error);
+      if (import.meta.env.DEV) console.error("Error fetching user details:", error);
     }
   }, []);
 
@@ -125,7 +144,7 @@ export const UserProvider = ({ children }) => {
     // Multi-tab sync listener via localStorage
     const handleStorageChange = (e) => {
       if (e.key === "logout-event") {
-        console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
+        if (import.meta.env.DEV) console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
 
         // Clear storages safely
         sessionStorage.clear();
@@ -153,7 +172,7 @@ export const UserProvider = ({ children }) => {
   }, [user?.email, fetchUserDetails]);
 
   const login = useCallback((userData, token) => {
-    console.log('[UserContext] Login function called with user:', userData?.email);
+    if (import.meta.env.DEV) console.log('[UserContext] Login function called with user:', userData?.email);
     if (token) sessionStorage.setItem("token", token);
     clearCareerAgentStorage();
     if (userData) {
