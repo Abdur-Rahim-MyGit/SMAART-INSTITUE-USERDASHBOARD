@@ -1039,6 +1039,7 @@ const BaseLineTest = () => {
 
 
               {/* DEV: Auto Answer */}
+              {import.meta.env.DEV && (
               <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
@@ -1077,6 +1078,7 @@ const BaseLineTest = () => {
                   {t("baseline_test.fail_dev", "⚡ Fail (Dev)")}
                 </button>
               </div>
+              )}
             </div>
           </motion.div>
         ) : (
