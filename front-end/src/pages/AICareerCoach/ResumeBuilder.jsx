@@ -1605,20 +1605,35 @@ const ResumeBuilder = () => {
         const radius = (size - strokeWidth) / 2;
         const circumference = radius * 2 * Math.PI;
         const offset = circumference - (score / 100) * circumference;
-        
+
         let colorClass = "text-emerald-500";
-        let glowClass = "drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]";
+        let glowColor = "rgba(16,185,129,0.45)";
+        let glowColorStrong = "rgba(16,185,129,0.8)";
         if (score < 50) {
             colorClass = "text-rose-500";
-            glowClass = "drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]";
+            glowColor = "rgba(244,63,94,0.45)";
+            glowColorStrong = "rgba(244,63,94,0.8)";
         } else if (score < 80) {
             colorClass = "text-amber-500";
-            glowClass = "drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]";
+            glowColor = "rgba(245,158,11,0.45)";
+            glowColorStrong = "rgba(245,158,11,0.8)";
         }
 
         const count = useMotionValue(0);
         const rounded = useTransform(count, Math.round);
         const [displayScore, setDisplayScore] = useState(0);
+        const [prevScore, setPrevScore] = useState(score);
+        const [flashing, setFlashing] = useState(false);
+
+        useEffect(() => {
+            // Trigger gold flash when score increases
+            if (score > prevScore && prevScore !== 0) {
+                setFlashing(true);
+                const t = setTimeout(() => setFlashing(false), 800);
+                return () => clearTimeout(t);
+            }
+            setPrevScore(score);
+        }, [score]);
 
         useEffect(() => {
             const controls = animate(count, score, {
@@ -1634,41 +1649,54 @@ const ResumeBuilder = () => {
         }, [rounded]);
 
         return (
-            <motion.div 
-                className="relative flex items-center justify-center group" 
+            <div
+                className="relative flex items-center justify-center"
                 style={{ width: size, height: size }}
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-                <div className={`absolute inset-0 rounded-full ${glowClass} opacity-50 group-hover:opacity-100 animate-pulse transition-opacity duration-500`} />
+                {/* Always-visible outer glow — flashes gold on score increase */}
+                <motion.div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    animate={{
+                        boxShadow: flashing
+                            ? `0 0 ${size * 0.3}px ${size * 0.12}px rgba(251,191,36,0.9), 0 0 ${size * 0.12}px ${size * 0.05}px rgba(251,191,36,0.6)`
+                            : `0 0 ${size * 0.18}px ${size * 0.06}px ${glowColor}`,
+                    }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                />
+
+                {/* SVG Ring */}
                 <motion.svg className="transform -rotate-90 w-full h-full relative z-10">
-                    {/* Background circle */}
-                    <circle 
-                        cx={size / 2} cy={size / 2} r={radius} 
-                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
-                        className="text-slate-100 dark:text-slate-800" 
+                    {/* Background track */}
+                    <circle
+                        cx={size / 2} cy={size / 2} r={radius}
+                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                        className="text-slate-100 dark:text-slate-800"
                     />
-                    {/* Progress circle */}
-                    <motion.circle 
-                        cx={size / 2} cy={size / 2} r={radius} 
-                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent" 
-                        strokeDasharray={circumference} 
+                    {/* Animated progress arc */}
+                    <motion.circle
+                        cx={size / 2} cy={size / 2} r={radius}
+                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                        strokeDasharray={circumference}
                         initial={{ strokeDashoffset: circumference }}
                         animate={{ strokeDashoffset: offset }}
                         transition={{ duration: 1.5, ease: "easeOut" }}
                         strokeLinecap="round"
-                        className={colorClass} 
+                        className={colorClass}
                     />
                 </motion.svg>
+
+                {/* Center number + optional label */}
                 <div className="absolute flex flex-col items-center justify-center text-center z-20">
-                    <span 
+                    <motion.span
+                        animate={flashing ? { color: "#fbbf24", scale: 1.15 } : { color: undefined, scale: 1 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
                         className="font-black text-slate-800 dark:text-white leading-none tracking-tighter"
                         style={{ fontSize: `${Math.max(14, size * 0.28)}px` }}
                     >
                         {displayScore}
-                    </span>
+                    </motion.span>
                     {label && (
-                        <span 
+                        <span
                             className="font-bold text-slate-400 uppercase tracking-widest mt-0.5"
                             style={{ fontSize: `${Math.max(8, size * 0.08)}px` }}
                         >
@@ -1676,7 +1704,7 @@ const ResumeBuilder = () => {
                         </span>
                     )}
                 </div>
-            </motion.div>
+            </div>
         );
     };
 
@@ -1805,19 +1833,8 @@ const ResumeBuilder = () => {
                         <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> Back
                     </button>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#1a3884] flex items-center justify-center shadow-sm relative group cursor-help">
-                            {/* Small ATS Score instead of icon */}
-                            <div className="absolute inset-0 flex items-center justify-center font-black text-white text-sm">
-                                {atsScore}
-                            </div>
-                            <svg className="transform -rotate-90 w-full h-full">
-                                <circle cx="20" cy="20" r="18" stroke="rgba(255,255,255,0.2)" strokeWidth="3" fill="transparent" />
-                                <circle cx="20" cy="20" r="18" stroke="#10b981" strokeWidth="3" fill="transparent" 
-                                    strokeDasharray={18 * 2 * Math.PI} 
-                                    strokeDashoffset={(18 * 2 * Math.PI) - ((atsScore / 100) * (18 * 2 * Math.PI))} 
-                                    className={`${atsScore >= 80 ? 'stroke-emerald-400' : atsScore >= 50 ? 'stroke-amber-400' : 'stroke-rose-400'} transition-all duration-1000`} 
-                                />
-                            </svg>
+                        <div className="w-10 h-10 cursor-help" title={`ATS Score: ${atsScore}/100`}>
+                            <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
                         </div>
                         <div>
                             <div className="relative flex items-center group">
