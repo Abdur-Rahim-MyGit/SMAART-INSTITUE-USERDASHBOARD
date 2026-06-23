@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
+import { createPortal } from "react-dom";
 
 const formatDate = (value) => {
   if (!value) return "No deadline listed";
@@ -280,7 +281,7 @@ const Placement = () => {
               </div>
             </div>
             {/* Confirm modal */}
-            {confirmOpen && (
+            {confirmOpen && createPortal(
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
                   <h3 className="text-lg font-bold text-[#0d1f4e]">Confirm withdraw</h3>
@@ -290,7 +291,8 @@ const Placement = () => {
                     <button onClick={confirmWithdraw} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white">Withdraw</button>
                   </div>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         </motion.div>
@@ -379,7 +381,7 @@ const Placement = () => {
                   // consider job closed if status contains 'closed' (case-insensitive)
                   const rawStatus = (job.displayStatus || job.status || "").toString().toLowerCase();
                   const isClosed = rawStatus.includes("closed");
-                  const applyLabel = isClosed ? "Closed" : "View";
+                  const applyLabel = isClosed ? "Closed" : "View Details";
                   const postedLabel = getPostedAgo(job.displayCreatedAt || job.createdAt);
 
                   return (
@@ -493,6 +495,12 @@ const Placement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">No applications found</h2>
                 <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">You haven't applied to any jobs yet.</p>
+                <button
+                  onClick={() => setActiveTab('jobs')}
+                  className="mt-4 rounded-xl bg-[#1a3884] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#132c6b]"
+                >
+                  Browse Jobs
+                </button>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -562,7 +570,7 @@ const Placement = () => {
                       </div>
 
                       <div className="mt-auto pt-5 flex items-center justify-center gap-3">
-                        <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 uppercase">STATUS : {String(statusLabel).toLowerCase()}</div>
+                        <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">Status: {statusLabel}</div>
                         <button
                           onClick={() => openConfirm(app._id || app.id, title)}
                           className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100"

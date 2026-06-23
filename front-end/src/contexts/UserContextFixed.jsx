@@ -6,7 +6,7 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { API_BASE_URL } from '@/services/api';
+import { API_BASE_URL, startTokenRenewal, stopTokenRenewal } from '@/services/api';
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const UserContext = createContext(null);
@@ -152,6 +152,7 @@ export const UserProvider = ({ children }) => {
         localStorage.removeItem("token");
         clearCareerAgentStorage();
         clearAssessmentTimerStorage();
+        stopTokenRenewal();
 
         // Set a flag so the LandingPage can show a clean toast message
         sessionStorage.setItem("logged_out_other_tab", "true");
@@ -173,7 +174,10 @@ export const UserProvider = ({ children }) => {
 
   const login = useCallback((userData, token) => {
     if (import.meta.env.DEV) console.log('[UserContext] Login function called with user:', userData?.email);
-    if (token) sessionStorage.setItem("token", token);
+    if (token) {
+      sessionStorage.setItem("token", token);
+      startTokenRenewal();
+    }
     clearCareerAgentStorage();
     if (userData) {
       const userToStore = { ...userData };
@@ -227,6 +231,7 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem('token');
     clearCareerAgentStorage();
     clearAssessmentTimerStorage();
+    stopTokenRenewal();
 
     // Step 3: Set flag for clean logout message
     sessionStorage.setItem('logged_out_other_tab', 'true');

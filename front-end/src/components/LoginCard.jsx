@@ -505,7 +505,7 @@ const LoginCard = () => {
             </button>
 
             {/* Registration Link */}
-            {/* <div className="mt-6 text-center">
+            <div className="mt-6 text-center">
               <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
               <button
                 type="button"
@@ -514,7 +514,7 @@ const LoginCard = () => {
               >
                 Sign Up
               </button>
-            </div> */}
+            </div>
           </form>
         </div>
       </motion.div>

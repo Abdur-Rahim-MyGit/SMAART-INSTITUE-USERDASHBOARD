@@ -1004,25 +1004,33 @@ const BaseLineTest = () => {
                   <Target className="text-[#1a3884] dark:text-blue-450" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
-                  {questions.map((q, idx) => (
-                    <button
-                      key={q._id}
-                      onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
-                      className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
-                        ${index === idx
-                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
-                          : selectedAnswers[q._id]
-                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
-                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
-                        }`}
-                    >
+                  {questions.map((q, idx) => {
+                    const isAnswered = !!selectedAnswers[q._id];
+                    return (
+                      <button
+                        key={q._id}
+                        onClick={() => {
+                          if (isAnswered) {
+                            setIndex(idx);
+                          }
+                        }}
+                        className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all relative group
+                          ${isAnswered ? 'cursor-pointer' : 'cursor-default'}
+                          ${index === idx
+                            ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
+                            : isAnswered
+                              ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
+                              : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
+                          }`}
+                      >
                       {idx + 1}
                       {/* Tooltip on hover */}
                       <span className="hidden md:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20">
                         Q{idx + 1}
                       </span>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

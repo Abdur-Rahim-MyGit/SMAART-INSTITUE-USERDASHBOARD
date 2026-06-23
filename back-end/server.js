@@ -97,7 +97,7 @@ app.use(cors({
   credentials: true
 }));
 // Increase payload size limit for base64 images (50MB)
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // SECURITY: strip MongoDB operator-injection keys ($ne, $gt, $where, dotted
 // paths, ...) from all request input before it reaches any query. Must run
