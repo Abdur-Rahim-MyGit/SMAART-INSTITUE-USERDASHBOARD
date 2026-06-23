@@ -117,7 +117,7 @@ export const apiCall = async (endpoint, options = {}) => {
         headers["Content-Type"] = "application/json";
       }
 
-      console.log(`🚀 API Call: ${baseUrl}${endpoint} (Timeout: ${customTimeout}ms)`);
+      if (import.meta.env.DEV) console.log(`🚀 API Call: ${baseUrl}${endpoint} (Timeout: ${customTimeout}ms)`);
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
         credentials: 'include', // Enable Cookies for HttpOnly Auth

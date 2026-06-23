@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 // Login rate limiter - 15 attempts per 15 minutes per IP+email
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 15 : 200,
+  max: process.env.NODE_ENV === 'production' ? 15 : 5,
   message: {
     error: 'Too many login attempts. Please try again in 15 minutes.',
     retryAfter: 15
@@ -29,7 +29,7 @@ const loginLimiter = rateLimit({
 // OTP verification rate limiter - 15 attempts per 5 minutes
 const otpLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: process.env.NODE_ENV === 'production' ? 15 : 200,
+  max: process.env.NODE_ENV === 'production' ? 15 : 10,
   message: {
     error: 'Too many OTP attempts. Please try again in 5 minutes.',
     retryAfter: 5
@@ -41,7 +41,7 @@ const otpLimiter = rateLimit({
 // Password reset rate limiter - 3 attempts per hour
 const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: process.env.NODE_ENV === 'production' ? 3 : 200,
+  max: process.env.NODE_ENV === 'production' ? 3 : 3,
   message: {
     error: 'Too many password reset requests. Please try again later.',
     retryAfter: 60
