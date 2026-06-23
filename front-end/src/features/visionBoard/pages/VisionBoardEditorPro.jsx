@@ -1101,29 +1101,6 @@ const VisionBoardEditorPro = () => {
   ]);
 
   useEffect(() => {
-    if (!draftLoadAttemptedRef.current) {
-      draftLoadAttemptedRef.current = true;
-      try {
-        const savedDraft = localStorage.getItem(getDraftKey());
-        if (savedDraft) {
-          const parsedDraft = JSON.parse(savedDraft);
-          if (parsedDraft?.snapshot) {
-            draftRestoredRef.current = true;
-            applySnapshot(parsedDraft.snapshot);
-            lastSnapshotRef.current = parsedDraft.snapshot;
-            toast({
-              title: t("vision_board.toast_draft_restored") || "Draft Restored",
-              description: t("vision_board.toast_draft_restored_desc") || "Recovered your last in-progress vision board.",
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Draft restore error:", error);
-      }
-    }
-  }, [t]);
-
-  useEffect(() => {
     if (!isEditing || !boardId || boardLoadAttemptedRef.current || draftRestoredRef.current) {
       return;
     }
@@ -1151,25 +1128,6 @@ const VisionBoardEditorPro = () => {
 
     loadBoardForEditing();
   }, [boardId, isEditing, navigate, toast, t]);
-
-  useEffect(() => {
-    if (!historyBootstrappedRef.current || !lastSnapshotRef.current) return;
-    const timer = setTimeout(() => {
-      try {
-        localStorage.setItem(
-          getDraftKey(),
-          JSON.stringify({
-            savedAt: new Date().toISOString(),
-            snapshot: lastSnapshotRef.current,
-          })
-        );
-      } catch (error) {
-        console.error("Draft save error:", error);
-      }
-    }, 700);
-
-    return () => clearTimeout(timer);
-  }, [title, description, shortTermGoals, longTermGoals, templateId, aspectRatio, backgroundColor, backgroundImage, borderRadius, gap, images, textOverlays, assetOverlays, userUploads, nextTextId, nextAssetId]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {

@@ -162,7 +162,7 @@ exports.getWarningStatus = async (req, res, next) => {
         const actualCourseId = await getActualCourseId(courseId);
 
         const query = { userId };
-        if (assessmentId) query.assessmentId = assessmentId;
+        if (assessmentId && mongoose.Types.ObjectId.isValid(assessmentId)) query.assessmentId = assessmentId;
         if (actualCourseId) query.courseId = actualCourseId;
 
         const count = await UserActivityLog.countDocuments(query);

@@ -6,6 +6,7 @@ import {
   IconBriefcase as Briefcase,
   IconBuilding as Building,
   IconCalendarDue as CalendarDue,
+  IconClock as Clock,
   IconExternalLink as ExternalLink,
   IconFileDescription as FileDescription,
   IconX as XIcon,
@@ -74,6 +75,28 @@ const getDocumentUrl = (job) => {
 const formatStatus = (value) => {
   if (!value) return "Active";
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+/**
+ * Returns a LinkedIn-style "Posted X ago" label.
+ * Purely client-side calculation from the existing createdAt timestamp.
+ */
+const getPostedAgo = (createdAt) => {
+  if (!createdAt) return null;
+  const posted = new Date(createdAt);
+  if (Number.isNaN(posted.getTime())) return null;
+  const diffMs = Date.now() - posted.getTime();
+  if (diffMs < 0) return null;
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Posted Today";
+  if (days === 1) return "Posted 1 day ago";
+  if (days < 7) return `Posted ${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "Posted 1 week ago";
+  if (weeks < 5) return `Posted ${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return "Posted 1 month ago";
+  return `Posted ${months} months ago`;
 };
 
 const PlacementDetail = () => {
@@ -228,9 +251,11 @@ const PlacementDetail = () => {
 
   const details = useMemo(() => {
     if (!job) return [];
+    const postedAgo = getPostedAgo(job.displayCreatedAt || job.createdAt);
     return [
       { label: "Company", value: job.displayCompany, icon: Building },
       { label: "Location", value: job.displayLocation, icon: MapPin },
+      ...(postedAgo ? [{ label: "Posted", value: postedAgo, icon: Clock }] : []),
       { label: "Job Type", value: job.displayType, icon: Briefcase },
       { label: "Deadline", value: formatDate(job.displayDeadline), icon: CalendarDue },
       { label: "Package", value: job.displaySalary || job.salaryPackage || job.ctc || job.package, icon: Tag },

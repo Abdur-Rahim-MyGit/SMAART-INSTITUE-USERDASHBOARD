@@ -4,6 +4,7 @@ import {
   IconBriefcase as Briefcase,
   IconBuilding as Building,
   IconCalendarDue as CalendarDue,
+  IconClock as Clock,
   IconMapPin as MapPin,
   IconRefresh as Refresh,
   IconSearch as Search,
@@ -67,6 +68,51 @@ const getCompanyLogo = (job) => {
 const formatStatus = (value) => {
   if (!value) return "Open";
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+<<<<<<< HEAD
+const getStatusTextColor = (status) => {
+  const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
+  switch (norm) {
+    case 'applied':
+      return "text-blue-600 dark:text-blue-400";
+    case 'under review':
+      return "text-amber-600 dark:text-amber-400";
+    case 'declined':
+      return "text-slate-500 dark:text-slate-400";
+    case 'shortlisted':
+      return "text-purple-600 dark:text-purple-400";
+    case 'hold':
+      return "text-orange-600 dark:text-orange-400";
+    case 'selected':
+      return "text-emerald-600 dark:text-emerald-400";
+    case 'rejected':
+      return "text-rose-600 dark:text-rose-400";
+    default:
+      return "text-slate-600 dark:text-slate-400";
+  }
+=======
+/**
+ * Returns a LinkedIn-style "Posted X ago" label.
+ * Calculation is purely client-side from the existing createdAt timestamp.
+ */
+const getPostedAgo = (createdAt) => {
+  if (!createdAt) return null;
+  const posted = new Date(createdAt);
+  if (Number.isNaN(posted.getTime())) return null;
+  const diffMs = Date.now() - posted.getTime();
+  if (diffMs < 0) return null; // future date — don't show
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Posted Today";
+  if (days === 1) return "Posted 1 day ago";
+  if (days < 7) return `Posted ${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "Posted 1 week ago";
+  if (weeks < 5) return `Posted ${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return "Posted 1 month ago";
+  return `Posted ${months} months ago`;
+>>>>>>> 381ae7d92a2b132e29c67479eaa6f2eb15c1e401
 };
 
 const Placement = () => {
@@ -406,6 +452,14 @@ const Placement = () => {
                           <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                           <span className="truncate">{job.displayLocation || 'Remote'}</span>
                         </div>
+                        {getPostedAgo(job.displayCreatedAt || job.createdAt) && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 shrink-0 text-slate-400" />
+                            <span className="text-slate-400 text-xs font-semibold">
+                              {getPostedAgo(job.displayCreatedAt || job.createdAt)}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
                           <span>{formatDate(job.displayDeadline)}</span>
@@ -530,7 +584,9 @@ const Placement = () => {
                       </div>
 
                       <div className="mt-auto pt-5 flex items-center justify-center gap-3">
-                        <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 uppercase">STATUS : {String(statusLabel).toLowerCase()}</div>
+                        <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold uppercase text-black dark:text-white">
+                          STATUS : <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
+                        </div>
                         <button
                           onClick={() => openConfirm(app._id || app.id, title)}
                           className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100"

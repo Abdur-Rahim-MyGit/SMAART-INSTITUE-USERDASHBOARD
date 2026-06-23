@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
-import { detectFaces } from '@/services/faceDetectionService';
+import { verifyFace, detectFaces, VerificationStatus, loadModels, isReady } from '@/services/faceVerificationService';
 import { proctoringApi } from '@/services/proctoringApi';
 import { toast } from 'sonner';
 
@@ -36,6 +36,7 @@ export const useProctoringEngine = ({
   resultId = null,
   assessmentId = null,
   isActive = false,
+  registeredFaceDescriptor = null, // NEW: Face embedding from ProctoringSetup
   onLockout = null // Custom submit callback
 }) => {
   const [warningsCount, setWarningsCount] = useState(0);
@@ -49,6 +50,11 @@ export const useProctoringEngine = ({
   const [isFaceDetected, setIsFaceDetected] = useState(false);
   const [faceCount, setFaceCount] = useState(0);
   const [cameraError, setCameraError] = useState(null);
+
+  // Face Verification State (NEW)
+  const [verificationStatus, setVerificationStatus] = useState('no_face');
+  // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces' | 'covered' | 'error'
+  const [similarityScore, setSimilarityScore] = useState(0);
 
   // Fullscreen State
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -69,6 +75,7 @@ export const useProctoringEngine = ({
   const faceIntervalRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
   const proctoringSessionIdRef = useRef(null);
+  const registeredFaceDescriptorRef = useRef(registeredFaceDescriptor);
 
   // Stable ref to triggerLockout to break TDZ initialization loops
   const triggerLockoutRef = useRef(null);
@@ -76,10 +83,17 @@ export const useProctoringEngine = ({
   // Debouncing face violations (require consecutive failures before logging)
   const faceAbsentStreak = useRef(0);
   const multipleFacesStreak = useRef(0);
+  const faceMismatchStreak = useRef(0);
+  const faceCoveredStreak = useRef(0);
 
   useEffect(() => {
     isActiveRef.current = isActive;
   }, [isActive]);
+
+  // Keep descriptor ref in sync
+  useEffect(() => {
+    registeredFaceDescriptorRef.current = registeredFaceDescriptor;
+  }, [registeredFaceDescriptor]);
 
   // Initialize and stop camera stream
   const startCamera = async () => {
@@ -87,16 +101,16 @@ export const useProctoringEngine = ({
     try {
       console.log('[ProctoringEngine] Requesting media stream...');
       const constraints = {
-        video: { width: 320, height: 240, frameRate: { ideal: 15 } },
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
         audio: false // No audio processing needed to protect privacy
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       
-      // Create hidden video element for BlazeFace predictions
+      // Create hidden video element for face verification
       const video = document.createElement('video');
-      video.width = 320;
-      video.height = 240;
+      video.width = 640;
+      video.height = 480;
       video.srcObject = stream;
       video.autoplay = true;
       video.playsInline = true;
@@ -113,6 +127,15 @@ export const useProctoringEngine = ({
 
       setIsCameraActive(true);
       setCameraError(null);
+
+      // Ensure face-api models are loaded
+      if (!isReady()) {
+        try {
+          await loadModels();
+        } catch (err) {
+          console.warn('[ProctoringEngine] Model loading failed during camera start:', err);
+        }
+      }
     } catch (error) {
       console.error('[ProctoringEngine] Webcam init failed:', error);
       setCameraError(error.name || 'WebcamAccessDenied');
@@ -135,6 +158,8 @@ export const useProctoringEngine = ({
     setIsCameraActive(false);
     setIsFaceDetected(false);
     setFaceCount(0);
+    setVerificationStatus('no_face');
+    setSimilarityScore(0);
   };
 
   // Trigger lockout and submit test
@@ -179,14 +204,14 @@ export const useProctoringEngine = ({
       let severity = 'low';
       if (eventType === 'attention_check_fail' || eventType === 'fullscreen_exit') {
         severity = 'medium';
-      } else if (eventType === 'multiple_faces') {
+      } else if (eventType === 'multiple_faces' || eventType === 'face_mismatch') {
         severity = 'high';
-      } else if (eventType === 'face_absent') {
+      } else if (eventType === 'face_absent' || eventType === 'face_covered') {
         severity = 'medium';
       }
 
       let screenshotUrl = '';
-      if (videoRef.current && isCameraActive && proctoringSessionIdRef.current) {
+      if (videoRef.current && proctoringSessionIdRef.current) {
         try {
           const blob = await captureScreenshot(videoRef.current);
           if (blob) {
@@ -238,7 +263,7 @@ export const useProctoringEngine = ({
         return next;
       });
     }
-  }, [isCameraActive]);
+  }, []);
 
   // Reset inactivity timer
   const resetInactivityTimer = useCallback(() => {
@@ -295,45 +320,120 @@ export const useProctoringEngine = ({
     }
   }, []);
 
-  // Run face check tick
-  const runFaceCheck = async () => {
-    if (!videoRef.current || !isCameraActive || !isActiveRef.current || hasLockedOutRef.current) return;
+  // ─── FACE VERIFICATION TICK (replaces old runFaceCheck) ────────────
+  const runFaceVerification = async () => {
+    if (!videoRef.current || !isActiveRef.current || hasLockedOutRef.current) return;
+    if (videoRef.current.readyState < 2) return;
+
+    const descriptor = registeredFaceDescriptorRef.current;
 
     try {
-      const result = await detectFaces(videoRef.current);
-      
-      if (result.error) {
-        console.warn('[ProctoringEngine] Face detection error:', result.error);
-        return; // Skip this frame on prediction errors
-      }
+      // If we have a registered face descriptor, run full verification
+      if (descriptor) {
+        const result = await verifyFace(videoRef.current, descriptor);
 
-      setFaceCount(result.faceCount);
-      setIsFaceDetected(result.isFacePresent);
+        if (result.error) {
+          console.warn('[ProctoringEngine] Face verification error:', result.error);
+          return;
+        }
 
-      // 1. Face Absent Check
-      if (result.faceCount === 0) {
-        faceAbsentStreak.current += 1;
-        if (faceAbsentStreak.current >= 4) { // ~10 seconds of continuous absence
+        setVerificationStatus(result.status);
+        setSimilarityScore(result.similarity || 0);
+        setFaceCount(result.faceCount);
+        setIsFaceDetected(result.status === VerificationStatus.VERIFIED);
+
+        // Handle each verification status
+        switch (result.status) {
+          case VerificationStatus.VERIFIED:
+            // All clear — reset all streaks
+            faceAbsentStreak.current = 0;
+            multipleFacesStreak.current = 0;
+            faceMismatchStreak.current = 0;
+            faceCoveredStreak.current = 0;
+            break;
+
+          case VerificationStatus.NO_FACE:
+            faceAbsentStreak.current += 1;
+            multipleFacesStreak.current = 0;
+            faceMismatchStreak.current = 0;
+            faceCoveredStreak.current = 0;
+            if (faceAbsentStreak.current >= 4) { // ~10 seconds
+              faceAbsentStreak.current = 0;
+              reportViolation('face_absent', 'Warning: Face not detected. Please face the camera.');
+            }
+            break;
+
+          case VerificationStatus.MULTIPLE_FACES:
+            multipleFacesStreak.current += 1;
+            faceAbsentStreak.current = 0;
+            faceMismatchStreak.current = 0;
+            faceCoveredStreak.current = 0;
+            if (multipleFacesStreak.current >= 3) { // ~7.5 seconds
+              multipleFacesStreak.current = 0;
+              reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
+            }
+            break;
+
+          case VerificationStatus.MISMATCH:
+            faceMismatchStreak.current += 1;
+            faceAbsentStreak.current = 0;
+            multipleFacesStreak.current = 0;
+            faceCoveredStreak.current = 0;
+            if (faceMismatchStreak.current >= 3) { // ~7.5 seconds of different person
+              faceMismatchStreak.current = 0;
+              reportViolation('face_mismatch', 'Warning: Face does not match registered candidate. Ensure the registered person is in front of the camera.');
+            }
+            break;
+
+          case VerificationStatus.COVERED:
+            faceCoveredStreak.current += 1;
+            faceAbsentStreak.current = 0;
+            multipleFacesStreak.current = 0;
+            faceMismatchStreak.current = 0;
+            if (faceCoveredStreak.current >= 4) { // ~10 seconds
+              faceCoveredStreak.current = 0;
+              reportViolation('face_covered', 'Warning: Face not clearly visible. Please remove any obstruction and look at the camera.');
+            }
+            break;
+
+          default:
+            break;
+        }
+      } else {
+        // No registered descriptor — fallback to basic detection (legacy behavior)
+        const result = await detectFaces(videoRef.current);
+
+        if (result.error) {
+          console.warn('[ProctoringEngine] Face detection error:', result.error);
+          return;
+        }
+
+        setFaceCount(result.faceCount);
+        setIsFaceDetected(result.isFacePresent);
+        setVerificationStatus(result.isFacePresent ? 'verified' : 'no_face');
+
+        if (result.faceCount === 0) {
+          faceAbsentStreak.current += 1;
+          if (faceAbsentStreak.current >= 4) {
+            faceAbsentStreak.current = 0;
+            reportViolation('face_absent', 'Warning: Face not detected. Ensure your face is centered in the camera feed.');
+          }
+        } else {
           faceAbsentStreak.current = 0;
-          reportViolation('face_absent', 'Warning: Face not detected. Ensure your face is centered in the camera feed.');
         }
-      } else {
-        faceAbsentStreak.current = 0;
-      }
 
-      // 2. Multiple Face Check
-      if (result.faceCount > 1) {
-        multipleFacesStreak.current += 1;
-        if (multipleFacesStreak.current >= 3) { // ~7.5 seconds of multiple faces
+        if (result.faceCount > 1) {
+          multipleFacesStreak.current += 1;
+          if (multipleFacesStreak.current >= 3) {
+            multipleFacesStreak.current = 0;
+            reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
+          }
+        } else {
           multipleFacesStreak.current = 0;
-          reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
         }
-      } else {
-        multipleFacesStreak.current = 0;
       }
-
     } catch (err) {
-      console.error('[ProctoringEngine] Face prediction tick failed:', err);
+      console.error('[ProctoringEngine] Face verification tick failed:', err);
     }
   };
 
@@ -393,6 +493,21 @@ export const useProctoringEngine = ({
     setIsWarningVisible(false);
   }, []);
 
+  // Stable refs for event handlers so the main effect doesn't re-fire
+  const handleVisibilityChangeRef = useRef(handleVisibilityChange);
+  const handleBlurRef = useRef(handleBlur);
+  const handleFullscreenChangeRef = useRef(handleFullscreenChange);
+  const resetInactivityTimerRef = useRef(resetInactivityTimer);
+  const reportViolationRef = useRef(reportViolation);
+  const scheduleAttentionCheckRef = useRef(scheduleAttentionCheck);
+
+  useEffect(() => { handleVisibilityChangeRef.current = handleVisibilityChange; }, [handleVisibilityChange]);
+  useEffect(() => { handleBlurRef.current = handleBlur; }, [handleBlur]);
+  useEffect(() => { handleFullscreenChangeRef.current = handleFullscreenChange; }, [handleFullscreenChange]);
+  useEffect(() => { resetInactivityTimerRef.current = resetInactivityTimer; }, [resetInactivityTimer]);
+  useEffect(() => { reportViolationRef.current = reportViolation; }, [reportViolation]);
+  useEffect(() => { scheduleAttentionCheckRef.current = scheduleAttentionCheck; }, [scheduleAttentionCheck]);
+
   // Sync / Fetch initial warning count on activation
   useEffect(() => {
     if (!isActive) {
@@ -431,7 +546,16 @@ export const useProctoringEngine = ({
           setWarningsCount(response.data.totalViolations || 0);
           warningsCountRef.current = response.data.totalViolations || 0;
           if (response.data.totalViolations > MAX_WARNINGS) {
-            triggerLockout();
+            if (triggerLockoutRef.current) triggerLockoutRef.current();
+          }
+
+          // Log face registration event if we have a registered descriptor
+          if (registeredFaceDescriptorRef.current) {
+            proctoringApi.logEvent(sessionId, {
+              eventType: 'face_registered',
+              severity: 'info',
+              details: 'Face identity registered during setup'
+            }).catch(err => console.warn('[ProctoringEngine] Failed to log face_registered event:', err));
           }
         }
       } catch (err) {
@@ -444,24 +568,30 @@ export const useProctoringEngine = ({
     startCamera();
 
     // Start Attention Check Scheduler
-    scheduleAttentionCheck();
+    scheduleAttentionCheckRef.current();
+
+    // Stable wrapper functions that delegate to latest refs
+    const onVisibilityChange = () => handleVisibilityChangeRef.current();
+    const onBlur = () => handleBlurRef.current();
+    const onFullscreenChange = () => handleFullscreenChangeRef.current();
+    const onActivity = () => resetInactivityTimerRef.current();
 
     // Set up tab / window listeners
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('blur', onBlur);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
     // Set up inactivity events
     const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'mousedown', 'touchstart'];
     activityEvents.forEach(event => {
-      window.addEventListener(event, resetInactivityTimer);
+      window.addEventListener(event, onActivity);
     });
 
-    resetInactivityTimer();
+    resetInactivityTimerRef.current();
 
-    // Face Check Interval
-    faceIntervalRef.current = setInterval(runFaceCheck, FACE_CHECK_INTERVAL);
+    // Face Verification Interval (replaces old face check)
+    faceIntervalRef.current = setInterval(runFaceVerification, FACE_CHECK_INTERVAL);
 
     // Initial fullscreen check
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
@@ -472,7 +602,9 @@ export const useProctoringEngine = ({
         setFullscreenCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(fullscreenTimerRef.current);
-            reportViolation('fullscreen_exit', 'Warning: Fullscreen exit detected.');
+            if (reportViolationRef.current) {
+              reportViolationRef.current('fullscreen_exit', 'Warning: Fullscreen exit detected.');
+            }
             return 0;
           }
           return prev - 1;
@@ -482,13 +614,13 @@ export const useProctoringEngine = ({
 
     return () => {
       stopCamera();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('blur', onBlur);
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
       
       activityEvents.forEach(event => {
-        window.removeEventListener(event, resetInactivityTimer);
+        window.removeEventListener(event, onActivity);
       });
 
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
@@ -496,7 +628,9 @@ export const useProctoringEngine = ({
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
     };
-  }, [isActive, resultId, assessmentId, handleVisibilityChange, handleBlur, handleFullscreenChange, resetInactivityTimer, triggerLockout, scheduleAttentionCheck]);
+  // Only re-run when these stable values change, not on every callback recreation
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, resultId, assessmentId]);
 
   return {
     warningsCount,
@@ -513,6 +647,10 @@ export const useProctoringEngine = ({
     cameraError,
     videoElement: videoRef.current,
     stream: streamRef.current,
+
+    // Face Verification (NEW)
+    verificationStatus,
+    similarityScore,
     
     // Fullscreen status
     isFullScreen,
