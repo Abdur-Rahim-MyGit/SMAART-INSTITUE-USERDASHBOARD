@@ -31,7 +31,7 @@ const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
 const VisionBoardEditorPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardEditorPro'));
 const VisionBoardView = lazy(() => import('@/features/visionBoard/pages/VisionBoardView'));
-const MindCareSessions = lazy(() => import('@/pages/MindCareSessions'));
+
 const GeneralDictionary = lazy(() => import('@/pages/GeneralDictionary'));
 const SMAArtToolkit = lazy(() => import('@/pages/SMAArtToolkit'));
 const CGPACalculator = lazy(() => import('@/pages/CGPACalculator'));
@@ -175,8 +175,6 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/library" element={<Library />} />
                         <Route path="/dictionary" element={<GeneralDictionary />} />
                         <Route path="/dashboard/dictionary" element={<GeneralDictionary />} />
-                        <Route path="/mind-care" element={<MindCareSessions />} />
-                        <Route path="/dashboard/mindcare-sessions" element={<MindCareSessions />} />
 
                         {/* Settings & Support */}
                         <Route path="/settings" element={<Settings />} />

@@ -78,9 +78,8 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
     useEffect(() => {
         if (validPaths.length === 0) return;
-        if (activeTab === 0) return; // 'All' tab selected
         
-        const currentPath = validPaths[activeTab - 1];
+        const currentPath = validPaths[activeTab];
         if (!currentPath) return;
 
         const cacheKey = currentPath.title || currentPath.id;
@@ -138,13 +137,11 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
         return <div className="w-full h-48 bg-slate-100 dark:bg-[#002147] rounded-2xl animate-pulse mb-6" />;
     }
 
-    const currentPath = activeTab === 0 ? null : validPaths[activeTab - 1];
+    const currentPath = validPaths[activeTab];
     const pathSkillSet = currentPath ? roleSkillsCache[currentPath.title || currentPath.id] : null;
 
     let displayedSkills = [];
-    if (activeTab === 0) {
-        displayedSkills = userSkills;
-    } else if (pathSkillSet && pathSkillSet.size > 0) {
+    if (pathSkillSet && pathSkillSet.size > 0) {
         const pathSkillsArray = Array.from(pathSkillSet).map(s => s.toLowerCase().trim());
         displayedSkills = userSkills.filter(s => {
             const userSkillName = s.skillName.toLowerCase().trim();
@@ -190,10 +187,9 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                 {/* Pathway Tabs */}
                 <div className="flex p-1 rounded-xl w-full lg:w-auto overflow-x-auto no-scrollbar"
                     style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f1f5f9' }}>
-                    {[{ id: 'all' }, ...validPaths].map((path, idx) => {
+                    {validPaths.map((path, idx) => {
                         const isActive = activeTab === idx;
-                        const label = path.id === 'all' ? 'All Active' :
-                            path.id === 'primary' ? 'Primary Path' :
+                        const label = path.id === 'primary' ? 'Primary Path' :
                             path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path';
 
                         return (
@@ -305,10 +301,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                             No active skills in this pathway.
                         </p>
                         <p className="text-[0.7rem] mt-1 px-4" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>
-                            {activeTab === 0 
-                                ? "Jump into your Career Roadmap to start mastering new skills!" 
-                                : <>Jump into the Career Roadmap for <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> to start mastering new skills!</>
-                            }
+                            Jump into the Career Roadmap for <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> to start mastering new skills!
                         </p>
                     </div>
                 )}

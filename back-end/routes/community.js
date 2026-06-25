@@ -1525,7 +1525,7 @@ router.post("/discussions/:id/react", async (req, res) => {
         .json({ success: false, error: "You cannot react to your own post" });
     }
 
-    if (!["like", "heart", "insightful", "support"].includes(type)) {
+    if (!["like", "heart", "insightful", "support", "smile"].includes(type)) {
       return res
         .status(400)
         .json({ success: false, error: "Invalid reaction type" });
@@ -1564,6 +1564,8 @@ router.post("/discussions/:id/react", async (req, res) => {
         (r) => r.type === "insightful",
       ).length,
       support: (discussion.reactions || []).filter((r) => r.type === "support")
+        .length,
+      smile: (discussion.reactions || []).filter((r) => r.type === "smile")
         .length,
     };
 

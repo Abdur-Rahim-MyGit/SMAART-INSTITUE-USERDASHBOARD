@@ -91,7 +91,8 @@ const getStatusTextColor = (status) => {
     default:
       return "text-slate-600 dark:text-slate-400";
   }
-}
+};
+
 /**
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.
@@ -261,11 +262,26 @@ const Placement = () => {
   return (
     <div className="min-h-screen bg-transparent pb-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Back Button (Mobile Mode Only) */}
+        <div className="flex items-center sm:hidden mt-6">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-3 w-fit selection:bg-transparent"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
+              <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+            </div>
+            <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
+              Back to Dashboard
+            </span>
+          </button>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mt-8 mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-5 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
+          className="mt-6 mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-5 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -278,18 +294,6 @@ const Placement = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Mobile: back button to dashboard */}
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="sm:hidden inline-flex items-center gap-3"
-                aria-label="Back to dashboard"
-              >
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d8e6f7] bg-white text-sm text-[#0d1f4e] shadow-sm">
-                  <ArrowLeft className="h-4 w-4" />
-                </span>
-                <span className="uppercase tracking-widest text-xs font-bold text-[#0d1f4e]">Back</span>
-              </button>
-
               <div className="hidden sm:block">
                 <button
                   onClick={fetchJobs}
@@ -335,9 +339,9 @@ const Placement = () => {
         </div>
 
         {activeTab === 'jobs' && (
-          <div className="mb-5 mt-3 flex items-center justify-between gap-3">
+          <div className="mb-5 mt-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Left: search box */}
-            <div className="relative flex-1 mr-4">
+            <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={searchQuery}
@@ -348,11 +352,11 @@ const Placement = () => {
             </div>
 
             {/* Right: filters dropdowns */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
               <select
                 value={sourceFilter}
                 onChange={(e) => setSourceFilter(e.target.value)}
-                className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                className="h-10 w-full sm:w-auto rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
               >
                 <option value="all">All jobs ({jobs.length})</option>
                 <option value="smaartjobpostings">SMAART ({sourceCounts.smaartjobpostings || 0})</option>
@@ -362,7 +366,7 @@ const Placement = () => {
               <select
                 value={jobType}
                 onChange={(e) => setJobType(e.target.value)}
-                className="h-10 rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                className="h-10 w-full sm:w-auto rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
               >
                 <option value="all">All types</option>
                 <option value="full-time">Full-Time</option>
@@ -413,33 +417,36 @@ const Placement = () => {
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
                       className={`relative flex min-h-[225px] flex-col rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-[0_2px_16px_rgba(26,56,132,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,56,132,0.12)] dark:border-[#1a3884]/20 dark:bg-[#001630] ${isClosed ? 'opacity-60' : ''}`}
                     >
-                      <div className="absolute right-5 top-5 flex items-center gap-2">
-                        <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
-                          {statusLabel}
-                        </span>
-                        <span className="inline-flex rounded-lg bg-[#eef4ff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300">
-                          {sourceLabel}
-                        </span>
-                      </div>
-
-                      <div className="mb-5 flex items-center gap-3 pr-36">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-sm font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
-                          {companyLogo ? (
-                            <img
-                              src={companyLogo}
-                              alt={`${job.displayCompany} logo`}
-                              className="h-full w-full object-contain p-1"
-                            />
-                          ) : (
-                            <span>{companyInitial}</span>
-                          )}
+                      {/* Top Row: Logo, Title, and Badges */}
+                      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-sm font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
+                            {companyLogo ? (
+                              <img
+                                src={companyLogo}
+                                alt={`${job.displayCompany} logo`}
+                                className="h-full w-full object-contain p-1"
+                              />
+                            ) : (
+                              <span>{companyInitial}</span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="line-clamp-2 text-lg font-extrabold leading-snug text-[#0d1f4e] dark:text-white">
+                              {job.displayTitle}
+                            </h2>
+                            <span className="mt-1 inline-flex text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                              {job.displayType}
+                            </span>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <h2 className="line-clamp-2 text-lg font-extrabold leading-snug text-[#0d1f4e] dark:text-white">
-                            {job.displayTitle}
-                          </h2>
-                          <span className="mt-1 inline-flex text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                            {job.displayType}
+
+                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                          <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
+                            {statusLabel}
+                          </span>
+                          <span className="inline-flex rounded-lg bg-[#eef4ff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300">
+                            {sourceLabel}
                           </span>
                         </div>
                       </div>
@@ -546,44 +553,38 @@ const Placement = () => {
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
                       className={`relative flex min-h-[225px] mt-6 flex-col rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-[0_2px_16px_rgba(26,56,132,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,56,132,0.12)]`}
                     >
-                      <div className="absolute right-5 top-5 flex items-center gap-2">
-                        {/* <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
-                          {statusLabel}
-                        </span> */}
+                      {/* Top Row: Logo, Title, and Badges */}
+                      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-sm font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
+                            {companyLogo ? (
+                              <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1" />
+                            ) : (
+                              <span>{companyInitial}</span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="line-clamp-2 text-lg font-extrabold leading-snug text-[#0d1f4e] dark:text-white">{title}</h2>
+                            {displayType && (
+                              <span className="mt-1 inline-flex text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">{displayType}</span>
+                            )}
+                          </div>
+                        </div>
+
                         {sourceLabel && (
-                          <span className="inline-flex rounded-lg bg-[#eef4ff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#1a3884]">
-                            {sourceLabel}
-                          </span>
+                          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                            <span className="inline-flex rounded-lg bg-[#eef4ff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300">
+                              {sourceLabel}
+                            </span>
+                          </div>
                         )}
                       </div>
 
-                      <div className="mb-5 flex items-center gap-3 pr-36">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-sm font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
-                          {companyLogo ? (
-                            <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1" />
-                          ) : (
-                            <span>{companyInitial}</span>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <h2 className="line-clamp-2 text-lg font-extrabold leading-snug text-[#0d1f4e] dark:text-white">{title}</h2>
-                          {displayType && (
-                            <span className="mt-1 inline-flex text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">{displayType}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2 text-sm font-medium text-slate-600">
+                      <div className="space-y-2 text-sm font-medium text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
                           <Building className="h-4 w-4 shrink-0 text-slate-400" />
                           <span className="truncate">{companyName}</span>
                         </div>
-                        {/* {location && (
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-                            <span className="truncate">{location}</span>
-                          </div>
-                        )} */}
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
                           <span>Applied: {formatDate(appliedAt)}</span>
@@ -593,10 +594,13 @@ const Placement = () => {
                       <div className="mt-auto pt-5 flex items-center justify-center gap-3">
                         <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold text-black dark:text-white">
                           Status: <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
+                      <div className="mt-auto pt-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold uppercase text-black dark:text-white text-center sm:text-left">
+                          STATUS : <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
                         </div>
                         <button
                           onClick={() => openConfirm(app._id || app.id, title)}
-                          className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100"
+                          className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100 transition-colors w-full sm:w-auto"
                         >
                           Withdraw
                         </button>
