@@ -70,7 +70,6 @@ const formatStatus = (value) => {
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-<<<<<<< HEAD
 const getStatusTextColor = (status) => {
   const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
   switch (norm) {
@@ -91,7 +90,8 @@ const getStatusTextColor = (status) => {
     default:
       return "text-slate-600 dark:text-slate-400";
   }
-=======
+};
+
 /**
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.
@@ -112,7 +112,6 @@ const getPostedAgo = (createdAt) => {
   const months = Math.floor(days / 30);
   if (months === 1) return "Posted 1 month ago";
   return `Posted ${months} months ago`;
->>>>>>> 381ae7d92a2b132e29c67479eaa6f2eb15c1e401
 };
 
 const Placement = () => {

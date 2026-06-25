@@ -15,7 +15,6 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import usePersistScreenshotBlackout from "../Disable ScreenShot";
 
 /* ─────────────────────────────────────────────────────────
    Tool definitions  (Career Agent removed as per request)
@@ -227,7 +226,6 @@ const ToolkitCard = ({ section, index }) => {
    Main Page
 ───────────────────────────────────────────────────────── */
 const SMAArtToolkit = () => {
-  usePersistScreenshotBlackout();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
