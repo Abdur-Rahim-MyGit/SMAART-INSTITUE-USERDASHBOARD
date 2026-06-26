@@ -39,6 +39,14 @@ const REACTION_CONFIG = [
     bubbleClassName: "bg-emerald-100 text-emerald-700",
     hoverClassName: "hover:border-emerald-200 hover:bg-emerald-50/70",
   },
+  {
+    value: "smile",
+    label: "Funny",
+    emoji: "😄",
+    activeClassName: "border-violet-200 bg-violet-50 text-violet-700 shadow-sm",
+    bubbleClassName: "bg-violet-100 text-violet-700",
+    hoverClassName: "hover:border-violet-200 hover:bg-violet-50/70",
+  },
 ];
 
 /**

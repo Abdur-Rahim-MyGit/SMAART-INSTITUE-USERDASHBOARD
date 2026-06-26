@@ -90,7 +90,8 @@ const getStatusTextColor = (status) => {
     default:
       return "text-slate-600 dark:text-slate-400";
   }
-}
+};
+
 /**
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.

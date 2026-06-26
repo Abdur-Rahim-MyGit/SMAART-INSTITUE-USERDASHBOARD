@@ -111,8 +111,6 @@ const pageTitles = {
   '/library': 'Library',
   '/dashboard/dictionary': 'Dictionary',
   '/dictionary': 'Dictionary',
-  '/dashboard/mindcare-sessions': 'MindCare',
-  '/mind-care': 'MindCare',
   '/dashboard/performance': 'Performance',
   '/dashboard/certificate': 'Certificates',
   '/certificate': 'Certificates',
@@ -282,14 +280,6 @@ const STATIC_SEARCH_ITEMS = [
     keywords: ["certificate", "award", "earned", "completion"]
   },
   {
-    id: "page-mindcare",
-    title: "MindCare Sessions",
-    subtitle: "Wellness and mental health support",
-    path: "/dashboard/mindcare-sessions",
-    type: "Page",
-    keywords: ["mindcare", "mental health", "wellness", "sessions", "support"]
-  },
-  {
     id: "page-quotients",
     title: "Quotients Grid",
     subtitle: "View your intelligence and skill quotients",
@@ -312,14 +302,6 @@ const STATIC_SEARCH_ITEMS = [
     path: "/dashboard/career-agent",
     type: "Page",
     keywords: ["career", "agent", "career agent", "career directions", "jobs", "path", "guidance", "ai career"]
-  },
-  {
-    id: "page-wallet",
-    title: "SMAART Wallet",
-    subtitle: "Manage your learning credits and rewards",
-    path: "/dashboard/smaart-wallet",
-    type: "Page",
-    keywords: ["wallet", "credits", "rewards", "coins", "points"]
   },
   {
     id: "page-todos",

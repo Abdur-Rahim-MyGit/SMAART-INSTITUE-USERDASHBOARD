@@ -345,7 +345,7 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Reaction counts */}
                     <div className="flex flex-wrap items-center gap-1">
-                      {["👍", "❤️", "🔥", "💡", "🙌"].map((emoji) => {
+                      {["👍", "❤️", "🔥", "💡", "🙌", "😄"].map((emoji) => {
                         const count = ann.reactions?.filter(r => r.emoji === emoji).length || 0;
                         const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString() && r.emoji === emoji);
 
@@ -397,7 +397,7 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-[#002A5C] rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-white/10 flex items-center gap-1 z-20"
                           >
-                            {["👍", "❤️", "🔥", "💡", "🙌"].map((emoji) => (
+                            {["👍", "❤️", "🔥", "💡", "🙌", "😄"].map((emoji) => (
                               <button
                                 key={emoji}
                                 onClick={(e) => {
