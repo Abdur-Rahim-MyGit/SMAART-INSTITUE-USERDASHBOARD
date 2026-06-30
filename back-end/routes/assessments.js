@@ -65,7 +65,8 @@ router.get('/', async (req, res) => {
             .select('assessmentCode assessmentName description questionCategory status duration totalAttempts averageScore createdAt')
             .populate('createdBy', 'fullName email')
             .sort({ createdAt: -1 })
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .lean();  // PERF: skip document hydration; identical JSON (no virtuals).
 
         res.json({
             success: true,

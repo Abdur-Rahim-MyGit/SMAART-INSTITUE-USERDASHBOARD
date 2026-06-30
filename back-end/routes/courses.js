@@ -56,7 +56,13 @@ const getAllowedCategories = async (user) => {
         return null; 
     }
     if (user.college) {
-        const collegeDoc = await College.findById(user.college);
+        // PERF: `protect` already populated req.user.college WITH subscriptionPlan,
+        // so reuse it and avoid a redundant College.findById() on every request.
+        // Fall back to a DB fetch only if it wasn't populated.
+        let collegeDoc = user.college;
+        if (!collegeDoc || collegeDoc.subscriptionPlan === undefined) {
+            collegeDoc = await College.findById(user.college);
+        }
         if (collegeDoc && collegeDoc.subscriptionPlan) {
             const { plan, addons } = collegeDoc.subscriptionPlan;
             const hasAIQ = !!addons?.aiq;
@@ -104,7 +110,7 @@ const checkCourseAccess = (course, allowedCategories) => {
 // NOW INCLUDES FULL MODULES AND DAYS DATA
 router.get('/', async (req, res) => {
     try {
-        const { search, status, college, category, limit = 50 } = req.query;
+        const { search, status, college, category, limit = 50, view } = req.query;
         let query = {};
 
         // Filter by status
@@ -143,11 +149,23 @@ router.get('/', async (req, res) => {
         }
 
         // Fetch courses with FULL modules and days data
-        const courses = await Course.find(query)
+        let coursesQuery = Course.find(query)
             .populate('createdBy', 'fullName email')
             .populate('colleges', 'name code')
             .sort({ courseCode: 1 })  // Sort by courseCode ascending (CRS00001, CRS00002, etc.)
             .limit(parseInt(limit));
+
+        // PERF (opt-in, non-breaking): `?view=summary` drops the heavy nested
+        // `modules`/`learningFlow` from the LIST response (each can be ~1.6MB).
+        // The full course is still available via GET /api/courses/:id. Default
+        // behaviour is unchanged so existing callers are unaffected.
+        if (view === 'summary') {
+            coursesQuery = coursesQuery.select('-modules -learningFlow');
+        }
+
+        const courses = await coursesQuery
+            .lean();  // PERF: skip Mongoose document hydration — much cheaper for
+                      // large course docs; output JSON is identical (no virtuals).
 
         if (courses.length > 0) {
             if (courses[0].modules && courses[0].modules.length > 0) {

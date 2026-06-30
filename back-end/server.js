@@ -4,6 +4,7 @@ const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
@@ -46,6 +47,10 @@ app.use((req, res, next) => {
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resource loading (e.g., images) across origins if needed
 }));
+
+// PERF: gzip responses (shrinks large JSON payloads, e.g. course lists).
+// In production CloudFront/ALB also compress, but this helps direct hits too.
+app.use(compression());
 
 app.use(cookieParser()); // Parse cookies
 app.use(require('./middleware/deviceFingerprint')); // Capture device info
@@ -246,8 +251,15 @@ logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulati
 // Career Agent Routes (Integrated from Career-Agent standalone system)
 app.use('/api/career-agent', require('./routes/careerAgent'));
 logger.info('✅ Career Agent Routes Loaded (/api/career-agent)');
+// DEEP health check: report 503 if the DB is not connected, so the load
+// balancer pulls an unhealthy task out of rotation instead of sending it
+// traffic. mongoose.connection.readyState === 1 means "connected".
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+  const dbConnected = mongoose.connection.readyState === 1;
+  if (!dbConnected) {
+    return res.status(503).json({ status: 'degraded', db: 'disconnected' });
+  }
+  res.json({ status: 'Server is running', db: 'connected' });
 });
 
 // Vision Boards Routes
@@ -306,5 +318,26 @@ const startServer = (port) => {
 
 startServer(PORT);
 startCronJobs();
+
+// GRACEFUL SHUTDOWN: on deploy, ECS/Docker sends SIGTERM. Stop accepting new
+// connections, finish in-flight requests, close DB, then exit — so a rolling
+// deploy never drops a student mid-request.
+const shutdown = (signal) => {
+  logger.info(`\n${signal} received — shutting down gracefully...`);
+  httpServer.close(() => {
+    logger.info('HTTP server closed.');
+    mongoose.connection.close(false).then(() => {
+      logger.info('MongoDB connection closed. Bye.');
+      process.exit(0);
+    }).catch(() => process.exit(0));
+  });
+  // Safety net: force-exit if cleanup hangs beyond 30s.
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout.');
+    process.exit(1);
+  }, 30000).unref();
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 
