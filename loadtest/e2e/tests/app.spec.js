@@ -55,6 +55,20 @@ test('2. college search API (through the LB) returns the seeded college', async 
     'seeded college present in search results').toBeTruthy();
 });
 
+test('4. UI college search works in-browser (validates same-origin /api fix)', async ({ page }) => {
+  // Drives the real SPA search box. Before the api.js fix this failed with
+  // "Failed to fetch" (SPA called host:5000). After the fix it calls /api
+  // same-origin through Nginx, so the seeded college now appears in the UI.
+  await page.goto('/login', { waitUntil: 'networkidle' });
+  const search = page.locator('input[placeholder*="college" i]').first();
+  await expect(search, 'college search box on /login').toBeVisible({ timeout: 20000 });
+  await search.fill('Load Test');
+  await expect(page.getByText(/Load Test Institute/i).first(),
+    'seeded college appears in the UI search results').toBeVisible({ timeout: 20000 });
+  await page.screenshot({ path: `${OUT}/05-ui-search.png`, fullPage: true });
+  console.log('[ui-search] SPA same-origin API call works');
+});
+
 test('3. login backend path (through the LB) reaches the OTP step', async ({ page }) => {
   // Browser-originated API call → Nginx → backend → Mongo. The seeded e2e user
   // has a real bcrypt password, so the password stage passes and the API

@@ -1,12 +1,11 @@
 name: CI
 
-# Continuous Integration — runs on every push/PR. Builds the backend image,
-# boots it against a real MongoDB and checks the deep health endpoint, builds
-# the frontend, and scans the image for vulnerabilities.
-#
-# This is the SAFE "CI half". It does NOT deploy anywhere (no AWS needed).
-# Deployment (CD) lives in a separate, manual-only workflow that stays OFF
-# until secrets are rotated (B1) and AWS is provisioned. See cd-deploy.yml.
+# Continuous Integration — runs on every push/PR. No AWS, no deploy.
+#   backend  : build image, boot it vs MongoDB, deep health, API smoke, Trivy scan
+#   frontend : install, lint (non-blocking), build
+#   e2e      : bring up the production-shaped stack (Nginx LB + 2 backend
+#              replicas), seed, run Playwright, and verify load balancing.
+# Deployment (CD) lives in the separate, manual-only, inactive cd-deploy.yml.
 
 on:
   push:
@@ -15,67 +14,123 @@ on:
     branches: [ main ]
 
 jobs:
-  # --- Backend: build image, smoke-boot it, scan it -----------------------
+  # ---------------------------------------------------------------- backend
   backend:
     runs-on: ubuntu-latest
     services:
       mongo:
         image: mongo:7
-        ports:
-          - 27017:27017
+        ports: [ '27017:27017' ]
     steps:
       - uses: actions/checkout@v4
 
       - name: Build backend image
         run: docker build -f aws-deployment/Dockerfile -t smaart-backend:${{ github.sha }} ./back-end
 
-      - name: Smoke-boot the container and check /api/health
+      - name: Boot container + deep /api/health
         run: |
           docker run -d --name backend --network host \
-            -e NODE_ENV=production \
-            -e PORT=5000 \
+            -e NODE_ENV=production -e PORT=5000 \
             -e MONGODB_URI=mongodb://localhost:27017/ci \
             -e JWT_SECRET=ci-only-not-a-real-secret \
             smaart-backend:${{ github.sha }}
-          echo "Waiting for the backend to become healthy..."
           for i in $(seq 1 30); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health || true)
-            if [ "$code" = "200" ]; then echo "Healthy (200)"; exit 0; fi
+            if [ "$code" = "200" ]; then echo "healthy"; break; fi
             sleep 2
           done
-          echo "Backend did not become healthy in time. Logs:"
-          docker logs backend
-          exit 1
+          test "$code" = "200" || (echo "not healthy"; docker logs backend; exit 1)
 
-      - name: Show health response (informational)
-        run: curl -s http://localhost:5000/api/health || true
+      - name: API smoke (routing + auth gate)
+        run: |
+          pub=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:5000/api/colleges?limit=1")
+          test "$pub" = "200" || (echo "public /api/colleges expected 200, got $pub"; exit 1)
+          prot=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:5000/api/students")
+          test "$prot" = "401" || (echo "protected /api/students expected 401, got $prot"; exit 1)
+          echo "API smoke OK (public 200, protected 401)"
 
       - name: Stop container
         if: always()
         run: docker rm -f backend || true
 
-      - name: Scan image for vulnerabilities (Trivy)
+      - name: Trivy image scan (fail on CRITICAL)
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: smaart-backend:${{ github.sha }}
           format: table
-          severity: CRITICAL          # fail the build only on CRITICAL
+          severity: CRITICAL
           exit-code: '1'
           ignore-unfixed: true
 
-  # --- Frontend: install + build (catches build breakage) -----------------
+  # --------------------------------------------------------------- frontend
   frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+        with: { node-version: 20 }
       - name: Install deps
         working-directory: front-end
         run: npm install --no-audit --no-fund
-      - name: Build
+      - name: Lint (non-blocking — reports existing debt without failing CI)
         working-directory: front-end
-        env:
-          VITE_API_URL: /api
+        run: npm run lint || true
+      - name: Build (same-origin API base)
+        working-directory: front-end
+        env: { VITE_API_URL: /api }
         run: npm run build
+
+  # -------------------------------------------------- end-to-end + load LB
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+
+      - name: Build frontend (same-origin /api) for the stack
+        working-directory: front-end
+        env: { VITE_API_URL: /api }
+        run: npm install --no-audit --no-fund && npm run build
+
+      - name: Provide local env for the stack
+        run: cp back-end/.env.local.example back-end/.env.local
+
+      - name: Bring up production-shaped stack (2 replicas)
+        run: docker compose -p smaart-prod -f docker-compose.prod-local.yml up -d --scale backend=2 --build
+
+      - name: Wait for health via the load balancer
+        run: |
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/health || true)
+            if [ "$code" = "200" ]; then echo "stack healthy"; break; fi
+            sleep 3
+          done
+          test "$code" = "200" || (echo "stack not healthy"; docker compose -p smaart-prod -f docker-compose.prod-local.yml logs --tail=50; exit 1)
+
+      - name: Seed fixtures (inside the compose network)
+        run: |
+          docker run --rm --network smaart-prod_default -v "$PWD:/app" -w /app/back-end \
+            -e LOADTEST_MONGODB_URI=mongodb://mongo:27017/smaart_local \
+            node:20-alpine node scripts/seed-loadtest.js
+
+      - name: Playwright E2E (against the LB)
+        run: |
+          docker run --rm --network smaart-prod_default -v "$PWD/loadtest:/loadtest" \
+            -w /loadtest/e2e -e BASE_URL=http://nginx \
+            mcr.microsoft.com/playwright:v1.49.1-jammy \
+            bash -c "npm install --no-save --no-audit --no-fund @playwright/test@1.49.1 && npx playwright test"
+
+      - name: Verify load balancing (>=2 distinct replicas serve traffic)
+        run: |
+          ups=$(for i in $(seq 1 40); do
+            curl -s -D - -o /dev/null http://localhost/api/health | tr -d '\r' | awk 'tolower($1)=="x-upstream:"{print $2}'
+          done | sort -u)
+          n=$(printf '%s\n' "$ups" | grep -c .)
+          echo "distinct backend replicas seen: $n"
+          printf '%s\n' "$ups"
+          test "$n" -ge 2 || (echo "Load balancer is NOT distributing across replicas"; exit 1)
+
+      - name: Teardown
+        if: always()
+        run: docker compose -p smaart-prod -f docker-compose.prod-local.yml down -v || true
