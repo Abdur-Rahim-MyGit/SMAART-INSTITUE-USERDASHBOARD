@@ -1,0 +1,81 @@
+name: CI
+
+# Continuous Integration — runs on every push/PR. Builds the backend image,
+# boots it against a real MongoDB and checks the deep health endpoint, builds
+# the frontend, and scans the image for vulnerabilities.
+#
+# This is the SAFE "CI half". It does NOT deploy anywhere (no AWS needed).
+# Deployment (CD) lives in a separate, manual-only workflow that stays OFF
+# until secrets are rotated (B1) and AWS is provisioned. See cd-deploy.yml.
+
+on:
+  push:
+    branches: [ main, vickram ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # --- Backend: build image, smoke-boot it, scan it -----------------------
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -f aws-deployment/Dockerfile -t smaart-backend:${{ github.sha }} ./back-end
+
+      - name: Smoke-boot the container and check /api/health
+        run: |
+          docker run -d --name backend --network host \
+            -e NODE_ENV=production \
+            -e PORT=5000 \
+            -e MONGODB_URI=mongodb://localhost:27017/ci \
+            -e JWT_SECRET=ci-only-not-a-real-secret \
+            smaart-backend:${{ github.sha }}
+          echo "Waiting for the backend to become healthy..."
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health || true)
+            if [ "$code" = "200" ]; then echo "Healthy (200)"; exit 0; fi
+            sleep 2
+          done
+          echo "Backend did not become healthy in time. Logs:"
+          docker logs backend
+          exit 1
+
+      - name: Show health response (informational)
+        run: curl -s http://localhost:5000/api/health || true
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f backend || true
+
+      - name: Scan image for vulnerabilities (Trivy)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: smaart-backend:${{ github.sha }}
+          format: table
+          severity: CRITICAL          # fail the build only on CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+
+  # --- Frontend: install + build (catches build breakage) -----------------
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        working-directory: front-end
+        run: npm install --no-audit --no-fund
+      - name: Build
+        working-directory: front-end
+        env:
+          VITE_API_URL: /api
+        run: npm run build

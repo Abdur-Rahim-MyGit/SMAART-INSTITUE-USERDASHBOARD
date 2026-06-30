@@ -1,0 +1,85 @@
+name: CD - Deploy to AWS (INACTIVE - manual only)
+
+# ============================================================================
+# CONTINUOUS DEPLOYMENT — INTENTIONALLY OFF.
+# ----------------------------------------------------------------------------
+# This workflow only runs when triggered MANUALLY (workflow_dispatch). It will
+# NOT run on push. Do NOT enable automatic triggers until ALL of these are done:
+#
+#   1. 🔴 Secrets rotated (B1) — the leaked MongoDB/JWT/Cloudinary/etc creds are
+#      replaced and removed from git history. Deploying before this ships a
+#      compromised system.
+#   2. AWS provisioned: ECR repo, ECS cluster + service, ALB, Secrets Manager.
+#   3. GitHub → AWS auth via OIDC role (NO long-lived keys). Set the role ARN in
+#      repo secret AWS_DEPLOY_ROLE_ARN and the region/names below.
+#
+# Until then this file is a documented template. The steps below are the
+# correct, mistake-proof shape (immutable SHA tags, push to ECR, rolling ECS
+# deploy, post-deploy smoke). Fill in the TODOs when the above are ready.
+# ============================================================================
+
+on:
+  workflow_dispatch:        # manual only — never auto-runs
+
+permissions:
+  id-token: write           # for AWS OIDC
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: smaart-backend
+  ECS_CLUSTER: smaart-cluster          # TODO: real cluster name
+  ECS_SERVICE: smaart-backend-service  # TODO: real service name
+  ECS_TASK_FAMILY: smaart-backend-task
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Requires a GitHub Environment with required reviewers = the human approval
+    # gate before production. TODO: create the "production" environment.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # - name: Configure AWS credentials (OIDC, no static keys)
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      # - name: Login to Amazon ECR
+      #   id: ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
+
+      # - name: Build & push image (immutable git-SHA tag, never :latest)
+      #   run: |
+      #     IMAGE=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+      #     docker build -f aws-deployment/Dockerfile -t "$IMAGE" ./back-end
+      #     docker push "$IMAGE"
+
+      # - name: Render new ECS task definition with the SHA image
+      #   id: taskdef
+      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+      #   with:
+      #     task-definition: aws-deployment/ecs-task-definition.json
+      #     container-name: backend
+      #     image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      # - name: Deploy to ECS (rolling, wait for stability)
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      #   with:
+      #     task-definition: ${{ steps.taskdef.outputs.task-definition }}
+      #     service: ${{ env.ECS_SERVICE }}
+      #     cluster: ${{ env.ECS_CLUSTER }}
+      #     wait-for-service-stability: true
+
+      # - name: Post-deploy smoke test against the live URL
+      #   run: |
+      #     code=$(curl -s -o /dev/null -w "%{http_code}" https://api.smaartminds.com/api/health)
+      #     test "$code" = "200" || (echo "Prod smoke failed ($code)"; exit 1)
+
+      - name: Placeholder (CD is not yet enabled)
+        run: |
+          echo "CD is intentionally inactive. Complete secrets rotation + AWS"
+          echo "provisioning, then uncomment the steps above."
+          exit 1

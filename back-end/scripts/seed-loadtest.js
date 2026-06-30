@@ -21,7 +21,13 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
+
+// A dedicated student with a REAL (bcrypt-hashed) password so the browser
+// E2E test can actually log in through the UI. Password meets the app policy.
+const E2E_EMAIL = 'e2e@loadtest.local';
+const E2E_PASSWORD = 'E2eTest@12345';
 
 // Host reaches the containerised Mongo on the published port (localhost:27017).
 const MONGODB_URI =
@@ -170,6 +176,26 @@ async function main() {
     TInfo(`  inserted ${Math.min(i + BATCH, docs.length)}/${docs.length}`);
   }
 
+  // --- One real-password student for the browser E2E login test ------------
+  const e2eHash = await bcrypt.hash(E2E_PASSWORD, 10);
+  await Students.insertOne({
+    _id: oid(),
+    fullName: 'E2E Test Student',
+    email: E2E_EMAIL,
+    mobile: '9000000001',
+    password: e2eHash,
+    role: 'student',
+    college: collegeId,
+    rollNumber: 'LTE2E0001',
+    status: 'active',
+    mustChangePassword: false,
+    isFirstLogin: false,
+    isRegistered: true,
+    createdAt: now,
+    updatedAt: now,
+  });
+  TInfo('E2E login student created:', E2E_EMAIL);
+
   // --- Mint a JWT per student (no sessionId => skips single-session check) ---
   TInfo('Minting JWTs...');
   const tokens = ids.map((id, i) =>
@@ -197,6 +223,8 @@ async function main() {
         count: tokens.length,
         assessmentId: assessmentId.toString(),
         collegeId: collegeId.toString(),
+        e2eEmail: E2E_EMAIL,
+        e2ePassword: E2E_PASSWORD,
         tokens,
       },
       null,
