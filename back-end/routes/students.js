@@ -5,7 +5,14 @@ const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
 const { protectOrBypass } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roleMiddleware');
+const escapeRegex = require('../utils/escapeRegex');
 router.use(generalLimiter);
+
+// SECURITY (audit HIGH): non-staff callers may only read their OWN student
+// record. Staff (admin/teacher/moderator) and the trusted admin dashboard
+// (protectOrBypass) may read any.
+const STAFF = ['admin', 'teacher', 'moderator'];
+const isStaff = (u) => !!u && (STAFF.includes(u.role) || (Array.isArray(u.roles) && u.roles.some((r) => STAFF.includes(r))));
 
 // SECURITY: require an authenticated session (or trusted admin dashboard).
 // Blocks the previously-open anonymous access to all student PII.
@@ -34,11 +41,12 @@ router.get('/', requireRole('admin', 'teacher'), async (req, res) => {
 
         // Search functionality
         if (search) {
+            const safe = escapeRegex(search);
             query.$or = [
-                { fullName: { $regex: search, $options: 'i' } },
-                { studentId: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { rollNumber: { $regex: search, $options: 'i' } }
+                { fullName: { $regex: safe, $options: 'i' } },
+                { studentId: { $regex: safe, $options: 'i' } },
+                { email: { $regex: safe, $options: 'i' } },
+                { rollNumber: { $regex: safe, $options: 'i' } }
             ];
         }
 
@@ -99,6 +107,10 @@ router.get('/by-email/:email', async (req, res) => {
 // Get student by ID
 router.get('/:id', async (req, res) => {
     try {
+        // SECURITY (audit HIGH): non-staff may only read their OWN record.
+        if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
         const student = await Student.findById(req.params.id)
             .select('-password')
             .populate('college', 'collegeName collegeCode address')
@@ -141,6 +153,11 @@ router.get('/studentId/:studentId', async (req, res) => {
                 success: false,
                 error: 'Student not found'
             });
+        }
+
+        // SECURITY (audit HIGH): non-staff may only read their OWN record.
+        if (!isStaff(req.user) && String(student._id) !== String(req.user && req.user._id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
         }
 
         res.json({

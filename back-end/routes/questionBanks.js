@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
 
         // Search functionality
         if (search) {
-            query.questionText = { $regex: search, $options: 'i' };
+            query.questionText = { $regex: require('../utils/escapeRegex')(search), $options: 'i' }; // SECURITY: ReDoS-safe
         }
 
         const questions = await QuestionBank.find(query)

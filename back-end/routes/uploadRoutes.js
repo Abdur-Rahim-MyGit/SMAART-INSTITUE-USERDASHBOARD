@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { generalLimiter } = require('../middleware/rateLimiter');
+const { generalLimiter, uploadLimiter } = require('../middleware/rateLimiter');
 router.use(generalLimiter);
 
 const { uploadCloudinary, uploadRegistration } = require('../middleware/upload');
 
-// Single file upload endpoint
+// Single file upload endpoint (used during pre-login registration, so it stays
+// public — but SECURITY: gated by a strict per-IP uploadLimiter to stop
+// denial-of-wallet abuse of the paid Cloudinary write path). The upload folder
+// is already derived from a sanitized email, and multer enforces type/size.
 // Uses 'file' as the field name
-router.post('/', (req, res) => {
+router.post('/', uploadLimiter, (req, res) => {
     uploadRegistration.single('file')(req, res, function (err) {
         if (err) {
             // Handle multer-specific errors (like file size limit)
