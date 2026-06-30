@@ -91,6 +91,12 @@ router.get('/by-email/:email', async (req, res) => {
             });
         }
 
+        // SECURITY (audit HIGH): non-staff may only resolve their OWN record by
+        // email — otherwise this enumerates every student's id/studentId.
+        if (!isStaff(req.user) && String(student._id) !== String(req.user && req.user._id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
+
         res.json({
             success: true,
             data: student
@@ -258,6 +264,10 @@ router.delete('/:id', requireRole('admin'), async (req, res) => {
 // Get student's enrolled courses
 router.get('/:id/courses', async (req, res) => {
     try {
+        // SECURITY (audit HIGH): non-staff may only read their OWN record.
+        if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
         const student = await Student.findById(req.params.id)
             .select('enrolledCourses fullName studentId')
             .populate('enrolledCourses', 'title courseCode description duration status');
@@ -286,6 +296,10 @@ router.get('/:id/courses', async (req, res) => {
 // Get student's assessments
 router.get('/:id/assessments', async (req, res) => {
     try {
+        // SECURITY (audit HIGH): non-staff may only read their OWN record.
+        if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
         const student = await Student.findById(req.params.id)
             .select('assessments fullName studentId')
             .populate('assessments.assessment', 'assessmentName assessmentCode questionCategory');

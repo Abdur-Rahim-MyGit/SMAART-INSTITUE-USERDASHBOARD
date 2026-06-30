@@ -160,7 +160,7 @@ router.get('/code/:code/status', async (req, res) => {
 // Get assessment by description
 router.get('/by-description/:description', async (req, res) => {
     try {
-        const description = req.params.description;
+        const description = require('../utils/escapeRegex')(req.params.description); // SECURITY: ReDoS-safe
 
         const assessment = await Assessment.findOne({
             description: { $regex: description, $options: 'i' },
