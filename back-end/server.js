@@ -340,4 +340,16 @@ const shutdown = (signal) => {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
+// RESILIENCE (audit): without these, an escaped promise rejection crashes the
+// whole process (Node default), and an uncaught exception leaves it dead with
+// no log. Log rejections (keep serving); on a truly uncaught exception the
+// state is unknown, so log and exit non-zero — ECS/Docker restarts a clean one.
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection: ' + (reason && reason.stack ? reason.stack : reason));
+});
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception: ' + (err && err.stack ? err.stack : err));
+  process.exit(1);
+});
+
 

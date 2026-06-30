@@ -73,6 +73,9 @@ function initWebSocket(httpServer) {
     const pathname = url.parse(req.url).pathname;
 
     if (pathname !== '/ws/notifications') {
+      // SECURITY (audit): destroy non-matching upgrade sockets instead of
+      // leaving them open (a bare return leaks the socket → slow resource DoS).
+      socket.destroy();
       return;
     }
 

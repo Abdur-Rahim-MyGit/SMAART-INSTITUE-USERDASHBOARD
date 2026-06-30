@@ -3,7 +3,7 @@ const { protect } = require('../middleware/auth');
 const chatbotService = require('../services/chatbotService');
 
 const router = express.Router();
-const { generalLimiter } = require('../middleware/rateLimiter');
+const { generalLimiter, aiLimiter } = require('../middleware/rateLimiter');
 router.use(generalLimiter);
 
 
@@ -15,7 +15,7 @@ const conversations = new Map();
  * @desc    Send a message to the chatbot
  * @access  Private
  */
-router.post('/message', protect, async (req, res) => {
+router.post('/message', protect, aiLimiter, async (req, res) => {
     try {
         const { message, conversationId } = req.body;
 
