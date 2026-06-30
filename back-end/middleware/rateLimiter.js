@@ -106,6 +106,18 @@ const aiLimiter = rateLimit({
   keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
 });
 
+// Upload limiter — caps the unauthenticated registration upload path (paid
+// Cloudinary writes) to prevent denial-of-wallet abuse. 30 uploads / 15 min per IP.
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: { error: 'Too many uploads. Please wait a few minutes and try again.', retryAfter: 15 },
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
+});
+
 module.exports = {
   loginLimiter,
   otpLimiter,
@@ -114,4 +126,5 @@ module.exports = {
   generalLimiter,
   resumeExportLimiter,
   aiLimiter,
+  uploadLimiter,
 };

@@ -1,84 +1,59 @@
 {
   "family": "smaart-backend-task",
   "networkMode": "awsvpc",
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "256",
-  "memory": "512",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
   "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/smaart-ecs-execution-role",
   "taskRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/smaart-ecs-task-role",
   "containerDefinitions": [
     {
       "name": "backend",
-      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smaart-backend:latest",
+      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smaart-backend:<IMAGE_TAG>",
+      "comment_image": "Pin to an immutable git-SHA tag, never :latest, so rollbacks are unambiguous.",
       "essential": true,
+      "stopTimeout": 30,
+      "comment_stopTimeout": "Gives the graceful SIGTERM handler time to drain in-flight requests on deploy.",
       "portMappings": [
-        {
-          "containerPort": 5000,
-          "hostPort": 5000,
-          "protocol": "tcp"
-        }
+        { "containerPort": 5000, "protocol": "tcp" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/smaart-backend",
-          "awslogs-region": "ap-south-1",
+          "awslogs-region": "<REGION>",
           "awslogs-stream-prefix": "backend"
         }
       },
       "environment": [
-        {
-          "name": "NODE_ENV",
-          "value": "production"
-        },
-        {
-          "name": "PORT",
-          "value": "5000"
-        },
-        {
-          "name": "FRONTEND_URL",
-          "value": "https://app.smaartminds.com"
-        }
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "5000" },
+        { "name": "FRONTEND_URL", "value": "https://staging.smaartminds.com" },
+        { "name": "OPENROUTER_BASE_URL", "value": "https://openrouter.ai/api/v1" },
+        { "name": "AI_MODEL", "value": "" },
+        { "name": "SMTP_HOST", "value": "" },
+        { "name": "SMTP_PORT", "value": "587" },
+        { "name": "CLOUDINARY_CLOUD_NAME", "value": "" },
+        { "name": "NSFW_THRESHOLD", "value": "0.7" },
+        { "name": "ITSM_URL", "value": "" },
+        { "name": "REDIS_HOST", "value": "" },
+        { "name": "REDIS_PORT", "value": "6379" }
       ],
+      "_comment_secrets": "Every value here resolves from AWS Secrets Manager at runtime. This list was reconciled against `grep -r process.env. back-end/`. NOTE: OPENAI_API_KEY was REMOVED (unused — the code uses OPENROUTER_API_KEY).",
       "secrets": [
-        {
-          "name": "MONGODB_URI",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:MONGODB_URI::"
-        },
-        {
-          "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:JWT_SECRET::"
-        },
-        {
-          "name": "REDIS_HOST",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:REDIS_HOST::"
-        },
-        {
-          "name": "REDIS_PORT",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:REDIS_PORT::"
-        },
-        {
-          "name": "REDIS_PASSWORD",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:REDIS_PASSWORD::"
-        },
-        {
-          "name": "OPENAI_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:OPENAI_API_KEY::"
-        },
-        {
-          "name": "CLOUDINARY_CLOUD_NAME",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:CLOUDINARY_CLOUD_NAME::"
-        },
-        {
-          "name": "CLOUDINARY_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:CLOUDINARY_API_KEY::"
-        },
-        {
-          "name": "CLOUDINARY_API_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:production/smaart/secrets-abc:CLOUDINARY_API_SECRET::"
-        }
+        { "name": "MONGODB_URI",            "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:MONGODB_URI::" },
+        { "name": "JWT_SECRET",             "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:JWT_SECRET::" },
+        { "name": "OPENROUTER_API_KEY",     "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:OPENROUTER_API_KEY::" },
+        { "name": "SMTP_USER",              "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:SMTP_USER::" },
+        { "name": "SMTP_PASS",              "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:SMTP_PASS::" },
+        { "name": "CLOUDINARY_API_KEY",     "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:CLOUDINARY_API_KEY::" },
+        { "name": "CLOUDINARY_API_SECRET",  "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:CLOUDINARY_API_SECRET::" },
+        { "name": "DEEPGRAM_API_KEY",       "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:DEEPGRAM_API_KEY::" },
+        { "name": "OCR_SPACE_API_KEY",      "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:OCR_SPACE_API_KEY::" },
+        { "name": "ADMIN_SYSTEM_SECRET",    "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:ADMIN_SYSTEM_SECRET::" },
+        { "name": "USERDASHBOARD_SYNC_TOKEN","valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:USERDASHBOARD_SYNC_TOKEN::" },
+        { "name": "ITSM_API_KEY",           "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:ITSM_API_KEY::" },
+        { "name": "REDIS_PASSWORD",         "valueFrom": "arn:aws:secretsmanager:<REGION>:<AWS_ACCOUNT_ID>:secret:staging/smaart/secrets-XXXX:REDIS_PASSWORD::" }
       ],
       "healthCheck": {
         "command": [
@@ -91,6 +66,7 @@
         "startPeriod": 15
       },
       "readonlyRootFilesystem": false,
+      "_comment_rootfs": "Kept false for G3 — the app writes to logs/ and tmp/. For G4 hardening set true + add tmpfs mounts for those paths.",
       "user": "node",
       "privileged": false
     }

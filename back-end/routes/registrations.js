@@ -41,7 +41,7 @@ router.get('/institutions', async (req, res) => {
     // Add search filter if provided
     if (search) {
       pipeline[0].$match.institution = {
-        $regex: search,
+        $regex: require('../utils/escapeRegex')(search), // SECURITY: ReDoS-safe
         $options: 'i'
       };
     }

@@ -3,12 +3,18 @@
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const getApiBaseUrl = () => {
+  // If an API base is configured at build time (e.g. "/api" for same-origin
+  // behind a load balancer / CDN), ALWAYS honor it — on every host. This is the
+  // production pattern (one domain, the LB routes /api to the backend).
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   const hostname = window.location.hostname;
   // If accessing from localhost, use localhost
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    return "http://localhost:5000/api";
   }
-  // If accessing from network IP, use the same IP for backend
+  // LAN/mobile dev fallback: talk to the backend on the same host, port 5000.
   return `http://${hostname}:5000/api`;
 };
 
@@ -20,6 +26,13 @@ let workingBaseUrl = null; // Will be discovered on first API call
 
 // Export for use in other files
 export const getBackendUrl = () => {
+  // When the API is configured same-origin (VITE_API_URL is a relative path
+  // like "/api"), WebSockets and /uploads also go through the same origin — the
+  // load balancer proxies /socket.io and /uploads to the backend.
+  const apiBase = import.meta.env.VITE_API_URL;
+  if (apiBase && apiBase.startsWith('/')) {
+    return window.location.origin;
+  }
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return "http://localhost:5000";

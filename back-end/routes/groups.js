@@ -555,13 +555,14 @@ router.get('/search/students', async (req, res) => {
 
         // Search in Student collection (and maybe others if needed)
         // Find students in same college, matching name/email, exclude requester
+        const safeQuery = require('../utils/escapeRegex')(query); // SECURITY: ReDoS-safe
         const students = await Student.find({
             college: collegeId,
             _id: { $ne: requesterId },
             $or: [
-                { fullName: { $regex: query, $options: 'i' } },
-                { email: { $regex: query, $options: 'i' } },
-                { role: { $regex: query, $options: 'i' } } // allow searching by role if needed?
+                { fullName: { $regex: safeQuery, $options: 'i' } },
+                { email: { $regex: safeQuery, $options: 'i' } },
+                { role: { $regex: safeQuery, $options: 'i' } } // allow searching by role if needed?
             ]
         }).select('fullName email profileImage').limit(20);
 
