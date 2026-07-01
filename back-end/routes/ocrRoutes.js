@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { generalLimiter } = require('../middleware/rateLimiter');
+const { generalLimiter, aiLimiter } = require('../middleware/rateLimiter');
 const { protect } = require('../middleware/auth');
 router.use(generalLimiter);
 // SECURITY: require a valid session. This endpoint proxies images to a paid
@@ -88,7 +88,7 @@ const runPaddleOcr = (imagePath) => new Promise((resolve, reject) => {
  * POST /api/ocr/paddle
  * Extract text and word boxes from an image using local PaddleOCR.
  */
-router.post('/paddle', async (req, res) => {
+router.post('/paddle', aiLimiter, async (req, res) => {
   let tempDir = null;
 
   try {
@@ -152,7 +152,7 @@ router.post('/paddle', async (req, res) => {
  * - text: string (extracted text)
  * - confidence: number (OCR confidence)
  */
-router.post('/extract', async (req, res) => {
+router.post('/extract', aiLimiter, async (req, res) => {
   try {
     const { imageData } = req.body;
     

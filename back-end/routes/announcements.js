@@ -97,10 +97,10 @@ const buildVisibilityFilter = async (user) => {
             const CollegeDegree = mongoose.model('CollegeDegree');
             const collegeDegs = await CollegeDegree.find({
               college: collegeId,
-              $or: [
-                { specialization: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } },
-                { fullName: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } }
-              ]
+              $or: (() => { const s = require('../utils/escapeRegex')(studentDegreeId); return [
+                { specialization: { $regex: new RegExp(`^${s}$`, 'i') } },
+                { fullName: { $regex: new RegExp(`^${s}$`, 'i') } }
+              ]; })()
             }).select('_id');
             collegeDegs.forEach(cd => {
               targetDegreeIds.push(cd._id);

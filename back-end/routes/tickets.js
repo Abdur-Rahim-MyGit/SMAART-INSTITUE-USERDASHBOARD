@@ -306,9 +306,10 @@ router.get('/all',
 
       // Search by ticketId or title
       if (search) {
+        const safe = require('../utils/escapeRegex')(search); // SECURITY: ReDoS-safe
         query.$or = [
-          { ticketId: { $regex: search, $options: 'i' } },
-          { title: { $regex: search, $options: 'i' } }
+          { ticketId: { $regex: safe, $options: 'i' } },
+          { title: { $regex: safe, $options: 'i' } }
         ];
       }
 

@@ -193,7 +193,7 @@ router.post('/', protectOrBypass, requireRole('admin'), async (req, res) => {
 // Get college by name
 router.get('/name/:name', async (req, res) => {
   try {
-    const name = decodeURIComponent(req.params.name);
+    const name = require('../utils/escapeRegex')(decodeURIComponent(req.params.name)); // SECURITY: ReDoS-safe
     const college = await College.findOne({
       collegeName: { $regex: new RegExp(`^${name}$`, 'i') }
     });

@@ -1,0 +1,62 @@
+# ============================================================================
+# docker-compose.local.yml  —  Run the SMAART backend stack on your machine
+# ----------------------------------------------------------------------------
+# WHAT THIS IS:
+#   A local rehearsal of production. It builds the SAME Docker image AWS will
+#   run (from aws-deployment/Dockerfile) and boots it next to a real MongoDB,
+#   so you can prove the production artifact works end-to-end BEFORE any AWS
+#   spend. This is gate G0/G1 from DEPLOYMENT_GUIDE.md.
+#
+# WHAT IT IS NOT:
+#   This is for LOCAL testing only. In production, AWS ECS Fargate runs the
+#   container (not Compose), MongoDB Atlas is the database, and the React
+#   frontend is served from S3 + CloudFront — not from here.
+#
+# PREREQUISITES:
+#   - Docker Desktop running.
+#   - back-end/.env.local exists (copy it from back-end/.env.local.example).
+#
+# RUN:
+#   docker compose -f docker-compose.local.yml up --build
+# STOP:
+#   docker compose -f docker-compose.local.yml down
+# RESET THE DATABASE (wipe local data):
+#   docker compose -f docker-compose.local.yml down -v
+# ============================================================================
+
+services:
+  # --- MongoDB: the local database (no auth, local only) --------------------
+  mongo:
+    image: mongo:7
+    container_name: smaart-mongo-local
+    ports:
+      - "27017:27017"          # exposed so you can inspect with Compass if you like
+    volumes:
+      - mongo-data:/data/db    # named volume = data survives `down`, wiped by `down -v`
+    healthcheck:
+      # Backend only starts once Mongo answers a ping (see depends_on below).
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # --- Backend: the REAL production image, built from aws-deployment/Dockerfile
+  backend:
+    build:
+      context: ./back-end                       # build context = backend folder
+      dockerfile: ../aws-deployment/Dockerfile  # the production Dockerfile
+    container_name: smaart-backend-local
+    env_file:
+      - ./back-end/.env.local                   # runtime settings (your local copy)
+    ports:
+      - "5000:5000"                             # http://localhost:5000
+    depends_on:
+      mongo:
+        condition: service_healthy              # wait for Mongo to be ready
+    restart: unless-stopped
+    # NOTE: the Dockerfile already defines a HEALTHCHECK hitting /api/health,
+    # so `docker compose ps` will show this container as healthy/unhealthy.
+
+volumes:
+  mongo-data:

@@ -54,10 +54,11 @@ router.get('/', async (req, res) => {
 
         // Search functionality
         if (search) {
+            const safe = require('../utils/escapeRegex')(search); // SECURITY: ReDoS-safe
             query.$or = [
-                { assessmentName: { $regex: search, $options: 'i' } },
-                { assessmentCode: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } }
+                { assessmentName: { $regex: safe, $options: 'i' } },
+                { assessmentCode: { $regex: safe, $options: 'i' } },
+                { description: { $regex: safe, $options: 'i' } }
             ];
         }
 
@@ -65,7 +66,8 @@ router.get('/', async (req, res) => {
             .select('assessmentCode assessmentName description questionCategory status duration totalAttempts averageScore createdAt')
             .populate('createdBy', 'fullName email')
             .sort({ createdAt: -1 })
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .lean();  // PERF: skip document hydration; identical JSON (no virtuals).
 
         res.json({
             success: true,
@@ -158,7 +160,7 @@ router.get('/code/:code/status', async (req, res) => {
 // Get assessment by description
 router.get('/by-description/:description', async (req, res) => {
     try {
-        const description = req.params.description;
+        const description = require('../utils/escapeRegex')(req.params.description); // SECURITY: ReDoS-safe
 
         const assessment = await Assessment.findOne({
             description: { $regex: description, $options: 'i' },

@@ -921,7 +921,7 @@ router.post('/onboarding', aiLimiter, optionalAuth, async (req, res) => {
           : edu.specialisation || '';
 
         await Student.findOneAndUpdate(
-          { email: { $regex: new RegExp(`^${studentEmail.trim()}$`, 'i') } },
+          { email: { $regex: new RegExp(`^${require('../utils/escapeRegex')(studentEmail.trim())}$`, 'i') } }, // SECURITY: ReDoS-safe
           {
             $set: {
               academic: {

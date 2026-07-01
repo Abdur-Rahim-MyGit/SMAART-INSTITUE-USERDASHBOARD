@@ -15,9 +15,16 @@
  * are dropped. Safe on Express 4 where req.query/body are mutable plain objects.
  */
 
-function sanitizeValue(value) {
+// SECURITY (audit): bound recursion depth so a deeply-nested JSON body cannot
+// blow the call stack (RangeError → 500 DoS). Real inputs are shallow; anything
+// past the limit is left as-is (it still can't reach a query as an operator key
+// because parents were already sanitized).
+const MAX_DEPTH = 32;
+
+function sanitizeValue(value, depth) {
+  if (depth > MAX_DEPTH) return;
   if (Array.isArray(value)) {
-    value.forEach(sanitizeValue);
+    value.forEach((v) => sanitizeValue(v, depth + 1));
     return;
   }
   if (value && typeof value === 'object') {
@@ -27,14 +34,14 @@ function sanitizeValue(value) {
         delete value[key];
         continue;
       }
-      sanitizeValue(value[key]);
+      sanitizeValue(value[key], depth + 1);
     }
   }
 }
 
 module.exports = function sanitizeMongo(req, res, next) {
-  if (req.body) sanitizeValue(req.body);
-  if (req.query) sanitizeValue(req.query);
-  if (req.params) sanitizeValue(req.params);
+  if (req.body) sanitizeValue(req.body, 0);
+  if (req.query) sanitizeValue(req.query, 0);
+  if (req.params) sanitizeValue(req.params, 0);
   next();
 };

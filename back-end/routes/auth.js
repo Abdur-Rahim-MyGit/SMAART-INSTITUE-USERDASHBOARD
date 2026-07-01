@@ -589,7 +589,7 @@ router.post('/login',
 
           // Generate OTP and send
           const otp = generateOTP();
-          console.log(`[OTP] Generated OTP for ${loginEmail}: '${otp}'`);
+          console.log(`[OTP] login code generated for ${loginEmail}`); // SECURITY: never log the code
           const tempToken = crypto.randomBytes(32).toString('hex');
 
           // Delete any existing OTP for this email
@@ -758,7 +758,7 @@ router.post('/login',
 
       // Generate OTP and send email
       const otp = generateOTP();
-      console.log(`[OTP] Generated OTP for ${loginEmail}: '${otp}'`);
+      console.log(`[OTP] login code generated for ${loginEmail}`); // SECURITY: never log the code
       const tempToken = crypto.randomBytes(32).toString('hex');
 
       // Delete any existing OTP for this email
@@ -1049,7 +1049,7 @@ router.post('/resend-login-otp', async (req, res) => {
 
     // Generate new OTP
     const otp = generateOTP();
-    console.log(`[OTP] Resent OTP for ${loginOtp.email}: '${otp}'`);
+    console.log(`[OTP] code resent for ${loginOtp.email}`); // SECURITY: never log the code
     const newTempToken = crypto.randomBytes(32).toString('hex');
 
     // Update the record with new OTP and token
@@ -1215,7 +1215,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
 
     // Generate OTP for password reset
     const otp = generateOTP();
-    console.log(`[OTP] Password reset OTP for ${normalizedEmail}: '${otp}'`);
+    console.log(`[OTP] password-reset code generated for ${normalizedEmail}`); // SECURITY: never log the code
     const resetToken = crypto.randomBytes(32).toString('hex');
 
     // Delete any existing reset OTP for this email
@@ -1682,12 +1682,22 @@ router.get('/me', protect, async (req, res) => {
   }
 });
 
-// === UTILITY: Clear stale session by email (for debugging) ===
-router.post('/clear-session', async (req, res) => {
+// === UTILITY: Clear stale session by email ===
+// SECURITY (audit HIGH): now requires auth, and a caller may only clear their
+// OWN session unless they are an admin. Previously unauthenticated — anyone
+// could force-logout any user by email (the single-session check then 401s the
+// victim on their next request), a remote no-auth forced-logout / DoS.
+router.post('/clear-session', protect, async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isSelf = req.user && (req.user.email || '').toLowerCase() === String(email).toLowerCase();
+    if (!isAdmin && !isSelf) {
+      return res.status(403).json({ error: 'Not authorized to clear this session' });
     }
 
     const Student = require('../models/Student');
