@@ -53,6 +53,11 @@ const isSessionCompleted = async (enrollment, course, moduleDoc, dayId) => {
  */
 const isModuleCompleted = async (enrollment, course, moduleDoc) => {
     try {
+        const mProg = enrollment.moduleProgress.find(mp => mp.module.toString() === moduleDoc._id.toString());
+        if (mProg && mProg.status === 'completed') {
+            return true;
+        }
+
         if (!moduleDoc.days || moduleDoc.days.length === 0) return false;
 
         for (const day of moduleDoc.days) {

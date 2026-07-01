@@ -604,7 +604,7 @@ const PlacementDetail = () => {
       </div>
 
       <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
-        <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+        <DialogContent className="w-[92%] sm:w-full max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
           <DialogHeader className="border-b border-[#d8e6f7] px-6 py-5 text-left dark:border-[#1a3884]/20">
             <DialogTitle className="text-xl font-extrabold text-[#0d1f4e] dark:text-white">
               Apply for {job.displayTitle}
@@ -670,7 +670,7 @@ const PlacementDetail = () => {
                   {!applicationForm.resumeFile ? (
                     <label
                       htmlFor="resumeFileInput"
-                      className="inline-flex h-11 w-full items-center justify-left
+                      className="inline-flex h-11 w-full items-center justify-start
                        rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-4 text-sm font-semibold text-[#0d1f4e] cursor-pointer hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
                     >
                       <UploadIcon className="mr-2 h-4 w-4 text-[#0d1f4e]" />
@@ -715,7 +715,7 @@ const PlacementDetail = () => {
               </a>
             )}
 
-            <DialogFooter className="border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20">
+            <DialogFooter className="border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20 gap-2 sm:gap-0">
               <button
                 type="button"
                 onClick={() => setApplyOpen(false)}

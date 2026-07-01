@@ -1,21 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, Lightbulb, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
-const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
+const MCQPractice = ({ content, questions, onComplete, isCompleted, storageKey, savedScore, savedTotalPoints }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [selectedAnswers, setSelectedAnswers] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return {};
+  });
   const [showExplanation, setShowExplanation] = useState({});
   const [allAnswered, setAllAnswered] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [showResults, setShowResults] = useState(isCompleted || false);
   const showImmediateFeedback = (questions?.length || 0) <= 1;
+
+  useEffect(() => {
+    if (isCompleted) {
+      setShowResults(true);
+    }
+  }, [isCompleted]);
 
   const currentQuestion = questions?.[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === (questions?.length - 1);
 
   const handleAnswerSelect = (questionIndex, answerIndex) => {
-    setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
+    const updated = { ...selectedAnswers, [questionIndex]: answerIndex };
+    setSelectedAnswers(updated);
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    }
   };
 
   const handleNext = () => {
@@ -40,6 +62,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
           return acc + 1;
         }, 0);
         if (onComplete) onComplete(score, questions.length);
+        setShowResults(true);
         toast.success('Practice completed!');
       } else {
         toast.error('Please answer all questions before completing.');
@@ -71,16 +94,28 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
 
     if (showResults) {
     const totalQuestions = questions.length;
-    const score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
-      const q = questions[qIndex];
-      const selIdx = selectedAnswers[qIndex];
-      const selOptionText = q.options?.[selIdx];
-      const isCorrect = 
-        selIdx === q.correctAnswer || 
-        String(selIdx) === String(q.correctAnswer) ||
-        (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer));
-      return acc + (isCorrect ? 1 : 0);
-    }, 0);
+    let score = 0;
+    if (typeof savedScore === 'number' && typeof savedTotalPoints === 'number' && Object.keys(selectedAnswers).length === 0) {
+      if (savedTotalPoints === totalQuestions) {
+        score = savedScore;
+      } else {
+        score = savedTotalPoints > 0 ? Math.min(totalQuestions, Math.round((savedScore / savedTotalPoints) * totalQuestions)) : 0;
+        if (savedScore > 0 && score === 0 && totalQuestions > 0) {
+          score = 1;
+        }
+      }
+    } else {
+      score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
+        const q = questions[qIndex];
+        const selIdx = selectedAnswers[qIndex];
+        const selOptionText = q.options?.[selIdx];
+        const isCorrect = 
+          selIdx === q.correctAnswer || 
+          String(selIdx) === String(q.correctAnswer) ||
+          (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer));
+        return acc + (isCorrect ? 1 : 0);
+      }, 0);
+    }
 
     return (
       <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
@@ -156,30 +191,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
     );
   }
 
-  if (isCompleted) {
-    return (
-      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 flex items-center justify-center min-h-[350px]">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-[#f8fafc] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-3xl p-8 text-center shadow-xl"
-        >
-          <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-green-500/20 animate-pulse">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-          <h3 className="text-2xl font-black text-[#1a3884] dark:text-white mb-2">
-            Practice Completed
-          </h3>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-            You have already successfully finished this practice exercise. Your results have been submitted and validated.
-          </p>
-          <div className="text-xs font-black uppercase tracking-wider text-green-600 dark:text-green-450 bg-green-500/10 py-3 px-5 rounded-2xl inline-block">
-            Status: Validated & Locked
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">

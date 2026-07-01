@@ -26,7 +26,7 @@ const InterviewPrepTool = () => {
 
     return (
         <div className="career-agent-page" style={{ height: 'auto', overflow: 'visible', background: 'transparent' }}>
-            <div className="max-w-5xl mx-auto w-full pb-12">
+            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-12">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}

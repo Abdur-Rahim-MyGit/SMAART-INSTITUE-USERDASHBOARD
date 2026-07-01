@@ -18,6 +18,7 @@ import {
   Megaphone,
   ClipboardCheck,
   RefreshCw,
+  ArrowLeft,
 } from 'lucide-react';
 import { NotificationsSkeleton } from '@/components/SkeletonPatterns';
 import { useNotifications } from '@/contexts/NotificationContext';
@@ -217,6 +218,19 @@ const Notifications = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 font-sans transition-colors duration-300">
       <main className="container mx-auto max-w-6xl px-3 py-4">
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+              <ArrowLeft className="h-4 w-4" />
+            </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+          </button>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

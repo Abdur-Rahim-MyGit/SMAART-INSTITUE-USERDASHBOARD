@@ -1368,7 +1368,7 @@ const ResumeBuilder = () => {
             if (!containerRef.current) return;
             const parentWidth = containerRef.current.getBoundingClientRect().width;
             const canvasWidth = 794; // 210mm in pixels
-            const padding = window.innerWidth < 768 ? 24 : 64; // md:p-12 vs p-8
+            const padding = window.innerWidth < 768 ? 32 : 64; // p-4 (32px) vs p-8 (64px)
             const availableWidth = parentWidth - padding;
 
             if (availableWidth < canvasWidth) {
@@ -1712,7 +1712,19 @@ const ResumeBuilder = () => {
         return (
             <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
                 <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
-                    <div className="max-w-6xl mx-auto space-y-8">
+                    <div className="max-w-6xl mx-auto space-y-6">
+                        {/* Header & Back Button */}
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={() => navigate("/dashboard/smaart-toolkit")}
+                                className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#112b6b] transition-all hover:text-[#1a3884] dark:text-slate-300"
+                            >
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                                    <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300" />
+                                </div>
+                                BACK TO TOOLKIT
+                            </button>
+                        </div>
                         {/* Page Header */}
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -1822,75 +1834,75 @@ const ResumeBuilder = () => {
 
     // --- Builder Mode Return ---
     return (
-        <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
+        <div className="flex flex-col lg:h-full bg-[#F8FAFC] dark:bg-[#00152E] lg:overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
             {/* Header */}
-            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm">
-                <div className="flex items-center gap-4">
+            <header className="min-h-[4rem] flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-0 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm gap-3">
+                <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
                     <button onClick={async () => {
                         await fetchResumeList();
                         setPageMode('list');
-                    }} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-[11px] text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                    }} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-[10px] sm:text-[11px] text-slate-650 dark:text-slate-350 uppercase tracking-wider shrink-0">
                         <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> Back
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 cursor-help" title={`ATS Score: ${atsScore}/100`}>
-                            <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 cursor-help shrink-0" title={`ATS Score: ${atsScore}/100`}>
+                            <CircularScoreRing score={atsScore} size={36} strokeWidth={4} label="" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <div className="relative flex items-center group">
                                 <input
                                     value={versionName}
                                     onChange={(e) => setVersionName(e.target.value)}
-                                    className="text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#1a3884] outline-none transition-colors w-[200px] pr-6"
+                                    className="text-sm sm:text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#1a3884] outline-none transition-colors w-28 sm:w-48 pr-6 truncate"
                                     placeholder="Resume Name"
                                 />
                                 <IconPencil stroke={2} className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                             </div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">ATS Score Status</p>
+                            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate hidden sm:block">ATS Score Status</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 dark:border-white/5">
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
                     </div>
                     {currentStep !== steps.length - 1 && (
-                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-200 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 shadow-sm">
+                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
                             <Eye className="w-3.5 h-3.5" />
                             <span>Review</span>
                         </button>
                     )}
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm">
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                        <span className="hidden sm:inline">Save Progress</span>
+                        <span>Save<span className="hidden sm:inline"> Progress</span></span>
                     </button>
                     {currentStep === steps.length - 1 && (
-                        <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50">
+                        <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1 px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50 shrink-0">
                             {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                            <span>Download PDF</span>
+                            <span>Download<span className="hidden sm:inline"> PDF</span></span>
                         </button>
                     )}
                 </div>
             </header>
-            <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <main className="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
                 {/* Form Section */}
                 <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden' : 'flex w-full'}`}>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="flex-1 lg:overflow-y-auto custom-scrollbar">
                         <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
                             {/* Modern Responsive Stepper */}
-                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm mb-8">
+                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">
-                                        Step {currentStep + 1} of {steps.length}
+                                        Step {currentStep + 1} of {steps.length} : <span className="text-slate-800 dark:text-slate-200">{steps[currentStep].label}</span>
                                     </span>
                                 </div>
                                 
                                 {/* Progress Bar / Stepper Track */}
-                                <div className="relative flex items-center justify-between w-full px-6 sm:px-16">
+                                <div className="relative flex items-center justify-between w-full px-2 sm:px-16">
                                     {/* Track line container */}
-                                    <div className="absolute left-10 sm:left-20 right-10 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
+                                    <div className="absolute left-6 sm:left-20 right-6 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
                                         {/* Background Track Line */}
                                         <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800/60 rounded-full" />
                                         {/* Active Progress Line */}
@@ -1909,7 +1921,7 @@ const ResumeBuilder = () => {
                                             <div key={step.id} className="relative z-10 flex flex-col items-center">
                                                 <button
                                                     onClick={() => handleStepClick(idx)}
-                                                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                                                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
                                                         isActive 
                                                             ? 'bg-[#1a3884] text-white ring-4 ring-blue-500/20 scale-110 shadow-md shadow-blue-500/10'
                                                             : isCompleted
@@ -1919,18 +1931,18 @@ const ResumeBuilder = () => {
                                                     title={step.label}
                                                 >
                                                     {isCompleted ? (
-                                                        <Check className="w-4 h-4" />
+                                                        <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     ) : (
-                                                        <Icon className="w-4 h-4" />
+                                                        <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     )}
                                                 </button>
                                                 
                                                 {/* Step label - hidden on mobile to avoid layout crowding */}
-                                                <span className={`absolute top-11 text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${
+                                                <span className={`absolute top-10 sm:top-11 text-[9px] sm:text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${
                                                     isActive 
                                                         ? 'text-[#1a3884] dark:text-blue-400 font-extrabold scale-105'
                                                         : isCompleted
-                                                            ? 'text-emerald-600 dark:text-emerald-450'
+                                                            ? 'text-emerald-600 dark:text-emerald-400'
                                                             : 'text-slate-400 dark:text-slate-500'
                                                 }`}>
                                                     {step.label}
@@ -1939,7 +1951,7 @@ const ResumeBuilder = () => {
                                         );
                                     })}
                                 </div>
-                                <div className="h-6 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
+                                <div className="h-2 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
                             </div>
 
                             <div className="min-h-[400px]">
@@ -2003,10 +2015,10 @@ const ResumeBuilder = () => {
                                             )}
                                         </div>
 
-                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
+                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
-                                                <div className="flex items-center gap-4">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                                     {resumeData.personalInfo.profileImage ? (
                                                         <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 group/photo">
                                                             <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
@@ -2022,7 +2034,7 @@ const ResumeBuilder = () => {
                                                             <User className="w-6 h-6 text-slate-400" />
                                                         </div>
                                                     )}
-                                                    <div className="flex-1">
+                                                    <div className="flex-1 w-full">
                                                         <input 
                                                             type="file" 
                                                             accept="image/*" 
@@ -2124,16 +2136,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.experience.map((exp, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <Briefcase className="w-4 h-4 text-blue-500" />
-                                                            {exp.company || 'Work Experience'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Briefcase className="w-4 h-4 text-blue-500 shrink-0" />
+                                                            <span className="truncate">{exp.company || 'Work Experience'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
@@ -2173,16 +2185,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.education.map((edu, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <GraduationCap className="w-4 h-4 text-emerald-500" />
-                                                            {edu.institution || 'Education Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <GraduationCap className="w-4 h-4 text-emerald-500 shrink-0" />
+                                                            <span className="truncate">{edu.institution || 'Education Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
                                                             <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -2222,16 +2234,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.projects.map((proj, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <FileText className="w-4 h-4 text-indigo-500" />
-                                                            {proj.title || 'Project Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                                                            <span className="truncate">{proj.title || 'Project Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
@@ -2258,11 +2270,11 @@ const ResumeBuilder = () => {
 
                                 {steps[currentStep].id === 'skills' && (
                                     <div className="space-y-6">
-                                        {/* Skill Chips from Career Agent */}
-                                        {(masteredSkills.length > 0 || inProgressSkills.length > 0 || suggestedSkills.length > 0) && (
-                                            <div className="bg-white dark:bg-[#002147] p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
+                                        {/* Suggestions Card */}
+                                        {careerPaths && (
+                                            <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
                                                 <div className="flex items-center gap-2 mb-4">
-                                                    <IconSparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                                                    <Sparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                                                     <h3 className="text-sm font-bold text-slate-800 dark:text-white">Career Agent Suggestions</h3>
                                                 </div>
                                                 
@@ -2270,7 +2282,7 @@ const ResumeBuilder = () => {
                                                     {masteredSkills.length > 0 && (
                                                         <div>
                                                             <div className="flex items-center gap-1.5 mb-2 text-emerald-600 dark:text-emerald-400">
-                                                                <IconCircleCheck className="w-3.5 h-3.5" />
+                                                                <Check className="w-3.5 h-3.5" />
                                                                 <span className="text-[10px] font-bold uppercase tracking-wider">Mastered (Auto-added)</span>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">
@@ -2286,7 +2298,7 @@ const ResumeBuilder = () => {
                                                     {inProgressSkills.length > 0 && (
                                                         <div>
                                                             <div className="flex items-center gap-1.5 mb-2 text-amber-600 dark:text-amber-400">
-                                                                <IconCircleHalf className="w-3.5 h-3.5" />
+                                                                <Plus className="w-3.5 h-3.5" />
                                                                 <span className="text-[10px] font-bold uppercase tracking-wider">In Progress (Click to add)</span>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">
@@ -2298,28 +2310,6 @@ const ResumeBuilder = () => {
                                                                         }));
                                                                         setInProgressSkills(prev => prev.filter(s => s !== skill));
                                                                     }} className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[11px] font-bold rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors flex items-center gap-1 shadow-sm">
-                                                                        {skill} <Plus className="w-3 h-3" />
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {suggestedSkills.length > 0 && (
-                                                        <div>
-                                                            <div className="flex items-center gap-1.5 mb-2 text-slate-500 dark:text-slate-400">
-                                                                <IconCircleDashed className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">Suggested for {selectedCareerPath?.roleName || 'Role'}</span>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {suggestedSkills.map(skill => (
-                                                                    <button key={skill} onClick={() => {
-                                                                        setResumeData(prev => ({
-                                                                            ...prev,
-                                                                            skills: { ...prev.skills, technical: prev.skills.technical ? `${prev.skills.technical}, ${skill}` : skill }
-                                                                        }));
-                                                                        setSuggestedSkills(prev => prev.filter(s => s !== skill));
-                                                                    }} className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-lg border border-slate-200 dark:border-white/10 transition-colors flex items-center gap-1 shadow-sm">
                                                                         {skill} <Plus className="w-3 h-3" />
                                                                     </button>
                                                                 ))}
@@ -2352,16 +2342,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.achievements.map((ach, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <Trophy className="w-4 h-4 text-amber-500" />
-                                                            {ach.title || 'Achievement Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                                                            <span className="truncate">{ach.title || 'Achievement Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
@@ -2414,25 +2404,25 @@ const ResumeBuilder = () => {
                 {/* Preview Canvas (Shows on last step) */}
                 <section
                     ref={containerRef}
-                    className={`flex-1 flex flex-col overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
+                    className={`flex-1 flex flex-col lg:overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
                 >
                     {!isPreviewFullscreen ? (
                         /* Layout Template Selector Dashboard */
-                        <div className="flex-1 flex flex-col overflow-hidden">
+                        <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Selector Header */}
-                            <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
                                 <button
                                     onClick={prevStep}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-350 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-205 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10 self-start sm:self-auto"
                                 >
                                     <ArrowLeft className="w-3.5 h-3.5" /> Back to Edit Details
                                 </button>
-                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">Choose A Template Style</h2>
-                                <div className="w-[130px]" />
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white text-center sm:text-left">Choose A Template Style</h2>
+                                <div className="hidden sm:block w-[130px]" />
                             </div>
 
                             {/* Template Grid Scroll Area */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
+                            <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
                                 <div className="text-center max-w-xl mb-8">
                                     <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
                                         Select an ATS-Friendly Layout
@@ -2444,14 +2434,14 @@ const ResumeBuilder = () => {
 
                                 {/* ATS Breakdown Panel */}
                                 <div className="w-full max-w-6xl bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm mb-10 overflow-hidden">
-                                    <div className="p-6 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+                                    <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14">
+                                            <div className="w-14 h-14 shrink-0">
                                                 <CircularScoreRing score={atsScore} size={56} strokeWidth={6} label="" />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-bold text-slate-800 dark:text-white">ATS Compliance Score</h3>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Detailed breakdown of your resume's parser performance</p>
+                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">ATS Compliance Score</h3>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Detailed breakdown of your resume's parser performance</p>
                                             </div>
                                         </div>
                                     </div>
@@ -2539,38 +2529,38 @@ const ResumeBuilder = () => {
                         </div>
                     ) : (
                         /* Full Screen Interactive Preview */
-                        <div className="flex-1 flex flex-col overflow-hidden">
+                        <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Toolbar with navigation and controls */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-md">
-                                <div className="flex items-center gap-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-202 dark:border-white/10 shrink-0 shadow-md">
+                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
                                     <button
                                         onClick={() => setIsPreviewFullscreen(false)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-105 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10"
                                     >
                                         <ArrowLeft className="w-3.5 h-3.5" /> All Styles
                                     </button>
                                     
-                                    <div className="h-8 w-px bg-slate-200 dark:bg-white/10 hidden md:block"></div>
+                                    <div className="h-8 w-px bg-slate-202 dark:bg-white/10 hidden sm:block"></div>
 
                                     {/* ATS Score Compact View */}
                                     <div className="flex items-center gap-3">
                                         <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
                                         <div className="flex flex-col">
                                             <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">ATS Score</span>
-                                            <span className="text-[10px] text-slate-500 dark:text-slate-400">Score updates as you edit</span>
+                                            <span className="text-[10px] text-slate-505 dark:text-slate-400">Score updates as you edit</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hidden sm:block">
+                                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-white/5">
+                                    <div className="flex items-center gap-2 flex-1 sm:flex-initial">
+                                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-505 dark:text-slate-400 hidden sm:block">
                                             Style:
                                         </label>
                                         <select
                                             value={selectedTemplate}
                                             onChange={(e) => setSelectedTemplate(e.target.value)}
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-850 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-202 dark:border-white/10 text-slate-855 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer w-full sm:w-auto"
                                         >
                                             {Object.values(templates).map((t) => (
                                                 <option key={t.id} value={t.id}>
@@ -2583,7 +2573,7 @@ const ResumeBuilder = () => {
                                     <button
                                         onClick={handleDownloadPDF}
                                         disabled={generating}
-                                        className="flex items-center justify-center gap-1.5 px-5 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg"
+                                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg flex-1 sm:flex-initial shrink-0"
                                     >
                                         {generating ? (
                                             <>
@@ -2599,10 +2589,11 @@ const ResumeBuilder = () => {
                             </div>
 
                             {/* Scrollable canvas area */}
-                            <div className="flex-1 overflow-auto custom-scrollbar p-4 md:p-8">
+                            <div className="flex-1 lg:overflow-auto custom-scrollbar p-4 md:p-8">
                                 <div
-                                    className="flex justify-center items-start w-full"
+                                    className="flex justify-center items-start mx-auto"
                                     style={{
+                                        width: scale < 1 ? `${794 * scale}px` : '100%',
                                         height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
                                         overflow: 'hidden'
                                     }}

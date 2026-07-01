@@ -4,7 +4,7 @@ import { FileText, Save, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { notesAPI } from '@/services/api';
 
-const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, courseId = "general" }) => {
+const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, courseId = "general", isVideoCompleted = true }) => {
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
   const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted || false);
@@ -137,30 +137,54 @@ const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, cour
             </div>
           </div>
   
-          {/* Save Button */}
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleSave}
-              disabled={loadingNotes || saved}
-              className="px-6 py-2 bg-slate-100 dark:bg-[#003170] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
-            >
-              {saved ? (
-                <CheckCircle2 size={16} className="text-green-500" />
-              ) : (
-                <Save size={16} />
+          {/* Save & Complete Action Panel */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={handleSave}
+                disabled={loadingNotes || saved}
+                className="px-6 py-2 bg-slate-100 dark:bg-[#003170] hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {saved ? (
+                  <CheckCircle2 size={16} className="text-green-500" />
+                ) : (
+                  <Save size={16} />
+                )}
+                {saved ? 'Saved!' : 'Save Reflection'}
+              </button>
+
+              {!hasMarkedComplete && (!isVideoCompleted || notes.trim().length === 0) && (
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold hidden md:inline-block">
+                  {!isVideoCompleted && notes.trim().length === 0
+                    ? "Complete the video & write reflection to unlock."
+                    : !isVideoCompleted
+                    ? "Watch the video completely to unlock."
+                    : "Write something in the input to unlock."}
+                </span>
               )}
-              {saved ? 'Saved!' : 'Save Reflection'}
-            </button>
+            </div>
 
             {!hasMarkedComplete ? (
-              <button
-                onClick={handleComplete}
-                className="px-6 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-lg font-bold transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
-              >
-                Mark as Complete
-              </button>
+              <div className="flex flex-col items-stretch sm:items-end w-full sm:w-auto gap-1.5">
+                <button
+                  onClick={handleComplete}
+                  disabled={!isVideoCompleted || notes.trim().length === 0}
+                  className="w-full sm:w-auto px-6 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-lg font-bold transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Mark as Complete
+                </button>
+                {!hasMarkedComplete && (!isVideoCompleted || notes.trim().length === 0) && (
+                  <span className="text-[10px] text-amber-500 dark:text-amber-400 font-semibold md:hidden text-center block">
+                    {!isVideoCompleted && notes.trim().length === 0
+                      ? "Watch video & write reflection to unlock"
+                      : !isVideoCompleted
+                      ? "Complete the video to unlock"
+                      : "Write your reflection to unlock"}
+                  </span>
+                )}
+              </div>
             ) : (
-              <div className="px-6 py-2 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 rounded-lg font-bold flex items-center gap-2">
+              <div className="w-full sm:w-auto px-6 py-2 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 rounded-lg font-bold flex items-center justify-center gap-2">
                 <CheckCircle2 size={16} />
                 Completed
               </div>

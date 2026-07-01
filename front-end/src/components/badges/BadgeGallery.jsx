@@ -8,6 +8,29 @@ import { STAGES, TRACKS } from "@/data/courseStructureData";
 import useUser from "@/hooks/useUser";
 import apiCall from "@/services/api";
 
+const getBadgeCategory = (badgeId) => {
+    const bId = (badgeId || '').toUpperCase();
+    if (bId.startsWith('S0') || bId.startsWith('S10')) {
+        return 'capacity';
+    }
+    if (bId.startsWith('S1')) {
+        return 'capability';
+    }
+    if (bId.startsWith('S2')) {
+        return 'leadership';
+    }
+    if (bId.startsWith('PIQ')) {
+        return 'piq';
+    }
+    if (bId.startsWith('AIQ')) {
+        return 'aiq';
+    }
+    if (bId.startsWith('SQ')) {
+        return 'sq';
+    }
+    return 'learning';
+};
+
 const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
     const { t } = useTranslation();
     const { user } = useUser();
@@ -17,12 +40,15 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
     const [activeCategory, setActiveCategory] = useState('all');
     const [isLoading, setIsLoading] = useState(true);
 
-    // Dynamically derive categories from loaded badges to ensure filter always works
-    const uniqueCategories = ['all', ...new Set(badges.map(b => b.category?.toLowerCase() || 'learning'))];
-    const filterOptions = uniqueCategories.map(cat => ({
-        id: cat,
-        label: cat === 'all' ? 'All Categories' : cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-    }));
+    const filterOptions = [
+        { id: 'all', label: 'All Categories' },
+        { id: 'capacity', label: 'Capacity' },
+        { id: 'capability', label: 'Capability' },
+        { id: 'leadership', label: 'Leadership' },
+        { id: 'piq', label: 'PIQ' },
+        { id: 'aiq', label: 'AIQ' },
+        { id: 'sq', label: 'SQ' }
+    ];
 
     useEffect(() => {
         const fetchAndAwardBadges = async () => {
@@ -90,24 +116,37 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
                 }
 
                 // Format badges for gallery display
-                const displayBadges = finalBadges.map(b => ({
-                    ...b,
-                    id: b._id || b.id,      // Ensure Mongo ID is used for QR
-                    _id: b._id || b.id,     // Duplicate for safety
-                    badgeId: b.badgeId,
-                    title: b.title || `${b.badgeId} Master`,
-                    description: b.description || `Awarded for successfully completing the track.`,
-                    category: b.category || 'learning',
-                    tier: b.tier || 'standard',
-                    xp: b.xp || 200,
-                    earnedDate: b.earnedDate || b.earnedAt || new Date(),
-                    isEarned: true,
-                    progress: 100,
-                    icon: b.icon || 'Award',
-                    color: b.color || '#1a3884' // Deep Navy theme
-                }));
+                const allPossibleBadges = [];
+
+                [...STAGES, ...TRACKS].forEach(module => {
+                    module.courses.forEach(course => {
+                        const targetBadgeId = `${course.id}-MASTER`;
+                        
+                        // Check if the user completed this course or has this badge in DB
+                        const dbBadge = finalBadges.find(b => b.badgeId === targetBadgeId || b.id === targetBadgeId);
+                        const isCompleted = completedCourses && completedCourses.includes(course.id);
+                        const isEarned = !!dbBadge || isCompleted;
+                        
+                        allPossibleBadges.push({
+                            id: dbBadge?.id || dbBadge?._id || targetBadgeId,
+                            _id: dbBadge?.id || dbBadge?._id || targetBadgeId,
+                            badgeId: targetBadgeId,
+                            title: dbBadge?.title || `${course.title} Master`,
+                            description: dbBadge?.description || course.subtitle || `Awarded for successfully completing the ${course.title} course.`,
+                            category: getBadgeCategory(targetBadgeId),
+                            tier: dbBadge?.tier || 'standard',
+                            xp: dbBadge?.xp || 200,
+                            earnedDate: dbBadge?.earnedDate || dbBadge?.earnedAt || (isEarned ? new Date() : null),
+                            isEarned: isEarned,
+                            isLocked: !isEarned,
+                            progress: isEarned ? 100 : 0,
+                            icon: dbBadge?.icon || 'Award',
+                            color: dbBadge?.color || '#1a3884' // Deep Navy theme
+                        });
+                    });
+                });
                 
-                setBadges(displayBadges);
+                setBadges(allPossibleBadges);
             } catch (error) {
                 console.error('Error loading/awarding badges:', error);
             } finally {
@@ -177,7 +216,7 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
                         >
                             <BadgeCard
                                 badge={badge}
-                                isLocked={false} // Force unlocked representation
+                                isLocked={badge.isLocked}
                                 onClick={handleBadgeClick}
                             />
                         </motion.div>

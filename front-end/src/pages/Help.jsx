@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   HelpCircle,
   MessageSquare,
@@ -13,7 +15,8 @@ import {
   Phone,
   Loader2,
   RefreshCw,
-  Inbox
+  Inbox,
+  ArrowLeft
 } from "lucide-react";
 import TicketForm from "@/components/tickets/TicketForm";
 import TicketCard from "@/components/tickets/TicketCard";
@@ -44,6 +47,8 @@ const FAQ_ITEMS = [
 ];
 
 const Help = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("faq"); // faq | create | mytickets
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -104,6 +109,19 @@ const Help = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Back Button - Mobile Only */}
+            <div className="mb-4 md:hidden">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                  <ArrowLeft className="h-4 w-4" />
+                </div>
+                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+              </button>
+            </div>
+
             {/* Page Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
