@@ -85,7 +85,7 @@ const DashboardHome = () => {
 
   if ((userLoading || dashboardLoading) && !loadingError) {
     return (
-      <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
         {/* Skeleton Hero */}
         <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
@@ -150,7 +150,7 @@ const DashboardHome = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.15 }}
-          className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
+          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
         >
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
@@ -158,7 +158,7 @@ const DashboardHome = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-full space-y-6"
+            className="w-full space-y-4 sm:space-y-6"
           >
             {/* Hero */}
             <HeroSection
@@ -183,13 +183,13 @@ const DashboardHome = () => {
           </motion.div>
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
-          <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
             {/* ── LEFT: Career Pathways ── */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="flex-1 min-w-0 flex flex-col gap-6"
+              className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
             >
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
               <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
@@ -202,7 +202,7 @@ const DashboardHome = () => {
               transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
             >
-              <div className="sticky top-24">
+              <div className="xl:sticky xl:top-24">
                 <LearningProgress />
               </div>
             </motion.div>

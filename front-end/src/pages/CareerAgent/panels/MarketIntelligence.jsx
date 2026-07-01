@@ -106,7 +106,20 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
 
     return (
         <div style={S.root} className="animate-fade-in">
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <style>{`
+                @keyframes spin { to { transform: rotate(360deg); } }
+                .mi-content-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 320px;
+                    gap: 1.5rem;
+                    margin-top: 0.25rem;
+                }
+                @media (max-width: 900px) {
+                    .mi-content-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            `}</style>
 
             {/* ── Role chips for the active direction ── */}
             {dirRoleNames.length > 0 && (
@@ -144,7 +157,7 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
 
             {/* ── Main Content ── */}
             {!loading && !error && roleProfile && (
-                <div style={S.contentGrid}>
+                <div className="mi-content-grid">
 
                     {/* LEFT: Role Header + AI Narrative */}
                     <div style={S.mainCol}>

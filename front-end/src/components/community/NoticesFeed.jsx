@@ -166,7 +166,7 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
       </div>
 
       {/* ── Filter row: Date + Role + Clear ────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-3 justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between w-full">
         {/* Date filter pills */}
         <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
           {DATE_FILTERS.map((f) => (
@@ -256,7 +256,7 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ delay: index * 0.04, duration: 0.2 }}
-                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
+                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
                   ? "opacity-60 border-gray-100 dark:border-white/8"
                   : ann.isPinned
                     ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"

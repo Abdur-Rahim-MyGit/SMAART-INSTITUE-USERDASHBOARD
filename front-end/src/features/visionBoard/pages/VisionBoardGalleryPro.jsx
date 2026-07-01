@@ -420,11 +420,11 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
           </div>
 
           {/* Actions */}
-          <div className="px-4 py-3 border-t border-gray-200 flex flex-row justify-between items-center gap-3">
+          <div className="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
             {isCurrentVision ? (
               <Button
                 onClick={handleDisableVision}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-semibold"
               >
                 <EyeOff className="w-4 h-4 mr-2" />
                 {t("vision_board.disable_vision")}
@@ -432,7 +432,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
             ) : (
               <Button
                 onClick={handleSetAsVision}
-                className="bg-[#1a3884] hover:bg-[#132c6b] text-white font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
+                className="w-full sm:w-auto bg-[#1a3884] hover:bg-[#132c6b] text-white font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 {t("vision_board.enable_vision")}
@@ -441,7 +441,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
             <Button
               variant="outline"
               onClick={handleDownload}
-              className="border-gray-200 text-[#002147] hover:bg-gray-50 bg-white"
+              className="w-full sm:w-auto border-gray-200 text-[#002147] hover:bg-gray-50 bg-white"
             >
               <Download className="w-4 h-4 mr-2" />
               {t("vision_board.download")}
@@ -817,7 +817,7 @@ const VisionBoardGalleryPro = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+            className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
             <div className="flex flex-col">
                 <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
