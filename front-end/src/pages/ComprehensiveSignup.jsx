@@ -699,7 +699,7 @@ const ComprehensiveSignup = () => {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Year of Passing (Expected) *</Label>
-                      <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{expectedYearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
+                      <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Mobile Number</Label>
