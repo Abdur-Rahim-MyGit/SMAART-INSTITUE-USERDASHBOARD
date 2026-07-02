@@ -92,6 +92,19 @@ const SupportTicketsPage = () => {
       <div className="pt-4">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6">
 
+          {/* Back Button - Mobile Only */}
+          <div className="mb-4 md:hidden">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                <ArrowLeft className="h-4 w-4" />
+              </div>
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </button>
+          </div>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -101,13 +114,13 @@ const SupportTicketsPage = () => {
           >
             <div className="flex items-center gap-4">
               {/* Back Button */}
-              <button
+              {/* <button
                 onClick={() => navigate("/dashboard")}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:border-slate-355 dark:hover:border-white/20 transition-all flex-shrink-0"
+                className="hidden md:flex h-11 w-11 items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:border-slate-355 dark:hover:border-white/20 transition-all flex-shrink-0"
                 title={t("support_tickets_page.back", "Back")}
               >
                 <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-350" />
-              </button>
+              </button> */}
 
               {/* Icon and Title Group */}
               <div className="flex items-center gap-3">

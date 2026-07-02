@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import {
   ChevronLeft,
   Download,
@@ -10,11 +11,13 @@ import {
   Loader2,
   Calendar,
   Clock,
+  ArrowLeft,
 } from "lucide-react";
 import { getVisionBoard } from "../services/visionBoardProApi";
 
 const VisionBoardView = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { id } = useParams();
   const { toast } = useToast();
   const canvasRef = useRef(null);
@@ -224,6 +227,19 @@ const VisionBoardView = () => {
   return (
     <div className="min-h-screen bg-[#f4f7fb] dark:bg-[#06101d]">
       <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
+          <button
+            onClick={() => navigate("/vision-board-pro/gallery")}
+            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+              <ArrowLeft className="h-4 w-4" />
+            </div>
+            {t("vision_board.back_to_gallery", "Back to Gallery")}
+          </button>
+        </div>
+
         <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
           <div className="border-b border-slate-200 px-4 py-4 dark:border-white/8 sm:px-6">
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
@@ -232,7 +248,7 @@ const VisionBoardView = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/vision-board-pro/gallery")}
-                className="rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#002A5C] dark:hover:text-white"
+                className="hidden sm:inline-flex rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#002A5C] dark:hover:text-white"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back to Gallery

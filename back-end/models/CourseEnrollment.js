@@ -154,9 +154,35 @@ courseEnrollmentSchema.pre('save', async function (next) {
         let totalExpectedDays = 0;
         let completedDaysCount = 0;
 
-        course.modules.forEach(mod => {
-          // Use actual day count as denominator
-          const modExpected = mod.days ? mod.days.length : 0;
+        // Check if there is an active learning flow configuration
+        const lf = course.learningFlow;
+        const hasLearningFlow = lf && (
+          lf.stepA_Why ||
+          lf.stepB_Story ||
+          lf.stepC_Framework ||
+          lf.stepD_Practice ||
+          lf.stepE_FlashCard ||
+          lf.stepF_AdvancedPractice
+        );
+
+        course.modules.forEach((mod, modIdx) => {
+          // Use learning flow steps count as expected denominator if configured, fallback to days length
+          let modExpected = 0;
+          if (modIdx === 0 && hasLearningFlow) {
+            let expectedStepsCount = 0;
+            if (lf.stepA_Why) expectedStepsCount++;
+            if (lf.stepB_Story) expectedStepsCount++;
+            if (lf.stepC_Framework) expectedStepsCount++;
+            if (lf.stepD_Practice) expectedStepsCount++;
+            if (lf.stepE_FlashCard && lf.stepE_FlashCard.cards && lf.stepE_FlashCard.cards.length > 0) expectedStepsCount++;
+            if (lf.stepF_AdvancedPractice) expectedStepsCount++;
+            if (lf.stepG_CaseStudy && lf.stepG_CaseStudy.isEnabled !== false) expectedStepsCount++;
+            if (lf.stepH_Notes && lf.stepH_Notes.isEnabled !== false) expectedStepsCount++;
+            modExpected = expectedStepsCount;
+          } else {
+            modExpected = mod.days ? mod.days.length : 0;
+          }
+
           totalExpectedDays += modExpected;
 
           // Find matching moduleProgress
@@ -183,19 +209,18 @@ courseEnrollmentSchema.pre('save', async function (next) {
               });
             }
 
-            // Update module status: If all real days are completed, mark as 'completed'
-            const realDaysCount = mod.days ? mod.days.length : 0;
-            if (realDaysCount > 0 && completedInMod.size >= realDaysCount) {
+            // Update module status: If all real days/steps are completed, mark as 'completed'
+            if (modExpected > 0 && completedInMod.size >= modExpected) {
               mProg.status = 'completed';
             } else if (completedInMod.size > 0) {
               mProg.status = 'in_progress';
             }
 
-            completedDaysCount += completedInMod.size;
+            completedDaysCount += Math.min(completedInMod.size, modExpected);
           }
         });
 
-        // Final progress = sum of completed days across all modules / sum of expected days (min 6 per mod)
+        // Final progress = sum of completed days across all modules / sum of expected days
         this.progress = totalExpectedDays > 0
           ? Math.min(100, Math.round((completedDaysCount / totalExpectedDays) * 100))
           : 0;

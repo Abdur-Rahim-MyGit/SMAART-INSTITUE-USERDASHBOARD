@@ -438,6 +438,26 @@ const CareerAgentDashboard = () => {
                 </div>
             </header>
 
+            {/* Mobile Nav Trigger (Visible on Mobile Only) */}
+            <div className="mobile-nav-bar">
+                <button
+                    className="mobile-nav-trigger"
+                    onClick={() => setShowMobileSidebar(true)}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <span className="mobile-nav-icon">
+                            {panels.find(p => p.id === activePanel)?.icon || <Compass size={18} />}
+                        </span>
+                        <span className="mobile-nav-label">
+                            {panels.find(p => p.id === activePanel)?.label || 'Menu'}
+                        </span>
+                    </div>
+                    <span className="mobile-nav-chevron">
+                        <ChevronDown size={18} />
+                    </span>
+                </button>
+            </div>
+
             <div className="dash-body">
                 <aside className="sidebar">
                     <div className="sb-header">

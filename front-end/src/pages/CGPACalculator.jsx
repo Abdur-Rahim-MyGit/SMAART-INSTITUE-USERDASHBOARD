@@ -1101,7 +1101,7 @@ export default function CGPACalculator() {
               {/* Smart Paste Button */}
               <button
                 onClick={() => setShowPasteModal(true)}
-                className="group flex items-center gap-1.5 rounded-xl bg-[#2c52b3] px-5 py-2.5 font-semibold text-white shadow-sm transition-all hover:bg-[#1a3884] active:scale-95"
+                className="group flex items-center justify-center gap-1.5 rounded-xl bg-[#2c52b3] px-5 py-2.5 font-semibold text-white shadow-sm transition-all hover:bg-[#1a3884] active:scale-95"
               >
                 <IconWand size={16} stroke={2} className="transition-transform group-hover:rotate-12" />
                 <span className="text-[14px]">Smart Paste Data</span>

@@ -1,34 +1,198 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, BookOpen, Lightbulb, Upload, FileText, X, Loader2, Send } from 'lucide-react';
+import { CheckCircle2, XCircle, BookOpen, Lightbulb, Upload, FileText, X, Loader2, Send, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
-const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isCompleted }) => {
-  const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [essayResponses, setEssayResponses] = useState({});
-  const [shortTextResponses, setShortTextResponses] = useState({});
-  const [fileUploads, setFileUploads] = useState({}); // Stores fake uploaded file details
+const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isCompleted, savedScore, savedTotalPoints, storageKey }) => {
+  const [selectedAnswers, setSelectedAnswers] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}_selected`);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return {};
+  });
+  const [essayResponses, setEssayResponses] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}_essay`);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return {};
+  });
+  const [shortTextResponses, setShortTextResponses] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}_short`);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return {};
+  });
+  const [fileUploads, setFileUploads] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}_file`);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return {};
+  }); // Stores fake uploaded file details
   const [uploadingState, setUploadingState] = useState({}); // Stores fake uploading progress/states
   const [showExplanation, setShowExplanation] = useState({});
   const [completed, setCompleted] = useState(isCompleted || false);
+  const [showReview, setShowReview] = useState(false);
+
+  useEffect(() => {
+    setCompleted(isCompleted || false);
+  }, [isCompleted]);
+
+  const handleEssayChange = (idx, value) => {
+    setEssayResponses(prev => {
+      const updated = { ...prev, [idx]: value };
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}_essay`, JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const handleShortTextChange = (idx, value) => {
+    setShortTextResponses(prev => {
+      const updated = { ...prev, [idx]: value };
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}_short`, JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const getIsCorrectOption = (q, optIdx, optionText) => {
+    if (!q || q.correctAnswer === undefined || q.correctAnswer === null) return false;
+    if (typeof q.correctAnswer === 'number' && q.correctAnswer === optIdx) {
+      return true;
+    }
+    const correctStr = String(q.correctAnswer).trim().toLowerCase();
+    if (correctStr === String(optIdx)) return true;
+    if (correctStr === String(optionText).trim().toLowerCase()) return true;
+    
+    if (/^[a-f]$/.test(correctStr)) {
+      const idx = correctStr.charCodeAt(0) - 97;
+      if (idx === optIdx) return true;
+    }
+    return false;
+  };
 
   const hasQuestionsList = questions && questions.length > 0;
   const showImmediateFeedback = (questions?.length || 0) + (mcq ? 1 : 0) <= 1;
 
+  const calculateScore = () => {
+    const actualTotalPoints = hasQuestionsList ? questions.length : (mcq ? 1 : 0);
+    const hasLocalAnswers = hasQuestionsList 
+      ? (Object.keys(selectedAnswers).length > 0 || Object.keys(essayResponses).length > 0 || Object.keys(shortTextResponses).length > 0 || Object.keys(fileUploads).length > 0)
+      : legacySelected !== null;
+
+    if (completed && typeof savedScore === 'number' && typeof savedTotalPoints === 'number' && !hasLocalAnswers) {
+      if (savedTotalPoints === actualTotalPoints) {
+        return { score: savedScore, totalPoints: savedTotalPoints };
+      }
+      let scaledScore = 0;
+      if (savedTotalPoints > 0) {
+        scaledScore = Math.round((savedScore / savedTotalPoints) * actualTotalPoints);
+        if (savedScore > 0 && scaledScore === 0 && actualTotalPoints > 0) {
+          scaledScore = 1;
+        }
+      }
+      return { score: scaledScore, totalPoints: actualTotalPoints };
+    }
+
+    let score = 0;
+    let totalPoints = 0;
+
+    if (hasQuestionsList) {
+      questions.forEach((q, idx) => {
+        totalPoints += 1;
+        if (q.type === 'mcq') {
+          const selected = selectedAnswers[idx];
+          if (selected !== undefined && selected !== null) {
+            const optIdx = q.options.findIndex(opt => 
+              String(opt).trim().toLowerCase() === String(selected).trim().toLowerCase()
+            );
+            const selectedIdx = optIdx !== -1 ? optIdx : parseInt(selected);
+            const isCorrectVal = getIsCorrectOption(q, selectedIdx, selected);
+            if (isCorrectVal) {
+              score += 1;
+            }
+          }
+        } else if (q.type === 'essay') {
+          if (essayResponses[idx] && essayResponses[idx].trim().length >= 5) {
+            score += 1;
+          }
+        } else if (q.type === 'text') {
+          if (shortTextResponses[idx] && shortTextResponses[idx].trim().length >= 2) {
+            score += 1;
+          }
+        } else if (q.type === 'file-upload') {
+          if (fileUploads[idx]) {
+            score += 1;
+          }
+        }
+      });
+
+      const answeredCount = Object.keys(selectedAnswers).length + Object.keys(essayResponses).length + Object.keys(shortTextResponses).length + Object.keys(fileUploads).length;
+      if (completed && answeredCount === 0 && typeof savedScore !== 'number') {
+        score = totalPoints;
+      }
+    } else if (mcq) {
+      totalPoints = 1;
+      const isCorrectAnswer = typeof mcq.correctAnswer === 'number'
+        ? legacySelected === mcq.correctAnswer
+        : legacySelected !== null && mcq.options[legacySelected] !== undefined && mcq.correctAnswer !== undefined && String(mcq.options[legacySelected]).trim().toLowerCase() === String(mcq.correctAnswer).trim().toLowerCase();
+      if (isCorrectAnswer) {
+        score = 1;
+      }
+      
+      if (completed && legacySelected === null && typeof savedScore !== 'number') {
+        score = totalPoints;
+      }
+    }
+
+    return { score, totalPoints };
+  };
+
   // Handle option select for MCQ reflection question type
   const handleMCQSelect = (qIdx, optionVal) => {
-    setSelectedAnswers(prev => ({ ...prev, [qIdx]: optionVal }));
+    setSelectedAnswers(prev => {
+      const updated = { ...prev, [qIdx]: optionVal };
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}_selected`, JSON.stringify(updated));
+      }
+      return updated;
+    });
     if (showImmediateFeedback) {
       setShowExplanation(prev => ({ ...prev, [qIdx]: true }));
     }
   };
 
   // Legacy MCQ selection (single MCQ prop)
-  const [legacySelected, setLegacySelected] = useState(null);
+  const [legacySelected, setLegacySelected] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`${storageKey}_legacy`);
+      if (saved !== null) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return null;
+  });
   const [legacyShowExplanation, setLegacyShowExplanation] = useState(false);
 
   const handleLegacySelect = (idx) => {
     setLegacySelected(idx);
+    if (storageKey) {
+      localStorage.setItem(`${storageKey}_legacy`, JSON.stringify(idx));
+    }
     if (showImmediateFeedback) {
       setLegacyShowExplanation(true);
     }
@@ -48,7 +212,13 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
       if (currentProgress >= 100) {
         clearInterval(interval);
         setUploadingState(prev => ({ ...prev, [qIdx]: { progress: 100, isUploading: false } }));
-        setFileUploads(prev => ({ ...prev, [qIdx]: { name: file.name, size: (file.size / 1024).toFixed(1) + ' KB' } }));
+        setFileUploads(prev => {
+          const updated = { ...prev, [qIdx]: { name: file.name, size: (file.size / 1024).toFixed(1) + ' KB' } };
+          if (storageKey) {
+            localStorage.setItem(`${storageKey}_file`, JSON.stringify(updated));
+          }
+          return updated;
+        });
         toast.success(`"${file.name}" uploaded to Skills Passport!`);
       } else {
         setUploadingState(prev => ({ ...prev, [qIdx]: { progress: currentProgress, isUploading: true } }));
@@ -73,6 +243,9 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
     setFileUploads(prev => {
       const copy = { ...prev };
       delete copy[qIdx];
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}_file`, JSON.stringify(copy));
+      }
       return copy;
     });
     setUploadingState(prev => {
@@ -104,14 +277,16 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
         return;
       }
 
+      const { score: calculatedScoreVal, totalPoints: calculatedTotalPoints } = calculateScore();
       setCompleted(true);
-      if (onComplete) onComplete();
+      if (onComplete) onComplete(calculatedScoreVal, calculatedTotalPoints, false);
       toast.success('Case study reflection completed!');
     } else if (mcq) {
       // Legacy MCQ submit
       if (legacySelected !== null) {
+        const { score: calculatedScoreVal, totalPoints: calculatedTotalPoints } = calculateScore();
         setCompleted(true);
-        if (onComplete) onComplete();
+        if (onComplete) onComplete(calculatedScoreVal, calculatedTotalPoints, false);
         toast.success('Case study completed!');
       } else {
         toast.error('Please answer the question before completing.');
@@ -119,14 +294,76 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
     } else {
       // No questions at all, just complete
       setCompleted(true);
-      if (onComplete) onComplete();
-      toast.success('Case study completed!');
+      if (onComplete) onComplete(0, 0, false);
     }
   };
+
+  const { score, totalPoints } = calculateScore();
+
+  if (completed && !showReview) {
+    return (
+      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto text-center py-8 space-y-6">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-6"
+          >
+            <Trophy size={48} />
+          </motion.div>
+
+          <div>
+            <h3 className="text-3xl font-bold text-gray-800 dark:text-white">Assessment Complete!</h3>
+            <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 py-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
+              <div className="text-xs text-gray-550 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-gray-305 dark:text-slate-600">/</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-slate-900 dark:text-white">{totalPoints}</div>
+              <div className="text-xs text-gray-550 dark:text-slate-400 uppercase tracking-wider">Total Points</div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => setShowReview(true)}
+              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
+            >
+              Review Responses
+            </button>
+            <button
+              onClick={() => {
+                if (onComplete) onComplete(score, totalPoints);
+              }}
+              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+            >
+              Continue to Next Step
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-8">
+        {completed && showReview && (
+          <button
+            type="button"
+            onClick={() => setShowReview(false)}
+            className="mb-4 text-sm font-semibold text-[#1a3884] hover:text-[#112b6b] transition-colors flex items-center gap-1.5"
+          >
+            ← Back to results
+          </button>
+        )}
         
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-white/10 pb-4">
@@ -215,7 +452,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                       <textarea
                         disabled={completed}
                         value={essayResponses[idx] || ''}
-                        onChange={(e) => setEssayResponses(prev => ({ ...prev, [idx]: e.target.value }))}
+                        onChange={(e) => handleEssayChange(idx, e.target.value)}
                         rows={4}
                         placeholder="Type your detailed essay response here..."
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#1a3884] focus:border-transparent transition-all resize-none outline-none disabled:opacity-60"
@@ -236,7 +473,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                         type="text"
                         disabled={completed}
                         value={shortTextResponses[idx] || ''}
-                        onChange={(e) => setShortTextResponses(prev => ({ ...prev, [idx]: e.target.value }))}
+                        onChange={(e) => handleShortTextChange(idx, e.target.value)}
                         placeholder="Type your answer..."
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#1a3884] focus:border-transparent transition-all outline-none disabled:opacity-60"
                       />
@@ -332,9 +569,11 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                     <div className="space-y-2.5">
                       <div className="grid grid-cols-1 gap-2">
                         {q.options.map((option, optIdx) => {
-                          const isSelected = selectedAnswers[idx] === option;
-                          // If q.correctAnswer is saved as option string
-                          const isCorrectVal = option === q.correctAnswer;
+                          const isSelected = selectedAnswers[idx] !== undefined && (
+                            String(selectedAnswers[idx]).trim().toLowerCase() === String(option).trim().toLowerCase() ||
+                            String(selectedAnswers[idx]).trim().toLowerCase() === String(optIdx)
+                          );
+                          const isCorrectVal = getIsCorrectOption(q, optIdx, option);
 
                           return (
                             <button
@@ -346,7 +585,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                                   ? isCorrectVal
                                     ? 'border-green-500 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300'
                                     : isSelected && !isCorrectVal
-                                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300'
+                                    ? 'border-red-500 bg-red-55/50 dark:bg-red-950/20 text-red-700 dark:text-red-300'
                                     : 'border-slate-200 dark:border-white/5 opacity-55 bg-[#F8FAFC]'
                                   : isSelected
                                   ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
@@ -373,6 +612,21 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                                 </div>
                                 <span>{option}</span>
                               </div>
+
+                              {showResult && (
+                                <div className="flex items-center gap-2 text-[10px] md:text-xs">
+                                  {isSelected && (
+                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">
+                                      Your answer
+                                    </span>
+                                  )}
+                                  {isCorrectVal && (
+                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-green-200/50 dark:bg-green-700/50 text-green-600 dark:text-green-300">
+                                      Correct
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </button>
                           );
                         })}
@@ -420,9 +674,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
             <div className="space-y-3 mb-6">
               {mcq.options.map((option, idx) => {
                 const isSelected = legacySelected === idx;
-                const isCorrectAnswer = typeof mcq.correctAnswer === 'number'
-                  ? idx === mcq.correctAnswer
-                  : option === mcq.correctAnswer;
+                const isCorrectAnswer = getIsCorrectOption(mcq, idx, option);
                 const showResult = legacyShowExplanation || completed;
 
                 return (
@@ -466,6 +718,21 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                       </div>
                       <span>{option}</span>
                     </div>
+
+                    {showResult && (
+                      <div className="flex items-center gap-2 text-[10px] md:text-xs">
+                        {isSelected && (
+                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">
+                            Your answer
+                          </span>
+                        )}
+                        {isCorrectAnswer && (
+                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-green-200/50 dark:bg-green-700/50 text-green-600 dark:text-green-300">
+                            Correct
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -490,16 +757,37 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
         ) : null}
 
         {/* Complete / Submit Button */}
-        <div className="pt-4 pb-8">
-          <button
-            onClick={handleComplete}
-            disabled={completed}
-            className={`w-full py-4 bg-gradient-to-r from-[#1a3884] to-[#112b6b] hover:from-[#112b6b] hover:to-[#002147] text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            <Send className="w-4 h-4" />
-            {completed ? 'Case Study Analysis Completed' : 'Submit Reflections & Complete Case Study'}
-          </button>
-        </div>
+        {!showReview && (
+          <div className="pt-4 pb-8">
+            <button
+              onClick={handleComplete}
+              disabled={completed}
+              className={`w-full py-4 bg-gradient-to-r from-[#1a3884] to-[#112b6b] hover:from-[#112b6b] hover:to-[#002147] text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              <Send className="w-4 h-4" />
+              {completed ? 'Case Study Analysis Completed' : 'Submit'}
+            </button>
+          </div>
+        )}
+
+        {completed && showReview && (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 pb-8">
+            <button
+              onClick={() => setShowReview(false)}
+              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] dark:text-blue-400 rounded-xl font-bold transition-all hover:bg-[#1a3884]/5"
+            >
+              Back to Summary
+            </button>
+            <button
+              onClick={() => {
+                if (onComplete) onComplete(score, totalPoints);
+              }}
+              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+            >
+              Continue to Next Step
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

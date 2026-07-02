@@ -1257,7 +1257,7 @@ const DashboardLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 h-[calc(100vh-70px)] overflow-hidden" : "")}>
+        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 lg:h-[calc(100vh-70px)] lg:overflow-hidden" : "")}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

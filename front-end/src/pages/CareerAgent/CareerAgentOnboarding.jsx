@@ -335,7 +335,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
           }}
         >
           {/* Header row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={13} color="#fff" strokeWidth={2.5} />
@@ -629,12 +629,12 @@ function SkillSection({ skills, onChange }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
         {/* Row 1: Skill Name & Basic Status */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '240px' }}>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <label className="fl">Skill Name</label>
-            <input type="text" placeholder="e.g. Python, Figma, React" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())} />
+            <input type="text" placeholder="e.g. Python, Figma, React" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())} style={{ width: '100%' }} />
           </div>
-          <div style={{ width: '220px' }}>
+          <div className="w-full sm:w-[220px]">
             <label className="fl">Skill Status <span className="req">*</span></label>
             <div style={{ display: 'flex', gap: '2px', background: 'rgba(255,255,255,0.05)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border2)' }}>
               <button type="button" onClick={() => setStatus('Verified')} style={{ flex: 1, padding: '0.45rem', border: 'none', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 800, cursor: 'pointer', background: status === 'Verified' ? 'var(--accent)' : 'transparent', color: status === 'Verified' ? '#fff' : 'var(--muted)', transition: '0.2s' }}>VERIFIED</button>
@@ -683,8 +683,8 @@ function SkillSection({ skills, onChange }) {
         {skills.length === 0 && <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center', padding: '1rem' }}>No skills added yet. Add your verified and self-learnt skills above.</p>}
       </div>
 
-      <div style={{ marginTop: '1.2rem', padding: '0.9rem', background: 'var(--accent-tint)', borderRadius: '10px', border: '1px solid var(--accent-border)', fontSize: '0.72rem', color: 'var(--text2)', display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
-        <ShieldCheck size={20} style={{ color: 'var(--accent)' }} />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 mt-5" style={{ background: 'var(--accent-tint)', borderRadius: '10px', border: '1px solid var(--accent-border)', fontSize: '0.72rem', color: 'var(--text2)' }}>
+        <ShieldCheck size={20} className="text-[var(--accent)] shrink-0" />
         <span>Providing certification details for <strong>Verified</strong> skills significantly boosts your platform ranking and visibility to potential employers.</span>
       </div>
     </div>
@@ -1373,11 +1373,13 @@ const CareerAgentOnboarding = () => {
         {/* ── EDIT MODE BANNER ── shown when user came via "Not Interested" */}
         {isEditMode && (
           <div style={{ maxWidth: '680px', margin: '0 auto 1.5rem', padding: '0 1rem' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '1rem',
-              background: 'rgba(245,158,11,0.08)', border: '1.5px solid rgba(245,158,11,0.35)',
-              borderRadius: '16px', padding: '1rem 1.2rem',
-            }}>
+            <div
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5"
+              style={{
+                background: 'rgba(245,158,11,0.08)', border: '1.5px solid rgba(245,158,11,0.35)',
+                borderRadius: '16px',
+              }}
+            >
               <div style={{
                 width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
                 background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1460,7 +1462,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 1: PERSONAL DETAILS */}
           {step === 1 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <User size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1475,7 +1477,10 @@ const CareerAgentOnboarding = () => {
 
 
               {user && (
-                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-6"
+                  style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px' }}
+                >
                   <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <ShieldCheck size={16} />
                   </div>
@@ -1536,7 +1541,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 2: EDUCATION */}
           {step === 2 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <GraduationCap size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1551,8 +1556,8 @@ const CareerAgentOnboarding = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {formData.education.map((edu, i) => (
-                  <div key={i} style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', padding: '1.8rem', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px dashed rgba(var(--accent-rgb), 0.15)' }}>
+                  <div key={i} className="p-4 sm:p-6 md:p-8 relative" style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-dashed border-[rgba(var(--accent-rgb),0.15)]">
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
                         <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(var(--accent-rgb), 0.3)' : 'none' }}>
                           {i + 1}
@@ -1646,7 +1651,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 3: PRIMARY PREFERENCE */}
           {step === 3 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <Trophy size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1665,7 +1670,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 4: SECONDARY PREFERENCE */}
           {step === 4 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <Compass size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1684,7 +1689,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 5: TERTIARY PREFERENCE */}
           {step === 5 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <Target size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1703,7 +1708,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 6: REVIEW & SUBMIT */}
           {step === 6 && (
             <div className="form-card">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
                   <CheckCircle size={24} color="#ffffff" stroke={1.5} />
                 </div>
@@ -1760,9 +1765,13 @@ const CareerAgentOnboarding = () => {
                       { label: 'Tertiary',  accent: '#a78bfa',        bg: 'rgba(167,139,250,0.05)', border: 'rgba(167,139,250,0.18)', val: formData.preferences.tertiary }
                     ].map(({ label, accent, bg, border, val }) =>
                       (val?.careerDirectionName || val?.role) ? (
-                        <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem 0.85rem', borderRadius: '10px', background: bg, border: `1px solid ${border}` }}>
+                        <div
+                          key={label}
+                          className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 sm:p-4"
+                          style={{ borderRadius: '10px', background: bg, border: `1px solid ${border}` }}
+                        >
                           <span style={{ fontSize: '0.58rem', fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', minWidth: '60px', flexShrink: 0 }}>{label}</span>
-                          <div style={{ width: '1px', height: '26px', background: border, flexShrink: 0 }} />
+                          <div className="hidden sm:block w-[1px] h-[26px]" style={{ background: border, flexShrink: 0 }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text1)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{val?.careerDirectionName || val?.role}</p>
                             {val?.role && val?.careerDirectionName && (
@@ -1784,7 +1793,10 @@ const CareerAgentOnboarding = () => {
               )}
 
               {/* AI Notice Strip */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', padding: '0.85rem 1.1rem', marginBottom: '1.5rem', background: 'linear-gradient(135deg,rgba(37,99,235,0.05),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '12px' }}>
+              <div
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 mb-6"
+                style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.05),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '12px' }}
+              >
                 <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Sparkles size={14} color="var(--accent)" />
                 </div>
@@ -1832,7 +1844,7 @@ const CareerAgentOnboarding = () => {
 
           {/* NAVIGATION */}
           <div className="form-nav">
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div className="flex items-center gap-4 w-full justify-between sm:w-auto sm:justify-start">
               {step > 1 && (
                 <button type="button" className="btn-back" onClick={() => setStep(s => s - 1)}>
                   Back
@@ -1842,7 +1854,7 @@ const CareerAgentOnboarding = () => {
                 Reset
               </button>
             </div>
-            <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
+            <div className="flex items-center gap-4 w-full justify-between sm:w-auto sm:justify-end">
               <span style={{ fontSize: '0.78rem', fontWeight: 600, color: isCurrentStepComplete ? '#10b981' : 'var(--muted)' }}>
                 {isCurrentStepComplete ? 'All required details completed' : `Step ${step} of ${STEPS.length}`}
               </span>
