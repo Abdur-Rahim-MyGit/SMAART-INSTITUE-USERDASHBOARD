@@ -55,10 +55,6 @@ const userSchema = new mongoose.Schema({
   subject: String,
   rollNumber: String,
   section: String,
-  assignedTeacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
   status: {
     type: String,
     enum: ['pending', 'active', 'inactive', 'suspended'],

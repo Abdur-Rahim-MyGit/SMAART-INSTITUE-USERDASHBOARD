@@ -62,7 +62,7 @@ const ticketValidation = [
     .isLength({ min: 10, max: 2000 })
     .withMessage('Description must be between 10 and 2000 characters'),
   body('category')
-     .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction'])
+     .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'])
      .withMessage('Invalid category'),
   body('priority')
     .optional()
@@ -98,7 +98,7 @@ const handleValidationErrors = (req, res, next) => {
 router.post('/',
   protect,
   ticketCreationLimiter,
-  uploadSupportAttachments.array('attachments', 3), // Max 3 attachments
+  uploadSupportAttachments.array('attachments', 20), // Max 20 attachments
   ticketValidation,
   handleValidationErrors,
   async (req, res) => {

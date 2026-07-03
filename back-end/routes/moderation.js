@@ -11,7 +11,7 @@ const Teacher = require('../models/Teacher');
 const Registration = require('../models/Registration');
 const CommunityPost = require('../models/CommunityPost');
 const ModerationLog = require('../models/ModerationLog');
-const { notifyModerationWarning, notifyModerationSuspension } = require('../services/notificationService');
+
 
 // Trace incoming requests to verify router reachability
 router.use((req, res, next) => {
@@ -61,14 +61,7 @@ router.post('/warn/:userId', async (req, res) => {
       reason
     });
 
-    // Send notification to warned student
-    try {
-      console.log('[WARN] sending notification to:', target._id.toString());
-      const notifResult = await notifyModerationWarning(target._id, reason);
-      console.log('[WARN] notification result:', notifResult?._id || notifResult);
-    } catch (notifErr) {
-      console.warn('[WARN] Failed to send notification:', notifErr.message);
-    }
+
 
     res.json({ success: true, message: 'Warning issued', userId: target._id });
   } catch (error) {
@@ -113,13 +106,7 @@ router.post('/suspend/:userId', async (req, res) => {
       reason: `${reason} (until ${untilDate.toISOString()})`
     });
 
-    // Send notification to suspended student
-    const effectiveDays = Math.ceil((untilDate - Date.now()) / (24 * 60 * 60 * 1000));
-    try {
-      await notifyModerationSuspension(target._id, reason, effectiveDays);
-    } catch (notifErr) {
-      console.warn('[SUSPEND] Failed to send notification:', notifErr.message);
-    }
+
 
     res.json({ success: true, message: 'User suspended', userId: target._id, suspendedUntil: untilDate });
   } catch (error) {

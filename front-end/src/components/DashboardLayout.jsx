@@ -721,7 +721,54 @@ const DashboardLayout = () => {
 
   // Get page title
   const getPageTitle = () => {
-    return pageTitles[location.pathname] || t('sidebar.dashboard');
+    const titleMap = {
+      '/dashboard': t('dashboard.home', 'Home'),
+      '/dashboard/home': t('dashboard.home', 'Home'),
+      '/dashboard/courses': t('sidebar.courses', 'My Courses'),
+      '/my-courses': t('sidebar.courses', 'My Courses'),
+      '/dashboard/assessment-centre': t('sidebar.assessments', 'Assessments'),
+      '/dashboard/assessments': t('sidebar.assessments', 'Assessments'),
+      '/dashboard/assessments/baseline': t('my_assessments.baseline_title', 'Base Line Test'),
+      '/dashboard/skills-vault': t('sidebar.skills_vault', 'Skills Vault'),
+      '/dashboard/skills-passport': t('sidebar.skills_passport', 'Skills Passport'),
+      '/skills-passport': t('sidebar.skills_passport', 'Skills Passport'),
+      '/dashboard/vision-boards': t('sidebar.vision_board', 'Vision Board'),
+      '/vision-board': t('sidebar.vision_board', 'Vision Board'),
+      '/vision-board-pro/gallery': t('sidebar.vision_board_gallery', 'Vision Board Gallery'),
+      '/vision-board-pro/create': t('sidebar.vision_board_editor', 'Vision Board Editor'),
+      '/vision-board/view/:id': t('sidebar.vision_board', 'Vision Board'),
+      '/dashboard/smaart-toolkit': t('sidebar.toolkit', 'Tool Kit'),
+      '/smaart-toolkit': t('sidebar.toolkit', 'Tool Kit'),
+      '/dashboard/community': t('sidebar.community', 'Community'),
+      '/community': t('sidebar.community', 'Community'),
+      '/dashboard/settings': t('sidebar.settings', 'Settings'),
+      '/settings': t('sidebar.settings', 'Settings'),
+      '/dashboard/support': t('sidebar.help', 'Help & Support'),
+      '/tickets': t('sidebar.help', 'Help & Support'),
+      '/dashboard/notifications': t('sidebar.notifications', 'Notifications'),
+      '/notifications': t('sidebar.notifications', 'Notifications'),
+      '/dashboard/profile': t('sidebar.profile', 'Profile'),
+      '/profile': t('sidebar.profile', 'Profile'),
+      '/dashboard/notes': t('sidebar.notes', 'My Notes'),
+      '/dashboard/library': t('sidebar.library', 'Library'),
+      '/library': t('sidebar.library', 'Library'),
+      '/dashboard/dictionary': t('sidebar.dictionary', 'Dictionary'),
+      '/dictionary': t('sidebar.dictionary', 'Dictionary'),
+      '/dashboard/performance': t('sidebar.performance', 'Performance'),
+      '/dashboard/certificate': t('sidebar.certificates', 'Certificates'),
+      '/certificate': t('sidebar.certificates', 'Certificates'),
+      '/skills-vault': t('sidebar.skills_vault', 'Skills Vault'),
+      '/dashboard/add-details': t('sidebar.add_details', 'Add Details'),
+      '/add-details': t('sidebar.add_details', 'Add Details'),
+      '/dashboard/groups': t('sidebar.groups', 'Student Groups'),
+      '/dashboard/groups/:id': t('sidebar.group_chat', 'Group Chat'),
+      '/dashboard/quotients-grid': t('sidebar.quotients_grid', 'Quotients Grid'),
+      '/quotients': t('sidebar.quotients_grid', 'Quotients Grid'),
+      '/dashboard/profile-analysis': t('sidebar.profile_analysis', 'AI Profile Analysis'),
+      '/dashboard/resume-builder': t('sidebar.resume_builder', 'Resume Builder'),
+      '/dashboard/career-data-fetcher': t('sidebar.career_data', 'Career Data'),
+    };
+    return titleMap[location.pathname] || t('sidebar.dashboard', 'Dashboard');
   };
 
   // Generate breadcrumbs from path
@@ -1016,11 +1063,11 @@ const DashboardLayout = () => {
                             <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
                               <div className="flex items-center gap-2 text-white">
                                 <Bell className="w-4 h-4" />
-                                <span className="text-sm font-bold tracking-wide">Notifications</span>
+                                <span className="text-sm font-bold tracking-wide">{t('notifications.title', 'Notifications')}</span>
                               </div>
                               {unreadCount > 0 && (
                                 <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
-                                  {unreadCount} New
+                                  {unreadCount} {t('notifications.new', 'New')}
                                 </span>
                               )}
                             </div>
@@ -1065,7 +1112,7 @@ const DashboardLayout = () => {
                                   <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
                                     <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
                                   </div>
-                                  <p className="text-sm font-medium">No notifications yet</p>
+                                  <p className="text-sm font-medium">{t('notifications.empty.no_notifications', 'No notifications yet')}</p>
                                 </div>
                               )}
                             </div>
@@ -1078,7 +1125,7 @@ const DashboardLayout = () => {
                               }}
                               className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
                             >
-                              View all notifications
+                              {t('notifications.view_all_notifications', 'View all notifications')}
                               <ExternalLink className="w-3 h-3" />
                             </button>
                           </motion.div>
@@ -1285,7 +1332,7 @@ const DashboardLayout = () => {
                 <div className="flex items-center gap-2">
                   <Flame className="w-5 h-5 text-[#1a3884] dark:text-blue-400 animate-pulse" />
                   <span className="text-sm font-bold text-[#1a3884] dark:text-white uppercase tracking-wider">
-                    My Daily Streaks
+                    {t('streaks.modal_title', 'My Daily Streaks')}
                   </span>
                 </div>
                 <button

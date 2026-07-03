@@ -5,8 +5,10 @@ import {
   ChevronLeft, ChevronRight, ClipboardList
 } from "lucide-react";
 import { todosAPI, apiCall } from "@/services/api";
+import { useTranslation } from "react-i18next";
 
 const LearningProgress = memo(() => {
+  const { t, i18n } = useTranslation();
   const today = new Date();
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(today);
@@ -59,7 +61,7 @@ const LearningProgress = memo(() => {
   // ── calendar helpers ──────────────────────────────
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
-  const monthLabel = viewDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = viewDate.toLocaleDateString(i18n.language || "en-US", { month: "long", year: "numeric" });
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -140,7 +142,15 @@ const LearningProgress = memo(() => {
     }
   };
 
-  const DAY_NAMES = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  const DAY_NAMES = [
+    t('calendar.su', 'Su'),
+    t('calendar.mo', 'Mo'),
+    t('calendar.tu', 'Tu'),
+    t('calendar.we', 'We'),
+    t('calendar.th', 'Th'),
+    t('calendar.fr', 'Fr'),
+    t('calendar.sa', 'Sa')
+  ];
   const doneCount = selectedTodos.filter(t => t.completed).length;
 
   return (
@@ -235,12 +245,12 @@ const LearningProgress = memo(() => {
             <ClipboardList className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
             <div>
               <p className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none">
-                {selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                {selectedDate.toLocaleDateString(i18n.language || "en-US", { weekday: "short", month: "short", day: "numeric" })}
               </p>
               <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
                 {selectedTodos.length === 0
-                  ? "No tasks"
-                  : `${doneCount} of ${selectedTodos.length} completed`}
+                  ? t('calendar.no_tasks', 'No tasks')
+                  : `${doneCount} ${t('calendar.of', 'of')} ${selectedTodos.length} ${t('calendar.completed', 'completed')}`}
               </p>
             </div>
           </div>
@@ -249,7 +259,7 @@ const LearningProgress = memo(() => {
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#1a3884] hover:bg-[#132c6b] text-white text-[11px] font-bold transition-colors shadow-sm"
           >
             <Plus className="w-3 h-3" />
-            Add
+            {t('dashboard.add', 'Add')}
           </button>
         </div>
 
@@ -267,13 +277,13 @@ const LearningProgress = memo(() => {
                 value={newTask}
                 onChange={e => setNewTask(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addTodo()}
-                placeholder="Task name…"
+                placeholder={t('calendar.task_name_placeholder', 'Task name…')}
                 className="w-full text-xs px-2.5 py-2 rounded-lg bg-white dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/30 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a3884]/25 transition-all"
               />
               <div className="flex items-center justify-between gap-2">
                 {/* Priority Selector */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">Priority:</span>
+                  <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">{t('calendar.priority', 'Priority')}:</span>
                   <div className="flex bg-white dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/20 rounded-md p-0.5">
                     {["low", "medium", "high"].map((p) => {
                       const active = newPriority === p;
@@ -289,7 +299,7 @@ const LearningProgress = memo(() => {
                           className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded transition-all ${active ? activeColors[p] : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                             }`}
                         >
-                          {p}
+                          {t(`calendar.priority_${p}`, p)}
                         </button>
                       );
                     })}
@@ -300,7 +310,7 @@ const LearningProgress = memo(() => {
                   disabled={adding || !newTask.trim()}
                   className="px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-lg text-[10px] font-bold disabled:opacity-40 transition-colors"
                 >
-                  {adding ? "…" : "Save"}
+                  {adding ? "…" : t('calendar.save', 'Save')}
                 </button>
               </div>
             </motion.div>
@@ -320,13 +330,7 @@ const LearningProgress = memo(() => {
               <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/20 flex items-center justify-center mb-2">
                 <Calendar className="w-4 h-4 text-slate-300 dark:text-slate-600" />
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">No tasks for this day</p>
-              {/* <button
-                onClick={() => setShowInput(true)}
-                className="text-[11px] text-[#1a3884] dark:text-blue-400 font-bold mt-1 hover:underline"
-              >
-                + Add a task
-              </button> */}
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">{t('calendar.no_tasks_day', 'No tasks for this day')}</p>
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
@@ -362,16 +366,16 @@ const LearningProgress = memo(() => {
                     {todo.isGlobalEvent && (
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-[9px] font-bold text-[#1a3884]/70 dark:text-blue-400/70 uppercase tracking-wider">
-                          {todo.type === 'assessment' ? 'Assessment' : todo.type === 'session' ? 'Session' : 'Event'}
+                          {todo.type === 'assessment' ? t('calendar.type_assessment', 'Assessment') : todo.type === 'session' ? t('calendar.type_session', 'Session') : t('calendar.type_event', 'Event')}
                         </span>
                         {(todo.creatorRole === 'admin' || todo.creatorRole === 'superadmin') && (
                           <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-[8px] font-bold uppercase tracking-wider">
-                            SMAART Admin
+                            {t('calendar.smaart_admin', 'SMAART Admin')}
                           </span>
                         )}
                         {todo.creatorRole === 'college_admin' && (
                           <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-[8px] font-bold uppercase tracking-wider">
-                            College Admin
+                            {t('calendar.college_admin', 'College Admin')}
                           </span>
                         )}
                       </div>
