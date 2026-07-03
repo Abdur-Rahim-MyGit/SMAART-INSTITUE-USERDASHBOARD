@@ -76,13 +76,17 @@ const SupportTicketsPage = () => {
   const getCategoryLabel = (cat) => {
     const config = {
       'technical': t("support_tickets_page.cat_technical", 'Technical Issue'),
-      'account': t("support_tickets_page.cat_account", 'Account'),
+      'account': t("support_tickets_page.cat_account", 'Account Issue'),
       'course & assessment': t("support_tickets_page.cat_course_assessment", 'Course & Assessment Issue'),
+      'course': t("support_tickets_page.cat_course", 'Course Issue'),
+      'assessment': t("support_tickets_page.cat_assessment", 'Assessment Issue'),
       'career Direction': t("support_tickets_page.cat_career_direction", 'Career Direction Issue'),
       'content': t("support_tickets_page.cat_content", 'Course Content'),
       'billing': t("support_tickets_page.cat_billing", 'Billing'),
       'feedback': t("support_tickets_page.cat_feedback", 'Feedback'),
-      'other': t("support_tickets_page.cat_other", 'Other')
+      'placement issue': t("support_tickets_page.cat_placement", 'Placement Issue'),
+      'certificates & badges issue': t("support_tickets_page.cat_certificates_badges", 'Certificates & Badges Issue'),
+      'other': t("support_tickets_page.cat_other", 'Others Issue')
     };
     return config[cat] || cat;
   };
@@ -252,29 +256,14 @@ const SupportTicketsPage = () => {
                         year: 'numeric'
                       });
 
-                      const priorityLabels = {
-                        low: t("support_tickets_page.priority_low_label", "Low Priority"),
-                        medium: t("support_tickets_page.priority_medium_label", "Medium Priority"),
-                        high: t("support_tickets_page.priority_high_label", "High Priority")
-                      };
-
-                      const priorityColors = {
-                        low: 'bg-emerald-500',
-                        medium: 'bg-amber-500',
-                        high: 'bg-rose-500'
-                      };
-
-                      const leftBarColor = priorityColors[ticket.priority] || 'bg-slate-300';
-                      const priorityLabelText = priorityLabels[ticket.priority] || 'Normal Priority';
-
                       return (
                         <div
                           key={ticket._id}
                           onClick={() => setSelectedTicket(ticket)}
                           className="relative bg-white dark:bg-slate-900 p-6 pl-8 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-[#1a3884]/40 hover:shadow-md hover:shadow-slate-200/10 dark:hover:shadow-none transition-all group cursor-pointer overflow-hidden"
                         >
-                          {/* Priority color bar on the left */}
-                          <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${leftBarColor}`} />
+                          {/* Accent color bar on the left */}
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#1a3884]" />
 
                           {/* Ticket Header (ID & Status) */}
                           <div className="flex justify-between items-start gap-4">
@@ -303,10 +292,6 @@ const SupportTicketsPage = () => {
                             <span className="flex items-center gap-1.5">
                               <Clock size={14} className="text-slate-400" />
                               {dateStr}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <Clock size={14} className="text-slate-400" />
-                              {priorityLabelText}
                             </span>
                             {ticket.responses?.length > 0 && (
                               <span className="flex items-center gap-1.5 text-[#1a3884] dark:text-blue-400">

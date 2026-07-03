@@ -3,8 +3,10 @@ import { Terminal, Zap, Layers, Map, Target, ChevronLeft, ChevronRight } from 'l
 import { useTheme } from '../../contexts/ThemeContext';
 import CertificateModal from '../CertificateModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const ActiveSkillsWidget = ({ userEmail, paths }) => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const [userSkills, setUserSkills] = useState([]);
     const [loadingSkills, setLoadingSkills] = useState(true);
@@ -176,10 +178,10 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                     <div>
                         <h2 className="text-base font-extrabold tracking-tight"
                             style={{ color: isDark ? '#ffffff' : '#0f172a' }}>
-                            Active Skills to Master
+                            {t('dashboard.active_skills_to_master', 'Active Skills to Master')}
                         </h2>
                         <p className="text-[0.72rem] mt-0.5" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
-                            Track your targeted skills across your career directions
+                            {t('dashboard.track_targeted_skills', 'Track your targeted skills across your career directions')}
                         </p>
                     </div>
                 </div>
@@ -189,8 +191,11 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                     style={{ background: isDark ? 'rgba(0,0,0,0.2)' : '#f1f5f9' }}>
                     {validPaths.map((path, idx) => {
                         const isActive = activeTab === idx;
-                        const label = path.id === 'primary' ? 'Primary Path' :
-                            path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path';
+                        const label = path.id === 'primary' 
+                            ? t('dashboard.primary_path', 'Primary Path') 
+                            : path.id === 'secondary' 
+                              ? t('dashboard.secondary_path', 'Secondary Path') 
+                              : t('dashboard.tertiary_path', 'Tertiary Path');
 
                         return (
                             <button
@@ -298,10 +303,10 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                             <Layers size={18} color={isDark ? '#475569' : '#94a3b8'} />
                         </div>
                         <p className="text-[0.82rem] font-bold" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
-                            No active skills in this pathway.
+                            {t('dashboard.no_active_skills', 'No active skills in this pathway.')}
                         </p>
                         <p className="text-[0.7rem] mt-1 px-4" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>
-                            Jump into the Career Roadmap for <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> to start mastering new skills!
+                            {t('dashboard.jump_into_roadmap', 'Jump into the Career Roadmap for')} <strong style={{ color: isDark ? '#e2e8f0' : '#475569' }}>{currentPath?.title}</strong> {t('dashboard.to_start_mastering', 'to start mastering new skills!')}
                         </p>
                     </div>
                 )}

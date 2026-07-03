@@ -23,6 +23,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   // Bug #4 Fix: Track auto-submit to prevent double-fire from React re-renders
   const hasAutoSubmittedRef = useRef(false);
 
+  const isVerifyingRef = useRef(false);
+
   useEffect(() => {
     setCurrentTempToken(tempToken);
     // Reset state on new token
@@ -110,6 +112,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   };
 
   const verifyOtp = async (forceRetry = false) => {
+    if (isVerifyingRef.current) return;
+    isVerifyingRef.current = true;
     setIsLoading(true);
     const otpString = otp.join("");
 
@@ -160,6 +164,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
       }
     } finally {
       setIsLoading(false);
+      isVerifyingRef.current = false;
     }
   };
 
