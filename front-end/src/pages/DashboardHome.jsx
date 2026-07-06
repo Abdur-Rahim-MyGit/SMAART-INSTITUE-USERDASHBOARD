@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
@@ -10,6 +10,8 @@ import ActiveSkillsWidget from "@/components/dashboard/ActiveSkillsWidget";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
+import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
+import { isCapacityDevUnlock, compareCourseIds } from "@/utils/courseUnlock";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
@@ -19,6 +21,24 @@ const DashboardHome = () => {
   const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
   const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
+  const { userProgress, loading: progressLoading, refresh: refreshProgress } = useSmaartCourseProgress(user?._id || user?.id);
+
+  const pendingAssessment = useMemo(() => {
+    if (!userProgress || progressLoading) return null;
+    const completed = userProgress.completedCourses || [];
+    const passed = userProgress.assessmentsPassed || [];
+    
+    // Check baseline T1
+    if (!passed.includes("T1") && !isCapacityDevUnlock()) return "T1";
+    // Check Stage 1 -> T2
+    if (completed.some(c => compareCourseIds(c, "S10")) && !passed.includes("T2")) return "T2";
+    // Check Stage 2 -> T3
+    if (completed.some(c => compareCourseIds(c, "S19")) && !passed.includes("T3")) return "T3";
+    // Check Stage 3 -> T4
+    if (completed.some(c => compareCourseIds(c, "S25")) && !passed.includes("T4")) return "T4";
+    
+    return null;
+  }, [userProgress, progressLoading]);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -65,7 +85,7 @@ const DashboardHome = () => {
 
   if ((userLoading || dashboardLoading) && !loadingError) {
     return (
-      <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
         {/* Skeleton Hero */}
         <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
@@ -130,7 +150,7 @@ const DashboardHome = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.15 }}
-          className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
+          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
         >
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
@@ -138,11 +158,12 @@ const DashboardHome = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-full space-y-6"
+            className="w-full space-y-4 sm:space-y-6"
           >
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
+              pendingAssessment={pendingAssessment}
               paths={(() => {
                 const incomplete = (list) => (list || []).filter(c => (c.progress || 0) < 100);
                 // 1. In-progress enrolled courses (progress > 0 and < 100) — highest priority
@@ -154,7 +175,7 @@ const DashboardHome = () => {
                 // 4. All done — show last completed
                 return enrolledCourses?.length > 0 ? enrolledCourses : paths;
               })()}
-              pathsLoading={pathsLoading}
+              pathsLoading={pathsLoading || progressLoading}
             />
 
             {/* College Banners */}
@@ -162,13 +183,13 @@ const DashboardHome = () => {
           </motion.div>
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
-          <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
             {/* ── LEFT: Career Pathways ── */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="flex-1 min-w-0 flex flex-col gap-6"
+              className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
             >
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
               <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
@@ -181,7 +202,7 @@ const DashboardHome = () => {
               transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
             >
-              <div className="sticky top-24">
+              <div className="xl:sticky xl:top-24">
                 <LearningProgress />
               </div>
             </motion.div>

@@ -7,6 +7,7 @@
     "results": "ਨਤੀਜੇ",
     "assessments": "ਮੁਲਾਂਕਣ",
     "toolkit": "ਟੂਲਕਿੱਟ",
+    "placement": "ਪਲੇਸਮੈਂਟ",
     "performance": "ਪ੍ਰਦਰਸ਼ਨ",
     "skills_vault": "ਹੁਨਰ ਵਾਲਟ",
     "badges": "ਮੇਰੇ ਬੈਜ",
@@ -57,7 +58,20 @@
     "retry": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
     "no_paths": "ਅਜੇ ਤੱਕ ਕੋਈ ਸਿੱਖਣ ਦੇ ਰਸਤੇ ਨਹੀਂ ਹਨ",
     "browse_courses": "ਕੋਰਸ ਬ੍ਰਾਊਜ਼ ਕਰੋ",
-    "unable_to_load_paths": "ਪਾਥ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ"
+    "unable_to_load_paths": "ਪਾਥ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਮਰੱਥ",
+    "home": "ਹੋਮ",
+    "my_career_paths": "ਮੇਰੇ ਕਰੀਅਰ ਦੇ ਰਸਤੇ",
+    "view_career_path": "ਕਰੀਅਰ ਦਾ ਰਸਤਾ ਦੇਖੋ",
+    "primary_path": "ਪ੍ਰਾਇਮਰੀ ਰਸਤਾ",
+    "secondary_path": "ਸੈਕੰਡਰੀ ਰਸਤਾ",
+    "tertiary_path": "ਤਿਆਰੀ ਰਸਤਾ",
+    "add": "ਜੋੜੋ",
+    "continue_path": "ਰਸਤਾ ਜਾਰੀ ਰੱਖੋ",
+    "active_skills_to_master": "ਸਿੱਖਣ ਲਈ ਸਰਗਰਮ ਹੁਨਰ",
+    "track_targeted_skills": "ਆਪਣੇ ਕਰੀਅਰ ਦੀਆਂ ਦਿਸ਼ਾਵਾਂ ਵਿੱਚ ਆਪਣੇ ਨਿਸ਼ਾਨੇ ਵਾਲੇ ਹੁਨਰਾਂ ਨੂੰ ਟਰੈਕ ਕਰੋ",
+    "no_active_skills": "ਇਸ ਰਸਤੇ ਵਿੱਚ ਕੋਈ ਸਰਗਰਮ ਹੁਨਰ ਨਹੀਂ ਹੈ।",
+    "jump_into_roadmap": "ਕਰੀਅਰ ਰੋਡਮੈਪ 'ਤੇ ਜਾਓ",
+    "to_start_mastering": "ਨਵੇਂ ਹੁਨਰ ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰਨ ਲਈ!"
   },
   "profile_page": {
     "personal_information": "ਨਿੱਜੀ ਜਾਣਕਾਰੀ",
@@ -141,7 +155,8 @@
     "file_attached_success": "ਫਾਈਲ ਸਫਲਤਾਪੂਰਵਕ ਨੱਥੀ ਕੀਤੀ ਗਈ",
     "remove_file": "ਫਾਇਲ ਹਟਾਓ",
     "save_credential": "ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ ਸੁਰੱਖਿਅਤ ਕਰੋ",
-    "saving": "ਰੱਖਿਅਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+    "saving": "ਰੱਖਿਅਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "view_skills_passport": "ਹੁਨਰ ਪਾਸਪੋਰਟ ਦੇਖੋ"
   },
   "support_tickets_page": {
     "back": "ਪਿੱਛੇ",
@@ -186,10 +201,10 @@
     "validation_desc_max": "ਵਰਣਨ 2000 ਅੱਖਰਾਂ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦਾ",
     "validation_category_required": "ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਸ਼੍ਰੇਣੀ ਚੁਣੋ",
     "validation_file_size": "ਫ਼ਾਈਲ ਦਾ ਆਕਾਰ 5MB ਤੋਂ ਘੱਟ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ",
-    "validation_file_count": "ਅਧਿਕਤਮ 3 ਫ਼ਾਈਲਾਂ ਦੀ ਇਜਾਜ਼ਤ ਹੈ",
-    "cat_technical": "ਤਕਨੀਕੀ ਮੁੱਦਾ",
-    "cat_technical_desc": "ਪਲੇਟਫਾਰਮ ਨਾਲ ਸਮੱਸਿਆਵਾਂ",
-    "cat_account": "ਖਾਤਾ",
+    "validation_file_count": "ਅਧਿਕਤਮ 20 ਫ਼ਾਈਲਾਂ ਦੀ ਇਜਾਜ਼ਤ ਹੈ",
+    "cat_technical": "ਤਕਨੀਕੀ ਸਮੱਸਿਆ",
+    "cat_technical_desc": "ਹਾਰਡਵੇਅਰ, ਸੌਫਟਵੇਅਰ, ਡਿਵਾਈਸ ਕਨੈਕਸ਼ਨ, ਸਿਸਟਮ ਬੱਗ",
+    "cat_account": "ਖਾਤੇ ਦੀ ਸਮੱਸਿਆ",
     "cat_account_desc": "ਲੌਗਇਨ, ਪ੍ਰੋਫਾਈਲ ਜਾਂ ਸੈਟਿੰਗਾਂ",
     "cat_content": "ਕੋਰਸ ਸਮੱਗਰੀ",
     "cat_content_desc": "ਕੋਰਸਾਂ ਬਾਰੇ ਸਵਾਲ",
@@ -197,9 +212,22 @@
     "cat_billing_desc": "ਭੁਗਤਾਨ ਅਤੇ ਗਾਹਕੀ",
     "cat_feedback": "ਫੀਡਬੈਕ",
     "cat_feedback_desc": "ਸੁਝਾਅ ਅਤੇ ਸੁਧਾਰ",
-    "cat_other": "ਹੋਰ",
+    "cat_other": "ਹੋਰ ਸਮੱਸਿਆਵਾਂ",
     "cat_other_desc": "ਆਮ ਪੁੱਛਗਿੱਛ",
-    "characters": "ਅੱਖਰ"
+    "characters": "ਅੱਖਰ",
+    "cat_course": "ਕੋਰਸ ਦੀ ਸਮੱਸਿਆ",
+    "cat_course_desc": "ਕੋਰਸ ਸਮੱਗਰੀ, ਵੀਡੀਓ, ਮੋਡੀਊਲ ਤੱਕ ਪਹੁੰਚ",
+    "cat_assessment": "ਮੁਲਾਂਕਣ ਦੀ ਸਮੱਸਿਆ",
+    "cat_assessment_desc": "ਟੈਸਟ ਤੱਕ ਪਹੁੰਚ, ਜਮ੍ਹਾਂ ਕਰਾਉਣ ਦੀਆਂ ਗਲਤੀਆਂ, ਗ੍ਰੇਡਿੰਗ",
+    "cat_placement": "ਪਲੇਸਮੈਂਟ ਦੀ ਸਮੱਸਿਆ",
+    "cat_placement_desc": "ਨੌਕਰੀ ਦੀ ਅਰਜ਼ੀ, ਪਲੇਸਮੈਂਟ ਡਰਾਈਵ, ਰੈਜ਼ਿਊਮੇ ਅਪਲੋਡ",
+    "cat_certificates_badges": "ਸਰਟੀਫਿਕੇਟ ਅਤੇ ਬੈਜ ਦੀ ਸਮੱਸਿਆ",
+    "cat_certificates_badges_desc": "ਸਰਟੀਫਿਕੇਟ ਜਨਰੇਸ਼ਨ, ਬੈਜ ਅਨਲੌਕ, ਸ਼ੇਅਰਿੰਗ",
+    "cat_career_direction": "ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ ਸਮੱਸਿਆ",
+    "cat_career_direction_desc": "ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ ਅਤੇ ਸਹਾਇਤਾ",
+    "upload_screenshot": "ਸਕ੍ਰੀਨਸ਼ੌਟ ਅਪਲੋਡ ਕਰੋ",
+    "add_more": "ਹੋਰ ਜੋੜੋ",
+    "my_tickets": "ਮੇਰੇ ਟਿਕਟ"
   },
   "community_page": {
     "title": "ਭਾਈਚਾਰਕ ਘੋਸ਼ਣਾਵਾਂ",
@@ -722,7 +750,9 @@
     "competency_aligned": "ਯੋਗਤਾ ਇਕਸਾਰ",
     "integrity_verified": "ਇਕਸਾਰਤਾ ਦੀ ਪੁਸ਼ਟੀ ਕੀਤੀ ਗਈ",
     "success_export": "ਸਫਲਤਾਪੂਰਵਕ ਨਿਰਯਾਤ ਕੀਤਾ ਗਿਆ!",
-    "error_export": "ਨਿਰਯਾਤ ਅਸਫਲ ਰਿਹਾ। "
+    "error_export": "ਨਿਰਯਾਤ ਅਸਫਲ ਰਿਹਾ। ",
+    "level": "ਪੱਧਰ",
+    "level_short": "ਪੱਧਰ"
   },
   "assessments_dashboard": {
     "badge": "ਮੁਲਾਂਕਣ ਯਾਤਰਾ",
@@ -1015,6 +1045,8 @@
       "desc": "ਤਤਕਾਲ-ਸੰਦਰਭ ਕਾਰਡ ਛੇ ਕੋਰ SMAART ਭਾਗਾਂ ਅਤੇ ਜ਼ਰੂਰੀ ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਨੂੰ ਕਵਰ ਕਰਦੇ ਹਨ।",
       "more_desc": "ਪੇਸ਼ੇਵਰ ਸ਼ਬਦਾਵਲੀ ਵਿੱਚ ਮੁਹਾਰਤ ਹਾਸਲ ਕਰਨ ਵਿੱਚ ਤੁਹਾਡੀ ਮਦਦ ਕਰਨ ਲਈ ਹਰੇਕ ਕੋਰਸ ਮੋਡੀਊਲ ਵਿੱਚ ਹੋਰ ਫਲੈਸ਼ਕਾਰਡ ਉਪਲਬਧ ਹਨ।",
       "explore_btn": "ਕੋਰਸ ਫਲੈਸ਼ਕਾਰਡਸ ਦੀ ਪੜਚੋਲ ਕਰੋ",
+      "all_categories": "ਸਾਰੀਆਂ ਸ਼੍ਰੇਣੀਆਂ",
+      "no_cards_found": "ਇਸ ਸ਼੍ਰੇਣੀ ਲਈ ਕੋਈ ਫਲੈਸ਼ਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।",
       "category": {
         "Quotient": "ਭਾਗ"
       },
@@ -1263,7 +1295,9 @@
       "task": "ਕਾਰਜ",
       "certificate": "ਸਰਟੀਫਿਕੇਟ",
       "system": "ਸਿਸਟਮ"
-    }
+    },
+    "new": "ਨਵੇਂ",
+    "view_all_notifications": "ਸਾਰੀਆਂ ਸੂਚਨਾਵਾਂ ਦੇਖੋ"
   },
   "settings_page": {
     "profile_desc": "ਆਪਣੀ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ",
@@ -1658,5 +1692,18 @@
       "placement_rate": "ਪਲੇਸਮੈਂਟ ਦਰ",
       "corporate_partners": "ਕਾਰਪੋਰੇਟ ਭਾਈਵਾਲ"
     }
+  },
+  "streaks": {
+    "modal_title": "ਮੇਰੀਆਂ ਰੋਜ਼ਾਨਾ ਸਟ੍ਰੀਕਸ",
+    "day_streak": "ਦਿਨ ਦੀ ਸਟ੍ਰੀਕ",
+    "longest": "ਸਭ ਤੋਂ ਲੰਬੀ",
+    "days": "ਦਿਨ",
+    "activity_tracker": "ਰੋਜ਼ਾਨਾ ਗਤੀਵਿਧੀ ਟ੍ਰੈਕਰ (ਐਤਵਾਰ ਨੂੰ ਆਰਾਮ)",
+    "available_vouchers": "ਉਪਲਬਧ ਵਾਊਚਰ",
+    "broken_title": "ਸਟ੍ਰੀਕ ਟੁੱਟ ਗਈ!",
+    "restore_instruction": "ਬਹਾਲ ਕਰਨ ਲਈ ਵਾਊਚਰ ਦੀ ਵਰਤੋਂ ਕਰੋ",
+    "select_voucher": "ਵਾਊਚਰ ਚੁਣੋ",
+    "restore_button": "ਬਹਾਲ ਕਰੋ",
+    "no_active_vouchers": "ਕੋਈ ਸਰਗਰਮ ਵਾਊਚਰ ਨਹੀਂ"
   }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const TYPE_LABELS = {
   badge: 'Badge',
@@ -17,6 +18,7 @@ const TYPE_LABELS = {
 };
 
 const NotificationBell = () => {
+  const { t } = useTranslation();
   const { notifications, unreadCount, wsStatus, markRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,7 +119,7 @@ const NotificationBell = () => {
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/10">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span className="font-semibold text-gray-900 dark:text-white">Notifications</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{t('notifications.title', 'Notifications')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-xs font-medium ${getStatusColor()}`}>
@@ -137,7 +139,7 @@ const NotificationBell = () => {
             {notifications.length === 0 ? (
               <div className="p-4 text-center text-gray-500 dark:text-slate-300">
                 <Bell className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm">No notifications yet</p>
+                <p className="text-sm">{t('notifications.empty.no_notifications', 'No notifications yet')}</p>
               </div>
             ) : (
               notifications.slice(0, 5).map((notification) => (
@@ -194,7 +196,7 @@ const NotificationBell = () => {
               to="/notifications"
               className="block w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium py-2 transition-colors"
             >
-              View all notifications
+              {t('notifications.view_all_notifications', 'View all notifications')}
             </Link>
           </div>
         </div>

@@ -58,7 +58,20 @@
     "retry": "Retry",
     "no_paths": "No learning paths yet",
     "browse_courses": "Browse Courses",
-    "unable_to_load_paths": "Unable to load paths"
+    "unable_to_load_paths": "Unable to load paths",
+    "home": "Home",
+    "my_career_paths": "My Career Paths",
+    "view_career_path": "View Career Path",
+    "primary_path": "Primary Path",
+    "secondary_path": "Secondary Path",
+    "tertiary_path": "Tertiary Path",
+    "add": "Add",
+    "continue_path": "Continue Path",
+    "active_skills_to_master": "Active Skills to Master",
+    "track_targeted_skills": "Track your targeted skills across your career directions",
+    "no_active_skills": "No active skills in this pathway.",
+    "jump_into_roadmap": "Jump into the Career Roadmap for",
+    "to_start_mastering": "to start mastering new skills!"
   },
   "profile_page": {
     "personal_information": "Personal Information",
@@ -142,7 +155,8 @@
     "file_attached_success": "File attached successfully",
     "remove_file": "Remove File",
     "save_credential": "Save Credential",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "view_skills_passport": "View Skills Passport"
   },
   "support_tickets_page": {
     "back": "Back",
@@ -187,10 +201,10 @@
     "validation_desc_max": "Description cannot exceed 2000 characters",
     "validation_category_required": "Please select a category",
     "validation_file_size": "File size must be less than 5MB",
-    "validation_file_count": "Maximum 3 files allowed",
+    "validation_file_count": "Maximum 20 files allowed",
     "cat_technical": "Technical Issue",
-    "cat_technical_desc": "Problems with the platform",
-    "cat_account": "Account",
+    "cat_technical_desc": "Hardware, software, device connection, system bugs",
+    "cat_account": "Account Issue",
     "cat_account_desc": "Login, profile, or settings",
     "cat_content": "Course Content",
     "cat_content_desc": "Questions about courses",
@@ -198,9 +212,22 @@
     "cat_billing_desc": "Payment and subscription",
     "cat_feedback": "Feedback",
     "cat_feedback_desc": "Suggestions and improvements",
-    "cat_other": "Other",
+    "cat_other": "Others Issue",
     "cat_other_desc": "General inquiries",
-    "characters": "characters"
+    "characters": "characters",
+    "cat_course": "Course Issue",
+    "cat_course_desc": "Course content, videos, modules access",
+    "cat_assessment": "Assessment Issue",
+    "cat_assessment_desc": "Test access, submission errors, grading",
+    "cat_placement": "Placement Issue",
+    "cat_placement_desc": "Job application, placement drive, resume upload",
+    "cat_certificates_badges": "Certificates & Badges Issue",
+    "cat_certificates_badges_desc": "Certificate generation, badge unlock, sharing",
+    "cat_career_direction": "Career Direction Issue",
+    "cat_career_direction_desc": "Career Direction guidance and support",
+    "upload_screenshot": "Upload Screenshot",
+    "add_more": "Add More",
+    "my_tickets": "My Tickets"
   },
   "community_page": {
     "title": "Community Announcements",
@@ -643,7 +670,7 @@
     },
     "step_locked_warning": "Please complete Step {{step}} first!",
     "preview": "Preview",
-    "transcription": "Transcription",
+    "transcription": "Transcript",
     "lesson_preview": "Lesson Preview",
     "lesson_preview_desc": "Watch this lesson to continue your learning journey.",
     "five_ten_min": "5-10 min",
@@ -723,7 +750,9 @@
     "competency_aligned": "Competency Aligned",
     "integrity_verified": "Integrity Verified",
     "success_export": "Successfully exported!",
-    "error_export": "Export failed. Please try again."
+    "error_export": "Export failed. Please try again.",
+    "level": "Level",
+    "level_short": "Lvl"
   },
   "assessments_dashboard": {
     "badge": "Assessment Journey",
@@ -1017,6 +1046,8 @@
       "desc": "Quick-reference cards covering the six core SMAART quotients and essential professional terminology.",
       "more_desc": "More flashcards are available within each course module to help you master professional terminology.",
       "explore_btn": "Explore Course Flashcards",
+      "all_categories": "All Categories",
+      "no_cards_found": "No flashcards found for this category.",
       "category": {
         "Quotient": "Quotient"
       },
@@ -1265,7 +1296,9 @@
       "task": "Tasks",
       "certificate": "Certificates",
       "system": "System"
-    }
+    },
+    "new": "New",
+    "view_all_notifications": "View all notifications"
   },
   "settings_page": {
     "profile_desc": "Manage your personal information",
@@ -1660,5 +1693,18 @@
       "placement_rate": "Placement Rate",
       "corporate_partners": "Corporate Partners"
     }
+  },
+  "streaks": {
+    "modal_title": "My Daily Streaks",
+    "day_streak": "Day Streak",
+    "longest": "Longest",
+    "days": "days",
+    "activity_tracker": "Daily Activity Tracker (Sundays Rest)",
+    "available_vouchers": "Available Vouchers",
+    "broken_title": "Streak broken!",
+    "restore_instruction": "Use a voucher to restore to",
+    "select_voucher": "Select Voucher",
+    "restore_button": "Restore",
+    "no_active_vouchers": "No Active Vouchers"
   }
 }

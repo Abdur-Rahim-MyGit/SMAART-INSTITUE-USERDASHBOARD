@@ -48,7 +48,7 @@ const Performance = () => {
   };
 
   return (
-    <div className="p-8 bg-transparent font-sans transition-colors duration-300">
+    <div className="p-4 sm:p-6 lg:p-8 bg-transparent font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Back Button - Mobile Only */}
         <div className="mb-4 md:hidden">

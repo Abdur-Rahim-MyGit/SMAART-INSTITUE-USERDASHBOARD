@@ -193,7 +193,7 @@ export function getReactionCounts(post) {
 
       return counts;
     },
-    { like: 0, heart: 0, insightful: 0, support: 0 },
+    { like: 0, heart: 0, insightful: 0, support: 0, smile: 0 },
   );
 }
 

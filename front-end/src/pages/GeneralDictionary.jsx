@@ -164,7 +164,7 @@ const GeneralDictionary = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           onClick={() => navigate("/dashboard/smaart-toolkit")}
-          className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
+          className="group mt-4 mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
             <ArrowLeft stroke={1.5} className="h-4 w-4" />

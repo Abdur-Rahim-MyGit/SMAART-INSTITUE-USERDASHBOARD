@@ -28,6 +28,12 @@ const resumeApi = {
         method: 'DELETE' 
     }),
 
+    // Duplicate a resume (server-side copy)
+    duplicateResume: (id) => apiCall(`/resumes/${id}/duplicate`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+    }),
+
     // Register secure export (rate limited server-side)
     issueExport: (id) => apiCall(`/resumes/${id}/export`, {
         method: 'POST',

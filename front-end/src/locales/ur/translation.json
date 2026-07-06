@@ -7,6 +7,7 @@
     "results": "نتائج",
     "assessments": "جائزے",
     "toolkit": "ٹول کٹ",
+    "placement": "پلیسمینٹ",
     "performance": "کارکردگی",
     "skills_vault": "مہارتوں کا مجموعہ",
     "badges": "میرے بیجز",
@@ -55,7 +56,20 @@
     "retry": "دوبارہ کوشش کریں",
     "no_paths": "ابھی تک کوئی سیکھنے کا راستہ نہیں ہے",
     "browse_courses": "کورسز دیکھیں",
-    "unable_to_load_paths": "سیکھنے کے راستے لوڈ کرنے میں ناکام"
+    "unable_to_load_paths": "سیکھنے کے راستے لوڈ کرنے میں ناکام",
+    "home": "ہوم",
+    "my_career_paths": "میرے کیریئر کے راستے",
+    "view_career_path": "کیریئر کا راستہ دیکھیں",
+    "primary_path": "پرائمری راستہ",
+    "secondary_path": "سیکنڈری راستہ",
+    "tertiary_path": "ٹیرشری راستہ",
+    "add": "شامل کریں",
+    "continue_path": "راستہ جاری رکھیں",
+    "active_skills_to_master": "سیکھنے کے لیے فعال مہارتیں",
+    "track_targeted_skills": "اپنے کیریئر کی سمتوں میں اپنی مطلوبہ مہارتوں کو ٹریک کریں",
+    "no_active_skills": "اس راستے میں کوئی فعال مہارتیں نہیں ہیں۔",
+    "jump_into_roadmap": "کیریئر روڈ میپ پر جائیں برائے",
+    "to_start_mastering": "نئی مہارتیں سیکھنا شروع کرنے کے لیے!"
   },
   "profile_page": {
     "personal_information": "ذاتی معلومات",
@@ -139,7 +153,8 @@
     "file_attached_success": "فائل کامیابی کے ساتھ منسلک ہو گئی",
     "remove_file": "فائل ہٹائیں",
     "save_credential": "سرٹیفکیٹ محفوظ کریں",
-    "saving": "محفوظ ہو رہا ہے..."
+    "saving": "محفوظ ہو رہا ہے...",
+    "view_skills_passport": "مہارت کا پاسپورٹ دیکھیں"
   },
   "support_tickets_page": {
     "back": "پیچھے",
@@ -184,10 +199,10 @@
     "validation_desc_max": "تفصیل 2000 حروف سے زیادہ نہیں ہو سکتی",
     "validation_category_required": "براہ کرم ایک زمرہ منتخب کریں",
     "validation_file_size": "فائل کا سائز 5MB سے کم ہونا چاہئے",
-    "validation_file_count": "زیادہ سے زیادہ 3 فائلوں کی اجازت ہے",
+    "validation_file_count": "زیادہ سے زیادہ 20 فائلوں کی اجازت ہے",
     "cat_technical": "تکنیکی مسئلہ",
-    "cat_technical_desc": "پلیٹ فارم کے ساتھ مسائل",
-    "cat_account": "اکاؤنٹ",
+    "cat_technical_desc": "ہارڈ ویئر، سافٹ ویئر، ڈیوائس کنکشن، سسٹم کی خرابیاں",
+    "cat_account": "اکاؤنٹ کا مسئلہ",
     "cat_account_desc": "لاگ ان، پروفائل، یا ترتیبات",
     "cat_content": "کورس کا مواد",
     "cat_content_desc": "کورسز کے بارے میں سوالات",
@@ -195,9 +210,22 @@
     "cat_billing_desc": "ادائیگی اور سبسکرプション",
     "cat_feedback": "فیڈ بیک",
     "cat_feedback_desc": "تجاویز اور بہتری",
-    "cat_other": "دیگر",
+    "cat_other": "دیگر مسائل",
     "cat_other_desc": "عام پوچھ گچھ",
-    "characters": "حروف"
+    "characters": "حروف",
+    "cat_course": "کورس کا مسئلہ",
+    "cat_course_desc": "کورس کے مواد، ویڈیوز، ماڈیولز تک رسائی",
+    "cat_assessment": "تشخیص کا مسئلہ",
+    "cat_assessment_desc": "ٹیسٹ تک رسائی، جمع کرانے کی غلطیاں، گریڈنگ",
+    "cat_placement": "پلیسمینٹ کا مسئلہ",
+    "cat_placement_desc": "ملازمت کی درخواست، پلیسمینٹ مہم، ریزیومے اپ لوڈ",
+    "cat_certificates_badges": "سرٹیفکیٹ اور بیجز کا مسئلہ",
+    "cat_certificates_badges_desc": "سرٹیفکیٹ جنریشن، بیج انلاک، شیئرنگ",
+    "cat_career_direction": "کیرئیر رہنمائی کا مسئلہ",
+    "cat_career_direction_desc": "کیرئیر رہنمائی اور مدد",
+    "upload_screenshot": "اسکرین شاٹ اپ لوڈ کریں",
+    "add_more": "مزید شامل کریں",
+    "my_tickets": "میرے ٹکٹ"
   },
   "community_page": {
     "title": "کمیونٹی کے اعلانات",
@@ -714,7 +742,9 @@
     "competency_aligned": "قابلیت کے مطابق",
     "integrity_verified": "سالمیت کی تصدیق",
     "success_export": "کامیابی سے برآمد کیا گیا!",
-    "error_export": "برآمد ناکام رہا۔ براہ کرم دوبارہ کوشش کریں۔"
+    "error_export": "برآمد ناکام رہا۔ براہ کرم دوبارہ کوشش کریں۔",
+    "level": "سطح",
+    "level_short": "سطح"
   },
   "assessments_dashboard": {
     "badge": "جائزے کا سفر",
@@ -1007,6 +1037,8 @@
       "desc": "چھ بنیادی SMAART حصوں اور ضروری پیشہ ورانہ اصطلاحات پر مشتمل فوری حوالہ کارڈز۔",
       "more_desc": "پیشہ ورانہ اصطلاحات پر مہارت حاصل کرنے میں آپ کی مدد کے لیے ہر کورس ماڈیول میں مزید فلیش کارڈز دستیاب ہیں۔",
       "explore_btn": "کورس فلیش کارڈز دریافت کریں",
+      "all_categories": "تمام زمرہ جات",
+      "no_cards_found": "اس زمرے کے لیے کوئی فلیش کارڈز نہیں ملے۔",
       "category": {
         "Quotient": "کوشینٹ"
       },
@@ -1351,7 +1383,9 @@
       "task": "کام",
       "certificate": "سرٹیفکیٹ",
       "system": "سسٹم"
-    }
+    },
+    "new": "نئے",
+    "view_all_notifications": "تمام اطلاعات دیکھیں"
   },
   "settings_page": {
     "profile_desc": "اپنی ذاتی معلومات کا نظم کریں",
@@ -1746,5 +1780,18 @@
       "placement_rate": "ملازمت کی شرح",
       "corporate_partners": "کارپوریٹ شراکت دار"
     }
+  },
+  "streaks": {
+    "modal_title": "میری روزمرہ کی لکیریں",
+    "day_streak": "دن کی لکیر",
+    "longest": "سب سے طویل",
+    "days": "دن",
+    "activity_tracker": "روزانہ سرگرمی کا ٹریکر (اتوار کو آرام)",
+    "available_vouchers": "دستیاب واؤچرز",
+    "broken_title": "لکیر ٹوٹ گئی!",
+    "restore_instruction": "بحال کرنے کے لیے واؤچر استعمال کریں",
+    "select_voucher": "واؤچر منتخب کریں",
+    "restore_button": "بحال کریں",
+    "no_active_vouchers": "کوئی فعال واؤچر نہیں"
   }
 }

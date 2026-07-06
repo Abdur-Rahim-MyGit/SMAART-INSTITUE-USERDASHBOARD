@@ -234,7 +234,7 @@ const TodoTracker = () => {
     };
 
     const formatDate = (isoString) => {
-        return new Date(isoString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return new Date(isoString).toLocaleDateString(i18n.language || undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
     return (
@@ -250,25 +250,25 @@ const TodoTracker = () => {
                         <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
                             <ArrowLeft className="w-4 h-4" />
                         </div>
-                        Back to Toolkit
+                        {t('todo_tracker.back_to_toolkit', 'Back to Toolkit')}
                     </button>
-
+ 
                     {/* Hero Banner */}
                     <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 mb-8">
                         <div className="absolute inset-px rounded-[31px] border border-white/60 dark:border-white/5 pointer-events-none" />
                         <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-blue-500/5 blur-3xl pointer-events-none" />
-
+ 
                         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                             <div className="space-y-3">
                                 <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-400">
                                     <Sparkles className="h-3 w-3" />
-                                    Task and Calendar Tracker
+                                    {t('todo_tracker.subtitle_tag', 'Task and Calendar Tracker')}
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                                    To-Do & <span className="text-[#1a3884] dark:text-blue-500">Calendar</span>
+                                    {t('todo_tracker.todo', 'To-Do')} & <span className="text-[#1a3884] dark:text-blue-500">{t('todo_tracker.calendar', 'Calendar')}</span>
                                 </h1>
                                 <p className="max-w-xl text-slate-600 dark:text-slate-400 text-base leading-relaxed">
-                                    Schedule daily tasks, set due date reminders, and inspect your study calendar deadlines dynamically.
+                                    {t('todo_tracker.hero_description', 'Schedule daily tasks, set due date reminders, and inspect your study calendar deadlines dynamically.')}
                                 </p>
                             </div>
                         </div>
@@ -280,23 +280,23 @@ const TodoTracker = () => {
                         <div className="bg-white dark:bg-[#002147] p-6 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm h-fit">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                 <Sparkles className="w-4 h-4 text-amber-500" />
-                                Schedule Productivity Task
+                                {t('todo_tracker.schedule_title', 'Schedule Productivity Task')}
                             </h2>
                             <form onSubmit={handleCreateTodo} className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                        Task Title
+                                        {t('todo_tracker.task_title', 'Task Title')}
                                     </label>
                                     <Input
                                         value={todoTitle}
                                         onChange={(e) => setTodoTitle(e.target.value)}
-                                        placeholder="What needs to be done?"
+                                        placeholder={t('todo_tracker.task_placeholder', 'What needs to be done?')}
                                         className="h-11 bg-[#F8FAFC] dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 rounded-xl"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                        Due Date & Time
+                                        {t('todo_tracker.due_date', 'Due Date & Time')}
                                     </label>
                                     <Input
                                         type="datetime-local"
@@ -309,7 +309,7 @@ const TodoTracker = () => {
                                     type="submit"
                                     className="w-full h-11 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl shadow-md font-bold transition-all active:scale-[0.98]"
                                 >
-                                    <Plus className="w-4 h-4 mr-1" /> Add Task
+                                    <Plus className="w-4 h-4 mr-1" /> {t('todo_tracker.add_task', 'Add Task')}
                                 </Button>
                             </form>
                         </div>
@@ -318,9 +318,9 @@ const TodoTracker = () => {
                         <div className="lg:col-span-2 bg-white dark:bg-[#002147] p-6 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm">
                             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 border-b border-slate-100 dark:border-white/5 pb-4">
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Active Tasks</h2>
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('todo_tracker.active_tasks', 'Active Tasks')}</h2>
                                     <p className="text-xs text-slate-400 font-medium">
-                                        {todos.filter(t => !t.completed).length} pending task(s) remaining
+                                        {todos.filter(t => !t.completed).length} {t('todo_tracker.pending_remaining', 'pending task(s) remaining')}
                                     </p>
                                 </div>
 
@@ -335,7 +335,7 @@ const TodoTracker = () => {
                                                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                                             }`}
                                         >
-                                            {filter}
+                                            {t(`todo_tracker.filter_${filter}`, filter)}
                                         </button>
                                     ))}
                                 </div>
@@ -412,7 +412,7 @@ const TodoTracker = () => {
                                                                 : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
                                                         }`}>
                                                             {status === "overdue" && <AlertTriangle className="w-2.5 h-2.5" />}
-                                                            {status}
+                                                            {t(`todo_tracker.status_${status}`, status)}
                                                         </span>
                                                     )}
 
@@ -423,7 +423,7 @@ const TodoTracker = () => {
                                                                     onClick={() => handleEditTodoSave(todo._id)}
                                                                     className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1 transition-all"
                                                                 >
-                                                                    <Save className="w-3.5 h-3.5" /> Save
+                                                                    <Save className="w-3.5 h-3.5" /> {t('common.save', 'Save')}
                                                                 </button>
                                                                 <button
                                                                     onClick={() => setEditingTodoId(null)}
@@ -458,7 +458,7 @@ const TodoTracker = () => {
 
                                     {filteredTodos.length === 0 && (
                                         <div className="text-center py-12">
-                                            <p className="text-slate-400 text-sm font-medium">No tasks found inside this filter.</p>
+                                            <p className="text-slate-400 text-sm font-medium">{t('todo_tracker.no_tasks_filter', 'No tasks found inside this filter.')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -472,7 +472,7 @@ const TodoTracker = () => {
                         <div className="lg:col-span-2 bg-white dark:bg-[#002147] p-6 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-lg font-black text-slate-900 dark:text-white">
-                                    {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                                    {currentDate.toLocaleDateString(i18n.language || "en-US", { month: "long", year: "numeric" })}
                                 </h2>
                                 <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
                                     <button 
@@ -485,7 +485,7 @@ const TodoTracker = () => {
                                         onClick={() => setCurrentDate(new Date())}
                                         className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg transition-all"
                                     >
-                                        Today
+                                        {t('todo_tracker.today', 'Today')}
                                     </button>
                                     <button 
                                         onClick={() => changeMonth(1)}
@@ -499,7 +499,7 @@ const TodoTracker = () => {
                             <div className="grid grid-cols-7 gap-2 mb-2 text-center">
                                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                                     <span key={day} className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                        {day}
+                                        {t(`calendar.${day.toLowerCase()}_short`, day)}
                                     </span>
                                 ))}
                             </div>
@@ -546,16 +546,16 @@ const TodoTracker = () => {
                         {/* Calendar Sidebar Inspect */}
                         <div className="bg-white dark:bg-[#002147] p-6 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[400px]">
                             <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-white/5 pb-3">
-                                Deadlines on {selectedDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                                {t('todo_tracker.deadlines_on', 'Deadlines on')} {selectedDate.toLocaleDateString(i18n.language || "en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                             </h3>
 
                             <div className="flex-1 overflow-y-auto py-4 space-y-5">
                                 <div className="space-y-2">
                                     <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                                        Tasks due ({getTodosForDate(selectedDate).length})
+                                        {t('todo_tracker.tasks_due', 'Tasks due')} ({getTodosForDate(selectedDate).length})
                                     </h4>
                                     {getTodosForDate(selectedDate).length === 0 ? (
-                                        <p className="text-xs text-slate-400 font-medium italic">No scheduled tasks due on this day.</p>
+                                        <p className="text-xs text-slate-400 font-medium italic">{t('todo_tracker.no_tasks_due', 'No scheduled tasks due on this day.')}</p>
                                     ) : (
                                         <div className="space-y-2">
                                             {getTodosForDate(selectedDate).map(todo => (
@@ -584,10 +584,10 @@ const TodoTracker = () => {
 
                                 <div className="space-y-2">
                                     <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                                        Notes written ({getNotesForDate(selectedDate).length})
+                                        {t('todo_tracker.notes_written', 'Notes written')} ({getNotesForDate(selectedDate).length})
                                     </h4>
                                     {getNotesForDate(selectedDate).length === 0 ? (
-                                        <p className="text-xs text-slate-400 font-medium italic">No notes created or edited on this day.</p>
+                                        <p className="text-xs text-slate-400 font-medium italic">{t('todo_tracker.no_notes_day', 'No notes created or edited on this day.')}</p>
                                     ) : (
                                         <div className="space-y-2">
                                             {getNotesForDate(selectedDate).map(note => (
@@ -597,7 +597,7 @@ const TodoTracker = () => {
                                                     className="p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/40 bg-slate-50 dark:bg-slate-900/40 hover:bg-blue-50/40 dark:hover:bg-slate-800/50 cursor-pointer flex items-center justify-between text-xs transition-colors"
                                                 >
                                                     <span className="font-semibold text-slate-700 dark:text-slate-200 truncate pr-2">
-                                                        {note.title || "Untitled Note"}
+                                                        {note.title || t('todo_tracker.untitled_note', 'Untitled Note')}
                                                     </span>
                                                     <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                                 </div>

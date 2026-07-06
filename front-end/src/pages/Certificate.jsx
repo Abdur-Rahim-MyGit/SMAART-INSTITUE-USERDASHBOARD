@@ -75,6 +75,21 @@ const Certificate = () => {
     const [certId, setCertId] = useState('');
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [scale, setScale] = useState(1);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.getBoundingClientRect().width;
+                const newScale = Math.min(1, containerWidth / 794);
+                setScale(newScale);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [selectedType]);
 
     useEffect(() => {
         if (user) {
@@ -255,7 +270,7 @@ const Certificate = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
+                    className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
                 >
                     <div className="relative z-10">
                         {/* Badge pill */}
@@ -266,7 +281,7 @@ const Certificate = () => {
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#1a3884] to-[#2656c8] text-white shadow-md">
                                 <ShieldCheck className="h-5 w-5" />
                             </div>
@@ -290,7 +305,7 @@ const Certificate = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
-                    className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
+                    className="rounded-2xl border border-[#d8e6f7] bg-white p-4 sm:p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
                 >
                     <div className="space-y-8 animate-fade-in">
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
@@ -298,7 +313,7 @@ const Certificate = () => {
                                 <button
                                     key={cert.id}
                                     onClick={() => setSelectedType(cert)}
-                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-5 text-left transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
+                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 sm:p-5 text-left transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
                                 >
                                     <div className="flex w-full items-start justify-between gap-4">
                                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
@@ -328,7 +343,7 @@ const Certificate = () => {
                         </div>
 
                         {/* Verify Actions */}
-                        <div className="flex flex-col items-center justify-center rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-8 text-center dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-5 sm:p-8 text-center dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#eef4ff] text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-400">
                                 <ShieldCheck className="h-6 w-6" />
                             </div>
@@ -363,7 +378,7 @@ const Certificate = () => {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
-            <main className="w-full relative py-8 px-4 flex flex-col items-center">
+            <main className="w-full relative py-6 px-3 sm:py-8 sm:px-4 flex flex-col items-center">
 
                 {/* Controls */}
                 <div className="z-[30] flex w-full max-w-[794px] items-center justify-between mb-8 no-print bg-white dark:bg-[#002147] p-3 sm:p-4 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
@@ -391,8 +406,18 @@ const Certificate = () => {
                 </div>
 
                 {/* Certificate Paper - A4 Portrait */}
-                <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top shadow-2xl">
-                    <div className="certificate-paper" ref={certificateRef} id="certificate-to-print">
+                <div ref={containerRef} className="w-full flex justify-center overflow-hidden" style={{ height: `${1123 * scale}px` }}>
+                    <div 
+                        style={{
+                            transform: `scale(${scale})`,
+                            transformOrigin: 'top center',
+                            width: '794px',
+                            height: '1123px',
+                            flexShrink: 0
+                        }}
+                        className="shadow-2xl"
+                    >
+                        <div className="certificate-paper" ref={certificateRef} id="certificate-to-print" style={{ margin: 0 }}>
                         {/* Security Watermark Backdrop */}
                         <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>
 
@@ -519,6 +544,7 @@ const Certificate = () => {
                         </div>
                     </div>
                 </div>
+            </div>
             </main>
         </div>
     );

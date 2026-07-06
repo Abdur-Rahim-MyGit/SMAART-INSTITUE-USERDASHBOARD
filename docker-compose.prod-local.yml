@@ -1,0 +1,73 @@
+# ============================================================================
+# docker-compose.prod-local.yml  —  PRODUCTION-SHAPED local deployment.
+# ----------------------------------------------------------------------------
+# Mirrors the AWS production architecture on your machine, free:
+#
+#   Browser → Nginx (:80)                 = CloudFront (CDN) + ALB + WAF
+#               ├── /            → static frontend dist   = S3 + CloudFront
+#               └── /api, /socket.io → backend × N        = ALB → ECS tasks
+#   backend × N → mongo + redis           = Atlas + ElastiCache
+#
+# This is how teams rehearse the prod architecture before paying for cloud.
+# The real ECS/ALB/CloudFront/WAF are validated later on AWS (gate G3).
+#
+# START (3 backend replicas, like 3 ECS tasks):
+#   docker compose -p smaart-prod -f docker-compose.prod-local.yml up -d --scale backend=3
+# OPEN:    http://localhost
+# STOP:    docker compose -p smaart-prod -f docker-compose.prod-local.yml down
+# ============================================================================
+
+services:
+  # --- Database (= MongoDB Atlas) ------------------------------------------
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # --- Redis (= ElastiCache) — provisioned for cross-task real-time --------
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # --- Backend (= ECS Fargate tasks) — scale with --scale backend=N --------
+  # No container_name and no published host port, so it can run as N replicas.
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: ../aws-deployment/Dockerfile
+    env_file:
+      - ./back-end/.env.local
+    environment:
+      - REDIS_HOST=redis      # provisioned; app Redis integration is a known gap
+      - REDIS_PORT=6379
+    expose:
+      - "5000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- Nginx edge (= CloudFront + ALB + WAF) -------------------------------
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"               # the single entry point → http://localhost
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./front-end/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

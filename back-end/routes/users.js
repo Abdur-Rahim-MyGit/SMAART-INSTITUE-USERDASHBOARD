@@ -607,29 +607,11 @@ router.patch('/register-section', async (req, res) => {
   }
 });
 
-// Debug: inspect user login state by email (DEV ONLY)
-router.get('/_debug/state/:email', async (req, res) => {
-  try {
-    const normalizedEmail = (req.params.email || '').trim().toLowerCase();
-    if (!normalizedEmail) return res.status(400).json({ error: 'Email required' });
-
-    const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-    const user = await User.findOne(emailQuery);
-    const registration = user ? await Registration.findOne({ userId: user._id }) : null;
-
-    return res.json({
-      foundUser: !!user,
-      userEmail: user?.email || null,
-      hasPassword: !!user?.password,
-      passwordHashPreview: user?.password ? String(user.password).slice(0, 7) + '...' : null,
-      registrationCompleted: !!user?.registrationCompleted,
-      hasRegistration: !!registration,
-      registrationEmail: registration?.email || null,
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+// SECURITY (audit HIGH): removed unauthenticated debug endpoints
+// GET /_debug/state/:email and GET /_debug_dump/:email — they exposed any
+// user's record (password-hash preview, live currentSessionId, full docs) to
+// anonymous callers by email. Diagnostics must go through an authenticated,
+// admin-gated path instead.
 
 // Login endpoint
 router.post('/login', async (req, res) => {

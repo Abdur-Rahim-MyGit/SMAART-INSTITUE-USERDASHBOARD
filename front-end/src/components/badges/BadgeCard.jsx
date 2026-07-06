@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles, Lock } from 'lucide-react';
+import { toast } from 'sonner';
 
 /* ────────────────────────────────────────────────
    Module colour palette — all in the Deep Navy family
-──────────────────────────────────────────────── */
+   ──────────────────────────────────────────────── */
 const MODULE_PALETTE = {
     'capacity': {
         hex: '#1a3884', ribbon: '#0d2059', text: '#FFFFFF',
@@ -50,10 +51,6 @@ export const resolveColors = (category = '') => {
 const HEX_PATH = 'M50 5 L95 27.5 L95 87.5 L50 110 L5 87.5 L5 27.5 Z';
 
 /**
- * Split course title into neat lines (≤13 chars each, max 3 lines)
- * so they fit cleanly inside the hex face.
- */
-/**
  * Split text into ≤3 lines that fit within the hex face.
  * Splits on spaces and hyphens, removing hyphens for clean visual centering.
  */
@@ -99,7 +96,6 @@ export const HexBadgeSVG = ({ colors, badgeId, courseName, year, size = 190 }) =
     const midY = 41.0; // Visually balanced center (between top point y=12 and ribbon peak y=61)
     
     // Standard baseline offset centering:
-    // startY is the baseline of the first line.
     // startY = midY - ((n - 1) * lh - 0.7 * fs) / 2
     const startY = midY - ((lines.length - 1) * lineHeight - 0.7 * fontSize) / 2;
 
@@ -203,8 +199,8 @@ export const HexBadgeSVG = ({ colors, badgeId, courseName, year, size = 190 }) =
 
 /* ────────────────────────────────────────────────
    BadgeCard  —  the full card shown in the grid
-──────────────────────────────────────────────── */
-const BadgeCard = ({ badge, onClick }) => {
+   ──────────────────────────────────────────────── */
+const BadgeCard = ({ badge, isLocked = false, onClick }) => {
     const colors = resolveColors(badge.category);
     const year   = badge.earnedDate
         ? new Date(badge.earnedDate).getFullYear()
@@ -221,29 +217,36 @@ const BadgeCard = ({ badge, onClick }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -6, scale: 1.02 }}
+            whileHover={isLocked ? {} : { y: -6, scale: 1.02 }}
             transition={{ duration: 0.28, ease: 'easeOut' }}
-            onClick={() => onClick?.(badge)}
-            className="group relative flex flex-col items-center cursor-pointer
+            onClick={() => {
+                if (isLocked) {
+                    toast.info(`Complete the course "${shortTitle}" to unlock this badge!`);
+                    return;
+                }
+                onClick?.(badge);
+            }}
+            className={`group relative flex flex-col items-center cursor-pointer
                        rounded-2xl border border-[#d8e6f7] bg-white
                        px-4 pt-6 pb-4 shadow-sm
-                       hover:shadow-[0_8px_32px_rgba(26,56,132,0.14)]
-                       hover:border-[#1a3884]/30
+                       ${isLocked ? 'opacity-80' : 'hover:shadow-[0_8px_32px_rgba(26,56,132,0.14)] hover:border-[#1a3884]/30'}
                        dark:border-[#1a3884]/20 dark:bg-[#001630]
-                       transition-all duration-300 overflow-hidden"
+                       transition-all duration-300 overflow-hidden`}
             style={{ minHeight: 290 }}
         >
             {/* Subtle radial glow on hover */}
-            <div
-                className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100
-                           transition-opacity duration-500 rounded-2xl"
-                style={{
-                    background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${colors.glow}22 0%, transparent 70%)`,
-                }}
-            />
+            {!isLocked && (
+                <div
+                    className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100
+                               transition-opacity duration-500 rounded-2xl"
+                    style={{
+                        background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${colors.glow}22 0%, transparent 70%)`,
+                    }}
+                />
+            )}
 
             {/* Hexagonal badge SVG */}
-            <div className="relative z-10 mb-3">
+            <div className={`relative z-10 mb-3 transition-all duration-300 ${isLocked ? 'filter grayscale opacity-60' : ''}`}>
                 <HexBadgeSVG
                     colors={colors}
                     badgeId={badge.id || badge.badgeId}
@@ -255,10 +258,10 @@ const BadgeCard = ({ badge, onClick }) => {
 
             {/* Course name below badge */}
             <h4
-                className="relative z-10 text-center text-[13px] font-extrabold leading-snug
+                className={`relative z-10 text-center text-[13px] font-extrabold leading-snug
                            text-[#0d1f4e] dark:text-white
-                           group-hover:text-[#1a3884] dark:group-hover:text-blue-300
-                           transition-colors duration-200 px-1 mb-1"
+                           ${isLocked ? '' : 'group-hover:text-[#1a3884] dark:group-hover:text-blue-300'}
+                           transition-colors duration-200 px-1 mb-1`}
             >
                 {shortTitle}
             </h4>
@@ -276,14 +279,22 @@ const BadgeCard = ({ badge, onClick }) => {
                 {moduleLabel}
             </span>
 
-            {/* Footer: Verified */}
+            {/* Footer: Verified or Locked */}
             <div className="relative z-10 mt-auto flex w-full items-center justify-center
                             border-t border-[#d8e6f7] dark:border-[#1a3884]/20 pt-2.5">
-                <span className="flex items-center gap-1.5 text-[9px] font-extrabold
-                                 uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                    Verified
-                </span>
+                {isLocked ? (
+                    <span className="flex items-center gap-1.5 text-[9px] font-extrabold
+                                     uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                        <Lock className="h-3.5 w-3.5 text-slate-400" />
+                        Locked
+                    </span>
+                ) : (
+                    <span className="flex items-center gap-1.5 text-[9px] font-extrabold
+                                     uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                        Verified
+                    </span>
+                )}
             </div>
         </motion.div>
     );

@@ -6,6 +6,7 @@ import {
   IconBriefcase as Briefcase,
   IconBuilding as Building,
   IconCalendarDue as CalendarDue,
+  IconClock as Clock,
   IconExternalLink as ExternalLink,
   IconFileDescription as FileDescription,
   IconX as XIcon,
@@ -74,6 +75,28 @@ const getDocumentUrl = (job) => {
 const formatStatus = (value) => {
   if (!value) return "Active";
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+/**
+ * Returns a LinkedIn-style "Posted X ago" label.
+ * Purely client-side calculation from the existing createdAt timestamp.
+ */
+const getPostedAgo = (createdAt) => {
+  if (!createdAt) return null;
+  const posted = new Date(createdAt);
+  if (Number.isNaN(posted.getTime())) return null;
+  const diffMs = Date.now() - posted.getTime();
+  if (diffMs < 0) return null;
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Posted Today";
+  if (days === 1) return "Posted 1 day ago";
+  if (days < 7) return `Posted ${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "Posted 1 week ago";
+  if (weeks < 5) return `Posted ${weeks} weeks ago`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return "Posted 1 month ago";
+  return `Posted ${months} months ago`;
 };
 
 const PlacementDetail = () => {
@@ -228,9 +251,11 @@ const PlacementDetail = () => {
 
   const details = useMemo(() => {
     if (!job) return [];
+    const postedAgo = getPostedAgo(job.displayCreatedAt || job.createdAt);
     return [
       { label: "Company", value: job.displayCompany, icon: Building },
       { label: "Location", value: job.displayLocation, icon: MapPin },
+      ...(postedAgo ? [{ label: "Posted", value: postedAgo, icon: Clock }] : []),
       { label: "Job Type", value: job.displayType, icon: Briefcase },
       { label: "Deadline", value: formatDate(job.displayDeadline), icon: CalendarDue },
       { label: "Package", value: job.displaySalary || job.salaryPackage || job.ctc || job.package, icon: Tag },
@@ -387,16 +412,20 @@ const PlacementDetail = () => {
   return (
     <div className="min-h-screen bg-transparent pb-12">
       <div className="mt-8 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <button
-          onClick={() => navigate("/dashboard/placement")}
-          aria-label="Back to placements"
-          className="mb-5 inline-flex items-center gap-3 text-sm font-bold text-[#1a3884] transition-colors hover:text-[#132c6b] dark:text-blue-300"
-        >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white text-[#1a3884] shadow-sm dark:bg-[#001a3d] dark:border-[#1a3884]/20">
-            <ArrowLeft className="h-4 w-4" />
-          </span>
-          <span className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">Back to Placement</span>
-        </button>
+        {/* Back Button */}
+        <div className="flex items-center mt-6 mb-5">
+          <button
+            onClick={() => navigate("/dashboard/placement")}
+            className="group flex items-center gap-3 w-fit selection:bg-transparent"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
+              <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+            </div>
+            <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
+              Back to Placement
+            </span>
+          </button>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -404,7 +433,7 @@ const PlacementDetail = () => {
           className="overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
         >
           <div className="border-b border-[#d8e6f7] p-6 dark:border-[#1a3884]/20">
-            <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex min-w-0 gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#d8e6f7] bg-[#f5f8ff] text-xl font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
                   {companyLogo ? (
@@ -426,8 +455,8 @@ const PlacementDetail = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <span className="flex h-10 items-center justify-center rounded-xl bg-emerald-50 px-4 text-xs font-extrabold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
+                <span className="flex h-10 items-center justify-center rounded-xl bg-emerald-50 px-4 text-xs font-extrabold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 w-full sm:w-auto">
                   {statusLabel}
                 </span>
                 {documentUrl && (
@@ -435,17 +464,17 @@ const PlacementDetail = () => {
                     href={documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300"
+                    className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300 w-full sm:w-auto"
                   >
                     View JD
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 )}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     onClick={() => setApplyOpen(true)}
                     disabled={hasApplied}
-                    className={`h-10 rounded-xl px-5 text-sm font-bold text-white ${hasApplied ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#1a3884] hover:bg-[#132c6b]'}`}
+                    className={`h-10 rounded-xl px-5 text-sm font-bold text-white flex-1 sm:flex-initial justify-center items-center ${hasApplied ? 'bg-slate-400 cursor-not-allowed w-full sm:w-auto' : 'bg-[#1a3884] hover:bg-[#132c6b] w-full sm:w-auto'}`}
                   >
                       {hasApplied ? 'Applied' : 'Apply'}
                   </button>
@@ -453,12 +482,12 @@ const PlacementDetail = () => {
                     <>
                       <button
                         onClick={() => setWithdrewConfirmOpen(true)}
-                        className="h-10 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300"
+                        className="h-10 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300 flex-1 sm:flex-initial justify-center items-center"
                       >
                         Withdrew
                       </button>
                       {withdrewConfirmOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
                             <h3 className="text-lg font-bold text-[#0d1f4e]">Confirm withdraw</h3>
                             <p className="mt-2 text-sm text-slate-600">Are you sure you want to withdraw your application for <strong>{job.displayTitle}</strong>? This action cannot be undone.</p>
@@ -557,13 +586,13 @@ const PlacementDetail = () => {
                 <h2 className="text-sm font-extrabold uppercase tracking-wide text-[#1a3884] dark:text-blue-300">
                   Job Information
                 </h2>
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-5">
                   {details.map(({ label, value, icon: Icon }) => (
                     <div key={label} className="flex gap-3">
-                      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#1a3884] dark:text-blue-400" />
                       <div className="min-w-0">
                         <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</p>
-                        <p className="mt-0.5 break-words text-sm font-semibold text-[#0d1f4e] dark:text-white">{formatValue(value)}</p>
+                        <p className="mt-0.5 break-words text-sm font-extrabold text-[#0d1f4e] dark:text-white">{formatValue(value)}</p>
                       </div>
                     </div>
                   ))}
@@ -575,7 +604,7 @@ const PlacementDetail = () => {
       </div>
 
       <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
-        <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+        <DialogContent className="w-[92%] sm:w-full max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
           <DialogHeader className="border-b border-[#d8e6f7] px-6 py-5 text-left dark:border-[#1a3884]/20">
             <DialogTitle className="text-xl font-extrabold text-[#0d1f4e] dark:text-white">
               Apply for {job.displayTitle}
@@ -641,7 +670,7 @@ const PlacementDetail = () => {
                   {!applicationForm.resumeFile ? (
                     <label
                       htmlFor="resumeFileInput"
-                      className="inline-flex h-11 w-full items-center justify-left
+                      className="inline-flex h-11 w-full items-center justify-start
                        rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-4 text-sm font-semibold text-[#0d1f4e] cursor-pointer hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
                     >
                       <UploadIcon className="mr-2 h-4 w-4 text-[#0d1f4e]" />
@@ -686,7 +715,7 @@ const PlacementDetail = () => {
               </a>
             )}
 
-            <DialogFooter className="border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20">
+            <DialogFooter className="border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20 gap-2 sm:gap-0">
               <button
                 type="button"
                 onClick={() => setApplyOpen(false)}

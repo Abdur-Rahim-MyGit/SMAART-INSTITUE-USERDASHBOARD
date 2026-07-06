@@ -1,6 +1,29 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IconFileDescription } from '@tabler/icons-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import {
+    IconFileDescription,
+    IconLock,
+    IconLockOpen,
+    IconBriefcase,
+    IconCopy,
+    IconTrash,
+    IconPencil,
+    IconDownload,
+    IconPlus,
+    IconStar,
+    IconStarFilled,
+    IconCircleCheck,
+    IconCircleHalf,
+    IconCircleDashed,
+    IconChartBar,
+    IconListCheck,
+    IconChevronDown,
+    IconChevronUp,
+    IconArrowLeft,
+    IconAlertTriangle,
+    IconSparkles,
+    IconTarget,
+} from '@tabler/icons-react';
 import {
     FileText,
     Download,
@@ -37,6 +60,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
+import { apiCall } from '@/services/api';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
@@ -163,25 +187,44 @@ const TemplateThumbnail = ({ type }) => {
     }
     if (type === 'tech') {
         return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none font-mono">
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col gap-0.5">
-                    <div className="w-20 h-2 bg-emerald-700 rounded-sm" />
-                    <div className="w-16 h-1.5 bg-slate-500 rounded-sm" />
+                    <div className="w-20 h-2 bg-slate-800 rounded-sm" />
+                    <div className="w-16 h-1.5 bg-[#1a3884] rounded-sm" />
+                </div>
+                <div className="flex flex-col gap-1 w-full mt-1 border-b border-slate-200 pb-1">
+                    <div className="w-12 h-1.5 bg-slate-800 rounded-sm" />
                 </div>
                 <div className="flex flex-col gap-1 w-full mt-1">
-                    <div className="flex items-center gap-1">
-                        <span className="text-[7px] text-emerald-500 font-bold">//</span>
-                        <div className="w-12 h-1.5 bg-emerald-700 rounded-sm" />
-                    </div>
                     <div className="w-full flex gap-1 pl-1">
-                        <span className="text-[6px] text-emerald-500 font-bold">&gt;</span>
-                        <div className="w-5/6 h-1 bg-slate-350 rounded-sm" />
+                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
+                        <div className="w-5/6 h-1 bg-slate-300 rounded-sm" />
                     </div>
                 </div>
                 <div className="w-full flex gap-1 pl-1">
-                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">HTML</div>
-                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">CSS</div>
-                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">JS</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">API</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">React</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">Node</div>
+                </div>
+            </div>
+        );
+    }
+    if (type === 'modernProfile') {
+        return (
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex gap-2 select-none pointer-events-none">
+                <div className="w-8 h-8 rounded bg-slate-300 shrink-0" />
+                <div className="flex flex-col gap-1 w-full">
+                    <div className="w-20 h-2 bg-[#1a3884] rounded-sm" />
+                    <div className="w-14 h-1.5 bg-slate-500 rounded-sm mb-1" />
+                    <div className="w-full h-[1px] bg-slate-200 mb-1" />
+                    <div className="w-full flex gap-1">
+                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
+                        <div className="w-4/5 h-1 bg-slate-350 rounded" />
+                    </div>
+                    <div className="w-full flex gap-1">
+                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
+                        <div className="w-5/6 h-1 bg-slate-250 rounded" />
+                    </div>
                 </div>
             </div>
         );
@@ -223,8 +266,9 @@ const templates = {
         sectionClass: 'mb-6',
         bodyTextClass: 'text-gray-800 text-[11px] leading-normal',
         bulletClass: 'text-gray-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
-        skillsClass: 'text-[11px] text-gray-700 space-y-1 px-1',
-        skillsLabelClass: 'font-bold text-black',
+        skillsClass: 'flex flex-col gap-2 mt-1',
+        skillsLabelClass: 'font-bold text-black text-[11px] w-full mb-1',
+        skillsBadge: 'bg-blue-50 text-[#1a3884] px-2 py-0.5 border border-blue-200 rounded text-[10.5px] font-semibold',
         cardBg: 'from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 border-slate-205 dark:border-white/10'
     },
     modern: {
@@ -258,27 +302,28 @@ const templates = {
         sectionClass: 'mb-5',
         bodyTextClass: 'text-slate-800 text-[11px] leading-normal',
         bulletClass: 'text-slate-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'■\'] before:absolute before:left-0 before:text-[#002147] before:text-[8px] before:top-[2px]',
-        skillsClass: 'text-[11px] text-slate-700 space-y-1.5 px-1',
-        skillsLabelClass: 'font-bold text-[#002147]',
+        skillsClass: 'flex flex-col gap-2 mt-1',
+        skillsLabelClass: 'font-bold text-[#002147] text-[11px] w-full mb-1 block',
+        skillsBadge: 'bg-slate-50 text-slate-800 px-2 py-0.5 border border-slate-300 rounded text-[10.5px] font-semibold',
         cardBg: 'from-amber-50/30 to-amber-100/20 dark:from-amber-950/10 dark:to-amber-900/5 border-amber-250/30 dark:border-amber-500/10'
     },
     tech: {
         id: 'tech',
-        name: 'Tech Developer',
-        desc: 'Monospace skill elements and neat modern hierarchy for engineering and analyst roles.',
+        name: 'Tech Professional',
+        desc: 'Ultra-clean, structured layout with sharp typography for engineering and analyst roles.',
         tag: 'Engineering & IT',
-        fontFamily: 'monospace, system-ui, sans-serif',
-        titleClass: 'text-3xl font-bold tracking-tight text-emerald-700 text-left uppercase',
-        subtitleClass: 'text-sm font-bold text-slate-500 tracking-wider text-left mt-0.5',
-        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2.5 text-[10px] text-slate-600 border-b border-slate-200 pb-3',
-        sectionHeaderClass: 'text-[12px] font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-1.5 before:content-[\'//\'] before:text-emerald-500',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        titleClass: 'text-3xl font-extrabold tracking-tight text-slate-900 text-left uppercase',
+        subtitleClass: 'text-sm font-bold text-[#1a3884] uppercase tracking-widest text-left mt-0.5',
+        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2.5 text-[10.5px] text-slate-600 border-b border-slate-200 pb-3',
+        sectionHeaderClass: 'text-[13px] font-bold text-slate-900 uppercase tracking-wider mb-2 border-b border-slate-300 pb-1',
         sectionClass: 'mb-5',
         bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
-        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'>\'] before:absolute before:left-0 before:text-emerald-500 before:font-bold',
-        skillsClass: 'flex flex-col gap-2 mt-1',
-        skillsLabelClass: 'font-bold text-slate-800 text-[10px] uppercase w-full mt-1.5',
-        skillsBadge: 'bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-mono border border-emerald-200/50',
-        cardBg: 'from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border-emerald-200/50 dark:border-emerald-500/10'
+        bulletClass: 'text-slate-700 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0 before:text-[#1a3884]',
+        skillsClass: 'flex flex-wrap gap-1.5 mt-1',
+        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1 block',
+        skillsBadge: 'bg-slate-50 text-slate-800 px-2 py-1 rounded text-[10px] font-semibold border border-slate-200',
+        cardBg: 'from-slate-50 to-slate-100/50 border-slate-200/80 dark:border-white/10'
     },
     academic: {
         id: 'academic',
@@ -293,9 +338,29 @@ const templates = {
         sectionClass: 'mb-4',
         bodyTextClass: 'text-black text-[10.5px] leading-normal',
         bulletClass: 'text-black text-[10.5px] leading-normal mt-0.5 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
-        skillsClass: 'text-[10.5px] text-black space-y-0.5 px-1',
-        skillsLabelClass: 'font-bold',
+        skillsClass: 'flex flex-col gap-1.5 mt-1',
+        skillsLabelClass: 'font-bold text-[10.5px] text-black w-full mb-0.5 block',
+        skillsBadge: 'bg-gray-100 text-black px-1.5 py-0.5 border border-gray-300 rounded-sm text-[10px]',
         cardBg: 'from-gray-50 to-gray-150 dark:from-slate-800 dark:to-slate-850 border-slate-200 dark:border-white/10'
+    },
+    modernProfile: {
+        id: 'modernProfile',
+        name: 'Modern Profile',
+        desc: 'Includes a professional photo. Popular in Europe, Asia, and creative fields.',
+        tag: 'Creative & Global',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        hasPhoto: true,
+        titleClass: 'text-3xl font-black tracking-tight text-[#1a3884] text-left uppercase',
+        subtitleClass: 'text-sm font-bold text-slate-500 uppercase tracking-widest text-left mt-1',
+        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2 text-[10.5px] text-slate-600',
+        sectionHeaderClass: 'text-[13px] font-bold text-slate-900 uppercase border-b-2 border-[#1a3884] pb-1 mb-3 tracking-wider flex items-center gap-2',
+        sectionClass: 'mb-6',
+        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
+        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1.5 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0 before:text-[#1a3884]',
+        skillsClass: 'flex flex-wrap gap-1.5 mt-1',
+        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1 block',
+        skillsBadge: 'bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold border border-slate-200',
+        cardBg: 'from-indigo-50/50 to-purple-50/30 dark:from-indigo-950/20 dark:to-purple-900/10 border-indigo-200/50 dark:border-purple-500/10'
     }
 };
 
@@ -304,8 +369,39 @@ const ResumeBuilder = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [generating, setGenerating] = useState(false);
+    const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
+    // ── Multi-resume list mode ───────────────────────────────────────────
+    const [pageMode, setPageMode] = useState('list');       // 'list' | 'builder'
+    const [resumeList, setResumeList] = useState([]);
+    const [editingResumeId, setEditingResumeId] = useState(null);
+    const [resumeListLoading, setResumeListLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
+    const [duplicatingId, setDuplicatingId] = useState(null);
+    const [renamingId, setRenamingId] = useState(null);
+    const [renameValue, setRenameValue] = useState('');
+    const [versionName, setVersionName] = useState('My Resume');
+
+    // ── Career path / lock state ─────────────────────────────────────────
+    const [careerLocked, setCareerLocked] = useState(false);
+    const [careerPaths, setCareerPaths] = useState({ primary: null, secondary: null, tertiary: null });
+    const [selectedCareerPath, setSelectedCareerPath] = useState(null); // { key, roleName }
+    const [careerLoading, setCareerLoading] = useState(true);
+    const [userEmail, setUserEmail] = useState('');
+
+    // ── Skill chips (3-tier) ─────────────────────────────────────────────
+    const [masteredSkills, setMasteredSkills] = useState([]);   // status: Completed
+    const [inProgressSkills, setInProgressSkills] = useState([]); // status: In Progress
+    const [suggestedSkills, setSuggestedSkills] = useState([]);  // from role API only
+    const [skillChipsLoading, setSkillChipsLoading] = useState(false);
+
+    const [atsScore, setAtsScore] = useState(0);
+    const [atsBreakdown, setAtsBreakdown] = useState([]);
+    const [atsOpenCategory, setAtsOpenCategory] = useState(null);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    // ── Builder core state ───────────────────────────────────────────────
     const [resumeId, setResumeId] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [scale, setScale] = useState(1);
@@ -337,7 +433,8 @@ const ResumeBuilder = () => {
             targetRole: '',
             linkedinUrl: '',
             githubUrl: '',
-            portfolioUrl: ''
+            portfolioUrl: '',
+            profileImage: ''
         },
         summary: '',
         experience: [],
@@ -389,12 +486,15 @@ const ResumeBuilder = () => {
                 resumeApi.getMyResumes().catch(() => ({ success: false })),
                 aiCareerCoachApi.getProfile().catch(() => ({ success: false }))
             ]);
+            const hydratedProfileRes = profileRes.success
+                ? await hydrateProfileWithRegisteredDetails(profileRes)
+                : profileRes;
 
             // Always capture student ID from profile (used in PDF footer for both branches)
-            if (profileRes.success) {
-                const pData = profileRes.richProfile || {};
-                const pReg = profileRes.registration || {};
-                setStudentId(pData.studentId || pReg.studentId || profileRes.student?.studentId || '');
+            if (hydratedProfileRes.success) {
+                const pData = hydratedProfileRes.richProfile || {};
+                const pReg = hydratedProfileRes.registration || {};
+                setStudentId(pData.studentId || pReg.studentId || hydratedProfileRes.student?.studentId || '');
             }
 
             if (resumeRes.success && resumeRes.data && resumeRes.data.length > 0) {
@@ -420,301 +520,740 @@ const ResumeBuilder = () => {
                     achievements: r.achievements || [],
                     personalDetails: r.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
                 });
-            } else if (profileRes.success) {
-                const data = profileRes.richProfile || {};
-                const reg = profileRes.registration || {};
+            } else if (hydratedProfileRes.success) {
+                const data = hydratedProfileRes.richProfile || {};
+                const reg = hydratedProfileRes.registration || {};
+                const student = hydratedProfileRes.student || {};
                 // Capture student ID for PDF footer
-                setStudentId(data.studentId || reg.studentId || profileRes.student?.studentId || '');
+                setStudentId(data.studentId || reg.studentId || student.studentId || '');
 
-                setResumeData(prev => ({
-                    ...prev,
-                    personalInfo: {
-                        ...prev.personalInfo,
-                        fullName: data.fullName || prev.personalInfo.fullName || '',
-                        email: data.email || prev.personalInfo.email || '',
-                        mobile: data.mobile || prev.personalInfo.mobile || '',
-                        targetRole: data.targetRole || prev.personalInfo.targetRole || '',
-                        location: reg.address ? `${reg.address.city || ''}, ${reg.address.state || ''}` : (data.location || prev.personalInfo.location || ''),
-                    },
-                    summary: reg.bio || prev.summary || '',
-                    education: (() => {
-                        const eduList = [];
-                        if (reg.higherEducation && reg.higherEducation.length > 0) {
-                            reg.higherEducation.forEach(edu => {
-                                eduList.push({
-                                    degree: edu.degreeFullName || edu.degree || '',
-                                    institution: edu.institutionName || edu.university || '',
-                                    year: edu.yearOfPassing || '',
-                                    score: edu.cgpaPercentage || ''
-                                });
-                            });
-                        }
-                        else if (reg.institution || data.college) {
-                            eduList.push({
-                                degree: reg.educationLevel || data.department || 'Student',
-                                institution: reg.institution || data.college || 'SMAART Institute',
-                                year: reg.yearOfPassing || data.batch || '',
-                                score: ''
-                            });
-                        }
-
-                        if (reg.twelfthDetails && reg.twelfthDetails.schoolName) {
-                            eduList.push({
-                                degree: `12th Standard (${reg.twelfthDetails.stream || 'N/A'})`,
-                                institution: reg.twelfthDetails.schoolName,
-                                year: reg.twelfthDetails.yearOfPassing || '',
-                                score: reg.twelfthDetails.percentage || ''
-                            });
-                        }
-                        if (reg.tenthDetails && reg.tenthDetails.schoolName) {
-                            eduList.push({
-                                degree: '10th Standard',
-                                institution: reg.tenthDetails.schoolName,
-                                year: reg.tenthDetails.yearOfPassing || '',
-                                score: reg.tenthDetails.percentage || ''
-                            });
-                        }
-                        return eduList.length > 0 ? eduList : prev.education;
-                    })(),
-                    experience: (() => {
-                        if (reg.workExperience && reg.workExperience.length > 0) {
-                            return reg.workExperience.map(exp => ({
-                                role: exp.jobTitle || exp.role || '',
-                                company: exp.organizationName || exp.companyName || '',
-                                duration: exp.duration || '',
-                                description: exp.description || ''
-                            }));
-                        }
-                        if (data.experience && data.experience !== 'None' && !data.experience.includes('Batch')) {
-                            return [{
-                                role: 'Professional',
-                                company: data.experience,
-                                duration: '',
-                                description: ''
-                            }];
-                        }
-                        return prev.experience;
-                    })(),
-                    skills: {
-                        technical: data.skills?.join(', ') || prev.skills.technical || '',
-                        soft: prev.skills.soft || '',
-                        languages: prev.skills.languages || ''
-                    },
-                    projects: (() => {
-                        if (reg.projects && reg.projects.length > 0) {
-                            return reg.projects.map(p => ({
-                                title: p.title || '',
-                                description: p.description || '',
-                                link: p.link || p.projectUrl || ''
-                            }));
-                        }
-                        if (data.projects && data.projects !== 'None') {
-                            return [{
-                                title: 'Key Project',
-                                description: data.projects,
-                                link: ''
-                            }];
-                        }
-                        return prev.projects;
-                    })(),
-                    achievements: (() => {
-                        const list = [];
-                        if (reg.certificates && reg.certificates.length > 0) {
-                            reg.certificates.forEach(c => {
-                                list.push({
-                                    title: c.title || '',
-                                    description: `Issued by ${c.issuingOrg || c.issuer || 'N/A'}`,
-                                    link: c.link || ''
-                                });
-                            });
-                        }
-                        if (reg.extracurricular && reg.extracurricular.length > 0) {
-                            reg.extracurricular.forEach(e => {
-                                list.push({
-                                    title: e.activityType || 'Extracurricular Activity',
-                                    description: `${e.description || ''} - ${e.achievements || ''}`,
-                                    link: ''
-                                });
-                            });
-                        }
-                        if (list.length === 0 && data.certificates && data.certificates !== 'None') {
-                            list.push({
-                                title: 'Certification',
-                                description: data.certificates,
-                                link: ''
-                            });
-                        }
-                        return list.length > 0 ? list : prev.achievements;
-                    })(),
-                }));
+                setResumeData(prev => buildResumeDataFromProfile(hydratedProfileRes, prev));
             }
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
+            setDataLoaded(true);
             setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchData();
+        fetchCareerData();
+        fetchResumeList();
     }, []);
 
-    const handleSyncProfile = async () => {
+    // ── Fetch all resumes (list mode) ────────────────────────────────────
+    const fetchResumeList = async () => {
+        setResumeListLoading(true);
+        try {
+            const res = await resumeApi.getMyResumes();
+            if (res.success) setResumeList(res.data || []);
+        } catch (e) {
+            console.error('Failed to fetch resume list:', e);
+        } finally {
+            setResumeListLoading(false);
+        }
+    };
+
+    // ── Fetch career lock + path analysis ────────────────────────────────
+    const fetchCareerData = async () => {
+        setCareerLoading(true);
+        try {
+            const token = sessionStorage.getItem('token');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+            const [lockRes, analysisRes] = await Promise.all([
+                apiCall('/career-agent/direction-lock/status').catch(e => { console.error('lockRes error:', e); return null; }),
+                apiCall('/career-agent/my-analysis').catch(e => { console.error('analysisRes error:', e); return null; }),
+            ]);
+            console.log('lockRes:', lockRes);
+            console.log('analysisRes:', analysisRes);
+
+            const locked = lockRes?.isLocked === true;
+            setCareerLocked(locked);
+
+            if (analysisRes && analysisRes.analysis) {
+                const paths = {
+                    primary:   analysisRes.analysis.primary?.tab1?.role_name   || null,
+                    secondary: analysisRes.analysis.secondary?.tab1?.role_name || null,
+                    tertiary:  analysisRes.analysis.tertiary?.tab1?.role_name  || null,
+                };
+                setCareerPaths(paths);
+                // Auto-select primary path
+                if (paths.primary) {
+                    setSelectedCareerPath({ key: 'primary', roleName: paths.primary });
+                }
+            } else if (analysisRes) {
+                // Fallback in case of old structure
+                const paths = {
+                    primary:   analysisRes.primary?.tab1?.role_name   || null,
+                    secondary: analysisRes.secondary?.tab1?.role_name || null,
+                    tertiary:  analysisRes.tertiary?.tab1?.role_name  || null,
+                };
+                setCareerPaths(paths);
+                if (paths.primary) {
+                    setSelectedCareerPath({ key: 'primary', roleName: paths.primary });
+                }
+            }
+        } catch (e) {
+            console.error('Career fetch error:', e);
+        } finally {
+            setCareerLoading(false);
+        }
+    };
+
+    // ── Fetch skill chips when career path is selected ───────────────────
+    const fetchSkillChips = useCallback(async (roleName, email) => {
+        if (!roleName) return;
+        setSkillChipsLoading(true);
+        try {
+            const token = sessionStorage.getItem('token');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            const emailToUse = email || userEmail || JSON.parse(sessionStorage.getItem('user') || '{}').email || '';
+
+            const [roleRes, userSkillsRes] = await Promise.all([
+                apiCall(`/career-agent/role-skills/${encodeURIComponent(roleName)}`).catch(() => null),
+                emailToUse ? apiCall(`/career-agent/user-skills/${encodeURIComponent(emailToUse)}`).catch(() => null) : Promise.resolve(null),
+            ]);
+
+            const roleSkills = roleRes?.skills || [];
+            const userSkillsRaw = Array.isArray(userSkillsRes) ? userSkillsRes : [];
+
+            // Build mastered and in-progress from platform activity
+            const mastered    = userSkillsRaw.filter(s => s.status === 'Completed').map(s => s.skillName);
+            const inProgress  = userSkillsRaw.filter(s => s.status === 'In Progress').map(s => s.skillName);
+
+            // Suggested = role skills NOT in mastered/in-progress (case-insensitive)
+            const known = new Set([...mastered, ...inProgress].map(s => s.toLowerCase().trim()));
+            const suggested = roleSkills
+                .filter(s => !known.has(s.skillName?.toLowerCase().trim()))
+                .filter(s => s.skillCategory !== 'Soft Skill')
+                .map(s => s.skillName);
+
+            const softSuggested = roleSkills
+                .filter(s => s.skillCategory === 'Soft Skill' && !known.has(s.skillName?.toLowerCase().trim()))
+                .map(s => s.skillName);
+
+            setMasteredSkills(mastered);
+            setInProgressSkills(inProgress);
+            setSuggestedSkills([...new Set([...suggested, ...softSuggested])]);
+
+            // Auto-fill mastered skills into technical field
+            if (mastered.length > 0) {
+                setResumeData(prev => {
+                    const existingTech = prev.skills.technical ? prev.skills.technical.split(',').map(s => s.trim()).filter(Boolean) : [];
+                    const toAdd = mastered.filter(m => !existingTech.some(e => e.toLowerCase() === m.toLowerCase()));
+                    if (toAdd.length === 0) return prev;
+                    const merged = [...existingTech, ...toAdd].join(', ');
+                    return { ...prev, skills: { ...prev.skills, technical: merged } };
+                });
+            }
+        } catch (e) {
+            console.error('Skill chips fetch error:', e);
+        } finally {
+            setSkillChipsLoading(false);
+        }
+    }, [userEmail]);
+
+    // Trigger skill chip fetch when path selection changes
+    useEffect(() => {
+        if (selectedCareerPath?.roleName && dataLoaded) {
+            fetchSkillChips(selectedCareerPath.roleName);
+        }
+    }, [selectedCareerPath, fetchSkillChips, dataLoaded]);
+
+    // ── ATS Score Engine (5 categories, 100 pts) ─────────────────────────
+    const calculateATSScore = useCallback((data, mastered = [], roleSkillsFromAPI = []) => {
+        const results = [];
+
+        // CAT 1 — Parseability & Format (25 pts)
+        const cat1 = { label: 'Parseability & Format', max: 25, checks: [] };
+        cat1.checks.push({ label: 'ATS-safe template', pts: 8, pass: true, step: null });
+        cat1.checks.push({ label: 'Standard section headings', pts: 7, pass: true, step: null });
+        const hasDates = (data.education || []).every(e => e.year?.trim()) && (data.experience || []).every(e => e.duration?.trim());
+        cat1.checks.push({ label: 'Dates in all entries', pts: 5, pass: hasDates, step: hasDates ? null : 2 });
+        const badChars = /[^\w\s@.\-+()]/;
+        const noSpecial = !badChars.test(data.personalInfo?.fullName || '') && !badChars.test(data.personalInfo?.email || '') && !badChars.test(data.personalInfo?.mobile || '');
+        cat1.checks.push({ label: 'No special chars in contact', pts: 5, pass: noSpecial, step: noSpecial ? null : 1 });
+        cat1.score = cat1.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
+        results.push(cat1);
+
+        // CAT 2 — Keyword & Role Match (30 pts)
+        const cat2 = { label: 'Keyword & Role Match', max: 30, checks: [] };
+        const hasRole = !!data.personalInfo?.targetRole?.trim();
+        cat2.checks.push({ label: 'Target Role is set', pts: 5, pass: hasRole, step: hasRole ? null : 1 });
+        const techSkillsArr = (data.skills?.technical || '').split(',').map(s => s.trim()).filter(Boolean);
+        const hasTech3 = techSkillsArr.length >= 3;
+        cat2.checks.push({ label: 'Technical Skills (3+ skills)', pts: 10, pass: hasTech3, step: hasTech3 ? null : 5 });
+        // Keyword match with mastered bonus
+        let kwScore = 0;
+        if (roleSkillsFromAPI.length > 0 && techSkillsArr.length > 0) {
+            let matched = 0;
+            techSkillsArr.forEach(skill => {
+                const isMatch = roleSkillsFromAPI.some(rs => rs.toLowerCase() === skill.toLowerCase());
+                if (isMatch) {
+                    const isMastered = mastered.some(m => m.toLowerCase() === skill.toLowerCase());
+                    matched += isMastered ? 1.2 : 1;
+                }
+            });
+            kwScore = Math.min(10, Math.round((matched / roleSkillsFromAPI.length) * 10));
+        }
+        cat2.checks.push({ label: 'Skills match role keywords', pts: 10, pass: kwScore >= 5, step: 5, earned: kwScore });
+        const hasSoft = !!data.skills?.soft?.trim();
+        cat2.checks.push({ label: 'Soft Skills filled', pts: 5, pass: hasSoft, step: hasSoft ? null : 5 });
+        cat2.score = cat2.checks.reduce((s, c) => s + (c.earned !== undefined ? c.earned : (c.pass ? c.pts : 0)), 0);
+        results.push(cat2);
+
+        // CAT 3 — Content Completeness (25 pts)
+        const cat3 = { label: 'Content Completeness', max: 25, checks: [] };
+        const summaryOk = (data.summary || '').length >= 80;
+        cat3.checks.push({ label: 'Summary (80+ chars)', pts: 8, pass: summaryOk, step: summaryOk ? null : 1 });
+        const expOk = data.experience?.length > 0 && (data.experience[0]?.description || '').length > 30;
+        cat3.checks.push({ label: 'Work Experience with description', pts: 7, pass: expOk, step: expOk ? null : 3 });
+        const eduOk = data.education?.length > 0 && data.education[0]?.institution?.trim() && data.education[0]?.year?.trim();
+        cat3.checks.push({ label: 'Education (institution + year)', pts: 5, pass: eduOk, step: eduOk ? null : 2 });
+        const projOk = data.projects?.length >= 2 && data.projects.every(p => (p.description || '').length > 20);
+        cat3.checks.push({ label: '2+ Projects with descriptions', pts: 5, pass: projOk, step: projOk ? null : 4 });
+        cat3.score = cat3.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
+        results.push(cat3);
+
+        // CAT 4 — Contact & Credibility (10 pts)
+        const cat4 = { label: 'Contact & Credibility', max: 10, checks: [] };
+        cat4.checks.push({ label: 'LinkedIn URL', pts: 3, pass: !!data.personalInfo?.linkedinUrl?.trim(), step: 1 });
+        cat4.checks.push({ label: 'GitHub URL', pts: 3, pass: !!data.personalInfo?.githubUrl?.trim(), step: 1 });
+        cat4.checks.push({ label: 'Location', pts: 2, pass: !!data.personalInfo?.location?.trim(), step: 1 });
+        cat4.checks.push({ label: 'Portfolio / Website', pts: 2, pass: !!data.personalInfo?.portfolioUrl?.trim(), step: 1 });
+        cat4.score = cat4.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
+        results.push(cat4);
+
+        // CAT 5 — Impact & Context (10 pts)
+        const cat5 = { label: 'Impact & Context', max: 10, checks: [] };
+        cat5.checks.push({ label: '1+ Achievement/Award', pts: 3, pass: data.achievements?.length > 0, step: 6 });
+        const metricRegex = /\d+(%|K|\+| years| months| users| projects)/i;
+        const allDescriptions = [...(data.experience || []).map(e => e.description || ''), ...(data.projects || []).map(p => p.description || '')].join(' ');
+        const hasMetrics = metricRegex.test(allDescriptions);
+        cat5.checks.push({ label: 'Numbers/metrics in descriptions', pts: 4, pass: hasMetrics, step: 3 });
+        const expSubstantive = (data.experience || []).every(e => (e.description || '').length >= 50);
+        cat5.checks.push({ label: 'Substantive experience descriptions', pts: 3, pass: expSubstantive || data.experience?.length === 0, step: 3 });
+        cat5.score = cat5.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
+        results.push(cat5);
+
+        const total = results.reduce((s, c) => s + c.score, 0);
+        return { total, breakdown: results };
+    }, []);
+
+    // Recalculate ATS score whenever resume data changes
+    useEffect(() => {
+        const roleSkillNames = [...masteredSkills, ...inProgressSkills, ...suggestedSkills];
+        const { total, breakdown } = calculateATSScore(resumeData, masteredSkills, roleSkillNames);
+        setAtsScore(total);
+        setAtsBreakdown(breakdown);
+    }, [resumeData, masteredSkills, inProgressSkills, suggestedSkills, calculateATSScore]);
+
+
+
+    const cleanProfileValue = (value) => {
+        if (value === null || value === undefined) return '';
+        const text = String(value).trim();
+        if (!text) return '';
+        const lowered = text.toLowerCase();
+        if (['not specified', 'n/a', 'na', 'none', 'null', 'undefined'].includes(lowered)) return '';
+        return text;
+    };
+
+    const firstCleanValue = (...values) => {
+        for (const value of values) {
+            const cleaned = cleanProfileValue(value);
+            if (cleaned) return cleaned;
+        }
+        return '';
+    };
+
+    const getAddressObject = (...sources) => {
+        for (const source of sources) {
+            if (source && typeof source === 'object' && !Array.isArray(source)) {
+                const hasAddress = ['street', 'city', 'state', 'country'].some(key => cleanProfileValue(source[key]));
+                if (hasAddress) return source;
+            }
+        }
+        return {};
+    };
+
+    const buildCleanLocation = (...addresses) => {
+        const address = getAddressObject(...addresses);
+        const cityStateCountry = [address.city, address.state, address.country]
+            .map(cleanProfileValue)
+            .filter(Boolean);
+        if (cityStateCountry.length > 0) return cityStateCountry.join(', ');
+        return cleanProfileValue(address.street);
+    };
+
+    const joinClean = (...values) => values.map(cleanProfileValue).filter(Boolean).join(', ');
+
+    const listFrom = (value) => {
+        if (Array.isArray(value)) return value;
+        if (Array.isArray(value?.items)) return value.items;
+        return [];
+    };
+
+    const uniqueCleanList = (...groups) => {
+        const seen = new Set();
+        const result = [];
+        groups.flat().forEach(value => {
+            const cleaned = cleanProfileValue(value);
+            if (!cleaned) return;
+            const key = cleaned.toLowerCase();
+            if (seen.has(key)) return;
+            seen.add(key);
+            result.push(cleaned);
+        });
+        return result;
+    };
+
+    const formatResumeDate = (value) => {
+        const cleaned = cleanProfileValue(value);
+        if (!cleaned) return '';
+        const date = new Date(cleaned);
+        if (Number.isNaN(date.getTime())) return cleaned;
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    };
+
+    const buildDateRange = (startDate, endDate, currentlyActive = false) => {
+        const start = formatResumeDate(startDate);
+        const end = currentlyActive ? 'Present' : formatResumeDate(endDate);
+        if (start && end) return `${start} - ${end}`;
+        return start || end;
+    };
+
+    const hydrateProfileWithRegisteredDetails = async (profileRes) => {
+        const data = profileRes.richProfile || {};
+        const reg = profileRes.registration || {};
+        const student = profileRes.student || {};
+        const user = profileRes.user || {};
+        const sessionUser = (() => {
+            try {
+                return JSON.parse(sessionStorage.getItem('user') || '{}');
+            } catch {
+                return {};
+            }
+        })();
+        const email = firstCleanValue(data.email, reg.email, student.email, user.email, sessionUser.email);
+
+        if (!email) return profileRes;
+
+        try {
+            const registeredDetails = await apiCall(`/users/register-details/${encodeURIComponent(email)}`).catch(() => null);
+            if (!registeredDetails || registeredDetails.error) return profileRes;
+
+            return {
+                ...profileRes,
+                registration: {
+                    ...reg,
+                    ...registeredDetails,
+                    address: {
+                        ...(reg.address || {}),
+                        ...(registeredDetails.address || {})
+                    }
+                },
+                richProfile: {
+                    ...data,
+                    fullName: firstCleanValue(data.fullName, registeredDetails.fullName),
+                    email: firstCleanValue(data.email, registeredDetails.email),
+                    mobile: firstCleanValue(data.mobile, registeredDetails.mobileNumber)
+                }
+            };
+        } catch (error) {
+            console.warn('Failed to hydrate resume profile from registered details:', error);
+            return profileRes;
+        }
+    };
+
+    // Helper: build full resume data from profile API response
+    const buildResumeDataFromProfile = (res, base = null) => {
+        const data = res.richProfile || {};
+        const reg = res.registration || {};
+        const student = res.student || {};
+        const user = res.user || {};
+
+        // Mobile: richProfile already merges student/reg/user
+        const mobile = firstCleanValue(
+            data.mobile,
+            reg.mobileNumber,
+            student.mobileNumber,
+            student.mobile,
+            user.mobileNumber,
+            user.mobile,
+            base?.personalInfo?.mobile
+        );
+
+        const location = firstCleanValue(
+            buildCleanLocation(reg.address, student.address, user.address, data.address),
+            base?.personalInfo?.location
+        );
+
+        // Profile image
+        const profileImage = firstCleanValue(
+            reg.profilePhoto,
+            student.profileImage,
+            student.profilePhoto,
+            user.profileImage,
+            user.profilePhoto,
+            user.otherDetails?.profilePhoto,
+            base?.personalInfo?.profileImage
+        );
+
+        const defaultLoc = location || firstCleanValue(reg.address?.country, student.address?.country, user.address?.country);
+
+        // Education
+        const eduList = [];
+        if (listFrom(reg.higherEducation).length > 0) {
+            listFrom(reg.higherEducation).forEach(edu => {
+                eduList.push({
+                    degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
+                    institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
+                    year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
+                    grade: firstCleanValue(edu.cgpaPercentage, edu.percentage, edu.grade),
+                    location: firstCleanValue(edu.location, defaultLoc)
+                });
+            });
+        } else if (reg.institution || data.college) {
+            eduList.push({
+                degree: firstCleanValue(reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
+                institution: firstCleanValue(reg.institution, data.college, 'SMAART Institute'),
+                year: firstCleanValue(reg.yearOfPassing, data.batch),
+                grade: '',
+                location: defaultLoc
+            });
+        }
+        if (reg.twelfthDetails?.schoolName) {
+            eduList.push({
+                degree: `12th Standard${cleanProfileValue(reg.twelfthDetails.stream) ? ` (${cleanProfileValue(reg.twelfthDetails.stream)})` : ''}`,
+                institution: cleanProfileValue(reg.twelfthDetails.schoolName),
+                year: cleanProfileValue(reg.twelfthDetails.yearOfPassing),
+                grade: cleanProfileValue(reg.twelfthDetails.percentage),
+                location: defaultLoc
+            });
+        }
+        if (reg.tenthDetails?.schoolName) {
+            eduList.push({
+                degree: '10th Standard',
+                institution: cleanProfileValue(reg.tenthDetails.schoolName),
+                year: cleanProfileValue(reg.tenthDetails.yearOfPassing),
+                grade: cleanProfileValue(reg.tenthDetails.percentage),
+                location: defaultLoc
+            });
+        }
+
+        // Experience
+        let experience = base?.experience || [];
+        if (listFrom(reg.workExperience).length > 0) {
+            experience = listFrom(reg.workExperience).map(exp => ({
+                role: firstCleanValue(exp.jobTitle, exp.role, exp.designation, exp.experienceType),
+                company: firstCleanValue(exp.organizationName, exp.companyName, exp.company),
+                duration: firstCleanValue(
+                    exp.duration,
+                    buildDateRange(exp.startDate, exp.endDate, exp.currentlyWorking)
+                ),
+                location: firstCleanValue(exp.location, defaultLoc),
+                description: joinClean(
+                    exp.description,
+                    exp.keyResponsibilities,
+                    exp.significantAccomplishments
+                )
+            }));
+        } else if (cleanProfileValue(data.experience) && !cleanProfileValue(data.experience).includes('Batch')) {
+            experience = [{ role: 'Professional', company: cleanProfileValue(data.experience), duration: '', location: defaultLoc, description: '' }];
+        }
+
+        // Projects
+        let projects = base?.projects || [];
+        if (listFrom(reg.projects).length > 0) {
+            projects = listFrom(reg.projects).map(p => ({
+                title: cleanProfileValue(p.title),
+                description: joinClean(
+                    p.description,
+                    p.significantAchievements,
+                    p.doneIn,
+                    p.institution,
+                    p.companyName,
+                    p.teamType
+                ),
+                link: firstCleanValue(p.link, p.projectUrl)
+            }));
+        } else if (cleanProfileValue(data.projects)) {
+            projects = [{ title: 'Key Project', description: cleanProfileValue(data.projects), link: '' }];
+        }
+
+        // Achievements
+        const achievementList = [];
+        if (listFrom(reg.certificates).length > 0) {
+            listFrom(reg.certificates).forEach(c => {
+                const issuer = firstCleanValue(c.issuingOrg, c.issuer);
+                const completion = firstCleanValue(c.yearOfCompletion, formatResumeDate(c.issueDate));
+                achievementList.push({
+                    title: cleanProfileValue(c.title),
+                    description: joinClean(
+                        issuer ? `Issued by ${issuer}` : '',
+                        completion ? `Completed ${completion}` : ''
+                    ),
+                    link: firstCleanValue(c.link, c.verificationUrl)
+                });
+            });
+        }
+        if (listFrom(reg.extracurricular).length > 0) {
+            listFrom(reg.extracurricular).forEach(e => achievementList.push({
+                title: firstCleanValue(e.customActivityType, e.activityType, 'Extracurricular Activity'),
+                description: joinClean(e.level, e.achievements, e.description),
+                link: ''
+            }));
+        }
+        if (achievementList.length === 0 && cleanProfileValue(data.certificates)) {
+            achievementList.push({ title: 'Certification', description: cleanProfileValue(data.certificates), link: '' });
+        }
+
+        // Target role
+        const profileTargetRole = cleanProfileValue(data.targetRole);
+        const targetRole = profileTargetRole && profileTargetRole !== 'Professional'
+            ? profileTargetRole
+            : firstCleanValue(
+                selectedCareerPath?.roleName,
+                careerPaths.primary,
+                reg.jobPreferences?.[0]?.preferredRole,
+                base?.personalInfo?.targetRole
+            );
+
+        const technicalSkills = uniqueCleanList(
+            listFrom(data.skills),
+            listFrom(reg.skills),
+            listFrom(reg.technicalSkills),
+            listFrom(reg.certificates).map(c => c.title),
+            reg.sectorPreferences?.preferredSectors || [],
+            reg.sectorPreferences?.secondarySectors || [],
+            base?.skills?.technical ? base.skills.technical.split(',') : []
+        ).join(', ');
+
+        return {
+            personalInfo: {
+                fullName: firstCleanValue(data.fullName, reg.fullName, student.fullName, user.fullName, base?.personalInfo?.fullName),
+                email: firstCleanValue(data.email, reg.email, student.email, user.email, base?.personalInfo?.email),
+                mobile,
+                location,
+                targetRole,
+                linkedinUrl: base?.personalInfo?.linkedinUrl || '',
+                githubUrl: base?.personalInfo?.githubUrl || '',
+                portfolioUrl: base?.personalInfo?.portfolioUrl || '',
+                profileImage,
+            },
+            summary: firstCleanValue(reg.bio, data.summary, base?.summary),
+            education: eduList.length > 0 ? eduList : (base?.education || []),
+            experience,
+            skills: {
+                technical: technicalSkills,
+                soft: base?.skills?.soft || '',
+                languages: base?.skills?.languages || ''
+            },
+            projects,
+            achievements: achievementList.length > 0 ? achievementList : (base?.achievements || []),
+            personalDetails: base?.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
+        };
+    };
+
+    const handleSyncProfile = async (silent = false) => {
         setIsSyncing(true);
         try {
             const res = await aiCareerCoachApi.getProfile();
             if (res.success) {
-                const data = res.richProfile || {};
-                const reg = res.registration || {};
-
-                setResumeData(prev => ({
-                    ...prev,
-                    personalInfo: {
-                        ...prev.personalInfo,
-                        fullName: data.fullName || prev.personalInfo.fullName || '',
-                        email: data.email || prev.personalInfo.email || '',
-                        mobile: data.mobile || prev.personalInfo.mobile || '',
-                        targetRole: data.targetRole || prev.personalInfo.targetRole || '',
-                        location: reg.address ? `${reg.address.city || ''}, ${reg.address.state || ''}` : (data.location || prev.personalInfo.location || ''),
-                    },
-                    summary: reg.bio || prev.summary || '',
-                    education: (() => {
-                        const eduList = [];
-                        if (reg.higherEducation && reg.higherEducation.length > 0) {
-                            reg.higherEducation.forEach(edu => {
-                                eduList.push({
-                                    degree: edu.degreeFullName || edu.degree || '',
-                                    institution: edu.institutionName || edu.university || '',
-                                    year: edu.yearOfPassing || '',
-                                    score: edu.cgpaPercentage || ''
-                                });
-                            });
-                        }
-                        else if (reg.institution || data.college) {
-                            eduList.push({
-                                degree: reg.educationLevel || data.department || 'Student',
-                                institution: reg.institution || data.college || 'SMAART Institute',
-                                year: reg.yearOfPassing || data.batch || '',
-                                score: ''
-                            });
-                        }
-
-                        if (reg.twelfthDetails && reg.twelfthDetails.schoolName) {
-                            eduList.push({
-                                degree: `12th Standard (${reg.twelfthDetails.stream || 'N/A'})`,
-                                institution: reg.twelfthDetails.schoolName,
-                                year: reg.twelfthDetails.yearOfPassing || '',
-                                score: reg.twelfthDetails.percentage || ''
-                            });
-                        }
-                        if (reg.tenthDetails && reg.tenthDetails.schoolName) {
-                            eduList.push({
-                                degree: '10th Standard',
-                                institution: reg.tenthDetails.schoolName,
-                                year: reg.tenthDetails.yearOfPassing || '',
-                                score: reg.tenthDetails.percentage || ''
-                            });
-                        }
-                        return eduList.length > 0 ? eduList : prev.education;
-                    })(),
-                    experience: (() => {
-                        if (reg.workExperience && reg.workExperience.length > 0) {
-                            return reg.workExperience.map(exp => ({
-                                role: exp.jobTitle || exp.role || '',
-                                company: exp.organizationName || exp.companyName || '',
-                                duration: exp.duration || '',
-                                description: exp.description || ''
-                            }));
-                        }
-                        if (data.experience && data.experience !== 'None' && !data.experience.includes('Batch')) {
-                            return [{
-                                role: 'Professional',
-                                company: data.experience,
-                                duration: '',
-                                description: ''
-                            }];
-                        }
-                        return prev.experience;
-                    })(),
-                    skills: {
-                        technical: data.skills?.join(', ') || prev.skills.technical || '',
-                        soft: prev.skills.soft || '',
-                        languages: prev.skills.languages || ''
-                    },
-                    projects: (() => {
-                        if (reg.projects && reg.projects.length > 0) {
-                            return reg.projects.map(p => ({
-                                title: p.title || '',
-                                description: p.description || '',
-                                link: p.link || p.projectUrl || ''
-                            }));
-                        }
-                        if (data.projects && data.projects !== 'None') {
-                            return [{
-                                title: 'Key Project',
-                                description: data.projects,
-                                link: ''
-                            }];
-                        }
-                        return prev.projects;
-                    })(),
-                    achievements: (() => {
-                        const list = [];
-                        if (reg.certificates && reg.certificates.length > 0) {
-                            reg.certificates.forEach(c => {
-                                list.push({
-                                    title: c.title || '',
-                                    description: `Issued by ${c.issuingOrg || c.issuer || 'N/A'}`,
-                                    link: c.link || ''
-                                });
-                            });
-                        }
-                        if (reg.extracurricular && reg.extracurricular.length > 0) {
-                            reg.extracurricular.forEach(e => {
-                                list.push({
-                                    title: e.activityType || 'Extracurricular Activity',
-                                    description: `${e.description || ''} - ${e.achievements || ''}`,
-                                    link: ''
-                                });
-                            });
-                        }
-                        if (list.length === 0 && data.certificates && data.certificates !== 'None') {
-                            list.push({
-                                title: 'Certification',
-                                description: data.certificates,
-                                link: ''
-                            });
-                        }
-                        return list.length > 0 ? list : prev.achievements;
-                    })(),
-                }));
-                toast.success('Profile data synced successfully!');
+                const hydratedRes = await hydrateProfileWithRegisteredDetails(res);
+                setResumeData(prev => buildResumeDataFromProfile(hydratedRes, prev));
+                if (!silent) toast.success('Profile data synced successfully!');
+            } else {
+                if (!silent) toast.error('Failed to sync profile. Please try again.');
             }
         } catch (error) {
             console.error('Sync error:', error);
-            toast.error('Failed to sync profile');
+            if (!silent) toast.error('Failed to sync profile');
         } finally {
             setIsSyncing(false);
         }
     };
 
-    const handleSave = async () => {
+    const handleSave = async (showToast = true) => {
         setSaving(true);
         try {
+            const payload = {
+                ...resumeData,
+                atsScore,
+                versionName,
+                targetRole: resumeData.personalInfo?.targetRole || '',
+            };
+
             if (resumeId) {
-                await resumeApi.updateResume(resumeId, resumeData);
-                toast.success('Resume updated successfully!');
+                await resumeApi.updateResume(resumeId, payload);
+                if (showToast) toast.success('Resume updated successfully!');
             } else {
-                const res = await resumeApi.createResume(resumeData);
+                const res = await resumeApi.createResume(payload);
                 if (res.success) {
                     setResumeId(res.data._id);
-                    toast.success('Resume saved successfully!');
+                    if (showToast) toast.success('Resume saved successfully!');
                 }
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to save resume');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleCreateNew = async () => {
+        setResumeId(null);
+        setVersionName('New Resume');
+        setAtsScore(0);
+        setSelectedCareerPath(careerPaths.primary ? { key: 'primary', roleName: careerPaths.primary } : null);
+        setCurrentStep(0);
+        setPageMode('builder');
+        setIsSyncing(true);
+
+        try {
+            // Fetch profile FIRST, then build the full resume data in one atomic update
+            // This avoids the race condition where setResumeData(empty) and handleSyncProfile
+            // would run in parallel, causing sync to read stale prev state.
+            const res = await aiCareerCoachApi.getProfile();
+            if (res.success) {
+                const hydratedRes = await hydrateProfileWithRegisteredDetails(res);
+                const newResumeData = buildResumeDataFromProfile(hydratedRes, null);
+                setResumeData(newResumeData);
+            } else {
+                // Fallback to blank slate if profile fetch fails
+                setResumeData({
+                    personalInfo: { fullName: '', email: '', mobile: '', location: '', targetRole: '', linkedinUrl: '', githubUrl: '', portfolioUrl: '', profileImage: '' },
+                    summary: '',
+                    experience: [],
+                    education: [],
+                    skills: { technical: '', soft: '', languages: '' },
+                    projects: [],
+                    achievements: [],
+                    personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load profile for new resume:', error);
+            // Fallback to blank slate
+            setResumeData({
+                personalInfo: { fullName: '', email: '', mobile: '', location: '', targetRole: '', linkedinUrl: '', githubUrl: '', portfolioUrl: '', profileImage: '' },
+                summary: '',
+                experience: [],
+                education: [],
+                skills: { technical: '', soft: '', languages: '' },
+                projects: [],
+                achievements: [],
+                personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
+            });
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
+    const handleGenerateSummary = async () => {
+        // Validation: Ensure they have at least a target role or some experience/education
+        const hasExperience = resumeData.experience && resumeData.experience.length > 0;
+        const hasEducation = resumeData.education && resumeData.education.length > 0;
+        const targetRole = resumeData.personalInfo?.targetRole || selectedCareerPath?.roleName;
+
+        if (!targetRole && !hasExperience && !hasEducation) {
+            toast.error("Please fill out your Target Role, Experience, or Education first so the AI has context to write your summary.");
+            return;
+        }
+
+        setIsGeneratingSummary(true);
+        try {
+            const res = await aiCareerCoachApi.generateSummary(resumeData, targetRole);
+            if (res.success && res.summary) {
+                setResumeData(prev => ({ ...prev, summary: res.summary }));
+                toast.success('Professional summary generated successfully!');
+            } else {
+                toast.error(res.message || 'Failed to generate summary.');
+            }
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            toast.error('An error occurred while generating the summary.');
+        } finally {
+            setIsGeneratingSummary(false);
+        }
+    };
+
+    const handleEditResume = (resume) => {
+        setResumeId(resume._id);
+        setVersionName(resume.versionName || 'My Resume');
+        setAtsScore(resume.atsScore || 0);
+        
+        // If the resume has a targetRole that matches one of their paths, auto-select it
+        if (resume.targetRole) {
+            const foundKey = Object.keys(careerPaths).find(key => careerPaths[key] === resume.targetRole);
+            if (foundKey) {
+                setSelectedCareerPath({ key: foundKey, roleName: resume.targetRole });
+            } else {
+                setSelectedCareerPath({ key: 'custom', roleName: resume.targetRole });
+            }
+        }
+
+        setResumeData({
+            personalInfo: resume.personalInfo || {},
+            summary: resume.summary || '',
+            experience: resume.experience || [],
+            education: resume.education || [],
+            skills: resume.skills || { technical: '', soft: '', languages: '' },
+            projects: resume.projects || [],
+            achievements: resume.achievements || [],
+            personalDetails: resume.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
+        });
+        
+        setCurrentStep(0);
+        setPageMode('builder');
+    };
+
+    const handleDuplicateResume = async (id, e) => {
+        if (e) e.stopPropagation();
+        setDuplicatingId(id);
+        try {
+            const res = await resumeApi.duplicateResume(id);
+            if (res.success) {
+                toast.success('Resume duplicated!');
+                fetchResumeList();
+            }
+        } catch (err) {
+            toast.error('Failed to duplicate resume');
+        } finally {
+            setDuplicatingId(null);
+        }
+    };
+
+    const handleDeleteResume = async (id, e) => {
+        if (e) e.stopPropagation();
+        if (!window.confirm('Are you sure you want to delete this resume?')) return;
+        setDeletingId(id);
+        try {
+            const res = await resumeApi.deleteResume(id);
+            if (res.success) {
+                toast.success('Resume deleted');
+                fetchResumeList();
+            }
+        } catch (err) {
+            toast.error('Failed to delete resume');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const renameResume = async (id, newName) => {
+        if (!newName.trim()) return;
+        try {
+            await resumeApi.updateResume(id, { versionName: newName.trim() });
+            toast.success('Name updated');
+            fetchResumeList();
+            setRenamingId(null);
+        } catch (err) {
+            toast.error('Failed to rename');
         }
     };
 
@@ -829,7 +1368,7 @@ const ResumeBuilder = () => {
             if (!containerRef.current) return;
             const parentWidth = containerRef.current.getBoundingClientRect().width;
             const canvasWidth = 794; // 210mm in pixels
-            const padding = window.innerWidth < 768 ? 24 : 64; // md:p-12 vs p-8
+            const padding = window.innerWidth < 768 ? 32 : 64; // p-4 (32px) vs p-8 (64px)
             const availableWidth = parentWidth - padding;
 
             if (availableWidth < canvasWidth) {
@@ -847,6 +1386,17 @@ const ResumeBuilder = () => {
             clearTimeout(timer);
         };
     }, [currentStep, loading]);
+
+    const isValidUrl = (url) => {
+        if (!url || !url.trim()) return true;
+        try {
+            const urlToTest = /^https?:\/\//i.test(url.trim()) ? url.trim() : `https://${url.trim()}`;
+            new URL(urlToTest);
+            return urlToTest.includes('.');
+        } catch (_) {
+            return false;
+        }
+    };
 
     const validateStep = (stepIndex) => {
         const stepId = steps[stepIndex]?.id;
@@ -875,9 +1425,19 @@ const ResumeBuilder = () => {
             if (!info.linkedinUrl?.trim()) {
                 toast.error("Please enter your LinkedIn URL.");
                 return false;
+            } else if (!isValidUrl(info.linkedinUrl)) {
+                toast.error("Please enter a valid LinkedIn URL.");
+                return false;
             }
             if (!info.githubUrl?.trim()) {
                 toast.error("Please enter your GitHub URL.");
+                return false;
+            } else if (!isValidUrl(info.githubUrl)) {
+                toast.error("Please enter a valid GitHub URL.");
+                return false;
+            }
+            if (info.portfolioUrl?.trim() && !isValidUrl(info.portfolioUrl)) {
+                toast.error("Please enter a valid Portfolio URL.");
                 return false;
             }
 
@@ -954,6 +1514,10 @@ const ResumeBuilder = () => {
                     toast.error(`Please enter Description for Project entry #${i + 1}.`);
                     return false;
                 }
+                if (proj.link?.trim() && !isValidUrl(proj.link)) {
+                    toast.error(`Please enter a valid URL for Project entry #${i + 1}.`);
+                    return false;
+                }
             }
         }
 
@@ -982,6 +1546,10 @@ const ResumeBuilder = () => {
                 }
                 if (!ach.description?.trim()) {
                     toast.error(`Please enter Description for Award entry #${i + 1}.`);
+                    return false;
+                }
+                if (ach.link?.trim() && !isValidUrl(ach.link)) {
+                    toast.error(`Please enter a valid URL for Award entry #${i + 1}.`);
                     return false;
                 }
             }
@@ -1032,65 +1600,309 @@ const ResumeBuilder = () => {
         );
     }
 
-    return (
-        <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-blue-500/30 selection:text-blue-200">
-            {/* Header */}
-            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-2xl transition-all group text-slate-500 hover:text-slate-900 dark:hover:text-white">
-                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    </button>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#1a3884] flex items-center justify-center shadow-sm">
-                            <IconFileDescription stroke={1.5} className="w-5 h-5 text-white" />
+    // --- SVG Circular Score Ring ---
+    const CircularScoreRing = ({ score, size = 120, strokeWidth = 10, label = "ATS" }) => {
+        const radius = (size - strokeWidth) / 2;
+        const circumference = radius * 2 * Math.PI;
+        const offset = circumference - (score / 100) * circumference;
+
+        let colorClass = "text-emerald-500";
+        let glowColor = "rgba(16,185,129,0.45)";
+        let glowColorStrong = "rgba(16,185,129,0.8)";
+        if (score < 50) {
+            colorClass = "text-rose-500";
+            glowColor = "rgba(244,63,94,0.45)";
+            glowColorStrong = "rgba(244,63,94,0.8)";
+        } else if (score < 80) {
+            colorClass = "text-amber-500";
+            glowColor = "rgba(245,158,11,0.45)";
+            glowColorStrong = "rgba(245,158,11,0.8)";
+        }
+
+        const count = useMotionValue(0);
+        const rounded = useTransform(count, Math.round);
+        const [displayScore, setDisplayScore] = useState(0);
+        const [prevScore, setPrevScore] = useState(score);
+        const [flashing, setFlashing] = useState(false);
+
+        useEffect(() => {
+            // Trigger gold flash when score increases
+            if (score > prevScore && prevScore !== 0) {
+                setFlashing(true);
+                const t = setTimeout(() => setFlashing(false), 800);
+                return () => clearTimeout(t);
+            }
+            setPrevScore(score);
+        }, [score]);
+
+        useEffect(() => {
+            const controls = animate(count, score, {
+                duration: 1.5,
+                ease: "easeOut",
+            });
+            return controls.stop;
+        }, [score]);
+
+        useEffect(() => {
+            const unsubscribe = rounded.on("change", (v) => setDisplayScore(v));
+            return () => unsubscribe();
+        }, [rounded]);
+
+        return (
+            <div
+                className="relative flex items-center justify-center"
+                style={{ width: size, height: size }}
+            >
+                {/* Always-visible outer glow — flashes gold on score increase */}
+                <motion.div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    animate={{
+                        boxShadow: flashing
+                            ? `0 0 ${size * 0.3}px ${size * 0.12}px rgba(251,191,36,0.9), 0 0 ${size * 0.12}px ${size * 0.05}px rgba(251,191,36,0.6)`
+                            : `0 0 ${size * 0.18}px ${size * 0.06}px ${glowColor}`,
+                    }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                />
+
+                {/* SVG Ring */}
+                <motion.svg className="transform -rotate-90 w-full h-full relative z-10">
+                    {/* Background track */}
+                    <circle
+                        cx={size / 2} cy={size / 2} r={radius}
+                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                        className="text-slate-100 dark:text-slate-800"
+                    />
+                    {/* Animated progress arc */}
+                    <motion.circle
+                        cx={size / 2} cy={size / 2} r={radius}
+                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                        strokeDasharray={circumference}
+                        initial={{ strokeDashoffset: circumference }}
+                        animate={{ strokeDashoffset: offset }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        strokeLinecap="round"
+                        className={colorClass}
+                    />
+                </motion.svg>
+
+                {/* Center number + optional label */}
+                <div className="absolute flex flex-col items-center justify-center text-center z-20">
+                    <motion.span
+                        animate={flashing ? { color: "#fbbf24", scale: 1.15 } : { color: undefined, scale: 1 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="font-black text-slate-800 dark:text-white leading-none tracking-tighter"
+                        style={{ fontSize: `${Math.max(14, size * 0.28)}px` }}
+                    >
+                        {displayScore}
+                    </motion.span>
+                    {label && (
+                        <span
+                            className="font-bold text-slate-400 uppercase tracking-widest mt-0.5"
+                            style={{ fontSize: `${Math.max(8, size * 0.08)}px` }}
+                        >
+                            {label}
+                        </span>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    if (pageMode === 'list') {
+        return (
+            <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
+                <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
+                    <div className="max-w-6xl mx-auto space-y-6">
+                        {/* Header & Back Button */}
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={() => navigate("/dashboard/smaart-toolkit")}
+                                className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#112b6b] transition-all hover:text-[#1a3884] dark:text-slate-300"
+                            >
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                                    <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300" />
+                                </div>
+                                BACK TO TOOLKIT
+                            </button>
                         </div>
-                        <div>
-                            <h1 className="text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Resume Builder</h1>
-                            <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Create, customize, and download a professional, ATS-optimized resume.</p>
+                        {/* Page Header */}
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                        >
+                            <div className="flex-1">
+                                <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                                    My <span className="text-[#1a3884] dark:text-blue-300">Resumes</span>
+                                </h1>
+                                <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                                    Manage your tailored resumes and track your ATS optimization scores.
+                                </p>
+                            </div>
+
+                            <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-3 md:pt-0 md:pl-6">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleCreateNew}
+                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#112b6b] dark:bg-blue-600 dark:hover:bg-blue-700"
+                                >
+                                    <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
+                                    Create New Resume
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                        {resumeListLoading ? (
+                            <div className="flex justify-center items-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a3884]"></div>
+                            </div>
+                        ) : resumeList.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-center">
+                                <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-[#1a3884]/20 flex items-center justify-center mb-4">
+                                    <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#1a3884] dark:text-blue-400" />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No resumes found</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">Create your first ATS-optimized resume to get started on your career journey.</p>
+                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#1a3884] text-white rounded-xl font-bold text-sm hover:bg-[#132c6b] transition-colors shadow-md">
+                                    Create First Resume
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {resumeList.map(resume => (
+                                    <div key={resume._id} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-500/30 transition-all duration-300 overflow-hidden flex flex-col group">
+                                        
+                                        <div className="p-6 flex-1 flex flex-col items-center relative">
+                                            {/* Score Ring */}
+                                            <div className="mb-4 relative">
+                                                <CircularScoreRing score={resume.atsScore || 0} size={100} strokeWidth={8} />
+                                            </div>
+
+                                            {renamingId === resume._id ? (
+                                                <div className="w-full mb-2">
+                                                    <input 
+                                                        autoFocus
+                                                        value={renameValue}
+                                                        onChange={e => setRenameValue(e.target.value)}
+                                                        onKeyDown={e => {
+                                                            if (e.key === 'Enter') renameResume(resume._id, renameValue);
+                                                            if (e.key === 'Escape') setRenamingId(null);
+                                                        }}
+                                                        onBlur={() => renameResume(resume._id, renameValue)}
+                                                        className="w-full text-center font-bold text-slate-800 dark:text-white bg-slate-50 dark:bg-slate-800 border-b-2 border-[#1a3884] outline-none px-2 py-1"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 mb-2 w-full justify-center group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 rounded-lg p-1 transition-colors cursor-text" onClick={() => { setRenamingId(resume._id); setRenameValue(resume.versionName || 'My Resume'); }}>
+                                                    <h3 className="font-bold text-lg text-slate-800 dark:text-white truncate max-w-[80%]">{resume.versionName || 'My Resume'}</h3>
+                                                    <IconPencil stroke={2} className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-[#1a3884]/20 text-[#1a3884] dark:text-blue-300 text-[10px] font-bold uppercase tracking-wider mb-4 border border-blue-100 dark:border-[#1a3884]/30">
+                                                <IconTarget stroke={2} className="w-3 h-3" />
+                                                <span className="truncate max-w-[150px]">{resume.targetRole || 'General Resume'}</span>
+                                            </div>
+
+                                            <p className="text-[10px] text-slate-400 font-medium">Last updated: {new Date(resume.updatedAt).toLocaleDateString()}</p>
+                                        </div>
+
+                                        <div className="grid grid-cols-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
+                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5">
+                                                <IconPencil stroke={1.5} className="w-4 h-4" />
+                                                <span className="text-[10px] font-bold">Edit</span>
+                                            </button>
+                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5 disabled:opacity-50">
+                                                {duplicatingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconCopy stroke={1.5} className="w-4 h-4" />}
+                                                <span className="text-[10px] font-bold">Copy</span>
+                                            </button>
+                                            <button onClick={(e) => handleDeleteResume(resume._id, e)} disabled={deletingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-rose-500 hover:text-white text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50">
+                                                {deletingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconTrash stroke={1.5} className="w-4 h-4" />}
+                                                <span className="text-[10px] font-bold">Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // --- Builder Mode Return ---
+    return (
+        <div className="flex flex-col lg:h-full bg-[#F8FAFC] dark:bg-[#00152E] lg:overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
+            {/* Header */}
+            <header className="min-h-[4rem] flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-0 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm gap-3">
+                <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                    <button onClick={async () => {
+                        await fetchResumeList();
+                        setPageMode('list');
+                    }} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-[10px] sm:text-[11px] text-slate-650 dark:text-slate-350 uppercase tracking-wider shrink-0">
+                        <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> Back
+                    </button>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 cursor-help shrink-0" title={`ATS Score: ${atsScore}/100`}>
+                            <CircularScoreRing score={atsScore} size={36} strokeWidth={4} label="" />
+                        </div>
+                        <div className="min-w-0">
+                            <div className="relative flex items-center group">
+                                <input
+                                    value={versionName}
+                                    onChange={(e) => setVersionName(e.target.value)}
+                                    className="text-sm sm:text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#1a3884] outline-none transition-colors w-28 sm:w-48 pr-6 truncate"
+                                    placeholder="Resume Name"
+                                />
+                                <IconPencil stroke={2} className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                            </div>
+                            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate hidden sm:block">ATS Score Status</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 dark:border-white/5">
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
                     </div>
                     {currentStep !== steps.length - 1 && (
-                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-200 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 shadow-sm">
+                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
                             <Eye className="w-3.5 h-3.5" />
                             <span>Review</span>
                         </button>
                     )}
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm">
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                        <span className="hidden sm:inline">Save Progress</span>
+                        <span>Save<span className="hidden sm:inline"> Progress</span></span>
                     </button>
                     {currentStep === steps.length - 1 && (
-                        <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50">
+                        <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1 px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50 shrink-0">
                             {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                            <span>Download PDF</span>
+                            <span>Download<span className="hidden sm:inline"> PDF</span></span>
                         </button>
                     )}
                 </div>
             </header>
-            <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <main className="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
                 {/* Form Section */}
                 <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden' : 'flex w-full'}`}>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="flex-1 lg:overflow-y-auto custom-scrollbar">
                         <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
                             {/* Modern Responsive Stepper */}
-                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm mb-8">
+                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">
-                                        Step {currentStep + 1} of {steps.length}
+                                        Step {currentStep + 1} of {steps.length} : <span className="text-slate-800 dark:text-slate-200">{steps[currentStep].label}</span>
                                     </span>
                                 </div>
                                 
                                 {/* Progress Bar / Stepper Track */}
-                                <div className="relative flex items-center justify-between w-full px-6 sm:px-16">
+                                <div className="relative flex items-center justify-between w-full px-2 sm:px-16">
                                     {/* Track line container */}
-                                    <div className="absolute left-10 sm:left-20 right-10 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
+                                    <div className="absolute left-6 sm:left-20 right-6 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
                                         {/* Background Track Line */}
                                         <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800/60 rounded-full" />
                                         {/* Active Progress Line */}
@@ -1109,7 +1921,7 @@ const ResumeBuilder = () => {
                                             <div key={step.id} className="relative z-10 flex flex-col items-center">
                                                 <button
                                                     onClick={() => handleStepClick(idx)}
-                                                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                                                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
                                                         isActive 
                                                             ? 'bg-[#1a3884] text-white ring-4 ring-blue-500/20 scale-110 shadow-md shadow-blue-500/10'
                                                             : isCompleted
@@ -1119,18 +1931,18 @@ const ResumeBuilder = () => {
                                                     title={step.label}
                                                 >
                                                     {isCompleted ? (
-                                                        <Check className="w-4 h-4" />
+                                                        <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     ) : (
-                                                        <Icon className="w-4 h-4" />
+                                                        <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                                     )}
                                                 </button>
                                                 
                                                 {/* Step label - hidden on mobile to avoid layout crowding */}
-                                                <span className={`absolute top-11 text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${
+                                                <span className={`absolute top-10 sm:top-11 text-[9px] sm:text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${
                                                     isActive 
                                                         ? 'text-[#1a3884] dark:text-blue-400 font-extrabold scale-105'
                                                         : isCompleted
-                                                            ? 'text-emerald-600 dark:text-emerald-450'
+                                                            ? 'text-emerald-600 dark:text-emerald-400'
                                                             : 'text-slate-400 dark:text-slate-500'
                                                 }`}>
                                                     {step.label}
@@ -1139,62 +1951,159 @@ const ResumeBuilder = () => {
                                         );
                                     })}
                                 </div>
-                                <div className="h-6 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
+                                <div className="h-2 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
                             </div>
 
                             <div className="min-h-[400px]">
                                 {steps[currentStep].id === 'personal' && (
-                                    <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
-                                        <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
-                                            <div className="relative">
-                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed dark:text-slate-400 transition-all text-sm font-medium shadow-sm opacity-80" title="Full name is verified from your profile and cannot be changed here." />
-                                            </div>
+                                    <div className="space-y-6">
+                                        {/* Career Path Selection Banner/Cards */}
+                                        <div className="bg-white dark:bg-[#002147] p-5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
+                                            {careerLoading ? (
+                                                <div className="flex items-center gap-3 text-slate-500">
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <span className="text-sm font-medium">Checking career direction...</span>
+                                                </div>
+                                            ) : careerPaths?.primary ? (
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        {careerLocked ? (
+                                                            <IconLock stroke={2} className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                                                        ) : (
+                                                            <IconLockOpen stroke={2} className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                                                        )}
+                                                        <h3 className="text-xs font-bold text-slate-800 dark:text-white">Select Target Career Path</h3>
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Choose one of your career paths to automatically optimize this resume.</p>
+                                                    
+                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                                        {['primary', 'secondary', 'tertiary'].map(key => {
+                                                            const roleName = careerPaths[key];
+                                                            if (!roleName) return null;
+                                                            const isSelected = selectedCareerPath?.key === key;
+                                                            return (
+                                                                <button
+                                                                    key={key}
+                                                                    onClick={() => {
+                                                                        setSelectedCareerPath({ key, roleName });
+                                                                        handleNestedChange('personalInfo', 'targetRole', roleName);
+                                                                    }}
+                                                                    className={`flex flex-col text-left py-2.5 px-3 rounded-xl border transition-all ${isSelected ? 'border-[#1a3884] bg-blue-50/50 dark:bg-[#1a3884]/20 ring-1 ring-[#1a3884]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
+                                                                >
+                                                                    <span className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`}>{key} Path</span>
+                                                                    <span className={`text-xs font-bold truncate w-full ${isSelected ? 'text-[#1a3884] dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>{roleName}</span>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+
+                                                    {!careerLocked && (
+                                                        <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-900/50 flex gap-2 items-start">
+                                                            <IconLockOpen className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                                                            <p className="text-[10px] text-amber-700 dark:text-amber-500">Note: Your career direction is currently in evaluation mode. Your latest analysis will automatically lock as your permanent career path after 14 days or once you use all 5 attempts.</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/50">
+                                                    <IconLockOpen className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-amber-800 dark:text-amber-500 mb-1">No Career Path Found</h4>
+                                                        <p className="text-xs text-amber-700/80 dark:text-amber-500/80">Complete your AI Career Analysis in the Career Agent to automatically tailor your resume and skills.</p>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Target Role</label>
-                                            <div className="relative">
-                                                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" placeholder="e.g. Senior Frontend Developer" value={resumeData.personalInfo.targetRole} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+
+                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                    {resumeData.personalInfo.profileImage ? (
+                                                        <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 group/photo">
+                                                            <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                                            <button 
+                                                                onClick={() => handleNestedChange('personalInfo', 'profileImage', '')}
+                                                                className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0">
+                                                            <User className="w-6 h-6 text-slate-400" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 w-full">
+                                                        <input 
+                                                            type="file" 
+                                                            accept="image/*" 
+                                                            onChange={(e) => {
+                                                                const file = e.target.files[0];
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        handleNestedChange('personalInfo', 'profileImage', reader.result);
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                            className="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#1a3884] hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 dark:hover:file:bg-blue-900/50 cursor-pointer"
+                                                        />
+                                                        <p className="text-[10px] text-slate-400 mt-1">Recommended for Modern Profile template. Max size 2MB.</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
+                                                <div className="relative group/input">
+                                                    <User className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                                                    <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title="Full name is verified from your profile and cannot be changed here." />
+                                                </div>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Target Role</label>
+                                                <div className="relative group/input">
+                                                    <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                                                    <input type="text" placeholder="Select a career path above" value={resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title="Target Role is automatically set based on your selected Career Path." />
+                                                </div>
+                                            </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
-                                                <div className="relative">
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <div className="relative group/input">
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
+                                                    <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mobile Number</label>
-                                                <div className="relative">
-                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <div className="relative group/input">
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
+                                                    <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="group">
                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Location</label>
-                                            <div className="relative">
-                                                <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                            <div className="relative group/input">
+                                                <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
+                                                <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">LinkedIn URL</label>
-                                                <div className="relative">
-                                                    <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <div className="relative group/input">
+                                                    <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
+                                                    <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">GitHub URL</label>
-                                                <div className="relative">
-                                                    <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <div className="relative group/input">
+                                                    <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
+                                                    <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1202,8 +2111,22 @@ const ResumeBuilder = () => {
 
 
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Professional Summary</label>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Professional Summary</label>
+                                                <button 
+                                                    onClick={handleGenerateSummary}
+                                                    disabled={isGeneratingSummary}
+                                                    className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-wider disabled:opacity-50"
+                                                >
+                                                    {isGeneratingSummary ? (
+                                                        <><Loader2 className="w-3 h-3 animate-spin" /> Generating...</>
+                                                    ) : (
+                                                        <><Sparkles className="w-3 h-3" /> Generate with AI</>
+                                                    )}
+                                                </button>
+                                            </div>
                                             <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder="A brief overview of your professional background and key strengths..."></textarea>
+                                        </div>
                                         </div>
                                     </div>
                                 )}
@@ -1213,16 +2136,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.experience.map((exp, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <Briefcase className="w-4 h-4 text-blue-500" />
-                                                            {exp.company || 'Work Experience'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Briefcase className="w-4 h-4 text-blue-500 shrink-0" />
+                                                            <span className="truncate">{exp.company || 'Work Experience'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
@@ -1262,16 +2185,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.education.map((edu, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <GraduationCap className="w-4 h-4 text-emerald-500" />
-                                                            {edu.institution || 'Education Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <GraduationCap className="w-4 h-4 text-emerald-500 shrink-0" />
+                                                            <span className="truncate">{edu.institution || 'Education Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
                                                             <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -1311,16 +2234,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.projects.map((proj, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <FileText className="w-4 h-4 text-indigo-500" />
-                                                            {proj.title || 'Project Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                                                            <span className="truncate">{proj.title || 'Project Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
@@ -1346,18 +2269,70 @@ const ResumeBuilder = () => {
                                 )}
 
                                 {steps[currentStep].id === 'skills' && (
-                                    <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
-                                        <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Technical Skills</label>
-                                            <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. JavaScript, React, Node.js, Python, AWS..."></textarea>
-                                        </div>
-                                        <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Soft Skills</label>
-                                            <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. Team Leadership, Problem Solving, Public Speaking..."></textarea>
-                                        </div>
-                                        <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Languages</label>
-                                            <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. English (Fluent), Urdu (Native), Tamil..."></textarea>
+                                    <div className="space-y-6">
+                                        {/* Suggestions Card */}
+                                        {careerPaths && (
+                                            <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <Sparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                                                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">Career Agent Suggestions</h3>
+                                                </div>
+                                                
+                                                <div className="space-y-4">
+                                                    {masteredSkills.length > 0 && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1.5 mb-2 text-emerald-600 dark:text-emerald-400">
+                                                                <Check className="w-3.5 h-3.5" />
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider">Mastered (Auto-added)</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {masteredSkills.map(skill => (
+                                                                    <span key={skill} className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1">
+                                                                        {skill} <Check className="w-3 h-3" />
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {inProgressSkills.length > 0 && (
+                                                        <div>
+                                                            <div className="flex items-center gap-1.5 mb-2 text-amber-600 dark:text-amber-400">
+                                                                <Plus className="w-3.5 h-3.5" />
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider">In Progress (Click to add)</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {inProgressSkills.map(skill => (
+                                                                    <button key={skill} onClick={() => {
+                                                                        setResumeData(prev => ({
+                                                                            ...prev,
+                                                                            skills: { ...prev.skills, technical: prev.skills.technical ? `${prev.skills.technical}, ${skill}` : skill }
+                                                                        }));
+                                                                        setInProgressSkills(prev => prev.filter(s => s !== skill));
+                                                                    }} className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[11px] font-bold rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors flex items-center gap-1 shadow-sm">
+                                                                        {skill} <Plus className="w-3 h-3" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Technical Skills</label>
+                                                <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. JavaScript, React, Node.js, Python, AWS..."></textarea>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Soft Skills</label>
+                                                <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. Team Leadership, Problem Solving, Public Speaking..."></textarea>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Languages</label>
+                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. English (Fluent), Urdu (Native), Tamil..."></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -1367,16 +2342,16 @@ const ResumeBuilder = () => {
                                         <AnimatePresence>
                                             {resumeData.achievements.map((ach, idx) => (
                                                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                            <Trophy className="w-4 h-4 text-amber-500" />
-                                                            {ach.title || 'Achievement Details'}
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                                                            <span className="truncate">{ach.title || 'Achievement Details'}</span>
                                                         </h4>
-                                                        <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                        <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <div className="p-6 space-y-4">
+                                                    <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
@@ -1429,25 +2404,25 @@ const ResumeBuilder = () => {
                 {/* Preview Canvas (Shows on last step) */}
                 <section
                     ref={containerRef}
-                    className={`flex-1 flex flex-col overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
+                    className={`flex-1 flex flex-col lg:overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
                 >
                     {!isPreviewFullscreen ? (
                         /* Layout Template Selector Dashboard */
-                        <div className="flex-1 flex flex-col overflow-hidden">
+                        <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Selector Header */}
-                            <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
                                 <button
                                     onClick={prevStep}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-350 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-205 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10 self-start sm:self-auto"
                                 >
                                     <ArrowLeft className="w-3.5 h-3.5" /> Back to Edit Details
                                 </button>
-                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">Choose A Template Style</h2>
-                                <div className="w-[130px]" />
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white text-center sm:text-left">Choose A Template Style</h2>
+                                <div className="hidden sm:block w-[130px]" />
                             </div>
 
                             {/* Template Grid Scroll Area */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
+                            <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
                                 <div className="text-center max-w-xl mb-8">
                                     <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
                                         Select an ATS-Friendly Layout
@@ -1455,6 +2430,59 @@ const ResumeBuilder = () => {
                                     <p className="text-sm text-slate-600 dark:text-slate-405 leading-relaxed">
                                         Our templates are professionally designed and engineered to pass applicant tracking systems (ATS). Select a style below to view your resume in full-screen and download.
                                     </p>
+                                </div>
+
+                                {/* ATS Breakdown Panel */}
+                                <div className="w-full max-w-6xl bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm mb-10 overflow-hidden">
+                                    <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-14 h-14 shrink-0">
+                                                <CircularScoreRing score={atsScore} size={56} strokeWidth={6} label="" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">ATS Compliance Score</h3>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Detailed breakdown of your resume's parser performance</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <AnimatePresence>
+                                            {atsBreakdown.map((item, index) => {
+                                                const feedback = item.checks.filter(c => !c.pass).map(c => c.label).join(', ') || 'Perfect score! All checks passed.';
+                                                return (
+                                                    <motion.div 
+                                                        key={item.label}
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
+                                                        className="flex flex-col bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5"
+                                                    >
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-sm font-bold text-slate-800 dark:text-white">{item.label}</span>
+                                                            <span className={`text-xs font-bold px-2 py-1 rounded-lg ${item.score >= item.max * 0.8 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                                                                {item.score} / {item.max}
+                                                            </span>
+                                                        </div>
+                                                        <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mb-3 overflow-hidden relative">
+                                                            <motion.div 
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${(item.score / item.max) * 100}%` }}
+                                                                transition={{ delay: 0.2 + (index * 0.1), duration: 1, ease: "easeOut" }}
+                                                                className={`absolute top-0 left-0 h-full rounded-full ${item.score >= item.max * 0.8 ? 'bg-emerald-500' : 'bg-amber-500'}`} 
+                                                            />
+                                                        </div>
+                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex-1">
+                                                            {item.score === item.max ? (
+                                                                <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> {feedback}</span>
+                                                            ) : (
+                                                                <span className="flex items-start gap-1"><span className="text-amber-500 mt-0.5 shrink-0">•</span> <span>Needs improvement: {feedback}</span></span>
+                                                            )}
+                                                        </p>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
@@ -1501,40 +2529,51 @@ const ResumeBuilder = () => {
                         </div>
                     ) : (
                         /* Full Screen Interactive Preview */
-                        <div className="flex-1 flex flex-col overflow-hidden">
+                        <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Toolbar with navigation and controls */}
-                            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-md">
-                                <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-202 dark:border-white/10 shrink-0 shadow-md">
+                                <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
                                     <button
                                         onClick={() => setIsPreviewFullscreen(false)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-105 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10"
                                     >
                                         <ArrowLeft className="w-3.5 h-3.5" /> All Styles
                                     </button>
+                                    
+                                    <div className="h-8 w-px bg-slate-202 dark:bg-white/10 hidden sm:block"></div>
+
+                                    {/* ATS Score Compact View */}
+                                    <div className="flex items-center gap-3">
+                                        <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">ATS Score</span>
+                                            <span className="text-[10px] text-slate-505 dark:text-slate-400">Score updates as you edit</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                        Style:
-                                    </label>
-                                    <select
-                                        value={selectedTemplate}
-                                        onChange={(e) => setSelectedTemplate(e.target.value)}
-                                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-850 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
-                                    >
-                                        {Object.values(templates).map((t) => (
-                                            <option key={t.id} value={t.id}>
-                                                {t.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-white/5">
+                                    <div className="flex items-center gap-2 flex-1 sm:flex-initial">
+                                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-505 dark:text-slate-400 hidden sm:block">
+                                            Style:
+                                        </label>
+                                        <select
+                                            value={selectedTemplate}
+                                            onChange={(e) => setSelectedTemplate(e.target.value)}
+                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-202 dark:border-white/10 text-slate-855 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer w-full sm:w-auto"
+                                        >
+                                            {Object.values(templates).map((t) => (
+                                                <option key={t.id} value={t.id}>
+                                                    {t.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
 
-                                <div className="flex items-center gap-2">
                                     <button
                                         onClick={handleDownloadPDF}
                                         disabled={generating}
-                                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-semibold rounded-lg text-xs transition-all shadow-md"
+                                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg flex-1 sm:flex-initial shrink-0"
                                     >
                                         {generating ? (
                                             <>
@@ -1542,7 +2581,7 @@ const ResumeBuilder = () => {
                                             </>
                                         ) : (
                                             <>
-                                                <Download className="w-3.5 h-3.5" /> Download PDF
+                                                <Download className="w-4 h-4" /> Download PDF
                                             </>
                                         )}
                                     </button>
@@ -1550,10 +2589,11 @@ const ResumeBuilder = () => {
                             </div>
 
                             {/* Scrollable canvas area */}
-                            <div className="flex-1 overflow-auto custom-scrollbar p-4 md:p-8">
+                            <div className="flex-1 lg:overflow-auto custom-scrollbar p-4 md:p-8">
                                 <div
-                                    className="flex justify-center items-start w-full"
+                                    className="flex justify-center items-start mx-auto"
                                     style={{
+                                        width: scale < 1 ? `${794 * scale}px` : '100%',
                                         height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
                                         overflow: 'hidden'
                                     }}
@@ -1571,13 +2611,19 @@ const ResumeBuilder = () => {
 
                                         <div className="relative z-10 text-left">
                                             {/* Header Section */}
-                                            <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech') ? 'flex flex-col items-start text-left relative z-10 mb-5 w-full' : 'flex flex-col items-center text-center relative z-10 mb-6 w-full'}>
-                                                <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
-                                                    {resumeData.personalInfo.fullName || 'FIRST LAST'}
-                                                </h1>
-                                                <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
+                                            <div className={`flex w-full mb-6 ${templates[selectedTemplate]?.hasPhoto ? 'items-center' : ''}`}>
+                                                {templates[selectedTemplate]?.hasPhoto && resumeData.personalInfo.profileImage && (
+                                                    <div className="w-[28mm] h-[28mm] rounded-full overflow-hidden mr-6 border-2 border-[#1a3884] shrink-0">
+                                                        <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                                <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech' || selectedTemplate === 'modernProfile') ? 'flex flex-col items-start text-left relative z-10 w-full' : 'flex flex-col items-center text-center relative z-10 w-full'}>
+                                                    <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
+                                                        {resumeData.personalInfo.fullName || 'FIRST LAST'}
+                                                    </h1>
+                                                    <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
 
-                                                <div className={templates[selectedTemplate]?.contactClass}>
+                                                    <div className={templates[selectedTemplate]?.contactClass}>
                                                     {resumeData.personalInfo.mobile && (
                                                         <span className="flex items-center gap-1">
                                                             <Phone className="w-[10px] h-[10px] shrink-0" />
@@ -1609,6 +2655,7 @@ const ResumeBuilder = () => {
                                                         </span>
                                                     )}
                                                 </div>
+                                            </div>
                                             </div>
 
                                             <div className="space-y-6">

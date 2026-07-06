@@ -11,7 +11,8 @@ import {
   IconPlayerPlayFilled as Play,
   IconFingerprint as Brain,
   IconCpu as Bot,
-  IconInfinity as Leaf
+  IconInfinity as Leaf,
+  IconLock as LockIcon
 } from "@tabler/icons-react";
 import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
@@ -281,13 +282,13 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       onClick={onClick}
-      className={`relative rounded-[16px] p-3 sm:p-4 cursor-pointer transition-all duration-300 group overflow-hidden border ${isCompleted
-        ? "bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30 shadow-sm"
+      className={`relative rounded-[16px] p-3 sm:p-4 transition-all duration-300 group overflow-hidden border ${isCompleted
+        ? "bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30 shadow-sm cursor-pointer"
         : isCurrent
-          ? "bg-white dark:bg-[#002147] shadow-md border-[#1a3884] dark:border-[#4c6ef5]"
+          ? "bg-white dark:bg-[#002147] shadow-md border-[#1a3884] dark:border-[#4c6ef5] cursor-pointer"
           : isUnlocked
-            ? "bg-white dark:bg-[#002147] hover:shadow-md hover:-translate-y-0.5 border-[#d8e6f7] dark:border-white/10"
-            : "bg-white dark:bg-[#001630] opacity-80 border-[#e2e8f0] dark:border-white/5 grayscale-[20%]"
+            ? "bg-white dark:bg-[#002147] hover:shadow-md hover:-translate-y-0.5 border-[#d8e6f7] dark:border-white/10 cursor-pointer"
+            : "bg-gray-50/50 dark:bg-slate-900/20 border-dashed border-gray-200 dark:border-slate-800 opacity-60 cursor-not-allowed grayscale-[40%]"
         }`}
       style={{
         borderWidth: isCurrent ? "1.5px" : "1px",
@@ -300,14 +301,16 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
             ? "bg-[#1a3884] border-[#112b6b] text-white shadow-md"
             : isUnlocked
               ? "bg-slate-50 border-slate-200 text-slate-400 group-hover:border-[#1a3884]/30 group-hover:text-[#1a3884]"
-              : "bg-white border-slate-200 text-slate-300"
+              : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500"
           }`}>
           {isCompleted ? (
             <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
           ) : isCurrent ? (
             <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-          ) : (
+          ) : isUnlocked ? (
             <span className="text-[12px] sm:text-sm font-bold">{index + 1}</span>
+          ) : (
+            <LockIcon className="w-4 h-4 text-slate-400 dark:text-slate-500" stroke={2} />
           )}
         </div>
 
@@ -318,16 +321,16 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
               ? "bg-[#1a3884]/5 border-[#1a3884]/20 text-[#1a3884]"
               : isUnlocked
                 ? "bg-slate-50 border-slate-200 text-slate-500"
-                : "bg-transparent border-slate-200 text-slate-400"
+                : "bg-slate-100/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-850 text-slate-400 dark:text-slate-500"
             }`}>
             {course.courseNumber || course.id}
           </span>
 
-          <h4 className={`font-bold text-[13px] sm:text-[14px] mb-1 leading-snug tracking-tight ${isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-slate-400"
+          <h4 className={`font-bold text-[13px] sm:text-[14px] mb-1 leading-snug tracking-tight ${isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-slate-500"
             }`}>
             {course.title || t(`my_courses_page.courses.${course.id}.title`)}
           </h4>
-          <p className="text-[11px] sm:text-[12px] text-gray-500 leading-relaxed line-clamp-1 font-medium">
+          <p className="text-[11px] sm:text-[12px] text-gray-500 dark:text-slate-500 leading-relaxed line-clamp-1 font-medium">
             {course.subtitle || course.description || t(`my_courses_page.courses.${course.id}.subtitle`)}
           </p>
         </div>

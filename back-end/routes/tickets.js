@@ -3,6 +3,27 @@ const { body, validationResult, query, param } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const SupportTicket = require('../models/SupportTicket');
+const ITSupport = require('../models/ITSupport');
+const Counter = require('../models/Counter');
+const User = require('../models/User');
+
+// Round-robin selection of the next IT support person to receive a ticket.
+const getNextITSupportAssignee = async () => {
+  const supports = await ITSupport.find({ status: 'active' })
+    .sort({ createdAt: 1 })
+    .select('_id fullName');
+
+  if (!supports.length) return null;
+
+  const counter = await Counter.findByIdAndUpdate(
+    { _id: 'ticketAssignment' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  const index = (counter.seq - 1) % supports.length;
+  return supports[index];
+};
 const { protect, authorize } = require('../middleware/auth');
 const { uploadSupportAttachments } = require('../middleware/upload');
 const itsmClient = require('../services/itsmClient');
@@ -41,8 +62,8 @@ const ticketValidation = [
     .isLength({ min: 10, max: 2000 })
     .withMessage('Description must be between 10 and 2000 characters'),
   body('category')
-    .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other'])
-    .withMessage('Invalid category'),
+     .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'])
+     .withMessage('Invalid category'),
   body('priority')
     .optional()
     .isIn(['low', 'medium', 'high'])
@@ -77,7 +98,7 @@ const handleValidationErrors = (req, res, next) => {
 router.post('/',
   protect,
   ticketCreationLimiter,
-  uploadSupportAttachments.array('attachments', 3), // Max 3 attachments
+  uploadSupportAttachments.array('attachments', 20), // Max 20 attachments
   ticketValidation,
   handleValidationErrors,
   async (req, res) => {
@@ -101,12 +122,25 @@ router.post('/',
 
       const ticket = new SupportTicket({
         userId: req.user._id,
+        userModel: 'Student',
         title,
         description,
         category,
         priority: priority || 'medium',
         attachments
       });
+
+      // Auto-assign to an IT support person using round-robin distribution
+      try {
+        const assignee = await getNextITSupportAssignee();
+        if (assignee) {
+          ticket.assignedTo = assignee._id;
+          ticket.assignedToModel = 'ITSupport';
+          ticket.status = 'open';
+        }
+      } catch (assignErr) {
+        console.warn('Auto-assign ticket failed:', assignErr.message);
+      }
 
       await ticket.save();
 
@@ -130,8 +164,48 @@ router.post('/',
         console.warn('[ITSM Bridge] Failed to create ITSM ticket:', itsmError.message);
       }
 
+      // Notify the assigned IT support person
+      if (ticket.assignedTo) {
+        try {
+          await createNotification({
+            userId: ticket.assignedTo,
+            type: 'support',
+            title: 'New Ticket Assigned',
+            message: `Ticket ${ticket.ticketId} has been assigned to you: ${ticket.title}`,
+            link: `/support/tickets/${ticket._id}`,
+            metadata: {
+              ticketId: ticket._id
+            }
+          });
+        } catch (notifyErr) {
+          console.warn('IT Support notification failed:', notifyErr.message);
+        }
+      }
+
+      // Notify Admins about new ticket
+      try {
+        const admins = await User.find({ role: 'admin', status: 'active' }).select('_id');
+        for (const admin of admins) {
+          await createNotification({
+            userId: admin._id,
+            type: 'support',
+            title: 'New Support Ticket',
+            message: `A new ticket (${ticket.ticketId}) has been raised regarding: ${ticket.title}`,
+            link: '/admin/support',
+            metadata: {
+              ticketId: ticket._id
+            }
+          });
+        }
+      } catch (notifyErr) {
+        console.warn('Admin notification failed:', notifyErr.message);
+      }
+
       // Populate user info for response
-      await ticket.populate('userId', 'fullName email userId');
+      await ticket.populate([
+        { path: 'userId', select: 'fullName email userId' },
+        { path: 'assignedTo', select: 'fullName email' }
+      ]);
 
       res.status(201).json({
         success: true,
@@ -172,6 +246,7 @@ router.get('/',
 
       const [tickets, total] = await Promise.all([
         SupportTicket.find(query)
+          .populate('assignedTo', 'fullName email')
           .sort(sortOptions)
           .skip(skip)
           .limit(parseInt(limit))
@@ -231,9 +306,10 @@ router.get('/all',
 
       // Search by ticketId or title
       if (search) {
+        const safe = require('../utils/escapeRegex')(search); // SECURITY: ReDoS-safe
         query.$or = [
-          { ticketId: { $regex: search, $options: 'i' } },
-          { title: { $regex: search, $options: 'i' } }
+          { ticketId: { $regex: safe, $options: 'i' } },
+          { title: { $regex: safe, $options: 'i' } }
         ];
       }
 
@@ -244,6 +320,7 @@ router.get('/all',
       const [tickets, total, stats] = await Promise.all([
         SupportTicket.find(query)
           .populate('userId', 'fullName email userId profileImage')
+          .populate('assignedTo', 'fullName email')
           .sort(sortOptions)
           .skip(skip)
           .limit(parseInt(limit))
@@ -303,6 +380,7 @@ router.get('/:id',
     try {
       const ticket = await SupportTicket.findById(req.params.id)
         .populate('userId', 'fullName email userId profileImage')
+        .populate('assignedTo', 'fullName email')
         .populate('responses.respondedBy', 'fullName email role');
 
       if (!ticket) {
@@ -405,6 +483,7 @@ router.post('/:id/user-response',
       // Populate for response
       await ticket.populate([
         { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'assignedTo', select: 'fullName email' },
         { path: 'responses.respondedBy', select: 'fullName email role' }
       ]);
 
@@ -485,6 +564,7 @@ router.put('/:id',
       // Populate for response
       await ticket.populate([
         { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'assignedTo', select: 'fullName email' },
         { path: 'responses.respondedBy', select: 'fullName email role' }
       ]);
 
@@ -569,6 +649,7 @@ router.post('/:id/response',
       // Populate for response
       await ticket.populate([
         { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'assignedTo', select: 'fullName email' },
         { path: 'responses.respondedBy', select: 'fullName email role' }
       ]);
 

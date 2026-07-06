@@ -1108,20 +1108,21 @@ const SkillsPassport = () => {
                 className="mx-auto flex max-w-[235mm] flex-col gap-5"
             >
                 {/* Back Button - Mobile Only */}
-                <div className="mb-4 md:hidden">
+                <div className="flex items-center mt-6 mb-5 md:hidden">
                     <button
-                        type="button"
                         onClick={() => navigate("/dashboard")}
-                        className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+                        className="group flex items-center gap-3 w-fit selection:bg-transparent"
                     >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                            <ArrowLeft className="h-4 w-4" />
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
+                            <ArrowLeft className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
                         </div>
-                        {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                        <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
+                            Back to Dashboard
+                        </span>
                     </button>
                 </div>
 
-                <div className={`mx-auto flex w-full flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between transition-all duration-300 ${activePage === 1 ? "max-w-[556px]" : "max-w-[210mm]"}`}>
+                <div className="mx-auto flex w-full flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between max-w-[210mm] transition-all duration-300">
                     <div>
                         <h1 className="text-[1.65rem] font-[800] tracking-tight text-[#10285a]" style={displayFont}>
                             Skills Passport
@@ -1131,9 +1132,6 @@ const SkillsPassport = () => {
                         </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap items-center gap-2">
-                        <div className="hidden md:block">
-                            <ActionButton icon={ArrowLeft} label="Back" onClick={() => navigate(-1)} />
-                        </div>
                         <ActionButton icon={Share2} label="Copy Link" onClick={handleCopyLink} />
                         <ActionButton
                             icon={Download}

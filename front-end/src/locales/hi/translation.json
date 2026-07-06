@@ -7,6 +7,7 @@
     "results": "परिणाम",
     "assessments": "आकलन",
     "toolkit": "टूलकिट",
+    "placement": "प्लेसमेंट",
     "performance": "प्रदर्शन",
     "skills_vault": "कौशल तिजोरी",
     "badges": "मेरे बैज",
@@ -55,7 +56,20 @@
     "retry": "पुनः प्रयास करें",
     "no_paths": "अभी तक कोई सीखने का रास्ता नहीं है",
     "browse_courses": "पाठ्यक्रम ब्राउज़ करें",
-    "unable_to_load_paths": "पथ लोड करने में असमर्थ"
+    "unable_to_load_paths": "पथ लोड करने में असमर्थ",
+    "home": "होम",
+    "my_career_paths": "मेरे करियर पथ",
+    "view_career_path": "करियर पथ देखें",
+    "primary_path": "प्राथमिक पथ",
+    "secondary_path": "माध्यमिक पथ",
+    "tertiary_path": "तृतीयक पथ",
+    "add": "जोड़ें",
+    "continue_path": "पथ जारी रखें",
+    "active_skills_to_master": "सक्रिय कौशल सीखने के लिए",
+    "track_targeted_skills": "अपने करियर दिशाओं में अपने लक्षित कौशलों को ट्रैक करें",
+    "no_active_skills": "इस पथ में कोई सक्रिय कौशल नहीं है।",
+    "jump_into_roadmap": "करियर रोडमैप पर जाएं",
+    "to_start_mastering": "नए कौशल सीखना शुरू करने के लिए!"
   },
   "profile_page": {
     "personal_information": "व्यक्तिगत जानकारी",
@@ -139,7 +153,8 @@
     "file_attached_success": "फ़ाइल सफलतापूर्वक संलग्न की गई",
     "remove_file": "फ़ाइल हटाएं",
     "save_credential": "क्रेडेंशियल सहेजें",
-    "saving": "सहेजा जा रहा है..."
+    "saving": "सहेजा जा रहा है...",
+    "view_skills_passport": "कौशल पासपोर्ट देखें"
   },
   "support_tickets_page": {
     "back": "पीछे",
@@ -184,10 +199,10 @@
     "validation_desc_max": "विवरण 2000 वर्णों से अधिक नहीं हो सकता",
     "validation_category_required": "कृपया एक श्रेणी चुनें",
     "validation_file_size": "फ़ाइल का आकार 5MB से कम होना चाहिए",
-    "validation_file_count": "अधिकतम 3 फ़ाइलों की अनुमति है",
+    "validation_file_count": "अधिकतम 20 फ़ाइलों की अनुमति है",
     "cat_technical": "तकनीकी समस्या",
-    "cat_technical_desc": "प्लेटफ़ॉर्म के साथ समस्याएँ",
-    "cat_account": "खाता",
+    "cat_technical_desc": "हार्डवेयर, सॉफ्टवेयर, डिवाइस कनेक्शन, सिस्टम बग",
+    "cat_account": "खाते की समस्या",
     "cat_account_desc": "लॉगिन, प्रोफ़ाइल, या सेटिंग्स",
     "cat_content": "पाठ्यक्रम सामग्री",
     "cat_content_desc": "पाठ्यक्रमों के बारे में प्रश्न",
@@ -195,9 +210,22 @@
     "cat_billing_desc": "भुगतान और सदस्यता",
     "cat_feedback": "प्रतिक्रिया",
     "cat_feedback_desc": "सुझाव और सुधार",
-    "cat_other": "अन्य",
+    "cat_other": "अन्य समस्याएं",
     "cat_other_desc": "सामान्य पूछताछ",
-    "characters": "वर्ण"
+    "characters": "वर्ण",
+    "cat_course": "कोर्स की समस्या",
+    "cat_course_desc": "कोर्स सामग्री, वीडियो, मॉड्यूल एक्सेस",
+    "cat_assessment": "मूल्यांकन की समस्या",
+    "cat_assessment_desc": "टेस्ट एक्सेस, सबमिशन त्रुटियां, ग्रेडिंग",
+    "cat_placement": "प्लेसमेंट की समस्या",
+    "cat_placement_desc": "नौकरी आवेदन, प्लेसमेंट ड्राइव, बायोडाटा अपलोड",
+    "cat_certificates_badges": "प्रमाण पत्र और बैज की समस्या",
+    "cat_certificates_badges_desc": "प्रमाण पत्र निर्माण, बैज अनलॉक, साझाकरण",
+    "cat_career_direction": "करियर मार्गदर्शन समस्या",
+    "cat_career_direction_desc": "करियर मार्गदर्शन और सहायता",
+    "upload_screenshot": "स्क्रीनशॉट अपलोड करें",
+    "add_more": "और जोड़ें",
+    "my_tickets": "मेरे टिकट"
   },
   "community_page": {
     "title": "सामुदायिक घोषणाएं",
@@ -714,7 +742,9 @@
     "competency_aligned": "क्षमता संरेखित",
     "integrity_verified": "अखंडता सत्यापित",
     "success_export": "सफलतापूर्वक निर्यात किया गया!",
-    "error_export": "निर्यात विफल रहा। कृपया पुनः प्रयास करें।"
+    "error_export": "निर्यात विफल रहा। कृपया पुनः प्रयास करें।",
+    "level": "लेवल",
+    "level_short": "लेवल"
   },
   "assessments_dashboard": {
     "badge": "मूल्यांकन यात्रा",
@@ -1007,6 +1037,8 @@
       "desc": "छह मुख्य SMAART भागफलों और आवश्यक व्यावसायिक शब्दावली को कवर करने वाले त्वरित-संदर्भ कार्ड।",
       "more_desc": "व्यावसायिक शब्दावली में महारत हासिल करने में आपकी सहायता के लिए प्रत्येक पाठ्यक्रम मॉड्यूल में अधिक फ़्लैशकार्ड उपलब्ध हैं।",
       "explore_btn": "पाठ्यक्रम फ़्लैशकार्ड का अन्वेषण करें",
+      "all_categories": "सभी श्रेणियाँ",
+      "no_cards_found": "इस श्रेणी के लिए कोई फ़्लैशकार्ड नहीं मिला।",
       "category": {
         "Quotient": "भागफल"
       },
@@ -1351,7 +1383,9 @@
       "task": "कार्य",
       "certificate": "प्रमाण पत्र",
       "system": "सिस्टम"
-    }
+    },
+    "new": "नए",
+    "view_all_notifications": "सभी सूचनाएं देखें"
   },
   "settings_page": {
     "profile_desc": "अपनी व्यक्तिगत जानकारी प्रबंधित करें",
@@ -1746,5 +1780,18 @@
       "placement_rate": "प्लेसमेंट दर",
       "corporate_partners": "कॉर्पोरेट साझेदार"
     }
+  },
+  "streaks": {
+    "modal_title": "मेरी दैनिक लकीरें",
+    "day_streak": "दिन की लकीर",
+    "longest": "सबसे लंबी",
+    "days": "दिन",
+    "activity_tracker": "दैनिक गतिविधि ट्रैकर (रविवार को आराम)",
+    "available_vouchers": "उपलब्ध वाउचर",
+    "broken_title": "लकीर टूट गई!",
+    "restore_instruction": "पुनर्स्थापित करने के लिए वाउचर का उपयोग करें",
+    "select_voucher": "वाउचर चुनें",
+    "restore_button": "पुनर्स्थापित करें",
+    "no_active_vouchers": "कोई सक्रिय वाउचर नहीं"
   }
 }

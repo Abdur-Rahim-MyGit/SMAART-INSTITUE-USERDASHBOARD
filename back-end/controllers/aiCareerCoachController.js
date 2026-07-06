@@ -42,7 +42,7 @@ const getRichProfile = async (userId) => {
     const richProfile = {
         fullName: student?.fullName || registration?.fullName || user?.fullName || 'User',
         email: email || 'Not specified',
-        mobile: student?.mobile || registration?.mobileNumber || user?.mobile || 'Not specified',
+        mobile: student?.mobile || student?.mobileNumber || registration?.mobileNumber || user?.mobileNumber || user?.mobile || 'Not specified',
         studentId: student?.studentId || registration?.studentId || 'N/A',
 
         // Education - Prioritizing actual student record and registration
@@ -113,7 +113,7 @@ const getRichProfile = async (userId) => {
 // Get or create AI profile (Enhanced with Registration)
 exports.getProfile = async (req, res) => {
     try {
-        const { richProfile, profileDoc, studentDoc, registrationDoc } = await getRichProfile(req.user.id);
+        const { richProfile, profileDoc, userDoc, studentDoc, registrationDoc } = await getRichProfile(req.user.id);
 
         let profile = profileDoc;
 
@@ -131,6 +131,7 @@ exports.getProfile = async (req, res) => {
             success: true,
             profile: profile || profileDoc,
             richProfile,
+            user: userDoc,
             student: studentDoc,
             registration: registrationDoc
         });
@@ -422,6 +423,40 @@ exports.generateResume = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to generate resume'
+        });
+    }
+};
+
+// Generate professional summary
+exports.generateProfessionalSummary = async (req, res) => {
+    try {
+        const { resumeData, targetRole } = req.body;
+
+        if (!resumeData) {
+            return res.status(400).json({
+                success: false,
+                message: 'Resume data is required'
+            });
+        }
+
+        const result = await openRouterService.generateProfessionalSummary(resumeData, targetRole);
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                message: result.error
+            });
+        }
+
+        res.json({
+            success: true,
+            summary: result.message
+        });
+    } catch (error) {
+        console.error('Professional Summary Generation Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate professional summary'
         });
     }
 };

@@ -29,11 +29,12 @@ router.get('/', async (req, res) => {
 
         // Search functionality
         if (search) {
+            const safe = require('../utils/escapeRegex')(search); // SECURITY: ReDoS-safe
             query.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { coachId: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { specialization: { $regex: search, $options: 'i' } }
+                { name: { $regex: safe, $options: 'i' } },
+                { coachId: { $regex: safe, $options: 'i' } },
+                { email: { $regex: safe, $options: 'i' } },
+                { specialization: { $regex: safe, $options: 'i' } }
             ];
         }
 

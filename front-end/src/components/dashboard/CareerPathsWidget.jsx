@@ -2,6 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, ArrowRight, Lock, TrendingUp, Code, Database, Cloud, Megaphone, MonitorPlay, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Map string identifiers to actual components
 const ICON_MAP = {
@@ -15,6 +16,7 @@ const ICON_MAP = {
 };
 
 const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const isCareerPathway = paths.some(p => ['primary', 'secondary', 'tertiary'].includes(p.id));
@@ -26,7 +28,7 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
       {/* Section heading */}
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-xs uppercase font-extrabold text-slate-800 dark:text-white tracking-tight">
-          My Career Paths
+          {t("dashboard.my_career_paths", "My Career Paths")}
         </h2>
       </div>
 
@@ -76,7 +78,11 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
                       {['primary', 'secondary', 'tertiary'].includes(path.id) && (
                         <div className="mb-1.5">
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400">
-                            {path.id === 'primary' ? 'Primary Path' : path.id === 'secondary' ? 'Secondary Path' : 'Tertiary Path'}
+                            {path.id === 'primary' 
+                              ? t('dashboard.primary_path', 'Primary Path') 
+                              : path.id === 'secondary' 
+                                ? t('dashboard.secondary_path', 'Secondary Path') 
+                                : t('dashboard.tertiary_path', 'Tertiary Path')}
                           </span>
                         </div>
                       )}
@@ -95,9 +101,13 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
                       }`}
                   >
                     {path.locked ? (
-                      <><Lock className="w-3 h-3" /> View Career Path</>
+                      <><Lock className="w-3 h-3" /> {t('dashboard.view_career_path', 'View Career Path')}</>
                     ) : (
-                      <>{path.btnText || "Continue Path"} <ArrowRight className="w-3 h-3 translate-x-0 group-hover/btn:translate-x-0.5 transition-transform" /></>
+                      <>{path.btnText === 'View Career Path' 
+                        ? t('dashboard.view_career_path', 'View Career Path') 
+                        : (path.btnText === 'Continue Path' 
+                          ? t('dashboard.continue_path', 'Continue Path') 
+                          : path.btnText || t('dashboard.continue_path', 'Continue Path'))} <ArrowRight className="w-3 h-3 translate-x-0 group-hover/btn:translate-x-0.5 transition-transform" /></>
                     )}
                   </button>
                 </div>

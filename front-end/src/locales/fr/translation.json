@@ -7,6 +7,7 @@
     "results": "Résultats",
     "assessments": "Évaluations",
     "toolkit": "Boîte à outils",
+    "placement": "Placement",
     "performance": "Performance",
     "skills_vault": "Coffre-fort de compétences",
     "badges": "Mes Badges",
@@ -57,7 +58,20 @@
     "retry": "Réessayer",
     "no_paths": "Pas encore de parcours d'apprentissage",
     "browse_courses": "Parcourir les cours",
-    "unable_to_load_paths": "Impossible de charger les parcours"
+    "unable_to_load_paths": "Impossible de charger les parcours",
+    "home": "Accueil",
+    "my_career_paths": "Mes plans de carrière",
+    "view_career_path": "Voir le plan de carrière",
+    "primary_path": "Plan primaire",
+    "secondary_path": "Plan secondaire",
+    "tertiary_path": "Plan tertiaire",
+    "add": "Ajouter",
+    "continue_path": "Continuer le chemin",
+    "active_skills_to_master": "Compétences actives à maîtriser",
+    "track_targeted_skills": "Suivez vos compétences ciblées dans vos plans de carrière",
+    "no_active_skills": "Aucune compétence active dans ce plan.",
+    "jump_into_roadmap": "Accéder à la feuille de route pour",
+    "to_start_mastering": "pour commencer à maîtriser de nouvelles compétences!"
   },
   "profile_page": {
     "personal_information": "Informations Personnelles",
@@ -141,7 +155,8 @@
     "file_attached_success": "Fichier joint avec succès",
     "remove_file": "Supprimer le Fichier",
     "save_credential": "Enregistrer le Certificat",
-    "saving": "Enregistrement..."
+    "saving": "Enregistrement...",
+    "view_skills_passport": "Voir le passeport de compétences"
   },
   "support_tickets_page": {
     "back": "Retour",
@@ -186,10 +201,10 @@
     "validation_desc_max": "La description ne peut pas dépasser 2000 caractères",
     "validation_category_required": "Veuillez sélectionner une catégorie",
     "validation_file_size": "La taille du fichier doit être inférieure à 5 Mo",
-    "validation_file_count": "Maximum 3 fichiers autorisés",
+    "validation_file_count": "Maximum 20 fichiers autorisés",
     "cat_technical": "Problème Technique",
-    "cat_technical_desc": "Problèmes avec la plateforme",
-    "cat_account": "Compte",
+    "cat_technical_desc": "Matériel, logiciel, connexion de l'appareil, bogues système",
+    "cat_account": "Problème de Compte",
     "cat_account_desc": "Connexion, profil ou paramètres",
     "cat_content": "Contenu du Cours",
     "cat_content_desc": "Questions sur les cours",
@@ -197,9 +212,22 @@
     "cat_billing_desc": "Paiement et abonnement",
     "cat_feedback": "Retour",
     "cat_feedback_desc": "Suggestions et améliorations",
-    "cat_other": "Autre",
+    "cat_other": "Autres Problèmes",
     "cat_other_desc": "Demandes générales",
-    "characters": "caractères"
+    "characters": "caractères",
+    "cat_course": "Problème de Cours",
+    "cat_course_desc": "Contenu du cours, vidéos, accès aux modules",
+    "cat_assessment": "Problème d'Évaluation",
+    "cat_assessment_desc": "Accès aux tests, erreurs de soumission, notation",
+    "cat_placement": "Problème de Placement",
+    "cat_placement_desc": "Demande d'emploi, campagne de placement, téléchargement de CV",
+    "cat_certificates_badges": "Problème de Certificats et Badges",
+    "cat_certificates_badges_desc": "Génération de certificat, déverrouillage de badge, partage",
+    "cat_career_direction": "Problème d'Orientation Professionnelle",
+    "cat_career_direction_desc": "Orientation professionnelle et soutien",
+    "upload_screenshot": "Télécharger une Capture d'Écran",
+    "add_more": "Ajouter Plus",
+    "my_tickets": "Mes Tickets"
   },
   "community_page": {
     "title": "Annonces de la Communauté",
@@ -716,7 +744,9 @@
     "competency_aligned": "Aligné sur les compétences",
     "integrity_verified": "Intégrité vérifiée",
     "success_export": "Exportation réussie !",
-    "error_export": "L'exportation a échoué. Veuillez réessayer."
+    "error_export": "L'exportation a échoué. Veuillez réessayer.",
+    "level": "Niveau",
+    "level_short": "Niv."
   },
   "assessments_dashboard": {
     "badge": "Parcours d'Évaluation",
@@ -1009,6 +1039,8 @@
       "desc": "Cartes de référence rapide couvrant les six quotients SMAART fondamentaux et la terminologie professionnelle essentielle.",
       "more_desc": "Plus de cartes mémoire sont disponibles dans chaque module de cours pour vous aider à maîtriser la terminologie professionnelle.",
       "explore_btn": "Explorer les Cartes mémoire du Cours",
+      "all_categories": "Toutes les catégories",
+      "no_cards_found": "Aucune carte mémoire trouvée pour cette catégorie.",
       "category": {
         "Quotient": "Quotient"
       },
@@ -1257,7 +1289,9 @@
       "task": "Tâches",
       "certificate": "Certificats",
       "system": "Système"
-    }
+    },
+    "new": "Nouveau",
+    "view_all_notifications": "Voir toutes les notifications"
   },
   "settings_page": {
     "profile_desc": "Gerez vos informations personnelles",
@@ -1652,5 +1686,18 @@
       "placement_rate": "Taux de Placement",
       "corporate_partners": "Partenaires Entreprises"
     }
+  },
+  "streaks": {
+    "modal_title": "Mes séries quotidiennes",
+    "day_streak": "Série de jours",
+    "longest": "La plus longue",
+    "days": "jours",
+    "activity_tracker": "Suivi d'activité quotidien (Repos le dimanche)",
+    "available_vouchers": "Bons disponibles",
+    "broken_title": "Série interrompue !",
+    "restore_instruction": "Utilisez un bon pour restaurer à",
+    "select_voucher": "Sélectionner un bon",
+    "restore_button": "Restaurer",
+    "no_active_vouchers": "Aucun bon actif"
   }
 }

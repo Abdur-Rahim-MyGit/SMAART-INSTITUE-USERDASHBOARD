@@ -37,6 +37,11 @@ const aiCareerCoachApi = {
         body: JSON.stringify({ targetRole })
     }),
 
+    generateSummary: (resumeData, targetRole) => apiCall('/ai-career-coach/generate-summary', {
+        method: 'POST',
+        body: JSON.stringify({ resumeData, targetRole })
+    }),
+
     // Chat Features
     sendChatMessage: (message, sessionId = null) => apiCall('/ai-career-coach/chat', {
         method: 'POST',

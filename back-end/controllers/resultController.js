@@ -21,10 +21,15 @@ const submitAssessment = async (req, res) => {
         const { resultId } = req.params;
         const {
             submissionReason = 'manual',
-            completeMissingAnswers = false,
-            forcePassDev = false,
-            forceFailDev = false
+            completeMissingAnswers = false
         } = req.body || {};
+        // SECURITY (audit CRITICAL): forcePassDev/forceFailDev are grading
+        // shortcuts for LOCAL testing only. Force them OFF in production so a
+        // student cannot self-grade a 70% pass by sending {forcePassDev:true}
+        // in the submit body. Dev behaviour is unchanged.
+        const isProd = process.env.NODE_ENV === 'production';
+        const forcePassDev = isProd ? false : !!(req.body && req.body.forcePassDev);
+        const forceFailDev = isProd ? false : !!(req.body && req.body.forceFailDev);
 
         const result = await Result.findById(resultId);
 

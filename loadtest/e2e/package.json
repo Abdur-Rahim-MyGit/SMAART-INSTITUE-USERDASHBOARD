@@ -1,0 +1,9 @@
+{
+  "name": "smaart-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright end-to-end tests against the production-shaped local stack",
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}

@@ -6,16 +6,34 @@ import { toast } from 'sonner';
 const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-
   const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted || false);
 
-  // Sync state with prop
+  const flashcards = cards || [];
+  const currentCard = flashcards[currentIndex];
+
+  const [viewedCards, setViewedCards] = useState(new Set([0]));
+
+  // Sync state with prop and reset viewedCards when cards change
   useEffect(() => {
     setHasMarkedComplete(isCompleted || false);
   }, [isCompleted]);
 
-  const flashcards = cards || [];
-  const currentCard = flashcards[currentIndex];
+  useEffect(() => {
+    setViewedCards(new Set([0]));
+  }, [cards]);
+
+  useEffect(() => {
+    if (flashcards.length > 0) {
+      setViewedCards(prev => {
+        if (prev.has(currentIndex)) return prev;
+        const nextSet = new Set(prev);
+        nextSet.add(currentIndex);
+        return nextSet;
+      });
+    }
+  }, [currentIndex, flashcards.length]);
+
+  const allCardsViewed = flashcards.length === 0 || viewedCards.size === flashcards.length;
 
   const handleNext = () => {
     setIsFlipped(false);
@@ -36,6 +54,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
   };
 
   const handleMarkComplete = () => {
+    if (!allCardsViewed) return;
     setHasMarkedComplete(true);
     toast.success('Flashcards marked as complete!');
     if (onComplete) {
@@ -46,7 +65,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto relative overflow-hidden">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-2 sm:p-6 overflow-y-auto relative overflow-hidden">
       {/* Subtle Background Glows */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-50/20 dark:bg-blue-900/5 rounded-full blur-[100px] -mr-48 -mt-48 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-50/20 dark:bg-indigo-900/5 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
@@ -69,7 +88,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             onClick={handleFlip}
             whileHover={{ scale: 1.01, y: -4 }}
             whileTap={{ scale: 0.99 }}
-            className="relative w-full max-w-2xl aspect-[3/2] cursor-pointer perspective-1000 group transition-all duration-500"
+            className="relative w-full max-w-2xl aspect-[4/3] sm:aspect-[3/2] cursor-pointer perspective-1000 group transition-all duration-500"
           >
             <motion.div
               className="relative w-full h-full shadow-2xl rounded-3xl"
@@ -80,7 +99,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             >
               {/* Front - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-[#1a3884] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-8 md:p-10 border border-white/10 overflow-hidden"
+                className="absolute inset-0 bg-[#1a3884] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-4 sm:p-8 md:p-10 border border-white/10 overflow-hidden"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -98,10 +117,10 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                     <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">Flashcard Front</span>
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-white leading-tight px-4 tracking-tight">
+                  <h3 className="text-lg sm:text-2xl md:text-3xl font-black text-white leading-tight px-4 tracking-tight">
                     {currentCard?.front}
                   </h3>
-                  <div className="pt-8 flex flex-col items-center gap-3 opacity-60">
+                  <div className="pt-4 sm:pt-8 flex flex-col items-center gap-3 opacity-60">
                     <div className="h-px w-10 bg-white/40" />
                     <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">
                       Tap to Flip
@@ -112,7 +131,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
               {/* Back - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-8 md:p-10 border border-slate-200 dark:border-white/10"
+                className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-4 sm:p-8 md:p-10 border border-slate-200 dark:border-white/10"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -126,10 +145,10 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                   <span className="text-[9px] font-black text-[#1a3884] dark:text-blue-450 uppercase tracking-[0.25em] mb-4 block">
                     THE SOLUTION
                   </span>
-                  <p className="text-lg md:text-2xl font-bold text-slate-900 dark:text-white leading-relaxed tracking-tight px-4">
+                  <p className="text-sm sm:text-lg md:text-2xl font-bold text-slate-900 dark:text-white leading-relaxed tracking-tight px-4">
                     {currentCard?.back}
                   </p>
-                  <div className="pt-6 opacity-30">
+                  <div className="pt-3 sm:pt-6 opacity-30">
                      <RotateCcw size={15} className="mx-auto text-slate-900 dark:text-white" />
                   </div>
                 </div>
@@ -162,13 +181,21 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
           {/* Complete Button */}
           {!hasMarkedComplete ? (
-            <button
-              onClick={handleMarkComplete}
-              className="w-full max-w-md px-6 py-3.5 bg-[#1a3884] hover:bg-[#112b6b] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
-            >
-              <CheckCircle2 size={18} />
-              Mark as Complete
-            </button>
+            <div className="w-full flex flex-col items-center gap-2">
+              <button
+                onClick={handleMarkComplete}
+                disabled={!allCardsViewed}
+                className="w-full max-w-md px-6 py-3.5 bg-[#1a3884] hover:bg-[#112b6b] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1a3884]"
+              >
+                <CheckCircle2 size={18} />
+                Mark as Complete
+              </button>
+              {!allCardsViewed && (
+                <p className="text-xs text-slate-550 dark:text-slate-400 font-semibold animate-pulse">
+                  Please view all cards to unlock completion ({viewedCards.size} / {flashcards.length})
+                </p>
+              )}
+            </div>
           ) : (
             <div className="w-full max-w-md px-6 py-3.5 bg-green-500/10 border-2 border-green-500 text-green-700 dark:text-green-450 font-bold rounded-xl flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
               <CheckCircle2 size={18} />
