@@ -58,7 +58,7 @@ const translateDefinition = async (definitionData, targetLang) => {
 
 const GeneralDictionary = () => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [definition, setDefinition] = useState(null);
   const [synonyms, setSynonyms] = useState([]);
@@ -148,9 +148,9 @@ const GeneralDictionary = () => {
 
   const playAudio = (audioUrl) => {
     if (audioUrl) {
-      new Audio(audioUrl).play().catch(() => toast.error("Audio playback error"));
+      new Audio(audioUrl).play().catch(() => toast.error(t("general_dictionary.audio_error", "Audio playback error")));
     } else {
-      toast.error("Audio not available");
+      toast.error(t("general_dictionary.audio_unavailable", "Audio not available"));
     }
   };
 
@@ -169,7 +169,7 @@ const GeneralDictionary = () => {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
             <ArrowLeft stroke={1.5} className="h-4 w-4" />
           </div>
-          Back to Toolkit
+          {t("general_dictionary.back_to_toolkit", "Back to Toolkit")}
         </motion.button>
 
         {/* Header Card */}
@@ -181,10 +181,10 @@ const GeneralDictionary = () => {
         >
           <div className="relative z-10">
             <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-              General <span className="text-[#1a3884] dark:text-blue-300">Dictionary</span>
+              {t("general_dictionary.title_1", "General")} <span className="text-[#1a3884] dark:text-blue-300">{t("general_dictionary.title_2", "Dictionary")}</span>
             </h1>
             <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-              Definitions, phonetics &amp; synonyms — all in one place.
+              {t("general_dictionary.subtitle", "Definitions, phonetics & synonyms — all in one place.")}
             </p>
           </div>
         </motion.div>
@@ -203,7 +203,7 @@ const GeneralDictionary = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search for a word…"
+              placeholder={t("general_dictionary.search_placeholder", "Search for a word…")}
               className="w-full rounded-xl border border-[#d8e6f7] bg-white py-3 pl-11 pr-4 text-[14px] font-medium text-[#0d1f4e] shadow-[0_2px_8px_rgba(26,56,132,0.06)] outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500"
             />
           </div>
@@ -213,7 +213,7 @@ const GeneralDictionary = () => {
             className="flex items-center gap-2 rounded-xl bg-[#1a3884] px-5 py-3 text-[13px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95 disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            {loading ? "Searching…" : "Search"}
+            {loading ? t("general_dictionary.searching", "Searching…") : t("general_dictionary.search", "Search")}
           </button>
         </motion.form>
 
@@ -233,15 +233,15 @@ const GeneralDictionary = () => {
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
                   <Search className="h-5 w-5 text-red-400" />
                 </div>
-                <h3 className="text-[14px] font-bold text-[#0d1f4e] dark:text-white">Word Not Found</h3>
+                <h3 className="text-[14px] font-bold text-[#0d1f4e] dark:text-white">{t("general_dictionary.word_not_found", "Word Not Found")}</h3>
                 <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
-                  Couldn&apos;t find &ldquo;{searchTerm}&rdquo;. Check spelling or try another word.
+                  {t("general_dictionary.not_found_desc", "Couldn't find “{{word}}”. Check spelling or try another word.", { word: searchTerm })}
                 </p>
                 <button
                   onClick={() => { setError(null); setSearchTerm(""); }}
                   className="mt-3 text-[12px] font-semibold text-[#1a3884] hover:underline dark:text-blue-400"
                 >
-                  Clear Search
+                  {t("general_dictionary.clear_search", "Clear Search")}
                 </button>
               </motion.div>
             )}
@@ -257,9 +257,9 @@ const GeneralDictionary = () => {
                   <Book className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
                 </div>
                 <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
-                  Type a word above and press{" "}
-                  <span className="text-[#1a3884] dark:text-blue-300">Search</span>{" "}
-                  to see its definition
+                  {t("general_dictionary.empty_before", "Type a word above and press")}{" "}
+                  <span className="text-[#1a3884] dark:text-blue-300">{t("general_dictionary.search", "Search")}</span>{" "}
+                  {t("general_dictionary.empty_after", "to see its definition")}
                 </p>
               </motion.div>
             )}
@@ -357,7 +357,7 @@ const GeneralDictionary = () => {
                     <div className="rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
                       <div className="mb-3 flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-amber-400" />
-                        <h3 className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">Synonyms &amp; Related Words</h3>
+                        <h3 className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">{t("general_dictionary.synonyms_title", "Synonyms & Related Words")}</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {synonyms.map(syn => (
@@ -392,7 +392,7 @@ const GeneralDictionary = () => {
                 <div className="p-5">
                   <div className="mb-3 flex items-center gap-2">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">Word of the Day</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">{t("general_dictionary.word_of_day", "Word of the Day")}</span>
                   </div>
                   <h3 className="text-[20px] font-extrabold capitalize leading-tight text-[#0d1f4e] dark:text-white">
                     {wordOfDay.word}
@@ -407,7 +407,7 @@ const GeneralDictionary = () => {
                     onClick={() => { setSearchTerm(wordOfDay.originalWord || wordOfDay.word); fetchData(wordOfDay.originalWord || wordOfDay.word); }}
                     className="mt-4 flex items-center gap-1.5 text-[12px] font-bold text-[#1a3884] transition-all hover:gap-2.5 dark:text-blue-400"
                   >
-                    Learn more <ArrowRight className="h-3.5 w-3.5" />
+                    {t("general_dictionary.learn_more", "Learn more")} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </motion.div>
@@ -422,7 +422,7 @@ const GeneralDictionary = () => {
             >
               <div className="mb-3 flex items-center gap-2">
                 <Book className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
-                <h3 className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">Trending Words</h3>
+                <h3 className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">{t("general_dictionary.trending_words", "Trending Words")}</h3>
               </div>
               <div className="space-y-1">
                 {["Resilience", "Empathy", "Agile", "Cognitive", "Paradigm"].map((item) => (

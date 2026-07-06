@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   IconBriefcase as Briefcase,
@@ -15,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
-const formatDate = (value) => {
-  if (!value) return "No deadline listed";
+const formatDate = (value, t) => {
+  if (!value) return t("placement.no_deadline", "No deadline listed");
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   return date.toLocaleDateString(undefined, {
@@ -26,9 +27,9 @@ const formatDate = (value) => {
   });
 };
 
-const getDescription = (job) => {
+const getDescription = (job, t) => {
   const value = job.description || job.jobDescription || job.summary || job.aboutRole || job.requirements;
-  if (!value) return "Role details will be shared by the placement team.";
+  if (!value) return t("placement.no_details", "Role details will be shared by the placement team.");
   if (Array.isArray(value)) return value.join(", ");
   return String(value);
 };
@@ -65,9 +66,12 @@ const getCompanyLogo = (job) => {
   return `${getBackendUrl()}/${logo.replace(/^\/+/, "")}`;
 };
 
-const formatStatus = (value) => {
-  if (!value) return "Open";
-  return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+const formatStatus = (value, t) => {
+  if (!value) return t("placement.open", "Open");
+  const norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  const key = `placement.status_${norm}`;
+  const fallback = String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  return t(key, fallback);
 };
 
 const getStatusTextColor = (status) => {
@@ -96,25 +100,26 @@ const getStatusTextColor = (status) => {
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.
  */
-const getPostedAgo = (createdAt) => {
+const getPostedAgo = (createdAt, t) => {
   if (!createdAt) return null;
   const posted = new Date(createdAt);
   if (Number.isNaN(posted.getTime())) return null;
   const diffMs = Date.now() - posted.getTime();
   if (diffMs < 0) return null; // future date — don't show
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (days === 0) return "Posted Today";
-  if (days === 1) return "Posted 1 day ago";
-  if (days < 7) return `Posted ${days} days ago`;
+  if (days === 0) return t("placement.posted_today", "Posted Today");
+  if (days === 1) return t("placement.posted_day_ago", "Posted 1 day ago");
+  if (days < 7) return t("placement.posted_days_ago", { count: days, defaultValue: `Posted ${days} days ago` });
   const weeks = Math.floor(days / 7);
-  if (weeks === 1) return "Posted 1 week ago";
-  if (weeks < 5) return `Posted ${weeks} weeks ago`;
+  if (weeks === 1) return t("placement.posted_week_ago", "Posted 1 week ago");
+  if (weeks < 5) return t("placement.posted_weeks_ago", { count: weeks, defaultValue: `Posted ${weeks} weeks ago` });
   const months = Math.floor(days / 30);
-  if (months === 1) return "Posted 1 month ago";
-  return `Posted ${months} months ago`;
+  if (months === 1) return t("placement.posted_month_ago", "Posted 1 month ago");
+  return t("placement.posted_months_ago", { count: months, defaultValue: `Posted ${months} months ago` });
 };
 
 const Placement = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
@@ -137,8 +142,8 @@ const Placement = () => {
     } catch (error) {
       console.error("Failed to load placement jobs:", error);
       toast({
-        title: "Could not load jobs",
-        description: error.message || "Please try again in a moment.",
+        title: t("placement.error_load_jobs_title", "Could not load jobs"),
+        description: error.message || t("placement.error_load_jobs_desc", "Please try again in a moment."),
         variant: "destructive",
       });
     } finally {
@@ -181,7 +186,7 @@ const Placement = () => {
       setAppliedJobs(enriched);
     } catch (error) {
       console.error('Failed to load applications:', error);
-      toast({ title: 'Could not load applications', description: error.message || 'Please try again', variant: 'destructive' });
+      toast({ title: t("placement.error_load_apps_title", "Could not load applications"), description: error.message || t("placement.error_withdraw_desc", "Please try again"), variant: 'destructive' });
     } finally {
       setLoadingApplied(false);
     }
@@ -221,28 +226,28 @@ const Placement = () => {
         job.displayCompany,
         job.displayLocation,
         job.displayType,
-        getDescription(job),
+        getDescription(job, t),
         getSkills(job).join(" "),
       ].join(" ").toLowerCase();
 
       return haystack.includes(query);
     });
-  }, [jobs, searchQuery, sourceFilter, jobType]);
+  }, [jobs, searchQuery, sourceFilter, jobType, t]);
 
   const handleWithdraw = async (applicationId) => {
     try {
       await placementsAPI.deleteApplication(applicationId);
       setAppliedJobs((prev) => prev.filter((a) => a._id !== applicationId && a.id !== applicationId));
-      toast({ title: 'Application withdrawn', description: 'Your application has been removed.' });
+      toast({ title: t("placement.applied_toast_title", "Application withdrawn"), description: t("placement.applied_toast_desc", "Your application has been removed.") });
     } catch (err) {
       console.error('withdraw error', err);
-      toast({ title: 'Could not withdraw', description: err.message || 'Please try again', variant: 'destructive' });
+      toast({ title: t("placement.error_withdraw_title", "Could not withdraw"), description: err.message || t("placement.error_withdraw_desc", "Please try again"), variant: 'destructive' });
     }
   };
 
   const openConfirm = (id, title) => {
     setConfirmAppId(id);
-    setConfirmAppTitle(title || 'this application');
+    setConfirmAppTitle(title || t("placement.this_application", "this application"));
     setConfirmOpen(true);
   };
 
@@ -271,7 +276,7 @@ const Placement = () => {
               <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
             </div>
             <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
-              Back to Dashboard
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
             </span>
           </button>
         </div>
@@ -285,10 +290,10 @@ const Placement = () => {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight text-[#0d1f4e] dark:text-white sm:text-3xl">
-                Placement
+                {t("placement.title", "Placement")}
               </h1>
               <p className="mt-1 max-w-2xl text-sm font-medium text-slate-500 dark:text-slate-400">
-                Explore active jobs from college placement postings and SMAART job postings.
+                {t("placement.subtitle", "Explore active jobs from college placement postings and SMAART job postings.")}
               </p>
             </div>
 
@@ -300,7 +305,7 @@ const Placement = () => {
                   className="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-4 text-sm font-bold text-white shadow-md transition-all hover:bg-[#132c6b] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <Refresh className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                  Refresh
+                  {t("placement.refresh", "Refresh")}
                 </button>
               </div>
             </div>
@@ -308,11 +313,13 @@ const Placement = () => {
             {confirmOpen && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-                  <h3 className="text-lg font-bold text-[#0d1f4e]">Confirm withdraw</h3>
-                  <p className="mt-2 text-sm text-slate-600">Are you sure you want to withdraw your application for <strong>{confirmAppTitle}</strong>? This action cannot be undone.</p>
+                  <h3 className="text-lg font-bold text-[#0d1f4e]">{t("placement.confirm_withdraw", "Confirm withdraw")}</h3>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {t("placement.withdraw_warning", { title: confirmAppTitle, defaultValue: "Are you sure you want to withdraw your application for {{title}}? This action cannot be undone." })}
+                  </p>
                   <div className="mt-4 flex justify-end gap-3">
-                    <button onClick={closeConfirm} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold">Cancel</button>
-                    <button onClick={confirmWithdraw} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white">Withdraw</button>
+                    <button onClick={closeConfirm} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold">{t("placement.cancel", "Cancel")}</button>
+                    <button onClick={confirmWithdraw} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white">{t("placement.withdraw", "Withdraw")}</button>
                   </div>
                 </div>
               </div>
@@ -326,13 +333,13 @@ const Placement = () => {
             onClick={() => setActiveTab('jobs')}
             className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'jobs' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
           >
-            Jobs
+            {t("placement.jobs", "Jobs")}
           </button>
           <button
             onClick={() => setActiveTab('status')}
             className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'status' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
           >
-            Job Status
+            {t("placement.job_status", "Job Status")}
           </button>
         </div>
 
@@ -344,7 +351,7 @@ const Placement = () => {
               <input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search roles, companies, skills"
+                placeholder={t("placement.search_placeholder", "Search roles, companies, skills")}
                 className="h-10 w-full rounded-xl border border-[#d8e6f7] bg-white pl-9 pr-3 text-sm font-medium text-black outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-white dark:text-black"
               />
             </div>
@@ -356,9 +363,9 @@ const Placement = () => {
                 onChange={(e) => setSourceFilter(e.target.value)}
                 className="h-10 w-full sm:w-auto rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
               >
-                <option value="all">All jobs ({jobs.length})</option>
-                <option value="smaartjobpostings">SMAART ({sourceCounts.smaartjobpostings || 0})</option>
-                <option value="jobpostings">College ({sourceCounts.jobpostings || 0})</option>
+                <option value="all">{t("placement.all_jobs", { count: jobs.length, defaultValue: "All jobs ({{count}})" })}</option>
+                <option value="smaartjobpostings">{t("placement.smaart_jobs", { count: sourceCounts.smaartjobpostings || 0, defaultValue: "SMAART ({{count}})" })}</option>
+                <option value="jobpostings">{t("placement.college_jobs", { count: sourceCounts.jobpostings || 0, defaultValue: "College ({{count}})" })}</option>
               </select>
 
               <select
@@ -366,10 +373,10 @@ const Placement = () => {
                 onChange={(e) => setJobType(e.target.value)}
                 className="h-10 w-full sm:w-auto rounded-xl border border-[#d8e6f7] bg-white px-3 text-sm font-bold text-[#0d1f4e] outline-none hover:border-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
               >
-                <option value="all">All types</option>
-                <option value="full-time">Full-Time</option>
-                <option value="part-time">Part-Time</option>
-                <option value="internship">Internship</option>
+                <option value="all">{t("placement.all_types", "All types")}</option>
+                <option value="full-time">{t("placement.full_time", "Full-Time")}</option>
+                <option value="part-time">{t("placement.part_time", "Part-Time")}</option>
+                <option value="internship">{t("placement.internship", "Internship")}</option>
               </select>
             </div>
           </div>
@@ -388,9 +395,9 @@ const Placement = () => {
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
                   <Briefcase className="h-7 w-7 text-[#1a3884] dark:text-blue-300" />
                 </div>
-                <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">No placement jobs found</h2>
+                <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">{t("placement.no_jobs_found", "No placement jobs found")}</h2>
                 <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">
-                  Try changing the filter or check back when new opportunities are posted.
+                  {t("placement.no_jobs_desc", "Try changing the filter or check back when new opportunities are posted.")}
                 </p>
               </div>
             ) : (
@@ -398,13 +405,13 @@ const Placement = () => {
                 {filteredJobs.map((job, index) => {
                   const skills = getSkills(job);
                   const companyLogo = getCompanyLogo(job);
-                  const sourceLabel = job.sourceCollection === "smaartjobpostings" ? "SMAART" : "College";
+                  const sourceLabel = job.sourceCollection === "smaartjobpostings" ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College");
                   const companyInitial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
-                  const statusLabel = formatStatus(job.displayStatus || job.status);
+                  const statusLabel = formatStatus(job.displayStatus || job.status, t);
                   // consider job closed if status contains 'closed' (case-insensitive)
                   const rawStatus = (job.displayStatus || job.status || "").toString().toLowerCase();
                   const isClosed = rawStatus.includes("closed");
-                  const applyLabel = isClosed ? "Closed" : "View";
+                  const applyLabel = isClosed ? t("placement.closed", "Closed") : t("placement.view", "View");
 
                   return (
                     <motion.article
@@ -455,19 +462,19 @@ const Placement = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span className="truncate">{job.displayLocation || 'Remote'}</span>
+                          <span className="truncate">{job.displayLocation || t("placement.remote", "Remote")}</span>
                         </div>
-                        {getPostedAgo(job.displayCreatedAt || job.createdAt) && (
+                        {getPostedAgo(job.displayCreatedAt || job.createdAt, t) && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 shrink-0 text-slate-400" />
                             <span className="text-slate-400 text-xs font-semibold">
-                              {getPostedAgo(job.displayCreatedAt || job.createdAt)}
+                              {getPostedAgo(job.displayCreatedAt || job.createdAt, t)}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span>{formatDate(job.displayDeadline)}</span>
+                          <span>{formatDate(job.displayDeadline, t)}</span>
                         </div>
                         {job.displaySalary && (
                           <div className="flex items-center gap-2">
@@ -518,8 +525,8 @@ const Placement = () => {
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
                   <Briefcase className="h-7 w-7 text-[#1a3884] dark:text-blue-300" />
                 </div>
-                <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">No applications found</h2>
-                <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">You haven't applied to any jobs yet.</p>
+                <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">{t("placement.no_applications_found", "No applications found")}</h2>
+                <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">{t("placement.no_applications_desc", "You haven't applied to any jobs yet.")}</p>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -533,8 +540,8 @@ const Placement = () => {
                   const appliedAt = app.appliedAt || app.createdAt || app.createdAt;
                   const location = (jobRef && jobRef.displayLocation) || app.location || '';
                   const deadline = (jobRef && jobRef.displayDeadline) || app.deadline || null;
-                  const statusLabel = formatStatus(app.status || app.applicationStatus || 'applied');
-                  const sourceLabel = app.postingOrigin || (jobRef && jobRef.sourceCollection === 'smaartjobpostings' ? 'SMAART' : (jobRef && jobRef.sourceCollection === 'jobpostings' ? 'College' : ''));
+                  const statusLabel = formatStatus(app.status || app.applicationStatus || 'applied', t);
+                  const sourceLabel = app.postingOrigin || (jobRef && jobRef.sourceCollection === 'smaartjobpostings' ? t("placement.source_smaart", "SMAART") : (jobRef && jobRef.sourceCollection === 'jobpostings' ? t("placement.source_college", "College") : ''));
 
                   return (
                     <motion.article
@@ -578,19 +585,19 @@ const Placement = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span>Applied: {formatDate(appliedAt)}</span>
+                          <span>{t("placement.applied", "Applied")}: {formatDate(appliedAt, t)}</span>
                         </div>
                       </div>
 
                       <div className="mt-auto pt-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold uppercase text-black dark:text-white text-center sm:text-left">
-                          STATUS : <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
+                          {t("placement.status_prefix", "STATUS :")} <span className={getStatusTextColor(app.status || app.applicationStatus || 'applied')}>{statusLabel}</span>
                         </div>
                         <button
                           onClick={() => openConfirm(app._id || app.id, title)}
                           className="rounded-full uppercase bg-red-50 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-100 transition-colors w-full sm:w-auto"
                         >
-                          Withdraw
+                          {t("placement.withdraw", "Withdraw")}
                         </button>
                       </div>
 

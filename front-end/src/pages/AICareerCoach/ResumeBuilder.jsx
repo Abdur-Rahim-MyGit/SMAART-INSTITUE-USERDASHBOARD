@@ -58,6 +58,7 @@ import {
     ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { apiCall } from '@/services/api';
@@ -366,6 +367,7 @@ const templates = {
 
 const ResumeBuilder = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [generating, setGenerating] = useState(false);
@@ -415,13 +417,13 @@ const ResumeBuilder = () => {
     const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
 
     const steps = [
-        { id: 'personal', label: 'Profile', icon: User },
-        { id: 'education', label: 'Education', icon: GraduationCap },
-        { id: 'experience', label: 'Experience', icon: Briefcase },
-        { id: 'projects', label: 'Projects', icon: FileText },
-        { id: 'skills', label: 'Skills', icon: Sparkles },
-        { id: 'achievements', label: 'Awards', icon: Trophy },
-        { id: 'preview', label: 'Review & Download', icon: FileText }
+        { id: 'personal', label: t('resume_builder.steps.profile', 'Profile'), icon: User },
+        { id: 'education', label: t('resume_builder.steps.education', 'Education'), icon: GraduationCap },
+        { id: 'experience', label: t('resume_builder.steps.experience', 'Experience'), icon: Briefcase },
+        { id: 'projects', label: t('resume_builder.steps.projects', 'Projects'), icon: FileText },
+        { id: 'skills', label: t('resume_builder.steps.skills', 'Skills'), icon: Sparkles },
+        { id: 'achievements', label: t('resume_builder.steps.awards', 'Awards'), icon: Trophy },
+        { id: 'preview', label: t('resume_builder.steps.review_download', 'Review & Download'), icon: FileText }
     ];
 
     const [resumeData, setResumeData] = useState({
@@ -668,24 +670,24 @@ const ResumeBuilder = () => {
         const results = [];
 
         // CAT 1 — Parseability & Format (25 pts)
-        const cat1 = { label: 'Parseability & Format', max: 25, checks: [] };
-        cat1.checks.push({ label: 'ATS-safe template', pts: 8, pass: true, step: null });
-        cat1.checks.push({ label: 'Standard section headings', pts: 7, pass: true, step: null });
+        const cat1 = { label: t('resume_builder.ats.cat_parseability', 'Parseability & Format'), max: 25, checks: [] };
+        cat1.checks.push({ label: t('resume_builder.ats.chk_ats_safe', 'ATS-safe template'), pts: 8, pass: true, step: null });
+        cat1.checks.push({ label: t('resume_builder.ats.chk_standard_headings', 'Standard section headings'), pts: 7, pass: true, step: null });
         const hasDates = (data.education || []).every(e => e.year?.trim()) && (data.experience || []).every(e => e.duration?.trim());
-        cat1.checks.push({ label: 'Dates in all entries', pts: 5, pass: hasDates, step: hasDates ? null : 2 });
+        cat1.checks.push({ label: t('resume_builder.ats.chk_dates', 'Dates in all entries'), pts: 5, pass: hasDates, step: hasDates ? null : 2 });
         const badChars = /[^\w\s@.\-+()]/;
         const noSpecial = !badChars.test(data.personalInfo?.fullName || '') && !badChars.test(data.personalInfo?.email || '') && !badChars.test(data.personalInfo?.mobile || '');
-        cat1.checks.push({ label: 'No special chars in contact', pts: 5, pass: noSpecial, step: noSpecial ? null : 1 });
+        cat1.checks.push({ label: t('resume_builder.ats.chk_no_special', 'No special chars in contact'), pts: 5, pass: noSpecial, step: noSpecial ? null : 1 });
         cat1.score = cat1.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
         results.push(cat1);
 
         // CAT 2 — Keyword & Role Match (30 pts)
-        const cat2 = { label: 'Keyword & Role Match', max: 30, checks: [] };
+        const cat2 = { label: t('resume_builder.ats.cat_keyword', 'Keyword & Role Match'), max: 30, checks: [] };
         const hasRole = !!data.personalInfo?.targetRole?.trim();
-        cat2.checks.push({ label: 'Target Role is set', pts: 5, pass: hasRole, step: hasRole ? null : 1 });
+        cat2.checks.push({ label: t('resume_builder.ats.chk_target_role', 'Target Role is set'), pts: 5, pass: hasRole, step: hasRole ? null : 1 });
         const techSkillsArr = (data.skills?.technical || '').split(',').map(s => s.trim()).filter(Boolean);
         const hasTech3 = techSkillsArr.length >= 3;
-        cat2.checks.push({ label: 'Technical Skills (3+ skills)', pts: 10, pass: hasTech3, step: hasTech3 ? null : 5 });
+        cat2.checks.push({ label: t('resume_builder.ats.chk_tech_3', 'Technical Skills (3+ skills)'), pts: 10, pass: hasTech3, step: hasTech3 ? null : 5 });
         // Keyword match with mastered bonus
         let kwScore = 0;
         if (roleSkillsFromAPI.length > 0 && techSkillsArr.length > 0) {
@@ -699,49 +701,49 @@ const ResumeBuilder = () => {
             });
             kwScore = Math.min(10, Math.round((matched / roleSkillsFromAPI.length) * 10));
         }
-        cat2.checks.push({ label: 'Skills match role keywords', pts: 10, pass: kwScore >= 5, step: 5, earned: kwScore });
+        cat2.checks.push({ label: t('resume_builder.ats.chk_skills_match', 'Skills match role keywords'), pts: 10, pass: kwScore >= 5, step: 5, earned: kwScore });
         const hasSoft = !!data.skills?.soft?.trim();
-        cat2.checks.push({ label: 'Soft Skills filled', pts: 5, pass: hasSoft, step: hasSoft ? null : 5 });
+        cat2.checks.push({ label: t('resume_builder.ats.chk_soft_filled', 'Soft Skills filled'), pts: 5, pass: hasSoft, step: hasSoft ? null : 5 });
         cat2.score = cat2.checks.reduce((s, c) => s + (c.earned !== undefined ? c.earned : (c.pass ? c.pts : 0)), 0);
         results.push(cat2);
 
         // CAT 3 — Content Completeness (25 pts)
-        const cat3 = { label: 'Content Completeness', max: 25, checks: [] };
+        const cat3 = { label: t('resume_builder.ats.cat_completeness', 'Content Completeness'), max: 25, checks: [] };
         const summaryOk = (data.summary || '').length >= 80;
-        cat3.checks.push({ label: 'Summary (80+ chars)', pts: 8, pass: summaryOk, step: summaryOk ? null : 1 });
+        cat3.checks.push({ label: t('resume_builder.ats.chk_summary', 'Summary (80+ chars)'), pts: 8, pass: summaryOk, step: summaryOk ? null : 1 });
         const expOk = data.experience?.length > 0 && (data.experience[0]?.description || '').length > 30;
-        cat3.checks.push({ label: 'Work Experience with description', pts: 7, pass: expOk, step: expOk ? null : 3 });
+        cat3.checks.push({ label: t('resume_builder.ats.chk_exp_desc', 'Work Experience with description'), pts: 7, pass: expOk, step: expOk ? null : 3 });
         const eduOk = data.education?.length > 0 && data.education[0]?.institution?.trim() && data.education[0]?.year?.trim();
-        cat3.checks.push({ label: 'Education (institution + year)', pts: 5, pass: eduOk, step: eduOk ? null : 2 });
+        cat3.checks.push({ label: t('resume_builder.ats.chk_edu', 'Education (institution + year)'), pts: 5, pass: eduOk, step: eduOk ? null : 2 });
         const projOk = data.projects?.length >= 2 && data.projects.every(p => (p.description || '').length > 20);
-        cat3.checks.push({ label: '2+ Projects with descriptions', pts: 5, pass: projOk, step: projOk ? null : 4 });
+        cat3.checks.push({ label: t('resume_builder.ats.chk_projects', '2+ Projects with descriptions'), pts: 5, pass: projOk, step: projOk ? null : 4 });
         cat3.score = cat3.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
         results.push(cat3);
 
         // CAT 4 — Contact & Credibility (10 pts)
-        const cat4 = { label: 'Contact & Credibility', max: 10, checks: [] };
-        cat4.checks.push({ label: 'LinkedIn URL', pts: 3, pass: !!data.personalInfo?.linkedinUrl?.trim(), step: 1 });
-        cat4.checks.push({ label: 'GitHub URL', pts: 3, pass: !!data.personalInfo?.githubUrl?.trim(), step: 1 });
-        cat4.checks.push({ label: 'Location', pts: 2, pass: !!data.personalInfo?.location?.trim(), step: 1 });
-        cat4.checks.push({ label: 'Portfolio / Website', pts: 2, pass: !!data.personalInfo?.portfolioUrl?.trim(), step: 1 });
+        const cat4 = { label: t('resume_builder.ats.cat_contact', 'Contact & Credibility'), max: 10, checks: [] };
+        cat4.checks.push({ label: t('resume_builder.ats.chk_linkedin', 'LinkedIn URL'), pts: 3, pass: !!data.personalInfo?.linkedinUrl?.trim(), step: 1 });
+        cat4.checks.push({ label: t('resume_builder.ats.chk_github', 'GitHub URL'), pts: 3, pass: !!data.personalInfo?.githubUrl?.trim(), step: 1 });
+        cat4.checks.push({ label: t('resume_builder.ats.chk_location', 'Location'), pts: 2, pass: !!data.personalInfo?.location?.trim(), step: 1 });
+        cat4.checks.push({ label: t('resume_builder.ats.chk_portfolio', 'Portfolio / Website'), pts: 2, pass: !!data.personalInfo?.portfolioUrl?.trim(), step: 1 });
         cat4.score = cat4.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
         results.push(cat4);
 
         // CAT 5 — Impact & Context (10 pts)
-        const cat5 = { label: 'Impact & Context', max: 10, checks: [] };
-        cat5.checks.push({ label: '1+ Achievement/Award', pts: 3, pass: data.achievements?.length > 0, step: 6 });
+        const cat5 = { label: t('resume_builder.ats.cat_impact', 'Impact & Context'), max: 10, checks: [] };
+        cat5.checks.push({ label: t('resume_builder.ats.chk_achievement', '1+ Achievement/Award'), pts: 3, pass: data.achievements?.length > 0, step: 6 });
         const metricRegex = /\d+(%|K|\+| years| months| users| projects)/i;
         const allDescriptions = [...(data.experience || []).map(e => e.description || ''), ...(data.projects || []).map(p => p.description || '')].join(' ');
         const hasMetrics = metricRegex.test(allDescriptions);
-        cat5.checks.push({ label: 'Numbers/metrics in descriptions', pts: 4, pass: hasMetrics, step: 3 });
+        cat5.checks.push({ label: t('resume_builder.ats.chk_metrics', 'Numbers/metrics in descriptions'), pts: 4, pass: hasMetrics, step: 3 });
         const expSubstantive = (data.experience || []).every(e => (e.description || '').length >= 50);
-        cat5.checks.push({ label: 'Substantive experience descriptions', pts: 3, pass: expSubstantive || data.experience?.length === 0, step: 3 });
+        cat5.checks.push({ label: t('resume_builder.ats.chk_substantive', 'Substantive experience descriptions'), pts: 3, pass: expSubstantive || data.experience?.length === 0, step: 3 });
         cat5.score = cat5.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
         results.push(cat5);
 
         const total = results.reduce((s, c) => s + c.score, 0);
         return { total, breakdown: results };
-    }, []);
+    }, [t]);
 
     // Recalculate ATS score whenever resume data changes
     useEffect(() => {
@@ -1066,13 +1068,13 @@ const ResumeBuilder = () => {
             if (res.success) {
                 const hydratedRes = await hydrateProfileWithRegisteredDetails(res);
                 setResumeData(prev => buildResumeDataFromProfile(hydratedRes, prev));
-                if (!silent) toast.success('Profile data synced successfully!');
+                if (!silent) toast.success(t('resume_builder.toast.sync_success', 'Profile data synced successfully!'));
             } else {
-                if (!silent) toast.error('Failed to sync profile. Please try again.');
+                if (!silent) toast.error(t('resume_builder.toast.sync_failed_retry', 'Failed to sync profile. Please try again.'));
             }
         } catch (error) {
             console.error('Sync error:', error);
-            if (!silent) toast.error('Failed to sync profile');
+            if (!silent) toast.error(t('resume_builder.toast.sync_failed', 'Failed to sync profile'));
         } finally {
             setIsSyncing(false);
         }
@@ -1090,16 +1092,16 @@ const ResumeBuilder = () => {
 
             if (resumeId) {
                 await resumeApi.updateResume(resumeId, payload);
-                if (showToast) toast.success('Resume updated successfully!');
+                if (showToast) toast.success(t('resume_builder.toast.update_success', 'Resume updated successfully!'));
             } else {
                 const res = await resumeApi.createResume(payload);
                 if (res.success) {
                     setResumeId(res.data._id);
-                    if (showToast) toast.success('Resume saved successfully!');
+                    if (showToast) toast.success(t('resume_builder.toast.save_success', 'Resume saved successfully!'));
                 }
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save resume');
+            toast.error(error.response?.data?.message || t('resume_builder.toast.save_failed', 'Failed to save resume'));
         } finally {
             setSaving(false);
         }
@@ -1161,7 +1163,7 @@ const ResumeBuilder = () => {
         const targetRole = resumeData.personalInfo?.targetRole || selectedCareerPath?.roleName;
 
         if (!targetRole && !hasExperience && !hasEducation) {
-            toast.error("Please fill out your Target Role, Experience, or Education first so the AI has context to write your summary.");
+            toast.error(t('resume_builder.toast.summary_needs_context', "Please fill out your Target Role, Experience, or Education first so the AI has context to write your summary."));
             return;
         }
 
@@ -1170,13 +1172,13 @@ const ResumeBuilder = () => {
             const res = await aiCareerCoachApi.generateSummary(resumeData, targetRole);
             if (res.success && res.summary) {
                 setResumeData(prev => ({ ...prev, summary: res.summary }));
-                toast.success('Professional summary generated successfully!');
+                toast.success(t('resume_builder.toast.summary_success', 'Professional summary generated successfully!'));
             } else {
-                toast.error(res.message || 'Failed to generate summary.');
+                toast.error(res.message || t('resume_builder.toast.summary_failed', 'Failed to generate summary.'));
             }
         } catch (error) {
             console.error('Error generating summary:', error);
-            toast.error('An error occurred while generating the summary.');
+            toast.error(t('resume_builder.toast.summary_error', 'An error occurred while generating the summary.'));
         } finally {
             setIsGeneratingSummary(false);
         }
@@ -1218,11 +1220,11 @@ const ResumeBuilder = () => {
         try {
             const res = await resumeApi.duplicateResume(id);
             if (res.success) {
-                toast.success('Resume duplicated!');
+                toast.success(t('resume_builder.toast.duplicate_success', 'Resume duplicated!'));
                 fetchResumeList();
             }
         } catch (err) {
-            toast.error('Failed to duplicate resume');
+            toast.error(t('resume_builder.toast.duplicate_failed', 'Failed to duplicate resume'));
         } finally {
             setDuplicatingId(null);
         }
@@ -1230,16 +1232,16 @@ const ResumeBuilder = () => {
 
     const handleDeleteResume = async (id, e) => {
         if (e) e.stopPropagation();
-        if (!window.confirm('Are you sure you want to delete this resume?')) return;
+        if (!window.confirm(t('resume_builder.confirm_delete', 'Are you sure you want to delete this resume?'))) return;
         setDeletingId(id);
         try {
             const res = await resumeApi.deleteResume(id);
             if (res.success) {
-                toast.success('Resume deleted');
+                toast.success(t('resume_builder.toast.delete_success', 'Resume deleted'));
                 fetchResumeList();
             }
         } catch (err) {
-            toast.error('Failed to delete resume');
+            toast.error(t('resume_builder.toast.delete_failed', 'Failed to delete resume'));
         } finally {
             setDeletingId(null);
         }
@@ -1249,11 +1251,11 @@ const ResumeBuilder = () => {
         if (!newName.trim()) return;
         try {
             await resumeApi.updateResume(id, { versionName: newName.trim() });
-            toast.success('Name updated');
+            toast.success(t('resume_builder.toast.rename_success', 'Name updated'));
             fetchResumeList();
             setRenamingId(null);
         } catch (err) {
-            toast.error('Failed to rename');
+            toast.error(t('resume_builder.toast.rename_failed', 'Failed to rename'));
         }
     };
 
@@ -1267,7 +1269,7 @@ const ResumeBuilder = () => {
             if (!activeResumeId) {
                 const created = await resumeApi.createResume(resumeData);
                 if (!created?.success) {
-                    throw new Error(created?.message || 'Save resume before exporting');
+                    throw new Error(created?.message || t('resume_builder.toast.save_before_export', 'Save resume before exporting'));
                 }
                 activeResumeId = created.data._id;
                 setResumeId(activeResumeId);
@@ -1281,7 +1283,7 @@ const ResumeBuilder = () => {
                 toast.error(
                     exportRes?.error ||
                     exportRes?.message ||
-                    `Export limit reached. Try again in ${retryMinutes} minutes.`
+                    t('resume_builder.toast.export_limit', 'Export limit reached. Try again in {{minutes}} minutes.', { minutes: retryMinutes })
                 );
                 return;
             }
@@ -1325,10 +1327,10 @@ const ResumeBuilder = () => {
             pdf.save(
                 `${normalizeText(resumeData.personalInfo.fullName) || 'Resume'}_${issued.resumePublicId}.pdf`
             );
-            toast.success('Verified PDF downloaded with org watermark and QR.');
+            toast.success(t('resume_builder.toast.pdf_success', 'Verified PDF downloaded with org watermark and QR.'));
         } catch (error) {
             console.error('Download error:', error);
-            toast.error(error.message || 'Failed to generate PDF');
+            toast.error(error.message || t('resume_builder.toast.pdf_failed', 'Failed to generate PDF'));
         } finally {
             setGenerating(false);
         }
@@ -1407,71 +1409,71 @@ const ResumeBuilder = () => {
             const details = resumeData.personalDetails || {};
             
             if (!info.targetRole?.trim()) {
-                toast.error("Please enter your Target Role.");
+                toast.error(t('resume_builder.validation.target_role', "Please enter your Target Role."));
                 return false;
             }
             if (!info.email?.trim()) {
-                toast.error("Please enter your Email Address.");
+                toast.error(t('resume_builder.validation.email', "Please enter your Email Address."));
                 return false;
             }
             if (!info.mobile?.trim()) {
-                toast.error("Please enter your Mobile Number.");
+                toast.error(t('resume_builder.validation.mobile', "Please enter your Mobile Number."));
                 return false;
             }
             if (!info.location?.trim()) {
-                toast.error("Please enter your Location.");
+                toast.error(t('resume_builder.validation.location', "Please enter your Location."));
                 return false;
             }
             if (!info.linkedinUrl?.trim()) {
-                toast.error("Please enter your LinkedIn URL.");
+                toast.error(t('resume_builder.validation.linkedin', "Please enter your LinkedIn URL."));
                 return false;
             } else if (!isValidUrl(info.linkedinUrl)) {
-                toast.error("Please enter a valid LinkedIn URL.");
+                toast.error(t('resume_builder.validation.linkedin_invalid', "Please enter a valid LinkedIn URL."));
                 return false;
             }
             if (!info.githubUrl?.trim()) {
-                toast.error("Please enter your GitHub URL.");
+                toast.error(t('resume_builder.validation.github', "Please enter your GitHub URL."));
                 return false;
             } else if (!isValidUrl(info.githubUrl)) {
-                toast.error("Please enter a valid GitHub URL.");
+                toast.error(t('resume_builder.validation.github_invalid', "Please enter a valid GitHub URL."));
                 return false;
             }
             if (info.portfolioUrl?.trim() && !isValidUrl(info.portfolioUrl)) {
-                toast.error("Please enter a valid Portfolio URL.");
+                toast.error(t('resume_builder.validation.portfolio_invalid', "Please enter a valid Portfolio URL."));
                 return false;
             }
 
             if (!resumeData.summary?.trim()) {
-                toast.error("Please enter a Professional Summary.");
+                toast.error(t('resume_builder.validation.summary', "Please enter a Professional Summary."));
                 return false;
             }
         }
 
         if (stepId === 'education') {
             if (!resumeData.education || resumeData.education.length === 0) {
-                toast.error("Please add at least one Education entry.");
+                toast.error(t('resume_builder.validation.education_required', "Please add at least one Education entry."));
                 return false;
             }
             for (let i = 0; i < resumeData.education.length; i++) {
                 const edu = resumeData.education[i];
                 if (!edu.institution?.trim()) {
-                    toast.error(`Please enter Institution Name for Education entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.edu_institution', "Please enter Institution Name for Education entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!edu.degree?.trim()) {
-                    toast.error(`Please enter Degree for Education entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.edu_degree', "Please enter Degree for Education entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!edu.year?.trim()) {
-                    toast.error(`Please enter Year of Passing for Education entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.edu_year', "Please enter Year of Passing for Education entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!edu.grade?.trim()) {
-                    toast.error(`Please enter Grade / CGPA for Education entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.edu_grade', "Please enter Grade / CGPA for Education entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!edu.location?.trim()) {
-                    toast.error(`Please enter Location for Education entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.edu_location', "Please enter Location for Education entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
             }
@@ -1481,19 +1483,19 @@ const ResumeBuilder = () => {
             for (let i = 0; i < resumeData.experience.length; i++) {
                 const exp = resumeData.experience[i];
                 if (!exp.company?.trim()) {
-                    toast.error(`Please enter Company Name for Experience entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.exp_company', "Please enter Company Name for Experience entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!exp.role?.trim()) {
-                    toast.error(`Please enter Role / Position for Experience entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.exp_role', "Please enter Role / Position for Experience entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!exp.duration?.trim()) {
-                    toast.error(`Please enter Duration for Experience entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.exp_duration', "Please enter Duration for Experience entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!exp.description?.trim()) {
-                    toast.error(`Please enter Description for Experience entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.exp_description', "Please enter Description for Experience entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
             }
@@ -1501,21 +1503,21 @@ const ResumeBuilder = () => {
 
         if (stepId === 'projects') {
             if (!resumeData.projects || resumeData.projects.length === 0) {
-                toast.error("Please add at least one Project.");
+                toast.error(t('resume_builder.validation.projects_required', "Please add at least one Project."));
                 return false;
             }
             for (let i = 0; i < resumeData.projects.length; i++) {
                 const proj = resumeData.projects[i];
                 if (!proj.title?.trim()) {
-                    toast.error(`Please enter Title for Project entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.proj_title', "Please enter Title for Project entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!proj.description?.trim()) {
-                    toast.error(`Please enter Description for Project entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.proj_description', "Please enter Description for Project entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (proj.link?.trim() && !isValidUrl(proj.link)) {
-                    toast.error(`Please enter a valid URL for Project entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.proj_link', "Please enter a valid URL for Project entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
             }
@@ -1524,15 +1526,15 @@ const ResumeBuilder = () => {
         if (stepId === 'skills') {
             const skills = resumeData.skills || {};
             if (!skills.technical?.trim()) {
-                toast.error("Please enter Technical Skills.");
+                toast.error(t('resume_builder.validation.technical', "Please enter Technical Skills."));
                 return false;
             }
             if (!skills.soft?.trim()) {
-                toast.error("Please enter Soft Skills.");
+                toast.error(t('resume_builder.validation.soft', "Please enter Soft Skills."));
                 return false;
             }
             if (!skills.languages?.trim()) {
-                toast.error("Please enter Languages.");
+                toast.error(t('resume_builder.validation.languages', "Please enter Languages."));
                 return false;
             }
         }
@@ -1541,15 +1543,15 @@ const ResumeBuilder = () => {
             for (let i = 0; i < resumeData.achievements.length; i++) {
                 const ach = resumeData.achievements[i];
                 if (!ach.title?.trim()) {
-                    toast.error(`Please enter Title for Award entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.award_title', "Please enter Title for Award entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (!ach.description?.trim()) {
-                    toast.error(`Please enter Description for Award entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.award_description', "Please enter Description for Award entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
                 if (ach.link?.trim() && !isValidUrl(ach.link)) {
-                    toast.error(`Please enter a valid URL for Award entry #${i + 1}.`);
+                    toast.error(t('resume_builder.validation.award_link', "Please enter a valid URL for Award entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
             }
@@ -1594,7 +1596,7 @@ const ResumeBuilder = () => {
                         <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
                         <div className="absolute inset-0 rounded-full border-4 border-t-blue-500 animate-spin"></div>
                     </div>
-                    <p className="text-[#1a3884] dark:text-blue-400 font-bold animate-pulse uppercase tracking-widest text-xs">Loading Builder...</p>
+                    <p className="text-[#1a3884] dark:text-blue-400 font-bold animate-pulse uppercase tracking-widest text-xs">{t('resume_builder.loading', 'Loading Builder...')}</p>
                 </div>
             </div>
         );
@@ -1722,7 +1724,7 @@ const ResumeBuilder = () => {
                                 <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
                                     <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300" />
                                 </div>
-                                BACK TO TOOLKIT
+                                {t('resume_builder.back_to_toolkit', 'BACK TO TOOLKIT')}
                             </button>
                         </div>
                         {/* Page Header */}
@@ -1734,10 +1736,10 @@ const ResumeBuilder = () => {
                         >
                             <div className="flex-1">
                                 <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                    My <span className="text-[#1a3884] dark:text-blue-300">Resumes</span>
+                                    {t('resume_builder.list_title_1', 'My')} <span className="text-[#1a3884] dark:text-blue-300">{t('resume_builder.list_title_2', 'Resumes')}</span>
                                 </h1>
                                 <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-                                    Manage your tailored resumes and track your ATS optimization scores.
+                                    {t('resume_builder.list_subtitle', 'Manage your tailored resumes and track your ATS optimization scores.')}
                                 </p>
                             </div>
 
@@ -1749,7 +1751,7 @@ const ResumeBuilder = () => {
                                     className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#112b6b] dark:bg-blue-600 dark:hover:bg-blue-700"
                                 >
                                     <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
-                                    Create New Resume
+                                    {t('resume_builder.create_new', 'Create New Resume')}
                                 </motion.button>
                             </div>
                         </motion.div>
@@ -1762,10 +1764,10 @@ const ResumeBuilder = () => {
                                 <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-[#1a3884]/20 flex items-center justify-center mb-4">
                                     <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#1a3884] dark:text-blue-400" />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">No resumes found</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">Create your first ATS-optimized resume to get started on your career journey.</p>
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first ATS-optimized resume to get started on your career journey.')}</p>
                                 <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#1a3884] text-white rounded-xl font-bold text-sm hover:bg-[#132c6b] transition-colors shadow-md">
-                                    Create First Resume
+                                    {t('resume_builder.create_first', 'Create First Resume')}
                                 </button>
                             </div>
                         ) : (
@@ -1794,32 +1796,32 @@ const ResumeBuilder = () => {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center gap-2 mb-2 w-full justify-center group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 rounded-lg p-1 transition-colors cursor-text" onClick={() => { setRenamingId(resume._id); setRenameValue(resume.versionName || 'My Resume'); }}>
-                                                    <h3 className="font-bold text-lg text-slate-800 dark:text-white truncate max-w-[80%]">{resume.versionName || 'My Resume'}</h3>
+                                                <div className="flex items-center gap-2 mb-2 w-full justify-center group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 rounded-lg p-1 transition-colors cursor-text" onClick={() => { setRenamingId(resume._id); setRenameValue(resume.versionName || t('resume_builder.default_name', 'My Resume')); }}>
+                                                    <h3 className="font-bold text-lg text-slate-800 dark:text-white truncate max-w-[80%]">{resume.versionName || t('resume_builder.default_name', 'My Resume')}</h3>
                                                     <IconPencil stroke={2} className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                 </div>
                                             )}
 
                                             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-[#1a3884]/20 text-[#1a3884] dark:text-blue-300 text-[10px] font-bold uppercase tracking-wider mb-4 border border-blue-100 dark:border-[#1a3884]/30">
                                                 <IconTarget stroke={2} className="w-3 h-3" />
-                                                <span className="truncate max-w-[150px]">{resume.targetRole || 'General Resume'}</span>
+                                                <span className="truncate max-w-[150px]">{resume.targetRole || t('resume_builder.general_resume', 'General Resume')}</span>
                                             </div>
 
-                                            <p className="text-[10px] text-slate-400 font-medium">Last updated: {new Date(resume.updatedAt).toLocaleDateString()}</p>
+                                            <p className="text-[10px] text-slate-400 font-medium">{t('resume_builder.last_updated', 'Last updated:')} {new Date(resume.updatedAt).toLocaleDateString()}</p>
                                         </div>
 
                                         <div className="grid grid-cols-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
                                             <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5">
                                                 <IconPencil stroke={1.5} className="w-4 h-4" />
-                                                <span className="text-[10px] font-bold">Edit</span>
+                                                <span className="text-[10px] font-bold">{t('resume_builder.edit', 'Edit')}</span>
                                             </button>
                                             <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5 disabled:opacity-50">
                                                 {duplicatingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconCopy stroke={1.5} className="w-4 h-4" />}
-                                                <span className="text-[10px] font-bold">Copy</span>
+                                                <span className="text-[10px] font-bold">{t('resume_builder.copy', 'Copy')}</span>
                                             </button>
                                             <button onClick={(e) => handleDeleteResume(resume._id, e)} disabled={deletingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-rose-500 hover:text-white text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50">
                                                 {deletingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconTrash stroke={1.5} className="w-4 h-4" />}
-                                                <span className="text-[10px] font-bold">Delete</span>
+                                                <span className="text-[10px] font-bold">{t('resume_builder.delete', 'Delete')}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -1842,10 +1844,10 @@ const ResumeBuilder = () => {
                         await fetchResumeList();
                         setPageMode('list');
                     }} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-[10px] sm:text-[11px] text-slate-650 dark:text-slate-350 uppercase tracking-wider shrink-0">
-                        <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> Back
+                        <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> {t('resume_builder.back', 'Back')}
                     </button>
                     <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 cursor-help shrink-0" title={`ATS Score: ${atsScore}/100`}>
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 cursor-help shrink-0" title={t('resume_builder.ats_score_title', 'ATS Score: {{score}}/100', { score: atsScore })}>
                             <CircularScoreRing score={atsScore} size={36} strokeWidth={4} label="" />
                         </div>
                         <div className="min-w-0">
@@ -1854,11 +1856,11 @@ const ResumeBuilder = () => {
                                     value={versionName}
                                     onChange={(e) => setVersionName(e.target.value)}
                                     className="text-sm sm:text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#1a3884] outline-none transition-colors w-28 sm:w-48 pr-6 truncate"
-                                    placeholder="Resume Name"
+                                    placeholder={t('resume_builder.resume_name_placeholder', 'Resume Name')}
                                 />
                                 <IconPencil stroke={2} className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                             </div>
-                            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate hidden sm:block">ATS Score Status</p>
+                            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate hidden sm:block">{t('resume_builder.ats_score_status', 'ATS Score Status')}</p>
                         </div>
                     </div>
                 </div>
@@ -1866,22 +1868,22 @@ const ResumeBuilder = () => {
                 <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 dark:border-white/5">
                     <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
+                        <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || t('resume_builder.secure_resume', 'Secure Resume')}</span>
                     </div>
                     {currentStep !== steps.length - 1 && (
                         <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
                             <Eye className="w-3.5 h-3.5" />
-                            <span>Review</span>
+                            <span>{t('resume_builder.review', 'Review')}</span>
                         </button>
                     )}
                     <button onClick={handleSave} disabled={saving} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                        <span>Save<span className="hidden sm:inline"> Progress</span></span>
+                        <span>{t('resume_builder.save', 'Save')}<span className="hidden sm:inline"> {t('resume_builder.progress', 'Progress')}</span></span>
                     </button>
                     {currentStep === steps.length - 1 && (
                         <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1 px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50 shrink-0">
                             {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                            <span>Download<span className="hidden sm:inline"> PDF</span></span>
+                            <span>{t('resume_builder.download', 'Download')}<span className="hidden sm:inline"> {t('resume_builder.pdf', 'PDF')}</span></span>
                         </button>
                     )}
                 </div>
@@ -1895,7 +1897,7 @@ const ResumeBuilder = () => {
                             <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">
-                                        Step {currentStep + 1} of {steps.length} : <span className="text-slate-800 dark:text-slate-200">{steps[currentStep].label}</span>
+                                        {t('resume_builder.step_of', 'Step {{current}} of {{total}} :', { current: currentStep + 1, total: steps.length })} <span className="text-slate-800 dark:text-slate-200">{steps[currentStep].label}</span>
                                     </span>
                                 </div>
                                 
@@ -1962,7 +1964,7 @@ const ResumeBuilder = () => {
                                             {careerLoading ? (
                                                 <div className="flex items-center gap-3 text-slate-500">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    <span className="text-sm font-medium">Checking career direction...</span>
+                                                    <span className="text-sm font-medium">{t('resume_builder.checking_career', 'Checking career direction...')}</span>
                                                 </div>
                                             ) : careerPaths?.primary ? (
                                                 <div className="space-y-3">
@@ -1972,9 +1974,9 @@ const ResumeBuilder = () => {
                                                         ) : (
                                                             <IconLockOpen stroke={2} className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                                                         )}
-                                                        <h3 className="text-xs font-bold text-slate-800 dark:text-white">Select Target Career Path</h3>
+                                                        <h3 className="text-xs font-bold text-slate-800 dark:text-white">{t('resume_builder.select_target_path', 'Select Target Career Path')}</h3>
                                                     </div>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Choose one of your career paths to automatically optimize this resume.</p>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">{t('resume_builder.select_path_desc', 'Choose one of your career paths to automatically optimize this resume.')}</p>
                                                     
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                                         {['primary', 'secondary', 'tertiary'].map(key => {
@@ -1990,7 +1992,7 @@ const ResumeBuilder = () => {
                                                                     }}
                                                                     className={`flex flex-col text-left py-2.5 px-3 rounded-xl border transition-all ${isSelected ? 'border-[#1a3884] bg-blue-50/50 dark:bg-[#1a3884]/20 ring-1 ring-[#1a3884]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
                                                                 >
-                                                                    <span className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`}>{key} Path</span>
+                                                                    <span className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`}>{t('resume_builder.path_label', '{{tier}} Path', { tier: t(`resume_builder.tier_${key}`, key) })}</span>
                                                                     <span className={`text-xs font-bold truncate w-full ${isSelected ? 'text-[#1a3884] dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>{roleName}</span>
                                                                 </button>
                                                             );
@@ -2000,7 +2002,7 @@ const ResumeBuilder = () => {
                                                     {!careerLocked && (
                                                         <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-900/50 flex gap-2 items-start">
                                                             <IconLockOpen className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                                                            <p className="text-[10px] text-amber-700 dark:text-amber-500">Note: Your career direction is currently in evaluation mode. Your latest analysis will automatically lock as your permanent career path after 14 days or once you use all 5 attempts.</p>
+                                                            <p className="text-[10px] text-amber-700 dark:text-amber-500">{t('resume_builder.eval_note', 'Note: Your career direction is currently in evaluation mode. Your latest analysis will automatically lock as your permanent career path after 14 days or once you use all 5 attempts.')}</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -2008,8 +2010,8 @@ const ResumeBuilder = () => {
                                                 <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/50">
                                                     <IconLockOpen className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                                     <div>
-                                                        <h4 className="text-sm font-bold text-amber-800 dark:text-amber-500 mb-1">No Career Path Found</h4>
-                                                        <p className="text-xs text-amber-700/80 dark:text-amber-500/80">Complete your AI Career Analysis in the Career Agent to automatically tailor your resume and skills.</p>
+                                                        <h4 className="text-sm font-bold text-amber-800 dark:text-amber-500 mb-1">{t('resume_builder.no_career_path', 'No Career Path Found')}</h4>
+                                                        <p className="text-xs text-amber-700/80 dark:text-amber-500/80">{t('resume_builder.no_career_path_desc', 'Complete your AI Career Analysis in the Career Agent to automatically tailor your resume and skills.')}</p>
                                                     </div>
                                                 </div>
                                             )}
@@ -2017,7 +2019,7 @@ const ResumeBuilder = () => {
 
                                         <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Profile Photo (Optional)</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.profile_photo', 'Profile Photo (Optional)')}</label>
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                                     {resumeData.personalInfo.profileImage ? (
                                                         <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 group/photo">
@@ -2050,34 +2052,34 @@ const ResumeBuilder = () => {
                                                             }}
                                                             className="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#1a3884] hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 dark:hover:file:bg-blue-900/50 cursor-pointer"
                                                         />
-                                                        <p className="text-[10px] text-slate-400 mt-1">Recommended for Modern Profile template. Max size 2MB.</p>
+                                                        <p className="text-[10px] text-slate-400 mt-1">{t('resume_builder.photo_hint', 'Recommended for Modern Profile template. Max size 2MB.')}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.full_name', 'Full Name')}</label>
                                                 <div className="relative group/input">
                                                     <User className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                                                    <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title="Full name is verified from your profile and cannot be changed here." />
+                                                    <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.full_name_title', 'Full name is verified from your profile and cannot be changed here.')} />
                                                 </div>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Target Role</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.target_role', 'Target Role')}</label>
                                                 <div className="relative group/input">
                                                     <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                                                    <input type="text" placeholder="Select a career path above" value={resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title="Target Role is automatically set based on your selected Career Path." />
+                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'Select a career path above')} value={resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.target_role_title', 'Target Role is automatically set based on your selected Career Path.')} />
                                                 </div>
                                             </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.email_address', 'Email Address')}</label>
                                                 <div className="relative group/input">
                                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
                                                     <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mobile Number</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.mobile_number', 'Mobile Number')}</label>
                                                 <div className="relative group/input">
                                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
                                                     <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
@@ -2085,22 +2087,22 @@ const ResumeBuilder = () => {
                                             </div>
                                         </div>
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Location</label>
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
                                             <div className="relative group/input">
                                                 <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <input type="text" placeholder={t('resume_builder.location_placeholder', 'City, State, Country')} value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">LinkedIn URL</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.linkedin_url', 'LinkedIn URL')}</label>
                                                 <div className="relative group/input">
                                                     <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
                                                     <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">GitHub URL</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.github_url', 'GitHub URL')}</label>
                                                 <div className="relative group/input">
                                                     <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
                                                     <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
@@ -2112,20 +2114,20 @@ const ResumeBuilder = () => {
 
                                         <div className="group">
                                             <div className="flex items-center justify-between mb-2">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Professional Summary</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('resume_builder.professional_summary', 'Professional Summary')}</label>
                                                 <button 
                                                     onClick={handleGenerateSummary}
                                                     disabled={isGeneratingSummary}
                                                     className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-wider disabled:opacity-50"
                                                 >
                                                     {isGeneratingSummary ? (
-                                                        <><Loader2 className="w-3 h-3 animate-spin" /> Generating...</>
+                                                        <><Loader2 className="w-3 h-3 animate-spin" /> {t('resume_builder.generating', 'Generating...')}</>
                                                     ) : (
-                                                        <><Sparkles className="w-3 h-3" /> Generate with AI</>
+                                                        <><Sparkles className="w-3 h-3" /> {t('resume_builder.generate_ai', 'Generate with AI')}</>
                                                     )}
                                                 </button>
                                             </div>
-                                            <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder="A brief overview of your professional background and key strengths..."></textarea>
+                                            <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
                                         </div>
                                         </div>
                                     </div>
@@ -2139,7 +2141,7 @@ const ResumeBuilder = () => {
                                                     <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
                                                         <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
                                                             <Briefcase className="w-4 h-4 text-blue-500 shrink-0" />
-                                                            <span className="truncate">{exp.company || 'Work Experience'}</span>
+                                                            <span className="truncate">{exp.company || t('resume_builder.work_experience', 'Work Experience')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
@@ -2148,34 +2150,34 @@ const ResumeBuilder = () => {
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
-                                                                <input type="text" placeholder="Company Name" value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.company', 'Company')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.company_placeholder', 'Company Name')} value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Job Role</label>
-                                                                <input type="text" placeholder="e.g. Project Associate" value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.job_role', 'Job Role')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.job_role_placeholder', 'e.g. Project Associate')} value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Duration</label>
-                                                                <input type="text" placeholder="e.g. 2021 - Present" value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.duration', 'Duration')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.duration_placeholder', 'e.g. 2021 - Present')} value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
-                                                                <input type="text" placeholder="City, State" value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                            <textarea placeholder="Key responsibilities and achievements..." value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[100px] resize-none" rows={4}></textarea>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.exp_desc_placeholder', 'Key responsibilities and achievements...')} value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[100px] resize-none" rows={4}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
                                         <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#1a3884] hover:text-[#1a3884] transition-all">
-                                            <Plus className="w-5 h-5" /> Add Experience
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_experience', 'Add Experience')}
                                         </button>
                                     </div>
                                 )}
@@ -2188,7 +2190,7 @@ const ResumeBuilder = () => {
                                                     <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
                                                         <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
                                                             <GraduationCap className="w-4 h-4 text-emerald-500 shrink-0" />
-                                                            <span className="truncate">{edu.institution || 'Education Details'}</span>
+                                                            <span className="truncate">{edu.institution || t('resume_builder.education_details', 'Education Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
@@ -2196,27 +2198,27 @@ const ResumeBuilder = () => {
                                                     </div>
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
-                                                            <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.institution_name', 'Institution Name')}</label>
+                                                            <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Degree</label>
-                                                                <input type="text" placeholder="e.g. MCA or B.Tech" value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.degree', 'Degree')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Year of Passing</label>
-                                                                <input type="text" placeholder="e.g. 2025" value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.year_of_passing', 'Year of Passing')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Grade / CGPA</label>
-                                                                <input type="text" placeholder="e.g. 8.5 CGPA" value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
-                                                                <input type="text" placeholder="City, State" value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2224,7 +2226,7 @@ const ResumeBuilder = () => {
                                             ))}
                                         </AnimatePresence>
                                         <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500 hover:text-emerald-500 transition-all">
-                                            <Plus className="w-5 h-5" /> Add Education
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_education', 'Add Education')}
                                         </button>
                                     </div>
                                 )}
@@ -2237,7 +2239,7 @@ const ResumeBuilder = () => {
                                                     <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
                                                         <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
                                                             <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
-                                                            <span className="truncate">{proj.title || 'Project Details'}</span>
+                                                            <span className="truncate">{proj.title || t('resume_builder.project_details', 'Project Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
@@ -2246,24 +2248,24 @@ const ResumeBuilder = () => {
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
-                                                                <input type="text" placeholder="Project Name" value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.project_title', 'Project Title')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.project_name_placeholder', 'Project Name')} value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Link</label>
-                                                                <input type="text" placeholder="URL or [Link]" value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.project_link', 'Project Link')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                            <textarea placeholder="Describe the technology and your contribution..." value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[80px] resize-none" rows={3}></textarea>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[80px] resize-none" rows={3}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
                                         <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 hover:text-indigo-500 transition-all">
-                                            <Plus className="w-5 h-5" /> Add Project
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_project', 'Add Project')}
                                         </button>
                                     </div>
                                 )}
@@ -2275,7 +2277,7 @@ const ResumeBuilder = () => {
                                             <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
                                                 <div className="flex items-center gap-2 mb-4">
                                                     <Sparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                                                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">Career Agent Suggestions</h3>
+                                                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">{t('resume_builder.career_suggestions', 'Career Agent Suggestions')}</h3>
                                                 </div>
                                                 
                                                 <div className="space-y-4">
@@ -2283,7 +2285,7 @@ const ResumeBuilder = () => {
                                                         <div>
                                                             <div className="flex items-center gap-1.5 mb-2 text-emerald-600 dark:text-emerald-400">
                                                                 <Check className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">Mastered (Auto-added)</span>
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('resume_builder.mastered_auto', 'Mastered (Auto-added)')}</span>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {masteredSkills.map(skill => (
@@ -2299,7 +2301,7 @@ const ResumeBuilder = () => {
                                                         <div>
                                                             <div className="flex items-center gap-1.5 mb-2 text-amber-600 dark:text-amber-400">
                                                                 <Plus className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">In Progress (Click to add)</span>
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('resume_builder.in_progress_click', 'In Progress (Click to add)')}</span>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {inProgressSkills.map(skill => (
@@ -2322,16 +2324,16 @@ const ResumeBuilder = () => {
 
                                         <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Technical Skills</label>
-                                                <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. JavaScript, React, Node.js, Python, AWS..."></textarea>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.technical_skills', 'Technical Skills')}</label>
+                                                <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Soft Skills</label>
-                                                <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. Team Leadership, Problem Solving, Public Speaking..."></textarea>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.soft_skills', 'Soft Skills')}</label>
+                                                <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.soft_placeholder', 'e.g. Team Leadership, Problem Solving, Public Speaking...')}></textarea>
                                             </div>
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Languages</label>
-                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder="e.g. English (Fluent), Urdu (Native), Tamil..."></textarea>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.languages', 'Languages')}</label>
+                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -2345,7 +2347,7 @@ const ResumeBuilder = () => {
                                                     <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
                                                         <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
                                                             <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-                                                            <span className="truncate">{ach.title || 'Achievement Details'}</span>
+                                                            <span className="truncate">{ach.title || t('resume_builder.achievement_details', 'Achievement Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
@@ -2354,24 +2356,24 @@ const ResumeBuilder = () => {
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
-                                                                <input type="text" placeholder="e.g. Best Student Award" value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.achievement_title', 'Achievement Title')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Link</label>
-                                                                <input type="text" placeholder="URL or [Link]" value={ach.link} onChange={(e) => handleArrayChange('achievements', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.link', 'Link')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={ach.link} onChange={(e) => handleArrayChange('achievements', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                            <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.ach_desc_placeholder', 'Provide some context about this achievement...')} value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
                                         <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
-                                            <Plus className="w-5 h-5" /> Add Achievement
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_achievement', 'Add Achievement')}
                                         </button>
                                     </div>
                                 )}
@@ -2387,13 +2389,13 @@ const ResumeBuilder = () => {
                                         : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#002147] border border-slate-250 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#002A5C] hover:scale-[1.02] active:scale-95 shadow-sm'
                                         }`}
                                 >
-                                    <ArrowLeft className="w-4 h-4" /> Previous
+                                    <ArrowLeft className="w-4 h-4" /> {t('resume_builder.previous', 'Previous')}
                                 </button>
                                 <button
                                     onClick={nextStep}
                                     className={`flex items-center gap-2 px-6 py-2.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#1a3884]/20 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#1a3884]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
                                 >
-                                    Next Step
+                                    {t('resume_builder.next_step', 'Next Step')}
                                     <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
@@ -2415,9 +2417,9 @@ const ResumeBuilder = () => {
                                     onClick={prevStep}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-205 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10 self-start sm:self-auto"
                                 >
-                                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Edit Details
+                                    <ArrowLeft className="w-3.5 h-3.5" /> {t('resume_builder.back_to_edit', 'Back to Edit Details')}
                                 </button>
-                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white text-center sm:text-left">Choose A Template Style</h2>
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white text-center sm:text-left">{t('resume_builder.choose_template', 'Choose A Template Style')}</h2>
                                 <div className="hidden sm:block w-[130px]" />
                             </div>
 
@@ -2425,10 +2427,10 @@ const ResumeBuilder = () => {
                             <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
                                 <div className="text-center max-w-xl mb-8">
                                     <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
-                                        Select an ATS-Friendly Layout
+                                        {t('resume_builder.select_ats_layout', 'Select an ATS-Friendly Layout')}
                                     </h1>
                                     <p className="text-sm text-slate-600 dark:text-slate-405 leading-relaxed">
-                                        Our templates are professionally designed and engineered to pass applicant tracking systems (ATS). Select a style below to view your resume in full-screen and download.
+                                        {t('resume_builder.ats_layout_desc', 'Our templates are professionally designed and engineered to pass applicant tracking systems (ATS). Select a style below to view your resume in full-screen and download.')}
                                     </p>
                                 </div>
 
@@ -2440,15 +2442,15 @@ const ResumeBuilder = () => {
                                                 <CircularScoreRing score={atsScore} size={56} strokeWidth={6} label="" />
                                             </div>
                                             <div>
-                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">ATS Compliance Score</h3>
-                                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Detailed breakdown of your resume's parser performance</p>
+                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">{t('resume_builder.ats_compliance_score', 'ATS Compliance Score')}</h3>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('resume_builder.ats_compliance_desc', "Detailed breakdown of your resume's parser performance")}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <AnimatePresence>
                                             {atsBreakdown.map((item, index) => {
-                                                const feedback = item.checks.filter(c => !c.pass).map(c => c.label).join(', ') || 'Perfect score! All checks passed.';
+                                                const feedback = item.checks.filter(c => !c.pass).map(c => c.label).join(', ') || t('resume_builder.perfect_score', 'Perfect score! All checks passed.');
                                                 return (
                                                     <motion.div 
                                                         key={item.label}
@@ -2475,7 +2477,7 @@ const ResumeBuilder = () => {
                                                             {item.score === item.max ? (
                                                                 <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> {feedback}</span>
                                                             ) : (
-                                                                <span className="flex items-start gap-1"><span className="text-amber-500 mt-0.5 shrink-0">•</span> <span>Needs improvement: {feedback}</span></span>
+                                                                <span className="flex items-start gap-1"><span className="text-amber-500 mt-0.5 shrink-0">•</span> <span>{t('resume_builder.needs_improvement', 'Needs improvement:')} {feedback}</span></span>
                                                             )}
                                                         </p>
                                                     </motion.div>
@@ -2486,14 +2488,14 @@ const ResumeBuilder = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
-                                    {Object.values(templates).map((t) => (
+                                    {Object.values(templates).map((tpl) => (
                                         <div
-                                            key={t.id}
+                                            key={tpl.id}
                                             className="group flex flex-col bg-white dark:bg-slate-900 border border-slate-205 dark:border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
                                         >
                                             {/* Simulated Preview graphic */}
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-white/5 flex items-center justify-center">
-                                                <TemplateThumbnail type={t.id} />
+                                                <TemplateThumbnail type={tpl.id} />
                                             </div>
 
                                             {/* Details */}
@@ -2501,25 +2503,25 @@ const ResumeBuilder = () => {
                                                 <div>
                                                     <div className="flex items-center justify-between gap-2 mb-2">
                                                         <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                                                            {t.name}
+                                                            {t(`resume_builder.templates.${tpl.id}.name`, tpl.name)}
                                                         </h3>
                                                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-[#1a3884] dark:text-blue-300 whitespace-nowrap">
-                                                            {t.tag}
+                                                            {t(`resume_builder.templates.${tpl.id}.tag`, tpl.tag)}
                                                         </span>
                                                     </div>
                                                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                                                        {t.desc}
+                                                        {t(`resume_builder.templates.${tpl.id}.desc`, tpl.desc)}
                                                     </p>
                                                 </div>
 
                                                 <button
                                                     onClick={() => {
-                                                        setSelectedTemplate(t.id);
+                                                        setSelectedTemplate(tpl.id);
                                                         setIsPreviewFullscreen(true);
                                                     }}
                                                     className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#1a3884] hover:bg-[#152e6c] text-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
                                                 >
-                                                    <Eye className="w-3.5 h-3.5" /> Preview & Select
+                                                    <Eye className="w-3.5 h-3.5" /> {t('resume_builder.preview_select', 'Preview & Select')}
                                                 </button>
                                             </div>
                                         </div>
@@ -2537,7 +2539,7 @@ const ResumeBuilder = () => {
                                         onClick={() => setIsPreviewFullscreen(false)}
                                         className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-105 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10"
                                     >
-                                        <ArrowLeft className="w-3.5 h-3.5" /> All Styles
+                                        <ArrowLeft className="w-3.5 h-3.5" /> {t('resume_builder.all_styles', 'All Styles')}
                                     </button>
                                     
                                     <div className="h-8 w-px bg-slate-202 dark:bg-white/10 hidden sm:block"></div>
@@ -2546,8 +2548,8 @@ const ResumeBuilder = () => {
                                     <div className="flex items-center gap-3">
                                         <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">ATS Score</span>
-                                            <span className="text-[10px] text-slate-505 dark:text-slate-400">Score updates as you edit</span>
+                                            <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">{t('resume_builder.ats_score', 'ATS Score')}</span>
+                                            <span className="text-[10px] text-slate-505 dark:text-slate-400">{t('resume_builder.score_updates', 'Score updates as you edit')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -2555,16 +2557,16 @@ const ResumeBuilder = () => {
                                 <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-white/5">
                                     <div className="flex items-center gap-2 flex-1 sm:flex-initial">
                                         <label className="text-[11px] font-bold uppercase tracking-wider text-slate-505 dark:text-slate-400 hidden sm:block">
-                                            Style:
+                                            {t('resume_builder.style', 'Style:')}
                                         </label>
                                         <select
                                             value={selectedTemplate}
                                             onChange={(e) => setSelectedTemplate(e.target.value)}
                                             className="bg-slate-50 dark:bg-slate-800 border border-slate-202 dark:border-white/10 text-slate-855 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer w-full sm:w-auto"
                                         >
-                                            {Object.values(templates).map((t) => (
-                                                <option key={t.id} value={t.id}>
-                                                    {t.name}
+                                            {Object.values(templates).map((tpl) => (
+                                                <option key={tpl.id} value={tpl.id}>
+                                                    {t(`resume_builder.templates.${tpl.id}.name`, tpl.name)}
                                                 </option>
                                             ))}
                                         </select>
@@ -2577,11 +2579,11 @@ const ResumeBuilder = () => {
                                     >
                                         {generating ? (
                                             <>
-                                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('resume_builder.generating', 'Generating...')}
                                             </>
                                         ) : (
                                             <>
-                                                <Download className="w-4 h-4" /> Download PDF
+                                                <Download className="w-4 h-4" /> {t('resume_builder.download_pdf', 'Download PDF')}
                                             </>
                                         )}
                                     </button>
@@ -2619,9 +2621,9 @@ const ResumeBuilder = () => {
                                                 )}
                                                 <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech' || selectedTemplate === 'modernProfile') ? 'flex flex-col items-start text-left relative z-10 w-full' : 'flex flex-col items-center text-center relative z-10 w-full'}>
                                                     <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
-                                                        {resumeData.personalInfo.fullName || 'FIRST LAST'}
+                                                        {resumeData.personalInfo.fullName || t('resume_builder.first_last', 'FIRST LAST')}
                                                     </h1>
-                                                    <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
+                                                    <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || t('resume_builder.professional_title', 'Professional Title')}</h2>
 
                                                     <div className={templates[selectedTemplate]?.contactClass}>
                                                     {resumeData.personalInfo.mobile && (
@@ -2662,7 +2664,7 @@ const ResumeBuilder = () => {
                                                 {/* Summary */}
                                                 {resumeData.summary && (
                                                     <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Professional Summary</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.professional_summary', 'Professional Summary')}</h3>
                                                         <p className={`${templates[selectedTemplate]?.bodyTextClass} whitespace-pre-wrap`}>
                                                             {resumeData.summary}
                                                         </p>
@@ -2672,7 +2674,7 @@ const ResumeBuilder = () => {
                                                 {/* Education */}
                                                 {resumeData.education.length > 0 && (
                                                     <div className={templates[selectedTemplate]?.sectionClass}>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Education</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.education_heading', 'Education')}</h3>
                                                         <div className="space-y-3">
                                                             {resumeData.education.map((edu, idx) => (
                                                                 <div key={idx} className="flex justify-between items-start">
@@ -2693,7 +2695,7 @@ const ResumeBuilder = () => {
                                                 {/* Experience */}
                                                 {resumeData.experience.length > 0 && (
                                                     <div className={templates[selectedTemplate]?.sectionClass}>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Professional Experience</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.experience_heading', 'Professional Experience')}</h3>
                                                         <div className="space-y-4">
                                                             {resumeData.experience.map((exp, idx) => (
                                                                 <div key={idx} className="flex flex-col">
@@ -2712,7 +2714,7 @@ const ResumeBuilder = () => {
                                                 {/* Projects */}
                                                 {resumeData.projects.length > 0 && (
                                                     <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Projects</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.projects_heading', 'Projects')}</h3>
                                                         <div className="space-y-3">
                                                             {resumeData.projects.map((proj, i) => (
                                                                 <div key={i}>
@@ -2732,11 +2734,11 @@ const ResumeBuilder = () => {
                                                 {/* Technical Skills */}
                                                 {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
                                                     <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Skills</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.skills_heading', 'Skills')}</h3>
                                                         <div className={templates[selectedTemplate]?.skillsClass || "text-[11px] space-y-1 px-1 !text-gray-700"}>
                                                             {resumeData.skills.technical && (
                                                                 <div>
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Technical Skills:</span>{' '}
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.technical_skills_label', 'Technical Skills:')}</span>{' '}
                                                                     {templates[selectedTemplate]?.skillsBadge ? (
                                                                         <span className="flex flex-wrap gap-1 mt-1">
                                                                             {resumeData.skills.technical.split(',').map((s, i) => (
@@ -2752,7 +2754,7 @@ const ResumeBuilder = () => {
                                                             )}
                                                             {resumeData.skills.soft && (
                                                                 <div className="mt-1">
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Soft Skills:</span>{' '}
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.soft_skills_label', 'Soft Skills:')}</span>{' '}
                                                                     {templates[selectedTemplate]?.skillsBadge ? (
                                                                         <span className="flex flex-wrap gap-1 mt-1">
                                                                             {resumeData.skills.soft.split(',').map((s, i) => (
@@ -2768,7 +2770,7 @@ const ResumeBuilder = () => {
                                                             )}
                                                             {resumeData.skills.languages && (
                                                                 <div className="mt-1">
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Languages:</span>{' '}
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.languages_label', 'Languages:')}</span>{' '}
                                                                     {templates[selectedTemplate]?.skillsBadge ? (
                                                                         <span className="flex flex-wrap gap-1 mt-1">
                                                                             {resumeData.skills.languages.split(',').map((s, i) => (
@@ -2789,7 +2791,7 @@ const ResumeBuilder = () => {
                                                 {/* Achievements */}
                                                 {resumeData.achievements.length > 0 && (
                                                     <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Achievements</h3>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.achievements_heading', 'Achievements')}</h3>
                                                         <div className="space-y-2">
                                                             {resumeData.achievements.map((ach, i) => (
                                                                 <div key={i} className="text-[11px]">
@@ -2813,15 +2815,15 @@ const ResumeBuilder = () => {
                                             <div className="min-w-0">
                                                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
                                                     <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
-                                                    {ORG_NAME} Verified Resume
+                                                    {ORG_NAME} {t('resume_builder.verified_resume', 'Verified Resume')}
                                                 </div>
                                                 <p className="mt-1 text-[9.5px] !text-gray-600">
-                                                    Document ID: <span className="font-semibold !text-black">{resumePublicId || 'Pending'}</span>
+                                                    {t('resume_builder.document_id', 'Document ID:')} <span className="font-semibold !text-black">{resumePublicId || t('resume_builder.pending', 'Pending')}</span>
                                                     {studentId && (
-                                                        <> &bull; Student ID: <span className="font-semibold !text-black">{studentId}</span></>
+                                                        <> &bull; {t('resume_builder.student_id', 'Student ID:')} <span className="font-semibold !text-black">{studentId}</span></>
                                                     )}
                                                 </p>
-                                                <p className="text-[8.5px] !text-gray-500 mt-0.5">Scan the QR code to verify the authenticity of this document online.</p>
+                                                <p className="text-[8.5px] !text-gray-500 mt-0.5">{t('resume_builder.scan_qr', 'Scan the QR code to verify the authenticity of this document online.')}</p>
                                             </div>
                                             {verificationQr ? (
                                                 <img
