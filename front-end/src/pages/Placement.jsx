@@ -11,6 +11,16 @@ import {
   IconSearch as Search,
   IconTag as Tag,
   IconArrowLeft as ArrowLeft,
+  IconFilter as Filter,
+  IconX as X,
+  IconExternalLink as ExternalLink,
+  IconSparkles as Sparkles,
+  IconTrendingUp as TrendingUp,
+  IconBriefcase2 as Briefcase2,
+  IconCategory as Category,
+  IconChevronRight as ChevronRight,
+  IconBookmark as Bookmark,
+  IconBookmarkFilled as BookmarkFilled
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
@@ -44,7 +54,6 @@ const getSkills = (job) => {
 };
 
 const normalizeJobType = (job) => {
-  // Look through several possible fields to find a type string
   const candidates = [job.displayType, job.type, job.jobType, job.employmentType, job.displayJobType]
     .filter(Boolean)
     .map((s) => String(s).toLowerCase());
@@ -77,22 +86,14 @@ const formatStatus = (value, t) => {
 const getStatusTextColor = (status) => {
   const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
   switch (norm) {
-    case 'applied':
-      return "text-blue-600 dark:text-blue-400";
-    case 'under review':
-      return "text-amber-600 dark:text-amber-400";
-    case 'declined':
-      return "text-slate-500 dark:text-slate-400";
-    case 'shortlisted':
-      return "text-purple-600 dark:text-purple-400";
-    case 'hold':
-      return "text-orange-600 dark:text-orange-400";
-    case 'selected':
-      return "text-emerald-600 dark:text-emerald-400";
-    case 'rejected':
-      return "text-rose-600 dark:text-rose-400";
-    default:
-      return "text-slate-600 dark:text-slate-400";
+    case 'applied': return "text-blue-600 dark:text-blue-400";
+    case 'under review': return "text-amber-600 dark:text-amber-400";
+    case 'declined': return "text-slate-500 dark:text-slate-400";
+    case 'shortlisted': return "text-purple-600 dark:text-purple-400";
+    case 'hold': return "text-orange-600 dark:text-orange-400";
+    case 'selected': return "text-emerald-600 dark:text-emerald-400";
+    case 'rejected': return "text-rose-600 dark:text-rose-400";
+    default: return "text-slate-600 dark:text-slate-400";
   }
 };
 
@@ -105,7 +106,7 @@ const getPostedAgo = (createdAt, t) => {
   const posted = new Date(createdAt);
   if (Number.isNaN(posted.getTime())) return null;
   const diffMs = Date.now() - posted.getTime();
-  if (diffMs < 0) return null; // future date — don't show
+  if (diffMs < 0) return null;
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (days === 0) return t("placement.posted_today", "Posted Today");
   if (days === 1) return t("placement.posted_day_ago", "Posted 1 day ago");
@@ -122,14 +123,32 @@ const Placement = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Data State
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('jobs');
   const [appliedJobs, setAppliedJobs] = useState([]);
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [userSkills, setUserSkills] = useState([]);
+  const [careerRoles, setCareerRoles] = useState([]);
+  
+  // UI State
+  const [loading, setLoading] = useState(true);
   const [loadingApplied, setLoadingApplied] = useState(false);
+  const [activeTab, setActiveTab] = useState('jobs');
+  
+  // View State (home vs search is now handled by activeTab)
+  
+  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [jobType, setJobType] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Master-Detail State
+  const [selectedJob, setSelectedJob] = useState(null);
+  
+  // Confirm Modal State
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAppId, setConfirmAppId] = useState(null);
   const [confirmAppTitle, setConfirmAppTitle] = useState('');
@@ -138,7 +157,12 @@ const Placement = () => {
     setLoading(true);
     try {
       const response = await placementsAPI.getJobs({ limit: 150 });
+      const savedRes = await placementsAPI.getSavedJobs().catch(e => { console.warn(e); return { data: [] }; });
+      
       setJobs(response?.data || []);
+      setSavedJobs(savedRes?.data || []);
+      if (response?.userSkills) setUserSkills(response.userSkills);
+      if (response?.careerRoles) setCareerRoles(response.careerRoles);
     } catch (error) {
       console.error("Failed to load placement jobs:", error);
       toast({
@@ -160,29 +184,20 @@ const Placement = () => {
     try {
       const response = await placementsAPI.listApplications();
       const apps = response?.data || [];
-
-      // Enrich applications: if application.job is an id string, fetch the job object so we can read nested recruiter/company fields
       const enriched = await Promise.all(apps.map(async (app) => {
         try {
           if (app && app.job && typeof app.job === 'string') {
-            const source = app.jobSource || app.jobSource || 'jobpostings';
+            const source = app.jobSource || 'jobpostings';
             try {
               const jobResp = await placementsAPI.getJob(source, app.job);
-              if (jobResp && jobResp.data) {
-                // replace job id with the full job object
-                app.job = jobResp.data;
-              }
+              if (jobResp && jobResp.data) app.job = jobResp.data;
             } catch (e) {
-              // fail quietly and keep original app.job
               console.warn('Failed to load job for application', app.job, e?.message || e);
             }
           }
-        } catch (e) {
-          // ignore per-app errors
-        }
+        } catch (e) {}
         return app;
       }));
-
       setAppliedJobs(enriched);
     } catch (error) {
       console.error('Failed to load applications:', error);
@@ -193,21 +208,22 @@ const Placement = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'status') {
-      fetchApplied();
-    }
+    if (activeTab === 'status') fetchApplied();
   }, [activeTab]);
 
-  const sourceCounts = useMemo(() => {
-    return jobs.reduce((acc, job) => {
-      const key = job.sourceCollection || "jobpostings";
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-  }, [jobs]);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setActiveTab('jobs');
+    setSelectedJob(null);
+  };
 
+  // ── FILTERING & CATEGORIZATION LOGIC ────────────────────────────────────────
+
+  // Main Filtered Results (for search view)
   const filteredJobs = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
+    const locQuery = locationQuery.trim().toLowerCase();
+    
     return jobs.filter((job) => {
       const sourceMatch = sourceFilter === "all" || job.sourceCollection === sourceFilter;
       if (!sourceMatch) return false;
@@ -219,7 +235,11 @@ const Placement = () => {
         if (jobType === 'internship' && normalized !== 'internship') return false;
       }
 
-      if (!query) return true;
+      if (locQuery) {
+        const loc = (job.displayLocation || '').toLowerCase();
+        const locWords = locQuery.split(/\s+/);
+        if (!locWords.every(w => loc.includes(w))) return false;
+      }
 
       const haystack = [
         job.displayTitle,
@@ -230,7 +250,37 @@ const Placement = () => {
         getSkills(job).join(" "),
       ].join(" ").toLowerCase();
 
-      return haystack.includes(query);
+        const queryWords = query.split(/\s+/);
+        if (!queryWords.every(w => haystack.includes(w))) return false;
+      }
+
+      return true;
+    });
+  }, [jobs, searchQuery, locationQuery, sourceFilter, jobType]);
+
+  // Derived Collections (for home view)
+  const recommendedJobs = useMemo(() => {
+    if (!jobs.length) return [];
+    
+    // Create a scoring system for jobs based on skills and career roles
+    const scoredJobs = jobs.map(job => {
+      let score = 0;
+      const jobSkills = getSkills(job).map(s => s.toLowerCase());
+      const jobTitle = (job.displayTitle || '').toLowerCase();
+      
+      // Score by career roles
+      careerRoles.forEach(role => {
+        if (jobTitle.includes(role.toLowerCase())) score += 10;
+      });
+      
+      // Score by skills
+      userSkills.forEach(skill => {
+        if (jobSkills.includes(skill.toLowerCase()) || getDescription(job).toLowerCase().includes(skill.toLowerCase())) {
+          score += 2;
+        }
+      });
+      
+      return { job, score };
     });
   }, [jobs, searchQuery, sourceFilter, jobType, t]);
 
@@ -263,17 +313,110 @@ const Placement = () => {
     closeConfirm();
   };
 
+  const handleToggleSave = async (e, job) => {
+    e.stopPropagation();
+    try {
+      const source = job.sourceCollection;
+      const id = job._id;
+      const response = await placementsAPI.toggleSavedJob(source, id);
+      setSavedJobs(response.data || []);
+      toast({ 
+        title: response.isSaved ? 'Job Saved' : 'Job Removed', 
+        description: response.isSaved ? 'Added to your Saved Jobs.' : 'Removed from your Saved Jobs.'
+      });
+    } catch (err) {
+      toast({ title: 'Could not save job', description: 'Please try again.', variant: 'destructive' });
+    }
+  };
+
+  // Component: Job Card Mini (For Master-Detail list or Grids)
+  const JobCard = ({ job, isSelected, onClick, layout = 'grid' }) => {
+    const skills = getSkills(job);
+    const companyLogo = getCompanyLogo(job);
+    const sourceLabel = job.sourceCollection === "smaartjobpostings" ? "SMAART" : "College";
+    const companyInitial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
+    const rawStatus = (job.displayStatus || job.status || "").toString().toLowerCase();
+    const isClosed = rawStatus.includes("closed");
+
+    return (
+      <motion.div
+        whileHover={{ y: -2 }}
+        onClick={() => onClick(job)}
+        className={`cursor-pointer rounded-2xl border p-4 transition-all duration-200 ${
+          isSelected 
+            ? 'border-[#1a3884] bg-[#f5f8ff] shadow-md dark:border-blue-500/50 dark:bg-[#1a3884]/20' 
+            : 'border-[#d8e6f7] bg-white hover:border-[#1a3884]/40 hover:shadow-lg dark:border-[#1a3884]/20 dark:bg-[#001630]'
+        } ${isClosed ? 'opacity-60' : ''}`}
+      >
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-lg font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
+            {companyLogo ? (
+              <img src={companyLogo} alt="logo" className="h-full w-full object-contain p-1" />
+            ) : (
+              <span>{companyInitial}</span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1 relative">
+            <button 
+              onClick={(e) => handleToggleSave(e, job)}
+              className="absolute right-0 top-0 p-1.5 text-slate-400 hover:text-blue-600 transition-colors z-10"
+            >
+              {savedJobs.some(sj => sj.jobId === job._id && sj.source === job.sourceCollection) ? (
+                <BookmarkFilled className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              ) : (
+                <Bookmark className="h-5 w-5 hover:fill-blue-50 dark:hover:fill-blue-900/30" />
+              )}
+            </button>
+            <h3 className="line-clamp-1 text-base font-bold text-[#0d1f4e] dark:text-white pr-8">
+              {job.displayTitle}
+            </h3>
+            <div className="mt-1 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+              <Building className="h-4 w-4" />
+              <span className="truncate">{job.displayCompany}</span>
+            </div>
+            <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-slate-400">
+              <MapPin className="h-3.5 w-3.5" />
+              <span className="truncate">{job.displayLocation || 'Remote'}</span>
+              <span className="mx-1">•</span>
+              <span className="uppercase text-[#1a3884] dark:text-blue-400">{job.displayType}</span>
+            </div>
+            {layout === 'grid' && skills.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {skills.slice(0, 3).map((skill) => (
+                  <span key={skill} className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-[#001a3d] dark:text-slate-300">
+                    {skill}
+                  </span>
+                ))}
+                {skills.length > 3 && (
+                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-[#001a3d] dark:text-slate-300">
+                    +{skills.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-slate-400">
+                {getPostedAgo(job.displayCreatedAt || job.createdAt) || 'Recently'}
+              </span>
+              <span className="inline-flex rounded-lg bg-[#eef4ff] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
+                {sourceLabel}
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-transparent pb-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Back Button (Mobile Mode Only) */}
+        
+        {/* Mobile Back Button */}
         <div className="flex items-center sm:hidden mt-6">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="group flex items-center gap-3 w-fit selection:bg-transparent"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
-              <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+          <button onClick={() => navigate("/dashboard")} className="group flex items-center gap-3 w-fit selection:bg-transparent">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+              <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300" />
             </div>
             <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
               {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
@@ -281,6 +424,7 @@ const Placement = () => {
           </button>
         </div>
 
+        {/* Original Header Block */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -327,17 +471,29 @@ const Placement = () => {
           </div>
         </motion.div>
 
-        {/* Tabs: Jobs | Job Status */}
-        <div className="mt-4 flex items-center gap-3">
+        {/* Tabs */}
+        <div className="mt-4 flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => setActiveTab('recommended')}
+            className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'recommended' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
+          >
+            Recommended
+          </button>
           <button
             onClick={() => setActiveTab('jobs')}
-            className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'jobs' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
+            className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'jobs' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
+          >
+            All Jobs
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'saved' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
           >
             {t("placement.jobs", "Jobs")}
           </button>
           <button
             onClick={() => setActiveTab('status')}
-            className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'status' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
+            className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'status' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
           >
             {t("placement.job_status", "Job Status")}
           </button>
@@ -382,12 +538,10 @@ const Placement = () => {
           </div>
         )}
 
-        {activeTab === 'jobs' && (
-          <>
             {loading ? (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-56 animate-pulse rounded-2xl border border-[#d8e6f7] bg-white dark:border-[#1a3884]/20 dark:bg-[#001630]" />
+              <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-56 animate-pulse rounded-2xl bg-white dark:bg-slate-800" />
                 ))}
               </div>
             ) : filteredJobs.length === 0 ? (
@@ -421,39 +575,63 @@ const Placement = () => {
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
                       className={`relative flex min-h-[225px] flex-col rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-[0_2px_16px_rgba(26,56,132,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,56,132,0.12)] dark:border-[#1a3884]/20 dark:bg-[#001630] ${isClosed ? 'opacity-60' : ''}`}
                     >
-                      {/* Top Row: Logo, Title, and Badges */}
-                      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start justify-between">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] text-sm font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
-                            {companyLogo ? (
-                              <img
-                                src={companyLogo}
-                                alt={`${job.displayCompany} logo`}
-                                className="h-full w-full object-contain p-1"
-                              />
-                            ) : (
-                              <span>{companyInitial}</span>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <h2 className="line-clamp-2 text-lg font-extrabold leading-snug text-[#0d1f4e] dark:text-white">
-                              {job.displayTitle}
-                            </h2>
-                            <span className="mt-1 inline-flex text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                              {job.displayType}
-                            </span>
-                          </div>
-                        </div>
+                      <Filter className="h-4 w-4" /> Filters
+                    </button>
+                  </div>
 
-                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                          <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300">
-                            {statusLabel}
-                          </span>
-                          <span className="inline-flex rounded-lg bg-[#eef4ff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300">
-                            {sourceLabel}
-                          </span>
+                  {/* Filters Drawer (Inline) */}
+                  <AnimatePresence>
+                    {showFilters && (
+                      <motion.div 
+                        initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
+                        className="overflow-hidden border-b border-[#d8e6f7] dark:border-[#1a3884]/20 bg-white dark:bg-[#001630] px-4"
+                      >
+                        <div className="py-4 space-y-4">
+                          <div>
+                            <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Source</label>
+                            <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="w-full rounded-lg border border-slate-200 p-2 text-sm font-medium dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                              <option value="all">All sources</option>
+                              <option value="smaartjobpostings">SMAART Platform</option>
+                              <option value="jobpostings">College Placement</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Job Type</label>
+                            <select value={jobType} onChange={(e) => setJobType(e.target.value)} className="w-full rounded-lg border border-slate-200 p-2 text-sm font-medium dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                              <option value="all">All types</option>
+                              <option value="full-time">Full-Time</option>
+                              <option value="part-time">Part-Time</option>
+                              <option value="internship">Internship</option>
+                            </select>
+                          </div>
                         </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Scrollable List */}
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
+                    {filteredJobs.length === 0 ? (
+                      <div className="mt-10 text-center">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                          <Search className="h-6 w-6 text-slate-400" />
+                        </div>
+                        <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white">No jobs found</h3>
+                        <p className="mt-1 text-xs text-slate-500">Try adjusting your search or filters.</p>
                       </div>
+                    ) : (
+                      filteredJobs.map(job => (
+                        <JobCard 
+                          key={job._id} 
+                          job={job} 
+                          layout="list"
+                          isSelected={selectedJob?._id === job._id}
+                          onClick={(j) => setSelectedJob(j)} 
+                        />
+                      ))
+                    )}
+                  </div>
+                </div>
 
                       <div className="space-y-2 text-sm font-medium text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
@@ -481,43 +659,97 @@ const Placement = () => {
                             <Tag className="h-4 w-4 shrink-0 text-slate-400" />
                             <span className="truncate">{job.displaySalary}</span>
                           </div>
-                        )}
-                      </div>
-
-                      {skills.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {skills.map((skill) => (
-                            <span key={skill} className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600 dark:bg-[#001a3d] dark:text-slate-300">
-                              {skill}
-                            </span>
-                          ))}
                         </div>
-                      )}
 
-                      <div className="mt-auto pt-5">
-                        <button
-                          onClick={() => !isClosed && navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } })}
-                          disabled={isClosed}
-                          className={isClosed ? "flex h-10 w-full items-center justify-center rounded-xl bg-gray-200 text-sm font-bold text-slate-500 transition-all cursor-not-allowed" : "flex h-10 w-full items-center justify-center rounded-xl bg-[#1a3884] text-sm font-bold text-white transition-all hover:bg-[#132c6b] active:scale-[0.98]"}
-                        >
-                          {applyLabel}
-                        </button>
+                        <hr className="my-8 border-slate-200 dark:border-slate-800" />
+
+                        {/* Detail Content */}
+                        <div className="grid grid-cols-3 gap-8">
+                          <div className="col-span-2 space-y-8">
+                            <section>
+                              <h3 className="text-lg font-bold text-[#0d1f4e] dark:text-white mb-4">About the Role</h3>
+                              <div className="prose prose-sm dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 whitespace-pre-wrap font-medium">
+                                {getDescription(selectedJob)}
+                              </div>
+                            </section>
+                          </div>
+                          
+                          <div className="col-span-1 space-y-6">
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800/50">
+                              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Job Overview</h3>
+                              <ul className="space-y-4">
+                                <li>
+                                  <span className="block text-xs font-semibold text-slate-500">Salary</span>
+                                  <span className="text-sm font-bold text-slate-900 dark:text-white">{selectedJob.displaySalary || 'Not disclosed'}</span>
+                                </li>
+                                <li>
+                                  <span className="block text-xs font-semibold text-slate-500">Apply By</span>
+                                  <span className="text-sm font-bold text-slate-900 dark:text-white">{formatDate(selectedJob.displayDeadline)}</span>
+                                </li>
+                                <li>
+                                  <span className="block text-xs font-semibold text-slate-500">Source</span>
+                                  <span className="inline-flex rounded bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                                    {selectedJob.sourceCollection === 'smaartjobpostings' ? 'SMAART Platform' : 'College Placement'}
+                                  </span>
+                                </li>
+                              </ul>
+                            </div>
+                            
+                            {getSkills(selectedJob).length > 0 && (
+                              <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Required Skills</h3>
+                                <div className="flex flex-wrap gap-2">
+                                  {getSkills(selectedJob).map((skill) => (
+                                    <span key={skill} className="rounded-lg bg-[#eef4ff] px-3 py-1.5 text-xs font-bold text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </motion.article>
-                  );
-                })}
-              </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             )}
-          </>
+          </div>
         )}
 
-        {/* Job Status tab */}
+        {/* Saved Jobs Tab */}
+        {activeTab === 'saved' && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-extrabold text-[#0d1f4e] dark:text-white mb-6">Saved Jobs</h2>
+            
+            {savedJobs.length === 0 ? (
+              <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-dashed border-[#d8e6f7] bg-white px-6 text-center shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
+                <Bookmark className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
+                <h2 className="mt-4 text-xl font-extrabold text-[#0d1f4e] dark:text-white">No saved jobs yet</h2>
+                <p className="mt-2 max-w-md text-sm font-medium text-slate-500">Bookmark jobs you are interested in applying for later.</p>
+                <button onClick={() => setActiveTab('jobs')} className="mt-6 rounded-xl bg-[#1a3884] px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-[#132c6b] active:scale-95 transition-all">
+                  Browse Jobs
+                </button>
+              </div>
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {jobs.filter(job => savedJobs.some(sj => sj.jobId === job._id && sj.source === job.sourceCollection)).map(job => (
+                  <JobCard key={job._id} job={job} onClick={(j) => { setSelectedJob(j); setActiveTab('jobs'); }} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Job Status Tab (My Applications) */}
         {activeTab === 'status' && (
-          <div>
+          <div className="mt-8">
+            <h2 className="text-2xl font-extrabold text-[#0d1f4e] dark:text-white mb-6">Your Applications</h2>
             {loadingApplied ? (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-56 animate-pulse rounded-2xl border border-[#d8e6f7] bg-white dark:border-[#1a3884]/20 dark:bg-[#001630]" />
+                  <div key={i} className="h-56 animate-pulse rounded-2xl bg-white dark:bg-slate-800" />
                 ))}
               </div>
             ) : appliedJobs.length === 0 ? (
@@ -600,14 +832,36 @@ const Placement = () => {
                           {t("placement.withdraw", "Withdraw")}
                         </button>
                       </div>
-
-                    </motion.article>
-                  );
-                })}
+                    ));
+                })()}
               </div>
             )}
           </div>
         )}
+
+        {/* Withdraw Confirm Modal */}
+        {confirmOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl dark:bg-slate-800">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30">
+                <X className="h-8 w-8" />
+              </div>
+              <h3 className="mt-6 text-center text-xl font-black text-slate-900 dark:text-white">Withdraw Application?</h3>
+              <p className="mt-2 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
+                Are you sure you want to withdraw from <strong>{confirmAppTitle}</strong>? This action cannot be undone.
+              </p>
+              <div className="mt-8 flex gap-4">
+                <button onClick={closeConfirm} className="flex-1 rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600">
+                  Keep it
+                </button>
+                <button onClick={confirmWithdraw} className="flex-1 rounded-xl bg-red-600 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-500">
+                  Withdraw
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
       </div>
     </div>
   );

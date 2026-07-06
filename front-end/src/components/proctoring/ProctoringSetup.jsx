@@ -10,7 +10,9 @@ import {
   RiFullscreenLine,
   RiArrowRightLine,
   RiUserSmileLine,
-  RiLoader4Line
+  RiLoader4Line,
+  RiSoundModuleLine,   // used for microphone row ✅
+  RiVolumeMuteLine,    // used for mic denied state ✅
 } from '@remixicon/react';
 import * as faceapi from '@vladmandic/face-api';
 import {
@@ -24,6 +26,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [cameraState, setCameraState] = useState('pending'); // 'pending' | 'checking' | 'allowed' | 'denied'
+  const [micState, setMicState] = useState('pending');       // 'pending' | 'checking' | 'allowed' | 'denied' | 'skipped'
   const [networkLatency, setNetworkLatency] = useState(null);
   const [networkState, setNetworkState] = useState('checking'); // 'checking' | 'good' | 'poor'
   const [consentGranted, setConsentGranted] = useState(false);
@@ -83,6 +86,30 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       setCameraState('denied');
     }
   };
+
+  // Handle microphone permission check (NEW)
+  const requestMicAccess = async () => {
+    setMicState('checking');
+    try {
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      // Immediately release — we only needed to verify permission
+      micStream.getTracks().forEach(t => t.stop());
+      setMicState('allowed');
+    } catch (err) {
+      console.error('[ProctoringSetup] Microphone access denied:', err);
+      setMicState('denied');
+    }
+  };
+
+  // Auto-request both on first render (common flow)
+  useEffect(() => {
+    if (step === 1 && micState === 'pending') {
+      // Stagger by 1s after camera prompt to avoid permission-denial cascade
+      const t = setTimeout(requestMicAccess, 1200);
+      return () => clearTimeout(t);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // Load AI Models when entering step 3
   const loadAIModels = useCallback(async () => {
@@ -253,7 +280,6 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       };
       init();
     } else {
-      // Cleanup
       if (faceCheckIntervalRef.current) {
         clearInterval(faceCheckIntervalRef.current);
         faceCheckIntervalRef.current = null;
@@ -265,7 +291,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         faceCheckIntervalRef.current = null;
       }
     };
-  }, [step, loadAIModels, startFaceScanning]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // Monitor Fullscreen Status
   useEffect(() => {
@@ -343,6 +370,20 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     return t('proctoring_setup.status_preparing', 'Preparing...');
   };
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(t => t.stop());
+        localStreamRef.current = null;
+      }
+      if (faceCheckIntervalRef.current) {
+        clearInterval(faceCheckIntervalRef.current);
+        faceCheckIntervalRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 bg-[#0F172A]/40 dark:bg-[#000F24]/80 backdrop-blur-lg flex items-center justify-center p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
       <div className="w-full max-w-xl bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)] dark:shadow-2xl relative overflow-hidden">
@@ -415,6 +456,45 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       onClick={requestWebcamAccess}
                       className="px-4 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95"
                     >{t('proctoring_setup.grant_access', 'Grant Access')}</button>
+                  )}
+                </div>
+
+              {/* Microphone Row (NEW) */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-slate-200/50 dark:bg-white/5 rounded-xl">
+                      <RiSoundModuleLine size={20} className="text-slate-600 dark:text-slate-300" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Microphone Access</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Required for voice activity monitoring</p>
+                    </div>
+                  </div>
+                  {micState === 'allowed' ? (
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/25">
+                      <RiCheckLine size={14} /> Allowed
+                    </span>
+                  ) : micState === 'checking' ? (
+                    <span className="text-xs text-slate-400 animate-pulse">Checking...</span>
+                  ) : micState === 'denied' ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                        <RiVolumeMuteLine size={13} /> Denied
+                      </span>
+                      <button
+                        onClick={requestMicAccess}
+                        className="text-xs font-bold text-[#1a3884] dark:text-cyan-400 hover:underline"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={requestMicAccess}
+                      className="px-4 py-2 bg-slate-700 hover:bg-slate-800 dark:bg-white/10 dark:hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95"
+                    >
+                      Grant Access
+                    </button>
                   )}
                 </div>
 

@@ -78,6 +78,11 @@ bio: {
     type: String,
     default: 'DD/MM/YYYY'
   },
+  savedJobs: [{
+    jobId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    source: { type: String, required: true },
+    savedAt: { type: Date, default: Date.now }
+  }],
   // Active vision board for dashboard display
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,7 +1,10 @@
-import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ShieldAlert, LogOut, MessageSquare } from 'lucide-react';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+
+import { useNotifications } from '@/contexts/NotificationContext';
 
 /**
  * LockedOut Page
@@ -11,7 +14,21 @@ import { motion } from 'framer-motion';
  */
 const LockedOut = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const reason = location.state?.reason || 'Disqualified due to tab switching or window inactivity';
+    const { notifications } = useNotifications();
+
+    // Listen for the "assessment_unlocked" notification
+    useEffect(() => {
+        if (notifications && notifications.length > 0) {
+            const unlockNotif = notifications.find(n => n.metadata?.action === 'assessment_unlocked');
+            if (unlockNotif) {
+                // Unlock detected, redirect back to dashboard or assessment center
+                toast.success("Your assessment has been unlocked by IT support.");
+                navigate('/dashboard/assessment-centre');
+            }
+        }
+    }, [notifications, navigate]);
 
     return (
         <div className="min-h-screen bg-[#00152E] flex items-center justify-center p-4">

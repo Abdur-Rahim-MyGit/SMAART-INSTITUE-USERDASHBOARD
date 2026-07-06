@@ -24,7 +24,7 @@ const getNextITSupportAssignee = async () => {
   const index = (counter.seq - 1) % supports.length;
   return supports[index];
 };
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, optionalAuth } = require('../middleware/auth');
 const { uploadSupportAttachments } = require('../middleware/upload');
 const itsmClient = require('../services/itsmClient');
 const { notifyTicketResponse, createNotification } = require('../services/notificationService');
@@ -62,8 +62,10 @@ const ticketValidation = [
     .isLength({ min: 10, max: 2000 })
     .withMessage('Description must be between 10 and 2000 characters'),
   body('category')
-     .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'])
-     .withMessage('Invalid category'),
+    .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'])
+    .withMessage('Invalid category'),
+  body('contactName').optional().trim(),
+  body('contactEmail').optional().trim().isEmail().withMessage('Invalid email format'),
   body('priority')
     .optional()
     .isIn(['low', 'medium', 'high'])
@@ -96,18 +98,18 @@ const handleValidationErrors = (req, res, next) => {
  * @access  Private (Authenticated users)
  */
 router.post('/',
-  protect,
+  optionalAuth,
   ticketCreationLimiter,
   uploadSupportAttachments.array('attachments', 20), // Max 20 attachments
   ticketValidation,
   handleValidationErrors,
   async (req, res) => {
     try {
-      const { title, description, category, priority } = req.body;
+      const { title, description, category, priority, contactName, contactEmail } = req.body;
 
-      // Verify user is authenticated
-      if (!req.user || !req.user._id) {
-        return res.status(401).json({ success: false, error: 'User not authenticated' });
+      // Verify user is authenticated OR provided contact info
+      if (!req.user && (!contactName || !contactEmail)) {
+        return res.status(400).json({ success: false, error: 'Name and email are required for guests' });
       }
 
       // Process uploaded files
@@ -121,7 +123,9 @@ router.post('/',
       })) : [];
 
       const ticket = new SupportTicket({
-        userId: req.user._id,
+        userId: req.user ? req.user._id : undefined,
+        contactName: req.user ? req.user.fullName : contactName,
+        contactEmail: req.user ? req.user.email : contactEmail,
         userModel: 'Student',
         title,
         description,

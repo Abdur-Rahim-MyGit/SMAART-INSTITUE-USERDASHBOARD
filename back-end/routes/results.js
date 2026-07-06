@@ -1,6 +1,8 @@
 const express = require('express');
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
+const ProctoringSession = require('../models/ProctoringSession');
+const SupportTicket = require('../models/SupportTicket');
 const { protect } = require('../middleware/auth');
 const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/assessmentAuth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
@@ -77,6 +79,36 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         assessment.questions.forEach(q => {
             questionMap.set(q._id.toString(), q);
         });
+
+        // --- PROCTORING LOCK CHECK ---
+        const activeLock = await ProctoringSession.findOne({
+            userId,
+            assessmentId,
+            isLocked: true
+        });
+
+        if (activeLock) {
+            let isStillLocked = true;
+            if (activeLock.activeTicketId) {
+                const ticket = await SupportTicket.findById(activeLock.activeTicketId);
+                // If ticket is resolved/closed, auto-unlock the assessment
+                if (ticket && (ticket.status === 'resolved' || ticket.status === 'closed')) {
+                    activeLock.isLocked = false;
+                    activeLock.status = 'active';
+                    await activeLock.save();
+                    isStillLocked = false;
+                }
+            }
+            if (isStillLocked) {
+                console.log(`🔒 Assessment ${assessmentId} is locked for user ${userId} due to proctoring violation`);
+                return res.status(403).json({
+                    success: false,
+                    error: 'Your assessment is currently locked due to a proctoring violation. A support ticket has been raised.',
+                    locked: true
+                });
+            }
+        }
+        // --- END PROCTORING LOCK CHECK ---
 
         // Check if user already has an in-progress attempt
         const existingResult = await Result.findOne({

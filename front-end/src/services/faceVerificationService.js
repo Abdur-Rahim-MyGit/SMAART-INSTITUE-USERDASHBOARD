@@ -12,6 +12,9 @@
  * All processing runs client-side — zero server calls for face data.
  */
 import * as faceapi from '@vladmandic/face-api';
+import { analyzeGaze, resetCalibration } from './eyeGazeService';
+
+export { resetCalibration as resetGazeCalibration };
 
 // ─── State ───────────────────────────────────────────────────────────
 let modelsLoaded = false;
@@ -345,18 +348,23 @@ export const verifyFace = async (videoElement, referenceDescriptor) => {
   const similarity = distanceToSimilarity(distance);
 
   if (distance < MATCH_THRESHOLD) {
+    // Attach gaze analysis piggy-backed on the same landmark result
+    const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
     return {
       status: VerificationStatus.VERIFIED,
       distance,
       similarity,
-      faceCount: 1
+      faceCount: 1,
+      gaze,
     };
   } else {
+    const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
     return {
       status: VerificationStatus.MISMATCH,
       distance,
       similarity,
-      faceCount: 1
+      faceCount: 1,
+      gaze,
     };
   }
 };
