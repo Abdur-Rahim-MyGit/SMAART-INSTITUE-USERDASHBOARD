@@ -64,10 +64,7 @@ const studentSchema = new mongoose.Schema({
     state: String,
     pincode: String
   },
-  assignedTeacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Teacher'
-  },
+
   enrolledCourses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
@@ -230,7 +227,7 @@ studentSchema.index({ studentId: 1 }, { unique: true, sparse: true });
 studentSchema.index({ college: 1 });
 studentSchema.index({ rollNumber: 1, college: 1 });
 studentSchema.index({ status: 1 });
-studentSchema.index({ assignedTeacher: 1 });
+
 studentSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Student', studentSchema);

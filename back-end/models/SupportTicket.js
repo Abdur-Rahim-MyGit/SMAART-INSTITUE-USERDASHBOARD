@@ -72,8 +72,8 @@ const supportTicketSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Category is required'],
     enum: {
-      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'course issue', 'assessment issue', 'career Direction'],
-      message: 'Invalid category.'
+      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'],
+      message: 'Invalid category. Must be one of: technical, billing, account, content, feedback, other, course & assessment, career Direction, course, assessment, placement issue, certificates & badges issue'
     }
   },
   priority: {
@@ -104,6 +104,8 @@ const supportTicketSchema = new mongoose.Schema({
     filename: String,
     originalName: String,
     path: String,
+    publicUrl: String,
+    url: String,
     mimetype: String,
     size: Number,
     uploadedAt: {

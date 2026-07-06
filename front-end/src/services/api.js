@@ -33,6 +33,18 @@ export const getBackendUrl = () => {
   if (apiBase && apiBase.startsWith('/')) {
     return window.location.origin;
   }
+  // Split hosting (e.g. frontend on Vercel, backend on Render): VITE_API_URL is
+  // an ABSOLUTE url like "https://smaart-backend.onrender.com/api". WebSockets
+  // (/socket.io) and /uploads live on that SAME backend origin — so strip the
+  // path and return the origin. Without this we'd wrongly hit the frontend host
+  // on :5000 over http, and real-time notifications would silently never connect.
+  if (apiBase && /^https?:\/\//i.test(apiBase)) {
+    try {
+      return new URL(apiBase).origin;
+    } catch {
+      // malformed value — fall through to hostname heuristics below
+    }
+  }
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return "http://localhost:5000";

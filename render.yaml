@@ -1,0 +1,54 @@
+# Render Blueprint for the SMAART backend.
+# Deploy: render.com -> New -> Blueprint -> connect this repo.
+# Render reads this file, provisions the service, and PROMPTS you for every
+# secret marked `sync: false` (so nothing sensitive lives in git).
+services:
+  - type: web
+    name: smaart-backend
+    runtime: node
+    rootDir: back-end
+    plan: free            # bump to "starter" (~$7/mo) to stop the 15-min idle sleep
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # --- Required: server refuses to boot without these ---
+      - key: MONGODB_URI
+        sync: false        # your MongoDB Atlas connection string
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong random secret for you
+      # --- Set after the frontend is live (Vercel URL); enables CORS ---
+      - key: FRONTEND_URL
+        sync: false
+      # --- Uploads (Cloudinary) ---
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # --- Email (OTP, contact form, notifications) ---
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      # --- Admin auth ---
+      - key: ADMIN_SYSTEM_SECRET
+        generateValue: true
+      # --- AI features (career coach, chatbot, moderation, reports) ---
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_AI_API_KEY
+        sync: false

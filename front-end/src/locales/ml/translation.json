@@ -58,7 +58,20 @@
     "retry": "വീണ്ടും ശ്രമിക്കുക",
     "no_paths": "ഇതുവരെ പഠന വഴികളൊന്നുമില്ല",
     "browse_courses": "കോഴ്സുകൾ ബ്രൗസ് ചെയ്യുക",
-    "unable_to_load_paths": "പാതകൾ ലോഡുചെയ്യാനായില്ല"
+    "unable_to_load_paths": "പാതകൾ ലോഡുചെയ്യാനായില്ല",
+    "home": "ഹോം",
+    "my_career_paths": "എന്റെ കരിയർ പാതകൾ",
+    "view_career_path": "കരിയർ പാത കാണുക",
+    "primary_path": "പ്രാഥമിക പാത",
+    "secondary_path": "ദ്വിതീയ പാത",
+    "tertiary_path": "തൃതീയ പാത",
+    "add": "ചേർക്കുക",
+    "continue_path": "പാത തുടരുക",
+    "active_skills_to_master": "മാസ്റ്റർ ചെയ്യേണ്ട സജീവ കഴിവുകൾ",
+    "track_targeted_skills": "നിങ്ങളുടെ കരിയർ ദിശകളിലുടനീളം നിങ്ങളുടെ ലക്ഷ്യമിട്ട കഴിവുകൾ ട്രാക്ക് ചെയ്യുക",
+    "no_active_skills": "ഈ പാതയിൽ സജീവമായ കഴിവുകളൊന്നുമില്ല.",
+    "jump_into_roadmap": "കരിയർ റോഡ്മാപ്പിലേക്ക് പോകുക",
+    "to_start_mastering": "പുതിയ കഴിവുകൾ മാസ്റ്റർ ചെയ്യാൻ ആരംഭിക്കുക!"
   },
   "profile_page": {
     "personal_information": "വ്യക്തിഗത വിവരങ്ങൾ",
@@ -142,7 +155,8 @@
     "file_attached_success": "ഫയൽ അറ്റാച്ചുചെയ്‌തു",
     "remove_file": "ഫയൽ നീക്കം ചെയ്യുക",
     "save_credential": "ക്രെഡൻഷ്യൽ സംരക്ഷിക്കുക",
-    "saving": "സംരക്ഷിക്കുന്നു..."
+    "saving": "സംരക്ഷിക്കുന്നു...",
+    "view_skills_passport": "നൈപുണ്യ പാസ്പോർട്ട് കാണുക"
   },
   "support_tickets_page": {
     "back": "തിരികെ",
@@ -187,10 +201,10 @@
     "validation_desc_max": "വിവരണം 2000 പ്രതീകങ്ങൾ കവിയരുത്",
     "validation_category_required": "ദയവായി ഒരു വിഭാഗം തിരഞ്ഞെടുക്കുക",
     "validation_file_size": "ഫയൽ വലുപ്പം 5MB-യിൽ കുറവായിരിക്കണം",
-    "validation_file_count": "പരമാവധി 3 ഫയലുകൾ അനുവദനീയമാണ്",
+    "validation_file_count": "പരമാവധി 20 ഫയലുകൾ അനുവദനീയമാണ്",
     "cat_technical": "സാങ്കേതിക പ്രശ്നം",
-    "cat_technical_desc": "പ്ലാറ്റ്‌ഫോമിലെ പ്രശ്നങ്ങൾ",
-    "cat_account": "അക്കൗണ്ട്",
+    "cat_technical_desc": "ഹാർഡ്‌വെയർ, സോഫ്റ്റ്‌വെയർ, ഉപകരണ കണക്ഷൻ, സിസ്റ്റം ബഗുകൾ",
+    "cat_account": "അക്കൗണ്ട് പ്രശ്നം",
     "cat_account_desc": "ലോഗിൻ, പ്രൊഫൈൽ അല്ലെങ്കിൽ ക്രമീകരണങ്ങൾ",
     "cat_content": "കോഴ്‌സ് ഉള്ളടക്കം",
     "cat_content_desc": "കോഴ്സുകളെക്കുറിച്ചുള്ള ചോദ്യങ്ങൾ",
@@ -198,9 +212,22 @@
     "cat_billing_desc": "പേയ്‌മെൻ്റും സബ്‌സ്‌ക്രിപ്‌ഷനും",
     "cat_feedback": "പ്രതികരണം",
     "cat_feedback_desc": "നിർദ്ദേശങ്ങളും മെച്ചപ്പെടുത്തലുകളും",
-    "cat_other": "മറ്റുള്ളവ",
+    "cat_other": "മറ്റു പ്രശ്നങ്ങൾ",
     "cat_other_desc": "പൊതുവായ അന്വേഷണങ്ങൾ",
-    "characters": "കഥാപാത്രങ്ങൾ"
+    "characters": "കഥാപാത്രങ്ങൾ",
+    "cat_course": "കോഴ്സ് പ്രശ്നം",
+    "cat_course_desc": "കോഴ്സ് ഉള്ളടക്കം, വീഡിയോകൾ, മൊഡ്യൂളുകളുടെ പ്രവേശനം",
+    "cat_assessment": "മൂല്യനിർണ്ണയ പ്രശ്നം",
+    "cat_assessment_desc": "ടെസ്റ്റ് പ്രവേശനം, സമർപ്പിക്കൽ പിശകുകൾ, ഗ്രേഡിംഗ്",
+    "cat_placement": "പ്ലേസ്‌മെന്റ് പ്രശ്നം",
+    "cat_placement_desc": "ജോലി അപേക്ഷ, പ്ലേസ്‌മെന്റ് ഡ്രൈവ്, റെസ്യൂമെ അപ്‌ലോഡ്",
+    "cat_certificates_badges": "സർട്ടിഫിക്കറ്റുകളും ബാഡ്ജുകളും സംബന്ധിച്ച പ്രശ്നം",
+    "cat_certificates_badges_desc": "സർട്ടിഫിക്കറ്റ് ജനറേഷൻ, ബാഡ്ജ് അൺലോക്ക് ചെയ്യൽ, പങ്കിടൽ",
+    "cat_career_direction": "കരിയർ മാർഗ്ഗനിർദ്ദേശ പ്രശ്നം",
+    "cat_career_direction_desc": "കരിയർ മാർഗ്ഗനിർദ്ദേശവും പിന്തുണയും",
+    "upload_screenshot": "സ്ക്രീൻഷോട്ട് അപ്‌ലോഡ് ചെയ്യുക",
+    "add_more": "കൂടുതൽ ചേർക്കുക",
+    "my_tickets": "എന്റെ ടിക്കറ്റുകൾ"
   },
   "community_page": {
     "title": "കമ്മ്യൂണിറ്റി പ്രഖ്യാപനങ്ങൾ",
@@ -723,7 +750,9 @@
     "competency_aligned": "കഴിവ് വിന്യസിച്ചു",
     "integrity_verified": "സമഗ്രത പരിശോധിച്ചു",
     "success_export": "കയറ്റുമതി ചെയ്തു!",
-    "error_export": "കയറ്റുമതി പരാജയപ്പെട്ടു. "
+    "error_export": "കയറ്റുമതി പരാജയപ്പെട്ടു. ",
+    "level": "നില",
+    "level_short": "നില"
   },
   "assessments_dashboard": {
     "badge": "വിലയിരുത്തൽ യാത്ര",
@@ -1266,7 +1295,9 @@
       "task": "ചുമതലകൾ",
       "certificate": "സർട്ടിഫിക്കറ്റുകൾ",
       "system": "സിസ്റ്റം"
-    }
+    },
+    "new": "പുതിയത്",
+    "view_all_notifications": "എല്ലാ അറിയിപ്പുകളും കാണുക"
   },
   "settings_page": {
     "profile_desc": "നിങ്ങളുടെ സ്വകാര്യ വിവരങ്ങൾ കൈകാര്യം ചെയ്യുക",
@@ -1661,5 +1692,18 @@
       "placement_rate": "പ്ലേസ്മെൻ്റ് നിരക്ക്",
       "corporate_partners": "കോർപ്പറേറ്റ് പങ്കാളികൾ"
     }
+  },
+  "streaks": {
+    "modal_title": "എന്റെ ദൈനംദിന സ്ട്രീക്കുകൾ",
+    "day_streak": "ദിവസത്തെ സ്ട്രീക്ക്",
+    "longest": "ഏറ്റവും ദൈർഘ്യമേറിയത്",
+    "days": "ദിവസങ്ങൾ",
+    "activity_tracker": "ദൈനംദിന പ്രവർത്തന ട്രാക്കർ (ഞായറാഴ്ച വിശ്രമം)",
+    "available_vouchers": "ലഭ്യമായ വൗച്ചറുകൾ",
+    "broken_title": "സ്ട്രീക്ക് തകർന്നു!",
+    "restore_instruction": "പുനഃസ്ഥാപിക്കാൻ വൗച്ചർ ഉപയോഗിക്കുക",
+    "select_voucher": "വൗച്ചർ തിരഞ്ഞെടുക്കുക",
+    "restore_button": "പുനഃസ്ഥാപിക്കുക",
+    "no_active_vouchers": "സജീവ വൗച്ചറുകൾ ഇല്ല"
   }
 }

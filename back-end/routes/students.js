@@ -21,7 +21,7 @@ router.use(protectOrBypass);
 // Get all students with search and filter functionality (staff only)
 router.get('/', requireRole('admin', 'teacher'), async (req, res) => {
     try {
-        const { search, college, status, assignedTeacher, limit = 50 } = req.query;
+        const { search, college, status, limit = 50 } = req.query;
         let query = {};
 
         // Filter by college
@@ -32,11 +32,6 @@ router.get('/', requireRole('admin', 'teacher'), async (req, res) => {
         // Filter by status
         if (status) {
             query.status = status;
-        }
-
-        // Filter by assigned teacher
-        if (assignedTeacher) {
-            query.assignedTeacher = assignedTeacher;
         }
 
         // Search functionality
@@ -53,7 +48,6 @@ router.get('/', requireRole('admin', 'teacher'), async (req, res) => {
         const students = await Student.find(query)
             .select('-password')
             .populate('college', 'collegeName collegeCode')
-            .populate('assignedTeacher', 'fullName email')
             .sort({ createdAt: -1 })
             .limit(parseInt(limit));
 
@@ -120,7 +114,6 @@ router.get('/:id', async (req, res) => {
         const student = await Student.findById(req.params.id)
             .select('-password')
             .populate('college', 'collegeName collegeCode address')
-            .populate('assignedTeacher', 'fullName email')
             .populate('enrolledCourses', 'title courseCode')
             .populate('assessments.assessment', 'assessmentName assessmentCode');
 
@@ -151,8 +144,7 @@ router.get('/studentId/:studentId', async (req, res) => {
             studentId: req.params.studentId.toUpperCase()
         })
             .select('-password')
-            .populate('college', 'collegeName collegeCode')
-            .populate('assignedTeacher', 'fullName email');
+            .populate('college', 'collegeName collegeCode');
 
         if (!student) {
             return res.status(404).json({

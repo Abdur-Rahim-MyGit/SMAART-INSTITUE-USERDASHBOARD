@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { streaksAPI } from "@/services/streaksApi";
+import { useTranslation } from "react-i18next";
 
 /* ── Animated counter ─────────────────────────────────────────── */
 const AnimatedNumber = ({ value }) => {
@@ -50,6 +51,7 @@ const Sparks = ({ count = 10 }) =>
 
 /* ── Main Widget ──────────────────────────────────────────────── */
 const StreaksWidget = ({ isModal = false }) => {
+  const { t, i18n } = useTranslation();
   const [streakData, setStreakData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -179,7 +181,7 @@ const StreaksWidget = ({ isModal = false }) => {
       if (isSunday) state = "sunday";
       else if (activeDates.has(dateStr)) state = "active";
       days.push({
-        name: d.toLocaleDateString("en-US", { weekday: "short" }),
+        name: d.toLocaleDateString(i18n.language || "en-US", { weekday: "short" }),
         date: d.getDate(), state,
         isToday: dateStr === getLocalDateString(now),
       });
@@ -252,16 +254,16 @@ const StreaksWidget = ({ isModal = false }) => {
               </span>
               <div className="border border-slate-200/80 dark:border-slate-700 rounded-full px-3 py-1 bg-white dark:bg-[#002147] shadow-sm mt-2">
                 <span className="text-[11px] font-black text-[#1e3a8a] dark:text-blue-400 tracking-widest uppercase">
-                  Day Streak
+                  {t('streaks.day_streak', 'Day Streak')}
                 </span>
               </div>
             </div>
             
             <div className="flex items-center gap-2 mt-4 text-slate-500 dark:text-slate-400 ml-1">
               <Trophy className="w-4 h-4 text-[#1e3a8a] dark:text-blue-400 stroke-[2]" />
-              <span className="text-[15px] font-semibold">Longest:</span>
+              <span className="text-[15px] font-semibold">{t('streaks.longest', 'Longest')}:</span>
               <span className="text-[15px] font-black text-[#0f172a] dark:text-white">
-                {streakData?.longestStreak || 0} days
+                {streakData?.longestStreak || 0} {t('streaks.days', 'days')}
               </span>
             </div>
           </div>
@@ -272,7 +274,7 @@ const StreaksWidget = ({ isModal = false }) => {
           <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 ml-1">
             <Calendar className="w-4 h-4 stroke-[2]" />
             <span className="text-[11px] font-extrabold uppercase tracking-widest">
-              Daily Activity Tracker (Sundays Rest)
+              {t('streaks.activity_tracker', 'Daily Activity Tracker (Sundays Rest)')}
             </span>
           </div>
 
@@ -323,7 +325,7 @@ const StreaksWidget = ({ isModal = false }) => {
         <div className="mt-1 flex items-center gap-3 w-full bg-[#f4f6fb] dark:bg-slate-800/50 border border-[#e2e8f0] dark:border-slate-700/50 py-3.5 px-5 rounded-xl shadow-sm">
           <Gift className="w-5 h-5 text-[#1e3a8a] dark:text-blue-400 stroke-[2]" />
           <span className="text-[13px] font-black text-[#1e3a8a] dark:text-blue-400 ml-1 tracking-wide">
-            Available Vouchers: {activeVouchers.length}
+            {t('streaks.available_vouchers', 'Available Vouchers')}: {activeVouchers.length}
           </span>
           <Sparkles className="w-4 h-4 text-[#1e3a8a]/60 dark:text-blue-400/60 ml-auto" />
         </div>
@@ -362,11 +364,11 @@ const StreaksWidget = ({ isModal = false }) => {
                 <ShieldAlert className="w-5 h-5 animate-pulse" />
               </div>
               <div>
-                <h4 className="text-[15px] font-black text-slate-800 dark:text-white">Streak broken!</h4>
+                <h4 className="text-[15px] font-black text-slate-800 dark:text-white">{t('streaks.broken_title', 'Streak broken!')}</h4>
                 <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                  Use a voucher to restore to{" "}
+                  {t('streaks.restore_instruction', 'Use a voucher to restore to')}{" "}
                   <span className="text-rose-600 dark:text-rose-400 font-black">
-                    {streakData.preResetStreak} days
+                    {streakData.preResetStreak} {t('streaks.days', 'days')}
                   </span>
                 </p>
               </div>
@@ -380,7 +382,7 @@ const StreaksWidget = ({ isModal = false }) => {
                     onChange={(e) => setSelectedVoucher(e.target.value)}
                     className="flex-1 text-[13px] font-bold py-2.5 px-3 bg-slate-50 dark:bg-[#001a40] border border-slate-200 dark:border-white/10 rounded-xl text-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#405cd2]/30"
                   >
-                    <option value="">Select Voucher</option>
+                    <option value="">{t('streaks.select_voucher', 'Select Voucher')}</option>
                     {activeVouchers.map((v, i) => (
                       <option key={i} value={v.voucher.code}>
                         {v.voucher.code}
@@ -393,13 +395,13 @@ const StreaksWidget = ({ isModal = false }) => {
                     className="py-2.5 px-5 bg-[#405cd2] hover:bg-[#304bc2] text-white rounded-xl text-[13px] font-black shadow-md active:translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-1.5 min-w-[100px]"
                   >
                     <RefreshCw className={`w-4 h-4 ${actionLoading ? "animate-spin" : ""}`} />
-                    Restore
+                    {t('streaks.restore_button', 'Restore')}
                   </button>
                 </>
               ) : (
                 <div className="text-[13px] font-black text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 py-2.5 px-4 rounded-xl flex items-center gap-2 border border-rose-100 w-full justify-center">
                   <Gift className="w-4 h-4" />
-                  No Active Vouchers
+                  {t('streaks.no_active_vouchers', 'No Active Vouchers')}
                 </div>
               )}
             </div>

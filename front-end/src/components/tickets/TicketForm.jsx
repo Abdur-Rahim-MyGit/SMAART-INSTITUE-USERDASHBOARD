@@ -17,19 +17,24 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
 
   const CATEGORIES = [
     {
+      value: 'technical',
+      label: t("support_tickets_page.cat_technical", "Technical Issue"),
+      description: t("support_tickets_page.cat_technical_desc", "Hardware, software, device connection, system bugs")
+    },
+    {
       value: 'account',
-      label: t("support_tickets_page.cat_account", "Account"),
+      label: t("support_tickets_page.cat_account", "Account Issue"),
       description: t("support_tickets_page.cat_account_desc", "Login, access, permissions")
     },
     {
-      value: 'course issue',
-      label: t("support_tickets_page.cat_course_issue", "Course Issue"),
-      description: t("support_tickets_page.cat_course_issue_desc", "Course access, content, and materials")
+      value: 'course',
+      label: t("support_tickets_page.cat_course", "Course Issue"),
+      description: t("support_tickets_page.cat_course_desc", "Course content, videos, modules access")
     },
     {
-      value: 'assessment issue',
-      label: t("support_tickets_page.cat_assessment_issue", "Assessment Issue"),
-      description: t("support_tickets_page.cat_assessment_issue_desc", "Assessment access and evaluation")
+      value: 'assessment',
+      label: t("support_tickets_page.cat_assessment", "Assessment Issue"),
+      description: t("support_tickets_page.cat_assessment_desc", "Test access, submission errors, grading")
     },
     {
       value: 'career Direction',
@@ -37,8 +42,18 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
       description: t("support_tickets_page.cat_career_direction_desc", "Career Direction guidance and support")
     },
     {
+      value: 'placement issue',
+      label: t("support_tickets_page.cat_placement", "Placement Issue"),
+      description: t("support_tickets_page.cat_placement_desc", "Job application, placement drive, resume upload")
+    },
+    {
+      value: 'certificates & badges issue',
+      label: t("support_tickets_page.cat_certificates_badges", "Certificates & Badges Issue"),
+      description: t("support_tickets_page.cat_certificates_badges_desc", "Certificate generation, badge unlock, sharing")
+    },
+    {
       value: 'other',
-      label: t("support_tickets_page.cat_other", "Other"),
+      label: t("support_tickets_page.cat_other", "Others Issue"),
       description: t("support_tickets_page.cat_other_desc", "General IT inquiries")
     }
   ];
@@ -120,9 +135,9 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
       return true;
     });
 
-    // Max 3 files
-    if (attachments.length + validFiles.length > 3) {
-      setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_count", "Maximum 3 attachments allowed") }));
+    // Max 20 files
+    if (attachments.length + validFiles.length > 20) {
+      setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_count", "Maximum 20 attachments allowed") }));
       return;
     }
 
@@ -282,31 +297,6 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
         )}
       </div>
 
-      {/* Priority */}
-      <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
-          {t("support_tickets_page.priority", "Priority")}
-        </label>
-        <div className="flex flex-wrap gap-2.5">
-          {PRIORITIES.map((pri) => {
-            const isSelected = formData.priority === pri.value;
-            return (
-              <button
-                key={pri.value}
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, priority: pri.value }))}
-                className={`px-6 py-2 text-sm font-semibold rounded-xl border transition-all ${isSelected
-                  ? pri.selectedClass
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-350 hover:border-slate-350 dark:hover:border-white/20'
-                  }`}
-              >
-                {pri.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Attachments */}
       <div className="space-y-2">
         <label className="block text-sm font-bold text-slate-700 dark:text-white">
@@ -375,7 +365,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
               );
             })}
 
-            {attachments.length < 3 && (
+            {attachments.length < 20 && (
               <label
                 htmlFor="attachments-upload"
                 className="flex items-center justify-center p-3 border border-dashed border-slate-250 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500"
