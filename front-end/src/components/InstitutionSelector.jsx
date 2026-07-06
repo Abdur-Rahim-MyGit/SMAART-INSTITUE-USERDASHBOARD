@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Building2, AlertCircle, RefreshCw, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { apiCall } from "@/services/api";
 
 const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
+  const { t } = useTranslation();
   const [selectedInstitution, setSelectedInstitution] = useState(null);
   const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,12 +32,12 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
       if (data.success) {
         setColleges(data.data || []);
       } else {
-        setError(data.error || 'Failed to load institutions');
+        setError(data.error || t('institution_select.error_load_failed', 'Failed to load institutions'));
         setColleges([]);
       }
     } catch (err) {
       console.error('Fetch colleges detail error:', err);
-      setError(err.message || 'Unable to load institutions. Please check your connection.');
+      setError(err.message || t('institution_select.error_unavailable', 'Unable to load institutions. Please check your connection.'));
       setColleges([]);
     } finally {
       setLoading(false);
@@ -156,7 +158,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
 
             <Input
               type="text"
-              placeholder="Type to search for your college…"
+              placeholder={t("institution_select.search_placeholder", "Type to search for your college…")}
               value={searchTerm}
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
@@ -175,7 +177,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
               <button
                 onClick={() => { setSearchTerm(""); setColleges([]); }}
                 className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors"
-                title="Clear search"
+                title={t("institution_select.clear_search", "Clear search")}
               >
                 <div className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/10">
                   <span className="text-[10px]">&times;</span>
@@ -199,7 +201,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                 {colleges.length > 0 ? (
                   <div className="p-2 sm:p-3">
                     <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/10 mb-2">
-                      Matching Institutions
+                      {t("institution_select.matching", "Matching Institutions")}
                     </p>
                     <div className="space-y-1">
                       {colleges.map((college, index) => (
@@ -283,7 +285,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                   <div className="p-8 text-center bg-white dark:bg-[#001c3d]">
                     <div className="flex flex-col items-center gap-3">
                       <RefreshCw className="h-6 w-6 text-[#1a3884] animate-spin" />
-                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">Searching...</p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">{t("institution_select.searching", "Searching...")}</p>
                     </div>
                   </div>
                 ) : error ? (
@@ -295,7 +297,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                         onClick={handleRetry}
                         className="mt-2 px-4 py-1.5 bg-[#1a3884] hover:bg-[#1a3884]/90 rounded-full text-xs font-bold text-white transition-colors"
                       >
-                        Try Again
+                        {t("institution_select.try_again", "Try Again")}
                       </button>
                     </div>
                   </div>
@@ -303,8 +305,8 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                   <div className="p-8 text-center bg-white dark:bg-[#001c3d]">
                     <div className="flex flex-col items-center gap-2">
                       <Building2 className="h-6 w-6 text-gray-300 dark:text-gray-600 mb-1" />
-                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">No partner institution found.</p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest">Verify the name and try again</p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">{t("institution_select.no_results", "No partner institution found.")}</p>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest">{t("institution_select.verify_name", "Verify the name and try again")}</p>
                     </div>
                   </div>
                 )}

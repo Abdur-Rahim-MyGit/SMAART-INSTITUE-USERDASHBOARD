@@ -9,6 +9,7 @@ import {
   IconFilter, IconShieldX, IconChartBar, IconShieldCheck, IconHelp,
   IconFlame, IconLogin, IconLogout, IconActivity, IconCalendar, IconBolt, IconAlertTriangle
 } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { apiCall } from '@/services/api';
 import useUser from '@/hooks/useUser';
 import { streaksAPI } from '@/services/streaksApi';
@@ -22,15 +23,22 @@ const CustomTooltip = ({ active, payload, label, y1Name = "Progress", y2Name = "
     return (
       <div className="bg-white dark:bg-[#002147] p-4 rounded-xl shadow-xl border border-slate-100 dark:border-white/10 text-xs">
         <p className="font-bold text-slate-800 dark:text-slate-200 mb-2">{label}</p>
-        {payload.map((p, idx) => (
-          <div key={idx} className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color || p.fill }} />
-            <span className="text-slate-500 dark:text-slate-400">{p.name}:</span>
-            <span className="font-bold text-slate-900 dark:text-white">
-              {p.value}{p.name.includes('Rate') || p.name.includes('Progress') ? '%' : p.name.includes('Hours') || p.name.includes('Time') ? 'h' : ''}
-            </span>
-          </div>
-        ))}
+        {payload.map((p, idx) => {
+          // Derive the unit from the stable dataKey (language-independent),
+          // so translated series names still render the correct suffix.
+          const pctKeys = ['progress', 'participationRate', 'averageProgress'];
+          const hourKeys = ['hoursSpent'];
+          const unit = pctKeys.includes(p.dataKey) ? '%' : hourKeys.includes(p.dataKey) ? 'h' : '';
+          return (
+            <div key={idx} className="flex items-center gap-2 mb-1">
+              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color || p.fill }} />
+              <span className="text-slate-500 dark:text-slate-400">{p.name}:</span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                {p.value}{unit}
+              </span>
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -42,6 +50,7 @@ const CustomTooltip = ({ active, payload, label, y1Name = "Progress", y2Name = "
 // ----------------------------------------------------
 export const StudentAnalyticsView = () => {
   const { user } = useUser();
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState(null);
   const [streakData, setStreakData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -90,8 +99,8 @@ export const StudentAnalyticsView = () => {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-[#002A5C] rounded-2xl border border-slate-100 dark:border-white/10 text-center">
         <ShieldAlert className="w-12 h-12 text-slate-400 mb-4" />
-        <h3 className="font-bold text-slate-900 dark:text-white mb-2">No Student Data Available</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Enroll in courses to begin tracking your progress.</p>
+        <h3 className="font-bold text-slate-900 dark:text-white mb-2">{t('analytics.no_student_data', 'No Student Data Available')}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('analytics.no_student_data_desc', 'Enroll in courses to begin tracking your progress.')}</p>
       </div>
     );
   }
@@ -111,7 +120,7 @@ export const StudentAnalyticsView = () => {
 
   const getFriendlyDate = (dateStr) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+    return d.toLocaleDateString(i18n.language || 'en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   // 1. Interpolate Selected Date in Chart Timeline Data
@@ -187,7 +196,7 @@ export const StudentAnalyticsView = () => {
   // Create course details map to match up.courseCode to course details
   const courseDetailsMap = new Map();
   courses.forEach(enroll => {
-    const courseTitle = enroll.course?.title || "Unknown Course";
+    const courseTitle = enroll.course?.title || t('analytics.unknown_course', 'Unknown Course');
     const courseCodeVal = enroll.course?.courseCode || enroll.course?.code || "";
     const courseNumberVal = enroll.course?.courseNumber || "";
     const courseDbIdVal = enroll.course?._id || "";
@@ -253,81 +262,81 @@ export const StudentAnalyticsView = () => {
         // Standard 7-step mapping
         switch (stepId) {
           case 1:
-            detail = 'Completed Video Lecture: Why';
+            detail = t('analytics.event.video_why', 'Completed Video Lecture: Why');
             eventType = 'video';
             break;
           case 2:
-            detail = 'Completed Video Lecture: Story';
+            detail = t('analytics.event.video_story', 'Completed Video Lecture: Story');
             eventType = 'video';
             break;
           case 3:
-            detail = 'Completed Video Lecture: Framework';
+            detail = t('analytics.event.video_framework', 'Completed Video Lecture: Framework');
             eventType = 'video';
             break;
           case 4:
             if (up.testCompleted && up.testScore !== null) {
-              detail = `Submitted Practice Quiz (Score: ${up.testScore}/${up.testTotalPoints})`;
+              detail = t('analytics.event.practice_quiz', 'Submitted Practice Quiz (Score: {{score}}/{{total}})', { score: up.testScore, total: up.testTotalPoints });
               eventType = 'quiz';
             } else {
-              detail = 'Completed Practice Assignment';
+              detail = t('analytics.event.practice_assignment', 'Completed Practice Assignment');
             }
             break;
           case 5:
-            detail = 'Completed Flashcard reinforcement cards';
+            detail = t('analytics.event.flashcards', 'Completed Flashcard reinforcement cards');
             break;
           case 6:
-            detail = 'Completed Case Study & Reflections';
+            detail = t('analytics.event.case_study', 'Completed Case Study & Reflections');
             break;
           case 7:
-            detail = 'Submitted Self-Reflection';
+            detail = t('analytics.event.self_reflection', 'Submitted Self-Reflection');
             eventType = 'reflection';
             break;
           default:
-            detail = `Completed Step ${stepId}`;
+            detail = t('analytics.event.completed_step', 'Completed Step {{step}}', { step: stepId });
         }
       } else {
         // 8-step builder flow mapping
         switch (stepId) {
           case 1:
-            detail = 'Completed Video Lecture: Why';
+            detail = t('analytics.event.video_why', 'Completed Video Lecture: Why');
             eventType = 'video';
             break;
           case 2:
-            detail = 'Completed Video Lecture: Story';
+            detail = t('analytics.event.video_story', 'Completed Video Lecture: Story');
             eventType = 'video';
             break;
           case 3:
-            detail = 'Completed Video Lecture: Framework';
+            detail = t('analytics.event.video_framework', 'Completed Video Lecture: Framework');
             eventType = 'video';
             break;
           case 4:
             if (up.testCompleted && up.testScore !== null) {
-              detail = `Submitted Practice Quiz (Score: ${up.testScore}/${up.testTotalPoints})`;
+              detail = t('analytics.event.practice_quiz', 'Submitted Practice Quiz (Score: {{score}}/{{total}})', { score: up.testScore, total: up.testTotalPoints });
               eventType = 'quiz';
             } else {
-              detail = 'Completed Practice Assignment';
+              detail = t('analytics.event.practice_assignment', 'Completed Practice Assignment');
             }
             break;
           case 5:
-            detail = 'Completed Flashcard reinforcement cards';
+            detail = t('analytics.event.flashcards', 'Completed Flashcard reinforcement cards');
             break;
           case 6:
             if (up.testCompleted && up.testScore !== null) {
-              detail = `Submitted Advanced Practice Quiz (Score: ${up.testScore}/${up.testTotalPoints})`;
+              detail = t('analytics.event.advanced_practice_quiz', 'Submitted Advanced Practice Quiz (Score: {{score}}/{{total}})', { score: up.testScore, total: up.testTotalPoints });
               eventType = 'quiz';
             } else {
-              detail = 'Completed Advanced Practice Assignment';
+              detail = t('analytics.event.advanced_practice_assignment', 'Completed Advanced Practice Assignment');
             }
             break;
           case 7:
-            detail = 'Completed Case Study & Reflections';
+            detail = t('analytics.event.case_study', 'Completed Case Study & Reflections');
             break;
           case 8:
-            detail = 'Submitted Self-Reflection';
+            detail = t('analytics.event.self_reflection', 'Submitted Self-Reflection');
             eventType = 'reflection';
             break;
           default:
-            detail = `Completed Step ${stepId}`;
+            detail = t('analytics.event.completed_step', 'Completed Step {{step}}', { step: stepId });
         }
       }
 
@@ -345,7 +354,7 @@ export const StudentAnalyticsView = () => {
   });
 
   courses.forEach(enroll => {
-    const courseTitle = enroll.course?.title || "Unknown Course";
+    const courseTitle = enroll.course?.title || t('analytics.unknown_course', 'Unknown Course');
     const courseCode = enroll.course?.courseCode || enroll.course?.code || enroll.course?.courseNumber || "";
     let courseActivityTime = 0;
     let tasksDone = 0;
@@ -398,7 +407,7 @@ export const StudentAnalyticsView = () => {
                 type: 'video',
                 time: formatEventTime(vw.watchedAt),
                 title: courseTitle,
-                detail: `Watched Video (${Math.round(durationMins)} mins)`,
+                detail: t('analytics.event.watched_video_mins', 'Watched Video ({{mins}} mins)', { mins: Math.round(durationMins) }),
                 timestamp: new Date(vw.watchedAt)
               });
             }
@@ -423,9 +432,9 @@ export const StudentAnalyticsView = () => {
               type: vp.isCompleted ? 'video_complete' : 'video',
               time: formatEventTime(vp.lastUpdated),
               title: courseTitle,
-              detail: vp.isCompleted 
-                ? `Completed Video: Day ${vp.dayId}, Step ${vp.stepId}` 
-                : `Watched Video: Day ${vp.dayId}, Step ${vp.stepId} (${vp.maxWatchedTime ? Math.round(vp.maxWatchedTime) : 0}s watched)`,
+              detail: vp.isCompleted
+                ? t('analytics.event.completed_video_day_step', 'Completed Video: Day {{day}}, Step {{step}}', { day: vp.dayId, step: vp.stepId })
+                : t('analytics.event.watched_video_day_step', 'Watched Video: Day {{day}}, Step {{step}} ({{seconds}}s watched)', { day: vp.dayId, step: vp.stepId, seconds: vp.maxWatchedTime ? Math.round(vp.maxWatchedTime) : 0 }),
               timestamp: new Date(vp.lastUpdated)
             });
           });
@@ -441,7 +450,7 @@ export const StudentAnalyticsView = () => {
                 type: 'quiz',
                 time: formatEventTime(q.completedAt),
                 title: courseTitle,
-                detail: `Submitted Quiz (Score: ${q.score}/${q.totalPoints})`,
+                detail: t('analytics.event.submitted_quiz', 'Submitted Quiz (Score: {{score}}/{{total}})', { score: q.score, total: q.totalPoints }),
                 timestamp: new Date(q.completedAt)
               });
             }
@@ -455,7 +464,7 @@ export const StudentAnalyticsView = () => {
                 type: 'reflection',
                 time: formatEventTime(r.submittedAt),
                 title: courseTitle,
-                detail: `Submitted Self-Reflection: Question #${r.questionIndex + 1}`,
+                detail: t('analytics.event.self_reflection_q', 'Submitted Self-Reflection: Question #{{num}}', { num: r.questionIndex + 1 }),
                 timestamp: new Date(r.submittedAt)
               });
             }
@@ -473,7 +482,7 @@ export const StudentAnalyticsView = () => {
                 type: 'task',
                 time: formatEventTime(ct.completedAt),
                 title: courseTitle,
-                detail: `Completed Practice Task: Day ${ct.dayId}, Task ID ${ct.taskId}`,
+                detail: t('analytics.event.practice_task', 'Completed Practice Task: Day {{day}}, Task ID {{taskId}}', { day: ct.dayId, taskId: ct.taskId }),
                 timestamp: new Date(ct.completedAt)
               });
             }
@@ -489,7 +498,7 @@ export const StudentAnalyticsView = () => {
                 type: 'task_result',
                 time: formatEventTime(tr.completedAt),
                 title: courseTitle,
-                detail: `Graded Practice Task: Score ${tr.score}/${tr.totalPoints} (Day ${tr.dayId}, Step ${tr.stepId})`,
+                detail: t('analytics.event.graded_task', 'Graded Practice Task: Score {{score}}/{{total}} (Day {{day}}, Step {{step}})', { score: tr.score, total: tr.totalPoints, day: tr.dayId, step: tr.stepId }),
                 timestamp: new Date(tr.completedAt)
               });
             }
@@ -503,8 +512,8 @@ export const StudentAnalyticsView = () => {
       events.push({
         type: 'quiz',
         time: formatEventTime(enroll.preAssessmentScore.completedAt),
-        title: 'Assessments Page',
-        detail: `Completed Pre-Assessment for ${courseTitle} (Score: ${enroll.preAssessmentScore.score}/${enroll.preAssessmentScore.totalPoints})`,
+        title: t('analytics.event.assessments_page', 'Assessments Page'),
+        detail: t('analytics.event.completed_pre_assessment', 'Completed Pre-Assessment for {{course}} (Score: {{score}}/{{total}})', { course: courseTitle, score: enroll.preAssessmentScore.score, total: enroll.preAssessmentScore.totalPoints }),
         timestamp: new Date(enroll.preAssessmentScore.completedAt)
       });
     }
@@ -514,8 +523,8 @@ export const StudentAnalyticsView = () => {
       events.push({
         type: 'quiz',
         time: formatEventTime(enroll.postAssessmentScore.completedAt),
-        title: 'Assessments Page',
-        detail: `Completed Post-Assessment for ${courseTitle} (Score: ${enroll.postAssessmentScore.score}/${enroll.postAssessmentScore.totalPoints})`,
+        title: t('analytics.event.assessments_page', 'Assessments Page'),
+        detail: t('analytics.event.completed_post_assessment', 'Completed Post-Assessment for {{course}} (Score: {{score}}/{{total}})', { course: courseTitle, score: enroll.postAssessmentScore.score, total: enroll.postAssessmentScore.totalPoints }),
         timestamp: new Date(enroll.postAssessmentScore.completedAt)
       });
     }
@@ -525,7 +534,7 @@ export const StudentAnalyticsView = () => {
         type: 'course_complete',
         time: formatEventTime(enroll.completionDate),
         title: courseTitle,
-        detail: `🎉 Completed all modules of the course!`,
+        detail: t('analytics.event.course_complete', '🎉 Completed all modules of the course!'),
         timestamp: new Date(enroll.completionDate)
       });
     }
@@ -549,8 +558,8 @@ export const StudentAnalyticsView = () => {
       events.push({
         type: 'task',
         time: formatEventTime(vb.updatedAt || vb.createdAt),
-        title: 'Vision Board Page',
-        detail: `Updated Vision Board: ${vb.title}`,
+        title: t('analytics.event.vision_board_page', 'Vision Board Page'),
+        detail: t('analytics.event.updated_vision_board', 'Updated Vision Board: {{title}}', { title: vb.title }),
         timestamp: new Date(vb.updatedAt || vb.createdAt)
       });
     }
@@ -561,8 +570,8 @@ export const StudentAnalyticsView = () => {
     events.push({
       type: 'quiz',
       time: formatEventTime(finalPathway.updated_at || finalPathway.created_at),
-      title: 'Career Direction & Coach Page',
-      detail: `Locked Career Pathway Direction (Selected primary role: ${finalPathway.primary_role || 'Not Set'})`,
+      title: t('analytics.event.career_page', 'Career Direction & Coach Page'),
+      detail: t('analytics.event.locked_pathway', 'Locked Career Pathway Direction (Selected primary role: {{role}})', { role: finalPathway.primary_role || t('analytics.event.not_set', 'Not Set') }),
       timestamp: new Date(finalPathway.updated_at || finalPathway.created_at)
     });
   }
@@ -571,8 +580,8 @@ export const StudentAnalyticsView = () => {
       events.push({
         type: 'task',
         time: formatEventTime(ca.created_at),
-        title: 'Career Direction & Coach Page',
-        detail: `Ran AI Career Intelligence Scan (Target primary role: ${ca.primary_role})`,
+        title: t('analytics.event.career_page', 'Career Direction & Coach Page'),
+        detail: t('analytics.event.ran_career_scan', 'Ran AI Career Intelligence Scan (Target primary role: {{role}})', { role: ca.primary_role }),
         timestamp: new Date(ca.created_at)
       });
     }
@@ -586,8 +595,8 @@ export const StudentAnalyticsView = () => {
         events.push({
           type: 'community',
           time: formatEventTime(ts),
-          title: 'Community Page',
-          detail: 'Visited community hub',
+          title: t('analytics.event.community_page', 'Community Page'),
+          detail: t('analytics.event.visited_community', 'Visited community hub'),
           timestamp: new Date(ts)
         });
       }
@@ -605,8 +614,8 @@ export const StudentAnalyticsView = () => {
         events.push({
           type: 'profile',
           time: formatEventTime(ts),
-          title: 'Profile Page',
-          detail: 'Viewed or edited profile information',
+          title: t('analytics.event.profile_page', 'Profile Page'),
+          detail: t('analytics.event.viewed_profile', 'Viewed or edited profile information'),
           timestamp: new Date(ts)
         });
       }
@@ -631,11 +640,11 @@ export const StudentAnalyticsView = () => {
           type: entry.type, // 'login' | 'logout'
           time: entryTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           title: entry.type === 'login'
-            ? (entry.ts.split('T')[0] === getTodayStr() ? 'Active Session Started (Login Logged)' : 'Session Started (Login Logged)')
-            : 'Session Ended (Logout Logged)',
+            ? (entry.ts.split('T')[0] === getTodayStr() ? t('analytics.event.active_session_started', 'Active Session Started (Login Logged)') : t('analytics.event.session_started', 'Session Started (Login Logged)'))
+            : t('analytics.event.session_ended', 'Session Ended (Logout Logged)'),
           detail: entry.type === 'login'
-            ? `Logged in — ${window.location.hostname === 'localhost' ? 'Local System' : 'SMAART Portal'}`
-            : 'Session closed and progress saved.',
+            ? t('analytics.event.logged_in_from', 'Logged in — {{source}}', { source: window.location.hostname === 'localhost' ? t('analytics.event.local_system', 'Local System') : t('analytics.event.smaart_portal', 'SMAART Portal') })
+            : t('analytics.event.session_closed_saved', 'Session closed and progress saved.'),
           timestamp: entryTime
         });
       }
@@ -653,8 +662,8 @@ export const StudentAnalyticsView = () => {
         events.push({
           type: 'login',
           time: new Date(user.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          title: lastLoginDateStr === getTodayStr() ? 'Active Session Started (Login Logged)' : 'Session Started (Login Logged)',
-          detail: 'Logged in from ' + (window.location.hostname === 'localhost' ? 'Local System' : 'Portal IP'),
+          title: lastLoginDateStr === getTodayStr() ? t('analytics.event.active_session_started', 'Active Session Started (Login Logged)') : t('analytics.event.session_started', 'Session Started (Login Logged)'),
+          detail: t('analytics.event.logged_in_from2', 'Logged in from {{source}}', { source: window.location.hostname === 'localhost' ? t('analytics.event.local_system', 'Local System') : t('analytics.event.portal_ip', 'Portal IP') }),
           timestamp: new Date(user.lastLogin)
         });
       }
@@ -669,8 +678,8 @@ export const StudentAnalyticsView = () => {
         events.push({
           type: 'login',
           time: new Date(user.previousLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          title: 'Previous Session Started (Login Logged)',
-          detail: 'Session initiated successfully.',
+          title: t('analytics.event.prev_session_started', 'Previous Session Started (Login Logged)'),
+          detail: t('analytics.event.session_initiated', 'Session initiated successfully.'),
           timestamp: new Date(user.previousLogin)
         });
 
@@ -678,8 +687,8 @@ export const StudentAnalyticsView = () => {
         events.push({
           type: 'logout',
           time: logoutTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          title: 'Previous Session Ended (Logout Logged)',
-          detail: 'User session closed successfully.',
+          title: t('analytics.event.prev_session_ended', 'Previous Session Ended (Logout Logged)'),
+          detail: t('analytics.event.user_session_closed', 'User session closed successfully.'),
           timestamp: logoutTime
         });
       }
@@ -694,37 +703,37 @@ export const StudentAnalyticsView = () => {
   const totalMinutesToday = actualMinutesToday > 0 ? actualMinutesToday : Math.round(dailyHoursSpent * 60);
   const dailyHours = Math.floor(totalMinutesToday / 60);
   const dailyMinutes = Math.round(totalMinutesToday % 60);
-  const dailyTimeSpentStr = dailyHours > 0 
-    ? `${dailyHours}h ${dailyMinutes}m` 
-    : `${dailyMinutes} mins`;
+  const dailyTimeSpentStr = dailyHours > 0
+    ? `${dailyHours}h ${dailyMinutes}m`
+    : `${dailyMinutes} ${t('analytics.mins', 'mins')}`;
 
   // Synthesize logs if timeline indicates study hours spent, but granular logs are missing (for fallback mock)
   if (events.length === 0 && dailyHoursSpent > 0) {
-    const primaryCourse = courses[0] || { course: { title: 'Assigned Course', code: 'CRS' }, progress: 0, status: 'in_progress' };
-    const courseTitle = primaryCourse.course?.title || 'Assigned Course';
+    const primaryCourse = courses[0] || { course: { title: t('analytics.assigned_course', 'Assigned Course'), code: 'CRS' }, progress: 0, status: 'in_progress' };
+    const courseTitle = primaryCourse.course?.title || t('analytics.assigned_course', 'Assigned Course');
     const courseCode = primaryCourse.course?.code || 'CRS';
-    
+
     events.push({
       type: 'login',
       time: '09:30 AM',
-      title: 'Session Started (Login Logged)',
-      detail: 'Secure browser connection established.',
+      title: t('analytics.event.session_started', 'Session Started (Login Logged)'),
+      detail: t('analytics.event.secure_connection', 'Secure browser connection established.'),
       timestamp: new Date(`${selectedDate}T09:30:00`)
     });
 
     events.push({
       type: 'video',
       time: '10:00 AM',
-      title: `Studied course material in ${courseTitle}`,
-      detail: `Reviewed lecture modules and steps for ${dailyTimeSpentStr}.`,
+      title: t('analytics.event.studied_material', 'Studied course material in {{course}}', { course: courseTitle }),
+      detail: t('analytics.event.reviewed_modules', 'Reviewed lecture modules and steps for {{duration}}.', { duration: dailyTimeSpentStr }),
       timestamp: new Date(`${selectedDate}T10:00:00`)
     });
 
     events.push({
       type: 'logout',
       time: '11:15 AM',
-      title: 'Session Ended (Logout Logged)',
-      detail: 'Successfully saved daily progression data.',
+      title: t('analytics.event.session_ended', 'Session Ended (Logout Logged)'),
+      detail: t('analytics.event.saved_progression', 'Successfully saved daily progression data.'),
       timestamp: new Date(`${selectedDate}T11:15:00`)
     });
 
@@ -746,22 +755,22 @@ export const StudentAnalyticsView = () => {
   // Streak status for selected date
   const isSunday = new Date(selectedDate).getDay() === 0;
   const hasActivity = dailyHoursSpent > 0 || events.length > 0;
-  let streakMessage = "Rest Day. Complete a step tomorrow to maintain your streak!";
+  let streakMessage = t('analytics.streak.rest_day', "Rest Day. Complete a step tomorrow to maintain your streak!");
   let isStreakMaintained = false;
 
   if (hasActivity) {
-    streakMessage = "Learning Streak maintained! Progression saved successfully.";
+    streakMessage = t('analytics.streak.maintained', "Learning Streak maintained! Progression saved successfully.");
     isStreakMaintained = true;
   } else if (isSunday) {
-    streakMessage = "Sundays Rest Day Policy applied. Streak preserved! 🧘";
+    streakMessage = t('analytics.streak.sunday', "Sundays Rest Day Policy applied. Streak preserved! 🧘");
     isStreakMaintained = true;
   } else {
     const todayStr = getTodayStr();
     if (selectedDate !== todayStr && new Date(selectedDate) < new Date(todayStr)) {
-      streakMessage = "No activity logged on this weekday. Streak was inactive.";
+      streakMessage = t('analytics.streak.inactive', "No activity logged on this weekday. Streak was inactive.");
       isStreakMaintained = false;
     } else {
-      streakMessage = "No activity logged yet today. Complete a task to keep the streak!";
+      streakMessage = t('analytics.streak.none_today', "No activity logged yet today. Complete a task to keep the streak!");
       isStreakMaintained = false;
     }
   }
@@ -872,8 +881,8 @@ export const StudentAnalyticsView = () => {
                                   interviewPrepMins + skillPassportMins;
   if (totalMinsFromBreakdown === 0 && dailyHoursSpent > 0) {
     const totalFallbackMins = Math.round(dailyHoursSpent * 60);
-    const primaryCourse = courses[0] || { course: { title: 'Assigned Course' } };
-    const primaryTitle = primaryCourse.course?.title || 'Assigned Course';
+    const primaryCourse = courses[0] || { course: { title: t('analytics.assigned_course', 'Assigned Course') } };
+    const primaryTitle = primaryCourse.course?.title || t('analytics.assigned_course', 'Assigned Course');
     
     courseTimeMap.set(primaryTitle, Math.round(totalFallbackMins * 0.4));
     assessmentMins = Math.round(totalFallbackMins * 0.1);
@@ -912,7 +921,7 @@ export const StudentAnalyticsView = () => {
 
   if (assessmentMins > 0) {
     categoryBreakdown.push({
-      label: 'Assessments',
+      label: t('analytics.category.assessments', 'Assessments'),
       minutes: Math.round(assessmentMins),
       color: 'bg-[#0d1f4e] dark:bg-blue-300',
       text: 'text-[#0d1f4e] dark:text-blue-300'
@@ -921,7 +930,7 @@ export const StudentAnalyticsView = () => {
 
   if (visionBoardMins > 0) {
     categoryBreakdown.push({
-      label: 'Vision Board',
+      label: t('analytics.category.vision_board', 'Vision Board'),
       minutes: Math.round(visionBoardMins),
       color: 'bg-[#1a3884] dark:bg-blue-400',
       text: 'text-[#1a3884] dark:text-blue-400'
@@ -930,7 +939,7 @@ export const StudentAnalyticsView = () => {
 
   if (careerDirectionMins > 0) {
     categoryBreakdown.push({
-      label: 'Career Direction & Coach',
+      label: t('analytics.category.career_direction', 'Career Direction & Coach'),
       minutes: Math.round(careerDirectionMins),
       color: 'bg-[#2b52b3] dark:bg-blue-500',
       text: 'text-[#2b52b3] dark:text-blue-500'
@@ -939,7 +948,7 @@ export const StudentAnalyticsView = () => {
 
   if (resumeBuilderMins > 0) {
     categoryBreakdown.push({
-      label: 'Resume Builder',
+      label: t('analytics.category.resume_builder', 'Resume Builder'),
       minutes: Math.round(resumeBuilderMins),
       color: 'bg-cyan-500',
       text: 'text-cyan-500'
@@ -948,7 +957,7 @@ export const StudentAnalyticsView = () => {
 
   if (dictionaryMins > 0) {
     categoryBreakdown.push({
-      label: 'General Dictionary',
+      label: t('analytics.category.dictionary', 'General Dictionary'),
       minutes: Math.round(dictionaryMins),
       color: 'bg-sky-600',
       text: 'text-sky-600'
@@ -957,7 +966,7 @@ export const StudentAnalyticsView = () => {
 
   if (notesMins > 0) {
     categoryBreakdown.push({
-      label: 'My Notes',
+      label: t('analytics.category.notes', 'My Notes'),
       minutes: Math.round(notesMins),
       color: 'bg-teal-500',
       text: 'text-teal-500'
@@ -966,7 +975,7 @@ export const StudentAnalyticsView = () => {
 
   if (interviewPrepMins > 0) {
     categoryBreakdown.push({
-      label: 'Interview Prep',
+      label: t('analytics.category.interview_prep', 'Interview Prep'),
       minutes: Math.round(interviewPrepMins),
       color: 'bg-orange-500',
       text: 'text-orange-500'
@@ -975,7 +984,7 @@ export const StudentAnalyticsView = () => {
 
   if (skillPassportMins > 0) {
     categoryBreakdown.push({
-      label: 'Skill Passport',
+      label: t('analytics.category.skill_passport', 'Skill Passport'),
       minutes: Math.round(skillPassportMins),
       color: 'bg-pink-500',
       text: 'text-pink-500'
@@ -984,7 +993,7 @@ export const StudentAnalyticsView = () => {
 
   if (categoryBreakdown.length === 0) {
     categoryBreakdown.push({
-      label: 'No active session details',
+      label: t('analytics.no_active_session', 'No active session details'),
       minutes: 0,
       color: 'bg-slate-350',
       text: 'text-slate-500'
@@ -997,7 +1006,7 @@ export const StudentAnalyticsView = () => {
     if (hrs > 0) {
       return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
     }
-    return `${mins} mins`;
+    return `${mins} ${t('analytics.mins', 'mins')}`;
   };
 
   // Calculate completions specifically for the selected date
@@ -1007,17 +1016,17 @@ export const StudentAnalyticsView = () => {
 
   const assessmentsCompletedToday = [];
   courses.forEach(enroll => {
-    const courseTitle = enroll.course?.title || "Unknown Course";
+    const courseTitle = enroll.course?.title || t('analytics.unknown_course', 'Unknown Course');
     if (enroll.preAssessmentScore && enroll.preAssessmentScore.completedAt && isSelectedDay(enroll.preAssessmentScore.completedAt)) {
       assessmentsCompletedToday.push({
-        name: `Pre-Assessment for ${courseTitle}`,
+        name: t('analytics.pre_assessment_for', 'Pre-Assessment for {{course}}', { course: courseTitle }),
         score: `${enroll.preAssessmentScore.score}/${enroll.preAssessmentScore.totalPoints}`,
         type: 'Pre-Assessment'
       });
     }
     if (enroll.postAssessmentScore && enroll.postAssessmentScore.completedAt && isSelectedDay(enroll.postAssessmentScore.completedAt)) {
       assessmentsCompletedToday.push({
-        name: `Post-Assessment for ${courseTitle}`,
+        name: t('analytics.post_assessment_for', 'Post-Assessment for {{course}}', { course: courseTitle }),
         score: `${enroll.postAssessmentScore.score}/${enroll.postAssessmentScore.totalPoints}`,
         type: 'Post-Assessment'
       });
@@ -1028,7 +1037,7 @@ export const StudentAnalyticsView = () => {
           mp.quizzesTaken.forEach(q => {
             if (isSelectedDay(q.completedAt)) {
               assessmentsCompletedToday.push({
-                name: `Module ${mIdx + 1} Quiz (${courseTitle})`,
+                name: t('analytics.module_quiz', 'Module {{num}} Quiz ({{course}})', { num: mIdx + 1, course: courseTitle }),
                 score: `${q.score}/${q.totalPoints}`,
                 type: 'Quiz'
               });
@@ -1045,10 +1054,10 @@ export const StudentAnalyticsView = () => {
       <div className="bg-white dark:bg-[#001630] p-4 sm:p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-[20px] font-extrabold text-[#0d1f4e] dark:text-white mt-1">
-            Performance on: <span className="text-[#1a3884] dark:text-blue-400">{getFriendlyDate(selectedDate)}</span>
+            {t('analytics.performance_on', 'Performance on:')} <span className="text-[#1a3884] dark:text-blue-400">{getFriendlyDate(selectedDate)}</span>
           </h2>
           <p className="text-[12.5px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-            Select any date to view historical study times, course completions, and activity logs.
+            {t('analytics.date_picker_hint', 'Select any date to view historical study times, course completions, and activity logs.')}
           </p>
         </div>
 
@@ -1074,7 +1083,7 @@ export const StudentAnalyticsView = () => {
                 : 'bg-slate-100 dark:bg-slate-900 text-slate-650 hover:bg-slate-200 dark:hover:bg-slate-800'
             }`}
           >
-            Today
+            {t('analytics.today', 'Today')}
           </button>
         </div>
       </div>
@@ -1082,33 +1091,33 @@ export const StudentAnalyticsView = () => {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { 
-            label: 'Today Learning Time', 
-            value: dailyTimeSpentStr, 
-            subText: dailyHoursSpent > 0 ? 'Active learning session logged' : 'No learning time logged',
-            icon: IconClock, 
-            color: 'text-[#1a3884] dark:text-blue-400', 
-            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
+          {
+            label: t('analytics.metric.today_learning', 'Today Learning Time'),
+            value: dailyTimeSpentStr,
+            subText: dailyHoursSpent > 0 ? t('analytics.metric.today_learning_active', 'Active learning session logged') : t('analytics.metric.today_learning_none', 'No learning time logged'),
+            icon: IconClock,
+            color: 'text-[#1a3884] dark:text-blue-400',
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40'
           },
-          { 
-            label: 'Total Hours on System', 
-            value: `${metrics.totalHoursSpent || 0} hours`, 
-            subText: 'Cumulative time spent studying',
-            icon: IconBook, 
-            color: 'text-[#1a3884] dark:text-blue-400', 
-            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
+          {
+            label: t('analytics.metric.total_hours', 'Total Hours on System'),
+            value: t('analytics.metric.hours_value', '{{count}} hours', { count: metrics.totalHoursSpent || 0 }),
+            subText: t('analytics.metric.total_hours_sub', 'Cumulative time spent studying'),
+            icon: IconBook,
+            color: 'text-[#1a3884] dark:text-blue-400',
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40'
           },
-          { 
-            label: 'Daily Avg Learning', 
-            value: metrics.dailyUsage ? (metrics.dailyUsage >= 1 ? `${metrics.dailyUsage}h/day` : `${Math.round(metrics.dailyUsage * 60)} mins/day`) : '0 mins/day', 
-            subText: 'Average hours spent per day',
-            icon: IconCircleCheck, 
-            color: 'text-[#1a3884] dark:text-blue-400', 
-            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40' 
+          {
+            label: t('analytics.metric.daily_avg', 'Daily Avg Learning'),
+            value: metrics.dailyUsage ? (metrics.dailyUsage >= 1 ? t('analytics.metric.hours_per_day', '{{count}}h/day', { count: metrics.dailyUsage }) : t('analytics.metric.mins_per_day', '{{count}} mins/day', { count: Math.round(metrics.dailyUsage * 60) })) : t('analytics.metric.mins_per_day', '{{count}} mins/day', { count: 0 }),
+            subText: t('analytics.metric.daily_avg_sub', 'Average hours spent per day'),
+            icon: IconCircleCheck,
+            color: 'text-[#1a3884] dark:text-blue-400',
+            bg: 'bg-[#eef4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40'
           },
-          { 
-            label: 'Current Streak', 
-            value: `${streakData?.currentStreak || 0} Days`, 
+          {
+            label: t('analytics.metric.current_streak', 'Current Streak'),
+            value: t('analytics.metric.days_value', '{{count}} Days', { count: streakData?.currentStreak || 0 }),
             subText: streakMessage,
             icon: IconFlame, 
             color: isStreakMaintained ? 'text-[#1a3884] dark:text-blue-400 animate-pulse' : 'text-slate-400', 
@@ -1136,9 +1145,9 @@ export const StudentAnalyticsView = () => {
           <div>
             <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2">
               <IconChartBar stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-              Progression Over Time
+              {t('analytics.progression_over_time', 'Progression Over Time')}
             </h3>
-            <p className="text-[12.5px] text-slate-500 mt-1">Correlation between completion % and daily usage (hours/day). Highlighted date: <span className="text-[#1a3884] dark:text-blue-400 font-bold">{getFriendlyDate(selectedDate)}</span></p>
+            <p className="text-[12.5px] text-slate-500 mt-1">{t('analytics.progression_desc', 'Correlation between completion % and daily usage (hours/day). Highlighted date:')} <span className="text-[#1a3884] dark:text-blue-400 font-bold">{getFriendlyDate(selectedDate)}</span></p>
           </div>
         </div>
         <div className="h-[350px] w-full">
@@ -1152,13 +1161,13 @@ export const StudentAnalyticsView = () => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.3} vertical={false} />
               <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Completion %', angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 11 }} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'Hours/Day', angle: 90, position: 'insideRight', fill: '#94a3b8', fontSize: 11 }} />
+              <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: t('analytics.chart.completion_pct', 'Completion %'), angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 11 }} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: t('analytics.chart.hours_day', 'Hours/Day'), angle: 90, position: 'insideRight', fill: '#94a3b8', fontSize: 11 }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-              <Area yAxisId="left" type="monotone" name="Completion %" dataKey="progress" stroke="#1a3884" strokeWidth={3} fillOpacity={1} fill="url(#colorProgress)" />
-              <Bar yAxisId="right" name="Hours/Day" dataKey="hoursSpent" barSize={24} fill="#8cb2f9" radius={[4, 4, 0, 0]} />
-              <ReferenceLine x={selectedDate} yAxisId="left" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" label={{ value: 'Selected Date', fill: '#f59e0b', fontSize: 10, position: 'top' }} />
+              <Area yAxisId="left" type="monotone" name={t('analytics.chart.completion_pct', 'Completion %')} dataKey="progress" stroke="#1a3884" strokeWidth={3} fillOpacity={1} fill="url(#colorProgress)" />
+              <Bar yAxisId="right" name={t('analytics.chart.hours_day', 'Hours/Day')} dataKey="hoursSpent" barSize={24} fill="#8cb2f9" radius={[4, 4, 0, 0]} />
+              <ReferenceLine x={selectedDate} yAxisId="left" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" label={{ value: t('analytics.chart.selected_date', 'Selected Date'), fill: '#f59e0b', fontSize: 10, position: 'top' }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -1171,7 +1180,7 @@ export const StudentAnalyticsView = () => {
           <div className="bg-white dark:bg-[#001630] p-4 sm:p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
             <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2 mb-6">
               <IconClock stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-              Where Learning Time Was Spent (Today)
+              {t('analytics.where_time_spent', 'Where Learning Time Was Spent (Today)')}
             </h3>
             
             <div className="space-y-4">
@@ -1186,11 +1195,11 @@ export const StudentAnalyticsView = () => {
                         <span>{item.label}</span>
                         {item.progress !== undefined && item.progress !== null && (
                           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
-                            (Syllabus: {item.progress}%)
+                            {t('analytics.syllabus_pct', '(Syllabus: {{pct}}%)', { pct: item.progress })}
                           </span>
                         )}
                       </span>
-                      <span className={`${item.text} font-bold`}>{formatMinsToHours(item.minutes)} ({percentage}% share)</span>
+                      <span className={`${item.text} font-bold`}>{formatMinsToHours(item.minutes)} {t('analytics.share_pct', '({{pct}}% share)', { pct: percentage })}</span>
                     </div>
                     <div className="w-full h-2 bg-slate-150 dark:bg-slate-900 rounded-full overflow-hidden">
                       <div 
@@ -1208,30 +1217,30 @@ export const StudentAnalyticsView = () => {
           <div className="bg-white dark:bg-[#001630] p-4 sm:p-6 rounded-2xl border border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
             <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2 mb-6">
               <IconAward stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-              Completions & Milestones (Today)
+              {t('analytics.completions_milestones', 'Completions & Milestones (Today)')}
             </h3>
 
             <div className="space-y-4">
               {/* Course Completions */}
               <div>
-                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">Course Completions</h4>
+                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">{t('analytics.course_completions', 'Course Completions')}</h4>
                 {coursesCompletedToday.length > 0 ? (
                   <div className="space-y-2">
                     {coursesCompletedToday.map((c, idx) => (
                       <div key={idx} className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
                         <IconCircleCheck stroke={1.5} className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">{c.course?.title} Completed!</span>
+                        <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">{t('analytics.course_completed', '{{course}} Completed!', { course: c.course?.title })}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-450 dark:text-slate-500 italic">No courses completed today.</p>
+                  <p className="text-[11px] text-slate-450 dark:text-slate-500 italic">{t('analytics.no_courses_today', 'No courses completed today.')}</p>
                 )}
               </div>
 
               {/* Assessment Completions */}
               <div>
-                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">Assessment & Quiz Completions</h4>
+                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-2">{t('analytics.assessment_quiz_completions', 'Assessment & Quiz Completions')}</h4>
                 {assessmentsCompletedToday.length > 0 ? (
                   <div className="space-y-2">
                     {assessmentsCompletedToday.map((a, idx) => (
@@ -1240,12 +1249,12 @@ export const StudentAnalyticsView = () => {
                           <IconAward stroke={1.5} className="w-4 h-4 text-blue-500 shrink-0" />
                           <span className="text-xs font-semibold text-slate-850 dark:text-slate-200">{a.name}</span>
                         </div>
-                        <span className="text-xs font-extrabold text-blue-500 whitespace-nowrap bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded-md">Score: {a.score}</span>
+                        <span className="text-xs font-extrabold text-blue-500 whitespace-nowrap bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded-md">{t('analytics.score_label', 'Score: {{score}}', { score: a.score })}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-450 dark:text-slate-500 italic">No quizzes or exams submitted today.</p>
+                  <p className="text-[11px] text-slate-450 dark:text-slate-500 italic">{t('analytics.no_quizzes_today', 'No quizzes or exams submitted today.')}</p>
                 )}
               </div>
             </div>
@@ -1258,10 +1267,10 @@ export const StudentAnalyticsView = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-[#0d1f4e] dark:text-white flex items-center gap-2">
                 <IconActivity stroke={1.5} className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                Session Logs & Activity Feed
+                {t('analytics.session_logs', 'Session Logs & Activity Feed')}
               </h3>
               <span className="text-[9px] bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-350 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Audit Trail
+                {t('analytics.audit_trail', 'Audit Trail')}
               </span>
             </div>
 
@@ -1309,8 +1318,8 @@ export const StudentAnalyticsView = () => {
                     <IconCalendar className="w-3 h-3 text-white" />
                   </span>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">No Learning Sessions Logged</h4>
-                    <p className="text-[10px] text-slate-450 dark:text-slate-400 mt-0.5">No login session or learning activities were recorded on this date.</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">{t('analytics.no_sessions_logged', 'No Learning Sessions Logged')}</h4>
+                    <p className="text-[10px] text-slate-450 dark:text-slate-400 mt-0.5">{t('analytics.no_sessions_desc', 'No login session or learning activities were recorded on this date.')}</p>
                   </div>
                 </div>
               )}
@@ -1321,9 +1330,9 @@ export const StudentAnalyticsView = () => {
                   <IconShieldCheck stroke={1.5} className="w-3 h-3 text-white" />
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Compliance & Proctoring Scorecard</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">{t('analytics.proctoring_scorecard', 'Compliance & Proctoring Scorecard')}</h4>
                   <p className="text-[10px] text-slate-400 dark:text-slate-400 mt-1 flex items-center gap-1">
-                    Security Proctoring Checks: <span className="font-semibold text-emerald-500">Fully Passed ✅</span>
+                    {t('analytics.proctoring_checks', 'Security Proctoring Checks:')} <span className="font-semibold text-emerald-500">{t('analytics.fully_passed', 'Fully Passed ✅')}</span>
                   </p>
                 </div>
               </div>
@@ -1332,7 +1341,7 @@ export const StudentAnalyticsView = () => {
 
           <div className="text-[10px] text-slate-450 dark:text-slate-400 mt-6 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3 flex items-center gap-1.5">
             <IconAlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            Security system captures abnormal activities, tab switching, and minimizes. Keep your proctoring logs clean.
+            {t('analytics.security_note', 'Security system captures abnormal activities, tab switching, and minimizes. Keep your proctoring logs clean.')}
           </div>
         </div>
       </div>
