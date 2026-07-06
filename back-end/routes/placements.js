@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
+const { FinalCareerPathwayModel, SkillProgressModel } = require('../models/careerAgentModels');
 
 const router = express.Router();
 
@@ -384,11 +385,30 @@ router.get('/jobs', protect, async (req, res) => {
       .sort((a, b) => new Date(b.displayCreatedAt || 0) - new Date(a.displayCreatedAt || 0))
       .slice(0, limit);
 
+    let userSkills = [];
+    let careerRoles = [];
+    try {
+      if (req.user) {
+        const pathway = await FinalCareerPathwayModel.findOne({ userId: req.user._id, is_locked: true });
+        if (pathway) {
+          careerRoles = [pathway.primary_role, pathway.secondary_role, pathway.tertiary_role].filter(Boolean);
+        }
+        if (req.user.email) {
+          const skills = await SkillProgressModel.find({ email: req.user.email, status: { $in: ['In Progress', 'Completed'] } });
+          userSkills = skills.map(s => s.skillName);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch user skills/pathway for placements:", e);
+    }
+
     res.json({
       success: true,
       count: data.length,
       data,
       sources: compact(collections),
+      userSkills,
+      careerRoles
     });
   } catch (err) {
     console.error('[Placements] jobs error:', err);
@@ -584,6 +604,59 @@ router.delete('/applications/:applicationId', protect, async (req, res) => {
   } catch (err) {
     console.error('[Placements] withdraw application error:', err);
     res.status(500).json({ success: false, error: 'Failed to withdraw application' });
+  }
+});
+
+// Get user's saved jobs list
+router.get('/saved-jobs', protect, async (req, res) => {
+  try {
+    const UserModel = req.user.constructor;
+    const user = await UserModel.findById(req.user._id).select('savedJobs');
+    res.json({ success: true, data: user?.savedJobs || [] });
+  } catch (error) {
+    console.error('[Placements] get saved jobs error:', error);
+    res.status(500).json({ success: false, error: 'Failed to get saved jobs' });
+  }
+});
+
+// Toggle save/unsave a job
+router.post('/saved-jobs', protect, async (req, res) => {
+  try {
+    const { jobId, source } = req.body;
+    if (!jobId || !source) return res.status(400).json({ success: false, error: 'jobId and source required' });
+
+    const UserModel = req.user.constructor;
+    
+    // Check if it's already saved
+    const user = await UserModel.findById(req.user._id).select('savedJobs');
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    
+    const existingIndex = (user.savedJobs || []).findIndex(sj => 
+      sj.jobId && sj.jobId.toString() === jobId.toString() && sj.source === source
+    );
+    
+    let isSaved = false;
+    if (existingIndex >= 0) {
+      // Remove it
+      await UserModel.updateOne(
+        { _id: req.user._id },
+        { $pull: { savedJobs: { jobId: new mongoose.Types.ObjectId(jobId), source: source } } }
+      );
+    } else {
+      // Add it
+      await UserModel.updateOne(
+        { _id: req.user._id },
+        { $push: { savedJobs: { jobId: new mongoose.Types.ObjectId(jobId), source: source } } }
+      );
+      isSaved = true;
+    }
+    
+    // Fetch updated to return to client
+    const updatedUser = await UserModel.findById(req.user._id).select('savedJobs');
+    res.json({ success: true, isSaved, data: updatedUser.savedJobs || [] });
+  } catch (error) {
+    console.error('[Placements] toggle saved job error:', error);
+    res.status(500).json({ success: false, error: 'Failed to toggle saved job' });
   }
 });
 

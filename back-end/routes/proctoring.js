@@ -35,13 +35,19 @@ const upload = multer({
   }
 });
 
+// Webhook for admin backend to trigger unlock via Socket.io (Internal)
+router.post('/webhook/unlock', proctoringController.webhookUnlock);
+
 // Protect all routes
 router.use(protect);
 
 router.post('/session/start', proctoringController.startSession);
 router.post('/session/:sessionId/event', proctoringController.logEvent);
 router.post('/session/:sessionId/complete', proctoringController.completeSession);
+router.post('/session/:sessionId/lock', proctoringController.triggerLock);
 router.post('/session/:sessionId/upload-snapshot', upload.single('snapshot'), proctoringController.uploadSnapshot);
+
+
 
 // Admin-only routes
 router.get('/admin/sessions', authorize('admin'), proctoringController.getSessions);

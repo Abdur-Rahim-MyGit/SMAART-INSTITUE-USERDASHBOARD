@@ -527,6 +527,15 @@ export const placementsAPI = {
       body,
     });
   },
+  getSavedJobs: async () => {
+    return apiCall('/placements/saved-jobs');
+  },
+  toggleSavedJob: async (source, id) => {
+    return apiCall('/placements/saved-jobs', {
+      method: 'POST',
+      body: JSON.stringify({ source, jobId: id }),
+    });
+  },
 };
 
 // Users API

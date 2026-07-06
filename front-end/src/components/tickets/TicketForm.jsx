@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { createTicket } from "@/services/ticketApi";
 
-const TicketForm = ({ onSuccess, onCancel, initialData }) => {
+const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
   const { t } = useTranslation();
 
   const CATEGORIES = [
@@ -22,9 +22,14 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
       description: t("support_tickets_page.cat_account_desc", "Login, access, permissions")
     },
     {
-      value: 'course & assessment',
-      label: t("support_tickets_page.cat_course_assessment", "Course & Assessment Issue"),
-      description: t("support_tickets_page.cat_course_assessment_desc", "Course & Assessment access, content, and materials")
+      value: 'course issue',
+      label: t("support_tickets_page.cat_course_issue", "Course Issue"),
+      description: t("support_tickets_page.cat_course_issue_desc", "Course access, content, and materials")
+    },
+    {
+      value: 'assessment issue',
+      label: t("support_tickets_page.cat_assessment_issue", "Assessment Issue"),
+      description: t("support_tickets_page.cat_assessment_issue_desc", "Assessment access and evaluation")
     },
     {
       value: 'career Direction',
@@ -48,7 +53,9 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
     title: initialData?.title || '',
     description: initialData?.description || '',
     category: initialData?.category || '',
-    priority: initialData?.priority || 'medium'
+    priority: initialData?.priority || 'medium',
+    contactName: '',
+    contactEmail: ''
   });
   const [attachments, setAttachments] = useState([]);
   const [errors, setErrors] = useState({});
@@ -57,6 +64,17 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
   const validateForm = () => {
     const newErrors = {};
+
+    if (isGuest) {
+      if (!formData.contactName.trim()) {
+        newErrors.contactName = t("support_tickets_page.validation_name_required", "Name is required");
+      }
+      if (!formData.contactEmail.trim()) {
+        newErrors.contactEmail = t("support_tickets_page.validation_email_required", "Email is required");
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) {
+        newErrors.contactEmail = t("support_tickets_page.validation_email_invalid", "Invalid email format");
+      }
+    }
 
     if (!formData.title.trim()) {
       newErrors.title = t("support_tickets_page.validation_title_required", "Title is required");
@@ -130,7 +148,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
       // Reset form after short delay
       setTimeout(() => {
-        setFormData({ title: '', description: '', category: '', priority: 'medium' });
+        setFormData({ title: '', description: '', category: '', priority: 'medium', contactName: '', contactEmail: '' });
         setAttachments([]);
         if (onSuccess) onSuccess(result.data);
       }, 1500);
@@ -171,6 +189,46 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           <AlertCircle className="w-5 h-5 text-red-400" />
           <span className="text-red-400">{errors.submit}</span>
         </motion.div>
+      )}
+
+      {/* Guest Fields (Name & Email) */}
+      {isGuest && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+              {t("support_tickets_page.name", "Name")} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="contactName"
+              value={formData.contactName}
+              onChange={handleChange}
+              placeholder={t("support_tickets_page.name_placeholder", "Your Full Name")}
+              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactName ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+            />
+            {errors.contactName && (
+              <p className="mt-1 text-sm text-red-500">{errors.contactName}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+              {t("support_tickets_page.email", "Email")} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="contactEmail"
+              value={formData.contactEmail}
+              onChange={handleChange}
+              placeholder={t("support_tickets_page.email_placeholder", "Your Email Address")}
+              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactEmail ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+            />
+            {errors.contactEmail && (
+              <p className="mt-1 text-sm text-red-500">{errors.contactEmail}</p>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Title */}

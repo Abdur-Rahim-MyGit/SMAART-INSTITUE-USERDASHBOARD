@@ -32,7 +32,17 @@ const supportTicketSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     refPath: 'userModel',
-    required: [true, 'User ID is required']
+    required: false
+  },
+  contactName: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  contactEmail: {
+    type: String,
+    required: false,
+    trim: true
   },
   userModel: {
     type: String,
@@ -62,8 +72,8 @@ const supportTicketSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Category is required'],
     enum: {
-      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction'],
-      message: 'Invalid category. Must be one of: technical, billing, account, content, feedback, other, course & assessment, career Direction'
+      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'course issue', 'assessment issue', 'career Direction'],
+      message: 'Invalid category.'
     }
   },
   priority: {

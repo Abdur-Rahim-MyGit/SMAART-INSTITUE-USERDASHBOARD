@@ -475,6 +475,17 @@ const BaseLineTest = () => {
 
       } catch (err) {
         console.error("❌ Error initializing assessment:", err);
+        
+        // --- PROCTORING LOCK CHECK ---
+        if (err.data && err.data.locked) {
+            clearTimerPersistence();
+            navigate('/locked-out', { 
+                replace: true, 
+                state: { reason: err.data.error || 'Your assessment is locked due to a proctoring violation.' } 
+            });
+            return;
+        }
+
         setError(err.message || t("baseline_test.error_loading", "Failed to load assessment. Please try refreshing the page."));
       } finally {
         setLoading(false);
@@ -709,10 +720,7 @@ const BaseLineTest = () => {
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor,
-    onLockout: useCallback(async () => {
-      await submit({ reason: "violation", redirectAfterSubmit: true, forceTimeoutCompletion: true });
-    }, [submit])
+    registeredFaceDescriptor
   });
 
   useEffect(() => {
