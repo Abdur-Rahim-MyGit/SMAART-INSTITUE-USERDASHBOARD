@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
@@ -15,7 +15,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
-import useUser from "@/hooks/useUser";
 
 const formatDate = (value, t) => {
   if (!value) return t("placement.no_deadline", "No deadline listed");
@@ -55,7 +54,7 @@ const normalizeJobType = (job) => {
 
   if (combined.includes('intern')) return 'internship';
   if (combined.includes('part')) return 'part-time';
-  if (combined.includes('full') || combined.includes('permanent') || combined.includes('f‑time')) return 'full-time';
+  if (combined.includes('full') || combined.includes('permanent') || combined.includes('f\u2011time')) return 'full-time';
 
   return 'other';
 };
@@ -106,7 +105,7 @@ const getPostedAgo = (createdAt, t) => {
   const posted = new Date(createdAt);
   if (Number.isNaN(posted.getTime())) return null;
   const diffMs = Date.now() - posted.getTime();
-  if (diffMs < 0) return null; // future date — don't show
+  if (diffMs < 0) return null; // future date ΓÇö don't show
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (days === 0) return t("placement.posted_today", "Posted Today");
   if (days === 1) return t("placement.posted_day_ago", "Posted 1 day ago");
@@ -123,14 +122,11 @@ const Placement = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useUser();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('jobs');
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loadingApplied, setLoadingApplied] = useState(false);
-  const [jobFairs, setJobFairs] = useState([]);
-  const [loadingFairs, setLoadingFairs] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [jobType, setJobType] = useState('all');
@@ -199,60 +195,8 @@ const Placement = () => {
   useEffect(() => {
     if (activeTab === 'status') {
       fetchApplied();
-    } else if (activeTab === 'job-fair') {
-      fetchJobFairs();
     }
   }, [activeTab]);
-
-  const fetchJobFairs = async () => {
-    setLoadingFairs(true);
-    try {
-      const response = await placementsAPI.getJobFairs();
-      setJobFairs(response?.data || []);
-    } catch (error) {
-      console.error("Failed to load job fairs:", error);
-      toast({
-        title: t("placement.error_load_fairs_title", "Could not load job fairs"),
-        description: error.message || t("placement.error_load_fairs_desc", "Please try again in a moment."),
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingFairs(false);
-    }
-  };
-
-  const handleRegisterFair = async (fairId) => {
-    try {
-      const response = await placementsAPI.registerJobFair(fairId);
-      if (response.success) {
-        toast({
-          title: t("placement.register_fair_success_title", "Registered Successfully"),
-          description: t("placement.register_fair_success_desc", "You have successfully registered for the Job Fair."),
-        });
-        // Update the local state so the registered status and student count reflect immediately
-        setJobFairs(prev => prev.map(fair => {
-          if (fair._id === fairId) {
-            const updatedStudents = [...(fair.registeredStudents || [])];
-            if (user?._id && !updatedStudents.includes(user._id)) {
-              updatedStudents.push(user._id);
-            }
-            return {
-              ...fair,
-              registeredStudents: updatedStudents
-            };
-          }
-          return fair;
-        }));
-      }
-    } catch (error) {
-      console.error("Failed to register for job fair:", error);
-      toast({
-        title: t("placement.error_register_fair_title", "Registration Failed"),
-        description: error.message || t("placement.error_register_fair_desc", "Please try again in a moment."),
-        variant: "destructive",
-      });
-    }
-  };
 
   const sourceCounts = useMemo(() => {
     return jobs.reduce((acc, job) => {
@@ -383,7 +327,7 @@ const Placement = () => {
           </div>
         </motion.div>
 
-        {/* Tabs: Jobs | Job Status | Job Fair */}
+        {/* Tabs: Jobs | Job Status */}
         <div className="mt-4 flex items-center gap-3">
           <button
             onClick={() => setActiveTab('jobs')}
@@ -396,12 +340,6 @@ const Placement = () => {
             className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'status' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
           >
             {t("placement.job_status", "Job Status")}
-          </button>
-          <button
-            onClick={() => setActiveTab('job-fair')}
-            className={`h-10 rounded-xl px-4 text-sm font-bold ${activeTab === 'job-fair' ? 'bg-[#1a3884] text-white' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7]'}`}
-          >
-            {t("placement.job_fair", "Job Fair")}
           </button>
         </div>
 
@@ -663,109 +601,6 @@ const Placement = () => {
                         </button>
                       </div>
 
-                    </motion.article>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Job Fair Tab */}
-        {activeTab === 'job-fair' && (
-          <div className="mt-6">
-            {loadingFairs ? (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="h-56 animate-pulse rounded-2xl border border-[#d8e6f7] bg-white dark:border-[#1a3884]/20 dark:bg-[#001630]" />
-                ))}
-              </div>
-            ) : jobFairs.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#d8e6f7] bg-white px-6 text-center dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
-                  <Briefcase className="h-7 w-7 text-[#1a3884] dark:text-blue-300" />
-                </div>
-                <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">{t("placement.no_fairs_found", "No Job Fairs found")}</h2>
-                <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">
-                  {t("placement.no_fairs_desc", "There are no active or upcoming job fairs at this moment.")}
-                </p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {jobFairs.map((fair, index) => {
-                  const isRegistered = fair.registeredStudents?.some(student => {
-                    const studentId = typeof student === 'object' ? (student._id || student.id) : student;
-                    return studentId === user?._id;
-                  });
-                  const totalRegistered = fair.registeredStudents?.length || 0;
-                  const bannerImageUrl = fair.bannerImage ? 
-                    (fair.bannerImage.startsWith('http') ? fair.bannerImage : `${getBackendUrl()}/${fair.bannerImage.replace(/^\/+/, "")}`) : 
-                    null;
-
-                  return (
-                    <motion.article
-                      key={fair._id}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className="relative flex min-h-[225px] mt-6 flex-col rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-[0_2px_16px_rgba(26,56,132,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(26,56,132,0.12)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
-                    >
-                      {bannerImageUrl && (
-                        <div className="mb-4 h-32 w-full overflow-hidden rounded-xl border border-slate-100 dark:border-slate-800">
-                          <img src={bannerImageUrl} alt={fair.title} className="h-full w-full object-cover" />
-                        </div>
-                      )}
-
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="inline-flex rounded-lg bg-indigo-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300">
-                            {fair.label === 'smaart job fair' ? t("placement.source_smaart_job_fair", "SMAART Job Fair") : t("placement.source_college_job_fair", "College Job Fair")}
-                          </span>
-                          <span className={`inline-flex rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
-                            fair.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' :
-                            fair.status === 'completed' ? 'bg-slate-100 text-slate-600' : 'bg-amber-50 text-amber-700'
-                          }`}>
-                            {formatStatus(fair.status, t)}
-                          </span>
-                        </div>
-                        <h2 className="text-lg font-extrabold text-[#0d1f4e] dark:text-white line-clamp-2">{fair.title}</h2>
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{fair.description}</p>
-                      </div>
-
-                      <div className="space-y-2 text-sm font-medium text-slate-600 dark:text-slate-300 mb-5">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span className="truncate">{fair.location}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CalendarDue className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span>
-                            {formatDate(fair.startDate, t)} - {formatDate(fair.endDate, t)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-400">
-                          <Clock className="h-4 w-4 shrink-0 text-slate-400" />
-                          <span>
-                            {t("placement.registered_count", { count: totalRegistered, defaultValue: `${totalRegistered} students registered` })}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="mt-auto pt-4">
-                        <button
-                          onClick={() => !isRegistered && handleRegisterFair(fair._id)}
-                          disabled={isRegistered || fair.status === 'completed' || fair.status === 'cancelled'}
-                          className={`flex h-10 w-full items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                            isRegistered 
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 cursor-default" 
-                              : fair.status === 'completed' || fair.status === 'cancelled'
-                                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                : "bg-[#1a3884] text-white hover:bg-[#132c6b] active:scale-[0.98]"
-                          }`}
-                        >
-                          {isRegistered ? t("placement.registered", "Registered") : t("placement.register", "Register")}
-                        </button>
-                      </div>
                     </motion.article>
                   );
                 })}

@@ -548,6 +548,14 @@ export const placementsAPI = {
       body: JSON.stringify({ source, jobId: id }),
     });
   },
+  getJobFairs: async () => {
+    return apiCall('/placements/job-fairs');
+  },
+  registerJobFair: async (id) => {
+    return apiCall(`/placements/job-fairs/${encodeURIComponent(id)}/register`, {
+      method: 'POST',
+    });
+  },
 };
 
 // Users API
