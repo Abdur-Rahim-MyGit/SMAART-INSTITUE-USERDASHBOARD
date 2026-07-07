@@ -25,18 +25,33 @@ const AssessmentFlowGuard = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // === PROCTORING: Active only on assessment routes ===
-  const isAssessmentRoute =
-    (location.pathname.startsWith("/assessment/") ||
+  // === PROCTORING: Active on assessment and course player routes ===
+  const isCourseRoute =
+    location.pathname.includes("/courses/") &&
+    location.pathname.includes("/player");
+
+  const isProctoredRoute =
+    ((location.pathname.startsWith("/assessment/") ||
       location.pathname.startsWith("/dashboard/assessments/")) &&
-    !location.pathname.endsWith("/report");
+      !location.pathname.endsWith("/report")) ||
+    isCourseRoute;
 
   const handleAutoSubmit = useCallback(() => {
-    // Navigate back to dashboard with a flag indicating auto-submission
-    navigate("/dashboard", {
-      replace: true,
-      state: { assessmentAutoSubmitted: true }
-    });
+    const isCurrentCourse =
+      window.location.pathname.includes("/courses/") &&
+      window.location.pathname.includes("/player");
+
+    if (isCurrentCourse) {
+      navigate("/dashboard/courses", {
+        replace: true,
+        state: { courseClosedByProctor: true }
+      });
+    } else {
+      navigate("/dashboard", {
+        replace: true,
+        state: { assessmentAutoSubmitted: true }
+      });
+    }
   }, [navigate]);
 
   const {
@@ -45,7 +60,7 @@ const AssessmentFlowGuard = ({ children }) => {
     clearWarning,
     violations,
     maxWarnings,
-  } = useTabSwitchProctor(isAssessmentRoute, handleAutoSubmit);
+  } = useTabSwitchProctor(isProctoredRoute, handleAutoSubmit);
 
   // Configuration for assessment order - Only Base Line Test required
   const assessmentOrder = [
@@ -328,13 +343,16 @@ const AssessmentFlowGuard = ({ children }) => {
       if (path.includes('/placement')) return "Placement";
       if (path.includes('/reports')) return "Reports";
       if (path.includes('/career-agent/dashboard')) return "Career Directions";
+      if (path.includes('/career-agent')) return "Career Directions";
+      if (path.includes('/grievances')) return "Grievances";
+      if (path.includes('/performance')) return "Performance";
       return "DashBoard";
     };
 
     return (
-      <DashboardLoader 
-        title={getLoaderTitle()} 
-        onComplete={() => setSplashComplete(true)} 
+      <DashboardLoader
+        title={getLoaderTitle()}
+        onComplete={() => setSplashComplete(true)}
       />
     );
   }

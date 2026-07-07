@@ -195,6 +195,7 @@ app.use('/api/coachSessions', require('./routes/coachSessions'));
 // Support Routes
 app.use('/api/escalations', require('./routes/escalations'));
 app.use('/api/tickets', require('./routes/tickets')); // Support Ticketing System
+app.use('/api/grievances', require('./routes/grievances')); // Grievance Redressal System
 app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 
 // Community Routes
