@@ -247,14 +247,11 @@ const GrievancesPage = () => {
                           {/* Left Bar Accent Color */}
                           <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${item.status === 'resolved' ? 'bg-emerald-500' : item.isAnonymous ? 'bg-indigo-500' : 'bg-[#1a3884]'}`} />
 
-                          {/* Top Row: ID, Category & Status */}
+                          {/* Top Row: ID & Status */}
                           <div className="flex justify-between items-start gap-4">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs font-mono font-bold text-slate-450 uppercase tracking-wider">
                                 #{item.grievanceId || item._id.slice(-6)}
-                              </span>
-                              <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-extrabold uppercase tracking-wider">
-                                {getCategoryLabel(item.category)}
                               </span>
                               {item.isAnonymous && (
                                 <span className="flex items-center gap-0.5 px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 text-[10px] font-extrabold uppercase tracking-wider">

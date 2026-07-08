@@ -22,6 +22,7 @@ const DashboardHome = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { user, loading: userLoading } = useUser();
 
   useEffect(() => {
@@ -57,7 +58,6 @@ const DashboardHome = () => {
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
