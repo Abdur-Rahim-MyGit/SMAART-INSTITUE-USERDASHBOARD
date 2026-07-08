@@ -11,6 +11,16 @@ import {
   IconSearch as Search,
   IconTag as Tag,
   IconArrowLeft as ArrowLeft,
+  IconFilter as Filter,
+  IconX as X,
+  IconExternalLink as ExternalLink,
+  IconSparkles as Sparkles,
+  IconTrendingUp as TrendingUp,
+  IconBriefcase2 as Briefcase2,
+  IconCategory as Category,
+  IconChevronRight as ChevronRight,
+  IconBookmark as Bookmark,
+  IconBookmarkFilled as BookmarkFilled
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
@@ -744,7 +754,6 @@ const Placement = () => {
           </div>
         )}
 
-<<<<<<< HEAD
         {/* Companies Tab */}
         {activeTab === 'companies' && (
           <div className="mt-8">
