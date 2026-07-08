@@ -7,8 +7,9 @@ import {
   IconClock as RiTimeLine,
   IconCircleCheckFilled as RiCheckboxCircleLine,
 } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 import CourseStructure from "@/components/CourseStructure";
 import useUser from "@/hooks/useUser";
 import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
@@ -75,8 +76,21 @@ const MyCoursesHeroBanner = ({
 /* ─── Main MyCourses Page ─── */
 const MyCourses = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
   const { user } = useUser();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (location.state?.courseClosedByProctor) {
+      toast({
+        title: t("my_courses_page.course_closed_title", "Course Closed"),
+        description: t("my_courses_page.course_closed_desc", "Your course session was automatically closed due to repeated tab switching."),
+        variant: "destructive",
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, toast, navigate, t, location.pathname]);
 
   const [publishedCourseCodes, setPublishedCourseCodes] = useState(null);
   const [quizTestCourse, setQuizTestCourse] = useState(null);

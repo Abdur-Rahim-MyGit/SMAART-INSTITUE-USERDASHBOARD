@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 const toolkitSections = [
   {
     id: 3,
+    slug: "resume_builder",
     title: "SMAART AI Resume Builder",
     description:
       "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",
@@ -35,6 +36,7 @@ const toolkitSections = [
   },
   {
     id: 6,
+    slug: "dictionary",
     title: "General Dictionary",
     description:
       "Master professional terminology with our interactive dictionary. Features real-time definitions and daily vocabulary building tools.",
@@ -48,6 +50,7 @@ const toolkitSections = [
   },
   {
     id: 8,
+    slug: "interview_prep",
     title: "Interview Preparation",
     description:
       "Access role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
@@ -74,6 +77,7 @@ const toolkitSections = [
   // },
   {
     id: 7,
+    slug: "notes",
     title: "My Notes",
     description:
       "Capture, organize, and sync your thoughts. Keep track of course insights and personal breakthroughs in one secure, cloud-synced space.",
@@ -87,6 +91,7 @@ const toolkitSections = [
   },
   {
     id: 10,
+    slug: "cgpa_calculator",
     title: "CGPA Calculator",
     description:
       "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results.",
@@ -123,13 +128,20 @@ const TRUNCATE_LENGTH = 100;
 
 const ToolkitCard = ({ section, index }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const Icon = section.icon;
   const [expanded, setExpanded] = useState(false);
-  const isLong = section.description.length > TRUNCATE_LENGTH;
+
+  const title = t(`smaart_toolkit.tools.${section.slug}.title`, section.title);
+  const meta = t(`smaart_toolkit.tools.${section.slug}.meta`, section.meta);
+  const cta = t(`smaart_toolkit.tools.${section.slug}.cta`, section.cta);
+  const description = t(`smaart_toolkit.tools.${section.slug}.description`, section.description);
+
+  const isLong = description.length > TRUNCATE_LENGTH;
   const displayText =
     expanded || !isLong
-      ? section.description
-      : section.description.slice(0, TRUNCATE_LENGTH).trimEnd() + "…";
+      ? description
+      : description.slice(0, TRUNCATE_LENGTH).trimEnd() + "…";
 
   return (
     <motion.div
@@ -155,12 +167,12 @@ const ToolkitCard = ({ section, index }) => {
 
           {/* Meta label */}
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1a3884]/60 dark:text-blue-400/60">
-            {section.meta}
+            {meta}
           </p>
 
           {/* Title */}
           <h3 className="mb-2.5 text-[15px] font-bold leading-snug tracking-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-300">
-            {section.title}
+            {title}
           </h3>
 
           {/* Description with Read More */}
@@ -178,11 +190,11 @@ const ToolkitCard = ({ section, index }) => {
               >
                 {expanded ? (
                   <>
-                    Show Less <ChevronUp size={13} stroke={1.5} />
+                    {t("smaart_toolkit.show_less", "Show Less")} <ChevronUp size={13} stroke={1.5} />
                   </>
                 ) : (
                   <>
-                    Read More <ChevronDown size={13} stroke={1.5} />
+                    {t("smaart_toolkit.read_more", "Read More")} <ChevronDown size={13} stroke={1.5} />
                   </>
                 )}
               </button>
@@ -208,10 +220,10 @@ const ToolkitCard = ({ section, index }) => {
           >
             <div>
               <p className="text-[13px] font-semibold text-[#0d1f4e] transition-colors group-hover:text-white dark:text-slate-200 dark:group-hover:text-white">
-                {section.cta}
+                {cta}
               </p>
               <p className="text-[11px] text-slate-400 transition-colors group-hover:text-blue-100 dark:text-slate-500 dark:group-hover:text-blue-200">
-                Launch from your toolkit
+                {t("smaart_toolkit.launch_from_toolkit", "Launch from your toolkit")}
               </p>
             </div>
             <ArrowRight stroke={1.5} className="h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-white" />
@@ -256,12 +268,12 @@ const SMAArtToolkit = () => {
           <div className="relative z-10">
             {/* Title */}
             <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-              SMAART <span className="text-[#1a3884] dark:text-blue-300">Toolkit</span>
+              {t("smaart_toolkit.title_1", "SMAART")} <span className="text-[#1a3884] dark:text-blue-300">{t("smaart_toolkit.title_2", "Toolkit")}</span>
             </h1>
 
             {/* Subtitle */}
             <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-              Explore our curated repository of career intelligence, wellness resources, and learning tools.
+              {t("smaart_toolkit.subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools.")}
             </p>
           </div>
         </motion.div>
@@ -270,7 +282,7 @@ const SMAArtToolkit = () => {
         <div className="mb-4 flex items-center gap-3">
           <Wrench stroke={1.5} className="h-4 w-4 text-[#1a3884]/60 dark:text-blue-400/60" />
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/60 dark:text-blue-400/60">
-            Your Tools
+            {t("smaart_toolkit.your_tools", "Your Tools")}
           </p>
           <div className="h-px flex-1 bg-[#d8e6f7] dark:bg-[#1a3884]/20" />
         </div>

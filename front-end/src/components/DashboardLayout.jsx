@@ -102,6 +102,8 @@ const pageTitles = {
   '/settings': 'Settings',
   '/dashboard/support': 'Help & Support',
   '/tickets': 'Help & Support',
+  '/dashboard/grievances': 'Grievance Redressal',
+  '/grievances': 'Grievance Redressal',
   '/dashboard/notifications': 'Notifications',
   '/notifications': 'Notifications',
   '/dashboard/profile': 'Profile',
@@ -138,6 +140,7 @@ const breadcrumbMap = {
   'community': { label: 'Community', path: '/dashboard/community' },
   'settings': { label: 'Settings', path: '/dashboard/settings' },
   'support': { label: 'Help & Support', path: '/dashboard/support' },
+  'grievances': { label: 'Grievance Redressal', path: '/dashboard/grievances' },
   'notifications': { label: 'Notifications', path: '/notifications' },
   'profile': { label: 'Profile', path: '/profile' },
 };
@@ -246,6 +249,14 @@ const STATIC_SEARCH_ITEMS = [
     path: "/dashboard/support",
     type: "Page",
     keywords: ["help", "support", "ticket", "issue"]
+  },
+  {
+    id: "page-grievances",
+    title: "Grievance Redressal",
+    subtitle: "Submit and track grievances securely",
+    path: "/dashboard/grievances",
+    type: "Page",
+    keywords: ["grievance", "redressal", "complaint", "issue", "anonymous"]
   },
   {
     id: "page-profile",
@@ -745,6 +756,8 @@ const DashboardLayout = () => {
       '/settings': t('sidebar.settings', 'Settings'),
       '/dashboard/support': t('sidebar.help', 'Help & Support'),
       '/tickets': t('sidebar.help', 'Help & Support'),
+      '/dashboard/grievances': t('sidebar.grievances', 'Grievance Redressal'),
+      '/grievances': t('sidebar.grievances', 'Grievance Redressal'),
       '/dashboard/notifications': t('sidebar.notifications', 'Notifications'),
       '/notifications': t('sidebar.notifications', 'Notifications'),
       '/dashboard/profile': t('sidebar.profile', 'Profile'),

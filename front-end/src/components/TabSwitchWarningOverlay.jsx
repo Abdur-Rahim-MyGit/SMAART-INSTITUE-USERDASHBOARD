@@ -12,6 +12,7 @@ import { AlertTriangle, XOctagon, Eye } from 'lucide-react';
  */
 const TabSwitchWarningOverlay = ({ warningLevel, isVisible, onDismiss, violations, maxWarnings }) => {
   const isAutoSubmitted = warningLevel >= 3;
+  const isCourseRoute = window.location.pathname.includes('/courses/') && window.location.pathname.includes('/player');
 
   const config = {
     1: {
@@ -20,12 +21,14 @@ const TabSwitchWarningOverlay = ({ warningLevel, isVisible, onDismiss, violation
       bg: 'linear-gradient(135deg, rgba(120,53,15,0.98) 0%, rgba(78,37,10,0.99) 100%)',
       glow: 'rgba(245,158,11,0.2)',
       title: 'Warning — Tab Switch Detected',
-      subtitle: 'Switching tabs during an assessment is not allowed.',
+      subtitle: isCourseRoute 
+        ? 'Switching tabs while taking a course is not allowed.' 
+        : 'Switching tabs during an assessment is not allowed.',
       badge: 'Warning 1 of 3',
       badgeColor: 'rgba(245,158,11,0.2)',
       badgeBorder: 'rgba(245,158,11,0.3)',
       badgeText: '#fbbf24',
-      buttonText: 'I Understand — Return to Assessment',
+      buttonText: isCourseRoute ? 'I Understand — Return to Course' : 'I Understand — Return to Assessment',
       buttonBg: 'linear-gradient(135deg, #d97706, #b45309)',
     },
     2: {
@@ -34,7 +37,9 @@ const TabSwitchWarningOverlay = ({ warningLevel, isVisible, onDismiss, violation
       bg: 'linear-gradient(135deg, rgba(69,10,10,0.99) 0%, rgba(50,7,7,0.99) 100%)',
       glow: 'rgba(239,68,68,0.2)',
       title: 'Final Warning — Do Not Leave',
-      subtitle: 'One more tab switch will automatically submit your assessment.',
+      subtitle: isCourseRoute 
+        ? 'One more tab switch will automatically close the course.' 
+        : 'One more tab switch will automatically submit your assessment.',
       badge: 'Warning 2 of 3 — FINAL',
       badgeColor: 'rgba(239,68,68,0.2)',
       badgeBorder: 'rgba(239,68,68,0.4)',
@@ -47,9 +52,11 @@ const TabSwitchWarningOverlay = ({ warningLevel, isVisible, onDismiss, violation
       color: '#6b7280',
       bg: 'linear-gradient(135deg, rgba(17,24,39,0.99) 0%, rgba(9,12,20,1) 100%)',
       glow: 'rgba(107,114,128,0.15)',
-      title: 'Assessment Auto-Submitted',
-      subtitle: 'Your assessment has been automatically submitted due to repeated tab switching violations.',
-      badge: 'Auto-Submitted',
+      title: isCourseRoute ? 'Course Session Closed' : 'Assessment Auto-Submitted',
+      subtitle: isCourseRoute 
+        ? 'Your course session has been automatically closed due to repeated tab switching violations.' 
+        : 'Your assessment has been automatically submitted due to repeated tab switching violations.',
+      badge: isCourseRoute ? 'Session Closed' : 'Auto-Submitted',
       badgeColor: 'rgba(107,114,128,0.15)',
       badgeBorder: 'rgba(107,114,128,0.3)',
       badgeText: '#9ca3af',
@@ -198,7 +205,9 @@ const TabSwitchWarningOverlay = ({ warningLevel, isVisible, onDismiss, violation
                   border: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
-                Your results will be processed and you will be redirected shortly...
+                {isCourseRoute 
+                  ? "You will be redirected back to the dashboard shortly..." 
+                  : "Your results will be processed and you will be redirected shortly..."}
               </motion.div>
             )}
           </motion.div>

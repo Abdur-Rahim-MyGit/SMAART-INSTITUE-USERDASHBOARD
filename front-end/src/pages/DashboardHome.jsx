@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -16,10 +16,25 @@ import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const { toast } = useToast();
   const { user, loading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (location.state?.assessmentAutoSubmitted) {
+      toast({
+        title: t("dashboard.assessment_submitted_title", "Assessment Auto-Submitted"),
+        description: t("dashboard.assessment_submitted_desc", "Your assessment was automatically submitted due to repeated tab switching."),
+        variant: "destructive",
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, toast, navigate, t, location.pathname]);
+
   const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
   const { userProgress, loading: progressLoading, refresh: refreshProgress } = useSmaartCourseProgress(user?._id || user?.id);
 

@@ -1,11 +1,12 @@
 # SMAART Institute — Notification System Documentation
 
-This document catalogs **every notification** in the project, split into the two
-delivery channels requested:
+This document catalogs **every notification** in the project across three
+dimensions:
 
 1. **Email notifications** — sent to the user's inbox via SMTP.
 2. **In-dashboard notifications** — shown inside the app (bell dropdown, toast,
    notifications page) and delivered in real time over WebSocket.
+3. **Which login type** (role) triggers it and which login type receives it.
 
 Many events fire on **both** channels at once.
 
@@ -186,4 +187,94 @@ Each creates a `Notification` doc **and** emits it live via WebSocket.
 
 ---
 
-*Generated 2026-07-02. Excludes `node_modules`. Line numbers may drift as code changes.*
+## 7. Login Types (Roles) in the System
+
+The platform has **9 account types** across 5 Mongoose models:
+
+| Role | Model | Login identifier | Notes |
+|---|---|---|---|
+| `student` | `Student.js` | Email **or** Student ID (e.g. `STU00001`) | Immutable role |
+| `teacher` | `Teacher.js` | Email or Teacher ID | Can award badges, assign assessments |
+| `admin` | `User.js` | Email | Full platform control |
+| `moderator` | `User.js` | Email | Community moderation only |
+| `college_admin` | `User.js` | Email | College-level admin |
+| `consultant` | `User.js` | Email | Consulting access |
+| `support` | `ITSupport.js` | Email | Handles support tickets |
+| Coach | `Coach.js` | Email | Separate model; schedules sessions |
+| Registration | `Registration.js` | Email | Legacy pre-migration model |
+
+---
+
+## 8. Who Triggers → Who Receives (Role Map)
+
+### 8.1 Complete notification role matrix
+
+| # | Notification | Triggered by (role) | Route guard | Received by (role) | 📧 | 🔔 |
+|---|---|---|---|---|:--:|:--:|
+| 1 | Welcome | Public signup (none) | Public | **Student** | ✓ | ✓ |
+| 2 | Badge Earned | **Admin / Teacher** | `protect + authorize('admin','teacher')` | **Student** | ✓ | ✓ |
+| 3 | Assessment Complete | Admin / Teacher | result controller | **Student** | ✓ | ✓ |
+| 4 | Course Enrollment | **Student** (self) | `protect` | **Student** | ✓ | ✓ |
+| 5 | Course Completed | **Student** (self) | `protect` | **Student** | ✓ | ✓ |
+| 6 | Session Completed | **Student** (self) | `protect` | **Student** | ✗ | ✓ |
+| 7 | Module Unlocked | System / Admin | — | **Student** | ✗ | ✓ |
+| 8 | Level Up | **Student** (avatar action) | `protect` | **Student** | ✗ | ✓ |
+| 9 | Streak Milestone | **Student** (avatar action) | `protect` | **Student** | ✗ | ✓ |
+| 10 | Community Reply | **Student** (posting) | `protect` | **Student** (post author) | ✗ | ✓ |
+| 11 | Mention | **Student** (posting) | `protect` | **Student** (mentioned) | ✗ | ✓ |
+| 12 | Coaching Session | **Coach** / Admin | coach sessions route | **Student** | ✓ | ✓ |
+| 13 | Ticket Response | **Admin** | `protect + authorize('admin')` | **Student** (ticket owner) | ✓ | ✓ |
+| 14 | Certificate Issued | **Student** (self) | `protect` | **Student** | ✓ | ✓ |
+| 15 | Task Due Soon | System reminder | — | **Student** | ✗ | ✓ |
+| 16 | System Announcement | **Admin** only | `protect` + role === 'admin' | All active **Students** | ✓ | ✓ |
+| 17 | New Course Published | **Admin / Teacher** | admin/course route | All **Students** | ✗ | ✓ |
+| 18 | Moderation Warning | **Moderator / Admin** | `protect + authorize('moderator','admin')` | **Student** (warned) | ✓ | ✓ |
+| 19 | Account Suspended | **Moderator / Admin** | `protect + authorize('moderator','admin')` | **Student** (suspended) | ✗ | ✓ |
+| 20 | Career Path Lock Warning | System (injected at GET) | `protect` | **Student** | ✗ | ✓ |
+| 21 | Password Changed | **Student** (self) | `protect` | **Student** | ✓ | ✗ |
+| 22 | Login OTP | **Any login attempt** | Public | **Any user** (email only) | ✓ | ✗ |
+| 23 | New Ticket Assigned | **Student** (creates ticket) | `protect` | **IT Support** staff | ✗ | ✓ |
+| 24 | New Ticket Alert | **Student** (creates ticket) | `protect` | All active **Admins** | ✗ | ✓ |
+
+> **#23 and #24 are the only notifications that go to non-Student roles** (IT Support and Admin).
+> All other notifications are received by the **Student** login type.
+
+---
+
+### 8.2 Notifications by RECEIVER login type
+
+#### Student receives
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 — **22 of 24 notifications**.
+
+#### IT Support receives
+- **#23 New Ticket Assigned** — when a Student opens a ticket, the assigned IT Support staff member receives an in-dashboard notification.
+
+#### Admin receives
+- **#24 New Ticket Alert** — when a Student opens a ticket, all active Admins get an in-dashboard alert.
+
+#### Teacher, Moderator, Coach, College Admin, Consultant
+- These roles **trigger** notifications for students but do **not** currently receive any system-generated notifications themselves.
+
+---
+
+### 8.3 Who can SEND each notification type
+
+| Notification | Who can send it |
+|---|---|
+| Welcome | Automatic on registration |
+| Badge Earned | Admin, Teacher |
+| Assessment Complete | Admin, Teacher (via result controller) |
+| Course actions (enroll, complete, session, module) | Student (self) or Admin |
+| Level Up / Streak Milestone | Student (self via avatar actions) |
+| Community Reply / Mention | Student (posting in community) |
+| Coaching Session | Coach / Admin |
+| Ticket Response | Admin only |
+| Certificate | Student (self-issued) |
+| System Announcement | Admin only |
+| Moderation Warning / Suspension | Moderator or Admin |
+| OTP | Automatic on any login attempt |
+| New Ticket Assigned / Alert | Automatic when Student creates ticket |
+
+---
+
+*Updated 2026-07-03. Excludes `node_modules`. Line numbers may drift as code changes.*
