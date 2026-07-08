@@ -136,6 +136,12 @@ const Placement = () => {
   const [jobType, setJobType] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   
+  // Companies State
+  const [companies, setCompanies] = useState([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [companySearch, setCompanySearch] = useState("");
+  const [companyTypeFilter, setCompanyTypeFilter] = useState("all");
+  
   // Master-Detail State
   const [selectedJob, setSelectedJob] = useState(null);
   
@@ -202,6 +208,25 @@ const Placement = () => {
     if (activeTab === 'status') fetchApplied();
   }, [activeTab]);
 
+  const fetchCompaniesData = async () => {
+    setLoadingCompanies(true);
+    try {
+      const response = await placementsAPI.getCompanies();
+      setCompanies(response?.data || []);
+    } catch (error) {
+      console.error('Failed to load companies:', error);
+      toast({ title: 'Could not load partners', description: error.message || 'Please try again', variant: 'destructive' });
+    } finally {
+      setLoadingCompanies(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'companies' && companies.length === 0) {
+      fetchCompaniesData();
+    }
+  }, [activeTab, companies.length]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     setActiveTab('jobs');
@@ -245,6 +270,14 @@ const Placement = () => {
       return true;
     });
   }, [jobs, searchQuery, locationQuery, sourceFilter, jobType]);
+
+  const filteredCompanies = useMemo(() => {
+    return companies.filter(c => {
+      const matchSearch = (c.name || '').toLowerCase().includes(companySearch.toLowerCase());
+      const matchType = companyTypeFilter === 'all' || c.partnerType === companyTypeFilter;
+      return matchSearch && matchType;
+    });
+  }, [companies, companySearch, companyTypeFilter]);
 
   // Derived Collections (for home view)
   const recommendedJobs = useMemo(() => {
@@ -476,6 +509,12 @@ const Placement = () => {
             className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'status' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
           >
             My Applications
+          </button>
+          <button
+            onClick={() => setActiveTab('companies')}
+            className={`h-10 rounded-xl px-4 text-sm font-bold transition-all ${activeTab === 'companies' ? 'bg-[#1a3884] text-white shadow-sm' : 'bg-white text-[#0d1f4e] border border-[#d8e6f7] hover:bg-slate-50 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white'}`}
+          >
+            Partners
           </button>
         </div>
 
@@ -904,6 +943,131 @@ const Placement = () => {
                       </div>
                     ));
                 })()}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Companies Tab */}
+        {activeTab === 'companies' && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-extrabold text-[#0d1f4e] dark:text-white mb-6">Partners Directory</h2>
+            
+            {/* Filters */}
+            <div className="mb-6 flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={companySearch}
+                  onChange={(e) => setCompanySearch(e.target.value)}
+                  placeholder="Search by company name..."
+                  className="h-12 w-full rounded-xl border border-[#d8e6f7] bg-white pl-11 pr-4 text-sm font-medium text-black outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-white shadow-sm hover:border-[#1a3884]/40"
+                />
+              </div>
+              <div className="relative sm:w-64">
+                <select
+                  value={companyTypeFilter}
+                  onChange={(e) => setCompanyTypeFilter(e.target.value)}
+                  className="h-12 w-full appearance-none rounded-xl border border-[#d8e6f7] bg-white px-4 text-sm font-bold text-slate-700 outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-slate-200 shadow-sm hover:border-[#1a3884]/40"
+                >
+                  <option value="all">All Partners</option>
+                  <option value="smaart">SMAART Partners</option>
+                  <option value="college">College Partners</option>
+                </select>
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <ChevronRight className="h-4 w-4 rotate-90" />
+                </div>
+              </div>
+            </div>
+
+            {loadingCompanies ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-64 animate-pulse rounded-3xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700" />
+                ))}
+              </div>
+            ) : filteredCompanies.length === 0 ? (
+              <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-dashed border-[#d8e6f7] bg-white px-6 text-center shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
+                <Building className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
+                <h2 className="mt-4 text-xl font-extrabold text-[#0d1f4e] dark:text-white">No partners found</h2>
+                <p className="mt-2 max-w-md text-sm font-medium text-slate-500">Try adjusting your filters or search query.</p>
+                {(companySearch || companyTypeFilter !== 'all') && (
+                  <button onClick={() => { setCompanySearch(""); setCompanyTypeFilter("all"); }} className="mt-6 rounded-xl bg-[#1a3884] px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-[#132c6b] active:scale-95 transition-all">
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {filteredCompanies.map((partner) => {
+                  const companyInitial = (partner.name || "C").trim().charAt(0).toUpperCase();
+                  const isSmaart = partner.partnerType === 'smaart';
+                  
+                  return (
+                    <div
+                      key={partner._id}
+                      className="group relative flex flex-col items-center overflow-hidden rounded-3xl border border-[#d8e6f7] bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-[#1a3884]/20 dark:bg-[#001630]"
+                    >
+                      <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-transparent via-[#1a3884]/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-blue-500/30" />
+                      
+                      <div className="absolute left-3 right-3 top-3 flex justify-start">
+                        <span className={`truncate max-w-[90%] rounded-full border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider ${
+                          isSmaart 
+                            ? 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-400' 
+                            : 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-900/30 dark:text-emerald-400'
+                        }`}>
+                          {isSmaart ? 'SMAART Partner' : 'College Partner'}
+                        </span>
+                      </div>
+
+                      <div className="mb-4 mt-6 flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 text-2xl font-black text-[#1a3884] shadow-sm dark:border-slate-700 dark:bg-[#001a3d] dark:text-blue-300 relative">
+                        {partner.logo && (
+                          <img 
+                            src={partner.logo.startsWith('http') || partner.logo.startsWith('data:') ? partner.logo : `${getBackendUrl()}/${partner.logo.replace(/^\/+/, '')}`} 
+                            alt="logo" 
+                            className="absolute inset-0 h-full w-full object-contain p-2" 
+                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                          />
+                        )}
+                        <span style={{ display: partner.logo ? 'none' : 'flex' }} className="h-full w-full items-center justify-center">{companyInitial}</span>
+                      </div>
+
+                      <h3 className="mb-1.5 w-full truncate px-2 text-lg font-black text-[#0d1f4e] dark:text-white" title={partner.name}>
+                        {partner.name}
+                      </h3>
+
+                      {partner.website && (
+                        <a
+                          href={partner.website.startsWith('http') ? partner.website : `https://${partner.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mb-3 flex items-center justify-center gap-1.5 w-full truncate px-2 text-xs font-bold text-[#1a3884] transition-colors hover:text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{partner.website.replace(/^https?:\/\//i, '')}</span>
+                        </a>
+                      )}
+
+                      {partner.description && (
+                        <div className="mt-2 w-full border-t border-slate-100 pt-3 px-1 dark:border-slate-800">
+                          <p className="line-clamp-3 text-[11px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                            {partner.description}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <button 
+                        onClick={() => {
+                           setSearchQuery(partner.name);
+                           setActiveTab('jobs');
+                        }}
+                        className="mt-4 w-full rounded-xl bg-[#f5f8ff] py-2 text-xs font-bold text-[#1a3884] transition-colors hover:bg-[#eef4ff] dark:bg-[#1a3884]/10 dark:text-blue-400 dark:hover:bg-[#1a3884]/20"
+                      >
+                        View Jobs
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

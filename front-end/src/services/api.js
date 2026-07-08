@@ -518,6 +518,9 @@ export const placementsAPI = {
       timeout: 12000,
     });
   },
+  getCompanies: async () => {
+    return apiCall('/placements/companies');
+  },
   // Check if current user has applied for this job
   // Use the placements applications endpoint which is the source used by the placements apply flow
   hasApplied: async (source, id) => {
