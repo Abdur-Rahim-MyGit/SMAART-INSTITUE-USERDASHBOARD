@@ -660,6 +660,58 @@ router.post('/saved-jobs', protect, async (req, res) => {
   }
 });
 
+// Get companies (SMAART Partners + College Partners)
+router.get('/companies', protect, async (req, res) => {
+  try {
+    const userCollegeId = req.user.college?._id || req.user.college;
+    const db = mongoose.connection.db;
+
+    // 1. Fetch College Partners
+    let collegePartners = [];
+    if (userCollegeId && mongoose.Types.ObjectId.isValid(userCollegeId)) {
+      collegePartners = await db.collection('companies')
+        .find({ college: new mongoose.Types.ObjectId(userCollegeId) })
+        .toArray();
+    }
+
+    // 2. Fetch SMAART Partners (recruiters without a specific college)
+    const smaartPartners = await db.collection('recruiters')
+      .find({ role: 'recruiter', status: { $ne: 'inactive' }, $or: [{ college: null }, { college: { $exists: false } }] })
+      .toArray();
+
+    // Map them to a common format
+    const formattedCollegePartners = collegePartners.map(p => ({
+      _id: p._id.toString(),
+      name: p.name || p.companyName,
+      logo: p.logo || p.companyLogo || p.logoUrl,
+      website: p.website,
+      description: p.description || p.aboutCompany,
+      partnerType: 'college',
+      collegeId: p.college
+    }));
+
+    const formattedSmaartPartners = smaartPartners.map(p => ({
+      _id: p._id.toString(),
+      name: p.qualification || p.fullName || p.companyName || 'SMAART Partner',
+      logo: p.profileImage || p.logo,
+      website: p.website,
+      description: p.aboutCompany || p.bio,
+      partnerType: 'smaart'
+    }));
+
+    const allPartners = [...formattedSmaartPartners, ...formattedCollegePartners];
+
+    res.json({
+      success: true,
+      count: allPartners.length,
+      data: allPartners
+    });
+  } catch (error) {
+    console.error('[Placements] get companies error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch companies' });
+  }
+});
+
 // Get all job fairs for the student's college
 router.get('/job-fairs', protect, async (req, res) => {
   try {
