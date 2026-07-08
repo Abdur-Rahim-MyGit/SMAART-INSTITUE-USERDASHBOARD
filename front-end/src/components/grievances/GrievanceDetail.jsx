@@ -176,27 +176,15 @@ const GrievanceDetail = ({ grievance, onClose, onUpdate, currentUser = null }) =
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
-          {/* Meta Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Category Card */}
-            <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-[#002147] border border-slate-100 dark:border-white/5">
-              <div className="flex items-center gap-2 text-slate-400 dark:text-gray-400 text-xs mb-1 font-semibold">
-                <Tag className="w-3.5 h-3.5 text-slate-400" />
-                Category
-              </div>
-              <span className="text-slate-900 dark:text-white text-[13.5px] font-bold">{categoryConfig.label}</span>
+          {/* Meta Info */}
+          <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-[#002147] border border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-2 text-slate-400 dark:text-gray-400 text-xs mb-1 font-semibold">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              Submitted
             </div>
-
-            {/* Created Card */}
-            <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-[#002147] border border-slate-100 dark:border-white/5">
-              <div className="flex items-center gap-2 text-slate-400 dark:text-gray-400 text-xs mb-1 font-semibold">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                Submitted
-              </div>
-              <span className="text-slate-900 dark:text-white text-[13.5px] font-bold block leading-tight">
-                {formatDate(grievance.createdAt)}
-              </span>
-            </div>
+            <span className="text-slate-900 dark:text-white text-[13.5px] font-bold block leading-tight">
+              {formatDate(grievance.createdAt)}
+            </span>
           </div>
 
           {/* Description */}

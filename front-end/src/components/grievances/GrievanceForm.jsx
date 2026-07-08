@@ -16,54 +16,10 @@ import { createGrievance } from "@/services/grievanceApi";
 
 const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
   const { t } = useTranslation();
-
-  const CATEGORIES = [
-    {
-      value: 'placement',
-      label: t("grievance.cat_placement", "Placement"),
-      description: t("grievance.cat_placement_desc", "Placement drives, recruiter interviews, job profiles")
-    },
-    {
-      value: 'course',
-      label: t("grievance.cat_course", "Course"),
-      description: t("grievance.cat_course_desc", "Learning materials, module contents, video lectures")
-    },
-    {
-      value: 'assessment',
-      label: t("grievance.cat_assessment", "Assessment"),
-      description: t("grievance.cat_assessment_desc", "Quizzes, lab tests, exam submissions, grades")
-    },
-    {
-      value: 'badges',
-      label: t("grievance.cat_badges", "Badges"),
-      description: t("grievance.cat_badges_desc", "Badge unlocks, achievements, rewards display")
-    },
-    {
-      value: 'certificate',
-      label: t("grievance.cat_certificate", "Certificate"),
-      description: t("grievance.cat_certificate_desc", "Course completion certificates, verification issues")
-    },
-    {
-      value: 'career-direction',
-      label: t("grievance.cat_career_direction", "Career Direction"),
-      description: t("grievance.cat_career_direction_desc", "AI suggestions, pathways selection, counseling")
-    },
-    {
-      value: 'skill-passport',
-      label: t("grievance.cat_skill_passport", "Skill Passport"),
-      description: t("grievance.cat_skill_passport_desc", "Skills verification, portfolio sync, progress status")
-    },
-    {
-      value: 'other-suggestion',
-      label: t("grievance.cat_suggestions", "Suggestions"),
-      description: t("grievance.cat_suggestions_desc", "General suggestions, ideas, and feedback")
-    }
-  ];
-
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
-    category: initialData?.category || '',
+    category: initialData?.category || 'other',
     isAnonymous: false
   });
   const [attachments, setAttachments] = useState([]);
@@ -88,10 +44,6 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
       newErrors.description = t("grievance.validation_desc_min", "Description must be at least 10 characters");
     } else if (formData.description.length > 3000) {
       newErrors.description = t("grievance.validation_desc_max", "Description cannot exceed 3000 characters");
-    }
-
-    if (!formData.category) {
-      newErrors.category = t("grievance.validation_category_required", "Category is required");
     }
 
     setErrors(newErrors);
@@ -142,7 +94,7 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
       setSubmitStatus('success');
 
       setTimeout(() => {
-        setFormData({ title: '', description: '', category: '', isAnonymous: false });
+        setFormData({ title: '', description: '', category: 'other', isAnonymous: false });
         setAttachments([]);
         if (onSuccess) onSuccess(result.data);
       }, 1500);
@@ -201,38 +153,6 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-500">{errors.title}</p>
-        )}
-      </div>
-
-      {/* Category */}
-      <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
-          {t("grievance.category", "Category")} <span className="text-rose-500">*</span>
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {CATEGORIES.map((cat) => {
-            const isSelected = formData.category === cat.value;
-            return (
-              <button
-                key={cat.value}
-                type="button"
-                onClick={() => {
-                  setFormData(prev => ({ ...prev, category: cat.value }));
-                  if (errors.category) setErrors(prev => ({ ...prev, category: null }));
-                }}
-                className={`p-4 rounded-xl border text-left transition-all ${isSelected
-                  ? 'border-[#1a3884] bg-[#1a3884]/5 dark:bg-[#1a3884]/20 ring-2 ring-[#1a3884]/20 shadow-sm'
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-[#1a3884]/30'
-                  }`}
-              >
-                <span className={`font-bold text-[13.5px] block ${isSelected ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-950 dark:text-white'}`}>{cat.label}</span>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mt-1 leading-normal">{cat.description}</p>
-              </button>
-            );
-          })}
-        </div>
-        {errors.category && (
-          <p className="mt-2 text-sm text-red-450">{errors.category}</p>
         )}
       </div>
 
