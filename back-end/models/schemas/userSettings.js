@@ -20,7 +20,7 @@ const createDefaultUserSettings = () => ({
     twoFactorEnabled: false
   },
   appearance: {
-    theme: 'system',
+    theme: 'light',
     accentColor: '#1a3884'
   },
   language: {
@@ -57,7 +57,7 @@ const userSettingsSchema = new mongoose.Schema({
     theme: {
       type: String,
       enum: ['light', 'dark', 'system'],
-      default: 'system'
+      default: 'light'
     },
     accentColor: { type: String, default: '#1a3884' }
   },
