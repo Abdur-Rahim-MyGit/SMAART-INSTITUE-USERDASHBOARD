@@ -496,10 +496,11 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       portfolioUrl,
       linkedInUrl,
       coverLetter,
+      resumeUrl: bodyResumeUrl
     } = req.body || {};
 
     // If a resume file was uploaded, derive a resumeUrl from the stored file info
-    let resumeUrl = null;
+    let resumeUrl = bodyResumeUrl || null;
     if (req.file) {
       // For Cloudinary registration storage, multer-storage-cloudinary sets path/secure_url
       resumeUrl = req.file.path || req.file.secure_url || req.file.url || `/uploads/${req.file.filename}`;

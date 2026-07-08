@@ -77,10 +77,10 @@ const generalLimiter = rateLimit({
 // Resume PDF export — 3 exports per hour per authenticated user
 const resumeExportLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 3,
+  max: process.env.NODE_ENV === 'production' ? 10 : 1000,
   message: {
     success: false,
-    error: 'Resume export limit reached. You can generate up to 3 PDFs per hour.',
+    error: 'Resume export limit reached. You can generate up to 10 PDFs per hour.',
     retryAfter: 60,
   },
   standardHeaders: true,
