@@ -62,6 +62,7 @@ import { useTranslation } from 'react-i18next';
 import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { apiCall } from '@/services/api';
+import { ATS_TEMPLATES, adaptData } from './ResumeTemplates';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
@@ -115,7 +116,7 @@ const ResumeWatermark = () => (
 );
 
 const TemplateThumbnail = ({ type }) => {
-    if (type === 'classic') {
+    if (type === 'classicBW') {
         return (
             <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col items-center gap-1">
@@ -135,7 +136,7 @@ const TemplateThumbnail = ({ type }) => {
             </div>
         );
     }
-    if (type === 'modern') {
+    if (type === 'navySerif') {
         return (
             <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex gap-2">
@@ -163,7 +164,7 @@ const TemplateThumbnail = ({ type }) => {
             </div>
         );
     }
-    if (type === 'executive') {
+    if (type === 'charcoalCentered') {
         return (
             <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col items-center gap-1">
@@ -186,7 +187,7 @@ const TemplateThumbnail = ({ type }) => {
             </div>
         );
     }
-    if (type === 'tech') {
+    if (type === 'minimalModern') {
         return (
             <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col gap-0.5">
@@ -210,27 +211,7 @@ const TemplateThumbnail = ({ type }) => {
             </div>
         );
     }
-    if (type === 'modernProfile') {
-        return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex gap-2 select-none pointer-events-none">
-                <div className="w-8 h-8 rounded bg-slate-300 shrink-0" />
-                <div className="flex flex-col gap-1 w-full">
-                    <div className="w-20 h-2 bg-[#1a3884] rounded-sm" />
-                    <div className="w-14 h-1.5 bg-slate-500 rounded-sm mb-1" />
-                    <div className="w-full h-[1px] bg-slate-200 mb-1" />
-                    <div className="w-full flex gap-1">
-                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
-                        <div className="w-4/5 h-1 bg-slate-350 rounded" />
-                    </div>
-                    <div className="w-full flex gap-1">
-                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
-                        <div className="w-5/6 h-1 bg-slate-250 rounded" />
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    // academic
+    // forestFormal
     return (
         <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1 justify-between select-none pointer-events-none">
             <div className="flex flex-col items-center">
@@ -253,116 +234,114 @@ const TemplateThumbnail = ({ type }) => {
     );
 };
 
-const templates = {
-    classic: {
-        id: 'classic',
-        name: 'Classic Professional',
-        desc: 'Traditional serif styling preferred by corporate, finance, and legal sectors.',
-        tag: 'Corporate & Finance',
-        fontFamily: '"Times New Roman", Times, serif',
-        titleClass: 'text-4xl font-bold uppercase tracking-tight text-black text-center',
-        subtitleClass: 'text-lg font-semibold text-gray-800 uppercase tracking-widest text-center mt-1',
-        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-gray-700 max-w-full',
-        sectionHeaderClass: 'text-[13px] font-bold text-black uppercase border-b-2 border-black pb-0.5 mb-2.5 tracking-wider',
-        sectionClass: 'mb-6',
-        bodyTextClass: 'text-gray-800 text-[11px] leading-normal',
-        bulletClass: 'text-gray-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
-        skillsClass: 'flex flex-col gap-2 mt-1',
-        skillsLabelClass: 'font-bold text-black text-[11px] w-full mb-1',
-        skillsBadge: 'bg-blue-50 text-[#1a3884] px-2 py-0.5 border border-blue-200 rounded text-[10.5px] font-semibold',
-        cardBg: 'from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 border-slate-205 dark:border-white/10'
-    },
-    modern: {
-        id: 'modern',
-        name: 'Modern Minimalist',
-        desc: 'Clean sans-serif typography and optimized spacing, perfect for tech and startups.',
-        tag: 'Tech & Startups',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        titleClass: 'text-3xl font-black tracking-tight text-slate-900 text-left border-l-4 border-[#1a3884] pl-3',
-        subtitleClass: 'text-md font-bold text-[#1a3884] uppercase tracking-wider text-left mt-1 pl-3',
-        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-slate-600 pl-3',
-        sectionHeaderClass: 'text-[12px] font-extrabold text-slate-900 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2.5 flex items-center gap-2',
-        sectionClass: 'mb-5',
-        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
-        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'◦\'] before:absolute before:left-0 before:text-[#1a3884] before:font-bold',
-        skillsClass: 'flex flex-col gap-2 mt-1',
-        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1',
-        skillsBadge: 'bg-slate-100 text-slate-850 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-slate-200',
-        cardBg: 'from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-200/50 dark:border-blue-500/10'
-    },
-    executive: {
-        id: 'executive',
-        name: 'Executive Premium',
-        desc: 'Distinguished editorial styling with navy accents, tailored for senior roles.',
-        tag: 'Business & Management',
-        fontFamily: 'Georgia, serif',
-        titleClass: 'text-3xl font-bold tracking-tight text-[#002147] text-center italic',
-        subtitleClass: 'text-sm font-bold text-slate-600 uppercase tracking-widest text-center mt-1 border-t border-b border-slate-200 py-1 max-w-md mx-auto',
-        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-slate-700 max-w-full italic',
-        sectionHeaderClass: 'text-[13px] font-extrabold text-[#002147] uppercase border-b-2 border-[#002147]/30 pb-0.5 mb-2.5 tracking-wider',
-        sectionClass: 'mb-5',
-        bodyTextClass: 'text-slate-800 text-[11px] leading-normal',
-        bulletClass: 'text-slate-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'■\'] before:absolute before:left-0 before:text-[#002147] before:text-[8px] before:top-[2px]',
-        skillsClass: 'flex flex-col gap-2 mt-1',
-        skillsLabelClass: 'font-bold text-[#002147] text-[11px] w-full mb-1 block',
-        skillsBadge: 'bg-slate-50 text-slate-800 px-2 py-0.5 border border-slate-300 rounded text-[10.5px] font-semibold',
-        cardBg: 'from-amber-50/30 to-amber-100/20 dark:from-amber-950/10 dark:to-amber-900/5 border-amber-250/30 dark:border-amber-500/10'
-    },
-    tech: {
-        id: 'tech',
-        name: 'Tech Professional',
-        desc: 'Ultra-clean, structured layout with sharp typography for engineering and analyst roles.',
-        tag: 'Engineering & IT',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        titleClass: 'text-3xl font-extrabold tracking-tight text-slate-900 text-left uppercase',
-        subtitleClass: 'text-sm font-bold text-[#1a3884] uppercase tracking-widest text-left mt-0.5',
-        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2.5 text-[10.5px] text-slate-600 border-b border-slate-200 pb-3',
-        sectionHeaderClass: 'text-[13px] font-bold text-slate-900 uppercase tracking-wider mb-2 border-b border-slate-300 pb-1',
-        sectionClass: 'mb-5',
-        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
-        bulletClass: 'text-slate-700 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0 before:text-[#1a3884]',
-        skillsClass: 'flex flex-wrap gap-1.5 mt-1',
-        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1 block',
-        skillsBadge: 'bg-slate-50 text-slate-800 px-2 py-1 rounded text-[10px] font-semibold border border-slate-200',
-        cardBg: 'from-slate-50 to-slate-100/50 border-slate-200/80 dark:border-white/10'
-    },
-    academic: {
-        id: 'academic',
-        name: 'Academic Standard',
-        desc: 'High density format focusing purely on content length and traditional formatting.',
-        tag: 'Academic & Research',
-        fontFamily: 'Arial, Helvetica, sans-serif',
-        titleClass: 'text-3xl font-black text-black text-center uppercase tracking-normal',
-        subtitleClass: 'text-sm font-bold text-black uppercase tracking-wide text-center mt-0.5',
-        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-[10.5px] text-black max-w-full',
-        sectionHeaderClass: 'text-[12px] font-bold text-black uppercase border-b border-black pb-0.5 mb-2 tracking-wide',
-        sectionClass: 'mb-4',
-        bodyTextClass: 'text-black text-[10.5px] leading-normal',
-        bulletClass: 'text-black text-[10.5px] leading-normal mt-0.5 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
-        skillsClass: 'flex flex-col gap-1.5 mt-1',
-        skillsLabelClass: 'font-bold text-[10.5px] text-black w-full mb-0.5 block',
-        skillsBadge: 'bg-gray-100 text-black px-1.5 py-0.5 border border-gray-300 rounded-sm text-[10px]',
-        cardBg: 'from-gray-50 to-gray-150 dark:from-slate-800 dark:to-slate-850 border-slate-200 dark:border-white/10'
-    },
-    modernProfile: {
-        id: 'modernProfile',
-        name: 'Modern Profile',
-        desc: 'Includes a professional photo. Popular in Europe, Asia, and creative fields.',
-        tag: 'Creative & Global',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        hasPhoto: true,
-        titleClass: 'text-3xl font-black tracking-tight text-[#1a3884] text-left uppercase',
-        subtitleClass: 'text-sm font-bold text-slate-500 uppercase tracking-widest text-left mt-1',
-        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2 text-[10.5px] text-slate-600',
-        sectionHeaderClass: 'text-[13px] font-bold text-slate-900 uppercase border-b-2 border-[#1a3884] pb-1 mb-3 tracking-wider flex items-center gap-2',
-        sectionClass: 'mb-6',
-        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
-        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1.5 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0 before:text-[#1a3884]',
-        skillsClass: 'flex flex-wrap gap-1.5 mt-1',
-        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1 block',
-        skillsBadge: 'bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold border border-slate-200',
-        cardBg: 'from-indigo-50/50 to-purple-50/30 dark:from-indigo-950/20 dark:to-purple-900/10 border-indigo-200/50 dark:border-purple-500/10'
+
+
+// --- SVG Circular Score Ring ---
+const CircularScoreRing = ({ score, size = 120, strokeWidth = 10, label = "ATS" }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (score / 100) * circumference;
+
+    let colorClass = "text-emerald-500";
+    let glowColor = "rgba(16,185,129,0.45)";
+    let glowColorStrong = "rgba(16,185,129,0.8)";
+    if (score < 50) {
+        colorClass = "text-rose-500";
+        glowColor = "rgba(244,63,94,0.45)";
+        glowColorStrong = "rgba(244,63,94,0.8)";
+    } else if (score < 80) {
+        colorClass = "text-amber-500";
+        glowColor = "rgba(245,158,11,0.45)";
+        glowColorStrong = "rgba(245,158,11,0.8)";
     }
+
+    const count = useMotionValue(0);
+    const rounded = useTransform(count, Math.round);
+    const [displayScore, setDisplayScore] = useState(0);
+    const [prevScore, setPrevScore] = useState(score);
+    const [flashing, setFlashing] = useState(false);
+
+    useEffect(() => {
+        // Trigger gold flash when score increases
+        if (score > prevScore && prevScore !== 0) {
+            setFlashing(true);
+            const t = setTimeout(() => setFlashing(false), 800);
+            return () => clearTimeout(t);
+        }
+        setPrevScore(score);
+    }, [score]);
+
+    useEffect(() => {
+        const controls = animate(count, score, {
+            duration: 1.5,
+            ease: "easeOut",
+        });
+        return controls.stop;
+    }, [score]);
+
+    useEffect(() => {
+        const unsubscribe = rounded.on("change", (v) => setDisplayScore(v));
+        return () => unsubscribe();
+    }, [rounded]);
+
+    return (
+        <div
+            className="relative flex items-center justify-center"
+            style={{ width: size, height: size }}
+        >
+            {/* Always-visible outer glow — flashes gold on score increase */}
+            <motion.div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                animate={{
+                    boxShadow: flashing
+                        ? `0 0 ${size * 0.3}px ${size * 0.12}px rgba(251,191,36,0.9), 0 0 ${size * 0.12}px ${size * 0.05}px rgba(251,191,36,0.6)`
+                        : `0 0 ${size * 0.18}px ${size * 0.06}px ${glowColor}`,
+                }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+
+            {/* SVG Ring */}
+            <motion.svg className="transform -rotate-90 w-full h-full relative z-10">
+                {/* Background track */}
+                <circle
+                    cx={size / 2} cy={size / 2} r={radius}
+                    stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                    className="text-slate-100 dark:text-slate-800"
+                />
+                {/* Animated progress arc */}
+                <motion.circle
+                    cx={size / 2} cy={size / 2} r={radius}
+                    stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
+                    strokeDasharray={circumference}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset: offset }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    strokeLinecap="round"
+                    className={colorClass}
+                />
+            </motion.svg>
+
+            {/* Center number + optional label */}
+            <div className="absolute flex flex-col items-center justify-center text-center z-20">
+                <motion.span
+                    animate={flashing ? { color: "#fbbf24", scale: 1.15 } : { color: undefined, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="font-black text-slate-800 dark:text-white leading-none tracking-tighter"
+                    style={{ fontSize: `${Math.max(14, size * 0.28)}px` }}
+                >
+                    {displayScore}
+                </motion.span>
+                {label && (
+                    <span
+                        className="font-bold text-slate-400 uppercase tracking-widest mt-0.5"
+                        style={{ fontSize: `${Math.max(8, size * 0.08)}px` }}
+                    >
+                        {label}
+                    </span>
+                )}
+            </div>
+        </div>
+    );
 };
 
 const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, viewOnly = false, preloadedData = null }) => {
@@ -414,7 +393,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [verificationUrl, setVerificationUrl] = useState('');
     const [verificationQr, setVerificationQr] = useState('');
     const [studentId, setStudentId] = useState('');
-    const [selectedTemplate, setSelectedTemplate] = useState('classic');
+    const [selectedTemplate, setSelectedTemplate] = useState('classicBW');
     const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
 
     const steps = [
@@ -460,6 +439,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     useEffect(() => {
         if (preloadedData) {
             setResumeData(preloadedData);
+            if (preloadedData.template) {
+                setSelectedTemplate(preloadedData.template);
+            }
             setDataLoaded(true);
         }
     }, [preloadedData]);
@@ -1124,6 +1106,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 atsScore,
                 versionName,
                 targetRole: resumeData.personalInfo?.targetRole || '',
+                template: selectedTemplate,
             };
 
             if (currentId) {
@@ -1227,6 +1210,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         setResumeId(resume._id);
         setVersionName(resume.versionName || 'My Resume');
         setAtsScore(resume.atsScore || 0);
+        
+        if (resume.template) {
+            setSelectedTemplate(resume.template);
+        }
         
         // If the resume has a targetRole that matches one of their paths, auto-select it
         if (resume.targetRole) {
@@ -1671,6 +1658,33 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     }
 
     if (viewOnly) {
+        const TemplateComponent = (ATS_TEMPLATES[selectedTemplate] || ATS_TEMPLATES.classicBW).Component;
+
+        const footer = (
+            <div className="absolute bottom-[15mm] left-[15mm] right-[15mm] pt-4 border-t border-gray-300 flex justify-between items-center gap-4 text-left z-20 bg-white">
+                <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
+                        {ORG_NAME} {t('resume_builder.verified_resume', 'Verified Resume')}
+                    </div>
+                    <p className="mt-1 text-[9.5px] !text-gray-600">
+                        {t('resume_builder.document_id', 'Document ID:')} <span className="font-semibold !text-black">{resumePublicId || t('resume_builder.pending', 'Pending')}</span>
+                        {studentId && (
+                            <> &bull; {t('resume_builder.student_id', 'Student ID:')} <span className="font-semibold !text-black">{studentId}</span></>
+                        )}
+                    </p>
+                    <p className="text-[8.5px] !text-gray-500 mt-0.5">{t('resume_builder.scan_qr', 'Scan the QR code to verify the authenticity of this document online.')}</p>
+                </div>
+                {verificationQr ? (
+                    <img src={verificationQr} alt="Resume verification QR code" className="w-12 h-12 border border-slate-200 bg-white p-0.5 shrink-0" />
+                ) : (
+                    <div className="w-12 h-12 border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                        <QrCode className="w-6 h-6 text-slate-400" />
+                    </div>
+                )}
+            </div>
+        );
+
         return (
             <div className="w-full flex justify-center bg-transparent py-6">
                 <div 
@@ -1681,355 +1695,18 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     }}
                 >
                     <div
-                        id="resume-preview"
-                        className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm"
                         style={{
-                            fontFamily: templates[selectedTemplate]?.fontFamily || '"Times New Roman", Times, serif',
                             transform: scale < 1 ? `scale(${scale})` : 'none',
-                            transformOrigin: 'top center'
+                            transformOrigin: 'top center',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
                         }}
                     >
-                        <ResumeWatermark />
-
-                        <div className="relative z-10 text-left pb-[20mm]">
-                            {/* Header Section */}
-                            <div className={`flex w-full mb-6 ${templates[selectedTemplate]?.hasPhoto ? 'items-center' : ''}`}>
-                                {templates[selectedTemplate]?.hasPhoto && resumeData.personalInfo.profileImage && (
-                                    <div className="w-[28mm] h-[28mm] rounded-full overflow-hidden mr-6 border-2 border-[#1a3884] shrink-0">
-                                        <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                                    </div>
-                                )}
-                                <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech' || selectedTemplate === 'modernProfile') ? 'flex flex-col items-start text-left relative z-10 w-full' : 'flex flex-col items-center text-center relative z-10 w-full'}>
-                                    <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
-                                        {resumeData.personalInfo.fullName || t('resume_builder.first_last', 'FIRST LAST')}
-                                    </h1>
-                                    <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || t('resume_builder.professional_title', 'Professional Title')}</h2>
-
-                                    <div className={templates[selectedTemplate]?.contactClass}>
-                                    {resumeData.personalInfo.mobile && (
-                                        <span className="flex items-center gap-1">
-                                            <Phone className="w-[10px] h-[10px] shrink-0" />
-                                            {resumeData.personalInfo.mobile}
-                                        </span>
-                                    )}
-                                    {resumeData.personalInfo.email && (
-                                        <span className="flex items-center gap-1">
-                                            <Mail className="w-[10px] h-[10px] shrink-0" />
-                                            {resumeData.personalInfo.email}
-                                        </span>
-                                    )}
-                                    {resumeData.personalInfo.location && (
-                                        <span className="flex items-center gap-1">
-                                            <MapPinIcon className="w-[10px] h-[10px] shrink-0" />
-                                            {resumeData.personalInfo.location}
-                                        </span>
-                                    )}
-                                    {resumeData.personalInfo.linkedinUrl && (
-                                        <span className="flex items-center gap-1">
-                                            <Linkedin className="w-[10px] h-[10px] shrink-0" />
-                                            {resumeData.personalInfo.linkedinUrl}
-                                        </span>
-                                    )}
-                                    {resumeData.personalInfo.githubUrl && (
-                                        <span className="flex items-center gap-1">
-                                            <Github className="w-[10px] h-[10px] shrink-0" />
-                                            {resumeData.personalInfo.githubUrl}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                {/* Summary */}
-                                {resumeData.summary && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.summary_heading', 'Professional Summary')}</h3>
-                                        <p className={templates[selectedTemplate]?.bodyTextClass}>{resumeData.summary}</p>
-                                    </section>
-                                )}
-
-                                {/* Experience */}
-                                {resumeData.experience.length > 0 && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.experience_heading', 'Experience')}</h3>
-                                        <div className={templates[selectedTemplate]?.sectionClass}>
-                                            {resumeData.experience.map((exp, i) => (
-                                                <div key={i} className="mb-3 last:mb-0">
-                                                    <div className="flex justify-between items-baseline mb-0.5">
-                                                        <span className="font-bold !text-black text-[12px]">{exp.role}</span>
-                                                        <span className={`text-[10px] font-semibold ${templates[selectedTemplate]?.bodyTextClass}`}>{exp.duration}</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-baseline mb-1">
-                                                        <span className={`font-semibold italic text-[11px] ${templates[selectedTemplate]?.bodyTextClass}`}>{exp.company}</span>
-                                                        <span className={`text-[10px] ${templates[selectedTemplate]?.bodyTextClass}`}>{exp.location}</span>
-                                                    </div>
-                                                    {exp.description && <p className={templates[selectedTemplate]?.bulletClass}>{exp.description}</p>}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* Projects */}
-                                {resumeData.projects.length > 0 && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.projects_heading', 'Projects')}</h3>
-                                        <div className={templates[selectedTemplate]?.sectionClass}>
-                                            {resumeData.projects.map((proj, i) => (
-                                                <div key={i} className="mb-2 last:mb-0">
-                                                    <div className="flex justify-between items-baseline mb-0.5">
-                                                        <span className="font-bold !text-black text-[12px]">{proj.title}</span>
-                                                        {proj.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{proj.link}</span>}
-                                                    </div>
-                                                    <p className={templates[selectedTemplate]?.bulletClass}>{proj.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* Education */}
-                                {resumeData.education.length > 0 && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.education_heading', 'Education')}</h3>
-                                        <div className={templates[selectedTemplate]?.sectionClass}>
-                                            {resumeData.education.map((edu, i) => (
-                                                <div key={i} className="mb-2 last:mb-0 flex justify-between items-start">
-                                                    <div>
-                                                        <div className="font-bold !text-black text-[11px] leading-tight">{edu.degree}</div>
-                                                        <div className={`italic text-[11px] ${templates[selectedTemplate]?.bodyTextClass} leading-tight`}>{edu.institution}</div>
-                                                        {edu.grade && <div className={`text-[10px] ${templates[selectedTemplate]?.bodyTextClass} mt-0.5`}>{t('resume_builder.grade', 'Grade:')} <span className="font-semibold">{edu.grade}</span></div>}
-                                                    </div>
-                                                    <div className="text-right shrink-0 ml-4">
-                                                        <div className={`text-[10px] font-semibold ${templates[selectedTemplate]?.bodyTextClass}`}>{edu.year}</div>
-                                                        <div className={`text-[10px] ${templates[selectedTemplate]?.bodyTextClass}`}>{edu.location}</div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* Skills */}
-                                {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.skills_heading', 'Skills')}</h3>
-                                        <div className={templates[selectedTemplate]?.skillsClass}>
-                                            {resumeData.skills.technical && (
-                                                <div className="mt-1">
-                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.technical_label', 'Technical Skills:')}</span>{' '}
-                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                            {resumeData.skills.technical.split(',').map((s, i) => (
-                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                    {s.trim()}
-                                                                </span>
-                                                            ))}
-                                                        </span>
-                                                    ) : (
-                                                        resumeData.skills.technical
-                                                    )}
-                                                </div>
-                                            )}
-                                            {resumeData.skills.soft && (
-                                                <div className="mt-1">
-                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.soft_skills_label', 'Soft Skills:')}</span>{' '}
-                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                            {resumeData.skills.soft.split(',').map((s, i) => (
-                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                    {s.trim()}
-                                                                </span>
-                                                            ))}
-                                                        </span>
-                                                    ) : (
-                                                        resumeData.skills.soft
-                                                    )}
-                                                </div>
-                                            )}
-                                            {resumeData.skills.languages && (
-                                                <div className="mt-1">
-                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.languages_label', 'Languages:')}</span>{' '}
-                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                            {resumeData.skills.languages.split(',').map((s, i) => (
-                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                    {s.trim()}
-                                                                </span>
-                                                            ))}
-                                                        </span>
-                                                    ) : (
-                                                        resumeData.skills.languages
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* Achievements */}
-                                {resumeData.achievements.length > 0 && (
-                                    <section>
-                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.achievements_heading', 'Achievements')}</h3>
-                                        <div className="space-y-2">
-                                            {resumeData.achievements.map((ach, i) => (
-                                                <div key={i} className="text-[11px]">
-                                                    <div className="flex justify-between items-baseline">
-                                                        <span className="font-bold !text-black">{ach.title}</span>
-                                                        {ach.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{ach.link}</span>}
-                                                    </div>
-                                                    <p className={`italic ${templates[selectedTemplate]?.bodyTextClass}`}>{ach.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Verification Footer absolutely pinned to the bottom of the A4 printed page */}
-                        <div
-                            className="absolute bottom-[15mm] left-[15mm] right-[15mm] pt-4 border-t border-gray-300 flex justify-between items-center gap-4 text-left z-20 bg-white"
-                        >
-                            <div className="min-w-0">
-                                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
-                                    <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
-                                    {ORG_NAME} {t('resume_builder.verified_resume', 'Verified Resume')}
-                                </div>
-                                <p className="mt-1 text-[9.5px] !text-gray-600">
-                                    {t('resume_builder.document_id', 'Document ID:')} <span className="font-semibold !text-black">{resumePublicId || t('resume_builder.pending', 'Pending')}</span>
-                                    {studentId && (
-                                        <> &bull; {t('resume_builder.student_id', 'Student ID:')} <span className="font-semibold !text-black">{studentId}</span></>
-                                    )}
-                                </p>
-                                <p className="text-[8.5px] !text-gray-500 mt-0.5">{t('resume_builder.scan_qr', 'Scan the QR code to verify the authenticity of this document online.')}</p>
-                            </div>
-                            {verificationQr ? (
-                                <img
-                                    src={verificationQr}
-                                    alt="Resume verification QR code"
-                                    className="w-12 h-12 border border-slate-200 bg-white p-0.5 shrink-0"
-                                />
-                            ) : (
-                                <div className="w-12 h-12 border border-slate-200 bg-white flex items-center justify-center shrink-0">
-                                    <QrCode className="w-6 h-6 text-slate-400" />
-                                </div>
-                            )}
-                        </div>
+                        <TemplateComponent data={adaptData(resumeData)} watermark={<ResumeWatermark />} footer={footer} />
                     </div>
                 </div>
             </div>
         );
     }
-
-    // --- SVG Circular Score Ring ---
-    const CircularScoreRing = ({ score, size = 120, strokeWidth = 10, label = "ATS" }) => {
-        const radius = (size - strokeWidth) / 2;
-        const circumference = radius * 2 * Math.PI;
-        const offset = circumference - (score / 100) * circumference;
-
-        let colorClass = "text-emerald-500";
-        let glowColor = "rgba(16,185,129,0.45)";
-        let glowColorStrong = "rgba(16,185,129,0.8)";
-        if (score < 50) {
-            colorClass = "text-rose-500";
-            glowColor = "rgba(244,63,94,0.45)";
-            glowColorStrong = "rgba(244,63,94,0.8)";
-        } else if (score < 80) {
-            colorClass = "text-amber-500";
-            glowColor = "rgba(245,158,11,0.45)";
-            glowColorStrong = "rgba(245,158,11,0.8)";
-        }
-
-        const count = useMotionValue(0);
-        const rounded = useTransform(count, Math.round);
-        const [displayScore, setDisplayScore] = useState(0);
-        const [prevScore, setPrevScore] = useState(score);
-        const [flashing, setFlashing] = useState(false);
-
-        useEffect(() => {
-            // Trigger gold flash when score increases
-            if (score > prevScore && prevScore !== 0) {
-                setFlashing(true);
-                const t = setTimeout(() => setFlashing(false), 800);
-                return () => clearTimeout(t);
-            }
-            setPrevScore(score);
-        }, [score]);
-
-        useEffect(() => {
-            const controls = animate(count, score, {
-                duration: 1.5,
-                ease: "easeOut",
-            });
-            return controls.stop;
-        }, [score]);
-
-        useEffect(() => {
-            const unsubscribe = rounded.on("change", (v) => setDisplayScore(v));
-            return () => unsubscribe();
-        }, [rounded]);
-
-        return (
-            <div
-                className="relative flex items-center justify-center"
-                style={{ width: size, height: size }}
-            >
-                {/* Always-visible outer glow — flashes gold on score increase */}
-                <motion.div
-                    className="absolute inset-0 rounded-full pointer-events-none"
-                    animate={{
-                        boxShadow: flashing
-                            ? `0 0 ${size * 0.3}px ${size * 0.12}px rgba(251,191,36,0.9), 0 0 ${size * 0.12}px ${size * 0.05}px rgba(251,191,36,0.6)`
-                            : `0 0 ${size * 0.18}px ${size * 0.06}px ${glowColor}`,
-                    }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                />
-
-                {/* SVG Ring */}
-                <motion.svg className="transform -rotate-90 w-full h-full relative z-10">
-                    {/* Background track */}
-                    <circle
-                        cx={size / 2} cy={size / 2} r={radius}
-                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
-                        className="text-slate-100 dark:text-slate-800"
-                    />
-                    {/* Animated progress arc */}
-                    <motion.circle
-                        cx={size / 2} cy={size / 2} r={radius}
-                        stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
-                        strokeDasharray={circumference}
-                        initial={{ strokeDashoffset: circumference }}
-                        animate={{ strokeDashoffset: offset }}
-                        transition={{ duration: 1.5, ease: "easeOut" }}
-                        strokeLinecap="round"
-                        className={colorClass}
-                    />
-                </motion.svg>
-
-                {/* Center number + optional label */}
-                <div className="absolute flex flex-col items-center justify-center text-center z-20">
-                    <motion.span
-                        animate={flashing ? { color: "#fbbf24", scale: 1.15 } : { color: undefined, scale: 1 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="font-black text-slate-800 dark:text-white leading-none tracking-tighter"
-                        style={{ fontSize: `${Math.max(14, size * 0.28)}px` }}
-                    >
-                        {displayScore}
-                    </motion.span>
-                    {label && (
-                        <span
-                            className="font-bold text-slate-400 uppercase tracking-widest mt-0.5"
-                            style={{ fontSize: `${Math.max(8, size * 0.08)}px` }}
-                        >
-                            {label}
-                        </span>
-                    )}
-                </div>
-            </div>
-        );
-    };
 
     if (pageMode === 'list') {
         return (
@@ -2865,7 +2542,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
-                                    {Object.values(templates).map((tpl) => (
+                                    {Object.values(ATS_TEMPLATES).map((tpl) => (
                                         <div
                                             key={tpl.id}
                                             className="group flex flex-col bg-white dark:bg-slate-900 border border-slate-205 dark:border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
@@ -2943,7 +2620,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             onChange={(e) => setSelectedTemplate(e.target.value)}
                                             className="bg-slate-50 dark:bg-slate-800 border border-slate-202 dark:border-white/10 text-slate-855 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer w-full sm:w-auto"
                                         >
-                                            {Object.values(templates).map((tpl) => (
+                                            {Object.values(ATS_TEMPLATES).map((tpl) => (
                                                 <option key={tpl.id} value={tpl.id}>
                                                     {t(`resume_builder.templates.${tpl.id}.name`, tpl.name)}
                                                 </option>
@@ -2969,17 +2646,17 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={handleDownloadPDF}
-                                            disabled={generating}
+                                            onClick={handleConfirmAndSave}
+                                            disabled={saving || generating}
                                             className="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg flex-1 sm:flex-initial shrink-0"
                                         >
-                                            {generating ? (
+                                            {saving || generating ? (
                                                 <>
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('resume_builder.generating', 'Generating...')}
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('resume_builder.saving', 'Saving...')}
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Download className="w-4 h-4" /> {t('resume_builder.download_pdf', 'Download PDF')}
+                                                    <Save className="w-4 h-4" /> {t('resume_builder.save_progress', 'Save Progress')}
                                                 </>
                                             )}
                                         </button>
@@ -2988,253 +2665,18 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             </div>
 
                             {/* Scrollable canvas area */}
-                            <div className="flex-1 lg:overflow-auto custom-scrollbar p-4 md:p-8">
+                            <div className="flex-1 lg:overflow-auto custom-scrollbar p-4 md:p-8 flex justify-center">
                                 <div
-                                    className="flex justify-center items-start mx-auto"
                                     style={{
-                                        width: scale < 1 ? `${794 * scale}px` : '100%',
-                                        height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
-                                        overflow: 'hidden'
+                                        transform: scale < 1 ? `scale(${scale})` : 'none',
+                                        transformOrigin: 'top center',
+                                        boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
                                     }}
                                 >
-                                    <div
-                                        id="resume-preview"
-                                        className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm"
-                                        style={{
-                                            fontFamily: templates[selectedTemplate]?.fontFamily || '"Times New Roman", Times, serif',
-                                            transform: scale < 1 ? `scale(${scale})` : 'none',
-                                            transformOrigin: 'top center'
-                                        }}
-                                    >
-                                        <ResumeWatermark />
-
-                                        <div className="relative z-10 text-left pb-[20mm]">
-                                            {/* Header Section */}
-                                            <div className={`flex w-full mb-6 ${templates[selectedTemplate]?.hasPhoto ? 'items-center' : ''}`}>
-                                                {templates[selectedTemplate]?.hasPhoto && resumeData.personalInfo.profileImage && (
-                                                    <div className="w-[28mm] h-[28mm] rounded-full overflow-hidden mr-6 border-2 border-[#1a3884] shrink-0">
-                                                        <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                                                    </div>
-                                                )}
-                                                <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech' || selectedTemplate === 'modernProfile') ? 'flex flex-col items-start text-left relative z-10 w-full' : 'flex flex-col items-center text-center relative z-10 w-full'}>
-                                                    <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
-                                                        {resumeData.personalInfo.fullName || t('resume_builder.first_last', 'FIRST LAST')}
-                                                    </h1>
-                                                    <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || t('resume_builder.professional_title', 'Professional Title')}</h2>
-
-                                                    <div className={templates[selectedTemplate]?.contactClass}>
-                                                    {resumeData.personalInfo.mobile && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Phone className="w-[10px] h-[10px] shrink-0" />
-                                                            {resumeData.personalInfo.mobile}
-                                                        </span>
-                                                    )}
-                                                    {resumeData.personalInfo.email && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Mail className="w-[10px] h-[10px] shrink-0" />
-                                                            {resumeData.personalInfo.email}
-                                                        </span>
-                                                    )}
-                                                    {resumeData.personalInfo.location && (
-                                                        <span className="flex items-center gap-1">
-                                                            <MapPinIcon className="w-[10px] h-[10px] shrink-0" />
-                                                            {resumeData.personalInfo.location}
-                                                        </span>
-                                                    )}
-                                                    {resumeData.personalInfo.linkedinUrl && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Linkedin className="w-[10px] h-[10px] shrink-0" />
-                                                            {resumeData.personalInfo.linkedinUrl}
-                                                        </span>
-                                                    )}
-                                                    {resumeData.personalInfo.githubUrl && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Github className="w-[10px] h-[10px] shrink-0" />
-                                                            {resumeData.personalInfo.githubUrl}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            </div>
-
-                                            <div className="space-y-6">
-                                                {/* Summary */}
-                                                {resumeData.summary && (
-                                                    <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.professional_summary', 'Professional Summary')}</h3>
-                                                        <p className={`${templates[selectedTemplate]?.bodyTextClass} whitespace-pre-wrap`}>
-                                                            {resumeData.summary}
-                                                        </p>
-                                                    </section>
-                                                )}
-
-                                                {/* Education */}
-                                                {resumeData.education.length > 0 && (
-                                                    <div className={templates[selectedTemplate]?.sectionClass}>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.education_heading', 'Education')}</h3>
-                                                        <div className="space-y-3">
-                                                            {resumeData.education.map((edu, idx) => (
-                                                                <div key={idx} className="flex justify-between items-start">
-                                                                    <div className="flex flex-col">
-                                                                        <span className="font-bold text-[13px] !text-black">{edu.institution}</span>
-                                                                        <span className="text-[12px] !text-gray-800">{edu.degree}</span>
-                                                                    </div>
-                                                                    <div className="flex flex-col items-end text-[11px] !text-gray-700">
-                                                                        <span className="font-semibold">{edu.year}</span>
-                                                                        <span>{edu.grade || edu.score}</span>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Experience */}
-                                                {resumeData.experience.length > 0 && (
-                                                    <div className={templates[selectedTemplate]?.sectionClass}>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.experience_heading', 'Professional Experience')}</h3>
-                                                        <div className="space-y-4">
-                                                            {resumeData.experience.map((exp, idx) => (
-                                                                <div key={idx} className="flex flex-col">
-                                                                    <div className="flex justify-between items-start">
-                                                                        <span className="font-bold text-[13px] !text-black">{exp.role}</span>
-                                                                        <span className="text-[11px] font-semibold !text-gray-700">{exp.duration}</span>
-                                                                    </div>
-                                                                    <span className="text-[12px] font-medium !text-gray-800 italic">{exp.company}</span>
-                                                                    <p className={`${templates[selectedTemplate]?.bodyTextClass} mt-1.5 leading-relaxed text-justify`}>{exp.description}</p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Projects */}
-                                                {resumeData.projects.length > 0 && (
-                                                    <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.projects_heading', 'Projects')}</h3>
-                                                        <div className="space-y-3">
-                                                            {resumeData.projects.map((proj, i) => (
-                                                                <div key={i}>
-                                                                    <div className="flex justify-between items-baseline">
-                                                                        <span className="font-bold text-[13px] !text-black">{proj.title}</span>
-                                                                        {proj.link && <span className="block italic text-blue-800 underline mt-0.5">{proj.link}</span>}
-                                                                    </div>
-                                                                    <p className={templates[selectedTemplate]?.bulletClass}>
-                                                                        {proj.description}
-                                                                    </p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </section>
-                                                )}
-
-                                                {/* Technical Skills */}
-                                                {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
-                                                    <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.skills_heading', 'Skills')}</h3>
-                                                        <div className={templates[selectedTemplate]?.skillsClass || "text-[11px] space-y-1 px-1 !text-gray-700"}>
-                                                            {resumeData.skills.technical && (
-                                                                <div>
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.technical_skills_label', 'Technical Skills:')}</span>{' '}
-                                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                                            {resumeData.skills.technical.split(',').map((s, i) => (
-                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                                    {s.trim()}
-                                                                                </span>
-                                                                            ))}
-                                                                        </span>
-                                                                    ) : (
-                                                                        resumeData.skills.technical
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                            {resumeData.skills.soft && (
-                                                                <div className="mt-1">
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.soft_skills_label', 'Soft Skills:')}</span>{' '}
-                                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                                            {resumeData.skills.soft.split(',').map((s, i) => (
-                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                                    {s.trim()}
-                                                                                </span>
-                                                                            ))}
-                                                                        </span>
-                                                                    ) : (
-                                                                        resumeData.skills.soft
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                            {resumeData.skills.languages && (
-                                                                <div className="mt-1">
-                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>{t('resume_builder.languages_label', 'Languages:')}</span>{' '}
-                                                                    {templates[selectedTemplate]?.skillsBadge ? (
-                                                                        <span className="flex flex-wrap gap-1 mt-1">
-                                                                            {resumeData.skills.languages.split(',').map((s, i) => (
-                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
-                                                                                    {s.trim()}
-                                                                                </span>
-                                                                            ))}
-                                                                        </span>
-                                                                    ) : (
-                                                                        resumeData.skills.languages
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </section>
-                                                )}
-
-                                                {/* Achievements */}
-                                                {resumeData.achievements.length > 0 && (
-                                                    <section>
-                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>{t('resume_builder.achievements_heading', 'Achievements')}</h3>
-                                                        <div className="space-y-2">
-                                                            {resumeData.achievements.map((ach, i) => (
-                                                                <div key={i} className="text-[11px]">
-                                                                    <div className="flex justify-between items-baseline">
-                                                                        <span className="font-bold !text-black">{ach.title}</span>
-                                                                        {ach.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{ach.link}</span>}
-                                                                    </div>
-                                                                    <p className={`italic ${templates[selectedTemplate]?.bodyTextClass}`}>{ach.description}</p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </section>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Verification Footer absolutely pinned to the bottom of the A4 printed page */}
-                                        <div
-                                            className="absolute bottom-[15mm] left-[15mm] right-[15mm] pt-4 border-t border-gray-300 flex justify-between items-center gap-4 text-left z-20 bg-white"
-                                        >
-                                            <div className="min-w-0">
-                                                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
-                                                    <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
-                                                    {ORG_NAME} {t('resume_builder.verified_resume', 'Verified Resume')}
-                                                </div>
-                                                <p className="mt-1 text-[9.5px] !text-gray-600">
-                                                    {t('resume_builder.document_id', 'Document ID:')} <span className="font-semibold !text-black">{resumePublicId || t('resume_builder.pending', 'Pending')}</span>
-                                                    {studentId && (
-                                                        <> &bull; {t('resume_builder.student_id', 'Student ID:')} <span className="font-semibold !text-black">{studentId}</span></>
-                                                    )}
-                                                </p>
-                                                <p className="text-[8.5px] !text-gray-500 mt-0.5">{t('resume_builder.scan_qr', 'Scan the QR code to verify the authenticity of this document online.')}</p>
-                                            </div>
-                                            {verificationQr ? (
-                                                <img
-                                                    src={verificationQr}
-                                                    alt="Resume verification QR code"
-                                                    className="w-12 h-12 border border-slate-200 bg-white p-0.5 shrink-0"
-                                                />
-                                            ) : (
-                                                <div className="w-12 h-12 border border-slate-200 bg-white flex items-center justify-center shrink-0">
-                                                    <QrCode className="w-6 h-6 text-slate-400" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    {(() => {
+                                        const T = (ATS_TEMPLATES[selectedTemplate] || ATS_TEMPLATES.classicBW).Component;
+                                        return <T data={adaptData(resumeData)} />;
+                                    })()}
                                 </div>
                             </div>
                         </div>
