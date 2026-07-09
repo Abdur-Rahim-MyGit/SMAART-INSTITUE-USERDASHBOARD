@@ -297,6 +297,38 @@ const PlacementDetail = () => {
     return list.length > 0 ? list : null;
   }, [job, t]);
 
+  const updateApplicationField = (field, value) => {
+    setApplicationForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // When the Apply modal opens, fetch the latest profile to prefill mobile
+  useEffect(() => {
+    let mounted = true;
+    const loadProfile = async () => {
+      if (!applyOpen) return;
+      try {
+        const response = await usersAPI.getProfile();
+        if (!mounted) return;
+        // /auth/me returns { success: true, user, registration }
+        if (response && response.success) {
+          const user = response.user || {};
+          const registration = response.registration || {};
+          // Prefer user.mobile, fallback to registration.mobileNumber or user.phone
+          const mobileFromUser = user.mobile || user.phone || user.mobileNumber;
+          const mobileFromReg = registration.mobileNumber || registration.mobile;
+          const mobile = mobileFromUser || mobileFromReg;
+          if (mobile) updateApplicationField('mobile', mobile);
+        }
+      } catch (err) {
+        // Silent fail — keep existing value from session storage
+        console.warn('Failed to load profile for application modal:', err?.message || err);
+      }
+    };
+
+    loadProfile();
+    return () => { mounted = false; };
+  }, [applyOpen]);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
@@ -329,10 +361,6 @@ const PlacementDetail = () => {
   const companyAbout = job.displayCompanyAbout || job.aboutCompany || job.companyAbout;
   const companyWebsite = job.displayCompanyWebsite || job.companyWebsite || job.website;
   const statusLabel = formatStatus(job.displayStatus || job.status, t);
-
-  const updateApplicationField = (field, value) => {
-    setApplicationForm((prev) => ({ ...prev, [field]: value }));
-  };
 
   const handleApplicationSubmit = async (event) => {
     event.preventDefault();
@@ -414,34 +442,6 @@ const PlacementDetail = () => {
       setSubmitting(false);
     }
   };
-
-  // When the Apply modal opens, fetch the latest profile to prefill mobile
-  useEffect(() => {
-    let mounted = true;
-    const loadProfile = async () => {
-      if (!applyOpen) return;
-      try {
-        const response = await usersAPI.getProfile();
-        if (!mounted) return;
-        // /auth/me returns { success: true, user, registration }
-        if (response && response.success) {
-          const user = response.user || {};
-          const registration = response.registration || {};
-          // Prefer user.mobile, fallback to registration.mobileNumber or user.phone
-          const mobileFromUser = user.mobile || user.phone || user.mobileNumber;
-          const mobileFromReg = registration.mobileNumber || registration.mobile;
-          const mobile = mobileFromUser || mobileFromReg;
-          if (mobile) updateApplicationField('mobile', mobile);
-        }
-      } catch (err) {
-        // Silent fail — keep existing value from session storage
-        console.warn('Failed to load profile for application modal:', err?.message || err);
-      }
-    };
-
-    loadProfile();
-    return () => { mounted = false; };
-  }, [applyOpen]);
 
   return (
     <div className="min-h-screen bg-transparent pb-12">

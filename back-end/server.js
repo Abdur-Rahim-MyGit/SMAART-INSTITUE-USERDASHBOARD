@@ -227,6 +227,7 @@ app.get('/api/ai-career-coach/recommendations', authMiddleware, aiCareerCoachCon
 app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiLimiter, aiCareerCoachController.analyzeSkillGap);
 app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiLimiter, aiCareerCoachController.generateLearningPlan);
 app.post('/api/ai-career-coach/resume', authMiddleware, aiLimiter, aiCareerCoachController.generateResume);
+app.post('/api/ai-career-coach/generate-summary', authMiddleware, aiLimiter, aiCareerCoachController.generateProfessionalSummary);
 
 // Chat Features
 app.post('/api/ai-career-coach/chat', authMiddleware, aiLimiter, aiCareerCoachController.chat);
