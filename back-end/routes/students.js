@@ -75,7 +75,9 @@ router.get('/by-email/:email', async (req, res) => {
         const student = await Student.findOne({
             email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
         })
-            .select('_id fullName email studentId')
+            .select('_id fullName email studentId academic department degree college cgpa')
+            .populate('college', 'collegeName collegeCode')
+            .populate('degree')
             .lean();
 
         if (!student) {
@@ -87,7 +89,9 @@ router.get('/by-email/:email', async (req, res) => {
 
         // SECURITY (audit HIGH): non-staff may only resolve their OWN record by
         // email — otherwise this enumerates every student's id/studentId.
-        if (!isStaff(req.user) && String(student._id) !== String(req.user && req.user._id)) {
+        if (!isStaff(req.user) && 
+            String(student._id) !== String(req.user && req.user._id) && 
+            (req.user && req.user.email && req.user.email.toLowerCase() !== student.email.toLowerCase())) {
             return res.status(403).json({ success: false, error: 'Not authorized' });
         }
 

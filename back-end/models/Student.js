@@ -3,6 +3,45 @@ const bcrypt = require('bcryptjs');
 const Counter = require('./Counter');
 const { createDefaultUserSettings, userSettingsSchema } = require('./schemas/userSettings');
 
+const departmentSubSchema = new mongoose.Schema({
+  degreeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Degree',
+    required: [true, 'Degree reference is required']
+  },
+  uniqueId: { 
+    type: String, 
+    required: [true, 'Degree unique ID is required'] 
+  },
+  level: { 
+    type: String, 
+    required: [true, 'Degree level is required'] 
+  },
+  domain: { 
+    type: String, 
+    required: [true, 'Domain is required'] 
+  },
+  fullName: { 
+    type: String, 
+    required: [true, 'Degree full name is required'] 
+  },
+  abbreviation: { 
+    type: String, 
+    required: [true, 'Abbreviation is required'] 
+  },
+  specialization: { 
+    type: String, 
+    default: 'General' 
+  },
+  duration: { 
+    type: String, 
+    default: 'N/A' 
+  },
+  batch: { 
+    type: String
+  }
+}, { _id: false });
+
 const studentSchema = new mongoose.Schema({
   studentId: {
     type: String,
@@ -47,7 +86,10 @@ const studentSchema = new mongoose.Schema({
     required: [true, 'Please provide roll number']
   },
   section: String,
-  department: String,
+  department: {
+    type: departmentSubSchema,
+    default: undefined
+  },
   semester: Number,
   batch: String,
   dateOfBirth: Date,
@@ -102,6 +144,10 @@ const studentSchema = new mongoose.Schema({
       type: String,
       default: ''
     }
+  },
+  cgpa: {
+    type: String,
+    default: ''
   },
   status: {
     type: String,
@@ -185,6 +231,29 @@ const studentSchema = new mongoose.Schema({
   }]
 }, {
   timestamps: true
+});
+
+// Pre-validate hook to clean up empty strings for ObjectId fields and incomplete department objects
+studentSchema.pre('validate', function (next) {
+  if (this.college === '') this.college = undefined;
+  if (this.degree === '') this.degree = undefined;
+  
+  if (this.department === '') {
+    this.department = undefined;
+  } else if (this.department) {
+    const deptObj = this.department.toObject ? this.department.toObject() : this.department;
+    if (
+      Object.keys(deptObj).length === 0 ||
+      !deptObj.uniqueId ||
+      !deptObj.level ||
+      !deptObj.domain ||
+      !deptObj.fullName ||
+      !deptObj.abbreviation
+    ) {
+      this.department = undefined;
+    }
+  }
+  next();
 });
 
 studentSchema.pre('save', async function (next) {

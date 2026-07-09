@@ -367,7 +367,9 @@ const Profile = () => {
             phone: user.mobileNumber || reg.mobileNumber || "",
             institution: parseInstitution(user.institution || reg.institution) || "",
             yearOfStudy: user.yearOfStudy || user.yearSemester || reg.yearOfStudy || reg.yearSemester || "",
-            department: user.department || reg.department || "",
+            department: typeof (user.department || reg.department) === 'object'
+              ? ((user.department || reg.department).fullName || (user.department || reg.department).name || "")
+              : (user.department || reg.department || ""),
             studentId: user.studentId || reg.studentId || "",
             dateOfBirth: (user.dob || reg.dob) ? new Date(user.dob || reg.dob).toISOString().split('T')[0] : "",
             street: (user.address || reg.address)?.street || "",
