@@ -19,6 +19,7 @@ const ComprehensiveSignup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showDashboardWarning, setShowDashboardWarning] = useState(false);
+  const [studentDetails, setStudentDetails] = useState(null);
 
   const [preFilledFields, setPreFilledFields] = useState({
     email: false, fullName: false, mobileNumber: false, institution: false, department: false,
@@ -68,42 +69,176 @@ const ComprehensiveSignup = () => {
         setPreFilledFields(prev => ({ ...prev, institution: true }));
       } catch { setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution })); setPreFilledFields(prev => ({ ...prev, institution: true })); }
     }
-    if (userData?.department) { setPersonalDetails(prev => ({ ...prev, department: userData.department })); setPreFilledFields(prev => ({ ...prev, department: true })); }
+    if (userData?.department) {
+      const deptStr = typeof userData.department === 'object' ? (userData.department.fullName || userData.department.name || "") : userData.department;
+      setPersonalDetails(prev => ({ ...prev, department: deptStr }));
+      setPreFilledFields(prev => ({ ...prev, department: true }));
+    }
 
     const fetchLatestDetails = async () => {
       if (email) {
         try {
           const regData = await apiCall(`/users/register-details/${email}`);
+          const studentRes = await apiCall(`/students/by-email/${email}`).catch(() => null);
+          let currentStudent = null;
+          if (studentRes?.success && studentRes?.data) {
+            currentStudent = studentRes.data;
+            setStudentDetails(studentRes.data);
+          }
+
           if (regData) {
             updateUser({
               ...regData,
               profileImage: regData.profilePhoto || regData.profileImage || userData?.profileImage
             });
+
+            const studentAcademic = currentStudent?.academic || {};
+            const studentDegree = currentStudent?.degree || {};
+            const studentDept = currentStudent?.department || regData.department || {};
+            const degreeLevel = studentAcademic.degreeLevel || studentDegree.level || studentDept.level || regData.academic?.degreeLevel || userData?.academic?.degreeLevel || regData.educationLevel || "";
+
+            // Year of passing extraction
+            let expectedYear = "";
+            const batchVal = currentStudent?.batch || studentDept.batch || "";
+            if (batchVal) {
+              const match = batchVal.match(/\b(20\d{2})\b/g);
+              if (match && match.length > 0) {
+                expectedYear = match[match.length - 1];
+              } else {
+                expectedYear = batchVal;
+              }
+            }
+
+            // Year of study calculation
+            let yearOfStudy = "";
+            if (currentStudent?.semester) {
+              const sem = Number(currentStudent.semester);
+              if (sem <= 2) yearOfStudy = "1st Year";
+              else if (sem <= 4) yearOfStudy = "2nd Year";
+              else if (sem <= 6) yearOfStudy = "3rd Year";
+              else yearOfStudy = "4th Year";
+            }
+
             setPersonalDetails(prev => ({
               ...prev,
-              fullName: regData.fullName || prev.fullName,
-              gender: regData.gender || prev.gender,
-              mobileNumber: regData.mobileNumber || regData.mobile || prev.mobileNumber,
-              institution: regData.institution || (regData.college?.collegeName) || prev.institution,
-              department: regData.department || prev.department,
-              dob: regData.dob ? new Date(regData.dob).toISOString().split('T')[0] : prev.dob,
-              profilePhoto: regData.profilePhoto || regData.profileImage || userData?.profileImage || prev.profilePhoto,
-              educationLevel: regData.academic?.degreeLevel || userData?.academic?.degreeLevel || regData.educationLevel || prev.educationLevel || "",
+              fullName: regData.fullName || currentStudent?.fullName || prev.fullName,
+              gender: regData.gender || currentStudent?.gender || prev.gender,
+              mobileNumber: regData.mobileNumber || regData.mobile || currentStudent?.mobile || prev.mobileNumber,
+              institution: regData.institution || regData.college?.collegeName || currentStudent?.college?.collegeName || prev.institution,
+              department: typeof studentDept === 'object' ? (studentDept.fullName || studentDept.name || "") : (studentDept || prev.department || ""),
+              dob: regData.dob ? new Date(regData.dob).toISOString().split('T')[0] : (currentStudent?.dateOfBirth ? new Date(currentStudent.dateOfBirth).toISOString().split('T')[0] : prev.dob),
+              profilePhoto: regData.profilePhoto || regData.profileImage || currentStudent?.profileImage || userData?.profileImage || prev.profilePhoto,
+              educationLevel: degreeLevel || prev.educationLevel || "",
+              cgpa: currentStudent?.cgpa || currentStudent?.academic?.cgpa || regData.cgpa || regData.academic?.cgpa || prev.cgpa || "",
+              yearOfPassing: expectedYear || regData.yearOfPassing || prev.yearOfPassing || "",
+              yearOfStudy: yearOfStudy || regData.yearOfStudy || prev.yearOfStudy || "",
               address: {
-                street: regData.address?.street || prev.address?.street || "",
-                city: regData.address?.city || prev.address?.city || "",
-                state: regData.address?.state || prev.address?.state || "",
-                country: regData.address?.country || prev.address?.country || ""
+                street: regData.address?.street || currentStudent?.address?.street || prev.address?.street || "",
+                city: regData.address?.city || currentStudent?.address?.city || prev.address?.city || "",
+                state: regData.address?.state || currentStudent?.address?.state || prev.address?.state || "",
+                country: regData.address?.country || currentStudent?.address?.address?.country || prev.address?.country || ""
               }
             }));
+
             setPreFilledFields(prev => ({
               ...prev,
               email: true,
-              fullName: !!regData.fullName,
-              mobileNumber: !!(regData.mobileNumber || regData.mobile),
-              institution: !!(regData.institution || regData.college?.collegeName),
-              department: !!regData.department
+              fullName: !!(regData.fullName || currentStudent?.fullName),
+              mobileNumber: !!(regData.mobileNumber || regData.mobile || currentStudent?.mobile),
+              institution: !!(regData.institution || regData.college?.collegeName || currentStudent?.college?.collegeName),
+              department: !!studentDept
             }));
+
+            // Pre-populate Higher Education
+            if (regData.higherEducation && Array.isArray(regData.higherEducation) && regData.higherEducation.length > 0) {
+              setHigherEducation(regData.higherEducation);
+              regData.higherEducation.forEach((item, index) => {
+                if (item.qualificationLevel) {
+                  const fetchSub = async () => {
+                    try {
+                      const domainsRes = await apiCall(`/degrees/domains?level=${encodeURIComponent(item.qualificationLevel)}`);
+                      if (domainsRes?.success) {
+                        setDegreeOptions(prev => ({
+                          ...prev,
+                          domains: { ...prev.domains, [index]: domainsRes.data }
+                        }));
+                      }
+                      if (item.degree) {
+                        const fullNamesRes = await apiCall(`/degrees/fullNames?level=${encodeURIComponent(item.qualificationLevel)}&domain=${encodeURIComponent(item.degree)}`);
+                        if (fullNamesRes?.success) {
+                          setDegreeOptions(prev => ({
+                            ...prev,
+                            fullNames: { ...prev.fullNames, [index]: fullNamesRes.data }
+                          }));
+                        }
+                      }
+                      if (item.degreeFullName) {
+                        const specsRes = await apiCall(`/degrees/specializations?level=${encodeURIComponent(item.qualificationLevel)}&domain=${encodeURIComponent(item.degree)}&fullName=${encodeURIComponent(item.degreeFullName)}`);
+                        if (specsRes?.success) {
+                          setDegreeOptions(prev => ({
+                            ...prev,
+                            specializations: { ...prev.specializations, [index]: specsRes.data }
+                          }));
+                        }
+                      }
+                    } catch (e) {
+                      console.error("Error pre-fetching degree sub options:", e);
+                    }
+                  };
+                  fetchSub();
+                }
+              });
+            } else {
+              const initialHigherEd = {
+                id: Date.now(),
+                qualificationLevel: degreeLevel || "",
+                degree: studentAcademic.domain || studentDegree.domain || studentDept.domain || "",
+                degreeFullName: studentAcademic.degreeGroup || studentDegree.fullName || studentDept.fullName || studentDegree.abbreviation || studentDept.abbreviation || "",
+                specialization: studentAcademic.specialisation || studentDegree.specialization || studentDept.specialization || "General",
+                institutionName: currentStudent?.college?.collegeName || regData.institution || "",
+                university: currentStudent?.college?.affiliatedUniversity || currentStudent?.college?.collegeName || "",
+                yearOfPassing: expectedYear || "",
+                cgpaPercentage: currentStudent?.cgpa || studentAcademic.cgpa || regData.cgpa || regData.academic?.cgpa || "",
+                degreeStatus: "pursuing",
+                certificate: null
+              };
+              setHigherEducation([initialHigherEd]);
+
+              if (initialHigherEd.qualificationLevel) {
+                const fetchSub = async () => {
+                  try {
+                    const domainsRes = await apiCall(`/degrees/domains?level=${encodeURIComponent(initialHigherEd.qualificationLevel)}`);
+                    if (domainsRes?.success) {
+                      setDegreeOptions(prev => ({
+                        ...prev,
+                        domains: { ...prev.domains, 0: domainsRes.data }
+                      }));
+                    }
+                    if (initialHigherEd.degree) {
+                      const fullNamesRes = await apiCall(`/degrees/fullNames?level=${encodeURIComponent(initialHigherEd.qualificationLevel)}&domain=${encodeURIComponent(initialHigherEd.degree)}`);
+                      if (fullNamesRes?.success) {
+                        setDegreeOptions(prev => ({
+                          ...prev,
+                          fullNames: { ...prev.fullNames, 0: fullNamesRes.data }
+                        }));
+                      }
+                    }
+                    if (initialHigherEd.degreeFullName) {
+                      const specsRes = await apiCall(`/degrees/specializations?level=${encodeURIComponent(initialHigherEd.qualificationLevel)}&domain=${encodeURIComponent(initialHigherEd.degree)}&fullName=${encodeURIComponent(initialHigherEd.degreeFullName)}`);
+                      if (specsRes?.success) {
+                        setDegreeOptions(prev => ({
+                          ...prev,
+                          specializations: { ...prev.specializations, 0: specsRes.data }
+                        }));
+                      }
+                    }
+                  } catch (e) {
+                    console.error("Error pre-fetching degree sub options:", e);
+                  }
+                };
+                fetchSub();
+              }
+            }
           }
         } catch (err) {
           console.error("Error fetching latest user registration details on mount:", err);
@@ -179,7 +314,7 @@ const ComprehensiveSignup = () => {
     fetchExcelData();
   }, []);
 
-  const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "" } });
+  const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "" }, cgpa: "" });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
@@ -723,10 +858,10 @@ const ComprehensiveSignup = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-1">
+                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Degree Level</Label>
                       <div className="relative">
-                        <Input value={user?.academic?.degreeLevel || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <Input value={studentDetails?.academic?.degreeLevel || studentDetails?.degree?.level || user?.academic?.degreeLevel || user?.department?.level || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <GraduationCap className="w-4 h-4 text-slate-400" />
                         </div>
@@ -735,7 +870,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Domain</Label>
                       <div className="relative">
-                        <Input value={user?.academic?.domain || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <Input value={studentDetails?.academic?.domain || studentDetails?.degree?.domain || user?.academic?.domain || user?.department?.domain || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <Target className="w-4 h-4 text-slate-400" />
                         </div>
@@ -744,7 +879,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Degree Group</Label>
                       <div className="relative">
-                        <Input value={user?.academic?.degreeGroup || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <Input value={studentDetails?.academic?.degreeGroup || studentDetails?.degree?.fullName || studentDetails?.degree?.abbreviation || user?.academic?.degreeGroup || user?.department?.fullName || user?.department?.abbreviation || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <Award className="w-4 h-4 text-slate-400" />
                         </div>
@@ -753,9 +888,23 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Specialization</Label>
                       <div className="relative">
-                        <Input value={user?.academic?.specialisation || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <Input value={studentDetails?.academic?.specialisation || studentDetails?.degree?.specialization || user?.academic?.specialisation || user?.department?.specialization || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <Briefcase className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">CGPA (Optional)</Label>
+                      <div className="relative">
+                        <Input
+                          value={personalDetails.cgpa || ""}
+                          onChange={(e) => setPersonalDetails({ ...personalDetails, cgpa: e.target.value })}
+                          className={inputClass}
+                          placeholder="e.g. 8.5"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Award className="w-4 h-4 text-slate-400" />
                         </div>
                       </div>
                     </div>
@@ -947,7 +1096,7 @@ const ComprehensiveSignup = () => {
 
                         <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
                         <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                        <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{expectedYearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                        <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
                         <div>
                           <Label className={item.degreeStatus === 'pursuing' ? "opacity-60" : ""}>CGPA / Percentage{item.degreeStatus !== 'pursuing' && ' *'}</Label>
                           <Input

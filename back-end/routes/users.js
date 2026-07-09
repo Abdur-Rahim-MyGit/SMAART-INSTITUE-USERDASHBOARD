@@ -241,7 +241,10 @@ router.post('/register-details', upload.fields([
       dob: parsedPersonalDetails?.dob || null,
       gender: parsedPersonalDetails?.gender || '',
       institution: parsedPersonalDetails?.institution || '',
-      department: parsedPersonalDetails?.department || '',
+      department: typeof parsedPersonalDetails?.department === 'object'
+        ? (parsedPersonalDetails.department.fullName || parsedPersonalDetails.department.name || '')
+        : (parsedPersonalDetails?.department || ''),
+      cgpa: parsedPersonalDetails?.cgpa || '',
       yearOfStudy: parsedPersonalDetails?.yearOfStudy || '',
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
@@ -346,6 +349,7 @@ router.post('/register-details', upload.fields([
         if (resolvedPhoto) {
           student.profileImage = resolvedPhoto;
         }
+        student.cgpa = parsedPersonalDetails?.cgpa || (mappedHigherEducation && mappedHigherEducation[0]?.cgpaPercentage) || student.cgpa || '';
         if (mappedHigherEducation && mappedHigherEducation.length > 0) {
           const he = mappedHigherEducation[0];
           student.academic = {
@@ -446,7 +450,10 @@ router.patch('/register-section', async (req, res) => {
         registration.gender = data.gender || registration.gender;
         registration.mobileNumber = data.mobileNumber || registration.mobileNumber;
         registration.institution = data.institution || registration.institution;
-        registration.department = data.department || registration.department;
+        registration.department = typeof data.department === 'object'
+          ? (data.department.fullName || data.department.name || '')
+          : (data.department || registration.department);
+        registration.cgpa = data.cgpa || registration.cgpa;
         registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
         registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
         registration.educationLevel = data.educationLevel || registration.educationLevel;
@@ -493,6 +500,9 @@ router.patch('/register-section', async (req, res) => {
           if (data.dob) student.dateOfBirth = data.dob;
           if (data.gender) student.gender = data.gender.toLowerCase();
           if (data.profilePhoto) student.profileImage = data.profilePhoto;
+          if (data.cgpa !== undefined) {
+            student.cgpa = data.cgpa;
+          }
           if (data.institution) {
             const college = await College.findOne({
               collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
@@ -799,7 +809,25 @@ router.get('/register-details/:email', async (req, res) => {
       studentForDetails = await Student.findOne({ email: normalizedEmail }).populate('degree');
     }
     const populatedDegree = studentForDetails?.degree || null;
-    const academic = studentForDetails?.academic || null;
+    let academic = studentForDetails?.academic || {};
+    if (studentForDetails && populatedDegree) {
+      const dept = populatedDegree;
+      academic = {
+        degreeLevel: academic?.degreeLevel || dept.level || '',
+        domain: academic?.domain || dept.domain || '',
+        degreeGroup: academic?.degreeGroup || dept.fullName || dept.abbreviation || '',
+        specialisation: academic?.specialisation || dept.specialization || '',
+        cgpa: academic?.cgpa || ''
+      };
+    } else {
+      academic = {
+        degreeLevel: academic?.degreeLevel || '',
+        domain: academic?.domain || '',
+        degreeGroup: academic?.degreeGroup || '',
+        specialisation: academic?.specialisation || '',
+        cgpa: academic?.cgpa || ''
+      };
+    }
 
     if (registration) {
       return res.json({

@@ -124,6 +124,7 @@ const PlacementDetail = () => {
   const [job, setJob] = useState(location.state?.job || null);
   const [loading, setLoading] = useState(!location.state?.job);
   const [applyOpen, setApplyOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [buildResumeOpen, setBuildResumeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [hasApplied, setHasApplied] = useState(() => {
@@ -169,6 +170,7 @@ const PlacementDetail = () => {
       resumeFile: null,
       resumeUrl: null,
       coverLetter: "",
+      activeBacklog: "",
     };
   });
 
@@ -362,8 +364,17 @@ const PlacementDetail = () => {
   const companyWebsite = job.displayCompanyWebsite || job.companyWebsite || job.website;
   const statusLabel = formatStatus(job.displayStatus || job.status, t);
 
-  const handleApplicationSubmit = async (event) => {
+  const updateApplicationField = (field, value) => {
+    setApplicationForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleApplicationSubmit = (event) => {
     event.preventDefault();
+    setTermsOpen(true);
+  };
+
+  const executeApplicationSubmit = async () => {
+    setTermsOpen(false);
     setSubmitting(true);
     try {
       let applyResp = null;
@@ -375,6 +386,9 @@ const PlacementDetail = () => {
         formData.append('mobile', applicationForm.mobile || '');
         formData.append('coverLetter', applicationForm.coverLetter || '');
         formData.append('resume', applicationForm.resumeFile);
+        if (applicationForm.activeBacklog !== undefined && applicationForm.activeBacklog !== null && applicationForm.activeBacklog !== "") {
+          formData.append('activeBacklog', applicationForm.activeBacklog);
+        }
         applyResp = await placementsAPI.applyJob(source, id, formData);
       } else {
         // Remove any file property before sending JSON
@@ -750,6 +764,19 @@ const PlacementDetail = () => {
               </label>
 
               <label className="space-y-1.5">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.active_backlog", "Active Backlogs")}</span>
+                <input
+                  required
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={applicationForm.activeBacklog}
+                  onChange={(event) => updateApplicationField("activeBacklog", event.target.value)}
+                  className="h-11 w-full rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-3 text-sm font-semibold text-[#0d1f4e] outline-none focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                />
+              </label>
+
+              <label className="space-y-1.5 sm:col-span-2">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.resume", "Resume")}</span>
                 <div className="flex items-center gap-3">
                   <input
@@ -825,6 +852,37 @@ const PlacementDetail = () => {
               </button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
+        <DialogContent className="w-[92%] sm:w-full max-w-md rounded-2xl border border-[#d8e6f7] bg-white p-6 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-amber-500" />
+              {t("placement.terms_title", "Terms & Conditions")}
+            </DialogTitle>
+            <DialogDescription className="mt-3 text-sm font-medium text-slate-650 dark:text-slate-400 leading-relaxed">
+              {t("placement.terms_text", "I hereby declare that all the information provided above is correct. Any misleading information will lead to rejection of my application.")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-6 flex justify-end gap-3 border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20">
+            <button
+              type="button"
+              onClick={() => setTermsOpen(false)}
+              className="h-10 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300"
+            >
+              {t("placement.cancel", "Cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={executeApplicationSubmit}
+              className="h-10 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white hover:bg-amber-700 transition-colors"
+            >
+              {t("placement.accept_submit", "Accept & Submit")}
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

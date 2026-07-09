@@ -496,6 +496,7 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       portfolioUrl,
       linkedInUrl,
       coverLetter,
+      activeBacklog,
       resumeUrl: bodyResumeUrl
     } = req.body || {};
 
@@ -523,16 +524,17 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       portfolioUrl: portfolioUrl?.trim() || null,
       linkedInUrl: linkedInUrl?.trim() || null,
       coverLetter: coverLetter?.trim() || '',
+      activeBacklog: activeBacklog !== undefined && activeBacklog !== '' && activeBacklog !== null ? Number(activeBacklog) : null,
       status: 'applied',
       appliedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    if (!application.studentName || !application.studentEmail || !application.studentMobile) {
+    if (!application.studentName || !application.studentEmail || !application.studentMobile || application.activeBacklog === null || application.activeBacklog === undefined) {
       return res.status(400).json({
         success: false,
-        error: 'Name, email, and mobile number are required',
+        error: 'Name, email, mobile number, and active backlogs count are required',
       });
     }
 

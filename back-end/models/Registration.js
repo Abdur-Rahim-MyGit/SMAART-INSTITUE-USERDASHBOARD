@@ -18,6 +18,7 @@ const registrationSchema = new mongoose.Schema({
   password: { type: String, required: false },
   institution: String,
   department: String,
+  cgpa: String,
   bio: { type: String, default: '' },
   timezone: { type: String, default: 'Asia/Kolkata' },
   dateFormat: { type: String, default: 'DD/MM/YYYY' },
