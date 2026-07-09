@@ -24,7 +24,11 @@ const calculateRiskScore = (violationsByType) => {
     attention_check_fail: 35,
     inactivity: 10,
     face_registered: 0,     // Info event — no risk contribution
-    identity_verified: 0    // Info event — no risk contribution
+    identity_verified: 0,   // Info event — no risk contribution
+    gaze_away: 10,
+    eyes_closed: 15,
+    voice_detected: 25,
+    prolonged_silence: 10
   };
   
   Object.keys(violations).forEach(type => {
@@ -45,6 +49,17 @@ exports.startSession = async (req, res) => {
 
     if (!resultId || !assessmentId) {
       return res.status(400).json({ success: false, error: 'resultId and assessmentId are required.' });
+    }
+
+    // Check if there is an existing locked session for this assessment and user
+    const existingLockedSession = await ProctoringSession.findOne({ userId, assessmentId, isLocked: true });
+    if (existingLockedSession) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Assessment is locked. A support ticket is pending.', 
+        isLocked: true, 
+        activeTicketId: existingLockedSession.activeTicketId 
+      });
     }
 
     // Terminate any existing active sessions for this user/assessment just in case
@@ -263,5 +278,80 @@ exports.getSessionDetails = async (req, res) => {
   } catch (err) {
     console.error('Error fetching session details:', err);
     res.status(500).json({ success: false, error: 'Server error fetching session details', message: err.message });
+  }
+};
+
+// Trigger lock on a session
+exports.triggerLock = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { lockReason } = req.body;
+    
+    const session = await ProctoringSession.findById(sessionId);
+    if (!session) {
+      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+    }
+
+    if (session.isLocked) {
+      return res.json({ success: true, isLocked: true, activeTicketId: session.activeTicketId });
+    }
+
+    session.isLocked = true;
+    session.status = 'locked';
+    session.lockReason = lockReason || 'Suspicious activity threshold exceeded';
+
+    // Create a support ticket
+    const SupportTicket = require('../models/SupportTicket');
+    const { createLog } = require('./logController');
+    const { broadcastToAll, sendNotificationToUser } = require('../services/websocketService');
+    const wsService = require('../services/websocketService'); // get user details
+    const User = require('../models/User'); 
+    const user = await User.findById(session.userId);
+    
+    const newTicket = new SupportTicket({
+      userId: session.userId,
+      userModel: 'Student',
+      title: 'Assessment Auto-Locked: Proctoring Violation',
+      description: `The assessment session ${session.assessmentId} for student ${user?.fullName || session.userId} has been automatically locked by the AI Proctoring system.\nReason: ${session.lockReason}\nViolations Count: ${session.totalViolations}\nRisk Score: ${session.riskScore}`,
+      category: 'course & assessment',
+      priority: 'high',
+      status: 'open'
+    });
+
+    await newTicket.save();
+
+    session.activeTicketId = newTicket._id;
+    await session.save();
+
+    res.json({
+      success: true,
+      data: session,
+      ticketId: newTicket.ticketId
+    });
+  } catch (err) {
+    console.error('Error locking proctoring session:', err);
+    res.status(500).json({ success: false, error: 'Server error locking session', message: err.message });
+  }
+};
+
+// Webhook to receive unlock signal from Admin and emit socket event
+exports.webhookUnlock = async (req, res) => {
+  try {
+    const { ticketId, userId } = req.body;
+    if (userId) {
+        const Notification = require('../models/Notification');
+        await Notification.createNotification({
+            userId,
+            title: 'Assessment Unlocked',
+            message: 'Your assessment has been unlocked by IT support. You may now resume.',
+            type: 'system',
+            metadata: { ticketId, action: 'assessment_unlocked' }
+        });
+    }
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Webhook unlock error:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 };

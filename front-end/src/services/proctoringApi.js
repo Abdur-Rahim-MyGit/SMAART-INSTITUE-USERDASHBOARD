@@ -24,6 +24,14 @@ export const proctoringApi = {
     });
   },
 
+  // Trigger lockout for a proctoring session
+  triggerLock: async (sessionId, data) => {
+    return apiCall(`/proctoring/session/${sessionId}/lock`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
   // Upload a webcam snapshot
   uploadSnapshot: async (sessionId, imageBlob) => {
     const formData = new FormData();

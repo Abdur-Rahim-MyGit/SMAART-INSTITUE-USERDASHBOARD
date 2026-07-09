@@ -32,7 +32,17 @@ const supportTicketSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     refPath: 'userModel',
-    required: [true, 'User ID is required']
+    required: false
+  },
+  contactName: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  contactEmail: {
+    type: String,
+    required: false,
+    trim: true
   },
   userModel: {
     type: String,

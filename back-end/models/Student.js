@@ -157,6 +157,11 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  savedJobs: [{
+    jobId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    source: { type: String, required: true },
+    savedAt: { type: Date, default: Date.now }
+  }],
   settings: {
     type: userSettingsSchema,
     default: createDefaultUserSettings

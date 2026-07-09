@@ -14,6 +14,7 @@ import FirstLoginPasswordModal from "./auth/FirstLoginPasswordModal";
 import { resetUserIdCache } from "@/features/visionBoard/services/visionBoardProApi";
 import useUser from "@/hooks/useUser";
 import InstitutionSelectModal from "./auth/InstitutionSelectModal";
+import ContactAdminModal from "./auth/ContactAdminModal";
 
 const LoginCard = () => {
   const navigate = useNavigate();
@@ -38,8 +39,7 @@ const LoginCard = () => {
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
   const [passwordChangeData, setPasswordChangeData] = useState({ tempToken: "", email: "", fullName: "" });
 
-
-
+  const [showContactAdmin, setShowContactAdmin] = useState(false);
 
   useEffect(() => {
     const storedInstitution = sessionStorage.getItem("selectedInstitution");
@@ -232,54 +232,75 @@ const LoginCard = () => {
 
   if (showInstitutionSelector) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
-        className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto"
-      >
-        {/* ── Card wrapper — matches the LoginCard Soft-UI style exactly ── */}
-        <div
-          className="overflow-hidden bg-white dark:bg-[#002A5C] rounded-3xl border border-black/5 dark:border-white/10"
-          style={{
-            boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)",
-          }}
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto"
         >
-          {/* Navy top accent line */}
-          <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
+          {/* ── Card wrapper — matches the LoginCard Soft-UI style exactly ── */}
+          <div
+            className="overflow-hidden bg-white dark:bg-[#002A5C] rounded-3xl border border-black/5 dark:border-white/10"
+            style={{
+              boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)",
+            }}
+          >
+            {/* Navy top accent line */}
+            <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
 
-          {/* Header */}
-          <div className="bg-[#F8FAFC] dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
-            {/* Icon badge */}
-            <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden">
-              {selectedInstitution?.logo ? (
-                <img
-                  src={selectedInstitution.logo}
-                  alt={selectedInstitution.name}
-                  className="w-full h-full object-contain p-2"
-                />
-              ) : (
-                <Building2 className="w-7 h-7 text-[#1a3884]" />
-              )}
+            {/* Header */}
+            <div className="bg-[#F8FAFC] dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
+              {/* Icon badge */}
+              <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden">
+                {selectedInstitution?.logo ? (
+                  <img
+                    src={selectedInstitution.logo}
+                    alt={selectedInstitution.name}
+                    className="w-full h-full object-contain p-2"
+                  />
+                ) : (
+                  <Building2 className="w-7 h-7 text-[#1a3884]" />
+                )}
+              </div>
+
+              <h2
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                Select Your Institution
+              </h2>
+              <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center max-w-[260px] leading-relaxed">
+                Find your college to access your personalised career dashboard.
+              </p>
             </div>
 
-            <h2
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
-              style={{ letterSpacing: "-0.02em" }}
-            >
-              Select Your Institution
-            </h2>
-            <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center max-w-[260px] leading-relaxed">
-              Find your college to access your personalised career dashboard.
-            </p>
-          </div>
+            {/* Search area */}
+            <div className="px-6 py-7 sm:px-8 sm:py-8">
+              <InstitutionSelector onSelect={handleInstitutionSelected} />
+            </div>
 
-          {/* Search area */}
-          <div className="px-6 py-7 sm:px-8 sm:py-8">
-            <InstitutionSelector onSelect={handleInstitutionSelected} />
+            {/* Contact Admin Link */}
+            <div className="px-8 pb-6 text-center">
+              <span className="text-sm font-medium text-slate-500">Need help? </span>
+              <button
+                type="button"
+                onClick={() => setShowContactAdmin(true)}
+                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
+              >
+                Contact Admin
+              </button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Contact Admin Modal — always mounted so it can open */}
+        <ContactAdminModal
+          isOpen={showContactAdmin}
+          onClose={() => setShowContactAdmin(false)}
+          selectedInstitution={selectedInstitution}
+        />
+      </>
     );
   }
 
@@ -504,17 +525,21 @@ const LoginCard = () => {
               )}
             </button>
 
-            {/* Registration Link */}
-            {/* <div className="mt-6 text-center">
-              <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
+            {/* Contact Admin Link */}
+            <div className="mt-4 text-center">
+              <span className="text-sm font-medium text-slate-500">Need help? </span>
               <button
                 type="button"
-                onClick={() => navigate("/signup-initial")}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowContactAdmin(true);
+                }}
                 className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
               >
-                Sign Up
+                Contact Admin
               </button>
-            </div> */}
+            </div>
           </form>
         </div>
       </motion.div>
@@ -550,6 +575,13 @@ const LoginCard = () => {
         isOpen={isInstitutionSelectOpen}
         onClose={() => setIsInstitutionSelectOpen(false)}
         onInstitutionSelected={handleInstitutionSelected}
+      />
+
+      {/* Contact Admin Modal */}
+      <ContactAdminModal 
+        isOpen={showContactAdmin}
+        onClose={() => setShowContactAdmin(false)}
+        selectedInstitution={selectedInstitution}
       />
     </div>
   );
