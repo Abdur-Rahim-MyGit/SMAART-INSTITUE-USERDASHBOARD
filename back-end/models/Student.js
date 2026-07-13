@@ -233,6 +233,17 @@ const studentSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Pre-init hook: runs before Mongoose hydrates a raw MongoDB document into a
+// Student instance. If `department` is stored as a plain string (corrupted data
+// from a previous bug), we strip it here so Mongoose never tries to cast a
+// primitive value into the departmentSubSchema — which would throw:
+//   "Tried to set nested object field `department` to primitive value …"
+studentSchema.pre('init', function (obj) {
+  if (obj && typeof obj.department === 'string') {
+    delete obj.department;
+  }
+});
+
 // Pre-validate hook to clean up empty strings for ObjectId fields and incomplete department objects
 studentSchema.pre('validate', function (next) {
   if (this.college === '') this.college = undefined;
