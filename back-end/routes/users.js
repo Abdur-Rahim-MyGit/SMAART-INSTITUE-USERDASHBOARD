@@ -249,6 +249,7 @@ router.post('/register-details', upload.fields([
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
       bio: parsedPersonalDetails?.bio || '',
+      batch: parsedPersonalDetails?.batch || '',
 
       // Address
       address: {
@@ -348,6 +349,9 @@ router.post('/register-details', upload.fields([
       if (student) {
         if (resolvedPhoto) {
           student.profileImage = resolvedPhoto;
+        }
+        if (parsedPersonalDetails?.batch) {
+          student.batch = parsedPersonalDetails.batch;
         }
         student.cgpa = parsedPersonalDetails?.cgpa || (mappedHigherEducation && mappedHigherEducation[0]?.cgpaPercentage) || student.cgpa || '';
         if (mappedHigherEducation && mappedHigherEducation.length > 0) {
@@ -457,6 +461,7 @@ router.patch('/register-section', async (req, res) => {
         registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
         registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
         registration.educationLevel = data.educationLevel || registration.educationLevel;
+        registration.batch = data.batch || registration.batch;
         registration.bio = data.bio || registration.bio;
         registration.timezone = data.timezone || registration.timezone;
         registration.dateFormat = data.dateFormat || registration.dateFormat;
@@ -502,6 +507,9 @@ router.patch('/register-section', async (req, res) => {
           if (data.profilePhoto) student.profileImage = data.profilePhoto;
           if (data.cgpa !== undefined) {
             student.cgpa = data.cgpa;
+          }
+          if (data.batch) {
+            student.batch = data.batch;
           }
           if (data.institution) {
             const college = await College.findOne({
@@ -829,15 +837,20 @@ router.get('/register-details/:email', async (req, res) => {
       };
     }
 
+    const studentBatch = studentForDetails?.batch || '';
+    const studentDept = studentForDetails?.department || null;
+
     if (registration) {
       return res.json({
         ...registration.toObject(),
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
+        batch: registration.batch || studentBatch || '',
         badges: aggregatedBadges,
         college: user?.college || fallbackCollege || null,
         degree: populatedDegree,
         academic,
+        department: studentDept,
         lastLogin: user?.lastLogin || null,
         previousLogin: user?.previousLogin || null
       });
@@ -852,6 +865,8 @@ router.get('/register-details/:email', async (req, res) => {
       ...userObj,
       degree: populatedDegree,
       academic,
+      department: studentDept,
+      batch: userObj.batch || studentBatch || '',
       badges: aggregatedBadges,
       otherDetails: {}
     });

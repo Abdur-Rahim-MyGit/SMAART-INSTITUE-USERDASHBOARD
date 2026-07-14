@@ -364,9 +364,7 @@ const PlacementDetail = () => {
   const companyWebsite = job.displayCompanyWebsite || job.companyWebsite || job.website;
   const statusLabel = formatStatus(job.displayStatus || job.status, t);
 
-  const updateApplicationField = (field, value) => {
-    setApplicationForm((prev) => ({ ...prev, [field]: value }));
-  };
+
 
   const handleApplicationSubmit = (event) => {
     event.preventDefault();
