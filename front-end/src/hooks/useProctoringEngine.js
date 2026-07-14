@@ -20,7 +20,7 @@ const captureScreenshot = (videoElement) => {
       ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         resolve(blob);
-      }, 'image/jpeg', 0.75); // 75% quality JPEG
+      }, 'image/jpeg', 0.75);
     } catch (e) {
       console.error('[ProctoringEngine] Canvas capture failed:', e);
       resolve(null);
@@ -29,15 +29,19 @@ const captureScreenshot = (videoElement) => {
 };
 
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-const FACE_CHECK_INTERVAL = 2500; // 2.5 seconds
 const MAX_WARNINGS = 3;
+
+// Adaptive Interval Constants
+const INTERVAL_STABLE_MS = 5000;    // 5.0 seconds when verified/stable
+const INTERVAL_DEFAULT_MS = 2500;   // 2.5 seconds baseline/transition
+const INTERVAL_INFRACTION_MS = 1000; // 1.0 second during active warning/streak to check rapidly
 
 export const useProctoringEngine = ({
   resultId = null,
   assessmentId = null,
   isActive = false,
-  registeredFaceDescriptor = null, // NEW: Face embedding from ProctoringSetup
-  onLockout = null // Custom submit callback
+  registeredFaceDescriptor = null,
+  onLockout = null
 }) => {
   const [warningsCount, setWarningsCount] = useState(0);
   const [isWarningVisible, setIsWarningVisible] = useState(false);
@@ -45,22 +49,17 @@ export const useProctoringEngine = ({
   const [lastViolationType, setLastViolationType] = useState('');
   const [proctoringSessionId, setProctoringSessionId] = useState(null);
   
-  // Camera & Face State
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isFaceDetected, setIsFaceDetected] = useState(false);
   const [faceCount, setFaceCount] = useState(0);
   const [cameraError, setCameraError] = useState(null);
 
-  // Face Verification State (NEW)
   const [verificationStatus, setVerificationStatus] = useState('no_face');
-  // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces' | 'covered' | 'error'
   const [similarityScore, setSimilarityScore] = useState(0);
 
-  // Fullscreen State
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [fullscreenCountdown, setFullscreenCountdown] = useState(0);
 
-  // Attention Check State
   const [showAttentionCheck, setShowAttentionCheck] = useState(false);
   const attentionTimerRef = useRef(null);
 
@@ -72,15 +71,15 @@ export const useProctoringEngine = ({
   const hasLockedOutRef = useRef(false);
   const warningsCountRef = useRef(0);
   const inactivityTimerRef = useRef(null);
-  const faceIntervalRef = useRef(null);
+  
+  // Timeout reference for adaptive checking
+  const faceTimeoutRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
   const proctoringSessionIdRef = useRef(null);
   const registeredFaceDescriptorRef = useRef(registeredFaceDescriptor);
 
-  // Stable ref to triggerLockout to break TDZ initialization loops
   const triggerLockoutRef = useRef(null);
 
-  // Debouncing face violations (require consecutive failures before logging)
   const faceAbsentStreak = useRef(0);
   const multipleFacesStreak = useRef(0);
   const faceMismatchStreak = useRef(0);
@@ -90,16 +89,15 @@ export const useProctoringEngine = ({
     isActiveRef.current = isActive;
   }, [isActive]);
 
-  // Keep descriptor ref in sync
   useEffect(() => {
     registeredFaceDescriptorRef.current = registeredFaceDescriptor;
   }, [registeredFaceDescriptor]);
 
-  // Initialize and stop camera stream
-  const startCamera = async () => {
+  // Initialize and stop camera stream with automatic retries for release delays
+  const startCamera = async (retryCount = 0) => {
     if (streamRef.current) return;
     try {
-      console.log('[ProctoringEngine] Requesting media stream...');
+      console.log(`[ProctoringEngine] Requesting media stream (attempt ${retryCount + 1})...`);
       const constraints = {
         video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
         audio: false // No audio processing needed to protect privacy
@@ -137,7 +135,20 @@ export const useProctoringEngine = ({
         }
       }
     } catch (error) {
-      console.error('[ProctoringEngine] Webcam init failed:', error);
+      console.error(`[ProctoringEngine] Webcam acquisition failed (attempt ${retryCount + 1}):`, error);
+      
+      // Retry on any hardware allocation error (device locked, busy, driver lag) up to 4 times
+      const isPermissionDenied = 
+        error.name === 'NotAllowedError' || 
+        error.name === 'PermissionDeniedError' || 
+        error.name === 'SecurityError';
+
+      if (!isPermissionDenied && retryCount < 4) {
+        console.warn(`[ProctoringEngine] Camera initialization issue (locked/busy). Retrying in 900ms...`);
+        await new Promise(resolve => setTimeout(resolve, 900));
+        return startCamera(retryCount + 1);
+      }
+
       setCameraError(error.name || 'WebcamAccessDenied');
       setIsCameraActive(false);
       
@@ -162,14 +173,12 @@ export const useProctoringEngine = ({
     setSimilarityScore(0);
   };
 
-  // Trigger lockout and submit test
   const triggerLockout = useCallback(async () => {
     if (hasLockedOutRef.current) return;
     hasLockedOutRef.current = true;
     setIsLockedOut(true);
     setIsWarningVisible(false);
 
-    // Stop streams
     stopCamera();
 
     try {
@@ -189,10 +198,8 @@ export const useProctoringEngine = ({
     }
   }, [assessmentId, navigate, onLockout]);
 
-  // Sync ref
   triggerLockoutRef.current = triggerLockout;
 
-  // Log violation to backend and increment warning counters
   const reportViolation = useCallback(async (eventType, displayMessage) => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
 
@@ -249,7 +256,6 @@ export const useProctoringEngine = ({
       }
     } catch (error) {
       console.error('Error reporting activity violation:', error);
-      // Fallback local tracking if backend call fails
       setWarningsCount(prev => {
         const next = prev + 1;
         warningsCountRef.current = next;
@@ -265,7 +271,6 @@ export const useProctoringEngine = ({
     }
   }, []);
 
-  // Reset inactivity timer
   const resetInactivityTimer = useCallback(() => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
 
@@ -283,7 +288,6 @@ export const useProctoringEngine = ({
     if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
     if (!isActiveRef.current || hasLockedOutRef.current) return;
     
-    // Trigger random attention check between 2.5 and 4.5 minutes (150000 to 270000 ms)
     const delay = Math.floor(Math.random() * 120000) + 150000; 
     attentionTimerRef.current = setTimeout(() => {
       if (isActiveRef.current && !hasLockedOutRef.current) {
@@ -304,7 +308,6 @@ export const useProctoringEngine = ({
     scheduleAttentionCheck();
   }, [reportViolation, scheduleAttentionCheck]);
 
-  // Request Fullscreen
   const requestFullscreen = useCallback(() => {
     const element = document.documentElement;
     try {
@@ -320,20 +323,29 @@ export const useProctoringEngine = ({
     }
   }, []);
 
-  // ─── FACE VERIFICATION TICK (replaces old runFaceCheck) ────────────
+  // Forward schedule wrapper helper
+  const scheduleNextFaceCheck = useCallback((delay) => {
+    if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
+    if (isActiveRef.current && !hasLockedOutRef.current) {
+      faceTimeoutRef.current = setTimeout(runFaceVerification, delay);
+    }
+  }, []);
+
+  // ─── ADAPTIVE FACE VERIFICATION SCHEDULER ───────────────────────────
   const runFaceVerification = async () => {
     if (!videoRef.current || !isActiveRef.current || hasLockedOutRef.current) return;
     if (videoRef.current.readyState < 2) return;
 
     const descriptor = registeredFaceDescriptorRef.current;
+    let nextDelay = INTERVAL_DEFAULT_MS;
 
     try {
-      // If we have a registered face descriptor, run full verification
       if (descriptor) {
         const result = await verifyFace(videoRef.current, descriptor);
 
         if (result.error) {
           console.warn('[ProctoringEngine] Face verification error:', result.error);
+          scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
           return;
         }
 
@@ -342,14 +354,17 @@ export const useProctoringEngine = ({
         setFaceCount(result.faceCount);
         setIsFaceDetected(result.status === VerificationStatus.VERIFIED);
 
-        // Handle each verification status
+        let activeInfraction = false;
+
         switch (result.status) {
           case VerificationStatus.VERIFIED:
-            // All clear — reset all streaks
             faceAbsentStreak.current = 0;
             multipleFacesStreak.current = 0;
             faceMismatchStreak.current = 0;
             faceCoveredStreak.current = 0;
+            
+            // Stable State -> Check every 5.0 seconds
+            nextDelay = INTERVAL_STABLE_MS;
             break;
 
           case VerificationStatus.NO_FACE:
@@ -357,7 +372,9 @@ export const useProctoringEngine = ({
             multipleFacesStreak.current = 0;
             faceMismatchStreak.current = 0;
             faceCoveredStreak.current = 0;
-            if (faceAbsentStreak.current >= 4) { // ~10 seconds
+            
+            activeInfraction = true;
+            if (faceAbsentStreak.current >= 4) { // 4 seconds total
               faceAbsentStreak.current = 0;
               reportViolation('face_absent', 'Warning: Face not detected. Please face the camera.');
             }
@@ -368,7 +385,9 @@ export const useProctoringEngine = ({
             faceAbsentStreak.current = 0;
             faceMismatchStreak.current = 0;
             faceCoveredStreak.current = 0;
-            if (multipleFacesStreak.current >= 3) { // ~7.5 seconds
+            
+            activeInfraction = true;
+            if (multipleFacesStreak.current >= 3) { // 3 seconds total
               multipleFacesStreak.current = 0;
               reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
             }
@@ -379,7 +398,9 @@ export const useProctoringEngine = ({
             faceAbsentStreak.current = 0;
             multipleFacesStreak.current = 0;
             faceCoveredStreak.current = 0;
-            if (faceMismatchStreak.current >= 3) { // ~7.5 seconds of different person
+            
+            activeInfraction = true;
+            if (faceMismatchStreak.current >= 3) { // 3 seconds total
               faceMismatchStreak.current = 0;
               reportViolation('face_mismatch', 'Warning: Face does not match registered candidate. Ensure the registered person is in front of the camera.');
             }
@@ -390,7 +411,9 @@ export const useProctoringEngine = ({
             faceAbsentStreak.current = 0;
             multipleFacesStreak.current = 0;
             faceMismatchStreak.current = 0;
-            if (faceCoveredStreak.current >= 4) { // ~10 seconds
+            
+            activeInfraction = true;
+            if (faceCoveredStreak.current >= 4) { // 4 seconds total
               faceCoveredStreak.current = 0;
               reportViolation('face_covered', 'Warning: Face not clearly visible. Please remove any obstruction and look at the camera.');
             }
@@ -399,12 +422,18 @@ export const useProctoringEngine = ({
           default:
             break;
         }
+
+        // Active violation state -> poll rapidly at 1.0 second intervals
+        if (activeInfraction) {
+          nextDelay = INTERVAL_INFRACTION_MS;
+        }
       } else {
-        // No registered descriptor — fallback to basic detection (legacy behavior)
+        // Fallback baseline basic detection
         const result = await detectFaces(videoRef.current);
 
         if (result.error) {
           console.warn('[ProctoringEngine] Face detection error:', result.error);
+          scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
           return;
         }
 
@@ -414,16 +443,19 @@ export const useProctoringEngine = ({
 
         if (result.faceCount === 0) {
           faceAbsentStreak.current += 1;
+          nextDelay = INTERVAL_INFRACTION_MS;
           if (faceAbsentStreak.current >= 4) {
             faceAbsentStreak.current = 0;
             reportViolation('face_absent', 'Warning: Face not detected. Ensure your face is centered in the camera feed.');
           }
         } else {
           faceAbsentStreak.current = 0;
+          nextDelay = INTERVAL_STABLE_MS;
         }
 
         if (result.faceCount > 1) {
           multipleFacesStreak.current += 1;
+          nextDelay = INTERVAL_INFRACTION_MS;
           if (multipleFacesStreak.current >= 3) {
             multipleFacesStreak.current = 0;
             reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
@@ -433,26 +465,25 @@ export const useProctoringEngine = ({
         }
       }
     } catch (err) {
-      console.error('[ProctoringEngine] Face verification tick failed:', err);
+      console.error('[ProctoringEngine] Face verification check crashed:', err);
     }
+
+    scheduleNextFaceCheck(nextDelay);
   };
 
-  // Visibility changes
   const handleVisibilityChange = useCallback(() => {
     if (document.hidden) {
       reportViolation('tab_switch', 'Warning: Tab switching is forbidden.');
     }
   }, [reportViolation]);
 
-  // Focus changes
   const handleBlur = useCallback(() => {
     setTimeout(() => {
-      if (document.hidden) return; // Handled by visibility change
+      if (document.hidden) return;
       reportViolation('minimize', 'Warning: Window focus lost.');
     }, 150);
   }, [reportViolation]);
 
-  // Fullscreen changes
   const handleFullscreenChange = useCallback(() => {
     const active = !!(
       document.fullscreenElement ||
@@ -464,7 +495,6 @@ export const useProctoringEngine = ({
     setIsFullScreen(active);
 
     if (!active && isActiveRef.current && !hasLockedOutRef.current) {
-      // Trigger grace period timer
       setFullscreenCountdown(15);
       
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
@@ -480,7 +510,6 @@ export const useProctoringEngine = ({
         });
       }, 1000);
     } else {
-      // Returned to fullscreen, clear timer
       if (fullscreenTimerRef.current) {
         clearInterval(fullscreenTimerRef.current);
         fullscreenTimerRef.current = null;
@@ -493,7 +522,6 @@ export const useProctoringEngine = ({
     setIsWarningVisible(false);
   }, []);
 
-  // Stable refs for event handlers so the main effect doesn't re-fire
   const handleVisibilityChangeRef = useRef(handleVisibilityChange);
   const handleBlurRef = useRef(handleBlur);
   const handleFullscreenChangeRef = useRef(handleFullscreenChange);
@@ -508,7 +536,6 @@ export const useProctoringEngine = ({
   useEffect(() => { reportViolationRef.current = reportViolation; }, [reportViolation]);
   useEffect(() => { scheduleAttentionCheckRef.current = scheduleAttentionCheck; }, [scheduleAttentionCheck]);
 
-  // Sync / Fetch initial warning count on activation
   useEffect(() => {
     if (!isActive) {
       if (proctoringSessionIdRef.current) {
@@ -521,7 +548,7 @@ export const useProctoringEngine = ({
       }
       stopCamera();
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (faceIntervalRef.current) clearInterval(faceIntervalRef.current);
+      if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
       return;
@@ -549,7 +576,6 @@ export const useProctoringEngine = ({
             if (triggerLockoutRef.current) triggerLockoutRef.current();
           }
 
-          // Log face registration event if we have a registered descriptor
           if (registeredFaceDescriptorRef.current) {
             proctoringApi.logEvent(sessionId, {
               eventType: 'face_registered',
@@ -564,25 +590,19 @@ export const useProctoringEngine = ({
     };
     startProctoringSession();
 
-    // Start Webcam
     startCamera();
-
-    // Start Attention Check Scheduler
     scheduleAttentionCheckRef.current();
 
-    // Stable wrapper functions that delegate to latest refs
     const onVisibilityChange = () => handleVisibilityChangeRef.current();
     const onBlur = () => handleBlurRef.current();
     const onFullscreenChange = () => handleFullscreenChangeRef.current();
     const onActivity = () => resetInactivityTimerRef.current();
 
-    // Set up tab / window listeners
     document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('blur', onBlur);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
-    // Set up inactivity events
     const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'mousedown', 'touchstart'];
     activityEvents.forEach(event => {
       window.addEventListener(event, onActivity);
@@ -590,10 +610,9 @@ export const useProctoringEngine = ({
 
     resetInactivityTimerRef.current();
 
-    // Face Verification Interval (replaces old face check)
-    faceIntervalRef.current = setInterval(runFaceVerification, FACE_CHECK_INTERVAL);
+    // Trigger initial adaptive check
+    scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
 
-    // Initial fullscreen check
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
     setIsFullScreen(isNowFull);
     if (!isNowFull) {
@@ -624,13 +643,11 @@ export const useProctoringEngine = ({
       });
 
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (faceIntervalRef.current) clearInterval(faceIntervalRef.current);
+      if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
     };
-  // Only re-run when these stable values change, not on every callback recreation
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, resultId, assessmentId]);
+  }, [isActive, resultId, assessmentId, scheduleNextFaceCheck]);
 
   return {
     warningsCount,
@@ -640,7 +657,6 @@ export const useProctoringEngine = ({
     lastViolationType,
     acknowledgeWarning,
     
-    // Webcam & Face tracking
     isCameraActive,
     isFaceDetected,
     faceCount,
@@ -648,16 +664,13 @@ export const useProctoringEngine = ({
     videoElement: videoRef.current,
     stream: streamRef.current,
 
-    // Face Verification (NEW)
     verificationStatus,
     similarityScore,
     
-    // Fullscreen status
     isFullScreen,
     fullscreenCountdown,
     requestFullscreen,
 
-    // Attention check
     showAttentionCheck,
     passAttentionCheck,
     failAttentionCheck,

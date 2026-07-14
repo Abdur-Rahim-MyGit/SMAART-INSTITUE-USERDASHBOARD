@@ -32,6 +32,11 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const [modelLoadState, setModelLoadState] = useState('idle'); // 'idle' | 'loading' | 'loaded' | 'error'
   const [registrationState, setRegistrationState] = useState('idle');
   // 'idle' | 'detecting' | 'face_found' | 'registering' | 'registered' | 'error'
+  const registrationStateRef = useRef(registrationState);
+  useEffect(() => {
+    registrationStateRef.current = registrationState;
+  }, [registrationState]);
+
   const [registrationProgress, setRegistrationProgress] = useState({ current: 0, total: 5 });
   const [registrationConfidence, setRegistrationConfidence] = useState(0);
   const [registeredDescriptor, setRegisteredDescriptor] = useState(null);
@@ -196,7 +201,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       if (!videoRef.current) return;
 
       try {
-        const result = await detectFaces(videoRef.current);
+        const result = await detectFaces(videoRef.current, true);
 
         if (result.error) {
           return; // Skip frame
@@ -209,7 +214,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           drawFaceFeedback(result.faces);
 
           // Face stable for 2+ consecutive checks (~1.6 seconds) → ready to register
-          if (faceStableCountRef.current >= 2 && registrationState !== 'registering' && registrationState !== 'registered') {
+          if (faceStableCountRef.current >= 2 && registrationStateRef.current !== 'registering' && registrationStateRef.current !== 'registered') {
             // Auto-start registration
             clearInterval(faceCheckIntervalRef.current);
             faceCheckIntervalRef.current = null;
@@ -230,13 +235,13 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         console.error('[ProctoringSetup] Face scanning error:', err);
       }
     }, 800);
-  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
+  }, [startFaceRegistration, drawFaceFeedback, clearCanvas]);
 
   // Step 3: Load models then start scanning
   useEffect(() => {
     if (step === 3) {
-      // Bind video stream
-      if (localStreamRef.current && videoRef.current) {
+      // Bind video stream only if not already bound to avoid stream reload interruption
+      if (localStreamRef.current && videoRef.current && videoRef.current.srcObject !== localStreamRef.current) {
         videoRef.current.srcObject = localStreamRef.current;
         videoRef.current.play().catch(err => console.warn('Video playback failed:', err));
       }
@@ -244,6 +249,14 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       // Load AI models first, then start scanning
       const init = async () => {
         await loadAIModels();
+        // Wait for video element to be ready
+        if (videoRef.current) {
+          let waitCount = 0;
+          while (videoRef.current && videoRef.current.readyState < 2 && waitCount < 25) {
+            await new Promise(r => setTimeout(r, 100));
+            waitCount++;
+          }
+        }
         // Only start scanning if models loaded successfully
         if (isModelsReady()) {
           startFaceScanning();
@@ -309,8 +322,10 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       triggerFullscreen();
     }
 
-    // Pass the registered face descriptor to the parent
-    onComplete({ faceDescriptor: registeredDescriptor });
+    // Delay calling onComplete to allow OS/browser camera drivers to release hardware lock cleanly
+    setTimeout(() => {
+      onComplete({ faceDescriptor: registeredDescriptor });
+    }, 450);
   };
 
   // Retry registration (reset state and rescan)
