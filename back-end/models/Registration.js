@@ -19,6 +19,7 @@ const registrationSchema = new mongoose.Schema({
   institution: String,
   department: String,
   cgpa: String,
+  batch: String,
   bio: { type: String, default: '' },
   timezone: { type: String, default: 'Asia/Kolkata' },
   dateFormat: { type: String, default: 'DD/MM/YYYY' },
