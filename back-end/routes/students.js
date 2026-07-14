@@ -228,6 +228,46 @@ router.put('/:id', requireRole('admin', 'teacher'), async (req, res) => {
     }
 });
 
+// Update student's academic performance
+router.put('/:id/academic-performance', async (req, res) => {
+    try {
+        // SECURITY (audit HIGH): non-staff may only update their OWN record.
+        if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
+        
+        const { semesterPerformances, overallCgpa, activeBacklogs, historyOfArrears } = req.body;
+        
+        const student = await Student.findById(req.params.id);
+        if (!student) {
+            return res.status(404).json({ success: false, error: 'Student not found' });
+        }
+        
+        if (!student.academic) {
+            student.academic = {};
+        }
+        
+        if (semesterPerformances !== undefined) student.academic.semesterPerformances = semesterPerformances;
+        if (overallCgpa !== undefined) student.academic.overallCgpa = overallCgpa;
+        if (activeBacklogs !== undefined) student.academic.activeBacklogs = activeBacklogs;
+        if (historyOfArrears !== undefined) student.academic.historyOfArrears = historyOfArrears;
+        
+        await student.save();
+        
+        res.json({
+            success: true,
+            message: 'Academic performance updated successfully',
+            data: student.academic
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Failed to update academic performance',
+            message: err.message
+        });
+    }
+});
+
 // Delete student (admin only)
 router.delete('/:id', requireRole('admin'), async (req, res) => {
     try {

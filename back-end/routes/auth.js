@@ -5,6 +5,79 @@ const crypto = require('crypto');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
+
+// ─── Shared Auth Logging (writes to Admin's Access Log collection) ───────────
+const Log = require('../models/Log');
+
+/**
+ * Write an auth event to the shared Log collection.
+ * Non-blocking — never crashes the login flow.
+ */
+const writeAuthLog = async ({ action, userId, userName, userEmail, userRole, details, success, req, targetEmail }) => {
+    try {
+        // ── IP Detection ──────────────────────────────────────────────────────
+        // req.ip respects the 'trust proxy' setting (set in server.js).
+        // Falls back through raw headers for extra resilience.
+        let ipAddress = req.ip
+            || req.headers['x-forwarded-for']
+            || req.headers['x-real-ip']
+            || req.headers['cf-connecting-ip']
+            || req.connection?.remoteAddress
+            || req.socket?.remoteAddress
+            || 'Unknown';
+
+        // Take the FIRST IP from a comma-separated list (proxy chain)
+        if (ipAddress && ipAddress.includes(',')) {
+            ipAddress = ipAddress.split(',')[0].trim();
+        }
+        // Strip IPv6 localhost prefix (::ffff:127.0.0.1 → 127.0.0.1)
+        if (ipAddress && ipAddress.startsWith('::ffff:')) {
+            ipAddress = ipAddress.substring(7);
+        }
+        // Normalise pure IPv6 loopback
+        if (ipAddress === '::1') ipAddress = '127.0.0.1';
+
+        // ── User-Agent / Device Info ──────────────────────────────────────────
+        const userAgent = req.headers['user-agent'] || '';
+        let deviceInfo = '';
+        if (userAgent) {
+            const browser = userAgent.includes('Edg/')   ? 'Edge'
+                : userAgent.includes('OPR/')  ? 'Opera'
+                : userAgent.includes('Chrome') ? 'Chrome'
+                : userAgent.includes('Firefox') ? 'Firefox'
+                : userAgent.includes('Safari') ? 'Safari'
+                : 'Browser';
+
+            const os = userAgent.includes('Windows NT') ? 'Windows'
+                : userAgent.includes('Mac OS X') ? 'macOS'
+                : userAgent.includes('Android') ? 'Android'
+                : userAgent.includes('iPhone') || userAgent.includes('iPad') ? 'iOS'
+                : userAgent.includes('Linux') ? 'Linux'
+                : 'Unknown OS';
+
+            const device = /Mobi|Android|iPhone|iPad/i.test(userAgent) ? 'Mobile' : 'Desktop';
+            deviceInfo = `${browser} / ${os} / ${device}`;
+        }
+
+        await Log.create({
+            action,
+            module: 'Auth',
+            user: userId || undefined,
+            userName,
+            userEmail,
+            userRole: userRole || 'student',
+            targetEmail,
+            details,
+            ipAddress,
+            userAgent,
+            deviceInfo,
+            success: success !== undefined ? success : true,
+        });
+    } catch (err) {
+        // Non-critical — never block the login flow
+        console.error('⚠️ Auth log write failed:', err.message);
+    }
+};
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
 const { notifyWelcome } = require('../services/notificationService');
 const { sendPasswordChangedEmail } = require('../services/emailService');
@@ -1010,6 +1083,18 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
       maxAge: 3 * 60 * 60 * 1000 // 3 hours — matches session duration
     });
 
+    // ─── Write to shared Admin Auth Log ────────────────────────────────────
+    writeAuthLog({
+        action: 'Login',
+        userId: user._id,
+        userName: user.fullName,
+        userEmail: user.email,
+        userRole: user.role || user.userType || 'student',
+        details: `User logged in via 2FA from ${user.userType || 'student'} portal`,
+        success: true,
+        req
+    });
+
     res.json({
       message: 'Login successful',
       token,
@@ -1654,6 +1739,21 @@ router.post('/logout', protect, async (req, res) => {
     httpOnly: true,
     sameSite: 'strict',
   });
+
+  // ─── Write to shared Admin Auth Log ──────────────────────────────────────
+  if (req.user) {
+    writeAuthLog({
+      action: 'Logout',
+      userId: req.user._id,
+      userName: req.user.fullName,
+      userEmail: req.user.email,
+      userRole: req.user.userType || req.user.role || 'student',
+      details: 'User logged out successfully',
+      success: true,
+      req
+    });
+  }
+
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 

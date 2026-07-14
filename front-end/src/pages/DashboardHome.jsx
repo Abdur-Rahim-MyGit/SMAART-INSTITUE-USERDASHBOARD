@@ -175,6 +175,23 @@ const DashboardHome = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full space-y-4 sm:space-y-6"
           >
+            {user && (!user.academic || !user.academic.overallCgpa || user.academic.overallCgpa === 0) && (
+              <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 dark:from-[#001630] dark:to-[#001024] dark:border-blue-900/30">
+                 <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full dark:bg-blue-900/30 dark:text-blue-400">
+                       <RiAlertLine size={20} />
+                    </div>
+                    <div>
+                       <h4 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Complete Your Academic Profile</h4>
+                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Please update your semester-wise CGPA. This will be automatically reflected in your ATS Resume.</p>
+                    </div>
+                 </div>
+                 <button onClick={() => navigate('/dashboard/cgpa-calculator')} className="shrink-0 px-4 py-2 bg-[#1a3884] text-white text-xs font-bold rounded-xl hover:bg-[#112b6b] transition-colors shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700">
+                    Update CGPA Now
+                 </button>
+              </motion.div>
+            )}
+
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}

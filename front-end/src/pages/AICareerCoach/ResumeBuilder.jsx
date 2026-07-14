@@ -941,7 +941,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 degree: firstCleanValue(reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
                 institution: firstCleanValue(reg.institution, data.college, 'SMAART Institute'),
                 year: firstCleanValue(reg.yearOfPassing, data.batch),
-                grade: '',
+                grade: data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : '',
                 location: defaultLoc
             });
         }

@@ -30,6 +30,7 @@ const GRADE_MAPPING = { O: 10, "A+": 9, A: 8, "B+": 7, B: 6, C: 5 };
 const FAIL_GRADES = ["RA", "SA", "AB", "W", "U", "F"];
 
 const METHODS = [
+  { id: "quick", name: "Quick Entry", badge: "Semester-wise Data" },
   { id: "slab", name: "Slab-Based Method", badge: "Anna University" },
   { id: "continuous", name: "Continuous Method", badge: "Madras University" },
   { id: "equal", name: "Equal-Credit Method", badge: "Autonomous Colleges" },
@@ -476,6 +477,56 @@ export default function CGPACalculator() {
     totalDegreeUnits: "",
   });
 
+  const [courseDurationYears, setCourseDurationYears] = useState(4);
+  const [quickSemesters, setQuickSemesters] = useState(
+    Array.from({ length: 8 }, (_, i) => ({ semesterNumber: i + 1, sgpa: '', cgpa: '', creditsEarned: '' }))
+  );
+  const [quickOverallCgpa, setQuickOverallCgpa] = useState(0);
+  const [activeBacklogs, setActiveBacklogs] = useState(0);
+  const [historyOfArrears, setHistoryOfArrears] = useState(0);
+
+  const handleDurationChange = (years) => {
+    setCourseDurationYears(years);
+    const targetSemesters = years * 2;
+    setQuickSemesters(prev => {
+      if (prev.length === targetSemesters) return prev;
+      if (prev.length > targetSemesters) return prev.slice(0, targetSemesters);
+      const next = [...prev];
+      for (let i = prev.length; i < targetSemesters; i++) {
+        next.push({ semesterNumber: i + 1, sgpa: '', cgpa: '', creditsEarned: '' });
+      }
+      return next;
+    });
+  };
+
+  const handleQuickChange = (index, field, value) => {
+    setQuickSemesters(prev => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  useEffect(() => {
+     if (activeMethod === 'quick') {
+        let totalC = 0;
+        let totalP = 0;
+        quickSemesters.forEach(s => {
+           const sg = parseFloat(s.sgpa);
+           const cr = parseFloat(s.creditsEarned) || 1;
+           if (!isNaN(sg) && sg > 0) {
+              totalP += (sg * cr);
+              totalC += cr;
+           }
+        });
+        if (totalC > 0) {
+           setQuickOverallCgpa(Math.round((totalP / totalC) * 100) / 100);
+        } else {
+           setQuickOverallCgpa(0);
+        }
+     }
+  }, [quickSemesters, activeMethod]);
+
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
@@ -628,6 +679,44 @@ export default function CGPACalculator() {
           }
           if (response.data.activeMethod) {
             setActiveMethod(response.data.activeMethod);
+          }
+        }
+        
+        const userStr = sessionStorage.getItem('user');
+        if (userStr) {
+          const userObj = JSON.parse(userStr);
+          const userId = userObj._id || userObj.id;
+          if (userId) {
+            const studentRes = await apiCall(`/students/${userId}`).catch(()=>null);
+            if (studentRes?.success && studentRes.data?.academic) {
+               const ac = studentRes.data.academic;
+               if (ac.semesterPerformances && ac.semesterPerformances.length > 0) {
+                 const maxSem = Math.max(...ac.semesterPerformances.map(sp => sp.semesterNumber));
+                 const calcYears = Math.max(2, Math.min(5, Math.ceil(maxSem / 2)));
+                 setCourseDurationYears(calcYears);
+                 
+                 setQuickSemesters(prev => {
+                    const targetLen = calcYears * 2;
+                    let next = prev.length > targetLen ? prev.slice(0, targetLen) : [...prev];
+                    while (next.length < targetLen) {
+                        next.push({ semesterNumber: next.length + 1, sgpa: '', cgpa: '', creditsEarned: '' });
+                    }
+                    
+                    ac.semesterPerformances.forEach(sp => {
+                       const idx = next.findIndex(n => n.semesterNumber === sp.semesterNumber);
+                       if (idx !== -1) {
+                          next[idx] = { ...next[idx], sgpa: sp.sgpa||'', cgpa: sp.cgpa||'', creditsEarned: sp.creditsEarned||'' };
+                       }
+                    });
+                    return next;
+                 });
+               }
+               if (ac.overallCgpa) {
+                 setQuickOverallCgpa(ac.overallCgpa);
+               }
+               if (ac.activeBacklogs !== undefined) setActiveBacklogs(ac.activeBacklogs);
+               if (ac.historyOfArrears !== undefined) setHistoryOfArrears(ac.historyOfArrears);
+            }
           }
         }
       } catch (error) {
@@ -995,18 +1084,55 @@ export default function CGPACalculator() {
     // Auto-sync to profile
     setIsSyncing(true);
     try {
-      await apiCall('/cgpa/save', {
-        method: 'POST',
-        body: JSON.stringify({
-          activeMethod,
-          semestersData,
-          cgpa: calculation.cgpa,
-          percentage: calculation.percentage,
-          totalPoints: calculation.totalPoints,
-          totalCredits: calculation.totalCredits,
-          totalSubjects: calculation.totalSubjects
-        })
-      });
+      if (activeMethod === "quick") {
+        const userStr = sessionStorage.getItem('user');
+        if (userStr) {
+          const userObj = JSON.parse(userStr);
+          const userId = userObj._id || userObj.id;
+          if (userId) {
+             const validSemesters = quickSemesters.filter(s => parseFloat(s.sgpa) > 0);
+             await apiCall(`/students/${userId}/academic-performance`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                   overallCgpa: quickOverallCgpa,
+                   activeBacklogs: parseInt(activeBacklogs) || 0,
+                   historyOfArrears: parseInt(historyOfArrears) || 0,
+                   semesterPerformances: validSemesters.map((s, idx) => {
+                      // Calculate running cgpa
+                      let tP = 0, tC = 0;
+                      for (let i = 0; i <= idx; i++) {
+                          const sg = parseFloat(validSemesters[i].sgpa);
+                          const cr = parseFloat(validSemesters[i].creditsEarned) || 1;
+                          if (!isNaN(sg) && sg > 0) { tP += sg * cr; tC += cr; }
+                      }
+                      const rcgpa = tC > 0 ? parseFloat((tP / tC).toFixed(2)) : 0;
+                      
+                      return {
+                          semesterNumber: s.semesterNumber,
+                          sgpa: parseFloat(s.sgpa) || 0,
+                          cgpa: rcgpa,
+                          creditsEarned: parseFloat(s.creditsEarned) || 0
+                      };
+                   })
+                })
+             });
+             alert("Profile successfully synced with your Quick Entry data!");
+          }
+        }
+      } else {
+        await apiCall('/cgpa/save', {
+          method: 'POST',
+          body: JSON.stringify({
+            activeMethod,
+            semestersData,
+            cgpa: calculation.cgpa,
+            percentage: calculation.percentage,
+            totalPoints: calculation.totalPoints,
+            totalCredits: calculation.totalCredits,
+            totalSubjects: calculation.totalSubjects
+          })
+        });
+      }
     } catch (error) {
       console.error("Failed to auto-sync profile:", error);
     } finally {
@@ -1113,7 +1239,7 @@ export default function CGPACalculator() {
         </motion.div>
 
         {/* --- METHOD SELECTOR --- */}
-        <div className="mb-8 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {METHODS.map((method) => {
             const isActive = activeMethod === method.id;
             return (
@@ -1149,6 +1275,83 @@ export default function CGPACalculator() {
           <div className="lg:col-span-7">
             <div className="rounded-3xl border border-[#d8e6f7] bg-white p-6 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
               
+              {activeMethod === "quick" ? (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 border-b border-slate-100 pb-4 dark:border-[#1a3884]/20">
+                    <div>
+                      <h3 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Semester-wise Quick Entry</h3>
+                      <p className="text-[11px] text-slate-400">Enter your GPA for each semester to automatically calculate your overall CGPA and sync it to your resume.</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap">Course Duration:</label>
+                       <div className="relative">
+                         <select 
+                            value={courseDurationYears}
+                            onChange={(e) => handleDurationChange(parseInt(e.target.value))}
+                            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-8 text-xs font-bold text-[#1a3884] outline-none focus:border-[#1a3884] focus:ring-1 focus:ring-[#1a3884] dark:border-slate-700 dark:bg-[#000a1a] dark:text-blue-400"
+                         >
+                            <option value={2}>2 Years (4 Sems)</option>
+                            <option value={3}>3 Years (6 Sems)</option>
+                            <option value={4}>4 Years (8 Sems)</option>
+                            <option value={5}>5 Years (10 Sems)</option>
+                         </select>
+                         <IconChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#1a3884] dark:text-blue-400" />
+                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-1 grid grid-cols-12 gap-2 rounded-lg bg-slate-100 px-3 py-2 dark:bg-[#000d20]">
+                    <div className="col-span-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Year & Semester</div>
+                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">SGPA</div>
+                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Cumul. CGPA</div>
+                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Credits</div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {quickSemesters.map((sem, idx) => {
+                      const yearNum = Math.ceil(sem.semesterNumber / 2);
+                      const calculateRunningCgpa = (semIndex) => {
+                          let totalP = 0;
+                          let totalC = 0;
+                          for (let i = 0; i <= semIndex; i++) {
+                              const s = quickSemesters[i];
+                              const sg = parseFloat(s.sgpa);
+                              const cr = parseFloat(s.creditsEarned) || 1;
+                              if (!isNaN(sg) && sg > 0) {
+                                  totalP += (sg * cr);
+                                  totalC += cr;
+                              }
+                          }
+                          return totalC > 0 ? (Math.round((totalP / totalC) * 100) / 100).toFixed(2) : "Auto";
+                      };
+                      const runningCgpa = calculateRunningCgpa(idx);
+                      
+                      return (
+                      <div key={idx} className="group grid grid-cols-12 gap-2 items-center rounded-xl border-l-4 border-l-[#1a3884] border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] dark:border-slate-700/60 dark:bg-[#000d20]">
+                         <div className="col-span-3 flex flex-col justify-center">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Year {yearNum}</span>
+                            <span className="text-sm font-bold text-[#0d1f4e] dark:text-white">Semester {sem.semesterNumber}</span>
+                         </div>
+                         <div className="col-span-3">
+                            <input type="number" min="0" max="10" step="0.01" value={sem.sgpa} onChange={(e) => handleQuickChange(idx, 'sgpa', e.target.value)} placeholder="e.g. 8.5" className="w-full text-center rounded-lg border-2 border-blue-100 bg-blue-50 px-2 py-1.5 text-[13px] font-bold text-[#1a3884] placeholder:font-semibold placeholder:text-blue-300 focus:border-[#1a3884] focus:bg-white focus:outline-none dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-300 dark:focus:border-blue-500" />
+                         </div>
+                         <div className="col-span-3">
+                            <div className="flex w-full items-center justify-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 dark:border-slate-700/60 dark:bg-[#001630]">
+                               <span className={`text-[13px] font-bold ${runningCgpa === "Auto" ? "text-slate-400" : "text-[#0d1f4e] dark:text-white"}`}>
+                                  {runningCgpa}
+                               </span>
+                            </div>
+                         </div>
+                         <div className="col-span-3">
+                            <input type="number" min="0" step="1" value={sem.creditsEarned} onChange={(e) => handleQuickChange(idx, 'creditsEarned', e.target.value)} placeholder="24" className="w-full text-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-bold text-[#0d1f4e] placeholder:font-semibold placeholder:text-slate-400 focus:border-[#1a3884] focus:bg-white focus:outline-none dark:border-slate-700/60 dark:bg-[#001630] dark:text-white" />
+                         </div>
+                      </div>
+                    )})}
+                  </div>
+                </div>
+              ) : (
+                <>
               {/* Semester Dropdown */}
               <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4 dark:border-[#1a3884]/20">
                 <div>
@@ -1289,6 +1492,8 @@ export default function CGPACalculator() {
                   <IconEraser size={16} /> Clear All
                 </button>
               </div>
+              </>
+              )}
             </div>
           </div>
 
@@ -1299,7 +1504,43 @@ export default function CGPACalculator() {
                 Calculation Result
               </h3>
 
-              {!calculation ? (
+              {activeMethod === "quick" ? (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center">
+                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Cumulative CGPA</p>
+                     <div className="relative mb-4 mt-2 flex items-baseline justify-center">
+                       <span className="bg-gradient-to-br from-[#0d1f4e] to-[#1a3884] bg-clip-text text-6xl font-extrabold tracking-tight text-transparent dark:from-white dark:to-blue-400">
+                         {quickOverallCgpa.toFixed(2)}
+                       </span>
+                       <span className="ml-2 text-lg font-bold text-slate-400/80">/ 10</span>
+                     </div>
+                     <div className="mb-6 rounded-full bg-blue-100/50 px-4 py-1.5 dark:bg-blue-900/20">
+                       <p className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400">
+                         Ready to sync with Resume
+                       </p>
+                     </div>
+                     
+                     <div className="mb-6 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700/50 dark:bg-[#000a1a]">
+                       <h4 className="mb-3 text-center text-[11px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Academic Standing</h4>
+                       <div className="grid grid-cols-2 gap-4">
+                         <div className="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm dark:bg-[#001630] border border-slate-100 dark:border-slate-700/60 transition-all hover:border-amber-200 dark:hover:border-amber-500/30">
+                           <span className="mb-1 text-[10px] font-bold uppercase tracking-wide text-amber-500">Active Backlogs</span>
+                           <input type="number" min="0" value={activeBacklogs} onChange={(e) => setActiveBacklogs(e.target.value)} className="w-16 text-center text-2xl font-black text-[#0d1f4e] outline-none dark:bg-transparent dark:text-white" />
+                         </div>
+                         <div className="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm dark:bg-[#001630] border border-slate-100 dark:border-slate-700/60 transition-all hover:border-rose-200 dark:hover:border-rose-500/30">
+                           <span className="mb-1 text-[10px] font-bold uppercase tracking-wide text-rose-500">History of Arrears</span>
+                           <input type="number" min="0" value={historyOfArrears} onChange={(e) => setHistoryOfArrears(e.target.value)} className="w-16 text-center text-2xl font-black text-[#0d1f4e] outline-none dark:bg-transparent dark:text-white" />
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <div className="w-full space-y-2">
+                       <button onClick={handleSaveResult} disabled={isSyncing} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a3884] py-3.5 text-sm font-bold text-white shadow-md transition-transform hover:-translate-y-0.5 hover:bg-[#112b6b] active:translate-y-0 disabled:opacity-70 dark:bg-[#00204d] dark:hover:bg-[#00337a]">
+                         {isSyncing ? <IconLoader2 size={18} className="animate-spin" /> : <IconCheck size={18} />}
+                         {isSyncing ? "Syncing..." : "Save & Sync to Profile"}
+                       </button>
+                     </div>
+                  </motion.div>
+              ) : !calculation ? (
                 <div className="flex h-48 flex-col items-center justify-center text-center">
                   <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-[#00204d]">
                     <IconCalculator size={32} className="text-slate-400" />

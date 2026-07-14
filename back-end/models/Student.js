@@ -101,6 +101,30 @@ const studentSchema = new mongoose.Schema({
     specialisation: {
       type: String,
       default: ''
+    },
+    overallCgpa: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 10
+    },
+    semesterPerformances: [{
+      semesterNumber: { type: Number, required: true },
+      sgpa: { type: Number, min: 0, max: 10 },
+      cgpa: { type: Number, min: 0, max: 10 },
+      creditsEarned: { type: Number, default: 0 },
+      passingYear: { type: String, default: '' },
+      lastUpdated: { type: Date, default: Date.now }
+    }],
+    activeBacklogs: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    historyOfArrears: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   status: {
