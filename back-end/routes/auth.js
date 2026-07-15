@@ -5,6 +5,79 @@ const crypto = require('crypto');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
+
+// ─── Shared Auth Logging (writes to Admin's Access Log collection) ───────────
+const Log = require('../models/Log');
+
+/**
+ * Write an auth event to the shared Log collection.
+ * Non-blocking — never crashes the login flow.
+ */
+const writeAuthLog = async ({ action, userId, userName, userEmail, userRole, details, success, req, targetEmail }) => {
+    try {
+        // ── IP Detection ──────────────────────────────────────────────────────
+        // req.ip respects the 'trust proxy' setting (set in server.js).
+        // Falls back through raw headers for extra resilience.
+        let ipAddress = req.ip
+            || req.headers['x-forwarded-for']
+            || req.headers['x-real-ip']
+            || req.headers['cf-connecting-ip']
+            || req.connection?.remoteAddress
+            || req.socket?.remoteAddress
+            || 'Unknown';
+
+        // Take the FIRST IP from a comma-separated list (proxy chain)
+        if (ipAddress && ipAddress.includes(',')) {
+            ipAddress = ipAddress.split(',')[0].trim();
+        }
+        // Strip IPv6 localhost prefix (::ffff:127.0.0.1 → 127.0.0.1)
+        if (ipAddress && ipAddress.startsWith('::ffff:')) {
+            ipAddress = ipAddress.substring(7);
+        }
+        // Normalise pure IPv6 loopback
+        if (ipAddress === '::1') ipAddress = '127.0.0.1';
+
+        // ── User-Agent / Device Info ──────────────────────────────────────────
+        const userAgent = req.headers['user-agent'] || '';
+        let deviceInfo = '';
+        if (userAgent) {
+            const browser = userAgent.includes('Edg/')   ? 'Edge'
+                : userAgent.includes('OPR/')  ? 'Opera'
+                : userAgent.includes('Chrome') ? 'Chrome'
+                : userAgent.includes('Firefox') ? 'Firefox'
+                : userAgent.includes('Safari') ? 'Safari'
+                : 'Browser';
+
+            const os = userAgent.includes('Windows NT') ? 'Windows'
+                : userAgent.includes('Mac OS X') ? 'macOS'
+                : userAgent.includes('Android') ? 'Android'
+                : userAgent.includes('iPhone') || userAgent.includes('iPad') ? 'iOS'
+                : userAgent.includes('Linux') ? 'Linux'
+                : 'Unknown OS';
+
+            const device = /Mobi|Android|iPhone|iPad/i.test(userAgent) ? 'Mobile' : 'Desktop';
+            deviceInfo = `${browser} / ${os} / ${device}`;
+        }
+
+        await Log.create({
+            action,
+            module: 'Auth',
+            user: userId || undefined,
+            userName,
+            userEmail,
+            userRole: userRole || 'student',
+            targetEmail,
+            details,
+            ipAddress,
+            userAgent,
+            deviceInfo,
+            success: success !== undefined ? success : true,
+        });
+    } catch (err) {
+        // Non-critical — never block the login flow
+        console.error('⚠️ Auth log write failed:', err.message);
+    }
+};
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
 const { notifyWelcome } = require('../services/notificationService');
 const { sendPasswordChangedEmail } = require('../services/emailService');
@@ -589,7 +662,7 @@ router.post('/login',
 
           // Generate OTP and send
           const otp = generateOTP();
-          console.log(`[OTP] Generated OTP for ${loginEmail}: '${otp}'`);
+          console.log(`[OTP] login code generated for ${loginEmail}`); // SECURITY: never log the code
           const tempToken = crypto.randomBytes(32).toString('hex');
 
           // Delete any existing OTP for this email
@@ -758,7 +831,7 @@ router.post('/login',
 
       // Generate OTP and send email
       const otp = generateOTP();
-      console.log(`[OTP] Generated OTP for ${loginEmail}: '${otp}'`);
+      console.log(`[OTP] login code generated for ${loginEmail}`); // SECURITY: never log the code
       const tempToken = crypto.randomBytes(32).toString('hex');
 
       // Delete any existing OTP for this email
@@ -1010,6 +1083,18 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
       maxAge: 3 * 60 * 60 * 1000 // 3 hours — matches session duration
     });
 
+    // ─── Write to shared Admin Auth Log ────────────────────────────────────
+    writeAuthLog({
+        action: 'Login',
+        userId: user._id,
+        userName: user.fullName,
+        userEmail: user.email,
+        userRole: user.role || user.userType || 'student',
+        details: `User logged in via 2FA from ${user.userType || 'student'} portal`,
+        success: true,
+        req
+    });
+
     res.json({
       message: 'Login successful',
       token,
@@ -1049,7 +1134,7 @@ router.post('/resend-login-otp', async (req, res) => {
 
     // Generate new OTP
     const otp = generateOTP();
-    console.log(`[OTP] Resent OTP for ${loginOtp.email}: '${otp}'`);
+    console.log(`[OTP] code resent for ${loginOtp.email}`); // SECURITY: never log the code
     const newTempToken = crypto.randomBytes(32).toString('hex');
 
     // Update the record with new OTP and token
@@ -1215,7 +1300,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
 
     // Generate OTP for password reset
     const otp = generateOTP();
-    console.log(`[OTP] Password reset OTP for ${normalizedEmail}: '${otp}'`);
+    console.log(`[OTP] password-reset code generated for ${normalizedEmail}`); // SECURITY: never log the code
     const resetToken = crypto.randomBytes(32).toString('hex');
 
     // Delete any existing reset OTP for this email
@@ -1654,6 +1739,21 @@ router.post('/logout', protect, async (req, res) => {
     httpOnly: true,
     sameSite: 'strict',
   });
+
+  // ─── Write to shared Admin Auth Log ──────────────────────────────────────
+  if (req.user) {
+    writeAuthLog({
+      action: 'Logout',
+      userId: req.user._id,
+      userName: req.user.fullName,
+      userEmail: req.user.email,
+      userRole: req.user.userType || req.user.role || 'student',
+      details: 'User logged out successfully',
+      success: true,
+      req
+    });
+  }
+
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 
@@ -1682,12 +1782,22 @@ router.get('/me', protect, async (req, res) => {
   }
 });
 
-// === UTILITY: Clear stale session by email (for debugging) ===
-router.post('/clear-session', async (req, res) => {
+// === UTILITY: Clear stale session by email ===
+// SECURITY (audit HIGH): now requires auth, and a caller may only clear their
+// OWN session unless they are an admin. Previously unauthenticated — anyone
+// could force-logout any user by email (the single-session check then 401s the
+// victim on their next request), a remote no-auth forced-logout / DoS.
+router.post('/clear-session', protect, async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isSelf = req.user && (req.user.email || '').toLowerCase() === String(email).toLowerCase();
+    if (!isAdmin && !isSelf) {
+      return res.status(403).json({ error: 'Not authorized to clear this session' });
     }
 
     const Student = require('../models/Student');

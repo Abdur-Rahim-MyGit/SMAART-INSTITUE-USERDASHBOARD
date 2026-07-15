@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -16,10 +16,26 @@ import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const { user, loading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (location.state?.assessmentAutoSubmitted) {
+      toast({
+        title: t("dashboard.assessment_submitted_title", "Assessment Auto-Submitted"),
+        description: t("dashboard.assessment_submitted_desc", "Your assessment was automatically submitted due to repeated tab switching."),
+        variant: "destructive",
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, toast, navigate, t, location.pathname]);
+
   const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
   const { userProgress, loading: progressLoading, refresh: refreshProgress } = useSmaartCourseProgress(user?._id || user?.id);
 
@@ -42,7 +58,6 @@ const DashboardHome = () => {
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
@@ -85,7 +100,7 @@ const DashboardHome = () => {
 
   if ((userLoading || dashboardLoading) && !loadingError) {
     return (
-      <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
         {/* Skeleton Hero */}
         <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
@@ -187,7 +202,7 @@ const DashboardHome = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.15 }}
-          className="flex flex-col gap-6 p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
+          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
         >
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
@@ -195,8 +210,25 @@ const DashboardHome = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-full space-y-6"
+            className="w-full space-y-4 sm:space-y-6"
           >
+            {user && (!user.academic || !user.academic.overallCgpa || user.academic.overallCgpa === 0) && (
+              <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 dark:from-[#001630] dark:to-[#001024] dark:border-blue-900/30">
+                 <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full dark:bg-blue-900/30 dark:text-blue-400">
+                       <RiAlertLine size={20} />
+                    </div>
+                    <div>
+                       <h4 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Complete Your Academic Profile</h4>
+                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Please update your semester-wise CGPA. This will be automatically reflected in your ATS Resume.</p>
+                    </div>
+                 </div>
+                 <button onClick={() => navigate('/dashboard/cgpa-calculator')} className="shrink-0 px-4 py-2 bg-[#1a3884] text-white text-xs font-bold rounded-xl hover:bg-[#112b6b] transition-colors shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700">
+                    Update CGPA Now
+                 </button>
+              </motion.div>
+            )}
+
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
@@ -220,13 +252,13 @@ const DashboardHome = () => {
           </motion.div>
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
-          <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
             {/* ── LEFT: Career Pathways ── */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="flex-1 min-w-0 flex flex-col gap-6"
+              className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
             >
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
               <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
@@ -239,7 +271,7 @@ const DashboardHome = () => {
               transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
             >
-              <div className="sticky top-24">
+              <div className="xl:sticky xl:top-24">
                 <LearningProgress />
               </div>
             </motion.div>

@@ -104,8 +104,28 @@ const supportAttachmentFileFilter = (req, file, cb) => {
   }
 };
 
+const supportCloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    const userId = req.user?._id?.toString() || 'anonymous';
+    const folder = `grievances/${userId}`;
+    const isDocument = file.mimetype === 'application/pdf' || 
+                       file.mimetype === 'application/msword' || 
+                       file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                       file.mimetype === 'text/plain';
+
+    return {
+      folder: folder,
+      allowed_formats: ["jpg", "png", "jpeg", "gif", "webp", "pdf", "doc", "docx", "txt"],
+      resource_type: isDocument ? "raw" : "image",
+      public_id: `${file.fieldname}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${path.extname(file.originalname).toLowerCase()}`,
+      ...(isDocument ? {} : { transformation: [{ width: 1000, height: 1000, crop: "limit" }] }),
+    };
+  },
+});
+
 const uploadSupportAttachments = multer({
-  storage,
+  storage: supportCloudinaryStorage,
   fileFilter: supportAttachmentFileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024
@@ -145,7 +165,7 @@ const registrationStorage = new CloudinaryStorage({
       folder: folder,
       allowed_formats: ["jpg", "png", "jpeg", "gif", "webp", "pdf"],
       resource_type: isDocument ? "raw" : "image",
-      public_id: `${file.fieldname}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      public_id: `${file.fieldname}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${path.extname(file.originalname).toLowerCase()}`,
       // Only apply transformation for images, not PDFs
       ...(isDocument ? {} : { transformation: [{ width: 1000, height: 1000, crop: "limit" }] }),
     };

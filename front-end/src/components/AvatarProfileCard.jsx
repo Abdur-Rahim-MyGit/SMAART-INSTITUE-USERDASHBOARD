@@ -188,7 +188,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 via-amber-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
                 <Flame className="w-4 h-4 text-white" />
               </div>
-              <span className="text-white font-bold text-sm tracking-wide">Level {avatarData?.level || 1}</span>
+              <span className="text-white font-bold text-sm tracking-wide">{t('common.level', 'Level')} {avatarData?.level || 1}</span>
             </div>
 
             {/* Mini Progress Bar */}
@@ -222,7 +222,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             <div className="relative flex items-center justify-center gap-2">
               <Trophy className="w-4.5 h-4.5" />
-              <span className="text-sm font-bold uppercase tracking-wide">Skills Passport</span>
+              <span className="text-sm font-bold uppercase tracking-wide">{t('sidebar.skills_passport', 'Skills Passport')}</span>
               <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
             </div>
           </motion.button>

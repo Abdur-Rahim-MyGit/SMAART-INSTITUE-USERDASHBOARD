@@ -1,20 +1,20 @@
 const Notification = require('../models/Notification');
-const emailService  = require('./emailService');
+const emailService = require('./emailService');
 
 // Icon and color mappings for notification types
 const NOTIFICATION_CONFIG = {
-  badge:       { icon: 'trophy',          color: '#FFD700' },
-  assessment:  { icon: 'clipboard-check', color: '#30919D' },
-  course:      { icon: 'book-open',       color: '#4F46E5' },
-  achievement: { icon: 'star',            color: '#F59E0B' },
-  community:   { icon: 'users',           color: '#EC4899' },
-  coaching:    { icon: 'calendar',        color: '#10B981' },
-  support:     { icon: 'headphones',      color: '#6366F1' },
-  task:        { icon: 'check-circle',    color: '#EF4444' },
-  certificate: { icon: 'award',           color: '#8B5CF6' },
-  warning:     { icon: 'alert-triangle',  color: '#F97316' },
-  suspension:  { icon: 'shield-off',      color: '#DC2626' },
-  system:      { icon: 'bell',            color: '#64748B' }
+  badge: { icon: 'trophy', color: '#FFD700' },
+  assessment: { icon: 'clipboard-check', color: '#30919D' },
+  course: { icon: 'book-open', color: '#4F46E5' },
+  achievement: { icon: 'star', color: '#F59E0B' },
+  community: { icon: 'users', color: '#EC4899' },
+  coaching: { icon: 'calendar', color: '#10B981' },
+  support: { icon: 'headphones', color: '#6366F1' },
+  task: { icon: 'check-circle', color: '#EF4444' },
+  certificate: { icon: 'award', color: '#8B5CF6' },
+  warning: { icon: 'alert-triangle', color: '#F97316' },
+  suspension: { icon: 'shield-off', color: '#DC2626' },
+  system: { icon: 'bell', color: '#64748B' }
 };
 
 /**
@@ -77,8 +77,8 @@ const notifyBadgeEarned = async (userId, badge) => {
   // 📧 Email – fire-and-forget
   _sendEmail(userId, emailService.sendBadgeEarnedEmail, {
     badgeTitle: badge.title,
-    badgeTier:  badge.tier,
-    xpEarned:   badge.xp
+    badgeTier: badge.tier,
+    xpEarned: badge.xp
   });
 
   return createNotification({
@@ -90,52 +90,6 @@ const notifyBadgeEarned = async (userId, badge) => {
     metadata: {
       badgeId: badge.badgeId,
       xpEarned: badge.xp
-    }
-  });
-};
-
-/**
- * Notify user about assessment results
- */
-const notifyAssessmentComplete = async (userId, assessment, resultId) => {
-  // 📧 Email – fire-and-forget
-  _sendEmail(userId, emailService.sendAssessmentResultsEmail, {
-    assessmentName: assessment.name || 'Assessment',
-    score:          assessment.score,
-    maxScore:       assessment.maxScore,
-    resultId
-  });
-
-  return createNotification({
-    userId,
-    type: 'assessment',
-    title: '📊 Assessment Results Ready',
-    message: `Your ${assessment.name || 'assessment'} results are now available. View your score and insights!`,
-    link: `/assessments/results/${resultId}`,
-    metadata: {
-      assessmentId: assessment._id
-    }
-  });
-};
-
-/**
- * Notify user about course enrollment
- */
-const notifyCourseEnrollment = async (userId, course) => {
-  // 📧 Email – fire-and-forget
-  _sendEmail(userId, emailService.sendCourseEnrollmentEmail, {
-    courseTitle: course.title,
-    startDate:   course.startDate
-  });
-
-  return createNotification({
-    userId,
-    type: 'course',
-    title: '📚 Course Enrolled!',
-    message: `Welcome to "${course.title}"! Start your learning journey now.`,
-    link: `/courses/${course._id}`,
-    metadata: {
-      courseId: course._id
     }
   });
 };
@@ -159,8 +113,8 @@ const notifyCourseCompleted = async (userId, course) => {
 
   // 📧 Email – fire-and-forget
   _sendEmail(userId, emailService.sendCourseCompletedEmail, {
-    courseTitle:     course.title,
-    completionDate:  new Date()
+    courseTitle: course.title,
+    completionDate: new Date()
   });
 
   return createNotification({
@@ -173,55 +127,6 @@ const notifyCourseCompleted = async (userId, course) => {
     color: '#10B981',
     metadata: {
       courseId: course._id.toString()
-    }
-  });
-};
-
-/**
- * Notify user about session (day) completion - ONLY ONCE per session
- */
-const notifySessionCompleted = async (userId, course, dayId) => {
-  // Check if notification already exists for this course/day combo
-  const existingNotification = await Notification.findOne({
-    userId,
-    type: 'achievement',
-    'metadata.courseId': course._id.toString(),
-    'metadata.dayId': dayId
-  });
-
-  if (existingNotification) {
-    console.log(`ℹ️ Session notification for Day ${dayId} already exists, skipping...`);
-    return null; // Already notified, don't create duplicate
-  }
-
-  return createNotification({
-    userId,
-    type: 'achievement',
-    title: '💪 Session Completed!',
-    message: `Great job! You've finished all activities for Day ${dayId} in "${course.title}".`,
-    link: null, // No hyperlinks - display only
-    icon: 'check-circle',
-    color: '#10B981',
-    metadata: {
-      courseId: course._id.toString(),
-      dayId
-    }
-  });
-};
-
-/**
- * Notify user about module unlock
- */
-const notifyModuleUnlocked = async (userId, course, moduleName) => {
-  return createNotification({
-    userId,
-    type: 'course',
-    title: '🔓 New Module Unlocked!',
-    message: `"${moduleName}" is now available in "${course.title}".`,
-    link: `/courses/${course._id}`,
-    icon: 'unlock',
-    metadata: {
-      courseId: course._id
     }
   });
 };
@@ -273,72 +178,6 @@ const notifyStreakMilestone = async (userId, streakDays) => {
     color: '#EF4444',
     metadata: {
       streakDays
-    }
-  });
-};
-
-/**
- * Notify user about community reply
- */
-const notifyCommunityReply = async (userId, postTitle, senderName, postId) => {
-  return createNotification({
-    userId,
-    type: 'community',
-    title: '💬 New Reply',
-    message: `${senderName} replied to your post "${postTitle.substring(0, 50)}..."`,
-    link: `/community/post/${postId}`,
-    metadata: {
-      postId,
-      senderName
-    }
-  });
-};
-
-/**
- * Notify user about mention
- */
-const notifyMention = async (userId, senderName, postId, context) => {
-  return createNotification({
-    userId,
-    type: 'community',
-    title: '📢 You were mentioned',
-    message: `${senderName} mentioned you: "${context.substring(0, 80)}..."`,
-    link: `/community/post/${postId}`,
-    metadata: {
-      postId,
-      senderName
-    }
-  });
-};
-
-/**
- * Notify user about coaching session
- */
-const notifySessionScheduled = async (userId, session, coachName) => {
-  const sessionDate = new Date(session.scheduledAt).toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
-  // 📧 Email – fire-and-forget
-  _sendEmail(userId, emailService.sendCoachingSessionEmail, {
-    coachName,
-    sessionDate: session.scheduledAt,
-    sessionTime: new Date(session.scheduledAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    sessionType: session.type || session.sessionType
-  });
-
-  return createNotification({
-    userId,
-    type: 'coaching',
-    title: '📅 Session Scheduled',
-    message: `Your session with ${coachName} is confirmed for ${sessionDate}.`,
-    link: '/mind-care',
-    metadata: {
-      sessionId: session._id
     }
   });
 };
@@ -460,44 +299,24 @@ const notifyNewCourse = async (userIds, course) => {
 };
 
 /**
- * Notify user about a moderator warning
+ * Notify user about assessment completion/grading
  */
-const notifyModerationWarning = async (userId, reason, warningCount) => {
+const notifyAssessmentComplete = async (userId, assessmentName, score) => {
   // 📧 Email – fire-and-forget
-  _sendEmail(userId, emailService.sendModerationWarningEmail, { reason, warningCount });
-
-  return createNotification({
-    userId,
-    type: 'warning',
-    title: '⚠️ Community Warning',
-    message: `A moderator has issued a warning on your account. Reason: ${reason || 'Policy violation'}`,
-    link: '/community',
-    icon: 'alert-triangle',
-    color: '#F97316',
-    metadata: {
-      action: 'warn',
-      reason
-    }
+  _sendEmail(userId, emailService.sendAssessmentResultsEmail, {
+    assessmentName,
+    score,
+    maxScore: 100
   });
-};
 
-/**
- * Notify user about account suspension
- */
-const notifyModerationSuspension = async (userId, reason, durationDays) => {
   return createNotification({
     userId,
-    type: 'suspension',
-    title: '🚫 Account Posting Suspended',
-    message: `Your posting privileges have been suspended. Reason: ${reason || 'Policy violation'}. Duration: ${durationDays} days.`,
-    link: '/community',
-    icon: 'shield-off',
-    color: '#DC2626',
-    metadata: {
-      action: 'suspend',
-      reason,
-      durationDays
-    }
+    type: 'assessment',
+    title: '📊 Assessment Results Ready',
+    message: `Your "${assessmentName}" results are now available. Score: ${score}%`,
+    link: '/assessments',
+    icon: 'clipboard-check',
+    color: '#30919D'
   });
 };
 
@@ -505,21 +324,14 @@ module.exports = {
   createNotification,
   notifyBadgeEarned,
   notifyAssessmentComplete,
-  notifyCourseEnrollment,
+
   notifyCourseCompleted,
-  notifySessionCompleted,
-  notifyModuleUnlocked,
   notifyLevelUp,
   notifyStreakMilestone,
-  notifyCommunityReply,
-  notifyMention,
-  notifySessionScheduled,
   notifyTicketResponse,
   notifyCertificateIssued,
   notifyTaskDue,
   notifySystemAnnouncement,
   notifyWelcome,
-  notifyNewCourse,
-  notifyModerationWarning,
-  notifyModerationSuspension
+  notifyNewCourse
 };

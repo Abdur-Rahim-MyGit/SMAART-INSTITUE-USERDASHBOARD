@@ -51,6 +51,7 @@ const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
 const LockedOut = lazy(() => import('@/pages/LockedOut'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
+const GrievancesPage = lazy(() => import('@/pages/GrievancesPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyPassport = lazy(() => import('@/pages/VerifyPassport'));
@@ -184,6 +185,8 @@ const AnimatedRoutes = () => {
                         <Route path="/help" element={<Help />} />
                         <Route path="/tickets" element={<SupportTicketsPage />} />
                         <Route path="/dashboard/support" element={<SupportTicketsPage />} />
+                        <Route path="/grievances" element={<GrievancesPage />} />
+                        <Route path="/dashboard/grievances" element={<GrievancesPage />} />
 
                         {/* Admin — Course management */}
                         <Route path="/dashboard/admin/courses" element={<AdminCourses />} />

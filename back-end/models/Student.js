@@ -3,6 +3,45 @@ const bcrypt = require('bcryptjs');
 const Counter = require('./Counter');
 const { createDefaultUserSettings, userSettingsSchema } = require('./schemas/userSettings');
 
+const departmentSubSchema = new mongoose.Schema({
+  degreeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Degree',
+    required: [true, 'Degree reference is required']
+  },
+  uniqueId: { 
+    type: String, 
+    required: [true, 'Degree unique ID is required'] 
+  },
+  level: { 
+    type: String, 
+    required: [true, 'Degree level is required'] 
+  },
+  domain: { 
+    type: String, 
+    required: [true, 'Domain is required'] 
+  },
+  fullName: { 
+    type: String, 
+    required: [true, 'Degree full name is required'] 
+  },
+  abbreviation: { 
+    type: String, 
+    required: [true, 'Abbreviation is required'] 
+  },
+  specialization: { 
+    type: String, 
+    default: 'General' 
+  },
+  duration: { 
+    type: String, 
+    default: 'N/A' 
+  },
+  batch: { 
+    type: String
+  }
+}, { _id: false });
+
 const studentSchema = new mongoose.Schema({
   studentId: {
     type: String,
@@ -47,7 +86,10 @@ const studentSchema = new mongoose.Schema({
     required: [true, 'Please provide roll number']
   },
   section: String,
-  department: String,
+  department: {
+    type: departmentSubSchema,
+    default: undefined
+  },
   semester: Number,
   batch: String,
   dateOfBirth: Date,
@@ -64,10 +106,7 @@ const studentSchema = new mongoose.Schema({
     state: String,
     pincode: String
   },
-  assignedTeacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Teacher'
-  },
+
   enrolledCourses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
@@ -104,7 +143,35 @@ const studentSchema = new mongoose.Schema({
     specialisation: {
       type: String,
       default: ''
+    },
+    overallCgpa: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 10
+    },
+    semesterPerformances: [{
+      semesterNumber: { type: Number, required: true },
+      sgpa: { type: Number, min: 0, max: 10 },
+      cgpa: { type: Number, min: 0, max: 10 },
+      creditsEarned: { type: Number, default: 0 },
+      passingYear: { type: String, default: '' },
+      lastUpdated: { type: Date, default: Date.now }
+    }],
+    activeBacklogs: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    historyOfArrears: {
+      type: Number,
+      default: 0,
+      min: 0
     }
+  },
+  cgpa: {
+    type: String,
+    default: ''
   },
   status: {
     type: String,
@@ -160,6 +227,11 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  savedJobs: [{
+    jobId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    source: { type: String, required: true },
+    savedAt: { type: Date, default: Date.now }
+  }],
   settings: {
     type: userSettingsSchema,
     default: createDefaultUserSettings
@@ -183,6 +255,40 @@ const studentSchema = new mongoose.Schema({
   }]
 }, {
   timestamps: true
+});
+
+// Pre-init hook: runs before Mongoose hydrates a raw MongoDB document into a
+// Student instance. If `department` is stored as a plain string (corrupted data
+// from a previous bug), we strip it here so Mongoose never tries to cast a
+// primitive value into the departmentSubSchema — which would throw:
+//   "Tried to set nested object field `department` to primitive value …"
+studentSchema.pre('init', function (obj) {
+  if (obj && typeof obj.department === 'string') {
+    delete obj.department;
+  }
+});
+
+// Pre-validate hook to clean up empty strings for ObjectId fields and incomplete department objects
+studentSchema.pre('validate', function (next) {
+  if (this.college === '') this.college = undefined;
+  if (this.degree === '') this.degree = undefined;
+  
+  if (this.department === '') {
+    this.department = undefined;
+  } else if (this.department) {
+    const deptObj = this.department.toObject ? this.department.toObject() : this.department;
+    if (
+      Object.keys(deptObj).length === 0 ||
+      !deptObj.uniqueId ||
+      !deptObj.level ||
+      !deptObj.domain ||
+      !deptObj.fullName ||
+      !deptObj.abbreviation
+    ) {
+      this.department = undefined;
+    }
+  }
+  next();
 });
 
 studentSchema.pre('save', async function (next) {
@@ -225,7 +331,7 @@ studentSchema.index({ studentId: 1 }, { unique: true, sparse: true });
 studentSchema.index({ college: 1 });
 studentSchema.index({ rollNumber: 1, college: 1 });
 studentSchema.index({ status: 1 });
-studentSchema.index({ assignedTeacher: 1 });
+
 studentSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Student', studentSchema);

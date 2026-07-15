@@ -81,7 +81,7 @@ export const ProctoringOverlay = ({
         console.warn('[ProctoringOverlay] Error playing webcam stream:', err);
       });
     }
-  }, [stream, isCameraActive]);
+  }, [stream, isCameraActive, isMinimized]);
 
   const statusConfig = STATUS_CONFIG[verificationStatus] || STATUS_CONFIG.no_face;
 

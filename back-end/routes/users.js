@@ -241,11 +241,15 @@ router.post('/register-details', upload.fields([
       dob: parsedPersonalDetails?.dob || null,
       gender: parsedPersonalDetails?.gender || '',
       institution: parsedPersonalDetails?.institution || '',
-      department: parsedPersonalDetails?.department || '',
+      department: typeof parsedPersonalDetails?.department === 'object'
+        ? (parsedPersonalDetails.department.fullName || parsedPersonalDetails.department.name || '')
+        : (parsedPersonalDetails?.department || ''),
+      cgpa: parsedPersonalDetails?.cgpa || '',
       yearOfStudy: parsedPersonalDetails?.yearOfStudy || '',
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
       bio: parsedPersonalDetails?.bio || '',
+      batch: parsedPersonalDetails?.batch || '',
 
       // Address
       address: {
@@ -346,6 +350,10 @@ router.post('/register-details', upload.fields([
         if (resolvedPhoto) {
           student.profileImage = resolvedPhoto;
         }
+        if (parsedPersonalDetails?.batch) {
+          student.batch = parsedPersonalDetails.batch;
+        }
+        student.cgpa = parsedPersonalDetails?.cgpa || (mappedHigherEducation && mappedHigherEducation[0]?.cgpaPercentage) || student.cgpa || '';
         if (mappedHigherEducation && mappedHigherEducation.length > 0) {
           const he = mappedHigherEducation[0];
           student.academic = {
@@ -446,10 +454,14 @@ router.patch('/register-section', async (req, res) => {
         registration.gender = data.gender || registration.gender;
         registration.mobileNumber = data.mobileNumber || registration.mobileNumber;
         registration.institution = data.institution || registration.institution;
-        registration.department = data.department || registration.department;
+        registration.department = typeof data.department === 'object'
+          ? (data.department.fullName || data.department.name || '')
+          : (data.department || registration.department);
+        registration.cgpa = data.cgpa || registration.cgpa;
         registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
         registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
         registration.educationLevel = data.educationLevel || registration.educationLevel;
+        registration.batch = data.batch || registration.batch;
         registration.bio = data.bio || registration.bio;
         registration.timezone = data.timezone || registration.timezone;
         registration.dateFormat = data.dateFormat || registration.dateFormat;
@@ -493,6 +505,12 @@ router.patch('/register-section', async (req, res) => {
           if (data.dob) student.dateOfBirth = data.dob;
           if (data.gender) student.gender = data.gender.toLowerCase();
           if (data.profilePhoto) student.profileImage = data.profilePhoto;
+          if (data.cgpa !== undefined) {
+            student.cgpa = data.cgpa;
+          }
+          if (data.batch) {
+            student.batch = data.batch;
+          }
           if (data.institution) {
             const college = await College.findOne({
               collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
@@ -607,38 +625,11 @@ router.patch('/register-section', async (req, res) => {
   }
 });
 
-// Debug: inspect user login state by email (DEV ONLY)
-router.get('/_debug/state/:email', async (req, res) => {
-  try {
-    const normalizedEmail = (req.params.email || '').trim().toLowerCase();
-    if (!normalizedEmail) return res.status(400).json({ error: 'Email required' });
-
-    const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-    const user = await User.findOne(emailQuery);
-    const registration = user ? await Registration.findOne({ userId: user._id }) : null;
-
-    return res.json({
-      foundUser: !!user,
-      userEmail: user?.email || null,
-      hasPassword: !!user?.password,
-      passwordHashPreview: user?.password ? String(user.password).slice(0, 7) + '...' : null,
-      registrationCompleted: !!user?.registrationCompleted,
-      hasRegistration: !!registration,
-      registrationEmail: registration?.email || null,
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Temporary debug dump
-router.get('/_debug_dump/:email', async (req, res) => {
-  const email = req.params.email;
-  const user = await User.findOne({ email });
-  const student = await Student.findOne({ email });
-  const registration = await Registration.findOne({ email });
-  res.json({ user, student, registration });
-});
+// SECURITY (audit HIGH): removed unauthenticated debug endpoints
+// GET /_debug/state/:email and GET /_debug_dump/:email — they exposed any
+// user's record (password-hash preview, live currentSessionId, full docs) to
+// anonymous callers by email. Diagnostics must go through an authenticated,
+// admin-gated path instead.
 
 // Login endpoint
 router.post('/login', async (req, res) => {
@@ -826,17 +817,40 @@ router.get('/register-details/:email', async (req, res) => {
       studentForDetails = await Student.findOne({ email: normalizedEmail }).populate('degree');
     }
     const populatedDegree = studentForDetails?.degree || null;
-    const academic = studentForDetails?.academic || null;
+    let academic = studentForDetails?.academic || {};
+    if (studentForDetails && populatedDegree) {
+      const dept = populatedDegree;
+      academic = {
+        degreeLevel: academic?.degreeLevel || dept.level || '',
+        domain: academic?.domain || dept.domain || '',
+        degreeGroup: academic?.degreeGroup || dept.fullName || dept.abbreviation || '',
+        specialisation: academic?.specialisation || dept.specialization || '',
+        cgpa: academic?.cgpa || ''
+      };
+    } else {
+      academic = {
+        degreeLevel: academic?.degreeLevel || '',
+        domain: academic?.domain || '',
+        degreeGroup: academic?.degreeGroup || '',
+        specialisation: academic?.specialisation || '',
+        cgpa: academic?.cgpa || ''
+      };
+    }
+
+    const studentBatch = studentForDetails?.batch || '';
+    const studentDept = studentForDetails?.department || null;
 
     if (registration) {
       return res.json({
         ...registration.toObject(),
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
+        batch: registration.batch || studentBatch || '',
         badges: aggregatedBadges,
         college: user?.college || fallbackCollege || null,
         degree: populatedDegree,
         academic,
+        department: studentDept,
         lastLogin: user?.lastLogin || null,
         previousLogin: user?.previousLogin || null
       });
@@ -851,6 +865,8 @@ router.get('/register-details/:email', async (req, res) => {
       ...userObj,
       degree: populatedDegree,
       academic,
+      department: studentDept,
+      batch: userObj.batch || studentBatch || '',
       badges: aggregatedBadges,
       otherDetails: {}
     });

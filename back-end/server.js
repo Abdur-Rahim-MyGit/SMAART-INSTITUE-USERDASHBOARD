@@ -4,6 +4,7 @@ const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
@@ -46,6 +47,10 @@ app.use((req, res, next) => {
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resource loading (e.g., images) across origins if needed
 }));
+
+// PERF: gzip responses (shrinks large JSON payloads, e.g. course lists).
+// In production CloudFront/ALB also compress, but this helps direct hits too.
+app.use(compression());
 
 app.use(cookieParser()); // Parse cookies
 app.use(require('./middleware/deviceFingerprint')); // Capture device info
@@ -97,8 +102,12 @@ app.use(cors({
   credentials: true
 }));
 // Increase payload size limit for base64 images (50MB)
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// SECURITY (audit HIGH): lowered from 50mb. 50mb of JSON parsed concurrently on
+// a 1GB task is an easy memory-exhaustion DoS. 16mb still comfortably covers
+// base64 image payloads (vision board / OCR / avatars). Tighten further with
+// per-route limits if a route inventory confirms smaller is safe.
+app.use(express.json({ limit: '16mb' }));
+app.use(express.urlencoded({ limit: '16mb', extended: true }));
 // SECURITY: strip MongoDB operator-injection keys ($ne, $gt, $where, dotted
 // paths, ...) from all request input before it reaches any query. Must run
 // AFTER the body parsers so req.body is populated.
@@ -186,6 +195,7 @@ app.use('/api/coachSessions', require('./routes/coachSessions'));
 // Support Routes
 app.use('/api/escalations', require('./routes/escalations'));
 app.use('/api/tickets', require('./routes/tickets')); // Support Ticketing System
+app.use('/api/grievances', require('./routes/grievances')); // Grievance Redressal System
 app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 
 // Community Routes
@@ -217,6 +227,7 @@ app.get('/api/ai-career-coach/recommendations', authMiddleware, aiCareerCoachCon
 app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiLimiter, aiCareerCoachController.analyzeSkillGap);
 app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiLimiter, aiCareerCoachController.generateLearningPlan);
 app.post('/api/ai-career-coach/resume', authMiddleware, aiLimiter, aiCareerCoachController.generateResume);
+app.post('/api/ai-career-coach/generate-summary', authMiddleware, aiLimiter, aiCareerCoachController.generateProfessionalSummary);
 
 // Chat Features
 app.post('/api/ai-career-coach/chat', authMiddleware, aiLimiter, aiCareerCoachController.chat);
@@ -246,8 +257,15 @@ logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulati
 // Career Agent Routes (Integrated from Career-Agent standalone system)
 app.use('/api/career-agent', require('./routes/careerAgent'));
 logger.info('✅ Career Agent Routes Loaded (/api/career-agent)');
+// DEEP health check: report 503 if the DB is not connected, so the load
+// balancer pulls an unhealthy task out of rotation instead of sending it
+// traffic. mongoose.connection.readyState === 1 means "connected".
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+  const dbConnected = mongoose.connection.readyState === 1;
+  if (!dbConnected) {
+    return res.status(503).json({ status: 'degraded', db: 'disconnected' });
+  }
+  res.json({ status: 'Server is running', db: 'connected' });
 });
 
 // Vision Boards Routes
@@ -306,5 +324,38 @@ const startServer = (port) => {
 
 startServer(PORT);
 startCronJobs();
+
+// GRACEFUL SHUTDOWN: on deploy, ECS/Docker sends SIGTERM. Stop accepting new
+// connections, finish in-flight requests, close DB, then exit — so a rolling
+// deploy never drops a student mid-request.
+const shutdown = (signal) => {
+  logger.info(`\n${signal} received — shutting down gracefully...`);
+  httpServer.close(() => {
+    logger.info('HTTP server closed.');
+    mongoose.connection.close(false).then(() => {
+      logger.info('MongoDB connection closed. Bye.');
+      process.exit(0);
+    }).catch(() => process.exit(0));
+  });
+  // Safety net: force-exit if cleanup hangs beyond 30s.
+  setTimeout(() => {
+    logger.error('Forced shutdown after timeout.');
+    process.exit(1);
+  }, 30000).unref();
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+// RESILIENCE (audit): without these, an escaped promise rejection crashes the
+// whole process (Node default), and an uncaught exception leaves it dead with
+// no log. Log rejections (keep serving); on a truly uncaught exception the
+// state is unknown, so log and exit non-zero — ECS/Docker restarts a clean one.
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection: ' + (reason && reason.stack ? reason.stack : reason));
+});
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught exception: ' + (err && err.stack ? err.stack : err));
+  process.exit(1);
+});
 
 

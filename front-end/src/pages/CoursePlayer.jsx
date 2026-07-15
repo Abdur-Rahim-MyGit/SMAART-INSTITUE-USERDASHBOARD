@@ -129,7 +129,9 @@ const CoursePlayer = () => {
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loadingCourse, setLoadingCourse] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(true);
+  const loading = loadingCourse || loadingProgress;
   const [dynamicFlow, setDynamicFlow] = useState(null);
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
@@ -287,7 +289,7 @@ const CoursePlayer = () => {
     let cancelled = false;
 
     const loadCourseFromApi = async () => {
-      setLoading(true);
+      setLoadingCourse(true);
       setDynamicFlow(null);
       setTotalSteps(9);
 
@@ -374,7 +376,7 @@ const CoursePlayer = () => {
       } catch (err) {
         console.warn('Using static course flow:', err.message);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadingCourse(false);
       }
     };
 
@@ -453,10 +455,10 @@ const CoursePlayer = () => {
     // ── Fetch detailed user progress from backend ──
     const fetchProgress = async () => {
       if (!courseId) {
-        setLoading(false);
+        setLoadingProgress(false);
         return;
       }
-      setLoading(true);
+      setLoadingProgress(true);
       try {
         const response = await courseEnrollmentAPI.getUserProgress(courseId);
         if (response && response.success && response.data) {
@@ -489,7 +491,7 @@ const CoursePlayer = () => {
       } catch (err) {
         console.error("Failed to load user progress:", err);
       } finally {
-        setLoading(false);
+        setLoadingProgress(false);
       }
     };
     fetchProgress();
@@ -539,9 +541,10 @@ const CoursePlayer = () => {
 
   const handleStartCourse = () => {
     setShowIntro(false);
-    setActiveStep('1');
+    const resumeStep = stepNumbers.find(step => !completedSteps[step]) || '1';
+    setActiveStep(resumeStep);
     setVideoWatched(false);
-    handleStartStep('1');
+    handleStartStep(resumeStep);
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
   };
 
@@ -559,7 +562,7 @@ const CoursePlayer = () => {
     }
   };
 
-  const handleStepComplete = async (stepNumber, score = null, totalPoints = null) => {
+  const handleStepComplete = async (stepNumber, score = null, totalPoints = null, autoAdvance = true) => {
     const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     setCompletedSteps(newCompletedSteps);
 
@@ -629,7 +632,7 @@ const CoursePlayer = () => {
       const userId = currentUser?._id || currentUser?.id || 'anon';
       localStorage.setItem(`${userId}_smaart_course_progress`, '100');
       markCourseCompleted(courseId);
-    } else {
+    } else if (autoAdvance) {
       // Auto-advance to next step
       const nextStep = (parseInt(stepNumber) + 1).toString();
       setActiveStep(nextStep);
@@ -812,7 +815,7 @@ const CoursePlayer = () => {
               <div className="flex p-1.5 bg-slate-100/50 dark:bg-slate-800/50 m-2 sm:m-4 rounded-xl border border-slate-200/30 dark:border-white/5">
                 <button
                   onClick={() => setActiveTab('preview')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'preview'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-[11px] sm:text-xs md:text-sm relative ${activeTab === 'preview'
                     ? 'text-white'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
                     }`}
@@ -824,14 +827,14 @@ const CoursePlayer = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                    <BookOpen size={14} className={activeTab === 'preview' ? 'text-white' : 'text-slate-400'} />
-                    {t("course_player.preview")}
+                  <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                    <BookOpen size={14} className={`hidden sm:inline-block ${activeTab === 'preview' ? 'text-white' : 'text-slate-400'}`} />
+                    <span>{t("course_player.preview")}</span>
                   </span>
                 </button>
                 <button
                   onClick={() => setActiveTab('transcription')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'transcription'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-[11px] sm:text-xs md:text-sm relative ${activeTab === 'transcription'
                     ? 'text-white'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
                     }`}
@@ -843,15 +846,15 @@ const CoursePlayer = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                    <FileText size={14} className={activeTab === 'transcription' ? 'text-white' : 'text-slate-400'} />
-                    {t("course_player.transcription")}
+                  <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                    <FileText size={14} className={`hidden sm:inline-block ${activeTab === 'transcription' ? 'text-white' : 'text-slate-400'}`} />
+                    <span>{t("course_player.transcription")}</span>
                   </span>
                 </button>
                 {/* Notes tab — replaces the floating Quick Notes button */}
                 <button
                   onClick={() => setActiveTab('notes')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'notes'
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-[11px] sm:text-xs md:text-sm relative ${activeTab === 'notes'
                     ? 'text-white'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
                     }`}
@@ -863,9 +866,9 @@ const CoursePlayer = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                    <StickyNote size={14} className={activeTab === 'notes' ? 'text-white' : 'text-slate-400'} />
-                    Notes
+                  <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                    <StickyNote size={14} className={`hidden sm:inline-block ${activeTab === 'notes' ? 'text-white' : 'text-slate-400'}`} />
+                    <span>Notes</span>
                   </span>
                 </button>
               </div>
@@ -965,6 +968,9 @@ const CoursePlayer = () => {
             questions={stepData.questions}
             onComplete={(score, totalPoints) => handleStepComplete(stepLetter, score, totalPoints)}
             isCompleted={isStepCompleted}
+            storageKey={`practice_${courseId}_${stepLetter}`}
+            savedScore={userProgressData[stepLetter]?.testScore}
+            savedTotalPoints={userProgressData[stepLetter]?.testTotalPoints}
           />
         );
       case 'flashcard':
@@ -983,6 +989,9 @@ const CoursePlayer = () => {
             questions={stepData.questions}
             onComplete={(score, totalPoints) => handleStepComplete(stepLetter, score, totalPoints)}
             isCompleted={isStepCompleted}
+            storageKey={`adv_practice_${courseId}_${stepLetter}`}
+            savedScore={userProgressData[stepLetter]?.testScore}
+            savedTotalPoints={userProgressData[stepLetter]?.testTotalPoints}
           />
         );
       case 'case-study':
@@ -992,8 +1001,11 @@ const CoursePlayer = () => {
             content={stepData.content}
             mcq={stepData.mcq}
             questions={stepData.questions}
-            onComplete={() => handleStepComplete(stepLetter)}
+            onComplete={(score, totalPoints, autoAdvance) => handleStepComplete(stepLetter, score, totalPoints, autoAdvance)}
             isCompleted={isStepCompleted}
+            savedScore={userProgressData[stepLetter]?.testScore}
+            savedTotalPoints={userProgressData[stepLetter]?.testTotalPoints}
+            storageKey={`case_study_${courseId}_${stepLetter}`}
           />
         );
       case 'notes': {
@@ -1022,6 +1034,7 @@ const CoursePlayer = () => {
               onNextLesson={handleNextLesson}
               showNextLesson={congratulationAcknowledged && stepLetter === lastStepKey}
               courseId={courseId}
+              isVideoCompleted={!playbackUrl || userProgressData[stepLetter]?.videoCompleted || videoWatched}
             />
           </div>
         );
@@ -1105,7 +1118,7 @@ const CoursePlayer = () => {
                   </div>
                   <span>{t("course_player.back_to_overview")}</span>
                 </button>
-                <div className="h-5 w-px bg-slate-200 dark:bg-[#003170]" />
+                <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-[#003170]" />
                 <div className="flex items-center gap-3">
                   <Badge variant="secondary" className="bg-[#1a3884]/10 dark:bg-blue-900/30 text-[#1a3884] dark:text-blue-300 border-transparent font-black px-3.5 py-1 text-xs uppercase tracking-wider">
                     {t(stageKey)}
@@ -1159,7 +1172,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.97 }}
-                      className="p-8 sm:p-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl border border-slate-200/50 dark:border-white/10 shadow-[0_20px_50px_rgba(13,31,78,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative transition-all duration-500"
+                      className="p-4 sm:p-8 md:p-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-3xl border border-slate-200/50 dark:border-white/10 shadow-[0_20px_50px_rgba(13,31,78,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden relative transition-all duration-500"
                     >
                       {/* Decorative Background Elements */}
                       <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-br from-[#1a3884]/10 to-[#4c6ef5]/10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
@@ -1246,7 +1259,7 @@ const CoursePlayer = () => {
                                 <Target className="w-4.5 h-4.5" />
                               </div>
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Step-by-step progress</p>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t("course_player.step_by_step_progress", "Step-by-step progress")}</p>
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
                                   {t("course_player.guideline_step", "Complete each step sequentially to validate your progress and unlock the next lesson.")}
                                 </p>
@@ -1257,7 +1270,7 @@ const CoursePlayer = () => {
                                 <Activity className="w-4.5 h-4.5" />
                               </div>
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Engagement monitor</p>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t("course_player.engagement_monitor", "Engagement monitor")}</p>
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
                                   {t("course_player.guideline_active", "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.")}
                                 </p>
@@ -1267,17 +1280,17 @@ const CoursePlayer = () => {
                         </div>
 
                         {/* Warning Alert Panel */}
-                        <div className="rounded-2xl border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/[0.02] dark:bg-amber-950/10 p-5 relative overflow-hidden text-left">
-                          <div className="flex items-center justify-between mb-4 border-b border-amber-500/10 pb-3">
+                        <div className="rounded-2xl border border-amber-500/20 dark:border-amber-500/30 bg-amber-500/[0.02] dark:bg-amber-950/10 p-4 sm:p-5 relative overflow-hidden text-left">
+                          <div className="flex flex-wrap items-center justify-between gap-2.5 mb-4 border-b border-amber-500/10 pb-3">
                             <div className="flex items-center gap-2">
                               <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                               <span className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300">
                                 {t("course_player.integrity_warning_title", "Integrity & Security Warning")}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
-                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                              <span className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Live Monitor</span>
+                            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 shrink-0">
+                              <span className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-red-500 animate-pulse" />
+                              <span className="text-[8px] sm:text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">{t("course_player.live_monitor", "Live Monitor")}</span>
                             </div>
                           </div>
                           
@@ -1289,7 +1302,7 @@ const CoursePlayer = () => {
                               </p>
                             </div>
                             <div className="flex gap-3">
-                              <AlertTriangle className="w-4 h-4 text-amber-650 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                               <p className="text-xs font-semibold text-amber-800/95 dark:text-amber-300/90 leading-relaxed">
                                 {t("course_player.warning_limit", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}
                               </p>
@@ -1306,13 +1319,17 @@ const CoursePlayer = () => {
                           onClick={handleStartCourse}
                           className="group relative flex items-center justify-center gap-3 px-12 py-4 bg-gradient-to-r from-[#1a3884] via-[#2a50b3] to-[#4c6ef5] hover:from-[#112b6b] hover:via-[#1a3884] hover:to-[#2b5a9e] text-white rounded-2xl font-black text-sm transition-all duration-300 shadow-[0_10px_30px_rgba(26,56,132,0.25)] hover:shadow-[0_15px_35px_rgba(26,56,132,0.35)] overflow-hidden"
                         >
-                          <span>{t("course_player.start_learning_journey")}</span>
+                          <span>
+                            {Object.keys(completedSteps).length > 0
+                              ? t("course_player.resume_learning_journey", "Resume Learning Journey")
+                              : t("course_player.start_learning_journey", "Start Learning Journey")}
+                          </span>
                           <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
                         </motion.button>
                         
                         <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mt-1">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                          Secure session protocol initialized.
+                          {t("course_player.secure_session_protocol", "Secure session protocol initialized.")}
                         </p>
                       </div>
                     </motion.div>
@@ -1335,7 +1352,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="p-6 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/8 mb-6 shadow-sm relative overflow-hidden"
+                      className="p-4 sm:p-6 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/8 mb-6 shadow-sm relative overflow-hidden"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                         <div className="flex items-center gap-3 sm:gap-4">
@@ -1398,7 +1415,7 @@ const CoursePlayer = () => {
                   className="space-y-6"
                 >
                   {/* Progress Card */}
-                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 border border-slate-200 dark:border-white/8 shadow-sm"
+                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-white/8 shadow-sm"
                   >
                     <h3 className="text-base font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center border border-slate-200 dark:border-white/10">
@@ -1460,7 +1477,7 @@ const CoursePlayer = () => {
                     </div>
                   </div>
                   {/* Curriculum Flow Card */}
-                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 border border-slate-200 dark:border-white/8 shadow-sm"
+                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-white/8 shadow-sm"
                   >
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-3">

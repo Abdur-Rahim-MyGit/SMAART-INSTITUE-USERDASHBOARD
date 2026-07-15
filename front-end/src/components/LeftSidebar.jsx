@@ -30,6 +30,7 @@ import {
   IconBrain as Brain,
   IconSun as Sun,
   IconMoon as Moon,
+  IconAlertTriangle as ShieldAlert,
 } from "@tabler/icons-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -98,6 +99,7 @@ const menuGroups = [
       { icon: Bell, label: "sidebar.notifications", path: "/dashboard/notifications", onlyMobile: true },
       { icon: Languages, label: "sidebar.language", isLanguageToggle: true, onlyMobile: true },
       { icon: Settings, label: "sidebar.settings", path: "/dashboard/settings" },
+      { icon: ShieldAlert, label: "sidebar.grievances", path: "/dashboard/grievances" },
       { icon: HelpCircle, label: "sidebar.help", path: "/dashboard/support" },
     ]
   }

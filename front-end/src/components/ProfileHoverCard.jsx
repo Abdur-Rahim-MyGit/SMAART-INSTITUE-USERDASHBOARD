@@ -145,7 +145,7 @@ const ProfileHoverCard = ({ user, avatarData, onLogout, onClose }) => {
                 <Star className="w-3 h-3 text-white fill-white" />
               </div>
               <span className="text-slate-800 dark:text-white font-bold text-xs tracking-wide">
-                Lvl {avatarData?.level || 1}
+                {t('common.level_short', 'Lvl')} {avatarData?.level || 1}
               </span>
             </div>
             <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
@@ -180,7 +180,7 @@ const ProfileHoverCard = ({ user, avatarData, onLogout, onClose }) => {
           >
             <Trophy className="w-4.5 h-4.5" />
             <span className="text-xs font-bold uppercase tracking-wide">
-              Skills Passport
+              {t('sidebar.skills_passport', 'Skills Passport')}
             </span>
             <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
           </button>

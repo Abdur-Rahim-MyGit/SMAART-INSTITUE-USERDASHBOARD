@@ -26,8 +26,8 @@ const Performance = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E] p-6 text-center">
         <div className="bg-white dark:bg-[#002A5C] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 max-w-md">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Please log in to view the Progression Analytics dashboard.</p>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("performance.access_denied", "Access Denied")}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t("performance.access_denied_desc", "Please log in to view the Progression Analytics dashboard.")}</p>
         </div>
       </div>
     );
@@ -48,7 +48,7 @@ const Performance = () => {
   };
 
   return (
-    <div className="p-8 bg-transparent font-sans transition-colors duration-300">
+    <div className="p-4 sm:p-6 lg:p-8 bg-transparent font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Back Button - Mobile Only */}
         <div className="mb-4 md:hidden">
@@ -67,10 +67,10 @@ const Performance = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-              Progression <span className="text-[#1a3884] dark:text-blue-300">Analytics</span>
+              {t("performance.title_1", "Progression")} <span className="text-[#1a3884] dark:text-blue-300">{t("performance.title_2", "Analytics")}</span>
             </h1>
             <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-              Visualizing course progression, student participation, and institutional performance insights.
+              {t("performance.subtitle", "Visualizing course progression, student participation, and institutional performance insights.")}
             </p>
           </div>
         </div>

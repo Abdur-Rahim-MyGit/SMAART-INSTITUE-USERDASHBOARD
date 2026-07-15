@@ -60,9 +60,9 @@ const MyNotes = () => {
                 dbNotes = response.data.map(n => {
                     let displayTitle = n.title;
                     if (!displayTitle) {
-                        if (n.courseId.startsWith("personal-")) displayTitle = "Untitled Note";
-                        else if (n.courseId === "general") displayTitle = "General Course Notes";
-                        else displayTitle = `Course: ${n.courseId}`;
+                        if (n.courseId.startsWith("personal-")) displayTitle = t("my_notes.note_types.untitled", "Untitled Note");
+                        else if (n.courseId === "general") displayTitle = t("my_notes.note_types.general_course", "General Course Notes");
+                        else displayTitle = t("my_notes.note_types.course_prefix", "Course: {{courseId}}", { courseId: n.courseId });
                     }
 
                     let colorId = localStorage.getItem(`note_color_${n._id}`) || DEFAULT_COLOR.id;
@@ -91,26 +91,26 @@ const MyNotes = () => {
 
     const handleSaveNote = async () => {
         if (!currentNote.title.trim() && !currentNote.content.trim()) {
-            toast({ title: "Empty Note", description: "Please add a title or content.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.empty_title", "Empty Note"), description: t("my_notes.toast.empty_desc", "Please add a title or content."), variant: "destructive" });
             return;
         }
         const isNew = !currentNote.id;
         const noteCourseId = currentNote.courseId || `personal-${Date.now()}`;
-        const noteTitle = currentNote.title || "Untitled Note";
+        const noteTitle = currentNote.title || t("my_notes.note_types.untitled", "Untitled Note");
 
         try {
             const response = await notesAPI.upsert(noteCourseId, currentNote.content, noteTitle);
             if (response.success && response.data) {
                 const savedId = response.data._id;
                 localStorage.setItem(`note_color_${savedId}`, currentNote.colorId);
-                toast({ title: isNew ? "Note Created" : "Note Updated", description: "Saved to the cloud." });
+                toast({ title: isNew ? t("my_notes.toast.created_title", "Note Created") : t("my_notes.toast.updated_title", "Note Updated"), description: t("my_notes.toast.saved_cloud", "Your note has been saved to the cloud.") });
                 loadNotes(user.id || user._id);
                 setShowModal(false);
                 setCurrentNote({ id: null, title: "", content: "", colorId: DEFAULT_COLOR.id });
             }
         } catch (err) {
             console.error("Failed to save note:", err);
-            toast({ title: "Error", description: "Failed to save note.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.error_title", "Error"), description: t("my_notes.toast.failed_save", "Failed to save note to database."), variant: "destructive" });
         }
     };
 
@@ -120,10 +120,10 @@ const MyNotes = () => {
             if (response.success) {
                 setNotes(notes.filter(n => n.id !== id));
                 localStorage.removeItem(`note_color_${id}`);
-                toast({ title: "Note Deleted" });
+                toast({ title: t("my_notes.toast.deleted_title", "Note Deleted"), description: t("my_notes.toast.deleted_desc", "The note has been removed from your account.") });
             }
         } catch {
-            toast({ title: "Error", description: "Could not delete the note.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.error_title", "Error"), description: t("my_notes.toast.failed_delete", "Could not delete the note."), variant: "destructive" });
         }
     };
 
@@ -156,12 +156,12 @@ const MyNotes = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     onClick={() => navigate("/dashboard/smaart-toolkit")}
-                    className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
+                    className="group mt-4 mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
                 >
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
                         <ArrowLeft stroke={1.5} className="h-4 w-4" />
                     </div>
-                    Back to Toolkit
+                    {t("my_notes.back_to_toolkit", "Back to Toolkit")}
                 </motion.button>
 
                 {/* Header Card */}
@@ -174,10 +174,10 @@ const MyNotes = () => {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                My <span className="text-[#1a3884] dark:text-blue-300">Notes</span>
+                                {t("my_notes.header.title_my", "My")} <span className="text-[#1a3884] dark:text-blue-300">{t("my_notes.header.title_notes", "Notes")}</span>
                             </h1>
                             <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-                                Organize your thoughts and course insights in one cloud-synced workspace.
+                                {t("my_notes.header.description", "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.")}
                             </p>
                         </div>
 
@@ -188,7 +188,7 @@ const MyNotes = () => {
                                 <input
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search notes…"
+                                    placeholder={t("my_notes.header.search_placeholder", "Search your library...")}
                                     className="w-44 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] py-2 pl-9 pr-3 text-[12.5px] font-medium text-[#0d1f4e] outline-none transition-all focus:border-[#1a3884] focus:w-56 focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500"
                                 />
                             </div>
@@ -196,7 +196,7 @@ const MyNotes = () => {
                                 onClick={openNewNote}
                                 className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
                             >
-                                <Plus className="h-4 w-4" /> New Note
+                                <Plus className="h-4 w-4" /> {t("my_notes.header.new_note", "New Note")}
                             </button>
                         </div>
                     </div>
@@ -217,7 +217,7 @@ const MyNotes = () => {
                                 <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef4ff] transition-transform group-hover:scale-110 dark:bg-[#1a3884]/15">
                                     <Plus className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
                                 </div>
-                                <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#1a3884] dark:text-slate-600 dark:group-hover:text-blue-400">New Note</p>
+                                <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#1a3884] dark:text-slate-600 dark:group-hover:text-blue-400">{t("my_notes.grid.create_new", "Create New Note")}</p>
                             </motion.div>
 
                             {filteredNotes.map((note) => {
@@ -235,7 +235,7 @@ const MyNotes = () => {
                                         <div className="mb-1.5 flex items-center gap-2">
                                             {note.isCourseNote && (
                                                 <span className="inline-flex rounded-full bg-white/60 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-indigo-700 shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300">
-                                                    Course Note
+                                                    {t("my_notes.grid.course_note", "Course Note")}
                                                 </span>
                                             )}
                                         </div>
@@ -252,7 +252,7 @@ const MyNotes = () => {
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id, note.courseId); }}
                                                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-100 hover:text-red-500"
-                                                title="Delete note"
+                                                title={t("my_notes.grid.delete_tooltip", "Delete note")}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </button>
@@ -270,7 +270,7 @@ const MyNotes = () => {
                             <StickyNote className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
                         </div>
                         <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
-                            No notes found for &ldquo;{searchQuery}&rdquo;
+                            {t("my_notes.grid.no_notes_matching", "No notes found matching \"{{query}}\"", { query: searchQuery })}
                         </p>
                     </div>
                 )}
@@ -298,7 +298,7 @@ const MyNotes = () => {
                             <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 px-5 py-3.5">
                                 <div className="flex items-center gap-3">
                                     <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">
-                                        {currentNote.id ? "Edit Note" : "New Note"}
+                                        {currentNote.id ? t("my_notes.editor.edit_title", "Edit Note") : t("my_notes.editor.new_title", "New Note")}
                                     </span>
                                     {/* Color picker swatches */}
                                     <div className="flex items-center gap-1.5">
@@ -306,7 +306,7 @@ const MyNotes = () => {
                                             <button
                                                 key={c.id}
                                                 onClick={() => setCurrentNote(prev => ({ ...prev, colorId: c.id }))}
-                                                title={c.label}
+                                                title={t(`my_notes.colors.${c.id}`, c.label)}
                                                 className="relative h-5 w-5 rounded-full border-2 transition-transform hover:scale-110"
                                                 style={{
                                                     backgroundColor: c.hex,
@@ -329,13 +329,13 @@ const MyNotes = () => {
                             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3" style={{ maxHeight: "60vh" }}>
                                 <input
                                     className="w-full bg-transparent text-[18px] font-bold text-[#0d1f4e] placeholder:text-slate-300 outline-none"
-                                    placeholder="Note title…"
+                                    placeholder={t("my_notes.editor.placeholder_title", "Title")}
                                     value={currentNote.title}
                                     onChange={(e) => setCurrentNote(prev => ({ ...prev, title: e.target.value }))}
                                 />
                                 <textarea
                                     className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-300 outline-none"
-                                    placeholder="Start writing…"
+                                    placeholder={t("my_notes.editor.placeholder_content", "Start typing...")}
                                     rows={10}
                                     value={currentNote.content}
                                     onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
@@ -345,13 +345,13 @@ const MyNotes = () => {
                             {/* Modal footer */}
                             <div className="flex items-center justify-between border-t border-black/10 dark:border-white/10 px-5 py-3">
                                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                                    {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
+                                    {currentNote.updatedAt && t("my_notes.editor.last_edited", "Last edited: {{date}}", { date: formatDate(currentNote.updatedAt) })}
                                 </span>
                                 <button
                                     onClick={handleSaveNote}
                                     className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
                                 >
-                                    <Save className="h-3.5 w-3.5" /> Save Note
+                                    <Save className="h-3.5 w-3.5" /> {t("my_notes.editor.save_note", "Save Note")}
                                 </button>
                             </div>
                         </motion.div>

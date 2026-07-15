@@ -7,27 +7,70 @@ import {
   X,
   AlertCircle,
   Loader2,
-  CheckCircle
+  CheckCircle,
+  Plus
 } from "lucide-react";
 import { createTicket } from "@/services/ticketApi";
 
-const TicketForm = ({ onSuccess, onCancel, initialData }) => {
+const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
   const { t } = useTranslation();
 
   const CATEGORIES = [
-    { value: 'technical', label: t("support_tickets_page.cat_technical"), description: t("support_tickets_page.cat_technical_desc") },
-    { value: 'account', label: t("support_tickets_page.cat_account"), description: t("support_tickets_page.cat_account_desc") },
-    { value: 'content', label: t("support_tickets_page.cat_content"), description: t("support_tickets_page.cat_content_desc") },
-    { value: 'billing', label: t("support_tickets_page.cat_billing"), description: t("support_tickets_page.cat_billing_desc") },
-    { value: 'feedback', label: t("support_tickets_page.cat_feedback"), description: t("support_tickets_page.cat_feedback_desc") },
-    { value: 'other', label: t("support_tickets_page.cat_other"), description: t("support_tickets_page.cat_other_desc") }
+    {
+      value: 'technical',
+      label: t("support_tickets_page.cat_technical", "Technical Issue"),
+      description: t("support_tickets_page.cat_technical_desc", "Hardware, software, device connection, system bugs")
+    },
+    {
+      value: 'account',
+      label: t("support_tickets_page.cat_account", "Account Issue"),
+      description: t("support_tickets_page.cat_account_desc", "Login, access, permissions")
+    },
+    {
+      value: 'course',
+      label: t("support_tickets_page.cat_course", "Course Issue"),
+      description: t("support_tickets_page.cat_course_desc", "Course content, videos, modules access")
+    },
+    {
+      value: 'assessment',
+      label: t("support_tickets_page.cat_assessment", "Assessment Issue"),
+      description: t("support_tickets_page.cat_assessment_desc", "Test access, submission errors, grading")
+    },
+    {
+      value: 'career Direction',
+      label: t("support_tickets_page.cat_career_direction", "Career Direction Issue"),
+      description: t("support_tickets_page.cat_career_direction_desc", "Career Direction guidance and support")
+    },
+    {
+      value: 'placement issue',
+      label: t("support_tickets_page.cat_placement", "Placement Issue"),
+      description: t("support_tickets_page.cat_placement_desc", "Job application, placement drive, resume upload")
+    },
+    {
+      value: 'certificates & badges issue',
+      label: t("support_tickets_page.cat_certificates_badges", "Certificates & Badges Issue"),
+      description: t("support_tickets_page.cat_certificates_badges_desc", "Certificate generation, badge unlock, sharing")
+    },
+    {
+      value: 'other',
+      label: t("support_tickets_page.cat_other", "Others Issue"),
+      description: t("support_tickets_page.cat_other_desc", "General IT inquiries")
+    }
+  ];
+
+  const PRIORITIES = [
+    { value: 'low', label: t("support_tickets_page.priority_low", "Low"), selectedClass: 'bg-emerald-50 text-emerald-600 border-emerald-300 ring-2 ring-emerald-500/10' },
+    { value: 'medium', label: t("support_tickets_page.priority_medium", "Medium"), selectedClass: 'bg-amber-50 text-amber-500 border-amber-300 ring-2 ring-amber-500/10' },
+    { value: 'high', label: t("support_tickets_page.priority_high", "High"), selectedClass: 'bg-rose-50 text-rose-600 border-rose-300 ring-2 ring-rose-500/10' }
   ];
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
     category: initialData?.category || '',
-    priority: initialData?.priority || 'medium'
+    priority: initialData?.priority || 'medium',
+    contactName: '',
+    contactEmail: ''
   });
   const [attachments, setAttachments] = useState([]);
   const [errors, setErrors] = useState({});
@@ -37,24 +80,35 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
   const validateForm = () => {
     const newErrors = {};
 
+    if (isGuest) {
+      if (!formData.contactName.trim()) {
+        newErrors.contactName = t("support_tickets_page.validation_name_required", "Name is required");
+      }
+      if (!formData.contactEmail.trim()) {
+        newErrors.contactEmail = t("support_tickets_page.validation_email_required", "Email is required");
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) {
+        newErrors.contactEmail = t("support_tickets_page.validation_email_invalid", "Invalid email format");
+      }
+    }
+
     if (!formData.title.trim()) {
-      newErrors.title = t("support_tickets_page.validation_title_required");
+      newErrors.title = t("support_tickets_page.validation_title_required", "Title is required");
     } else if (formData.title.length < 5) {
-      newErrors.title = t("support_tickets_page.validation_title_min");
+      newErrors.title = t("support_tickets_page.validation_title_min", "Title must be at least 5 characters");
     } else if (formData.title.length > 100) {
-      newErrors.title = t("support_tickets_page.validation_title_max");
+      newErrors.title = t("support_tickets_page.validation_title_max", "Title cannot exceed 100 characters");
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = t("support_tickets_page.validation_desc_required");
+      newErrors.description = t("support_tickets_page.validation_desc_required", "Description is required");
     } else if (formData.description.length < 10) {
-      newErrors.description = t("support_tickets_page.validation_desc_min");
+      newErrors.description = t("support_tickets_page.validation_desc_min", "Description must be at least 10 characters");
     } else if (formData.description.length > 2000) {
-      newErrors.description = t("support_tickets_page.validation_desc_max");
+      newErrors.description = t("support_tickets_page.validation_desc_max", "Description cannot exceed 2000 characters");
     }
 
     if (!formData.category) {
-      newErrors.category = t("support_tickets_page.validation_category_required");
+      newErrors.category = t("support_tickets_page.validation_category_required", "Category is required");
     }
 
     setErrors(newErrors);
@@ -75,15 +129,15 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
     const validFiles = files.filter(file => {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_size") }));
+        setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_size", "File size must be less than 5MB") }));
         return false;
       }
       return true;
     });
 
-    // Max 3 files
-    if (attachments.length + validFiles.length > 3) {
-      setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_count") }));
+    // Max 20 files
+    if (attachments.length + validFiles.length > 20) {
+      setErrors(prev => ({ ...prev, attachments: t("support_tickets_page.validation_file_count", "Maximum 20 attachments allowed") }));
       return;
     }
 
@@ -109,7 +163,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
       // Reset form after short delay
       setTimeout(() => {
-        setFormData({ title: '', description: '', category: '', priority: 'medium' });
+        setFormData({ title: '', description: '', category: '', priority: 'medium', contactName: '', contactEmail: '' });
         setAttachments([]);
         if (onSuccess) onSuccess(result.data);
       }, 1500);
@@ -126,7 +180,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="space-y-6"
+      className="space-y-6 text-slate-800 dark:text-slate-100"
     >
       {/* Success Message */}
       {submitStatus === 'success' && (
@@ -136,7 +190,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           className="p-4 rounded-xl bg-green-500/20 border border-green-500/30 flex items-center gap-3"
         >
           <CheckCircle className="w-5 h-5 text-green-400" />
-          <span className="text-green-400 font-medium">{t("support_tickets_page.ticket_submitted_successfully")}</span>
+          <span className="text-green-400 font-medium">{t("support_tickets_page.ticket_submitted_successfully", "Ticket submitted successfully")}</span>
         </motion.div>
       )}
 
@@ -152,162 +206,217 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
         </motion.div>
       )}
 
+      {/* Guest Fields (Name & Email) */}
+      {isGuest && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+              {t("support_tickets_page.name", "Name")} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="contactName"
+              value={formData.contactName}
+              onChange={handleChange}
+              placeholder={t("support_tickets_page.name_placeholder", "Your Full Name")}
+              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactName ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+            />
+            {errors.contactName && (
+              <p className="mt-1 text-sm text-red-500">{errors.contactName}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+              {t("support_tickets_page.email", "Email")} <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="contactEmail"
+              value={formData.contactEmail}
+              onChange={handleChange}
+              placeholder={t("support_tickets_page.email_placeholder", "Your Email Address")}
+              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactEmail ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+            />
+            {errors.contactEmail && (
+              <p className="mt-1 text-sm text-red-500">{errors.contactEmail}</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Title */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
-          {t("support_tickets_page.title")} <span className="text-red-400">*</span>
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+          {t("support_tickets_page.title", "Title")} <span className="text-rose-500">*</span>
         </label>
         <input
           type="text"
           name="title"
           value={formData.title}
           onChange={handleChange}
-          placeholder={t("support_tickets_page.title_placeholder")}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.title ? 'border-red-500' : 'border-slate-200 dark:border-white/10'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors`}
+          placeholder={t("support_tickets_page.title_placeholder", "Brief summary of your issue")}
+          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.title ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-500">{errors.title}</p>
         )}
-        <p className="mt-1 text-xs text-slate-400 dark:text-slate-400">{formData.title.length}/100 {t("support_tickets_page.characters")}</p>
       </div>
 
       {/* Category */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
-          {t("support_tickets_page.category")} <span className="text-red-400">*</span>
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+          {t("support_tickets_page.category", "Category")} <span className="text-rose-500">*</span>
         </label>
-        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 gap-3">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              type="button"
-              onClick={() => {
-                setFormData(prev => ({ ...prev, category: cat.value }));
-                if (errors.category) setErrors(prev => ({ ...prev, category: null }));
-              }}
-              className={`p-3 rounded-xl border text-left transition-all ${formData.category === cat.value
-                ? 'border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20'
-                : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50'
-                }`}
-            >
-              <span className={`font-medium text-sm ${formData.category === cat.value ? 'text-[#1a3884]' : 'text-slate-900 dark:text-white'}`}>{cat.label}</span>
-              <p className="text-slate-500 dark:text-slate-300 text-xs mt-0.5">{cat.description}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {CATEGORIES.map((cat) => {
+            const isSelected = formData.category === cat.value;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, category: cat.value }));
+                  if (errors.category) setErrors(prev => ({ ...prev, category: null }));
+                }}
+                className={`p-4 rounded-xl border text-left transition-all ${isSelected
+                  ? 'border-[#1a3884] bg-[#1a3884]/5 dark:bg-[#1a3884]/20 ring-2 ring-[#1a3884]/20 shadow-sm'
+                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-[#1a3884]/30'
+                  }`}
+              >
+                <span className={`font-bold text-[13.5px] block ${isSelected ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-950 dark:text-white'}`}>{cat.label}</span>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mt-1 leading-normal">{cat.description}</p>
+              </button>
+            );
+          })}
         </div>
         {errors.category && (
           <p className="mt-2 text-sm text-red-400">{errors.category}</p>
         )}
       </div>
 
-      {/* Priority */}
-      {/* <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
-          Priority
+      {/* Attachments */}
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+          {t("support_tickets_page.attachments", "Attachments")}
         </label>
-        <div className="flex gap-3">
-          {PRIORITIES.map((pri) => (
-            <button
-              key={pri.value}
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, priority: pri.value }))}
-              className={`px-4 py-2 rounded-xl border transition-all ${formData.priority === pri.value
-                  ? pri.color
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 hover:border-[#1a3884]/50'
-                }`}
-            >
-              {pri.label}
-            </button>
-          ))}
-        </div>
-      </div> */}
+
+        <input
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          className="hidden"
+          id="attachments-upload"
+          accept="image/png, image/jpeg, image/webp"
+        />
+
+        {attachments.length === 0 ? (
+          <label
+            htmlFor="attachments-upload"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl cursor-pointer hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all bg-[#fafbfc] dark:bg-transparent"
+          >
+            <div className="flex flex-col items-center justify-center p-6 text-center">
+              <Paperclip className="w-8 h-8 text-slate-400 mb-2 rotate-45" />
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-250">
+                {t("support_tickets_page.upload_screenshot", "Upload Screenshot")}
+              </span>
+              <span className="text-xs text-slate-400 mt-1">
+                {t("support_tickets_page.upload_hint", "PNG, JPG, WEBP (Max 5MB)")}
+              </span>
+            </div>
+          </label>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {attachments.map((file, index) => {
+              const isImage = file.type.startsWith('image/');
+              return (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl font-medium"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {isImage ? (
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        className="w-10 h-10 object-cover rounded-lg border border-slate-200 flex-shrink-0"
+                      />
+                    ) : (
+                      <Paperclip className="w-6 h-6 text-[#1a3884] flex-shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-750 dark:text-white truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-[10px] text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(index)}
+                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors"
+                    title={t("support_tickets_page.remove_file", "Remove file")}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
+
+            {attachments.length < 20 && (
+              <label
+                htmlFor="attachments-upload"
+                className="flex items-center justify-center p-3 border border-dashed border-slate-250 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="text-xs font-semibold">{t("support_tickets_page.add_more", "Add More")}</span>
+              </label>
+            )}
+          </div>
+        )}
+
+        {errors.attachments && (
+          <p className="mt-1 text-sm text-red-500">{errors.attachments}</p>
+        )}
+      </div>
 
       {/* Description */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
-          {t("support_tickets_page.description")} <span className="text-red-400">*</span>
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+          {t("support_tickets_page.description", "Description")} <span className="text-rose-500">*</span>
         </label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder={t("support_tickets_page.description_placeholder")}
+          placeholder={t("support_tickets_page.description_placeholder", "Describe your issue in detail...")}
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.description ? 'border-red-500' : 'border-slate-200 dark:border-white/10'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none`}
+          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.description ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all resize-none`}
         />
         {errors.description && (
           <p className="mt-1 text-sm text-red-500">{errors.description}</p>
         )}
-        <p className="mt-1 text-xs text-slate-400 dark:text-slate-400">{formData.description.length}/2000 {t("support_tickets_page.characters")}</p>
       </div>
 
-      {/* Attachments */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
-          {t("support_tickets_page.attachments")}
-        </label>
-        <div className="flex flex-wrap gap-3">
-          {attachments.map((file, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-[#002147] border border-slate-200 dark:border-white/10"
-            >
-              <Paperclip className="w-4 h-4 text-[#1a3884]" />
-              <span className="text-sm text-slate-700 dark:text-slate-200 max-w-[150px] truncate">{file.name}</span>
-              <button
-                type="button"
-                onClick={() => removeAttachment(index)}
-                className="text-slate-400 dark:text-slate-300 hover:text-red-500 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-          {attachments.length < 3 && (
-            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-slate-300 dark:border-white/10 cursor-pointer hover:border-[#1a3884]/50 transition-colors bg-white dark:bg-transparent">
-              <Paperclip className="w-4 h-4 text-slate-400 dark:text-slate-300" />
-              <span className="text-sm text-slate-500 dark:text-slate-300">{t("support_tickets_page.add_file")}</span>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/*,.pdf,.doc,.docx,.txt"
-              />
-            </label>
-          )}
-        </div>
-        {errors.attachments && (
-          <p className="mt-2 text-sm text-red-500">{errors.attachments}</p>
-        )}
-        <p className="mt-2 text-xs text-slate-400 dark:text-slate-400">{t("support_tickets_page.attachments_hint")}</p>
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4">
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-bold rounded-lg border border-slate-200 dark:border-[#1a3884]/50 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#1a3884] transition-colors"
-          >
-            {t("support_tickets_page.cancel")}
-          </button>
-        )}
+      {/* Footer / Submit */}
+      <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-white/5">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg bg-[#1a3884] text-white hover:bg-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-xl bg-[#0f2c59] hover:bg-[#153c7a] dark:bg-[#1a3884] dark:hover:bg-[#254ea8] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              {t("support_tickets_page.submitting")}
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t("support_tickets_page.submitting", "Submitting")}
             </>
           ) : (
             <>
-              <Send className="w-3.5 h-3.5" />
-              {t("support_tickets_page.submit_ticket")}
+              <Send className="w-4 h-4" />
+              {t("support_tickets_page.submit_ticket", "Submit Ticket")}
             </>
           )}
         </button>
@@ -317,4 +426,3 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 };
 
 export default TicketForm;
-

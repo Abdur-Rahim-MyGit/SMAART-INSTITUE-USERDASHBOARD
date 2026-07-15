@@ -19,8 +19,6 @@
  *   sendCertificateEmail        – certificate issued / ready to download
  *   sendAssessmentResultsEmail  – assessment score available
  *   sendTicketUpdateEmail       – support ticket reply received
- *   sendCoachingSessionEmail    – coaching session confirmed
- *   sendModerationWarningEmail  – moderator warning issued
  *   sendPasswordChangedEmail    – password was changed (security alert)
  *   sendSystemAnnouncementEmail – admin broadcast to one user
  */
@@ -292,33 +290,6 @@ async function sendBadgeEarnedEmail({ to, fullName, badgeTitle, badgeTier, xpEar
 }
 
 /**
- * Course enrollment confirmation.
- */
-async function sendCourseEnrollmentEmail({ to, fullName, courseTitle, startDate }) {
-  const firstName = (fullName || 'Student').split(' ')[0];
-  const html = wrapTemplate({
-    preheader: `You're enrolled in "${courseTitle}". Your learning journey begins!`,
-    headerTitle: '📚 Course Enrollment Confirmed',
-    accentColor: '#4F46E5',
-    body: `
-      ${p(`Hi <strong>${firstName}</strong>,`)}
-      ${p('You have successfully enrolled in a new course. Here are your details:')}
-      <table width="100%" cellpadding="0" cellspacing="0"
-             style="border:1px solid ${BRAND.border};border-radius:8px;overflow:hidden;margin:20px 0;">
-        ${stat('Course', courseTitle, '#4F46E5')}
-        ${stat('Enrolled on', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), BRAND.textMid)}
-        ${startDate ? stat('Start date', new Date(startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })) : ''}
-      </table>
-      ${infoBox('💡 <strong>Pro tip:</strong> Complete at least one session per day to stay on track and unlock your streak bonuses!', '#4F46E5')}
-    `,
-    ctaUrl:   `${FRONTEND_URL}/dashboard/courses`,
-    ctaLabel: 'Start Learning Now →',
-  });
-
-  return _send({ to, subject: `Enrolled: "${courseTitle}" – ${BRAND.name}`, html });
-}
-
-/**
  * Course completion celebration.
  */
 async function sendCourseCompletedEmail({ to, fullName, courseTitle, completionDate }) {
@@ -441,63 +412,6 @@ async function sendTicketUpdateEmail({ to, fullName, ticketSubject, ticketId, ag
 }
 
 /**
- * Coaching session scheduled / confirmed.
- */
-async function sendCoachingSessionEmail({ to, fullName, coachName, sessionDate, sessionTime, sessionType }) {
-  const firstName = (fullName || 'Student').split(' ')[0];
-  const formattedDate = sessionDate
-    ? new Date(sessionDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-    : 'TBC';
-
-  const html = wrapTemplate({
-    preheader: `Your session with ${coachName} is confirmed for ${formattedDate}.`,
-    headerTitle: '📅 Coaching Session Confirmed',
-    accentColor: '#10B981',
-    body: `
-      ${p(`Hi <strong>${firstName}</strong>,`)}
-      ${p('Your upcoming coaching session has been confirmed. Here are the details:')}
-      <table width="100%" cellpadding="0" cellspacing="0"
-             style="border:1px solid ${BRAND.border};border-radius:8px;overflow:hidden;margin:20px 0;">
-        ${stat('Coach',        coachName || 'TBC',   '#10B981')}
-        ${stat('Date',         formattedDate,         BRAND.textDark)}
-        ${sessionTime ? stat('Time', sessionTime, BRAND.textDark) : ''}
-        ${sessionType ? stat('Type', sessionType, BRAND.textMid) : ''}
-      </table>
-      ${infoBox('📝 <strong>Tip:</strong> Prepare any questions or topics you\'d like to discuss beforehand to make the most of your session.', '#10B981')}
-    `,
-    ctaUrl:   `${FRONTEND_URL}/dashboard`,
-    ctaLabel: 'View My Sessions →',
-  });
-
-  return _send({ to, subject: `📅 Session Confirmed with ${coachName} – ${BRAND.name}`, html });
-}
-
-/**
- * Moderation warning.
- */
-async function sendModerationWarningEmail({ to, fullName, reason, warningCount }) {
-  const firstName = (fullName || 'Student').split(' ')[0];
-  const html = wrapTemplate({
-    preheader: `Important: A community warning has been issued on your ${BRAND.name} account.`,
-    headerTitle: '⚠️ Community Warning Issued',
-    accentColor: '#F97316',
-    body: `
-      ${p(`Dear <strong>${firstName}</strong>,`)}
-      ${p(`A moderator has issued a <strong>Community Warning</strong> on your account. Please review the reason below:`)}
-      ${infoBox(`<strong>Reason:</strong> ${reason || 'Violation of community guidelines'}`, '#F97316')}
-      ${warningCount ? p(`This is warning <strong>${warningCount}</strong> on your account.`) : ''}
-      ${p('Please review our <strong>Community Guidelines</strong> to ensure future interactions remain positive and respectful for all members.')}
-      ${divider()}
-      ${p('Continued violations may result in posting restrictions or account suspension. If you believe this warning was issued in error, please contact our support team.', `font-size:14px;color:${BRAND.textLight};`)}
-    `,
-    ctaUrl:   `${FRONTEND_URL}/dashboard/support`,
-    ctaLabel: 'Contact Support →',
-  });
-
-  return _send({ to, subject: `⚠️ Community Warning – ${BRAND.name}`, html });
-}
-
-/**
  * Password changed security notification.
  */
 async function sendPasswordChangedEmail({ to, fullName, ipAddress, userAgent }) {
@@ -577,13 +491,11 @@ module.exports = {
   // Templates
   sendWelcomeEmail,
   sendBadgeEarnedEmail,
-  sendCourseEnrollmentEmail,
+
   sendCourseCompletedEmail,
   sendCertificateEmail,
   sendAssessmentResultsEmail,
   sendTicketUpdateEmail,
-  sendCoachingSessionEmail,
-  sendModerationWarningEmail,
   sendPasswordChangedEmail,
   sendSystemAnnouncementEmail,
 };

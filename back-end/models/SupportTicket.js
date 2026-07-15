@@ -31,8 +31,23 @@ const supportTicketSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'User ID is required']
+    refPath: 'userModel',
+    required: false
+  },
+  contactName: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  contactEmail: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  userModel: {
+    type: String,
+    enum: ['User', 'Student', 'Teacher'],
+    default: 'Student'
   },
   title: {
     type: String,
@@ -40,6 +55,11 @@ const supportTicketSchema = new mongoose.Schema({
     trim: true,
     minlength: [5, 'Title must be at least 5 characters'],
     maxlength: [100, 'Title cannot exceed 100 characters']
+  },
+  subject: {
+    type: String,
+    required: false,
+    trim: true
   },
   description: {
     type: String,
@@ -52,8 +72,8 @@ const supportTicketSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Category is required'],
     enum: {
-      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other'],
-      message: 'Invalid category. Must be one of: technical, billing, account, content, feedback, other'
+      values: ['technical', 'billing', 'account', 'content', 'feedback', 'other', 'course & assessment', 'career Direction', 'course', 'assessment', 'placement issue', 'certificates & badges issue'],
+      message: 'Invalid category. Must be one of: technical, billing, account, content, feedback, other, course & assessment, career Direction, course, assessment, placement issue, certificates & badges issue'
     }
   },
   priority: {
@@ -84,6 +104,8 @@ const supportTicketSchema = new mongoose.Schema({
     filename: String,
     originalName: String,
     path: String,
+    publicUrl: String,
+    url: String,
     mimetype: String,
     size: Number,
     uploadedAt: {
@@ -92,6 +114,18 @@ const supportTicketSchema = new mongoose.Schema({
     }
   }],
   responses: [responseSchema],
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    // Dynamic ref: an assignee can live in the User collection (admin/consultant)
+    // or in the ITSupport collection (auto round-robin IT support assignment).
+    refPath: 'assignedToModel',
+    default: null
+  },
+  assignedToModel: {
+    type: String,
+    enum: ['User', 'ITSupport'],
+    default: 'User'
+  },
   resolvedAt: {
     type: Date,
     default: null
@@ -106,7 +140,7 @@ const supportTicketSchema = new mongoose.Schema({
 });
 
 // Generate ticket ID before saving (atomic counter to prevent race conditions)
-supportTicketSchema.pre('save', async function(next) {
+supportTicketSchema.pre('save', async function (next) {
   if (!this.ticketId) {
     try {
       const counter = await Counter.findByIdAndUpdate(
@@ -119,7 +153,7 @@ supportTicketSchema.pre('save', async function(next) {
       return next(error);
     }
   }
-  
+
   // Set resolvedAt timestamp when status changes to resolved
   if (this.isModified('status')) {
     if (this.status === 'resolved' && !this.resolvedAt) {
@@ -129,7 +163,7 @@ supportTicketSchema.pre('save', async function(next) {
       this.closedAt = new Date();
     }
   }
-  
+
   next();
 });
 
@@ -143,12 +177,39 @@ supportTicketSchema.index({ createdAt: -1 });
 supportTicketSchema.index({ userId: 1, status: 1 }); // Compound index for user queries
 
 // Virtual for response count
-supportTicketSchema.virtual('responseCount').get(function() {
+supportTicketSchema.virtual('responseCount').get(function () {
   return this.responses ? this.responses.length : 0;
 });
 
 // Ensure virtuals are included in JSON output
 supportTicketSchema.set('toJSON', { virtuals: true });
 supportTicketSchema.set('toObject', { virtuals: true });
+
+// Virtual populate for 'user' field using 'userId'
+supportTicketSchema.virtual('user', {
+  refPath: 'userModel',
+  localField: 'userId',
+  foreignField: '_id',
+  justOne: true
+});
+
+// Sync hooks for title & subject compatibility
+supportTicketSchema.post('init', function (doc) {
+  if (doc.title && !doc.subject) {
+    doc.subject = doc.title;
+  } else if (doc.subject && !doc.title) {
+    doc.title = doc.subject;
+  }
+});
+
+// Pre-validate hook to sync before saving
+supportTicketSchema.pre('validate', function (next) {
+  if (this.title && !this.subject) {
+    this.subject = this.title;
+  } else if (this.subject && !this.title) {
+    this.title = this.subject;
+  }
+  next();
+});
 
 module.exports = mongoose.model('SupportTicket', supportTicketSchema);

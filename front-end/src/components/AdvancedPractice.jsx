@@ -1,19 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, Lightbulb, Target } from 'lucide-react';
+import { CheckCircle2, XCircle, Lightbulb, Target, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
-const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
+const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storageKey, savedScore, savedTotalPoints }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [selectedAnswers, setSelectedAnswers] = useState(() => {
+    if (storageKey) {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    return {};
+  });
   const [showExplanation, setShowExplanation] = useState({});
   const [allAnswered, setAllAnswered] = useState(false);
+  const [showResults, setShowResults] = useState(isCompleted || false);
+
+  useEffect(() => {
+    if (isCompleted) {
+      setShowResults(true);
+    }
+  }, [isCompleted]);
 
   const currentQuestion = questions?.[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === (questions?.length - 1);
 
   const handleAnswerSelect = (questionIndex, answerIndex) => {
-    setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
+    const updated = { ...selectedAnswers, [questionIndex]: answerIndex };
+    setSelectedAnswers(updated);
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    }
     setShowExplanation(prev => ({ ...prev, [questionIndex]: true }));
   };
 
@@ -38,6 +61,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
           return acc + 1;
         }, 0);
         if (onComplete) onComplete(score, questions.length);
+        setShowResults(true);
         toast.success('Advanced practice completed!');
       } else {
         toast.error('Please answer all questions before completing.');
@@ -55,27 +79,124 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
   const progress = (getAnsweredCount() / questions?.length) * 100;
 
 
-  if (isCompleted) {
+  if (showResults) {
+    const totalQuestions = questions.length;
+    let score = 0;
+    if (typeof savedScore === 'number' && typeof savedTotalPoints === 'number' && Object.keys(selectedAnswers).length === 0) {
+      if (savedTotalPoints === totalQuestions) {
+        score = savedScore;
+      } else {
+        score = savedTotalPoints > 0 ? Math.min(totalQuestions, Math.round((savedScore / savedTotalPoints) * totalQuestions)) : 0;
+        if (savedScore > 0 && score === 0 && totalQuestions > 0) {
+          score = 1;
+        }
+      }
+    } else {
+      score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
+        const q = questions[qIndex];
+        if (q && q.correctAnswer !== undefined) {
+          const selIdx = selectedAnswers[qIndex];
+          const selOptionText = q.options?.[selIdx];
+          const isCorrect = 
+            selIdx === q.correctAnswer || 
+            String(selIdx) === String(q.correctAnswer) ||
+            (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer));
+          return acc + (isCorrect ? 1 : 0);
+        }
+        return acc + 1;
+      }, 0);
+    }
+
     return (
-      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 flex items-center justify-center min-h-[350px]">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-[#f8fafc] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-3xl p-8 text-center shadow-xl"
-        >
-          <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-green-500/20 animate-pulse">
-            <CheckCircle2 className="w-8 h-8" />
+      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-6 text-center py-8">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-6 animate-bounce">
+            <Trophy size={40} />
           </div>
-          <h3 className="text-2xl font-black text-[#1a3884] dark:text-white mb-2">
-            Advanced Practice Completed
-          </h3>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-            You have already successfully finished this advanced practice exercise. Your results have been submitted and validated.
-          </p>
-          <div className="text-xs font-black uppercase tracking-wider text-green-600 dark:text-green-455 bg-green-500/10 py-3 px-5 rounded-2xl inline-block">
-            Status: Validated & Locked
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Advanced Practice Complete!</h3>
+          <p className="text-slate-500 dark:text-slate-400">Here is your performance summary</p>
+          
+          <div className="flex justify-center items-center gap-4 py-4 text-2xl font-bold">
+            <span className="text-slate-900 dark:text-white">{score}</span>
+            <span className="text-gray-400">/</span>
+            <span className="text-slate-600 dark:text-slate-400">{totalQuestions}</span>
           </div>
-        </motion.div>
+
+          <div className="text-left space-y-6 pt-6 border-t border-slate-200 dark:border-white/10">
+            <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200">Review Responses</h4>
+            {questions.map((q, qIndex) => {
+              const selectedIdx = selectedAnswers[qIndex];
+              
+              if (q.type === 'reflection') {
+                return (
+                  <div key={qIndex} className="p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-white/5 space-y-3">
+                    <p className="font-semibold text-slate-900 dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
+                    <div className="p-3 bg-white dark:bg-[#002A5C] rounded-lg border border-slate-100 dark:border-white/5">
+                      <p className="text-xs text-slate-450 uppercase font-bold mb-1">Your Reflection</p>
+                      <p className="text-sm text-slate-850 dark:text-slate-200 italic">
+                        {selectedIdx || "No response provided"}
+                      </p>
+                    </div>
+                    {q.explanation && (
+                      <div className="text-xs text-blue-700 dark:text-blue-200 bg-blue-55/50 dark:bg-blue-900/15 p-3 rounded-lg">
+                        <strong>Explanation/Ideal Response:</strong> {q.explanation}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // scenario-mcq
+              const correctIdx = q.correctAnswer;
+              return (
+                <div key={qIndex} className="p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-white/5 space-y-3">
+                  <p className="font-semibold text-slate-900 dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
+                  <div className="space-y-2">
+                    {q.options && q.options.map((option, idx) => {
+                      const isUserChoice = selectedIdx === idx;
+                      const isCorrect = idx === correctIdx || String(idx) === String(correctIdx) || String(option) === String(correctIdx);
+                      
+                      let optionClass = "p-3 rounded-lg border text-sm flex items-center justify-between ";
+                      if (isCorrect) {
+                        optionClass += "border-green-500 bg-green-50/50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
+                      } else if (isUserChoice) {
+                        optionClass += "border-red-500 bg-red-55/50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
+                      } else {
+                        optionClass += "border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-400";
+                      }
+
+                      return (
+                        <div key={idx} className={optionClass}>
+                          <span>{String.fromCharCode(65 + idx)}. {option}</span>
+                          <div className="flex items-center gap-2 text-xs">
+                            {isUserChoice && <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">Your answer</span>}
+                            {isCorrect && <CheckCircle2 size={16} className="text-green-500" />}
+                            {isUserChoice && !isCorrect && <XCircle size={16} className="text-red-500" />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {q.explanation && (
+                    <div className="text-xs text-blue-700 dark:text-blue-205 bg-blue-55/50 dark:bg-blue-900/15 p-3 rounded-lg">
+                      <strong>Explanation:</strong> {q.explanation}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => {
+              if (onComplete) onComplete(score, totalQuestions);
+              toast.success('Advanced Practice completed!');
+            }}
+            className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all mt-6"
+          >
+            Continue to Next Step
+          </button>
+        </div>
       </div>
     );
   }

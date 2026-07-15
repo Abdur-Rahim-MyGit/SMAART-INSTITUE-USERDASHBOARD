@@ -1,0 +1,74 @@
+# ============================================================================
+# back-end/.dockerignore
+# ----------------------------------------------------------------------------
+# Docker builds the backend image from THIS folder. The Dockerfile runs
+# `COPY . .`, which would otherwise copy EVERYTHING here into the image —
+# including secrets and junk. This file is the allow/deny list that keeps
+# those out. It works exactly like .gitignore, but for `docker build`.
+#
+# Rule of thumb: if it is a secret, a local-only file, or not needed to RUN
+# the server, it does not belong in the image.
+# ============================================================================
+
+# --- SECRETS: never bake credentials into a shippable image -----------------
+.env
+.env.*
+*.env
+.env.backup
+*.pem
+*.key
+credentials.json
+
+# --- Dependencies: reinstalled cleanly inside the image via `npm ci` --------
+node_modules/
+
+# --- Python OCR virtualenvs / model caches (huge, machine-specific) ---------
+.venv/
+.venv-ocr/
+venv/
+.paddlex-cache/
+.paddleocr/
+__pycache__/
+*.pyc
+
+# --- Logs & runtime scratch (regenerated at runtime) ------------------------
+logs/
+tmp/
+*.log
+
+# --- User uploads: served from Cloudinary in production, not the image ------
+uploads/
+
+# --- Local debug dumps & one-off scripts (not used to run the server) -------
+debug_*.json
+db_debug_output.json
+debug_db*.json
+debug_profile.json
+check_*.js
+find_user*.js
+find_users*.js
+inspect_*.js
+dump_user.js
+fetch_dump.js
+queryCourses.js
+normalize_all_courses.js
+scratch_test.js
+scratch/
+test_*.js
+test-*.js
+
+# --- Test suites (not run inside the production container) -------------------
+tests/
+testsprite_tests/
+
+# --- Data dumps & notes that aren't needed at runtime -----------------------
+collections_list.txt
+*.md
+
+# --- Dev tooling / VCS metadata ---------------------------------------------
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+nodemon.json

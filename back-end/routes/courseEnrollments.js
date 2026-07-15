@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const CourseEnrollment = require('../models/CourseEnrollment');
 const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
-const { notifyCourseEnrollment, notifyCourseCompleted, notifySessionCompleted } = require('../services/notificationService');
+const { notifyCourseCompleted } = require('../services/notificationService');
 const { isSessionCompleted, isModuleCompleted } = require('../utils/progressUtils');
 const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils');
 
@@ -89,16 +89,6 @@ router.post('/', async (req, res) => {
         const enrollment = new CourseEnrollment(req.body);
         await enrollment.save();
 
-        // Send notification for course enrollment
-        try {
-            // Try to get course title for better notification
-            const course = await Course.findById(enrollment.course);
-            const courseName = course?.title || 'a new course';
-            await notifyCourseEnrollment(enrollment.student, courseName);
-            console.log(`🔔 Notification sent for course enrollment: ${courseName}`);
-        } catch (notifyError) {
-            console.error("⚠️ Error sending enrollment notification:", notifyError);
-        }
 
         res.status(201).json({
             success: true,
@@ -297,14 +287,7 @@ router.post('/task-progress', async (req, res) => {
 
         const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
 
-        if (!wasDoneBefore && isDoneNow) {
-            try {
-                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
-                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
-            } catch (notifyError) {
-                console.error("⚠️ Error sending session notification:", notifyError);
-            }
-        }
+
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -430,14 +413,7 @@ router.post('/video-progress', async (req, res) => {
 
         const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
 
-        if (!wasDoneBefore && isDoneNow) {
-            try {
-                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
-                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
-            } catch (notifyError) {
-                console.error("⚠️ Error sending session notification:", notifyError);
-            }
-        }
+
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -551,14 +527,7 @@ router.post('/quiz-progress', async (req, res) => {
 
         const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
 
-        if (!wasDoneBefore && isDoneNow) {
-            try {
-                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
-                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
-            } catch (notifyError) {
-                console.error("⚠️ Error sending session notification:", notifyError);
-            }
-        }
+
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -682,13 +651,7 @@ router.post('/task-result', async (req, res) => {
 
         const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
 
-        if (!wasDoneBefore && isDoneNow) {
-            try {
-                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
-            } catch (notifyError) {
-                console.error("⚠️ Error sending session notification:", notifyError);
-            }
-        }
+
 
         // Check for badge eligibility
         const badgesEarned = [];

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Mail, ArrowRight, RefreshCw, AlertTriangle, Monitor, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { apiCall } from "@/services/api";
 import blueLogo from "@/assets/blue.png";
 
 const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
+  const { t } = useTranslation();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -22,6 +24,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   const inputRefs = useRef([]);
   // Bug #4 Fix: Track auto-submit to prevent double-fire from React re-renders
   const hasAutoSubmittedRef = useRef(false);
+
+  const isVerifyingRef = useRef(false);
 
   useEffect(() => {
     setCurrentTempToken(tempToken);
@@ -110,6 +114,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   };
 
   const verifyOtp = async (forceRetry = false) => {
+    if (isVerifyingRef.current) return;
+    isVerifyingRef.current = true;
     setIsLoading(true);
     const otpString = otp.join("");
 
@@ -126,9 +132,9 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
       });
 
       if (data.requirePasswordChange) {
-        toast.success("OTP verified! Please change your password.");
+        toast.success(t("login_otp.toast.verified_change_password", "OTP verified! Please change your password."));
       } else {
-        toast.success(forceRetry ? "Session reclaimed successfully!" : "Login successful!");
+        toast.success(forceRetry ? t("login_otp.toast.session_reclaimed", "Session reclaimed successfully!") : t("login.toast.login_success", "Login successful!"));
       }
       onSuccess(data);
     } catch (error) {
@@ -137,7 +143,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
       // Handle Force Logout Requirement
       if (error.status === 409 || error.data?.requiresForceLogout) {
         console.log("Detecting 409/Force Logout requirement:", error.data);
-        setForceLogoutMessage(error.message || error.data?.message || "You are already logged in on another device.");
+        setForceLogoutMessage(error.message || error.data?.message || t("login_otp.already_logged_in", "You are already logged in on another device."));
         setShowForceLogout(true);
         setIsLoading(false);
         return;
@@ -145,21 +151,23 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
       // Handle account lock or rate limit
       if (error.message.includes('locked') || error.message.includes('Too many')) {
-        const msg = error.message.includes('Too many')
-          ? "Too many attempts. Please wait 5 minutes or restart the server."
+        const isTooMany = error.message.includes('Too many');
+        const msg = isTooMany
+          ? t("login_otp.toast.too_many", "Too many attempts. Please wait 5 minutes or restart the server.")
           : error.message;
         toast.error(msg, { duration: 5000 });
-        if (msg.includes('Too many')) onClose(); // Close on rate limit to prevent spam
+        if (isTooMany) onClose(); // Close on rate limit to prevent spam
         return;
       }
 
-      toast.error(error.message || "Invalid OTP");
+      toast.error(error.message || t("login_otp.toast.invalid_otp", "Invalid OTP"));
       if (!showForceLogout) {
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }
     } finally {
       setIsLoading(false);
+      isVerifyingRef.current = false;
     }
   };
 
@@ -168,7 +176,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
     const otpString = otp.join("");
 
     if (otpString.length !== 6) {
-      toast.error("Please enter the complete 6-digit OTP");
+      toast.error(t("login_otp.toast.enter_complete", "Please enter the complete 6-digit OTP"));
       return;
     }
 
@@ -199,7 +207,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
         body: JSON.stringify({ tempToken: currentTempToken }),
       });
 
-      toast.success("New OTP sent to your email");
+      toast.success(t("login_otp.toast.new_otp_sent", "New OTP sent to your email"));
       setCurrentTempToken(data.tempToken);
       setResendCooldown(20);
       setOtp(["", "", "", "", "", ""]);
@@ -207,7 +215,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
       inputRefs.current[0]?.focus();
     } catch (error) {
       console.error("Resend OTP error detail:", error);
-      toast.error(error.message || "Failed to resend OTP");
+      toast.error(error.message || t("login_otp.toast.resend_failed", "Failed to resend OTP"));
       if (error.message.includes("expired")) {
         onClose();
       }
@@ -254,10 +262,10 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     <Mail className="w-6 h-6 text-[#1a3884] dark:text-[#00a3e0]" />
                   </div>
                   <h2 className="text-gray-900 dark:text-white text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
-                    Verify Your Email
+                    {t("login_otp.verify_email", "Verify Your Email")}
                   </h2>
                   <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center px-8">
-                    We've sent a security code to <br />
+                    {t("login_otp.sent_to", "We've sent a security code to")} <br />
                     <span className="text-[#112b6b] dark:text-white font-bold">{email}</span>
                   </p>
                 </div>
@@ -276,7 +284,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div
                       role="group"
-                      aria-label="One-time password input"
+                      aria-label={t("login_otp.otp_group_label", "One-time password input")}
                       className="flex justify-center gap-1.5 sm:gap-3"
                       onPaste={handlePaste}
                     >
@@ -288,7 +296,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           inputMode="numeric"
                           maxLength={1}
                           value={digit}
-                          aria-label={`OTP digit ${index + 1} of 6`}
+                          aria-label={t("login_otp.otp_digit", "OTP digit {{n}} of 6", { n: index + 1 })}
                           autoComplete={index === 0 ? "one-time-code" : "off"}
                           onChange={(e) => handleChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
@@ -299,7 +307,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                     <div className="text-center">
                       <p className={`text-[12px] font-bold uppercase tracking-wider ${expirationTime < 60 ? 'text-red-500' : 'text-slate-400'}`}>
-                        Expires in: <span className="font-mono">{formatTime(expirationTime)}</span>
+                        {t("login_otp.expires_in", "Expires in:")} <span className="font-mono">{formatTime(expirationTime)}</span>
                       </p>
                     </div>
 
@@ -313,7 +321,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
                         <span className="flex items-center gap-2">
-                          Access Portal
+                          {t("login.access_portal", "Access Portal")}
                           <motion.div
                             animate={{ x: [0, 4, 0] }}
                             transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
@@ -327,7 +335,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                   <div className="mt-8 text-center pt-6 border-t border-gray-50 dark:border-white/5">
                     <p className="text-gray-400 dark:text-slate-400 text-[12px] font-medium mb-3">
-                      Didn't receive the code?
+                      {t("login_otp.didnt_receive", "Didn't receive the code?")}
                     </p>
                     <button
                       onClick={handleResend}
@@ -340,8 +348,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                         <RefreshCw className="w-4 h-4" />
                       )}
                       {resendCooldown > 0
-                        ? `Resend in ${resendCooldown}s`
-                        : "Resend Code"}
+                        ? t("login_otp.resend_in", "Resend in {{seconds}}s", { seconds: resendCooldown })
+                        : t("login_otp.resend_code", "Resend Code")}
                     </button>
                   </div>
                 </div>
@@ -397,7 +405,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">This Device</span>
+                      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">{t("login_otp.this_device", "This Device")}</span>
                     </motion.div>
 
                     {/* Center: Clash / Conflict Wave */}
@@ -442,14 +450,14 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-red-500/80 dark:text-red-400 uppercase tracking-widest">Other Device</span>
+                      <span className="text-[10px] font-bold text-red-500/80 dark:text-red-400 uppercase tracking-widest">{t("login_otp.other_device", "Other Device")}</span>
                     </motion.div>
                   </div>
                 </div>
 
                 {/* Typography and Descriptions */}
                 <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent mb-2.5">
-                  Active Session
+                  {t("login_otp.active_session", "Active Session")}
                 </h3>
                 
                 {/* Warning Card Container */}
@@ -458,9 +466,9 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h4 className="text-[10px] font-extrabold text-red-800 dark:text-red-300 uppercase tracking-widest mb-0.5">Security Notice</h4>
+                    <h4 className="text-[10px] font-extrabold text-red-800 dark:text-red-300 uppercase tracking-widest mb-0.5">{t("login_otp.security_notice", "Security Notice")}</h4>
                     <p className="text-[12.5px] text-red-700/95 dark:text-red-300/85 leading-relaxed font-semibold">
-                      {forceLogoutMessage || "You are already logged in on another device."}
+                      {forceLogoutMessage || t("login_otp.already_logged_in", "You are already logged in on another device.")}
                     </p>
                   </div>
                 </div>
@@ -477,7 +485,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                       <Loader2 className="w-5 h-5 animate-spin relative z-10" />
                     ) : (
                       <>
-                        <span className="relative z-10">Sign out other device</span>
+                        <span className="relative z-10">{t("login_otp.sign_out_other", "Sign out other device")}</span>
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 relative z-10" />
                       </>
                     )}
@@ -489,7 +497,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     variant="ghost"
                     className="w-full h-11 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/80 dark:hover:bg-white/5 font-bold text-[13px] rounded-xl transition-all duration-300"
                   >
-                    Cancel
+                    {t("login_otp.cancel", "Cancel")}
                   </Button>
                 </div>
               </motion.div>

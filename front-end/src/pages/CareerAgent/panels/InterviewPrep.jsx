@@ -185,7 +185,7 @@ const InterviewPrep = ({ roleName }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} className="animate-fade-in">
 
             {/* ── Row 1: Aptitude + Domain Resources ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                 {/* Aptitude box */}
                 <div style={box}>
@@ -204,7 +204,7 @@ const InterviewPrep = ({ roleName }) => {
             </div>
 
             {/* ── Row 2: Technical Qs + HR Qs ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                 {/* Technical questions */}
                 <div style={box}>

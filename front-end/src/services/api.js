@@ -3,12 +3,18 @@
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const getApiBaseUrl = () => {
+  // If an API base is configured at build time (e.g. "/api" for same-origin
+  // behind a load balancer / CDN), ALWAYS honor it — on every host. This is the
+  // production pattern (one domain, the LB routes /api to the backend).
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   const hostname = window.location.hostname;
   // If accessing from localhost, use localhost
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    return "http://localhost:5000/api";
   }
-  // If accessing from network IP, use the same IP for backend
+  // LAN/mobile dev fallback: talk to the backend on the same host, port 5000.
   return `http://${hostname}:5000/api`;
 };
 
@@ -20,6 +26,25 @@ let workingBaseUrl = null; // Will be discovered on first API call
 
 // Export for use in other files
 export const getBackendUrl = () => {
+  // When the API is configured same-origin (VITE_API_URL is a relative path
+  // like "/api"), WebSockets and /uploads also go through the same origin — the
+  // load balancer proxies /socket.io and /uploads to the backend.
+  const apiBase = import.meta.env.VITE_API_URL;
+  if (apiBase && apiBase.startsWith('/')) {
+    return window.location.origin;
+  }
+  // Split hosting (e.g. frontend on Vercel, backend on Render): VITE_API_URL is
+  // an ABSOLUTE url like "https://smaart-backend.onrender.com/api". WebSockets
+  // (/socket.io) and /uploads live on that SAME backend origin — so strip the
+  // path and return the origin. Without this we'd wrongly hit the frontend host
+  // on :5000 over http, and real-time notifications would silently never connect.
+  if (apiBase && /^https?:\/\//i.test(apiBase)) {
+    try {
+      return new URL(apiBase).origin;
+    } catch {
+      // malformed value — fall through to hostname heuristics below
+    }
+  }
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return "http://localhost:5000";
@@ -512,6 +537,9 @@ export const placementsAPI = {
       timeout: 12000,
     });
   },
+  getCompanies: async () => {
+    return apiCall('/placements/companies');
+  },
   // Check if current user has applied for this job
   // Use the placements applications endpoint which is the source used by the placements apply flow
   hasApplied: async (source, id) => {
@@ -531,6 +559,23 @@ export const placementsAPI = {
     return apiCall(`/placements/jobs/${encodeURIComponent(source)}/${encodeURIComponent(id)}/apply`, {
       method: 'POST',
       body,
+    });
+  },
+  getSavedJobs: async () => {
+    return apiCall('/placements/saved-jobs');
+  },
+  toggleSavedJob: async (source, id) => {
+    return apiCall('/placements/saved-jobs', {
+      method: 'POST',
+      body: JSON.stringify({ source, jobId: id }),
+    });
+  },
+  getJobFairs: async () => {
+    return apiCall('/placements/job-fairs');
+  },
+  registerJobFair: async (id) => {
+    return apiCall(`/placements/job-fairs/${encodeURIComponent(id)}/register`, {
+      method: 'POST',
     });
   },
 };

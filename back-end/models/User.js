@@ -55,10 +55,6 @@ const userSchema = new mongoose.Schema({
   subject: String,
   rollNumber: String,
   section: String,
-  assignedTeacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
   status: {
     type: String,
     enum: ['pending', 'active', 'inactive', 'suspended'],
@@ -82,6 +78,11 @@ bio: {
     type: String,
     default: 'DD/MM/YYYY'
   },
+  savedJobs: [{
+    jobId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    source: { type: String, required: true },
+    savedAt: { type: Date, default: Date.now }
+  }],
   // Active vision board for dashboard display
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,

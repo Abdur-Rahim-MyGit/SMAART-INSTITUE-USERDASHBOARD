@@ -16,7 +16,7 @@ const Registration = require("../models/Registration");
 const { protect } = require("../middleware/auth");
 const { requireRole } = require("../middleware/roleMiddleware");
 const { uploadCommunity, cloudinary } = require("../middleware/upload");
-const { notifyCommunityReply } = require("../services/notificationService");
+
 const { classifyDistress } = require("../helpers/distressClassifier");
 const CoachAlert = require("../models/CoachAlert");
 const { scanImage } = require("../helpers/nsfwModeration");
@@ -729,10 +729,10 @@ router.get("/discussions", async (req, res) => {
             const CollegeDegree = mongoose.model("CollegeDegree");
             const collegeDegs = await CollegeDegree.find({
               college: req.user.college,
-              $or: [
-                { specialization: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } },
-                { fullName: { $regex: new RegExp(`^${studentDegreeId}$`, 'i') } }
-              ]
+              $or: (() => { const s = require('../utils/escapeRegex')(studentDegreeId); return [
+                { specialization: { $regex: new RegExp(`^${s}$`, 'i') } },
+                { fullName: { $regex: new RegExp(`^${s}$`, 'i') } }
+              ]; })()
             }).select("_id");
             collegeDegs.forEach(cd => {
               targetDegreeIds.push(cd._id);
@@ -1785,32 +1785,7 @@ router.post("/discussions/:id/reply", async (req, res) => {
       console.error("Error logging mentorship interaction:", logError);
     }
 
-    // Send notification to post author about the reply (don't notify if replying to own post)
-    if (discussion.author.toString() !== authorId) {
-      try {
-        // Get replier's name for the notification
-        let replier = await User.findById(authorId).select("fullName");
-        if (!replier)
-          replier = await Student.findById(authorId).select("fullName");
-        if (!replier)
-          replier = await Teacher.findById(authorId).select("fullName");
-        if (!replier)
-          replier = await Registration.findById(authorId).select("fullName");
-        const replierName = replier?.fullName || "Someone";
 
-        await notifyCommunityReply(
-          discussion.author,
-          discussion.title || "your post",
-          replierName,
-          discussion._id,
-        );
-        console.log(
-          `🔔 Notification sent for community reply to ${discussion.author}`,
-        );
-      } catch (notifyError) {
-        console.error("⚠️ Error sending reply notification:", notifyError);
-      }
-    }
 
     const populatedDiscussion = await CommunityPost.findById(
       discussion._id,

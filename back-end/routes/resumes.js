@@ -62,7 +62,7 @@ router.get('/verify/:resumePublicId', async (req, res) => {
     const record = await ResumeVerification.findOne({
       resumePublicId,
       status: { $ne: 'revoked' },
-    });
+    }).populate('resumeId');
 
     if (!record) {
       return res.status(404).json({
@@ -73,6 +73,11 @@ router.get('/verify/:resumePublicId', async (req, res) => {
     }
 
     const payload = buildVerificationPayload(record, fingerprint, req);
+    
+    // Add the populated full resume data
+    if (record.resumeId) {
+      payload.resumeData = record.resumeId;
+    }
 
     if (fingerprint && record.fingerprint !== fingerprint) {
       return res.status(409).json({

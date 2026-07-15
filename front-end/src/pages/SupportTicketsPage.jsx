@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle, Filter, RefreshCw } from 'lucide-react';
+import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock } from 'lucide-react';
 import TicketForm from '@/components/tickets/TicketForm';
 import TicketDetail from '@/components/tickets/TicketDetail';
 import { getMyTickets } from '@/services/ticketApi';
@@ -16,13 +16,10 @@ const SupportTicketsPage = () => {
   const [activeTab, setActiveTab] = useState('create'); // 'create' | 'history'
   const [tickets, setTickets] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
   // Format chatbot conversation if present
   useEffect(() => {
     if (conversationData?.messages) {
-      // ... (existing logic)
       const conversationText = conversationData.messages
         .map((msg) => {
           const role = msg.role === 'user' ? 'You' : 'Support Bot';
@@ -41,13 +38,12 @@ const SupportTicketsPage = () => {
     if (activeTab === 'history') {
       fetchTickets();
     }
-  }, [activeTab, statusFilter]);
+  }, [activeTab]);
 
   const fetchTickets = async () => {
     try {
       setLoadingHistory(true);
       const filters = {};
-      if (statusFilter) filters.status = statusFilter;
       const response = await getMyTickets(filters);
       if (response.success) {
         setTickets(response.data);
@@ -70,119 +66,151 @@ const SupportTicketsPage = () => {
 
   const statusColor = (status) => {
     switch (status) {
-      case 'resolved': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
-      case 'in-progress': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
-      case 'open': return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
-      default: return 'text-slate-500 bg-slate-500/10 border-slate-500/20';
+      case 'resolved': return 'text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
+      case 'in-progress': return 'text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
+      case 'open': return 'text-amber-600 bg-amber-50 border-amber-250 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
+      default: return 'text-slate-650 bg-slate-50 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20';
     }
+  };
+
+  const getCategoryLabel = (cat) => {
+    const config = {
+      'technical': t("support_tickets_page.cat_technical", 'Technical Issue'),
+      'account': t("support_tickets_page.cat_account", 'Account Issue'),
+      'course & assessment': t("support_tickets_page.cat_course_assessment", 'Course & Assessment Issue'),
+      'course': t("support_tickets_page.cat_course", 'Course Issue'),
+      'assessment': t("support_tickets_page.cat_assessment", 'Assessment Issue'),
+      'career Direction': t("support_tickets_page.cat_career_direction", 'Career Direction Issue'),
+      'content': t("support_tickets_page.cat_content", 'Course Content'),
+      'billing': t("support_tickets_page.cat_billing", 'Billing'),
+      'feedback': t("support_tickets_page.cat_feedback", 'Feedback'),
+      'placement issue': t("support_tickets_page.cat_placement", 'Placement Issue'),
+      'certificates & badges issue': t("support_tickets_page.cat_certificates_badges", 'Certificates & Badges Issue'),
+      'other': t("support_tickets_page.cat_other", 'Others Issue')
+    };
+    return config[cat] || cat;
   };
 
   return (
     <div className="min-h-screen bg-transparent transition-colors duration-300 pb-24">
       <div className="pt-4">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          {/* Header */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6">
+
           {/* Back Button - Mobile Only */}
           <div className="mb-4 md:hidden">
             <button
               onClick={() => navigate("/dashboard")}
-              className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+              className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
             >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                <ArrowLeft className="w-4 h-4" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                <ArrowLeft className="h-4 w-4" />
               </div>
               {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
             </button>
           </div>
 
-          {/* ── Standardized Header ── */}
+          {/* Header */}
           <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2"
           >
-              <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a3884]/10 dark:bg-blue-900/30">
-                          <LifeBuoy className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
-                      </div>
-                      <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                          Support <span className="text-[#1a3884] dark:text-blue-300">Center</span>
-                      </h1>
-                  </div>
-                  <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                      {t("support_tickets_page.we_are_here_to_help")}
-                  </p>
-              </div>
+            <div className="flex items-center gap-4">
+              {/* Back Button */}
+              {/* <button
+                onClick={() => navigate("/dashboard")}
+                className="hidden md:flex h-11 w-11 items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:border-slate-355 dark:hover:border-white/20 transition-all flex-shrink-0"
+                title={t("support_tickets_page.back", "Back")}
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-350" />
+              </button> */}
 
-              {/* Tabs */}
-              <div className="flex w-full md:w-auto gap-1 p-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm">
-                <button
-                  onClick={() => setActiveTab('create')}
-                  className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
-                    ? 'bg-[#1a3884] text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                >
-                  <Plus size={15} /> {t("support_tickets_page.new_ticket")}
-                </button>
-                <button
-                  onClick={() => setActiveTab('history')}
-                  className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'history'
-                    ? 'bg-[#1a3884] text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                >
-                  <History size={15} /> {t("support_tickets_page.history")}
-                </button>
+              {/* Icon and Title Group */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0f2c59] dark:bg-[#1a3884] shadow-md shadow-[#0f2c59]/10">
+                  <LifeBuoy className="h-6 w-6 text-white animate-pulse" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-extrabold leading-none tracking-tight text-slate-950 dark:text-white">
+                    {t("support_tickets_page.it_support", "IT Support")}
+                  </h1>
+                  <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                    {t("support_tickets_page.we_are_here_to_help", "Raise and track your IT support requests")}
+                  </p>
+                </div>
               </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex gap-1 p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm self-start md:self-auto flex-shrink-0">
+              <button
+                onClick={() => setActiveTab('create')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${activeTab === 'create'
+                  ? 'bg-[#0f2c59] dark:bg-[#1a3884] text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+              >
+                <Plus size={15} /> {t("support_tickets_page.new_ticket", "New Ticket")}
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${activeTab === 'history'
+                  ? 'bg-[#0f2c59] dark:bg-[#1a3884] text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+              >
+                <History size={15} /> {t("support_tickets_page.my_tickets", "My Tickets")}
+              </button>
+            </div>
           </motion.div>
 
           <AnimatePresence mode="wait">
             {activeTab === 'create' ? (
               <motion.div
                 key="create"
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
+                exit={{ opacity: 0, x: 10 }}
+                className="space-y-6"
               >
                 {/* ITSM Success Banner */}
                 {successTicket?.itsmTicketNumber && (
-                  <div className="mb-6 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-indigo-400" />
-                      <span className="text-sm font-semibold text-indigo-400">
-                        {t("support_tickets_page.ticket_submitted_success")}
+                  <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 shadow-sm flex items-start gap-3">
+                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 mt-1.5 animate-ping flex-shrink-0" />
+                    <div>
+                      <span className="text-sm font-bold text-indigo-650 dark:text-indigo-400 block">
+                        {t("support_tickets_page.ticket_submitted_success", "Ticket created and synced successfully!")}
                       </span>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-normal">
+                        {t("support_tickets_page.itsm_reference_prefix", "Your reference number is")}{' '}
+                        <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/40 px-1.5 py-0.5 rounded">{successTicket.itsmTicketNumber}</span>.{' '}
+                        {t("support_tickets_page.itsm_reference_suffix", "Our support agents will respond shortly.")}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-300 mt-1">
-                      {t("support_tickets_page.itsm_reference_prefix")}{' '}
-                      <span className="font-mono text-indigo-400 font-bold">{successTicket.itsmTicketNumber}</span>
-                      {t("support_tickets_page.itsm_reference_suffix")}
-                    </p>
                   </div>
                 )}
 
                 {/* Chat Conversation Preview */}
                 {conversationData?.messages && (
-                  <div className="mb-6 p-4 rounded-xl bg-[#1a3884]/5 dark:bg-[#1a3884]/10 border border-[#1a3884]/20 dark:border-white/10 shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
-                      <MessageSquare className="w-4 h-4 text-[#1a3884]" />
-                      <span className="text-sm font-semibold text-[#1a3884]">
-                        {t("support_tickets_page.chat_included")}
+                  <div className="p-4 rounded-2xl bg-[#1a3884]/5 dark:bg-[#1a3884]/15 border border-[#1a3884]/15 dark:border-white/10 shadow-sm flex items-start gap-3">
+                    <MessageSquare className="w-5 h-5 text-[#1a3884] dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="text-sm font-bold text-[#1a3884] dark:text-blue-300 block">
+                        {t("support_tickets_page.chat_included", "Chat Transcript Attached")}
                       </span>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-normal">
+                        {t("support_tickets_page.chat_history_automatic", "Your recent conversation with the Support Bot has been pre-filled below to speed up diagnosis.")}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-300">
-                      {t("support_tickets_page.chat_history_automatic")}
-                    </p>
                   </div>
                 )}
 
-                <div className="bg-white dark:bg-dark-card/50 rounded-2xl border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                {/* Main Form Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/5 p-6 sm:p-8 shadow-sm">
                   <TicketForm
                     onSuccess={handleSuccess}
-                    onCancel={() => navigate(-1)}
+                    onCancel={() => navigate("/dashboard")}
                     initialData={initialDescription ? { description: initialDescription } : undefined}
                   />
                 </div>
@@ -190,126 +218,93 @@ const SupportTicketsPage = () => {
             ) : (
               <motion.div
                 key="history"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
+                exit={{ opacity: 0, x: -10 }}
+                className="space-y-5"
               >
-                {/* Filters */}
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setShowFilters(!showFilters)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${showFilters || statusFilter
-                        ? "border-[#1a3884] text-[#1a3884]"
-                        : "border-[#1a3884]/30 text-gray-400"
-                        }`}
-                    >
-                      <Filter className="w-4 h-4" />
-                      {t("support_tickets_page.filters")}
-                      {statusFilter && (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-[#1a3884]/20">1</span>
-                      )}
-                    </button>
-                    <button
-                      onClick={fetchTickets}
-                      disabled={loadingHistory}
-                      className="p-2 rounded-xl border border-[#1a3884]/30 text-gray-400 hover:text-white hover:border-[#1a3884] transition-colors"
-                    >
-                      <RefreshCw className={`w-4 h-4 ${loadingHistory ? 'animate-spin' : ''}`} />
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('create')}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    {t("support_tickets_page.new_ticket")}
-                  </button>
-                </div>
-
-                {/* Filter Options */}
-                <AnimatePresence>
-                  {showFilters && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-sm text-gray-400 mr-2">{t("support_tickets_page.status")}:</span>
-                          {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
-                            <button
-                              key={status}
-                              onClick={() => setStatusFilter(status)}
-                              className={`px-3 py-1 text-sm rounded-lg transition-colors ${statusFilter === status
-                                  ? "bg-[#1a3884] text-white"
-                                  : "bg-gray-100 dark:bg-[#002147] text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
-                                }`}
-                            >
-                              {status ? t("support_tickets_page.status_" + status.replace('-', '_')) : t("support_tickets_page.all")}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {loadingHistory ? (
-                  <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-                    <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1a3884]" />
-                    <p>{t("support_tickets_page.loading_tickets")}</p>
-                  </div>
-                ) : tickets.length === 0 ? (
-                  <div className="py-20 text-center bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <LifeBuoy className="w-8 h-8 text-slate-400" />
+                {/* List Container */}
+                <div className="space-y-4">
+                  {loadingHistory ? (
+                    <div className="py-24 flex flex-col items-center justify-center text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/5 shadow-sm">
+                      <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1a3884]" />
+                      <p className="text-sm font-semibold">{t("support_tickets_page.loading_tickets", "Loading your ticket history...")}</p>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("support_tickets_page.no_tickets_yet")}</h3>
-                    <p className="text-slate-500 dark:text-slate-300 mb-6">{t("support_tickets_page.no_tickets_desc")}</p>
-                    <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg font-bold shadow-lg shadow-[#1a3884]/20 hover:scale-105 transition-transform">{t("support_tickets_page.create_ticket")}</button>
-                  </div>
-                ) : (
-                  tickets.map((ticket) => (
-                    <div key={ticket._id} onClick={() => setSelectedTicket(ticket)} className="bg-white dark:bg-white/5 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group cursor-pointer">
-                      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 mb-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                            <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">#{ticket.ticketId || ticket._id.slice(-6)}</span>
-                            {ticket.itsmTicketNumber && (
-                              <span className="px-2 py-0.5 text-[10px] sm:text-xs rounded-full border bg-indigo-500/20 text-indigo-400 border-indigo-500/30 font-mono flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
-                                {ticket.itsmTicketNumber}
+                  ) : tickets.length === 0 ? (
+                    <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/5 shadow-sm">
+                      <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <LifeBuoy className="w-8 h-8 text-slate-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-950 dark:text-white mb-2">
+                        {t("support_tickets_page.no_tickets_yet", "No Support Tickets Found")}
+                      </h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs max-w-sm mx-auto mb-6 leading-relaxed">
+                        {t("support_tickets_page.no_tickets_desc", "You haven't submitted any support requests yet. Create a ticket if you're experiencing any issues.")}
+                      </p>
+                      <button
+                        onClick={() => setActiveTab('create')}
+                        className="px-6 py-2.5 bg-[#0f2c59] dark:bg-[#1a3884] text-white rounded-xl font-bold text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                      >
+                        {t("support_tickets_page.create_ticket", "Submit a Ticket")}
+                      </button>
+                    </div>
+                  ) : (
+                    tickets.map((ticket) => {
+                      const dateStr = new Date(ticket.createdAt).toLocaleDateString('en-US', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        year: 'numeric'
+                      });
+
+                      return (
+                        <div
+                          key={ticket._id}
+                          onClick={() => setSelectedTicket(ticket)}
+                          className="relative bg-white dark:bg-slate-900 p-6 pl-8 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-[#1a3884]/40 hover:shadow-md hover:shadow-slate-200/10 dark:hover:shadow-none transition-all group cursor-pointer overflow-hidden"
+                        >
+                          {/* Accent color bar on the left */}
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#1a3884]" />
+
+                          {/* Ticket Header (ID & Status) */}
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
+                                #{ticket.ticketId || ticket._id.slice(-6)}
+                              </span>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusColor(ticket.status)} capitalize shadow-sm flex-shrink-0`}>
+                              {t("support_tickets_page.status_" + ticket.status.replace('-', '_'), ticket.status.replace('-', ' '))}
+                            </span>
+                          </div>
+
+                          {/* Ticket Title */}
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-2 mb-1.5 leading-snug">
+                            {ticket.title}
+                          </h3>
+
+                          {/* Ticket Description */}
+                          <p className="text-slate-550 dark:text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
+                            {ticket.description}
+                          </p>
+
+                          {/* Ticket Footer Info */}
+                          <div className="flex flex-wrap items-center gap-5 text-xs text-slate-400 font-semibold pt-1">
+                            <span className="flex items-center gap-1.5">
+                              <Clock size={14} className="text-slate-400" />
+                              {dateStr}
+                            </span>
+                            {ticket.responses?.length > 0 && (
+                              <span className="flex items-center gap-1.5 text-[#1a3884] dark:text-blue-400">
+                                <MessageSquare size={14} />
+                                {ticket.responses.length} {ticket.responses.length === 1 ? t("support_tickets_page.response", "Response") : t("support_tickets_page.responses", "Responses")}
                               </span>
                             )}
                           </div>
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors">{ticket.title}</h3>
                         </div>
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm flex-shrink-0`}>
-                          {t("support_tickets_page.status_" + ticket.status.replace('-', '_'))}
-                        </span>
-                      </div>
-
-                      <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mb-5 sm:mb-6 line-clamp-2">
-                        {ticket.description}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <Clock size={14} /> {new Date(ticket.createdAt).toLocaleDateString()}
-                        </span>
-                        {ticket.responses?.length > 0 && (
-                          <span className="flex items-center gap-1 text-[#1a3884]">
-                            <MessageSquare size={14} /> {ticket.responses.length} {t("support_tickets_page.responses")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
+                      );
+                    })
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -337,5 +332,3 @@ const SupportTicketsPage = () => {
 };
 
 export default SupportTicketsPage;
-
-
