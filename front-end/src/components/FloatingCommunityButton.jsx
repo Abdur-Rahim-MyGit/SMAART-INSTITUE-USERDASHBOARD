@@ -21,7 +21,8 @@ const FloatingCommunityButton = () => {
     const [notificationCount, setNotificationCount] = useState(0);
     const [isSplashVisible, setIsSplashVisible] = useState(false);
     const [lastSeenCount, setLastSeenCount] = useState(() => {
-        const stored = localStorage.getItem('communityLastSeenCount');
+        const userId = user?._id || user?.id || 'anon';
+        const stored = localStorage.getItem(`${userId}_communityLastSeenCount`);
         return stored ? parseInt(stored, 10) : 0;
     });
 
@@ -77,7 +78,8 @@ const FloatingCommunityButton = () => {
                     if (data && data.success && data.data) {
                         const totalDiscussions = data.data.totalDiscussions || 0;
                         setLastSeenCount(totalDiscussions);
-                        localStorage.setItem('communityLastSeenCount', totalDiscussions.toString());
+                        const userId = user?._id || user?.id || 'anon';
+                        localStorage.setItem(`${userId}_communityLastSeenCount`, totalDiscussions.toString());
                         setNotificationCount(0);
                     }
                 } catch (error) {

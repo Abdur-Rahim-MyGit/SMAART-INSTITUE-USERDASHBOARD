@@ -115,14 +115,32 @@ const tryRenewToken = async () => {
   }
 };
 
-// Check for renewal every 5 minutes
-setInterval(tryRenewToken, 5 * 60 * 1000);
-// Also check on page visibility restore
+let renewalInterval = null;
+
+export const startTokenRenewal = () => {
+  if (typeof window === 'undefined') return;
+  if (renewalInterval) clearInterval(renewalInterval);
+  if (sessionStorage.getItem('token')) {
+    renewalInterval = setInterval(tryRenewToken, 5 * 60 * 1000);
+  }
+};
+
+export const stopTokenRenewal = () => {
+  if (renewalInterval) {
+    clearInterval(renewalInterval);
+    renewalInterval = null;
+  }
+};
+
+// Check for renewal on page visibility restore if token exists
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') tryRenewToken();
+    if (document.visibilityState === 'visible' && sessionStorage.getItem('token')) tryRenewToken();
   });
 }
+
+// Start on initial module load if token already exists (e.g. page refresh)
+startTokenRenewal();
 
 export const apiCall = async (endpoint, options = {}) => {
   const timeout = options.timeout || 30000; // Default 30s, allow custom timeout for long operations
@@ -142,7 +160,7 @@ export const apiCall = async (endpoint, options = {}) => {
         headers["Content-Type"] = "application/json";
       }
 
-      console.log(`🚀 API Call: ${baseUrl}${endpoint} (Timeout: ${customTimeout}ms)`);
+      if (import.meta.env.DEV) console.log(`🚀 API Call: ${baseUrl}${endpoint} (Timeout: ${customTimeout}ms)`);
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
         credentials: 'include', // Enable Cookies for HttpOnly Auth
@@ -174,6 +192,7 @@ export const apiCall = async (endpoint, options = {}) => {
         sessionStorage.removeItem("sessionExpiresAt");
         localStorage.removeItem("user"); // FIX #4: Clear localStorage too
         clearAssessmentTimerStorage();
+        stopTokenRenewal();
 
         // Use window.location to force redirect and UI reset
         // FIXED: Only redirect if NOT on a public route where 401 is expected/allowed
@@ -260,7 +279,7 @@ export const apiCall = async (endpoint, options = {}) => {
     // "sometimes take 5-10s". Only genuine connection failures probe for the port.
     const isErrorThatTriggersFallback = isNetworkError;
 
-    if (isErrorThatTriggersFallback) {
+    if (isErrorThatTriggersFallback && import.meta.env.DEV) {
       console.warn("⚠️ API connection failed, searching for backend on fallback ports (5001, 5002)...");
 
       const hostname = window.location.hostname;

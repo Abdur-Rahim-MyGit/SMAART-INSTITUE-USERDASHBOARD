@@ -444,11 +444,12 @@ const CoursePlayer = () => {
     window.scrollTo(0, 0);
 
     if (courseId) {
+      const userId = currentUser?._id || currentUser?.id || 'anon';
       const courseData = staticCourse || { title: learningFlowData?.overviewTitle || courseId };
-      localStorage.setItem("smaart_last_watched_course", courseId);
-      localStorage.setItem("smaart_last_watched_title", courseData.title || courseId);
-      localStorage.setItem("smaart_last_watched_lesson", courseData.title || courseId);
-      localStorage.setItem("smaart_course_progress", "0");
+      localStorage.setItem(`${userId}_smaart_last_watched_course`, courseId);
+      localStorage.setItem(`${userId}_smaart_last_watched_title`, courseData.title || courseId);
+      localStorage.setItem(`${userId}_smaart_last_watched_lesson`, courseData.title || courseId);
+      localStorage.setItem(`${userId}_smaart_course_progress`, "0");
     }
 
     // ── Fetch detailed user progress from backend ──
@@ -501,7 +502,8 @@ const CoursePlayer = () => {
     if (!courseId || totalSteps <= 0) return;
     const stepsDone = Object.keys(completedSteps).length;
     const pct = Math.round((stepsDone / totalSteps) * 100);
-    localStorage.setItem('smaart_course_progress', String(pct));
+    const userId = currentUser?._id || currentUser?.id || 'anon';
+    localStorage.setItem(`${userId}_smaart_course_progress`, String(pct));
   }, [completedSteps, totalSteps, courseId]);
 
   const handleStartStep = async (stepNumber) => {
@@ -601,8 +603,9 @@ const CoursePlayer = () => {
     const pct = Math.round((stepsDone / totalSteps) * 100);
     const courseData = staticCourse || { title: courseId };
     const currentStepData = learningFlowData?.steps?.[stepNumber];
-    localStorage.setItem('smaart_course_progress', String(pct));
-    localStorage.setItem('smaart_last_watched_lesson',
+    const userId = currentUser?._id || currentUser?.id || 'anon';
+    localStorage.setItem(`${userId}_smaart_course_progress`, String(pct));
+    localStorage.setItem(`${userId}_smaart_last_watched_lesson`,
       currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
     );
 
@@ -626,7 +629,8 @@ const CoursePlayer = () => {
     if (allCompleted) {
       setShowCongratulation(true);
       setActiveStep(null);
-      localStorage.setItem('smaart_course_progress', '100');
+      const userId = currentUser?._id || currentUser?.id || 'anon';
+      localStorage.setItem(`${userId}_smaart_course_progress`, '100');
       markCourseCompleted(courseId);
     } else if (autoAdvance) {
       // Auto-advance to next step

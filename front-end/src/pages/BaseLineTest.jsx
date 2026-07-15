@@ -445,6 +445,14 @@ const BaseLineTest = () => {
         setResultId(startResponse.data.resultId);
         setAssessmentToken(startResponse.data.assessmentToken); // Save JWT
 
+        // Synchronize local timer start time with server-side creation time to prevent stale persistence bugs
+        if (startResponse.data.startedAt) {
+          const serverStartTime = new Date(startResponse.data.startedAt).getTime();
+          const { startTimeKey } = buildAssessmentTimerStorageKeys(stageKey, userId);
+          localStorage.setItem(startTimeKey, String(serverStartTime));
+          console.log(`⏰ Synced timer key ${startTimeKey} to server time:`, new Date(serverStartTime).toISOString());
+        }
+
         // Ensure questions are in order (defensive check)
         const fetchedQuestions = startResponse.data.questions || [];
         console.log(`📚 Received ${fetchedQuestions.length} questions`);

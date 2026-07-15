@@ -212,6 +212,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     questions,
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
+                    startedAt: existingResult.startedAt,
                     assessmentToken
                 }
             });
@@ -342,6 +343,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 resultId: result._id,
                 questions: shuffledQuestions,
                 totalQuestions: totalQuestions,
+                startedAt: result.startedAt,
                 assessmentToken
             }
         });
