@@ -1,4 +1,7 @@
 import * as faceapi from '@vladmandic/face-api';
+import { analyzeGaze, resetCalibration } from './eyeGazeService';
+
+export { resetCalibration as resetGazeCalibration };
 
 // ─── State ───────────────────────────────────────────────────────────
 let modelsLoaded = false;
@@ -537,19 +540,24 @@ export const verifyFace = async (videoElement, referenceDescriptor) => {
   });
 
   if (distance < MATCH_THRESHOLD) {
+    // Attach gaze analysis piggy-backed on the same landmark result
+    const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
     return {
       status: VerificationStatus.VERIFIED,
       distance,
       similarity,
       faceCount: 1,
+      gaze,
       timings: result.timings
     };
   } else {
+    const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
     return {
       status: VerificationStatus.MISMATCH,
       distance,
       similarity,
       faceCount: 1,
+      gaze,
       timings: result.timings
     };
   }

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
-import { verifyFace, detectFaces, VerificationStatus, loadModels, isReady } from '@/services/faceVerificationService';
+import { verifyFace, detectFaces, VerificationStatus, loadModels, isReady, resetGazeCalibration } from '@/services/faceVerificationService';
 import { proctoringApi } from '@/services/proctoringApi';
+import { startAudioMonitoring, stopAudioMonitoring } from '@/services/audioMonitorService';
 import { toast } from 'sonner';
 
 // Helper to capture a frame from the video stream as a JPEG Blob
@@ -54,9 +55,16 @@ export const useProctoringEngine = ({
   const [faceCount, setFaceCount] = useState(0);
   const [cameraError, setCameraError] = useState(null);
 
+  // Face Verification State
   const [verificationStatus, setVerificationStatus] = useState('no_face');
   const [similarityScore, setSimilarityScore] = useState(0);
 
+  // Eye Gaze State (NEW)
+  const [gazeDirection, setGazeDirection] = useState('center');
+
+  // Audio Monitor State (NEW)
+  const [isMicActive, setIsMicActive] = useState(false);
+  const [isAudioCalibrated, setIsAudioCalibrated] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [fullscreenCountdown, setFullscreenCountdown] = useState(0);
 
@@ -80,10 +88,14 @@ export const useProctoringEngine = ({
 
   const triggerLockoutRef = useRef(null);
 
-  const faceAbsentStreak = useRef(0);
+  // Debouncing face violations (require consecutive failures before logging)
+  const faceAbsentStreak    = useRef(0);
   const multipleFacesStreak = useRef(0);
-  const faceMismatchStreak = useRef(0);
-  const faceCoveredStreak = useRef(0);
+  const faceMismatchStreak  = useRef(0);
+  const faceCoveredStreak   = useRef(0);
+  // Eye gaze streaks (NEW)
+  const gazeAwayStreak      = useRef(0);
+  const eyesClosedStreak    = useRef(0);
 
   useEffect(() => {
     isActiveRef.current = isActive;
@@ -103,6 +115,12 @@ export const useProctoringEngine = ({
         audio: false // No audio processing needed to protect privacy
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      // Handle race condition: component might have unmounted or isActive became false while waiting for camera permission
+      if (!isActiveRef.current || hasLockedOutRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
       
       // Create hidden video element for face verification
@@ -118,7 +136,7 @@ export const useProctoringEngine = ({
       // Wait for metadata to load
       await new Promise((resolve) => {
         video.onloadedmetadata = () => {
-          video.play();
+          video.play().catch(e => console.warn('Video play interrupted', e));
           resolve();
         };
       });
@@ -157,21 +175,35 @@ export const useProctoringEngine = ({
     }
   };
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
       streamRef.current = null;
     }
     if (videoRef.current) {
+      const srcStream = videoRef.current.srcObject;
+      if (srcStream && srcStream.getTracks) {
+        srcStream.getTracks().forEach(track => track.stop());
+      }
       videoRef.current.srcObject = null;
       videoRef.current = null;
     }
+    
+    // As a nuclear fallback, stop any lingering media streams requested by this window
+    try {
+        navigator.mediaDevices?.getUserMedia({ video: true, audio: false })
+            .then(stream => stream.getTracks().forEach(track => track.stop()))
+            .catch(() => {});
+    } catch(e) {}
+
     setIsCameraActive(false);
     setIsFaceDetected(false);
     setFaceCount(0);
     setVerificationStatus('no_face');
     setSimilarityScore(0);
-  };
+  }, []);
 
   const triggerLockout = useCallback(async () => {
     if (hasLockedOutRef.current) return;
@@ -185,18 +217,16 @@ export const useProctoringEngine = ({
       console.log('🔒 Locking out user due to activity violations...');
       if (onLockout) {
         await onLockout();
-      } else {
-        await apiCall('/security/lockout-submit', {
-          method: 'POST',
-          body: JSON.stringify({ assessmentId })
-        });
+      } else if (proctoringSessionIdRef.current) {
+        // Trigger lock via backend API
+        await proctoringApi.triggerLock(proctoringSessionIdRef.current, { lockReason: lastViolationType });
       }
     } catch (error) {
-      console.error('Error calling lockout-submit API:', error);
+      console.error('Error calling lockout API:', error);
     } finally {
-      navigate('/locked-out', { replace: true, state: { reason: 'Disqualified due to proctoring violations' } });
+      navigate('/locked-out', { replace: true, state: { reason: 'Assessment Locked due to multiple violations. A support ticket has been raised for IT Support.' } });
     }
-  }, [assessmentId, navigate, onLockout]);
+  }, [navigate, onLockout, lastViolationType]);
 
   triggerLockoutRef.current = triggerLockout;
 
@@ -353,15 +383,43 @@ export const useProctoringEngine = ({
         setSimilarityScore(result.similarity || 0);
         setFaceCount(result.faceCount);
         setIsFaceDetected(result.status === VerificationStatus.VERIFIED);
-
         let activeInfraction = false;
 
         switch (result.status) {
           case VerificationStatus.VERIFIED:
-            faceAbsentStreak.current = 0;
+            // All clear — reset all face/gaze streaks
+            faceAbsentStreak.current    = 0;
             multipleFacesStreak.current = 0;
-            faceMismatchStreak.current = 0;
-            faceCoveredStreak.current = 0;
+            faceMismatchStreak.current  = 0;
+            faceCoveredStreak.current   = 0;
+
+            // ── Gaze analysis (piggy-backed from verifyFace) ──────────────
+            if (result.gaze) {
+              const { gazeDirection: dir, eyesOpen } = result.gaze;
+              setGazeDirection(dir);
+
+              // Eyes closed streak
+              if (!eyesOpen) {
+                eyesClosedStreak.current++;
+                gazeAwayStreak.current = Math.max(0, gazeAwayStreak.current - 1);
+                if (eyesClosedStreak.current >= 5) { // ~5 s
+                  eyesClosedStreak.current = 0;
+                  reportViolation('eyes_closed', 'Warning: Eyes closed for extended period. Please look at the screen.');
+                }
+              } else if (dir !== 'center') {
+                // Gaze away left or right
+                gazeAwayStreak.current++;
+                eyesClosedStreak.current = Math.max(0, eyesClosedStreak.current - 1);
+                if (gazeAwayStreak.current >= 3) { // ~3 s
+                  gazeAwayStreak.current = 0;
+                  reportViolation('gaze_away', `Warning: Gaze detected ${dir}. Please look at the screen during the exam.`);
+                }
+              } else {
+                // All clear - decrement streaks
+                gazeAwayStreak.current   = Math.max(0, gazeAwayStreak.current - 1);
+                eyesClosedStreak.current = Math.max(0, eyesClosedStreak.current - 1);
+              }
+            }
             
             // Stable State -> Check every 5.0 seconds
             nextDelay = INTERVAL_STABLE_MS;
@@ -547,10 +605,11 @@ export const useProctoringEngine = ({
         setProctoringSessionId(null);
       }
       stopCamera();
+      stopAudioMonitoring();
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
       if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
-      if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
+      if (attentionTimerRef.current)  clearTimeout(attentionTimerRef.current);
       return;
     }
 
@@ -586,11 +645,43 @@ export const useProctoringEngine = ({
         }
       } catch (err) {
         console.error('Error starting proctoring session:', err);
+        if (err.data && err.data.isLocked) {
+           navigate('/locked-out', { replace: true, state: { reason: 'Assessment Locked due to multiple violations. A support ticket has been raised for IT Support.' } });
+        }
       }
     };
     startProctoringSession();
 
+    // Reset eye-gaze calibration for fresh session
+    resetGazeCalibration();
+
+    // Start Webcam
     startCamera();
+
+    // Start Audio Monitoring (non-fatal if mic denied)
+    startAudioMonitoring({
+      onVoiceDetected: () => {
+        if (isActiveRef.current && !hasLockedOutRef.current) {
+          reportViolationRef.current?.('voice_detected', 'Warning: Sustained speech detected during the exam. Talking is not permitted.');
+        }
+      },
+      onProlongedSilence: () => {
+        if (isActiveRef.current && !hasLockedOutRef.current) {
+          reportViolationRef.current?.('prolonged_silence', 'Alert: No activity detected for over 4 minutes. Please confirm you are present.');
+        }
+      },
+      onCalibrated: () => {
+        setIsAudioCalibrated(true);
+        console.log('[ProctoringEngine] Audio noise floor calibrated.');
+      },
+    }).then((started) => {
+      setIsMicActive(started);
+      if (!started) {
+        console.warn('[ProctoringEngine] Microphone not available — audio monitoring disabled.');
+      }
+    });
+
+    // Start Attention Check Scheduler
     scheduleAttentionCheckRef.current();
 
     const onVisibilityChange = () => handleVisibilityChangeRef.current();
@@ -633,6 +724,7 @@ export const useProctoringEngine = ({
 
     return () => {
       stopCamera();
+      stopAudioMonitoring();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('blur', onBlur);
       document.removeEventListener('fullscreenchange', onFullscreenChange);
@@ -646,6 +738,18 @@ export const useProctoringEngine = ({
       if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
+      
+      // Nuclear fix to ensure any running track is killed on unmount
+      if (window.localStream) {
+         window.localStream.getTracks().forEach(t => t.stop());
+      }
+
+      if (proctoringSessionIdRef.current) {
+        proctoringApi.completeSession(proctoringSessionIdRef.current).catch(err => {
+          console.error('[ProctoringEngine] Error auto-completing session on unmount:', err);
+        });
+        proctoringSessionIdRef.current = null;
+      }
     };
   }, [isActive, resultId, assessmentId, scheduleNextFaceCheck]);
 
@@ -664,8 +768,16 @@ export const useProctoringEngine = ({
     videoElement: videoRef.current,
     stream: streamRef.current,
 
+    // Face Verification
     verificationStatus,
     similarityScore,
+
+    // Eye Gaze (NEW)
+    gazeDirection,
+
+    // Audio Monitor (NEW)
+    isMicActive,
+    isAudioCalibrated,
     
     isFullScreen,
     fullscreenCountdown,

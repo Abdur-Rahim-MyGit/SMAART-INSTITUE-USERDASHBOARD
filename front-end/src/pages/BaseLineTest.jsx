@@ -31,7 +31,6 @@ import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
 import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
-import { STAGE_COURSE_MAP } from "@/config/courseConfig";
 import useProctoringEngine from "@/hooks/useProctoringEngine";
 import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
 import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
@@ -484,6 +483,17 @@ const BaseLineTest = () => {
 
       } catch (err) {
         console.error("❌ Error initializing assessment:", err);
+        
+        // --- PROCTORING LOCK CHECK ---
+        if (err.data && err.data.locked) {
+            clearTimerPersistence();
+            navigate('/locked-out', { 
+                replace: true, 
+                state: { reason: err.data.error || 'Your assessment is locked due to a proctoring violation.' } 
+            });
+            return;
+        }
+
         setError(err.message || t("baseline_test.error_loading", "Failed to load assessment. Please try refreshing the page."));
       } finally {
         setLoading(false);
@@ -718,10 +728,7 @@ const BaseLineTest = () => {
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor,
-    onLockout: useCallback(async () => {
-      await submit({ reason: "violation", redirectAfterSubmit: true, forceTimeoutCompletion: true });
-    }, [submit])
+    registeredFaceDescriptor
   });
 
   useEffect(() => {
@@ -1019,33 +1026,25 @@ const BaseLineTest = () => {
                   <Target className="text-[#1a3884] dark:text-blue-450" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
-                  {questions.map((q, idx) => {
-                    const isAnswered = !!selectedAnswers[q._id];
-                    return (
-                      <button
-                        key={q._id}
-                        onClick={() => {
-                          if (isAnswered) {
-                            setIndex(idx);
-                          }
-                        }}
-                        className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all relative group
-                          ${isAnswered ? 'cursor-pointer' : 'cursor-default'}
-                          ${index === idx
-                            ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
-                            : isAnswered
-                              ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
-                              : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
-                          }`}
-                      >
+                  {questions.map((q, idx) => (
+                    <button
+                      key={q._id}
+                      onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
+                      className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
+                        ${index === idx
+                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
+                          : selectedAnswers[q._id]
+                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
+                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
+                        }`}
+                    >
                       {idx + 1}
                       {/* Tooltip on hover */}
                       <span className="hidden md:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20">
                         Q{idx + 1}
                       </span>
                     </button>
-                    );
-                  })}
+                  ))}
                 </div>
               </div>
 
@@ -1063,7 +1062,6 @@ const BaseLineTest = () => {
 
 
               {/* DEV: Auto Answer */}
-              {import.meta.env.DEV && (
               <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
@@ -1102,7 +1100,6 @@ const BaseLineTest = () => {
                   {t("baseline_test.fail_dev", "⚡ Fail (Dev)")}
                 </button>
               </div>
-              )}
             </div>
           </motion.div>
         ) : (
@@ -1336,7 +1333,8 @@ const BaseLineTest = () => {
                   <button
                     onClick={() => {
                       if (stageKey === 'T1') navigate("/dashboard/courses");
-                      else if (STAGE_COURSE_MAP[stageKey]) navigate(`/dashboard/courses/${STAGE_COURSE_MAP[stageKey]}/player`);
+                      else if (stageKey === 'T2') navigate("/dashboard/courses/S11/player");
+                      else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player");
                       else navigate("/dashboard/skills-passport");
                     }}
                     className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
