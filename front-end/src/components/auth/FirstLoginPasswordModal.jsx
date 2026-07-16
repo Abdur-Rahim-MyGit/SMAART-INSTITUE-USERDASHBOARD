@@ -157,7 +157,7 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
             </h2>
             <p
               className="text-[12px] text-gray-500 dark:text-slate-300 mt-1 text-center px-4 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: t("first_login_pw.subtitle", { name: fullName || "User" }) }}
+              dangerouslySetInnerHTML={{ __html: t("first_login_pw.subtitle", { name: fullName || "User", interpolation: { escapeValue: true } }) }}
             />
           </div>
 

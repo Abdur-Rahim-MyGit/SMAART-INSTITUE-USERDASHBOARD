@@ -736,6 +736,22 @@ router.get('/register-details/:email', async (req, res) => {
     const Student = require('../models/Student');
     const normalizedEmail = email.toLowerCase().trim();
 
+    // SECURITY (audit CRITICAL): this endpoint spreads full Mongo documents into
+    // the response. Strip credential/session/secret fields so the bcrypt password
+    // hash and live session ids are never disclosed (this route is reachable
+    // during the pre-auth registration flow).
+    const stripSensitive = (o) => {
+      if (!o || typeof o !== 'object') return o;
+      const c = { ...o };
+      for (const k of [
+        'password', 'currentSessionId', 'sessionExpiresAt',
+        'resetPasswordToken', 'resetPasswordExpires', 'resetToken', 'resetTokenExpiry',
+        'otp', 'otpExpiry', 'otpExpires', 'loginOtp', 'twoFactorSecret', 'mfaSecret',
+        '__v'
+      ]) delete c[k];
+      return c;
+    };
+
     // First try to find in User collection
     let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
     let userSource = 'User';
@@ -759,7 +775,7 @@ router.get('/register-details/:email', async (req, res) => {
       const regByEmail = await Registration.findOne({ email: normalizedEmail });
       if (regByEmail) {
         return res.json({
-          ...regByEmail.toObject(),
+          ...stripSensitive(regByEmail.toObject()),
           fullName: regByEmail.fullName,
           gender: regByEmail.gender
         });
@@ -842,7 +858,7 @@ router.get('/register-details/:email', async (req, res) => {
 
     if (registration) {
       return res.json({
-        ...registration.toObject(),
+        ...stripSensitive(registration.toObject()),
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
         batch: registration.batch || studentBatch || '',
@@ -857,7 +873,7 @@ router.get('/register-details/:email', async (req, res) => {
     }
 
     // Return user data without registration — include all available fields
-    const userObj = user.toObject ? user.toObject() : user;
+    const userObj = stripSensitive(user.toObject ? user.toObject() : user);
     if (fallbackCollege && !userObj.college) {
       userObj.college = fallbackCollege;
     }
