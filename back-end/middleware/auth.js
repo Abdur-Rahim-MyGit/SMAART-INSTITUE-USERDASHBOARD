@@ -181,19 +181,22 @@ const optionalAuth = async (req, res, next) => {
  * logged-in users.
  */
 const protectOrBypass = (req, res, next) => {
-  const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
-  if (
-    req.headers['x-admin-bypass'] === 'true' &&
-    adminSecret &&
-    req.headers['x-admin-secret'] === adminSecret
-  ) {
-    req.user = {
-      role: 'admin',
-      roles: ['admin'],
-      _id: new mongoose.Types.ObjectId(),
-      id: 'admin-bypass'
-    };
-    return next();
+  // ADMIN BYPASS - DEV ONLY (disabled in production)
+  if (process.env.NODE_ENV !== 'production') {
+    const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
+    if (
+      req.headers['x-admin-bypass'] === 'true' &&
+      adminSecret &&
+      req.headers['x-admin-secret'] === adminSecret
+    ) {
+      req.user = {
+        role: 'admin',
+        roles: ['admin'],
+        _id: new mongoose.Types.ObjectId(),
+        id: 'admin-bypass'
+      };
+      return next();
+    }
   }
   return protect(req, res, next);
 };

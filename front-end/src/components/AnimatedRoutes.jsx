@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 
 // Layout Components
 import DashboardLayout from '@/components/DashboardLayout';
+import PrivateRoute from '@/components/PrivateRoute';
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import('@/pages/LandingPage'));
@@ -117,7 +118,8 @@ const AnimatedRoutes = () => {
                     <Route path="/complete-registration" element={<ComprehensiveSignup />} />
                     <Route path="/signup-success" element={<SignupSuccess />} />
 
-                    {/* Protected Dashboard Routes - Using DashboardLayout */}
+                    {/* Protected Dashboard Routes - Auth guard + DashboardLayout */}
+                    <Route element={<PrivateRoute />}>
                     <Route element={<ProtectedDashboardLayout />}>
                         {/* Home */}
                         <Route path="/dashboard" element={<DashboardHome />} />
@@ -161,9 +163,7 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
                         <Route path="/dashboard/cgpa-calculator" element={<CGPACalculator />} />
 
-                        {/* Skills Vault */}
-                        <Route path="/skills-vault" element={<SkillsVault />} />
-                        <Route path="/dashboard/skills-vault" element={<SkillsVault />} />
+
 
                         {/* Community */}
                         <Route path="/community" element={<Community />} />
@@ -221,6 +221,7 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/career-agent" element={<CareerAgentEntry />} />
                         <Route path="/dashboard/career-agent/onboarding" element={<CareerAgentOnboarding />} />
                         <Route path="/dashboard/career-agent/dashboard" element={<CareerAgentDashboard />} />
+                    </Route>
                     </Route>
                     <Route path="/assessment/:stage" element={<BaseLineTest />} />
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />

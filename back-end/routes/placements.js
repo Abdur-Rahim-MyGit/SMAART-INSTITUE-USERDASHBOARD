@@ -562,8 +562,10 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
 router.get('/applications', protect, async (req, res) => {
   try {
     const { job, jobSource } = req.query;
-    console.log('[DEBUG /applications] incoming query params:', { job, jobSource });
-    console.log('[DEBUG /applications] req.user:', { id: req.user?._id, role: req.user?.role });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DEBUG /applications] incoming query params:', { job, jobSource });
+      console.log('[DEBUG /applications] req.user:', { id: req.user?._id, role: req.user?.role });
+    }
     const query = {};
     if (job && mongoose.Types.ObjectId.isValid(job)) query.job = new mongoose.Types.ObjectId(job);
     if (jobSource) query.jobSource = jobSource;
@@ -574,10 +576,10 @@ router.get('/applications', protect, async (req, res) => {
       query.student = new mongoose.Types.ObjectId(req.user._id);
     }
 
-    console.log('[DEBUG /applications] final query:', query);
+    if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] final query:', query);
     const applicationCollection = mongoose.connection.db.collection('placementapplications');
     const docs = await applicationCollection.find(query).sort({ createdAt: -1 }).limit(200).toArray();
-    console.log('[DEBUG /applications] found docs count:', docs.length);
+    if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] found docs count:', docs.length);
     res.json({ success: true, data: docs });
   } catch (err) {
     console.error('[Placements] list applications error:', err);

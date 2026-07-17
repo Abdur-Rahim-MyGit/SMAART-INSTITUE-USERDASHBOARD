@@ -18,6 +18,7 @@ loadtest/e2e/node_modules/
 *.env.backup
 back-end/.env
 back-end/.env.backup
+front-end/.env
 
 # Dependencies
 node_modules/

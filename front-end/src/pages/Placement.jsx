@@ -25,6 +25,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
+import { createPortal } from "react-dom";
 import useUser from "@/hooks/useUser";
 
 const formatDate = (value, t) => {
@@ -443,7 +444,7 @@ const Placement = () => {
               </div>
             </div>
             {/* Confirm modal */}
-            {confirmOpen && (
+            {confirmOpen && createPortal(
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
                   <h3 className="text-lg font-bold text-[#0d1f4e]">{t("placement.confirm_withdraw", "Confirm withdraw")}</h3>
@@ -455,7 +456,8 @@ const Placement = () => {
                     <button onClick={confirmWithdraw} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white">{t("placement.withdraw", "Withdraw")}</button>
                   </div>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         </motion.div>
@@ -553,10 +555,10 @@ const Placement = () => {
                   const sourceLabel = job.sourceCollection === "smaartjobpostings" ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College");
                   const companyInitial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
                   const statusLabel = formatStatus(job.displayStatus || job.status, t);
-                  // consider job closed if status contains 'closed' (case-insensitive)
                   const rawStatus = (job.displayStatus || job.status || "").toString().toLowerCase();
                   const isClosed = rawStatus.includes("closed");
-                  const applyLabel = isClosed ? t("placement.closed", "Closed") : t("placement.view", "View");
+                  const applyLabel = isClosed ? t("placement.closed", "Closed") : t("placement.view", "View Details");
+                  const postedLabel = getPostedAgo(job.displayCreatedAt || job.createdAt, t);
 
                   return (
                     <motion.article
@@ -609,11 +611,11 @@ const Placement = () => {
                           <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                           <span className="truncate">{job.displayLocation || t("placement.remote", "Remote")}</span>
                         </div>
-                        {getPostedAgo(job.displayCreatedAt || job.createdAt, t) && (
+                        {postedLabel && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 shrink-0 text-slate-400" />
                             <span className="text-slate-400 text-xs font-semibold">
-                              {getPostedAgo(job.displayCreatedAt || job.createdAt, t)}
+                              {postedLabel}
                             </span>
                           </div>
                         )}
@@ -672,6 +674,12 @@ const Placement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-[#0d1f4e] dark:text-white">{t("placement.no_applications_found", "No applications found")}</h2>
                 <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">{t("placement.no_applications_desc", "You haven't applied to any jobs yet.")}</p>
+                <button
+                  onClick={() => setActiveTab('jobs')}
+                  className="mt-4 rounded-xl bg-[#1a3884] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#132c6b]"
+                >
+                  {t("placement.browse_jobs", "Browse Jobs")}
+                </button>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
