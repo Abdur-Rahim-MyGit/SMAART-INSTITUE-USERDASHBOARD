@@ -2,7 +2,6 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const Registration = require('../models/Registration');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const College = require('../models/College');
@@ -17,6 +16,29 @@ router.use(generalLimiter);
 
 
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Reconstruct the flat "registration" shape the frontend expects from a merged
+// student document (embedded `registration` sub-object + reconciled top-level
+// fields). Returns null when there's no student.
+const buildFlatRegistration = (studentDoc) => {
+  if (!studentDoc) return null;
+  const doc = studentDoc.toObject ? studentDoc.toObject() : studentDoc;
+  const sub = doc.registration || {};
+  return {
+    ...sub,
+    userId: doc.userId,
+    email: doc.email,
+    fullName: doc.fullName,
+    mobileNumber: doc.mobile,
+    profilePhoto: doc.profileImage,
+    dob: doc.dateOfBirth,
+    gender: doc.gender,
+    cgpa: doc.cgpa,
+    batch: doc.batch,
+    address: doc.address,
+    status: doc.profileStatus,
+  };
+};
 
 const cloneDefaultUserSettings = () => createDefaultUserSettings();
 
@@ -50,20 +72,22 @@ const normalizeUserSettings = (settings = {}, profileOverrides = {}) => {
 };
 
 const resolveSettingsProfile = async (account) => {
-  const registration = await Registration.findOne({
+  // Registration data is embedded on the merged student document.
+  const studentDoc = await Student.findOne({
     $or: [
-      { userId: account._id },
+      { _id: account._id },
       { email: account.email }
     ]
-  }).lean();
+  }).select('registration fullName email mobile settings').lean();
+  const registration = studentDoc ? (studentDoc.registration || null) : null;
 
   return {
     registration,
     profile: {
-      displayName: account.fullName || registration?.fullName || '',
-      email: account.email || registration?.email || '',
-      phone: account.mobile || registration?.mobileNumber || '',
-      bio: account.settings?.profile?.bio || ''
+      displayName: account.fullName || studentDoc?.fullName || '',
+      email: account.email || studentDoc?.email || '',
+      phone: account.mobile || studentDoc?.mobile || '',
+      bio: account.settings?.profile?.bio || registration?.bio || ''
     }
   };
 };
@@ -144,46 +168,16 @@ router.post('/register-details', upload.fields([
       });
     }
 
-    // Check if user already exists
+    // Student details are stored ONLY in the students collection (not users).
     const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-    let user = await User.findOne(emailQuery);
 
-    if (!user) {
-      // Create new user
-      user = new User({
-        fullName,
-        email: normalizedEmail,
-        mobile: mobileNumber, // User model uses 'mobile' field
-        password, // Will be hashed by pre-save hook
-      });
-      await user.save();
-    } else {
-      // SECURITY: this endpoint is unauthenticated, so it must NOT be able to
-      // overwrite the password of an account that already has one — that would
-      // let anyone reset any victim's password by posting their email (account
-      // takeover). Only allow setting an initial password for an account that
-      // does not yet have one (first-time registration before first login).
-      if (password && !user.password) {
-        user.password = password;
-        await user.save();
-      }
-    }
-
-    // Link college to user and student if institution name is provided in personalDetails
+    // Resolve a college id if an institution name is provided.
+    let collegeId = null;
     if (parsedPersonalDetails?.institution) {
       const college = await College.findOne({
         collegeName: { $regex: new RegExp(`^${escapeRegex(parsedPersonalDetails.institution.trim())}$`, 'i') }
       });
-      if (college) {
-        user.college = college._id;
-        await user.save();
-
-        const student = await Student.findOne(emailQuery);
-        if (student) {
-          student.college = college._id;
-          await student.save();
-        }
-      }
+      if (college) collegeId = college._id;
     }
 
     // Prepare registration data with all 11 sections
@@ -228,7 +222,6 @@ router.post('/register-details', upload.fields([
       expectedSalary: job.expectedSalary || '',
     })) : [];
     const registrationPayload = {
-      userId: user._id,
       email: normalizedEmail,
       fullName,
       mobileNumber,
@@ -257,6 +250,8 @@ router.post('/register-details', upload.fields([
         city: parsedPersonalDetails?.address?.city || '',
         state: parsedPersonalDetails?.address?.state || '',
         country: parsedPersonalDetails?.address?.country || '',
+        district: parsedPersonalDetails?.address?.district || '',
+        pincode: parsedPersonalDetails?.address?.pincode || '',
       },
 
       // 10th Standard Details
@@ -320,62 +315,66 @@ router.post('/register-details', upload.fields([
       submissionDate: new Date(),
     };
 
-    // Create or update registration
-    let registration = await Registration.findOne({ userId: user._id });
-
-    if (registration) {
-      // Update existing registration
-      Object.assign(registration, registrationPayload);
-      await registration.save();
-    } else {
-      // Create new registration
-      registration = new Registration(registrationPayload);
-      await registration.save();
-    }
-
-    // Mark registration as completed
-    user.registrationCompleted = true;
-
-    // Sync profilePhoto to User and Student models
     const resolvedPhoto = registrationPayload.profilePhoto || parsedPersonalDetails?.profilePhoto;
-    if (resolvedPhoto) {
-      user.profileImage = resolvedPhoto;
-    }
-    await user.save();
 
-    // Sync academic details and profileImage to Student document
-    try {
-      const student = await Student.findOne(emailQuery);
-      if (student) {
-        if (resolvedPhoto) {
-          student.profileImage = resolvedPhoto;
-        }
-        if (parsedPersonalDetails?.batch) {
-          student.batch = parsedPersonalDetails.batch;
-        }
-        student.cgpa = parsedPersonalDetails?.cgpa || (mappedHigherEducation && mappedHigherEducation[0]?.cgpaPercentage) || student.cgpa || '';
-        if (mappedHigherEducation && mappedHigherEducation.length > 0) {
-          const he = mappedHigherEducation[0];
-          student.academic = {
-            degreeLevel: he.qualificationLevel || '',
-            domain: he.degree || '',
-            degreeGroup: he.degreeFullName || '',
-            specialisation: he.specialization || ''
-          };
-        }
-        await student.save();
-      }
-    } catch (err) {
-      console.warn('Student academic/profileImage sync in register-details failed:', err.message);
+    // Registrations were merged into students. Write the reconciled top-level
+    // fields and the embedded `registration` sub-object onto the student
+    // (creating a `pending` self-registered student if one doesn't exist yet).
+    // Select +password so the "don't overwrite an existing password" check below
+    // is accurate (password has select:false).
+    let student = await Student.findOne(emailQuery).select('+password');
+    if (!student) {
+      student = new Student({
+        fullName,
+        email: normalizedEmail,
+        mobile: mobileNumber,
+        status: 'pending',
+        profileStatus: 'pending',
+        mustChangePassword: password ? false : true,
+      });
     }
+    if (collegeId) student.college = collegeId;
+
+    // Split the payload: reconciled top-level fields vs. the intake sub-object.
+    const {
+      email: _e, fullName: _f, mobileNumber: _m, password: _p,
+      profilePhoto: _pp, dob: _dob, gender: _gender, cgpa: _cgpa, batch: _batch,
+      address: _address, ...registrationSubdoc
+    } = registrationPayload;
+
+    if (mobileNumber) student.mobile = mobileNumber;
+    if (_dob) student.dateOfBirth = _dob;
+    if (['male', 'female', 'other'].includes(_gender)) student.gender = _gender;
+    if (resolvedPhoto) student.profileImage = resolvedPhoto;
+    student.cgpa = _cgpa || (mappedHigherEducation && mappedHigherEducation[0]?.cgpaPercentage) || student.cgpa || '';
+    if (_batch) student.batch = _batch;
+    if (_address && Object.keys(_address).length) {
+      const currentAddress = (student.address && student.address.toObject) ? student.address.toObject() : (student.address || {});
+      student.address = { ...currentAddress, ..._address };
+    }
+    if (mappedHigherEducation && mappedHigherEducation.length > 0) {
+      const he = mappedHigherEducation[0];
+      student.academic = {
+        ...(student.academic && student.academic.toObject ? student.academic.toObject() : student.academic),
+        degreeLevel: he.qualificationLevel || '',
+        domain: he.degree || '',
+        degreeGroup: he.degreeFullName || '',
+        specialisation: he.specialization || ''
+      };
+    }
+
+    student.registration = registrationSubdoc;
+    student.isRegistered = true;
+    if (password && !student.password) student.password = password;
+    await student.save();
 
     res.status(201).json({
       message: 'Registration details saved successfully',
       registration: {
-        id: registration._id,
-        email: registration.email,
-        fullName: registration.fullName,
-        status: registration.status,
+        id: student._id,
+        email: student.email,
+        fullName: student.fullName,
+        status: student.profileStatus,
       },
     });
   } catch (err) {
@@ -395,53 +394,46 @@ router.patch('/register-section', async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Find or create user (and also find student)
+    // Student details are stored ONLY in the students collection (not users).
     const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-    let user = await User.findOne(emailQuery);
     let student = await Student.findOne(emailQuery);
 
-    if (!user && !student) {
-      // Create a minimal user record if neither exists
-      user = new User({
+    // Ensure a student exists and work against an in-memory copy of its embedded
+    // `registration` sub-object.
+    if (!student) {
+      student = new Student({
         fullName: data.fullName || 'User',
         email: normalizedEmail,
         mobile: data.mobileNumber || '',
+        status: 'pending',
+        profileStatus: 'pending',
+        mustChangePassword: true,
       });
-      await user.save();
+      await student.save();
     }
 
-    // Find or create registration (using both userId and email to prevent duplicates)
-    let registration = await Registration.findOne({
-      $or: [
-        { userId: user?._id },
-        { userId: student?._id },
-        { email: normalizedEmail }
-      ]
-    }).sort({ updatedAt: -1 });
+    const registration = (student.registration && student.registration.toObject)
+      ? student.registration.toObject()
+      : (student.registration ? { ...student.registration } : {});
 
-    if (!registration) {
-      registration = new Registration({
-        userId: user?._id || student?._id,
-        email: normalizedEmail,
-        fullName: data.fullName || user?.fullName || student?.fullName || 'User',
-        mobileNumber: data.mobileNumber || user?.mobile || student?.mobile || '',
-      });
-    } else {
-      // Ensure registration is linked to current user/student ID if missing
-      if (!registration.userId) {
-        registration.userId = user?._id || student?._id;
-      }
+    // Seed reconciled top-level fields so section handlers can read them.
+    registration.email = normalizedEmail;
+    registration.fullName = registration.fullName || data.fullName || student.fullName || 'User';
+    registration.mobileNumber = registration.mobileNumber || student.mobile || '';
+    registration.dob = registration.dob || student.dateOfBirth;
+    registration.gender = registration.gender || student.gender;
+    registration.cgpa = registration.cgpa || student.cgpa;
+    registration.batch = registration.batch || student.batch;
+    registration.profilePhoto = registration.profilePhoto || student.profileImage;
+    if (!registration.address) {
+      registration.address = (student.address && student.address.toObject) ? student.address.toObject() : (student.address || undefined);
     }
 
     // Update the specific section
     const sectionMapping = {
       'profilePhoto': async () => {
         registration.profilePhoto = data.profilePhoto || registration.profilePhoto;
-        // Sync to User and Student models for immediate feedback
-        if (user) {
-          user.profileImage = registration.profilePhoto;
-          await user.save();
-        }
+        // Sync to the student for immediate feedback
         if (student) {
           student.profileImage = registration.profilePhoto;
           await student.save();
@@ -477,27 +469,12 @@ router.patch('/register-section', async (req, res) => {
             city: data.address.city || registration.address?.city || '',
             state: data.address.state || registration.address?.state || '',
             country: data.address.country || registration.address?.country || '',
+            district: data.address.district || registration.address?.district || '',
+            pincode: data.address.pincode || registration.address?.pincode || '',
           };
         }
 
-        // Sync critical fields to User and Student models
-        if (user) {
-          if (data.fullName) user.fullName = data.fullName;
-          if (data.mobileNumber) user.mobile = data.mobileNumber;
-          if (data.bio) user.bio = data.bio;
-          if (data.timezone) user.timezone = data.timezone;
-          if (data.dateFormat) user.dateFormat = data.dateFormat;
-          if (data.profilePhoto) user.profileImage = data.profilePhoto;
-          if (data.institution) {
-            const college = await College.findOne({
-              collegeName: { $regex: new RegExp(`^${escapeRegex(data.institution.trim())}$`, 'i') }
-            });
-            if (college) {
-              user.college = college._id;
-            }
-          }
-          await user.save();
-        }
+        // Sync critical fields to the student (student data never goes to users)
         if (student) {
           if (data.fullName) student.fullName = data.fullName;
           if (data.mobileNumber) student.mobile = data.mobileNumber;
@@ -528,6 +505,8 @@ router.patch('/register-section', async (req, res) => {
           city: data.city || registration.address?.city || '',
           state: data.state || registration.address?.state || '',
           country: data.country || registration.address?.country || '',
+          district: data.district || registration.address?.district || '',
+          pincode: data.pincode || registration.address?.pincode || '',
         };
       },
       'tenthDetails': async () => {
@@ -608,8 +587,33 @@ router.patch('/register-section', async (req, res) => {
       return res.status(400).json({ error: `Unknown section: ${section}` });
     }
 
-    registration.updatedAt = new Date();
-    await registration.save();
+    // Persist: reconciled fields to the student top level, the rest into the
+    // embedded `registration` sub-object.
+    if (registration.mobileNumber) student.mobile = registration.mobileNumber;
+    if (registration.dob) student.dateOfBirth = registration.dob;
+    if (['male', 'female', 'other'].includes(String(registration.gender || '').toLowerCase())) {
+      student.gender = String(registration.gender).toLowerCase();
+    }
+    if (registration.profilePhoto) student.profileImage = registration.profilePhoto;
+    if (registration.cgpa !== undefined && registration.cgpa !== '') student.cgpa = registration.cgpa;
+    if (registration.batch) student.batch = registration.batch;
+    if (registration.timezone) student.timezone = registration.timezone;
+    if (registration.dateFormat) student.dateFormat = registration.dateFormat;
+    if (registration.notificationPrefs) student.notificationPrefs = registration.notificationPrefs;
+    if (registration.address && Object.keys(registration.address).length) {
+      const currentAddress = (student.address && student.address.toObject) ? student.address.toObject() : (student.address || {});
+      student.address = { ...currentAddress, ...registration.address };
+    }
+
+    const reconciledKeys = ['userId', 'email', 'fullName', 'mobileNumber', 'password', 'profilePhoto', 'dob', 'gender', 'cgpa', 'batch', 'address', 'timezone', 'dateFormat', 'notificationPrefs', 'updatedAt', 'createdAt', 'status'];
+    const subdoc = { ...registration };
+    reconciledKeys.forEach(k => delete subdoc[k]);
+    const currentSub = (student.registration && student.registration.toObject) ? student.registration.toObject() : (student.registration || {});
+    student.registration = { ...currentSub, ...subdoc };
+    // NOTE: do NOT set isRegistered here — a progressive section save is not a
+    // completed registration. isRegistered is set on the final register-details
+    // submit, and is what routes the user past the ComprehensiveSignup form.
+    await student.save();
 
     console.log(`[register-section] Saved section '${section}' for ${normalizedEmail}`);
 
@@ -646,22 +650,41 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Find user by email (case-insensitive)
+    // Find user by email — first try the User collection, then fall back directly
+    // to the Student collection (admin-onboarded students have no User doc).
     const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-    let user = await User.findOne(emailQuery);
+    let user = null;
+    let resolvedFromStudent = false;
+
+    // 1. Try User collection
+    user = await User.findOne(emailQuery).select('+password');
+
+    // 2. If not found, try Student via userId link
     if (!user) {
-      console.log('User not found by email, trying registration link:', normalizedEmail);
-      const reg = await Registration.findOne({ email: normalizedEmail });
-      if (reg?.userId) {
-        user = await User.findById(reg.userId);
-      }
-      if (!user) {
-        console.log('User still not found after registration lookup:', normalizedEmail);
-        return res.status(401).json({ error: 'Invalid email or password' });
+      console.log('User not found in users, trying student link:', normalizedEmail);
+      const linkedStudent = await Student.findOne(emailQuery).select('userId');
+      if (linkedStudent?.userId) {
+        user = await User.findById(linkedStudent.userId).select('+password');
       }
     }
 
-    console.log('User found:', { email: normalizedEmail, registrationCompleted: user.registrationCompleted, hasPassword: !!user.password });
+    // 3. If still not found, try Student collection directly
+    //    (admin-created students live only in the students collection)
+    if (!user) {
+      console.log('Falling back to direct Student collection lookup:', normalizedEmail);
+      const studentDoc = await Student.findOne(emailQuery).select('+password');
+      if (studentDoc) {
+        user = studentDoc;
+        resolvedFromStudent = true;
+      }
+    }
+
+    if (!user) {
+      console.log('User not found in any collection:', normalizedEmail);
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    console.log('User found:', { email: normalizedEmail, resolvedFromStudent, hasPassword: !!user.password });
 
     // Check if password exists
     if (!user.password) {
@@ -685,26 +708,19 @@ router.post('/login', async (req, res) => {
 
     console.log('Password valid for user:', normalizedEmail);
 
-    // Get registration details to check if user has completed comprehensive registration
-    const registration = await Registration.findOne({ userId: user._id });
-    const hasRegistration = !!registration;
+    // Registration data is embedded on the student document.
+    // If we already resolved from Student, reuse that doc; otherwise look it up.
+    const linkedStudentDoc = resolvedFromStudent
+      ? user
+      : await Student.findOne({
+        $or: [{ _id: user._id }, { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } }]
+      }).select('registration gender profileImage isRegistered').lean();
+
+    const registration = linkedStudentDoc ? (linkedStudentDoc.registration || null) : null;
+    const hasRegistration = !!(linkedStudentDoc && linkedStudentDoc.isRegistered);
 
     // Robust gender lookup
-    let finalGender = user.gender;
-    console.log(`[Users/Login] Initial gender for ${normalizedEmail}: ${finalGender}`);
-
-    if (!finalGender && registration) {
-      finalGender = registration.gender;
-      console.log(`[Users/Login] Found gender in linked Registration for ${normalizedEmail}: ${finalGender}`);
-    }
-    if (!finalGender) {
-      const regRecord = await Registration.findOne({
-        email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') }
-      });
-      finalGender = regRecord?.gender;
-      console.log(`[Users/Login] Found gender by email lookup for ${normalizedEmail}: ${finalGender}`);
-    }
-
+    let finalGender = user.gender || linkedStudentDoc?.gender;
     console.log(`[Users/Login] Final resolved gender: ${finalGender}`);
 
     // Return success with user data
@@ -715,11 +731,11 @@ router.post('/login', async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         gender: finalGender,
-        mobileNumber: user.mobile, // User model uses 'mobile' field
-        role: user.role,
-        registrationCompleted: user.registrationCompleted,
-        hasRegistration: hasRegistration, // Flag to check if comprehensive registration exists
-        profilePhoto: registration?.profilePhoto || null, // Profile photo from registration
+        mobileNumber: user.mobile,
+        role: user.role || 'student',
+        registrationCompleted: user.registrationCompleted || false,
+        hasRegistration: hasRegistration,
+        profilePhoto: linkedStudentDoc?.profileImage || user.profileImage || null,
       },
       registration: registration || null,
     });
@@ -754,18 +770,6 @@ router.get('/register-details/:email', async (req, res) => {
       }
     }
 
-    // If still not found, check Registration collection by email
-    if (!user) {
-      const regByEmail = await Registration.findOne({ email: normalizedEmail });
-      if (regByEmail) {
-        return res.json({
-          ...regByEmail.toObject(),
-          fullName: regByEmail.fullName,
-          gender: regByEmail.gender
-        });
-      }
-    }
-
     // If no user found anywhere, return generic response
     if (!user) {
       return res.json({
@@ -775,13 +779,11 @@ router.get('/register-details/:email', async (req, res) => {
       });
     }
 
-    // Try to find registration by userId or email
-    const registration = await Registration.findOne({
-      $or: [
-        { userId: user._id },
-        { email: normalizedEmail }
-      ]
-    }).sort({ updatedAt: -1 });
+    // Registration data is embedded on the merged student document.
+    const registrationHost = (userSource === 'Student')
+      ? user
+      : await Student.findOne({ email: normalizedEmail });
+    const registration = buildFlatRegistration(registrationHost);
 
     // Aggregated badges
     let aggregatedBadges = [];
@@ -842,7 +844,7 @@ router.get('/register-details/:email', async (req, res) => {
 
     if (registration) {
       return res.json({
-        ...registration.toObject(),
+        ...registration,
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
         batch: registration.batch || studentBatch || '',
@@ -943,23 +945,16 @@ router.put('/settings', protect, async (req, res) => {
 
     await req.user.save();
 
-    if (existingProfile.registration) {
-      const registrationUpdates = {};
-
-      if (existingProfile.registration.fullName !== settings.profile.displayName) {
-        registrationUpdates.fullName = settings.profile.displayName;
-      }
-
-      if (existingProfile.registration.mobileNumber !== settings.profile.phone) {
-        registrationUpdates.mobileNumber = settings.profile.phone;
-      }
-
-      if (Object.keys(registrationUpdates).length > 0) {
-        await Registration.updateOne(
-          { _id: existingProfile.registration._id },
-          { $set: registrationUpdates }
-        );
-      }
+    // fullName / phone are top-level fields on the merged student — keep the
+    // canonical student document in sync when the settings profile changes.
+    const studentUpdates = {};
+    if (settings.profile.displayName) studentUpdates.fullName = settings.profile.displayName;
+    if (typeof settings.profile.phone === 'string') studentUpdates.mobile = settings.profile.phone;
+    if (Object.keys(studentUpdates).length > 0) {
+      await Student.updateOne(
+        { $or: [{ _id: req.user._id }, { email: req.user.email }] },
+        { $set: studentUpdates }
+      );
     }
 
     return res.json({
@@ -1022,25 +1017,25 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(badgeId)) {
       // Fallback: Verify generic badge template if it's a string like 'BADGE-CRQ-2026-001'
       const genericBadge = await MasterBadge.findOne({ badgeId: badgeId.toUpperCase() });
-      
+
       if (genericBadge) {
-          return res.json({
-            success: true,
-            badge: {
-              id: genericBadge.badgeId,
-              badgeId: genericBadge.badgeId,
-              title: genericBadge.title,
-              description: genericBadge.description,
-              tier: genericBadge.tier,
-              xp: genericBadge.xp,
-              earnedDate: new Date(), // Generic current date since it's not a specific assignment
-              category: genericBadge.category
-            },
-            owner: {
-              fullName: 'Verified SMAART Learner'
-            },
-            issuedBy: 'SMAART Institute'
-          });
+        return res.json({
+          success: true,
+          badge: {
+            id: genericBadge.badgeId,
+            badgeId: genericBadge.badgeId,
+            title: genericBadge.title,
+            description: genericBadge.description,
+            tier: genericBadge.tier,
+            xp: genericBadge.xp,
+            earnedDate: new Date(), // Generic current date since it's not a specific assignment
+            category: genericBadge.category
+          },
+          owner: {
+            fullName: 'Verified SMAART Learner'
+          },
+          issuedBy: 'SMAART Institute'
+        });
       }
       return res.status(400).json({ error: 'Invalid Badge ID format or Badge not found' });
     }
@@ -1120,75 +1115,8 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
   }
 });
 
-// Dev-only: Backfill Users from Registrations so old registrations can log in.
-// Registered ONCE at module level (previously this was mistakenly defined inside
-// the /register-details handler, stacking a new route on every signup request).
-router.post('/_dev/backfill', async (req, res) => {
-  try {
-    if (process.env.NODE_ENV === 'production') {
-      return res.status(403).json({ error: 'Backfill disabled in production' });
-    }
-
-    const emailInput = (req.body?.email || req.query?.email || '').trim().toLowerCase();
-
-    const regFilter = emailInput
-      ? { email: { $regex: new RegExp(`^${escapeRegex(emailInput)}$`, 'i') } }
-      : {};
-
-    const registrations = await Registration.find(regFilter);
-    if (registrations.length === 0) {
-      return res.json({ processed: 0, created: 0, updated: 0, message: 'No registrations found for filter' });
-    }
-
-    let created = 0;
-    let updated = 0;
-    const results = [];
-
-    for (const reg of registrations) {
-      const normalizedEmail = (reg.email || '').trim().toLowerCase();
-      const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
-
-      let user = null;
-      if (reg.userId) {
-        user = await User.findById(reg.userId);
-      }
-      if (!user) {
-        user = await User.findOne(emailQuery);
-      }
-
-      if (!user) {
-        // Create new user from registration
-        user = new User({
-          fullName: reg.fullName || 'User',
-          email: normalizedEmail,
-          mobileNumber: reg.mobileNumber || '',
-          password: reg.password || undefined, // will hash if provided
-          registrationCompleted: true,
-        });
-        await user.save();
-        created += 1;
-        results.push({ email: user.email, action: 'created' });
-      } else {
-        // Ensure flags are set and email normalized
-        let changed = false;
-        if (!user.registrationCompleted) { user.registrationCompleted = true; changed = true; }
-        if (user.email !== normalizedEmail) { user.email = normalizedEmail; changed = true; }
-        if (!user.password && reg.password) { user.password = reg.password; changed = true; }
-        if (changed) { await user.save(); updated += 1; results.push({ email: user.email, action: 'updated' }); }
-      }
-
-      // Link registration to user if missing
-      if (!reg.userId || String(reg.userId) !== String(user._id)) {
-        reg.userId = user._id;
-        await reg.save();
-      }
-    }
-
-    return res.json({ processed: registrations.length, created, updated, results });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
+// (Removed dev-only /_dev/backfill route: the registrations collection was
+// merged into students, so there is nothing to backfill from.)
 
 module.exports = router;
 

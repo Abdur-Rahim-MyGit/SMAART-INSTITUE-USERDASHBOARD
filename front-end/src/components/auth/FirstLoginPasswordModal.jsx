@@ -19,12 +19,12 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
 
   // Full password policy validation (matching backend)
   const passwordChecks = {
-    length:    newPassword.length >= 8,
+    length: newPassword.length >= 8,
     uppercase: /[A-Z]/.test(newPassword),
     lowercase: /[a-z]/.test(newPassword),
-    number:    /[0-9]/.test(newPassword),
-    special:   /[!@#$%^&*(),.?":{}|<>]/.test(newPassword),
-    match:     newPassword === confirmPassword && confirmPassword.length > 0,
+    number: /[0-9]/.test(newPassword),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(newPassword),
+    match: newPassword === confirmPassword && confirmPassword.length > 0,
   };
 
   const isPasswordValid = Object.values(passwordChecks).every(Boolean);
@@ -271,12 +271,12 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
 
             {/* ── Password Requirements Checklist ─────────────────────────── */}
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 py-3 border-y border-gray-100 dark:border-white/5">
-              <RequirementItem label={t("first_login_pw.req_length", "Min 8 characters")}   met={passwordChecks.length} />
-              <RequirementItem label={t("first_login_pw.req_number", "At least 1 number")}  met={passwordChecks.number} />
-              <RequirementItem label={t("first_login_pw.req_upper", "Uppercase letter")}   met={passwordChecks.uppercase} />
-              <RequirementItem label={t("first_login_pw.req_special", "Special character")}  met={passwordChecks.special} />
-              <RequirementItem label={t("first_login_pw.req_lower", "Lowercase letter")}   met={passwordChecks.lowercase} />
-              <RequirementItem label={t("first_login_pw.req_match", "Passwords match")}    met={passwordChecks.match} />
+              <RequirementItem label={t("first_login_pw.req_length", "Min 8 characters")} met={passwordChecks.length} />
+              <RequirementItem label={t("first_login_pw.req_number", "At least 1 number")} met={passwordChecks.number} />
+              <RequirementItem label={t("first_login_pw.req_upper", "Uppercase letter")} met={passwordChecks.uppercase} />
+              <RequirementItem label={t("first_login_pw.req_special", "Special character")} met={passwordChecks.special} />
+              <RequirementItem label={t("first_login_pw.req_lower", "Lowercase letter")} met={passwordChecks.lowercase} />
+              <RequirementItem label={t("first_login_pw.req_match", "Passwords match")} met={passwordChecks.match} />
             </div>
 
             {/* Submit & Cancel Actions */}
@@ -322,16 +322,14 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
 const RequirementItem = ({ label, met }) => (
   <div className="flex items-center gap-2">
     <div
-      className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${
-        met ? "bg-green-500 shadow-sm dark:shadow-none" : "bg-gray-100 dark:bg-slate-800"
-      }`}
+      className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${met ? "bg-green-500 shadow-sm dark:shadow-none" : "bg-gray-100 dark:bg-slate-800"
+        }`}
     >
       <CheckCircle2 className={`w-3 h-3 ${met ? "text-white" : "text-gray-400 dark:text-slate-500"}`} />
     </div>
     <span
-      className={`text-[11px] font-bold transition-colors duration-200 ${
-        met ? "text-gray-800 dark:text-slate-200" : "text-gray-400 dark:text-slate-500"
-      }`}
+      className={`text-[11px] font-bold transition-colors duration-200 ${met ? "text-gray-800 dark:text-slate-200" : "text-gray-400 dark:text-slate-500"
+        }`}
     >
       {label}
     </span>

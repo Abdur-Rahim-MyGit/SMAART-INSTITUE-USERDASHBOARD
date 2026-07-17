@@ -45,24 +45,18 @@ exports.getAvatar = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Attempt to get gender
+    // Attempt to get gender (a top-level field on the merged student document)
     let gender = user.gender;
-    const Registration = require('../models/Registration');
 
-    if (!gender) {
-      // Look up by linked userId first
-      const registration = await Registration.findOne({ userId: user._id });
-      gender = registration?.gender;
-
-      // If still missing, try by email (defensive fallback)
-      if (!gender && user.email) {
-        const normalizedEmail = user.email.toLowerCase().trim();
-        const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regRecord = await Registration.findOne({
-          email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') }
-        });
-        gender = regRecord?.gender;
-      }
+    if (!gender && user.email) {
+      // Defensive fallback: look the gender up on the student by email.
+      const Student = require('../models/Student');
+      const normalizedEmail = user.email.toLowerCase().trim();
+      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const studentDoc = await Student.findOne({
+        email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') }
+      }).select('gender').lean();
+      gender = studentDoc?.gender;
     }
 
     // Prepare response with only unlocked items
@@ -343,28 +337,21 @@ exports.updateStreak = async (req, res) => {
     const avatar = await Avatar.getOrCreate(userId);
     const streakStatus = await avatar.updateStreak();
 
-    // Also update streak in Registration model for student data tracking
-    const Registration = require('../models/Registration');
+    // Also mirror streak data onto the merged student document for student tracking
+    const Student = require('../models/Student');
     const user = await User.findById(userId);
-    
-    if (user) {
-      // Find registration by email
-      const registration = await Registration.findOne({ email: user.email });
-      if (registration) {
-        // Sync streak data to Registration
-        registration.streakData = {
-          streakCycleDay: avatar.streakCycleDay,
-          streakCyclesCompleted: avatar.streakCyclesCompleted,
-          streakStartDate: avatar.streakStartDate,
-          lastStreakDate: avatar.lastStreakDate,
-          streakActive: avatar.streakActive,
-          totalStreakDays: streakStatus.totalStreakDays,
-          streakHistory: avatar.streakHistory,
-          sundayHolidays: avatar.sundayHolidays || []
-        };
-        await registration.save();
-      }
-    }
+    const streakData = {
+      streakCycleDay: avatar.streakCycleDay,
+      streakCyclesCompleted: avatar.streakCyclesCompleted,
+      streakStartDate: avatar.streakStartDate,
+      lastStreakDate: avatar.lastStreakDate,
+      streakActive: avatar.streakActive,
+      totalStreakDays: streakStatus.totalStreakDays,
+      streakHistory: avatar.streakHistory,
+      sundayHolidays: avatar.sundayHolidays || []
+    };
+    const streakFilter = user ? { email: user.email } : { _id: userId };
+    await Student.updateOne(streakFilter, { $set: { streakData } });
 
     // Bonus XP for completing a full week (cycle)
     let bonusXP = 0;
@@ -427,16 +414,15 @@ exports.getStreakStatus = async (req, res) => {
     const avatar = await Avatar.getOrCreate(userId);
     const streakStatus = avatar.getStreakStatus();
 
-    // Also get streak data from Registration (if available)
-    const Registration = require('../models/Registration');
+    // Also get streak data from the merged student document (if available)
+    const Student = require('../models/Student');
     const user = await User.findById(userId);
     let registrationStreak = null;
-    
-    if (user) {
-      const registration = await Registration.findOne({ email: user.email });
-      if (registration && registration.streakData) {
-        registrationStreak = registration.streakData;
-      }
+
+    const streakFilter = user ? { email: user.email } : { _id: userId };
+    const studentDoc = await Student.findOne(streakFilter).select('streakData').lean();
+    if (studentDoc && studentDoc.streakData) {
+      registrationStreak = studentDoc.streakData;
     }
 
     res.json({

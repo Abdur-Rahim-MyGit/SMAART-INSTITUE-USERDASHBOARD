@@ -31,7 +31,7 @@ const sendOTPEmail = async (email, otp, fullName = '', subject = '') => {
 
   try {
     const transporter = createTransporter();
-    
+
     const mailOptions = {
       from: `"SMAART Minds" <${process.env.SMTP_USER}>`,
       to: email,

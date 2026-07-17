@@ -41,6 +41,7 @@ const registrationSchema = new mongoose.Schema({
     city: String,
     state: String,
     country: String,
+    district: String,
     pincode: String,
   },
 

@@ -38,9 +38,9 @@ const clearCareerAgentStorage = () => {
 
   // Dynamically clear specific prefixes to prevent cross-user data bleed
   Object.keys(localStorage).forEach(key => {
-    if (key.startsWith('course-notes-') || 
-        key.startsWith('passport_demo_') || 
-        key.startsWith('note_color_')) {
+    if (key.startsWith('course-notes-') ||
+      key.startsWith('passport_demo_') ||
+      key.startsWith('note_color_')) {
       localStorage.removeItem(key);
     }
   });
