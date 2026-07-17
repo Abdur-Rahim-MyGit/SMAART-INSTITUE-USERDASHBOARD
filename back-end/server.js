@@ -117,7 +117,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 
 const connectWithFallback = async () => {
   const primaryURI = process.env.MONGODB_URI;
-  const fallbackURI = process.env.MONGODB_URI;
+  const fallbackURI = process.env.MONGODB_FALLBACK_URI || 'mongodb://127.0.0.1:27017/minds';
 
   const options = {
     useNewUrlParser: true,

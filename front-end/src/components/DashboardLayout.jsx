@@ -424,8 +424,8 @@ const DashboardLayout = () => {
   }, [location.pathname]);
 
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
-  const isFullScreenPage = isCareerAgentDashboard;
   const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
+  const isFullScreenPage = isCareerAgentDashboard || location.pathname === '/dashboard/assessments/baseline' || isImmersiveRoute;
 
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();

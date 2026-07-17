@@ -49,7 +49,8 @@ const protect = async (req, res, next) => {
       } else if (userType === 'teacher') {
         UserModel = require('../models/Teacher');
       } else if (userType === 'registration') {
-        UserModel = require('../models/Registration');
+        // Legacy 'registration' tokens now resolve against the merged Student model.
+        UserModel = require('../models/Student');
       }
 
       // Attach user to request (excluding password)
@@ -152,7 +153,8 @@ const optionalAuth = async (req, res, next) => {
       const userType = decoded.userType || 'user';
       if (userType === 'student') UserModel = require('../models/Student');
       else if (userType === 'teacher') UserModel = require('../models/Teacher');
-      else if (userType === 'registration') UserModel = require('../models/Registration');
+      // Legacy 'registration' tokens now resolve against the merged Student model.
+      else if (userType === 'registration') UserModel = require('../models/Student');
 
       req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName').select('-password');
 

@@ -89,8 +89,8 @@ router.get('/by-email/:email', async (req, res) => {
 
         // SECURITY (audit HIGH): non-staff may only resolve their OWN record by
         // email — otherwise this enumerates every student's id/studentId.
-        if (!isStaff(req.user) && 
-            String(student._id) !== String(req.user && req.user._id) && 
+        if (!isStaff(req.user) &&
+            String(student._id) !== String(req.user && req.user._id) &&
             (req.user && req.user.email && req.user.email.toLowerCase() !== student.email.toLowerCase())) {
             return res.status(403).json({ success: false, error: 'Not authorized' });
         }
@@ -239,25 +239,25 @@ router.put('/:id/academic-performance', async (req, res) => {
         if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
             return res.status(403).json({ success: false, error: 'Not authorized' });
         }
-        
+
         const { semesterPerformances, overallCgpa, activeBacklogs, historyOfArrears } = req.body;
-        
+
         const student = await Student.findById(req.params.id);
         if (!student) {
             return res.status(404).json({ success: false, error: 'Student not found' });
         }
-        
+
         if (!student.academic) {
             student.academic = {};
         }
-        
+
         if (semesterPerformances !== undefined) student.academic.semesterPerformances = semesterPerformances;
         if (overallCgpa !== undefined) student.academic.overallCgpa = overallCgpa;
         if (activeBacklogs !== undefined) student.academic.activeBacklogs = activeBacklogs;
         if (historyOfArrears !== undefined) student.academic.historyOfArrears = historyOfArrears;
-        
+
         await student.save();
-        
+
         res.json({
             success: true,
             message: 'Academic performance updated successfully',
