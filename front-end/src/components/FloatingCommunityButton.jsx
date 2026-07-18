@@ -26,6 +26,12 @@ const FloatingCommunityButton = () => {
         return stored ? parseInt(stored, 10) : 0;
     });
 
+    useEffect(() => {
+        const userId = user?._id || user?.id || 'anon';
+        const stored = localStorage.getItem(`${userId}_communityLastSeenCount`);
+        setLastSeenCount(stored ? parseInt(stored, 10) : 0);
+    }, [user]);
+
     // Check for Vision Board splash screen
     useEffect(() => {
         const checkSplash = () => {

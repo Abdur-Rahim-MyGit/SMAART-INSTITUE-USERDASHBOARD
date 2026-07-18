@@ -15,6 +15,11 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
         secure: false,
       },
+      '/socket.io': {
+        target: 'ws://localhost:5000',
+        ws: true,
+        changeOrigin: true,
+      },
       '/ws': {
         target: 'ws://localhost:5000',
         ws: true,
@@ -114,5 +119,6 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ["@vladmandic/face-api"],
+    exclude: ["onnxruntime-web"]
   },
 }));

@@ -17,6 +17,7 @@ import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
+import { clearCareerAgentStorage } from "@/contexts/UserContextFixed";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
@@ -148,36 +149,7 @@ const DashboardHome = () => {
               sessionStorage.clear();
               localStorage.removeItem('user');
               localStorage.removeItem('token');
-              // Clear career agent and assessment keys (matching logout logic)
-              const careerKeys = [
-                'smaart_student_name', 'smaart_student_email', 'smaart_analysis',
-                'smaart_analysis_id', 'smaart_pref_primary', 'smaart_pref_secondary',
-                'smaart_pref_tertiary', 'smaart_onboarding_draft', 'smaart_user_degree',
-                'smaart_user_specialisation', 'smaart_user_skills', 'smaart_user',
-                'smaart_completed_courses', 'smaart_last_watched_course',
-                'smaart_last_watched_title', 'smaart_last_watched_lesson',
-                'smaart_course_progress', 'smaart_last_active', 'smaart_demo_progress',
-                'smaart_capacity_dev_unlocked'
-              ];
-              careerKeys.forEach(k => {
-                localStorage.removeItem(k);
-                if (userId !== 'anon') {
-                  localStorage.removeItem(`${userId}_${k}`);
-                }
-                Object.keys(localStorage).forEach((key) => {
-                  if (key.endsWith(`_${k}`)) {
-                    localStorage.removeItem(key);
-                  }
-                });
-              });
-              Object.keys(localStorage).forEach(k => {
-                if (k.startsWith('course-notes-') || 
-                    k.startsWith('passport_demo_') || 
-                    k.startsWith('note_color_') ||
-                    k.endsWith('_communityLastSeenCount')) {
-                  localStorage.removeItem(k);
-                }
-              });
+              clearCareerAgentStorage(userId);
               window.location.href = '/';
             }}
             className="px-6 py-2.5 bg-white dark:bg-[#002147] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"

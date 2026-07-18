@@ -28,7 +28,13 @@ const calculateRiskScore = (violationsByType) => {
     gaze_away: 10,
     eyes_closed: 15,
     voice_detected: 25,
-    prolonged_silence: 10
+    prolonged_silence: 10,
+    // v2 ONNX events
+    spoof_detected: 40,        // Critical — photo/video replay attack
+    camera_quality_check: 0,   // Info
+    registration_quality: 0,   // Info
+    tracker_loss: 5,           // Low — brief tracking loss
+    identity_confidence: 0,    // Info
   };
   
   Object.keys(violations).forEach(type => {
@@ -121,8 +127,13 @@ exports.logEvent = async (req, res) => {
 
     await event.save();
 
-    // Info-only events (face_registered, identity_verified) don't count as violations
-    const infoOnlyEvents = ['face_registered', 'identity_verified'];
+    // Info-only events don't count as violations
+    const infoOnlyEvents = [
+      'face_registered', 'identity_verified',
+      // v2 info events
+      'camera_quality_check', 'registration_quality', 'identity_confidence',
+    ];
+    const metadataPayload = req.body.metadata || {};
     
     if (infoOnlyEvents.includes(eventType)) {
       // Mark face registration on session
@@ -355,3 +366,95 @@ exports.webhookUnlock = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+// ─── Save face registration embedding to session ───────────────────────────
+/**
+ * POST /api/proctoring/sessions/:sessionId/registration
+ * Body: {
+ *   embedding: number[],        // Float32Array serialised to plain array
+ *   model: string,              // 'arcface-r50-onnx'
+ *   qualityScore: number,       // 0-100
+ *   framesCaptured: number,     // 5
+ *   antispoofPassed: boolean,   // true
+ *   alignedCropUrl?: string,    // optional preview URL
+ * }
+ *
+ * The embedding is serialised as JSON to fit in a String field.
+ * It is scoped to this proctoring session only and auto-deleted after 30 days
+ * via the TTL index on completedAt (DPDPA 2023 compliance).
+ */
+exports.saveRegistration = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
+
+    if (!embedding || !Array.isArray(embedding)) {
+      return res.status(400).json({ success: false, error: 'embedding (array) is required.' });
+    }
+    if (embedding.length !== 512) {
+      return res.status(400).json({ success: false, error: `Expected 512-d embedding, got ${embedding.length}.` });
+    }
+
+    const session = await ProctoringSession.findOne({ _id: sessionId, userId });
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
+    }
+
+    session.faceEmbedding         = JSON.stringify(embedding);
+    session.faceEmbeddingModel    = model || 'arcface-r50-onnx';
+    session.faceEmbeddingDims     = 512;
+    session.faceRegistrationQuality = qualityScore ?? null;
+    session.faceRegistrationFrames  = framesCaptured ?? null;
+    session.antispoofPassed         = antispoofPassed ?? null;
+    session.faceAlignedCropUrl      = alignedCropUrl || null;
+    session.faceRegistered          = true;
+    session.faceRegisteredAt        = new Date();
+
+    await session.save();
+
+    res.status(200).json({ success: true, message: 'Face registration saved to session.' });
+  } catch (err) {
+    console.error('[ProctoringController] saveRegistration error:', err);
+    res.status(500).json({ success: false, error: 'Server error saving registration.', message: err.message });
+  }
+};
+
+// ─── Retrieve embedding for session resume ─────────────────────────────────
+/**
+ * GET /api/proctoring/sessions/:sessionId/embedding
+ * Returns the stored ArcFace embedding for this session so the client can
+ * resume verification after a page refresh without re-registering.
+ */
+exports.getEmbedding = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+
+    const session = await ProctoringSession.findOne(
+      { _id: sessionId, userId },
+      'faceEmbedding faceEmbeddingModel faceEmbeddingDims faceRegistered faceRegistrationQuality'
+    );
+
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Session not found.' });
+    }
+    if (!session.faceRegistered || !session.faceEmbedding) {
+      return res.status(404).json({ success: false, error: 'No face registration found for this session.' });
+    }
+
+    const embedding = JSON.parse(session.faceEmbedding);
+
+    res.json({
+      success: true,
+      embedding,
+      model: session.faceEmbeddingModel,
+      dimensions: session.faceEmbeddingDims,
+      qualityScore: session.faceRegistrationQuality,
+    });
+  } catch (err) {
+    console.error('[ProctoringController] getEmbedding error:', err);
+    res.status(500).json({ success: false, error: 'Server error retrieving embedding.', message: err.message });
+  }
+};
+

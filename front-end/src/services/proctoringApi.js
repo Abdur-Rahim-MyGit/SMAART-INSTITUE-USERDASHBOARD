@@ -52,7 +52,29 @@ export const proctoringApi = {
   // Admin: Get detailed proctoring session
   getSessionDetails: async (sessionId) => {
     return apiCall(`/proctoring/admin/session/${sessionId}`);
-  }
+  },
+
+  // v2: Persist ArcFace registration embedding to the session record
+  // embedding: Float32Array | number[]
+  saveRegistration: async (sessionId, registrationData) => {
+    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = registrationData;
+    return apiCall(`/proctoring/session/${sessionId}/registration`, {
+      method: 'POST',
+      body: JSON.stringify({
+        embedding: Array.from(embedding),  // Convert Float32Array → plain array for JSON
+        model,
+        qualityScore,
+        framesCaptured,
+        antispoofPassed,
+        alignedCropUrl: alignedCropUrl || null,
+      }),
+    });
+  },
+
+  // v2: Retrieve stored embedding for session resume after page refresh
+  getEmbedding: async (sessionId) => {
+    return apiCall(`/proctoring/session/${sessionId}/embedding`);
+  },
 };
 
 export default proctoringApi;

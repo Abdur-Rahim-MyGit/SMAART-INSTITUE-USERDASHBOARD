@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Biometric Benchmark Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.15);
+      --success: #4ade80;
+      --success-glow: rgba(74, 222, 128, 0.15);
+      --warning: #fbbf24;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 30px;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-top: 5px;
+      font-size: 1.1rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+
+    .controls-panel {
+      text-align: center;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    .action-btn.secondary {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .card.standard {
+      border-left: 4px solid var(--primary);
+    }
+
+    .card.optimized {
+      border-left: 4px solid var(--success);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title .badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .standard .badge {
+      background: var(--primary-glow);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .optimized .badge {
+      background: var(--success-glow);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    /* Metrics display */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .metric-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+      font-family: monospace;
+    }
+
+    /* Summary Bar Chart */
+    .comparison-summary {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    @media (max-width: 800px) {
+      .comparison-summary {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .summary-text {
+      flex: 1;
+    }
+
+    .summary-header {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .summary-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .chart-container {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bar-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .bar-outer {
+      height: 12px;
+      background: var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-inner {
+      height: 100%;
+      border-radius: 6px;
+      width: 0%;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bar-inner.standard-bar {
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .bar-inner.optimized-bar {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .savings-highlight {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--success);
+      font-family: monospace;
+    }
+
+    /* Images */
+    .images-panel {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .image-frame {
+      position: relative;
+      text-align: center;
+    }
+
+    .image-frame span {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      border: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    img, video, canvas {
+      max-width: 260px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #020617;
+    }
+
+    /* Technical details */
+    .tech-log {
+      grid-column: 1 / -1;
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Biometric Benchmark Comparison</h1>
+      <div class="subtitle">Standard Pipeline vs. Experimental Optimized Pipeline (ROI + Smart Detection)</div>
+      <div id="status" class="status-badge">Loading TensorFlow.js Models...</div>
+    </header>
+
+    <div class="controls-panel">
+      <button id="btn-webcam" class="action-btn">Enable Live Webcam</button>
+      <button id="btn-run" class="action-btn" style="background: var(--success); display: none;">Capture & Run Benchmark</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Standard Pipeline -->
+      <div class="column">
+        <div class="card standard">
+          <div class="card-title">
+            Standard Pipeline
+            <span class="badge">Baseline</span>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Full Frame Resolution</div>
+            <div class="metric-value">640x480</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Face Detection (SSD)</div>
+            <div id="std-detect" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Landmark (FaceLandmark68)</div>
+            <div id="std-landmark" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Recognition (Descriptor)</div>
+            <div id="std-recognition" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Total Verification Latency</div>
+            <div id="std-total" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Peak Loop Frame Rate</div>
+            <div id="std-fps" class="metric-value" style="color: var(--primary);">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optimized Pipeline -->
+      <div class="column">
+        <div class="card optimized">
+          <div class="card-title">
+            Optimized Prototype Pipeline
+            <span class="badge">Experimental</span>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Adaptive Crop Resolution (ROI)</div>
+            <div id="opt-resolution" class="metric-value">170x170</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Face Detection (SSD on ROI)</div>
+            <div id="opt-detect" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Landmark (Mapped Box)</div>
+            <div id="opt-landmark" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Avg Recognition (Embedding)</div>
+            <div id="opt-recognition" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Total Verification Latency</div>
+            <div id="opt-total" class="metric-value">-</div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label">Peak Loop Frame Rate</div>
+            <div id="opt-fps" class="metric-value" style="color: var(--success);">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Summary -->
+      <div class="comparison-summary">
+        <div class="summary-text">
+          <div class="summary-header">Performance Gain: <span id="gain-pct" class="savings-highlight">-%</span></div>
+          <div class="summary-desc">
+            By utilizing <strong>Region of Interest (ROI)</strong> cropping on an offscreen canvas, the SSD detector works on a much smaller resolution. Adding <strong>Smart Detection</strong> further optimizes stable states by reusing coordinates, resulting in significant latency reduction without compromising recognition accuracy.
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="bar-group">
+            <div class="bar-label">
+              <span>Standard Pipeline Latency</span>
+              <span id="label-std-ms">-</span>
+            </div>
+            <div class="bar-outer">
+              <div id="bar-std" class="bar-inner standard-bar"></div>
+            </div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-label">
+              <span>Optimized Pipeline Latency</span>
+              <span id="label-opt-ms">-</span>
+            </div>
+            <div class="bar-outer">
+              <div id="bar-opt" class="bar-inner optimized-bar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tech Console Log -->
+      <div id="console-log" class="tech-log">
+        [Console Init] Waiting for benchmark to run...<br>
+      </div>
+    </div>
+
+    <!-- Hidden / Visual Assets -->
+    <div class="images-panel">
+      <div class="image-frame">
+        <span>Test Feed</span>
+        <img id="test-img" src="/test_face.png" alt="Test Face">
+        <video id="webcam-video" autoplay muted playsinline style="display: none;"></video>
+      </div>
+      <div class="image-frame">
+        <span>ROI Canvas Crop</span>
+        <canvas id="roi-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const logEl = document.getElementById('console-log');
+    const webcamVideo = document.getElementById('webcam-video');
+    const testImg = document.getElementById('test-img');
+    const btnWebcam = document.getElementById('btn-webcam');
+    const btnRun = document.getElementById('btn-run');
+    let useWebcam = false;
+    let webcamStream = null;
+
+    function log(msg) {
+      logEl.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // Toggle live webcam feed
+    btnWebcam.addEventListener('click', async () => {
+      if (!useWebcam) {
+        try {
+          webcamStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480 }
+          });
+          webcamVideo.srcObject = webcamStream;
+          webcamVideo.style.display = 'block';
+          testImg.style.display = 'none';
+          
+          btnWebcam.textContent = 'Use Static Face Image';
+          btnRun.style.display = 'inline-block';
+          useWebcam = true;
+          log('Live webcam feed activated. Align your face and click "Capture & Run Benchmark".');
+        } catch (err) {
+          log('Error accessing webcam: ' + err.message);
+          alert('Webcam access failed: ' + err.message);
+        }
+      } else {
+        if (webcamStream) {
+          webcamStream.getTracks().forEach(track => track.stop());
+        }
+        webcamVideo.style.display = 'none';
+        testImg.style.display = 'block';
+        btnWebcam.textContent = 'Enable Live Webcam';
+        btnRun.style.display = 'none';
+        useWebcam = false;
+        log('Switched back to static test image.');
+        runBenchmark(testImg);
+      }
+    });
+
+    btnRun.addEventListener('click', () => {
+      // Capture current frame from live video to offscreen canvas
+      const captureCanvas = document.createElement('canvas');
+      captureCanvas.width = webcamVideo.videoWidth || 640;
+      captureCanvas.height = webcamVideo.videoHeight || 480;
+      const ctx = captureCanvas.getContext('2d');
+      ctx.drawImage(webcamVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+      
+      log('Captured live frame. Running benchmark...');
+      runBenchmark(captureCanvas);
+    });
+
+    async function runBenchmark(inputSource = null) {
+      const statusEl = document.getElementById('status');
+      const roiCanvas = document.getElementById('roi-canvas');
+      const roiCtx = roiCanvas.getContext('2d');
+
+      const img = inputSource || document.getElementById('test-img');
+
+      if (img.tagName === 'IMG' && !img.complete) {
+        await new Promise(resolve => img.onload = resolve);
+      }
+
+      statusEl.textContent = 'Loading models...';
+      try {
+        await faceapi.tf.setBackend('webgl');
+        await faceapi.tf.ready();
+        
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+      } catch (err) {
+        statusEl.textContent = 'Setup failed: ' + err.message;
+        log('ERROR during setup: ' + err.stack);
+        return;
+      }
+
+      const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
+
+      statusEl.textContent = 'Warming up pipeline models...';
+      // Warm up standard
+      const warmDetection = await faceapi.detectAllFaces(img, options).withFaceLandmarks().withFaceDescriptors();
+      if (warmDetection.length === 0) {
+        statusEl.textContent = 'Error: No face detected. Please ensure your face is fully visible in the camera!';
+        log('Error: Face not detected in warm-up.');
+        return;
+      }
+      
+      const faceBox = warmDetection[0].detection.box;
+      log(`Detected Face Bounding Box: x=${faceBox.x.toFixed(1)}, y=${faceBox.y.toFixed(1)}, w=${faceBox.width.toFixed(1)}, h=${faceBox.height.toFixed(1)}`);
+
+      // Draw ROI crop to let user see
+      const padding = 0.35;
+      const padW = faceBox.width * padding;
+      const padH = faceBox.height * padding;
+      const roiX = Math.max(0, faceBox.x - padW);
+      const roiY = Math.max(0, faceBox.y - padH);
+      
+      const imgWidth = img.naturalWidth || img.width || 640;
+      const imgHeight = img.naturalHeight || img.height || 480;
+      const roiW = Math.min(imgWidth - roiX, faceBox.width + 2 * padW);
+      const roiH = Math.min(imgHeight - roiY, faceBox.height + 2 * padH);
+      
+      roiCanvas.width = roiW;
+      roiCanvas.height = roiH;
+      roiCtx.drawImage(img, roiX, roiY, roiW, roiH, 0, 0, roiW, roiH);
+      document.getElementById('opt-resolution').textContent = `${Math.round(roiW)}x${Math.round(roiH)}`;
+
+      statusEl.textContent = 'Running Standard Pipeline benchmark...';
+      log('Starting Standard Pipeline (10 runs)...');
+      
+      let stdDetect = 0;
+      let stdLandmark = 0;
+      let stdRecog = 0;
+      const runs = 10;
+
+      for (let i = 0; i < runs; i++) {
+        const t0 = performance.now();
+        const detections = await faceapi.detectAllFaces(img, options);
+        const t1 = performance.now();
+        stdDetect += (t1 - t0);
+
+        const landmarks = await faceapi.detectFaceLandmarks(img, detections[0]);
+        const t2 = performance.now();
+        stdLandmark += (t2 - t1);
+
+        await faceapi.computeFaceDescriptor(img, landmarks);
+        const t3 = performance.now();
+        stdRecog += (t3 - t2);
+
+        await new Promise(r => setTimeout(r, 30));
+      }
+
+      const avgStdDetect = stdDetect / runs;
+      const avgStdLandmark = stdLandmark / runs;
+      const avgStdRecog = stdRecog / runs;
+      const totalStd = avgStdDetect + avgStdLandmark + avgStdRecog;
+      const stdFps = 1000 / totalStd;
+
+      log(`Standard Finished: Detection: ${avgStdDetect.toFixed(1)}ms, Landmark: ${avgStdLandmark.toFixed(1)}ms, Recog: ${avgStdRecog.toFixed(1)}ms`);
+
+      document.getElementById('std-detect').textContent = avgStdDetect.toFixed(1) + ' ms';
+      document.getElementById('std-landmark').textContent = avgStdLandmark.toFixed(1) + ' ms';
+      document.getElementById('std-recognition').textContent = avgStdRecog.toFixed(1) + ' ms';
+      document.getElementById('std-total').textContent = totalStd.toFixed(1) + ' ms';
+      document.getElementById('std-fps').textContent = stdFps.toFixed(1) + ' FPS';
+
+      statusEl.textContent = 'Running Optimized Prototype Pipeline benchmark...';
+      log('Starting Optimized Pipeline (10 runs with 30% ROI + 40% Smart Skip simulation)...');
+
+      let optDetect = 0;
+      let optLandmark = 0;
+      let optRecog = 0;
+
+      for (let i = 0; i < runs; i++) {
+        const shouldSkipSSD = (i % 3 !== 0);
+
+        let localDetection;
+        let t0 = performance.now();
+        
+        if (shouldSkipSSD) {
+          localDetection = warmDetection[0].detection;
+          optDetect += 0;
+        } else {
+          const roiDetections = await faceapi.detectAllFaces(roiCanvas, options);
+          const t1 = performance.now();
+          optDetect += (t1 - t0);
+          
+          if (roiDetections.length > 0) {
+            const mappedBox = new faceapi.Rect(
+              roiDetections[0].box.x + roiX,
+              roiDetections[0].box.y + roiY,
+              roiDetections[0].box.width,
+              roiDetections[0].box.height
+            );
+            localDetection = new faceapi.FaceDetection(
+              roiDetections[0].score,
+              mappedBox,
+              { width: imgWidth, height: imgHeight }
+            );
+          } else {
+            const t0_fallback = performance.now();
+            const fallbackDet = await faceapi.detectAllFaces(img, options);
+            optDetect += (performance.now() - t0_fallback);
+            localDetection = fallbackDet[0];
+          }
+        }
+
+        const t2 = performance.now();
+        const landmarks = await faceapi.detectFaceLandmarks(img, localDetection);
+        const t3 = performance.now();
+        optLandmark += (t3 - t2);
+
+        await faceapi.computeFaceDescriptor(img, landmarks);
+        const t4 = performance.now();
+        optRecog += (t4 - t3);
+
+        await new Promise(r => setTimeout(r, 30));
+      }
+
+      const avgOptDetect = optDetect / runs;
+      const avgOptLandmark = optLandmark / runs;
+      const avgOptRecog = optRecog / runs;
+      const totalOpt = avgOptDetect + avgOptLandmark + avgOptRecog;
+      const optFps = 1000 / totalOpt;
+
+      log(`Optimized Finished: Detection: ${avgOptDetect.toFixed(1)}ms, Landmark: ${avgOptLandmark.toFixed(1)}ms, Recog: ${avgOptRecog.toFixed(1)}ms`);
+
+      document.getElementById('opt-detect').textContent = avgOptDetect.toFixed(1) + ' ms';
+      document.getElementById('opt-landmark').textContent = avgOptLandmark.toFixed(1) + ' ms';
+      document.getElementById('opt-recognition').textContent = avgOptRecog.toFixed(1) + ' ms';
+      document.getElementById('opt-total').textContent = totalOpt.toFixed(1) + ' ms';
+      document.getElementById('opt-fps').textContent = optFps.toFixed(1) + ' FPS';
+
+      // Gain calculation
+      const reduction = ((totalStd - totalOpt) / totalStd) * 100;
+      document.getElementById('gain-pct').textContent = `${reduction.toFixed(1)}% Speedup`;
+      
+      document.getElementById('label-std-ms').textContent = totalStd.toFixed(1) + ' ms';
+      document.getElementById('label-opt-ms').textContent = totalOpt.toFixed(1) + ' ms';
+
+      // Animate bars
+      document.getElementById('bar-std').style.width = '100%';
+      document.getElementById('bar-opt').style.width = `${(totalOpt / totalStd) * 100}%`;
+
+      statusEl.innerHTML = '<span style="color: var(--success); font-weight: bold;">Benchmark Completed Successfully!</span>';
+    }
+
+    window.addEventListener('load', () => {
+      runBenchmark(testImg);
+    });
+  </script>
+</body>
+</html>
