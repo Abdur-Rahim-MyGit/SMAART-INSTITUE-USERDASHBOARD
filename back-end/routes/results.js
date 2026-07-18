@@ -111,7 +111,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         // --- END PROCTORING LOCK CHECK ---
 
         // Check if user already has an in-progress attempt
-        const existingResult = await Result.findOne({
+        let existingResult = await Result.findOne({
             userId,
             assessmentId,
             completionStatus: 'in-progress'
@@ -121,6 +121,48 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         const stageInfo = getStageByCode(assessment.assessmentCode);
         const stageKey = stageInfo ? stageInfo.stage : null;
         const expectedQuestions = stageInfo ? stageInfo.totalQuestions : assessment.questions.length;
+
+        // Stage configurations (copied from frontend)
+        const STAGE_MAP = {
+          T1: { durationMinutes: 45 },
+          T2: { durationMinutes: 40 },
+          T3: { durationMinutes: 45 },
+          T4: { durationMinutes: 40 },
+          AIQ: { durationMinutes: 45 },
+          SQ: { durationMinutes: 45 },
+          PIQ: { durationMinutes: 45 },
+        };
+        const durationMinutes = stageKey ? (STAGE_MAP[stageKey]?.durationMinutes || 45) : (assessment.duration || 45);
+
+        if (existingResult) {
+            const elapsedSeconds = Math.floor((Date.now() - existingResult.startedAt.getTime()) / 1000);
+            const remainingSeconds = Math.max(durationMinutes * 60 - elapsedSeconds, 0);
+
+            if (remainingSeconds <= 0) {
+                console.log(`⌛ [AUTO-SUBMIT] Resumed attempt ${existingResult._id} has expired (${elapsedSeconds}s elapsed). Auto-submitting and starting fresh...`);
+                existingResult.completionStatus = 'completed';
+                existingResult.submittedAt = new Date();
+
+                // Grade unanswered questions as UNANSWERED
+                const unansweredQuestions = assessment.questions.filter(
+                    q => !existingResult.responses.some(r => r.questionId.toString() === q._id.toString())
+                );
+                unansweredQuestions.forEach(q => {
+                    existingResult.responses.push({
+                        questionId: q._id,
+                        questionText: q.questionText || '',
+                        selectedValue: 'UNANSWERED',
+                        isCorrect: false,
+                        score: 0,
+                        answeredAt: new Date()
+                    });
+                });
+                existingResult.updateAnsweredCount();
+                await existingResult.save();
+
+                existingResult = null; // Forces creation of a fresh attempt below
+            }
+        }
 
         if (existingResult) {
             console.log(`🔄 [DEBUG] Resuming result ${existingResult._id}`);
@@ -197,6 +239,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
             console.log(`📤 [DEBUG] Final question count to send: ${questions.length}`);
 
+            // Calculate remaining seconds for the resumed session
+            const elapsedSeconds = Math.floor((Date.now() - existingResult.startedAt.getTime()) / 1000);
+            const remainingSeconds = Math.max(durationMinutes * 60 - elapsedSeconds, 0);
+
             // Sign assessment token for existing result
             const assessmentToken = signAssessmentToken({
                 resultId: existingResult._id,
@@ -213,6 +259,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
                     startedAt: existingResult.startedAt,
+                    remainingSeconds, // exact seconds remaining based on server clock
                     assessmentToken
                 }
             });
@@ -344,6 +391,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 questions: shuffledQuestions,
                 totalQuestions: totalQuestions,
                 startedAt: result.startedAt,
+                remainingSeconds: durationMinutes * 60, // exact full duration in seconds
                 assessmentToken
             }
         });
