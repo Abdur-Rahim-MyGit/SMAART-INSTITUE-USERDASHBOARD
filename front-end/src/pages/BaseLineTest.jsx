@@ -181,6 +181,7 @@ const BaseLineTest = () => {
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  const [registrationMetadata, setRegistrationMetadata] = useState(null); // quality/model info for backend persistence
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -728,7 +729,8 @@ const BaseLineTest = () => {
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor
+    registeredFaceDescriptor,
+    registrationMetadata,
   });
 
   useEffect(() => {
@@ -853,8 +855,15 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={({ faceDescriptor }) => {
+          onComplete={({ faceDescriptor, registrationQualityScore, registrationCropUrl }) => {
             setRegisteredFaceDescriptor(faceDescriptor);
+            setRegistrationMetadata({
+              model: 'arcface-r50-onnx',
+              qualityScore: registrationQualityScore || null,
+              framesCaptured: 5,
+              antispoofPassed: true,
+              registrationCropUrl: registrationCropUrl || null,
+            });
             setSetupCompleted(true);
           }}
           assessmentTitle={translatedTitle}

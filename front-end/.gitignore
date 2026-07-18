@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ONNX Models and Web Assembly Binaries (downloaded via script)
+public/models/onnx/
+public/onnx-wasm/
+

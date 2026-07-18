@@ -119,7 +119,8 @@ const connectWithFallback = async () => {
   const primaryURI = process.env.MONGODB_URI;
   const fallbackURI = process.env.MONGODB_URI;
 
-  const options = {
+  const isLocal = primaryURI.includes('127.0.0.1') || primaryURI.includes('localhost');
+  const options = isLocal ? {} : {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     maxPoolSize: 50,

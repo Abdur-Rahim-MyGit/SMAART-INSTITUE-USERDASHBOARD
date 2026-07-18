@@ -15,6 +15,7 @@ const protect = async (req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
       req.headers['x-admin-bypass'] === 'true' &&
+      process.env.ADMIN_SYSTEM_SECRET &&
       req.headers['x-admin-secret'] === process.env.ADMIN_SYSTEM_SECRET
     ) {
       req.user = {
