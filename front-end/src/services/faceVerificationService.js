@@ -19,7 +19,7 @@
  */
 
 import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady } from './onnxPipeline';
-import { evaluateFrameQuality } from './faceQualityService';
+import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
 import { analyzeGaze, resetCalibration } from './eyeGazeService';
 
 // Re-export gaze calibration reset so useProctoringEngine.js doesn't change
@@ -52,7 +52,7 @@ export const resetTrackingState = () => {
 };
 
 // ─── Thresholds ───────────────────────────────────────────────────────────────
-const VERIFICATION_COSINE_THRESHOLD = 0.40;  // cosine sim > 0.40 = same person
+const VERIFICATION_COSINE_THRESHOLD = 0.35;  // cosine sim > 0.35 = same person (more tolerant to lighting/posture changes)
 const REGISTRATION_COSINE_THRESHOLD = 0.35;  // consistency check across frames
 const ANTISPOOF_MIN_SCORE          = 0.50;   // real person liveness threshold
 const REGISTRATION_FRAMES          = 5;
@@ -331,6 +331,19 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
   const t0 = performance.now();
 
   try {
+    // ── Pre-step: Brightness / Covered check (prevent noise/grain false-positives) ──────
+    const brightResult = checkBrightness(videoEl);
+    if (!brightResult.passed && brightResult.brightness < 20) {
+      console.warn(`[FaceVerification] Camera covered or too dark: brightness = ${brightResult.brightness}`);
+      return { 
+        status: VerificationStatus.NO_FACE, 
+        similarity: 0, 
+        distance: 1, 
+        faceCount: 0, 
+        timings: { total: performance.now() - t0 } 
+      };
+    }
+
     // ── Step 1: Fast detection only (no embedding, ~200-400ms) ──────────────
     const quickFaces = await detectOnly(videoEl);
     

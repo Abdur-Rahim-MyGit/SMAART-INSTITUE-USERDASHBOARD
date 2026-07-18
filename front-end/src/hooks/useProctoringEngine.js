@@ -99,7 +99,7 @@ export const useProctoringEngine = ({
   // Grace timer: track when no-face was first detected (ms timestamp)
   const noFaceGraceStartRef = useRef(null);
   const GRACE_PERIOD_MS     = 5000;  // 5 seconds grace before logging no-face violation
-  const MISMATCH_LOCKOUT    = 3;     // consecutive mismatches → suspected impersonation
+  const MISMATCH_LOCKOUT    = 6;     // consecutive mismatches → suspected impersonation
 
   // Initialization grace period (8 seconds) to prevent false focus/fullscreen flags while loading
   const isInitializingRef   = useRef(true);
@@ -477,7 +477,7 @@ export const useProctoringEngine = ({
             break;
 
           case VerificationStatus.MULTIPLE_FACES:
-            // ── Immediate violation — no grace period ──────────────────────
+            // ── Accumulate multiple faces streak to filter brief camera glitches ──
             noFaceGraceStartRef.current  = null;
             faceAbsentStreak.current     = 0;
             faceMismatchStreak.current   = 0;
@@ -485,17 +485,21 @@ export const useProctoringEngine = ({
 
             multipleFacesStreak.current += 1;
             activeInfraction = true;
-            // Trigger immediately on first detection (no streak needed)
-            reportViolation(
-              'multiple_faces',
-              'Warning: Multiple people detected. Only the registered candidate may remain in view.'
-            );
-            // Reset streak so the next check starts fresh
-            multipleFacesStreak.current = 0;
+
+            if (multipleFacesStreak.current >= 3) {
+              multipleFacesStreak.current = 0;
+              reportViolation(
+                'multiple_faces',
+                'Warning: Multiple people detected. Only the registered candidate may remain in view.'
+              );
+            } else {
+              // Transient visual warning - does not increment official warning strikes
+              toast.warning(`Multiple faces detected. Ensure only you are visible (check ${multipleFacesStreak.current}/3).`);
+            }
             break;
 
           case VerificationStatus.MISMATCH:
-            // ── 3 consecutive mismatches → suspected impersonation lockout ─
+            // ── Accumulate mismatches to filter lighting/posture variations ──
             noFaceGraceStartRef.current  = null;
             faceAbsentStreak.current     = 0;
             multipleFacesStreak.current  = 0;
@@ -511,10 +515,8 @@ export const useProctoringEngine = ({
                 'Suspected identity substitution detected. The assessment has been flagged for review.'
               );
             } else {
-              reportViolation(
-                'face_mismatch',
-                `Warning: Face does not match registered candidate (check ${faceMismatchStreak.current}/${MISMATCH_LOCKOUT}).`
-              );
+              // Transient visual warning - does not increment official warning strikes
+              toast.warning(`Face mismatch detected. Adjust your lighting or camera angle (check ${faceMismatchStreak.current}/${MISMATCH_LOCKOUT}).`);
             }
             break;
 
