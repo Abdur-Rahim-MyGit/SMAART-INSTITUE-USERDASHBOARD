@@ -102,7 +102,7 @@ export const detectFaces = async (videoEl, _disableOpts = false) => {
 
   const t0 = performance.now();
   try {
-    const raw = await detectOnly(videoEl);
+    const raw = (await detectOnly(videoEl)).filter(f => f.score >= 0.65);
     const elapsed = performance.now() - t0;
     return {
       faceCount: raw.length,
@@ -150,7 +150,7 @@ export const registerFace = async (videoEl, options = {}) => {
   while (acceptedEmbeddings.length < frameCount && attempts < REGISTRATION_MAX_ATTEMPTS) {
     attempts++;
 
-    const faces = await detectAndEmbed(videoEl);
+    const faces = (await detectAndEmbed(videoEl)).filter(f => f.score >= 0.65);
 
     // ── Hard Stop 1: No face ──────────────────────────────────────────────────
     if (faces.length === 0) {
@@ -345,7 +345,7 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
     }
 
     // ── Step 1: Fast detection only (no embedding, ~200-400ms) ──────────────
-    const quickFaces = await detectOnly(videoEl);
+    const quickFaces = (await detectOnly(videoEl)).filter(f => f.score >= 0.65);
     
     if (quickFaces.length === 0) {
       return { status: VerificationStatus.NO_FACE, similarity: 0, distance: 1, faceCount: 0, timings: { total: performance.now() - t0 } };
@@ -356,7 +356,7 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
     }
 
     // ── Step 2: Full embed only if 1 face found ──────────────────────────
-    const faces = await detectAndEmbed(videoEl);
+    const faces = (await detectAndEmbed(videoEl)).filter(f => f.score >= 0.65);
     const elapsed = performance.now() - t0;
 
     if (faces.length === 0) {
