@@ -24,7 +24,7 @@ const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
 
 const SCRFD_INPUT_SIZE = 640;        // SCRFD input resolution
 const ARCFACE_INPUT_SIZE = 112;      // ArcFace aligned face crop size
-const NMS_THRESHOLD = 0.4;
+const NMS_THRESHOLD = 0.3;
 const SCORE_THRESHOLD = 0.5;
 
 // SCRFD anchor strides and base anchors

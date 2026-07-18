@@ -19,7 +19,7 @@
  */
 
 import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady } from './onnxPipeline';
-import { evaluateFrameQuality } from './faceQualityService';
+import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
 import { analyzeGaze, resetCalibration } from './eyeGazeService';
 
 // Re-export gaze calibration reset so useProctoringEngine.js doesn't change
@@ -52,7 +52,7 @@ export const resetTrackingState = () => {
 };
 
 // ─── Thresholds ───────────────────────────────────────────────────────────────
-const VERIFICATION_COSINE_THRESHOLD = 0.40;  // cosine sim > 0.40 = same person
+const VERIFICATION_COSINE_THRESHOLD = 0.35;  // cosine sim > 0.35 = same person (more tolerant to lighting/posture changes)
 const REGISTRATION_COSINE_THRESHOLD = 0.35;  // consistency check across frames
 const ANTISPOOF_MIN_SCORE          = 0.50;   // real person liveness threshold
 const REGISTRATION_FRAMES          = 5;
@@ -102,7 +102,7 @@ export const detectFaces = async (videoEl, _disableOpts = false) => {
 
   const t0 = performance.now();
   try {
-    const raw = await detectOnly(videoEl);
+    const raw = (await detectOnly(videoEl)).filter(f => f.score >= 0.65);
     const elapsed = performance.now() - t0;
     return {
       faceCount: raw.length,
@@ -150,7 +150,7 @@ export const registerFace = async (videoEl, options = {}) => {
   while (acceptedEmbeddings.length < frameCount && attempts < REGISTRATION_MAX_ATTEMPTS) {
     attempts++;
 
-    const faces = await detectAndEmbed(videoEl);
+    const faces = (await detectAndEmbed(videoEl)).filter(f => f.score >= 0.65);
 
     // ── Hard Stop 1: No face ──────────────────────────────────────────────────
     if (faces.length === 0) {
@@ -331,8 +331,21 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
   const t0 = performance.now();
 
   try {
+    // ── Pre-step: Brightness / Covered check (prevent noise/grain false-positives) ──────
+    const brightResult = checkBrightness(videoEl);
+    if (!brightResult.passed && brightResult.brightness < 20) {
+      console.warn(`[FaceVerification] Camera covered or too dark: brightness = ${brightResult.brightness}`);
+      return { 
+        status: VerificationStatus.NO_FACE, 
+        similarity: 0, 
+        distance: 1, 
+        faceCount: 0, 
+        timings: { total: performance.now() - t0 } 
+      };
+    }
+
     // ── Step 1: Fast detection only (no embedding, ~200-400ms) ──────────────
-    const quickFaces = await detectOnly(videoEl);
+    const quickFaces = (await detectOnly(videoEl)).filter(f => f.score >= 0.65);
     
     if (quickFaces.length === 0) {
       return { status: VerificationStatus.NO_FACE, similarity: 0, distance: 1, faceCount: 0, timings: { total: performance.now() - t0 } };
@@ -343,7 +356,7 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
     }
 
     // ── Step 2: Full embed only if 1 face found ──────────────────────────
-    const faces = await detectAndEmbed(videoEl);
+    const faces = (await detectAndEmbed(videoEl)).filter(f => f.score >= 0.65);
     const elapsed = performance.now() - t0;
 
     if (faces.length === 0) {
