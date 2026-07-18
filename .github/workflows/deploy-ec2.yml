@@ -41,10 +41,15 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            sudo mkdir -p /var/www/html
             sudo rm -rf /var/www/html/*
-            sudo cp -r /home/ubuntu/frontend-dist/* /var/www/html/
+            if [ -d "/home/ubuntu/frontend-dist" ] && [ "$(ls -A /home/ubuntu/frontend-dist)" ]; then
+              sudo cp -r /home/ubuntu/frontend-dist/* /var/www/html/
+            else
+              echo "Warning: /home/ubuntu/frontend-dist is empty or missing"
+            fi
             sudo systemctl restart nginx
-
+            
   deploy-backend:
     runs-on: ubuntu-latest
     needs: deploy-frontend
@@ -57,6 +62,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ${{ secrets.EC2_BACKEND_PATH }}
-            git pull origin main
-            npm install
-            pm2 restart smaart-userdashboard-backend
+            git fetch origin main
+            git reset --hard origin/main
+            npm install --production
+            pm2 restart smaart-userdashboard-backend || pm2 start server.js --name "smaart-userdashboard-backend"
