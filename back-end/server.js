@@ -115,9 +115,8 @@ app.use(require('./middleware/sanitizeMongo'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-const connectWithFallback = async () => {
+const connectDB = async () => {
   const primaryURI = process.env.MONGODB_URI;
-  const fallbackURI = process.env.MONGODB_FALLBACK_URI || 'mongodb://127.0.0.1:27017/minds';
 
   const options = {
     useNewUrlParser: true,
@@ -134,25 +133,12 @@ const connectWithFallback = async () => {
     await mongoose.connect(primaryURI, options);
     logger.info('✅ MongoDB connected successfully');
   } catch (err) {
-    logger.error('❌ Primary MongoDB connection error:', err.message);
-    if (primaryURI !== fallbackURI) {
-      logger.info(`🔄 Attempting to connect to fallback MongoDB at ${fallbackURI}`);
-      try {
-        await mongoose.connect(fallbackURI, options);
-        logger.info('✅ Fallback MongoDB connected successfully');
-      } catch (fallbackErr) {
-        logger.error('❌ Fallback MongoDB connection error:', fallbackErr.message);
-        // Don't exit process if we can run without DB, or exit if DB is strictly required.
-        // As per plan, we keep process.exit(1) if both fail.
-        process.exit(1);
-      }
-    } else {
-      process.exit(1);
-    }
+    logger.error('❌ MongoDB connection error:', err.message);
+    process.exit(1);
   }
 };
 
-connectWithFallback();
+connectDB();
 
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // Response schema for individual question answers
 const responseSchema = new mongoose.Schema({
     questionId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         required: true
     },
     questionText: {
@@ -76,7 +76,7 @@ const resultSchema = new mongoose.Schema({
     },
     // Question order for this specific user attempt (shuffled)
     questionOrder: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         required: true
     }],
     // User responses - saved directly on each answer

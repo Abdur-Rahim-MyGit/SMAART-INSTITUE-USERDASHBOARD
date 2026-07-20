@@ -40,9 +40,9 @@ import AttentionCheck from "@/components/proctoring/AttentionCheck";
 // Stage configuration map
 const STAGE_MAP = {
   T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 1, passingPercentage: 0 },
-  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
-  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
-  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 34, durationMinutes: 45, maxAttempts: 3, passingPercentage: 60 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 36, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
   AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
   SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
   PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
@@ -1125,6 +1125,25 @@ const BaseLineTest = () => {
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
                 </h2>
+
+                {/* Blueprint v1.0 competence tier — headline classification (T2-T4) */}
+                {testResults?.competenceTier && testResults.competenceTier !== 'Baseline' && (
+                  <div className="mb-3">
+                    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border ${
+                      testResults.competenceTier === 'Distinction'
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20'
+                        : testResults.competenceTier === 'Pass'
+                        ? 'bg-[#1a3884]/5 dark:bg-[#1a3884]/10 text-[#1a3884] dark:text-blue-300 border-[#1a3884]/20'
+                        : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20'
+                    }`}>
+                      {testResults.competenceTier === 'Distinction'
+                        ? t("baseline_test.tier.distinction", "Pass with Distinction")
+                        : testResults.competenceTier === 'Pass'
+                        ? t("baseline_test.tier.pass", "Pass")
+                        : t("baseline_test.tier.not_yet_competent", "Not Yet Competent")}
+                    </span>
+                  </div>
+                )}
 
                 {/* Pass/Fail Badge for multi-attempt stages */}
                 {stageConfig.maxAttempts > 1 && testResults && (

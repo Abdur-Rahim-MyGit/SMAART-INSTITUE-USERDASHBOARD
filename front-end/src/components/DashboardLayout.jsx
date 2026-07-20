@@ -546,7 +546,8 @@ const DashboardLayout = () => {
     { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
     { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
-    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
+    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' },
+    { code: 'ar', name: 'Arabic', native: 'العربية', shortLabel: 'AR' }
   ];
   const activeLanguageCode = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const activeLanguage = languageOptions.find((lang) => lang.code === activeLanguageCode) || languageOptions[0];
