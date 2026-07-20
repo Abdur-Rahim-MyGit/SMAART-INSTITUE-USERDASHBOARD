@@ -93,9 +93,25 @@ export const useProctoringEngine = ({
   const multipleFacesStreak = useRef(0);
   const faceMismatchStreak  = useRef(0);
   const faceCoveredStreak   = useRef(0);
-  // Eye gaze streaks (NEW)
+  // Eye gaze streaks
   const gazeAwayStreak      = useRef(0);
   const eyesClosedStreak    = useRef(0);
+  // Grace timer: track when no-face was first detected (ms timestamp)
+  const noFaceGraceStartRef = useRef(null);
+  const GRACE_PERIOD_MS     = 5000;  // 5 seconds grace before logging no-face violation
+  const MISMATCH_LOCKOUT    = 6;     // consecutive mismatches → suspected impersonation
+
+  // Initialization grace period (8 seconds) to prevent false focus/fullscreen flags while loading
+  const isInitializingRef   = useRef(true);
+
+  useEffect(() => {
+    isInitializingRef.current = true;
+    const timer = setTimeout(() => {
+      isInitializingRef.current = false;
+      console.log('[ProctoringEngine] Initialization grace period ended. Focus and fullscreen monitoring active.');
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     isActiveRef.current = isActive;
@@ -108,14 +124,22 @@ export const useProctoringEngine = ({
   // Initialize and stop camera stream with automatic retries for release delays
   const startCamera = async (retryCount = 0) => {
     if (streamRef.current) return;
+
+    // On the very first attempt, wait for the setup stream to fully release.
+    // ProctoringSetup already waits 1800ms before mounting this component,
+    // but some OS/browser combos need an additional buffer.
+    if (retryCount === 0) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+    }
+
     try {
       console.log(`[ProctoringEngine] Requesting media stream (attempt ${retryCount + 1})...`);
       const constraints = {
         video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
-        audio: false // No audio processing needed to protect privacy
+        audio: false
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      // Handle race condition: component might have unmounted or isActive became false while waiting for camera permission
+      // Handle race condition: component might have unmounted or isActive became false
       if (!isActiveRef.current || hasLockedOutRef.current) {
         stream.getTracks().forEach((track) => track.stop());
         return;
@@ -139,12 +163,15 @@ export const useProctoringEngine = ({
           video.play().catch(e => console.warn('Video play interrupted', e));
           resolve();
         };
+        // Safety timeout in case onloadedmetadata never fires
+        setTimeout(resolve, 3000);
       });
 
       setIsCameraActive(true);
       setCameraError(null);
+      console.log('[ProctoringEngine] ✅ Camera stream acquired.');
 
-      // Ensure face-api models are loaded
+      // Ensure ONNX models are loaded
       if (!isReady()) {
         try {
           await loadModels();
@@ -153,50 +180,39 @@ export const useProctoringEngine = ({
         }
       }
     } catch (error) {
-      console.error(`[ProctoringEngine] Webcam acquisition failed (attempt ${retryCount + 1}):`, error);
-      
-      // Retry on any hardware allocation error (device locked, busy, driver lag) up to 4 times
       const isPermissionDenied = 
         error.name === 'NotAllowedError' || 
         error.name === 'PermissionDeniedError' || 
         error.name === 'SecurityError';
 
-      if (!isPermissionDenied && retryCount < 4) {
-        console.warn(`[ProctoringEngine] Camera initialization issue (locked/busy). Retrying in 900ms...`);
-        await new Promise(resolve => setTimeout(resolve, 900));
+      if (!isPermissionDenied && retryCount < 6) {
+        // AbortError = hardware still locked by previous stream. Wait progressively longer.
+        const retryDelay = retryCount < 2 ? 1500 : 2500;
+        console.warn(`[ProctoringEngine] Camera locked/busy. Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/6)`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
         return startCamera(retryCount + 1);
       }
 
       setCameraError(error.name || 'WebcamAccessDenied');
       setIsCameraActive(false);
-      
-      // Soft-gate fallback: let the user proceed but display a warning
-      toast.warning('Camera permissions are required. Denying webcam access lowers your session trust score.');
+      toast.warning('Camera unavailable. Please check that no other app is using your webcam.');
     }
   };
 
   const stopCamera = useCallback(() => {
+    // Stop tracks on the stream ref
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => {
-        track.stop();
-      });
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
+    // Null out the hidden video element
     if (videoRef.current) {
-      const srcStream = videoRef.current.srcObject;
-      if (srcStream && srcStream.getTracks) {
-        srcStream.getTracks().forEach(track => track.stop());
-      }
       videoRef.current.srcObject = null;
       videoRef.current = null;
     }
-    
-    // As a nuclear fallback, stop any lingering media streams requested by this window
-    try {
-        navigator.mediaDevices?.getUserMedia({ video: true, audio: false })
-            .then(stream => stream.getTracks().forEach(track => track.stop()))
-            .catch(() => {});
-    } catch(e) {}
+    // NOTE: Do NOT call getUserMedia here as a "nuclear fallback" —
+    // acquiring and immediately stopping a stream re-locks the hardware
+    // and causes AbortError on the next legitimate getUserMedia call.
 
     setIsCameraActive(false);
     setIsFaceDetected(false);
@@ -232,6 +248,12 @@ export const useProctoringEngine = ({
 
   const reportViolation = useCallback(async (eventType, displayMessage) => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
+
+    // Ignore focus/fullscreen checks during initialization grace period
+    if (isInitializingRef.current && (eventType === 'minimize' || eventType === 'fullscreen_exit')) {
+      console.log(`[ProctoringEngine] Grace period: Bypassing focus/fullscreen violation '${eventType}' during initial load.`);
+      return;
+    }
 
     try {
       console.warn(`⚠️ Proctoring violation: ${eventType}`);
@@ -383,6 +405,12 @@ export const useProctoringEngine = ({
         setSimilarityScore(result.similarity || 0);
         setFaceCount(result.faceCount);
         setIsFaceDetected(result.status === VerificationStatus.VERIFIED);
+
+        // Reset grace timer when face is verified
+        if (result.status === VerificationStatus.VERIFIED) {
+          noFaceGraceStartRef.current = null;
+          faceAbsentStreak.current = 0;
+        }
         let activeInfraction = false;
 
         switch (result.status) {
@@ -426,41 +454,69 @@ export const useProctoringEngine = ({
             break;
 
           case VerificationStatus.NO_FACE:
-            faceAbsentStreak.current += 1;
+            // ── Grace timer: only log violation after 5-second absence ──────
+            if (!noFaceGraceStartRef.current) {
+              noFaceGraceStartRef.current = Date.now();
+              // Show immediate UI warning but don't log yet
+              setIsFaceDetected(false);
+              setVerificationStatus(VerificationStatus.NO_FACE);
+            }
             multipleFacesStreak.current = 0;
-            faceMismatchStreak.current = 0;
-            faceCoveredStreak.current = 0;
-            
+            faceMismatchStreak.current  = 0;
+            faceCoveredStreak.current   = 0;
+
             activeInfraction = true;
-            if (faceAbsentStreak.current >= 4) { // 4 seconds total
-              faceAbsentStreak.current = 0;
-              reportViolation('face_absent', 'Warning: Face not detected. Please face the camera.');
+            if (Date.now() - noFaceGraceStartRef.current >= GRACE_PERIOD_MS) {
+              noFaceGraceStartRef.current = null;
+              faceAbsentStreak.current += 1;
+              if (faceAbsentStreak.current >= 1) {
+                faceAbsentStreak.current = 0;
+                reportViolation('face_absent', 'Warning: Face not detected. Please face the camera.');
+              }
             }
             break;
 
           case VerificationStatus.MULTIPLE_FACES:
+            // ── Accumulate multiple faces streak to filter brief camera glitches ──
+            noFaceGraceStartRef.current  = null;
+            faceAbsentStreak.current     = 0;
+            faceMismatchStreak.current   = 0;
+            faceCoveredStreak.current    = 0;
+
             multipleFacesStreak.current += 1;
-            faceAbsentStreak.current = 0;
-            faceMismatchStreak.current = 0;
-            faceCoveredStreak.current = 0;
-            
             activeInfraction = true;
-            if (multipleFacesStreak.current >= 3) { // 3 seconds total
+
+            if (multipleFacesStreak.current >= 3) {
               multipleFacesStreak.current = 0;
-              reportViolation('multiple_faces', 'Warning: Multiple faces detected. Only the candidate should be visible.');
+              reportViolation(
+                'multiple_faces',
+                'Warning: Multiple people detected. Only the registered candidate may remain in view.'
+              );
+            } else {
+              // Transient visual warning - does not increment official warning strikes
+              toast.warning(`Multiple faces detected. Ensure only you are visible (check ${multipleFacesStreak.current}/3).`);
             }
             break;
 
           case VerificationStatus.MISMATCH:
+            // ── Accumulate mismatches to filter lighting/posture variations ──
+            noFaceGraceStartRef.current  = null;
+            faceAbsentStreak.current     = 0;
+            multipleFacesStreak.current  = 0;
+            faceCoveredStreak.current    = 0;
+
             faceMismatchStreak.current += 1;
-            faceAbsentStreak.current = 0;
-            multipleFacesStreak.current = 0;
-            faceCoveredStreak.current = 0;
-            
             activeInfraction = true;
-            if (faceMismatchStreak.current >= 3) { // 3 seconds total
+
+            if (faceMismatchStreak.current >= MISMATCH_LOCKOUT) {
               faceMismatchStreak.current = 0;
-              reportViolation('face_mismatch', 'Warning: Face does not match registered candidate. Ensure the registered person is in front of the camera.');
+              reportViolation(
+                'face_mismatch',
+                'Suspected identity substitution detected. The assessment has been flagged for review.'
+              );
+            } else {
+              // Transient visual warning - does not increment official warning strikes
+              toast.warning(`Face mismatch detected. Adjust your lighting or camera angle (check ${faceMismatchStreak.current}/${MISMATCH_LOCKOUT}).`);
             }
             break;
 
@@ -635,12 +691,49 @@ export const useProctoringEngine = ({
             if (triggerLockoutRef.current) triggerLockoutRef.current();
           }
 
-          if (registeredFaceDescriptorRef.current) {
+          const descriptor = registeredFaceDescriptorRef.current;
+
+          if (descriptor) {
+            // ── Persist the registration embedding to the backend ──────────────
+            // This is the single source of truth for identity verification.
+            // Stored in ProctoringSession.faceEmbedding, auto-deleted after 30 days (DPDPA).
+            try {
+              await proctoringApi.saveRegistration(sessionId, {
+                embedding: descriptor,
+                model: 'arcface-r50-onnx',
+                qualityScore: null,
+                framesCaptured: 5,
+                antispoofPassed: true,
+              });
+              console.log('[ProctoringEngine] ✅ Face embedding saved to backend session.');
+            } catch (saveErr) {
+              console.warn('[ProctoringEngine] Failed to persist face embedding to backend:', saveErr);
+              // Non-fatal — in-memory descriptor still works for the session
+            }
+
+            // Log face_registered info event
             proctoringApi.logEvent(sessionId, {
               eventType: 'face_registered',
               severity: 'info',
-              details: 'Face identity registered during setup'
+              details: 'Face identity registered and persisted to session record'
             }).catch(err => console.warn('[ProctoringEngine] Failed to log face_registered event:', err));
+
+          } else {
+            // ── No descriptor in memory — try to recover from backend ─────────
+            // This happens after a page refresh where the in-memory descriptor is lost
+            console.warn('[ProctoringEngine] No face descriptor in memory. Attempting recovery from backend...');
+            try {
+              const embeddingRes = await proctoringApi.getEmbedding(sessionId);
+              if (embeddingRes && embeddingRes.success && embeddingRes.embedding) {
+                const recovered = new Float32Array(embeddingRes.embedding);
+                registeredFaceDescriptorRef.current = recovered;
+                console.log('[ProctoringEngine] ✅ Face embedding recovered from backend session.');
+              } else {
+                console.warn('[ProctoringEngine] No face embedding found in backend. Identity verification will be detection-only.');
+              }
+            } catch (fetchErr) {
+              console.warn('[ProctoringEngine] Could not recover face embedding from backend:', fetchErr);
+            }
           }
         }
       } catch (err) {

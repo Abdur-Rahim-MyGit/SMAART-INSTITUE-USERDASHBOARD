@@ -181,6 +181,7 @@ const BaseLineTest = () => {
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  const [registrationMetadata, setRegistrationMetadata] = useState(null); // quality/model info for backend persistence
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -445,7 +446,11 @@ const BaseLineTest = () => {
         setResultId(startResponse.data.resultId);
         setAssessmentToken(startResponse.data.assessmentToken); // Save JWT
 
-        // Synchronize local timer start time with server-side creation time to prevent stale persistence bugs
+        // Sync remainingSeconds and startedAt with server response
+        if (startResponse.data.remainingSeconds !== undefined) {
+          setRemainingSeconds(startResponse.data.remainingSeconds);
+          console.log(`⏰ Synced remaining time to server: ${startResponse.data.remainingSeconds} seconds`);
+        }
         if (startResponse.data.startedAt) {
           const serverStartTime = new Date(startResponse.data.startedAt).getTime();
           const { startTimeKey } = buildAssessmentTimerStorageKeys(stageKey, userId);
@@ -652,54 +657,40 @@ const BaseLineTest = () => {
   useEffect(() => {
     if (loading || submitted || !resultId || !setupCompleted) return;
 
-    let persistedStartTime = Number(localStorage.getItem(timerStartStorageKey));
-    if (!Number.isFinite(persistedStartTime) || persistedStartTime <= 0 || persistedStartTime > Date.now()) {
-      persistedStartTime = Date.now();
-      localStorage.setItem(timerStartStorageKey, String(persistedStartTime));
-    }
-
-    timerStartRef.current = persistedStartTime;
     oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
 
-    const updateCountdown = () => {
-      if (!timerStartRef.current) return;
+    const timer = setInterval(() => {
+      setRemainingSeconds((prev) => {
+        const next = Math.max(prev - 1, 0);
 
-      if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
-        localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
-      }
+        if (next <= 60 && next > 0 && !oneMinuteAlertShownRef.current) {
+          oneMinuteAlertShownRef.current = true;
+          localStorage.setItem(timerWarningStorageKey, "1");
+          alert(t("baseline_test.one_minute_left", "Only 1 minute left!"));
+          toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
+        }
 
-      const elapsedSeconds = Math.floor((Date.now() - timerStartRef.current) / 1000);
-      const nextRemainingSeconds = Math.max(stageDurationSeconds - elapsedSeconds, 0);
-      setRemainingSeconds(nextRemainingSeconds);
+        if (next === 0 && !timeoutSubmitTriggeredRef.current) {
+          timeoutSubmitTriggeredRef.current = true;
+          clearInterval(timer);
+          setTimeExpired(true);
+          setInteractionLocked(true);
+          setShowExitWarning(false);
+          toast.error(t("baseline_test.time_up_submitting", "Time is up. Submitting your assessment..."));
+          submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
+        }
 
-      if (nextRemainingSeconds <= 60 && nextRemainingSeconds > 0 && !oneMinuteAlertShownRef.current) {
-        oneMinuteAlertShownRef.current = true;
-        localStorage.setItem(timerWarningStorageKey, "1");
-        alert(t("baseline_test.one_minute_left", "Only 1 minute left!"));
-        toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
-      }
-
-      if (nextRemainingSeconds === 0 && !timeoutSubmitTriggeredRef.current) {
-        timeoutSubmitTriggeredRef.current = true;
-        setTimeExpired(true);
-        setInteractionLocked(true);
-        setShowExitWarning(false);
-        toast.error(t("baseline_test.time_up_submitting", "Time is up. Submitting your assessment..."));
-        submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
-      }
-    };
-
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
+        return next;
+      });
+    }, 1000);
 
     return () => clearInterval(timer);
   }, [
     loading,
     resultId,
-    stageDurationSeconds,
+    setupCompleted,
     submitted,
     submit,
-    timerStartStorageKey,
     timerWarningStorageKey,
     t
   ]);
@@ -728,7 +719,8 @@ const BaseLineTest = () => {
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor
+    registeredFaceDescriptor,
+    registrationMetadata,
   });
 
   useEffect(() => {
@@ -853,8 +845,15 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={({ faceDescriptor }) => {
+          onComplete={({ faceDescriptor, registrationQualityScore, registrationCropUrl }) => {
             setRegisteredFaceDescriptor(faceDescriptor);
+            setRegistrationMetadata({
+              model: 'arcface-r50-onnx',
+              qualityScore: registrationQualityScore || null,
+              framesCaptured: 5,
+              antispoofPassed: true,
+              registrationCropUrl: registrationCropUrl || null,
+            });
             setSetupCompleted(true);
           }}
           assessmentTitle={translatedTitle}

@@ -100,7 +100,7 @@ export const useSmaartCourseProgress = (userId) => {
         completedStages,
         tracksCompleted,
         assessmentsPassed,
-        currentCourse: localStorage.getItem("smaart_last_watched_course"),
+        currentCourse: localStorage.getItem(`${userId}_smaart_last_watched_course`) || localStorage.getItem("smaart_last_watched_course"),
         stageStatus,
         enrollmentProgress: enrollments.map((e) => ({
           courseId: e.course?._id || e.course,

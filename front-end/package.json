@@ -8,7 +8,8 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup:models": "node scripts/download-onnx-models.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -69,6 +70,7 @@
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "nsfwjs": "^4.3.0",
+    "onnxruntime-web": "^1.27.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.3",
@@ -102,6 +104,7 @@
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
+    "adm-zip": "^0.6.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",

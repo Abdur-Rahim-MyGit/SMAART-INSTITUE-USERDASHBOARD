@@ -72,6 +72,7 @@ const decodeTokenPayload = (token) => {
 
 // Renew token if it expires within the next hour
 let renewalInProgress = false;
+let renewalGeneration = 0;
 const TOKEN_RENEWAL_THRESHOLD = 60 * 60 * 1000; // 1 hour before expiry
 
 const tryRenewToken = async () => {
@@ -89,6 +90,7 @@ const tryRenewToken = async () => {
   if (timeUntilExpiry > TOKEN_RENEWAL_THRESHOLD || timeUntilExpiry <= 0) return;
 
   renewalInProgress = true;
+  const currentGen = renewalGeneration;
   try {
     const baseUrl = workingBaseUrl || API_BASE_URL;
     const response = await fetch(`${baseUrl}/auth/renew-token`, {
@@ -102,7 +104,7 @@ const tryRenewToken = async () => {
 
     if (response.ok) {
       const data = await response.json();
-      if (data.token) {
+      if (data.token && currentGen === renewalGeneration && sessionStorage.getItem("token") === token) {
         sessionStorage.setItem("token", data.token);
         console.log('🔄 Token renewed silently');
       }
@@ -126,6 +128,7 @@ export const startTokenRenewal = () => {
 };
 
 export const stopTokenRenewal = () => {
+  renewalGeneration++; // Invalidate in-flight renewals
   if (renewalInterval) {
     clearInterval(renewalInterval);
     renewalInterval = null;

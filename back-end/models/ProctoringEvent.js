@@ -12,19 +12,33 @@ const ProctoringEventSchema = new mongoose.Schema({
       'face_absent', 'multiple_faces', 'face_mismatch', 'face_covered',
       // Liveness / attention
       'attention_check_fail', 'identity_verified', 'face_registered',
-      // Eye gaze violations (NEW)
-      'gaze_away',         // student looking persistently left or right
-      'eyes_closed',       // eyes shut for extended period
-      // Audio / voice violations (NEW)
-      'voice_detected',    // sustained speech detected during exam
-      'prolonged_silence', // no activity for 4+ minutes
+      // Eye gaze violations
+      'gaze_away',
+      'eyes_closed',
+      // Audio / voice violations
+      'voice_detected',
+      'prolonged_silence',
+      // v2: ONNX Pipeline events
+      'spoof_detected',          // Anti-spoof: photo or video replay detected
+      'camera_quality_check',    // Pre-assessment camera quality gate result
+      'registration_quality',    // Face registration quality score logged
+      'tracker_loss',            // Lightweight tracker lost the face between verifications
+      'identity_confidence',     // Per-verification cosine similarity score logged
     ],
     required: true 
   },
   severity: { type: String, enum: ['info', 'low', 'medium', 'high', 'critical'], default: 'low' },
   timestamp: { type: Date, default: Date.now },
   details: { type: String },
-  screenshotUrl: { type: String } // Path to stored webcam snapshot image file
+  screenshotUrl: { type: String },
+  // v2: Structured metadata for ONNX pipeline events
+  metadata: {
+    qualityScore:    { type: Number },   // 0–100 frame quality at time of event
+    similarityScore: { type: Number },   // cosine similarity 0–1
+    antispoofScore:  { type: Number },   // liveness score 0–1
+    model:           { type: String },   // e.g. 'arcface-r50-onnx'
+    framesCaptured:  { type: Number },   // for registration_quality event
+  }
 }, { timestamps: true });
 
 // Index for query performance

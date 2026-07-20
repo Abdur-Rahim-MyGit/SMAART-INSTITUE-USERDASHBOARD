@@ -11,12 +11,13 @@ import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const UserContext = createContext(null);
 
-const clearCareerAgentStorage = () => {
-  let userId = 'anon';
-  try {
-    const u = JSON.parse(sessionStorage.getItem('user') || 'null');
-    if (u) userId = u._id || u.id || 'anon';
-  } catch {}
+export const clearCareerAgentStorage = (userId = 'anon') => {
+  if (userId === 'anon') {
+    try {
+      const u = JSON.parse(sessionStorage.getItem('user') || 'null');
+      if (u) userId = u._id || u.id || 'anon';
+    } catch {}
+  }
 
   const explicitKeys = [
     'smaart_student_name',
@@ -46,21 +47,17 @@ const clearCareerAgentStorage = () => {
     if (userId !== 'anon') {
       localStorage.removeItem(`${userId}_${key}`);
     }
-    // Also scan all keys to be absolutely thorough
-    Object.keys(localStorage).forEach((k) => {
-      if (k.endsWith(`_${key}`)) {
-        localStorage.removeItem(k);
-      }
-    });
   });
 
-  // Dynamically clear specific prefixes to prevent cross-user data bleed
-  Object.keys(localStorage).forEach(key => {
-    if (key.startsWith('course-notes-') || 
-        key.startsWith('passport_demo_') || 
-        key.startsWith('note_color_') ||
-        key.endsWith('_communityLastSeenCount')) {
-      localStorage.removeItem(key);
+  // Consolidate the scan of all localStorage keys into a single pass
+  Object.keys(localStorage).forEach((k) => {
+    const matchesExplicit = explicitKeys.some(key => k.endsWith(`_${key}`));
+    const matchesDynamic = k.startsWith('course-notes-') || 
+                           k.startsWith('passport_demo_') || 
+                           k.startsWith('note_color_') ||
+                           k.endsWith('_communityLastSeenCount');
+    if (matchesExplicit || matchesDynamic) {
+      localStorage.removeItem(k);
     }
   });
 };

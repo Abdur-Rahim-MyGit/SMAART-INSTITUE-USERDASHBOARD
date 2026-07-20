@@ -118,7 +118,8 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 const connectDB = async () => {
   const primaryURI = process.env.MONGODB_URI;
 
-  const options = {
+  const isLocal = primaryURI.includes('127.0.0.1') || primaryURI.includes('localhost');
+  const options = isLocal ? {} : {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     maxPoolSize: 50,
@@ -134,7 +135,7 @@ const connectDB = async () => {
     logger.info('✅ MongoDB connected successfully');
   } catch (err) {
     logger.error('❌ MongoDB connection error:', err.message);
-    process.exit(1);
+    logger.warn('⚠️ Server will remain running. Mongoose will automatically retry connecting in the background.');
   }
 };
 
