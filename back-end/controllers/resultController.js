@@ -12,6 +12,19 @@ const determineLevel = (pct) => {
     return 'Emerging';
 };
 
+// Blueprint v1.0 competence classification for the OVERALL stage score.
+// This is separate from the per-quotient 5-band `determineLevel` above:
+//   Pass with Distinction: score >= 75
+//   Pass:                   passScore (60) <= score < 75
+//   Not Yet Competent:      score < passScore
+// T1 is a baseline diagnostic (passScore 0) and has no competence tier.
+const competenceTier = (score, passScore = 60, distinctionScore = 75) => {
+    if (passScore === 0) return 'Baseline';
+    if (distinctionScore && score >= distinctionScore) return 'Distinction';
+    if (score >= passScore) return 'Pass';
+    return 'Not Yet Competent';
+};
+
 /**
  * Submits an assessment result and grades it.
  * Evaluated under the 'NEW_ASSESSMENT_EVALUATION' feature flag check.
@@ -48,7 +61,12 @@ const submitAssessment = async (req, res) => {
         }
 
         // Fetch the assessment
-        const assessment = await Assessment.findById(result.assessmentId);
+        let assessment = await Assessment.findById(result.assessmentId);
+        if (!assessment) {
+            const db = require('mongoose').connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new (require('mongoose').Types.ObjectId)(result.assessmentId) });
+        }
+
         console.log('🔍 Assessment details:', {
             code: assessment?.assessmentCode,
             name: assessment?.assessmentName,
@@ -349,10 +367,13 @@ const submitAssessment = async (req, res) => {
 
             const stageBand = determineLevel(stageScore);
 
-            // Use stage-specific passing percentage (defaults to 70%)
-            const passingPercentage = stageInfo.passingPercentage !== undefined ? stageInfo.passingPercentage : 70;
-            // T1 (Baseline) always passes (passingPercentage=0), T2-T4+ require 70%
+            // Use stage-specific passing percentage (Blueprint v1.0: pass = 60; defaults to 60)
+            const passingPercentage = stageInfo.passingPercentage !== undefined ? stageInfo.passingPercentage : 60;
+            const distinctionPercentage = stageInfo.distinctionPercentage !== undefined ? stageInfo.distinctionPercentage : 75;
+            // T1 (Baseline) always passes (passingPercentage=0), T2-T4+ require the pass threshold
             const passed = passingPercentage === 0 ? true : stageScore >= passingPercentage;
+            // Blueprint v1.0 overall-stage competence tier (Distinction / Pass / Not Yet Competent)
+            const tier = competenceTier(stageScore, passingPercentage, distinctionPercentage);
 
             // Count existing attempts for this user+stage to set attemptNumber
             const StageResult = require('../models/StageResult');
@@ -367,6 +388,7 @@ const submitAssessment = async (req, res) => {
             responseData.baselineScore = stageScore; // Keep backward compat
             responseData.stageScore = stageScore;
             responseData.stageBand = stageBand;
+            responseData.competenceTier = tier;
             responseData.passed = passed;
             responseData.stage = stageInfo.stage;
             responseData.assessmentType = `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`;
@@ -384,6 +406,7 @@ const submitAssessment = async (req, res) => {
                     stage: stageInfo.stage,
                     stageScore,
                     stageBand,
+                    competenceTier: tier,
                     passed,
                     attemptNumber,
                     quotientProfile: finalProfile,
@@ -473,6 +496,20 @@ const submitAssessment = async (req, res) => {
                         message: blError.message
                     });
                 }
+            }
+
+            // Check if this is a skill assessment (either from skillassessments collection or type === 'skill')
+            const isSkillAssessment = assessment && (assessment.assessmentType === 'skill' || !assessment.assessmentCode);
+            if (isSkillAssessment) {
+                const passMark = 70;
+                const passed = percentage >= passMark;
+                
+                responseData.assessmentType = 'skill';
+                responseData.passed = passed;
+                responseData.passingPercentage = passMark;
+                responseData.skillName = assessment.instructions || assessment.questionCategory;
+                
+                console.log(`🎯 Skill assessment completed: ${responseData.skillName}. Score: ${percentage}%, Passed: ${passed}`);
             }
         }
 

@@ -11,6 +11,7 @@ import translationTE from "./locales/te/translation.json";
 import translationKN from "./locales/kn/translation.json";
 import translationML from "./locales/ml/translation.json";
 import translationPA from "./locales/pa/translation.json";
+import translationAR from "./locales/ar/translation.json";
 
 const resources = {
   en: {
@@ -39,6 +40,9 @@ const resources = {
   },
   pa: {
     translation: translationPA,
+  },
+  ar: {
+    translation: translationAR,
   },
 };
 

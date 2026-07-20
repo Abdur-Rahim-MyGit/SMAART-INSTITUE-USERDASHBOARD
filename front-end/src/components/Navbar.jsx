@@ -29,7 +29,8 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
     { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
     { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
-    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
+    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' },
+    { code: 'ar', name: 'Arabic', native: 'العربية', shortLabel: 'AR' }
   ];
 
   const activeLanguageCode = i18n.language || 'en';
@@ -45,6 +46,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
       case 'ml': return "സ്ഥാപനം";
       case 'pa': return "ਸੰਸਥਾ";
       case 'ur': return "ادارہ";
+      case 'ar': return "معهد";
       default: return "Institute";
     }
   };

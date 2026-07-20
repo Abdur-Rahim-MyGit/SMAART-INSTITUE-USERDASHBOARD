@@ -65,6 +65,7 @@ const Legal = lazy(() => import('@/pages/Legal'));
 const AdminCourses = lazy(() => import('@/pages/AdminCourses'));
 const AdminCourseForm = lazy(() => import('@/pages/AdminCourseForm'));
 const AdminProctoringDashboard = lazy(() => import('@/pages/ProctoringDashboard'));
+const SkillAssessmentPlayer = lazy(() => import('@/pages/SkillAssessmentPlayer'));
 
 
 // Career Agent (Integrated from Career-Agent standalone system)
@@ -228,6 +229,7 @@ const AnimatedRoutes = () => {
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
                     <Route path="/locked-out" element={<LockedOut />} />
+                    <Route path="/skill-assessment/:skillName" element={<SkillAssessmentPlayer />} />
 
                     {/* Fallback */}
                     <Route path="*" element={<NotFound />} />

@@ -151,7 +151,10 @@ export const generateAssessmentReport = (user, testResults) => {
 
     doc.setFontSize(10);
     doc.setTextColor(...grey);
-    doc.text(`Current Band: ${testResults?.stageBand || 'N/A'}`, margin, 71);
+    const tierLabel = testResults?.competenceTier && testResults.competenceTier !== 'Baseline'
+        ? (testResults.competenceTier === 'Distinction' ? 'Pass with Distinction' : testResults.competenceTier)
+        : null;
+    doc.text(`Current Band: ${testResults?.stageBand || 'N/A'}${tierLabel ? `  |  Result: ${tierLabel}` : ''}`, margin, 71);
     doc.text(`${testResults?.stage === 'T1' ? 'Baseline' : testResults?.stage === 'T2' ? 'Capacity' : testResults?.stage === 'T3' ? 'Capability' : testResults?.stage === 'T4' ? 'Leadership' : 'Assessment'} Report`, pageWidth - margin, 71, { align: 'right' });
 
     const barWidth = pageWidth - (margin * 2);

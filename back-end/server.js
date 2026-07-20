@@ -115,9 +115,8 @@ app.use(require('./middleware/sanitizeMongo'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-const connectWithFallback = async () => {
+const connectDB = async () => {
   const primaryURI = process.env.MONGODB_URI;
-  const fallbackURI = process.env.MONGODB_FALLBACK_URI || 'mongodb://127.0.0.1:27017/minds';
 
   const isLocal = primaryURI.includes('127.0.0.1') || primaryURI.includes('localhost');
   const options = isLocal ? {} : {
@@ -140,7 +139,7 @@ const connectWithFallback = async () => {
   }
 };
 
-connectWithFallback();
+connectDB();
 
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
