@@ -2,6 +2,11 @@
 echo Testing OpenRouter API...
 echo.
 
+if "%OPENROUTER_API_KEY%"=="" (
+    echo Error: OPENROUTER_API_KEY environment variable is not set or empty.
+    exit /b 1
+)
+
 curl -X POST "https://openrouter.ai/api/v1/chat/completions" ^
   -H "Authorization: Bearer %OPENROUTER_API_KEY%" ^
   -H "Content-Type: application/json" ^
