@@ -10,7 +10,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const userId = '691c4a243408254901245d8d';
 
 // Use exact URI from .env
-const mongoUri = "mongodb+srv://smaartmind:smaartmind123@smaartminds.hhyscvh.mongodb.net/?appName=SmaartMinds";
+const mongoUri = process.env.MONGODB_URI;
 
 async function checkData() {
     try {

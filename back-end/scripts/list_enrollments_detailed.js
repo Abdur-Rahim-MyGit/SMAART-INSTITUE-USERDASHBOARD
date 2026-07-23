@@ -3,7 +3,7 @@ const User = require('./models/User');
 const Course = require('./models/Course');
 const CourseEnrollment = require('./models/CourseEnrollment');
 
-const mongoURI = 'mongodb+srv://smaartmind:smaartmind123@smaartminds.hhyscvh.mongodb.net/?appName=SmaartMinds';
+const mongoURI = process.env.MONGODB_URI;
 
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
