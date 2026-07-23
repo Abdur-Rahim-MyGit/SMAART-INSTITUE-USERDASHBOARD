@@ -1,7 +1,8 @@
 const fetch = require('node-fetch') || global.fetch; // just in case
 
 async function testDeepgram() {
-    const deepgramApiKey = '83725db39dddc49f92cc73a23c2a61a3d50d662d';
+    const deepgramApiKey = process.env.DEEPGRAM_API_KEY;
+    if (!deepgramApiKey) { console.error('Set DEEPGRAM_API_KEY in the environment first.'); return; }
     const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
     
     console.log('Testing Deepgram with URL:', videoUrl);

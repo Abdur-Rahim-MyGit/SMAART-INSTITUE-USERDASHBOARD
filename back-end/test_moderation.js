@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const GOOGLE_AI_KEY = 'AIzaSyB6ele3hGRUsFfBiWPhheYivJqsKZfEjcM';
+const GOOGLE_AI_KEY = process.env.GOOGLE_AI_KEY;
 const GOOGLE_AI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 async function testGoogleAI() {
