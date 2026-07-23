@@ -17,6 +17,15 @@ export const proctoringApi = {
     });
   },
 
+  // Liveness ping. The server measures the gap between pings and records a
+  // violation when contact lapses — which is why going offline can no longer
+  // produce a clean record.
+  heartbeat: async (sessionId) => {
+    return apiCall(`/proctoring/session/${sessionId}/heartbeat`, {
+      method: 'POST'
+    });
+  },
+
   // Complete a proctoring session
   completeSession: async (sessionId) => {
     return apiCall(`/proctoring/session/${sessionId}/complete`, {

@@ -3,6 +3,7 @@ const Assessment = require('../models/Assessment');
 const { getStageByCode } = require('../config/stage_distributions');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { isFeatureEnabled } = require('../helpers/featureFlag');
+const { evaluateAttempt, applyHold, buildHeldResponse } = require('../services/proctoringGate');
 
 const determineLevel = (pct) => {
     if (pct >= 81) return 'Advanced';
@@ -47,6 +48,17 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // A held attempt is finished too — it must not be re-submitted to try
+        // for a different verdict.
+        if (result.completionStatus === 'pending_review') {
+            return res.status(400).json({
+                success: false,
+                held: true,
+                status: 'pending_review',
+                error: 'This assessment has already been submitted and is awaiting review.'
+            });
+        }
+
         // Fetch the assessment
         const assessment = await Assessment.findById(result.assessmentId);
         console.log('🔍 Assessment details:', {
@@ -62,8 +74,37 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // ── PROCTORING SUBMIT GATE ──────────────────────────────────────────
+        // Evaluated before any grading path so both the feature-flag branch and
+        // the normal branch are covered. Answers are always kept; only
+        // PUBLICATION of the score is conditional.
+        const proctoringVerdict = await evaluateAttempt(result);
+
+        const holdAttempt = async () => {
+            applyHold(result, proctoringVerdict);
+            result.submittedAt = new Date();
+            result.timeTaken = Math.floor((Date.now() - result.startedAt.getTime()) / 1000);
+            await result.save();
+
+            // The timing pass may have added a violation, so persist the
+            // session's updated counters too.
+            if (proctoringVerdict.session) {
+                await proctoringVerdict.session.save();
+            }
+
+            console.log(
+                `🔍 Attempt ${result._id} unverified (${proctoringVerdict.outcome}) — ` +
+                `risk ${proctoringVerdict.riskScore}, retries left ${proctoringVerdict.retriesRemaining}`
+            );
+            return res.json(buildHeldResponse(result, proctoringVerdict));
+        };
+
         // Check if the new assessment evaluation feature flag is enabled
         const useNewEvaluation = await isFeatureEnabled('NEW_ASSESSMENT_EVALUATION');
+
+        if (useNewEvaluation && proctoringVerdict.hold) {
+            return holdAttempt();
+        }
 
         if (useNewEvaluation) {
             console.log(`🚀 [NEW_ASSESSMENT_EVALUATION] Feature flag is ENABLED. Routing to new evaluation placeholder.`);
@@ -240,11 +281,28 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // ── PROCTORING SUBMIT GATE (normal grading path) ────────────────────
+        // Every answer is already persisted. If the session was held, stop here:
+        // record the attempt as pending_review and publish nothing. Stage
+        // progression, badges and notifications below are all skipped, so a
+        // held attempt cannot unlock the next stage before a human clears it.
+        if (proctoringVerdict.hold) {
+            return holdAttempt();
+        }
+
         // Calculate time taken
         const timeTaken = Math.floor((Date.now() - result.startedAt.getTime()) / 1000);
 
         // Update result
         result.completionStatus = 'completed';
+        result.scoreReleased = true;
+        if (proctoringVerdict.session) {
+            result.proctoringSessionId = proctoringVerdict.session._id;
+            // The gate recomputed riskScore (and may have logged a timing
+            // anomaly) — persist that even on a clean pass, so the audit trail
+            // reflects what was actually evaluated.
+            await proctoringVerdict.session.save();
+        }
         result.submittedAt = new Date();
         result.timeTaken = timeTaken;
 

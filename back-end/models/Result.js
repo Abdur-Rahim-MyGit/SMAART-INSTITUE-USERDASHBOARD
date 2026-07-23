@@ -74,6 +74,19 @@ const resultSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    /**
+     * Per-attempt option order, keyed by question id.
+     *
+     * MUST be persisted whenever options are shuffled. A stored answer of "B"
+     * is meaningless without knowing which option B was for THIS candidate —
+     * without this map the attempt cannot be graded or replayed, and a
+     * re-render would silently show different letters against the same answer.
+     */
+    optionOrder: {
+        type: Map,
+        of: [String],
+        default: undefined
+    },
     // Question order for this specific user attempt (shuffled)
     questionOrder: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -96,8 +109,35 @@ const resultSchema = new mongoose.Schema({
     },
     completionStatus: {
         type: String,
-        enum: ['in-progress', 'completed', 'abandoned'],
+        // 'pending_review' is the state this whole design depends on: the
+        // attempt is finished and stored, but the score is NOT published until
+        // a human clears the proctoring record.
+        enum: ['in-progress', 'completed', 'abandoned', 'pending_review'],
         default: 'in-progress'
+    },
+    // Whether the score may be shown to the candidate. A held attempt keeps
+    // every answer but withholds the outcome until review completes.
+    scoreReleased: {
+        type: Boolean,
+        default: true
+    },
+    // Proctoring session backing this attempt — the join the submit gate reads.
+    proctoringSessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProctoringSession'
+    },
+    // Audit trail for the reviewer's decision on a held attempt.
+    review: {
+        state: {
+            type: String,
+            enum: ['none', 'pending', 'released', 'invalidated', 'retake'],
+            default: 'none'
+        },
+        reasons: [{ type: String }],
+        riskScore: { type: Number, default: 0 },
+        decidedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        decidedAt: { type: Date },
+        note: { type: String }
     },
     // Analytics
     totalQuestions: {

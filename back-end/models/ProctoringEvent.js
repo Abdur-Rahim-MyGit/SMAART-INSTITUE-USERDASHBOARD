@@ -10,6 +10,9 @@ const ProctoringEventSchema = new mongoose.Schema({
       'tab_switch', 'minimize', 'fullscreen_exit', 'inactivity',
       // Face detection violations
       'face_absent', 'multiple_faces', 'face_mismatch', 'face_covered',
+      // Candidate away from the camera for a full minute — a materially
+      // different thing from a brief absence, so it carries its own weight.
+      'student_absent_extended',
       // Liveness / attention
       'attention_check_fail', 'identity_verified', 'face_registered',
       // Eye gaze violations (NEW)
@@ -18,6 +21,18 @@ const ProctoringEventSchema = new mongoose.Schema({
       // Audio / voice violations (NEW)
       'voice_detected',    // sustained speech detected during exam
       'prolonged_silence', // no activity for 4+ minutes
+      // Attention — sustained downward head pose is the best available proxy
+      // for reading a phone in the lap. Inference, never proof.
+      'looking_down',
+      // Environment — strong signals that are hard to explain away
+      'second_screen_detected',   // screen.isExtended
+      'virtual_camera_detected',  // OBS / ManyCam / Snap Camera feeding the webcam
+      'multiple_exam_windows',    // same assessment open in more than one tab
+      // Server-derived. The candidate cannot suppress these, because the
+      // signal is either an absence of contact or an analysis of their own
+      // submitted data.
+      'proctoring_offline',
+      'timing_anomaly',
     ],
     required: true 
   },

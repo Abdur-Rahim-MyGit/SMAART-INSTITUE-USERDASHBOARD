@@ -112,6 +112,21 @@ app.use(express.urlencoded({ limit: '16mb', extended: true }));
 // paths, ...) from all request input before it reaches any query. Must run
 // AFTER the body parsers so req.body is populated.
 app.use(require('./middleware/sanitizeMongo'));
+// PRIVACY (proctoring): webcam stills of identifiable candidates live in
+// uploads/proctoring. Both static mounts below would otherwise expose them to
+// anyone who guessed a filename — the second mount serves the uploads folder at
+// the site root, so /proctoring/<file>.jpg worked too. Deny both spellings and
+// force callers through GET /api/proctoring/snapshot/:filename, which proves
+// the requester is the candidate or an admin.
+app.use((req, res, next) => {
+  if (/^\/(uploads\/)?proctoring(\/|$)/i.test(req.path)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Proctoring snapshots are not publicly accessible.'
+    });
+  }
+  next();
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 

@@ -13,8 +13,9 @@
  */
 import * as faceapi from '@vladmandic/face-api';
 import { analyzeGaze, resetCalibration } from './eyeGazeService';
+import { analyzeHeadPose, resetHeadPoseCalibration } from './headPoseService';
 
-export { resetCalibration as resetGazeCalibration };
+export { resetCalibration as resetGazeCalibration, resetHeadPoseCalibration };
 
 // ─── State ───────────────────────────────────────────────────────────
 let modelsLoaded = false;
@@ -24,9 +25,37 @@ let loadError = null;
 // ─── Constants ───────────────────────────────────────────────────────
 const MODEL_URL = '/models';
 const MATCH_THRESHOLD = 0.6; // Euclidean distance < 0.6 = match (face-api.js standard)
-const MIN_FACE_CONFIDENCE = 0.5; // SSD MobileNet detection confidence
-const REGISTRATION_FRAMES = 5; // Number of frames to capture for robust reference
-const REGISTRATION_INTERVAL_MS = 600; // Milliseconds between capture frames
+const MIN_FACE_CONFIDENCE = 0.5; // Detector confidence threshold
+
+/**
+ * PERFORMANCE: we use TinyFaceDetector, not SSD MobileNet V1.
+ *
+ * SSD's weights are 5.6 MB against Tiny's 193 KB — 29x more to download before
+ * the first detection can even run — and its per-frame inference is several
+ * times slower. Since the exam loop runs a detection every second on whatever
+ * laptop the candidate owns, the cheaper detector is worth far more than the
+ * marginal accuracy, especially as identity matching is still done by the full
+ * recognition net.
+ *
+ * inputSize must be a multiple of 32. 320 balances accuracy against speed;
+ * drop to 224 if detection still feels slow on low-end hardware.
+ */
+const DETECTOR_INPUT_SIZE = 320;
+
+const REGISTRATION_FRAMES = 3; // Number of frames to capture for robust reference
+const REGISTRATION_INTERVAL_MS = 400; // Milliseconds between capture frames
+
+// Reused across every call — constructing this per frame is pure waste.
+let detectorOptions = null;
+const getDetectorOptions = () => {
+  if (!detectorOptions) {
+    detectorOptions = new faceapi.TinyFaceDetectorOptions({
+      inputSize: DETECTOR_INPUT_SIZE,
+      scoreThreshold: MIN_FACE_CONFIDENCE
+    });
+  }
+  return detectorOptions;
+};
 
 // ─── Model Loading ───────────────────────────────────────────────────
 
@@ -54,22 +83,24 @@ export const loadModels = async (onProgress) => {
 
   try {
     console.log('[FaceVerification] Loading face-api.js models from', MODEL_URL);
-    onProgress?.(10);
+    onProgress?.(5);
 
-    // 1. SSD MobileNet V1 — face detector
-    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
-    console.log('[FaceVerification] ✅ SSD MobileNet V1 loaded');
-    onProgress?.(40);
+    // Loaded CONCURRENTLY. These were previously three sequential awaits, so
+    // the browser downloaded ~12 MB one file at a time while the candidate
+    // stared at a spinner. They are independent — there is no reason to wait.
+    let done = 0;
+    const total = 3;
+    const step = (name) => {
+      done += 1;
+      console.log(`[FaceVerification] ✅ ${name} loaded (${done}/${total})`);
+      onProgress?.(Math.round((done / total) * 100));
+    };
 
-    // 2. Face Landmark 68 — facial landmark detection
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    console.log('[FaceVerification] ✅ Face Landmark 68 loaded');
-    onProgress?.(70);
-
-    // 3. Face Recognition — 128-d embedding generation
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-    console.log('[FaceVerification] ✅ Face Recognition model loaded');
-    onProgress?.(100);
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL).then(() => step('Tiny Face Detector')),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL).then(() => step('Face Landmark 68')),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL).then(() => step('Face Recognition'))
+    ]);
 
     modelsLoaded = true;
     return true;
@@ -100,7 +131,7 @@ export const getLoadError = () => loadError;
  * @param {HTMLVideoElement|HTMLCanvasElement} input
  * @returns {Promise<object>} - { faceCount, faces, isFacePresent, error? }
  */
-export const detectFaces = async (input) => {
+export const detectFaces = async (input, withDescriptors = true) => {
   if (!input) {
     return { faceCount: 0, faces: [], isFacePresent: false, error: 'No input element' };
   }
@@ -115,11 +146,12 @@ export const detectFaces = async (input) => {
   }
 
   try {
-    const options = new faceapi.SsdMobilenetv1Options({ minConfidence: MIN_FACE_CONFIDENCE });
-    const detections = await faceapi
-      .detectAllFaces(input, options)
-      .withFaceLandmarks()
-      .withFaceDescriptors();
+    const chain = faceapi.detectAllFaces(input, getDetectorOptions()).withFaceLandmarks();
+
+    // Computing 128-d embeddings runs the 6.4 MB recognition net over every
+    // face. Callers that only need "is someone there?" can skip it entirely,
+    // which is most of them — presence scanning, framing feedback, face counts.
+    const detections = withDescriptors ? await chain.withFaceDescriptors() : await chain;
 
     const faces = detections.map(d => ({
       detection: d.detection,
@@ -141,6 +173,14 @@ export const detectFaces = async (input) => {
     return { faceCount: 0, faces: [], isFacePresent: false, error: error.message };
   }
 };
+
+/**
+ * Presence-only detection: face count, boxes and landmarks, no embeddings.
+ *
+ * Use this for anything that just needs to know whether a face is in frame.
+ * It skips the recognition net, which is the single most expensive stage.
+ */
+export const detectFacesFast = (input) => detectFaces(input, false);
 
 /**
  * Detect faces and return result in the legacy format (backward compat with faceDetectionService).
@@ -348,23 +388,28 @@ export const verifyFace = async (videoElement, referenceDescriptor) => {
   const similarity = distanceToSimilarity(distance);
 
   if (distance < MATCH_THRESHOLD) {
-    // Attach gaze analysis piggy-backed on the same landmark result
+    // Gaze and head pose piggy-back on the same landmark result — both are
+    // pure geometry over points we have already paid to compute.
     const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
+    const headPose = face.hasLandmarks ? analyzeHeadPose(face.landmarks) : null;
     return {
       status: VerificationStatus.VERIFIED,
       distance,
       similarity,
       faceCount: 1,
       gaze,
+      headPose,
     };
   } else {
     const gaze = face.hasLandmarks ? analyzeGaze(face.landmarks) : null;
+    const headPose = face.hasLandmarks ? analyzeHeadPose(face.landmarks) : null;
     return {
       status: VerificationStatus.MISMATCH,
       distance,
       similarity,
       faceCount: 1,
       gaze,
+      headPose,
     };
   }
 };

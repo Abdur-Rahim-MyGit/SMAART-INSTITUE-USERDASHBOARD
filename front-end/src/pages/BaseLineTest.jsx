@@ -34,8 +34,11 @@ import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/
 import useProctoringEngine from "@/hooks/useProctoringEngine";
 import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
 import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
-import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningModal";
+import ProctoringPause from "@/components/proctoring/ProctoringPause";
+import ProctoringNotice from "@/components/proctoring/ProctoringNotice";
+import ProctoringStatusPill from "@/components/proctoring/ProctoringStatusPill";
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
+import InactivityOverlay from "@/components/proctoring/InactivityOverlay";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -181,6 +184,21 @@ const BaseLineTest = () => {
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+
+  // ── MCQ interaction ────────────────────────────────────────────────────
+  // Presentation flags come from the server. Marks and negative marking are
+  // deliberately NOT sent to the browser — they are grading policy, and
+  // knowing them lets a candidate reason about which questions to guess on.
+  const [mcqConfig, setMcqConfig] = useState({
+    allowBackNavigation: true,
+    allowMarkForReview: true,
+    multipleCorrect: false
+  });
+  const [markedForReview, setMarkedForReview] = useState(() => new Set());
+  // 'idle' | 'saving' | 'saved' | 'error' — a quiet header tick, never a toast.
+  // Twenty toasts across twenty questions is punishment, not feedback.
+  const [saveState, setSaveState] = useState('idle');
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -445,6 +463,13 @@ const BaseLineTest = () => {
         setResultId(startResponse.data.resultId);
         setAssessmentToken(startResponse.data.assessmentToken); // Save JWT
 
+        // Presentation flags for this assessment (back navigation, review
+        // flags, multi-correct). Defaults stay permissive so existing Likert
+        // assessments behave exactly as before.
+        if (startResponse.data.mcqConfig) {
+          setMcqConfig((prev) => ({ ...prev, ...startResponse.data.mcqConfig }));
+        }
+
         // Ensure questions are in order (defensive check)
         const fetchedQuestions = startResponse.data.questions || [];
         console.log(`📚 Received ${fetchedQuestions.length} questions`);
@@ -520,9 +545,11 @@ const BaseLineTest = () => {
       [currentQuestionId]: optionValue
     }));
 
-    // 2. Fire and forget saving to backend
+    // 2. Persist. A save failure is the ONE case worth interrupting for —
+    // silently losing an answer is far worse than a moment's friction.
     try {
       setSavingAnswer(true);
+      setSaveState('saving');
       const response = await assessmentApi.saveAnswer(
         resultId,
         currentQuestionId,
@@ -533,13 +560,36 @@ const BaseLineTest = () => {
 
       if (!response.success) {
         console.error("❌ Failed to save answer to backend");
-        // Revert UI if needed? Usually for assessments we just keep trying or log it
+        setSaveState('error');
+      } else {
+        setSaveState('saved');
       }
     } catch (err) {
       console.error("❌ Error saving answer:", err);
+      setSaveState('error');
     } finally {
       setSavingAnswer(false);
     }
+  };
+
+  const toggleMarkForReview = () => {
+    if (!currentQuestionId || !mcqConfig.allowMarkForReview) return;
+    setMarkedForReview((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentQuestionId)) next.delete(currentQuestionId);
+      else next.add(currentQuestionId);
+      return next;
+    });
+  };
+
+  /** Jump straight to a question from the palette or the submit summary. */
+  const goToQuestion = (targetIndex) => {
+    if (interactionLocked || submitted || timeExpired) return;
+    if (targetIndex < 0 || targetIndex >= questions.length) return;
+    // Moving backwards is a config decision; forward jumps are always allowed
+    // to a question the candidate could have reached anyway.
+    if (targetIndex < index && !mcqConfig.allowBackNavigation) return;
+    setIndex(targetIndex);
   };
 
   const nextQ = () => {
@@ -552,7 +602,15 @@ const BaseLineTest = () => {
       setIndex((i) => i + 1);
     }
   };
-  const prevQ = () => { /* Disabled as per user request */ };
+  const prevQ = () => {
+    if (!mcqConfig.allowBackNavigation) return;
+    goToQuestion(index - 1);
+  };
+
+  // Questions with no answer recorded, for the pre-submit summary.
+  const unansweredIndexes = questions
+    .map((q, i) => (selectedAnswers[q._id] ? null : i))
+    .filter((i) => i !== null);
 
   const submit = useCallback(async ({ reason = "manual", redirectAfterSubmit = false, forceTimeoutCompletion = false, forcePassDev = false, forceFailDev = false } = {}) => {
     if (!resultId || submitting || submitted) return;
@@ -577,6 +635,28 @@ const BaseLineTest = () => {
         forcePassDev,
         forceFailDev,
       });
+
+      // The attempt finished but the server could not verify it. Answers are
+      // saved either way — only the score is withheld — so this is a normal
+      // outcome, not an error path.
+      if (response.success && response.held) {
+        submitSucceeded = true;
+        clearTimerPersistence();
+        setSubmitted(true);
+        navigate('/assessment-held', {
+          replace: true,
+          state: {
+            outcome: response.outcome,
+            reference: response.reference,
+            flags: response.flags,
+            retriesRemaining: response.retriesRemaining,
+            answersRecorded: response.answersRecorded,
+            totalQuestions: response.totalQuestions,
+            assessmentCode: stageKey
+          }
+        });
+        return;
+      }
 
       if (response.success) {
         submitSucceeded = true;
@@ -656,11 +736,25 @@ const BaseLineTest = () => {
     const updateCountdown = () => {
       if (!timerStartRef.current) return;
 
+      // Tier 3 stops the clock. Time spent in a proctoring pause is not
+      // charged to the candidate, which removes any argument that being
+      // interrupted cost them marks.
+      if (isPausedRef.current) {
+        if (pauseStartedAtRef.current === null) pauseStartedAtRef.current = Date.now();
+        return;
+      }
+      if (pauseStartedAtRef.current !== null) {
+        pausedMsRef.current += Date.now() - pauseStartedAtRef.current;
+        pauseStartedAtRef.current = null;
+      }
+
       if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
         localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
       }
 
-      const elapsedSeconds = Math.floor((Date.now() - timerStartRef.current) / 1000);
+      const elapsedSeconds = Math.floor(
+        (Date.now() - timerStartRef.current - pausedMsRef.current) / 1000
+      );
       const nextRemainingSeconds = Math.max(stageDurationSeconds - elapsedSeconds, 0);
       setRemainingSeconds(nextRemainingSeconds);
 
@@ -696,6 +790,12 @@ const BaseLineTest = () => {
     t
   ]);
 
+  // Accumulated time spent in a Tier 3 proctoring pause, excluded from the
+  // countdown. Read through refs so the 1s interval never needs re-creating.
+  const pausedMsRef = useRef(0);
+  const pauseStartedAtRef = useRef(null);
+  const isPausedRef = useRef(false);
+
   // Proctoring Logic - Anti-Cheat (using useProctoringEngine)
   const {
     warningsCount,
@@ -715,13 +815,29 @@ const BaseLineTest = () => {
     passAttentionCheck,
     failAttentionCheck,
     verificationStatus,
-    similarityScore
+    similarityScore,
+    // Escalation ladder
+    tier,
+    nudgeMessage,
+    pauseObservations,
+    isPaused,
+    resumeFromPause,
+    // Inactivity presence check
+    showInactivityOverlay,
+    dismissInactivityOverlay,
+    failInactivityCheck
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
     registeredFaceDescriptor
   });
+
+  // Keep the countdown's view of the pause state current without re-running
+  // the timer effect.
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   useEffect(() => {
     if (submitted || loading) return;
@@ -852,6 +968,20 @@ const BaseLineTest = () => {
           assessmentTitle={translatedTitle}
         />
       )}
+      {/* Tier 2 — a recorded warning. Non-blocking on purpose: the candidate
+          keeps answering underneath while this is on screen. */}
+      {!submitted && !loading && !error && setupCompleted && (
+        <ProctoringNotice
+          isOpen={tier === 'warn' && isWarningVisible}
+          violationType={lastViolationType}
+          warnings={warningsCount}
+          maxWarnings={maxWarnings}
+          onFix={!isFullScreen ? requestFullscreen : null}
+          fixLabel={t("baseline_test.return_fullscreen", "Return to fullscreen")}
+          onDismiss={acknowledgeWarning}
+        />
+      )}
+
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {!submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
@@ -879,7 +1009,45 @@ const BaseLineTest = () => {
                       </span>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center gap-3">
+                    {/* Auto-save state. A quiet tick, never a toast — twenty
+                        toasts across twenty questions is punishment, not
+                        feedback. A save FAILURE is the exception: losing an
+                        answer silently is far worse than a moment's friction. */}
+                    {saveState !== 'idle' && (
+                      <span
+                        role="status"
+                        aria-live="polite"
+                        className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+                          saveState === 'error'
+                            ? 'text-red-600 dark:text-red-400'
+                            : saveState === 'saving'
+                              ? 'text-slate-400 dark:text-slate-500'
+                              : 'text-emerald-600 dark:text-emerald-400'
+                        }`}
+                      >
+                        {saveState === 'saving' && (
+                          <>
+                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            {t("baseline_test.saving", "Saving")}
+                          </>
+                        )}
+                        {saveState === 'saved' && <>✓ {t("baseline_test.saved", "Saved")}</>}
+                        {saveState === 'error' && <>⚠ {t("baseline_test.save_failed", "Couldn't save — retrying")}</>}
+                      </span>
+                    )}
+
+                    {/* Tier 0/1 — present from the first second, so a later
+                        change of colour reads as information, not ambush. */}
+                    {setupCompleted && (
+                      <ProctoringStatusPill
+                        tier={tier}
+                        message={nudgeMessage}
+                        warnings={warningsCount}
+                        maxWarnings={maxWarnings}
+                      />
+                    )}
+                    <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
                       {t("baseline_test.time_left", "Time Left")}:{" "}
                       <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884] dark:text-blue-400"}`}>
@@ -891,6 +1059,7 @@ const BaseLineTest = () => {
                         {t("baseline_test.time_almost_up", "Time Almost Up!")}
                       </p>
                     )}
+                    </div>
                   </div>
                 </div>
 
@@ -946,8 +1115,43 @@ const BaseLineTest = () => {
                   })}
                 </div>
 
+                {/* Previous / Mark for review. Previous is HIDDEN rather than
+                    disabled when back navigation is off — a dead control
+                    invites clicking. */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  {mcqConfig.allowBackNavigation && index > 0 && (
+                    <button
+                      type="button"
+                      onClick={prevQ}
+                      disabled={interactionLocked || submitting || timeExpired}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:bg-slate-50 dark:hover:bg-[#003170] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      {t("baseline_test.previous", "Previous")}
+                    </button>
+                  )}
+                  {mcqConfig.allowMarkForReview && (
+                    <button
+                      type="button"
+                      onClick={toggleMarkForReview}
+                      disabled={interactionLocked || submitting || timeExpired}
+                      aria-pressed={markedForReview.has(currentQuestionId)}
+                      className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                        markedForReview.has(currentQuestionId)
+                          ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'
+                          : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#003170]'
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${markedForReview.has(currentQuestionId) ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-600'}`} />
+                      {markedForReview.has(currentQuestionId)
+                        ? t("baseline_test.marked_for_review", "Marked for review")
+                        : t("baseline_test.mark_for_review", "Mark for review")}
+                    </button>
+                  )}
+                </div>
+
                 {/* Manual "Next" / "Submit" button */}
-                <div className="h-16 mt-6 md:mt-8 flex justify-center items-center">
+                <div className="h-16 mt-4 md:mt-6 flex justify-center items-center">
                   <AnimatePresence>
                     {index < questions.length - 1 ? (
                       selectedValue && (
@@ -981,7 +1185,7 @@ const BaseLineTest = () => {
                         initial={{ opacity: 0, y: 10, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        onClick={() => submit()}
+                        onClick={() => setShowSubmitConfirm(true)}
                         disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered || !selectedValue}
                         className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2 ${(!allQuestionsAnswered || !selectedValue)
                           ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed'
@@ -1018,11 +1222,20 @@ const BaseLineTest = () => {
                   <Target className="text-[#1a3884] dark:text-blue-450" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
-                  {questions.map((q, idx) => (
+                  {questions.map((q, idx) => {
+                    // Reachable if it's ahead of us, or behind us and back
+                    // navigation is allowed for this assessment.
+                    const reachable = idx >= index || mcqConfig.allowBackNavigation;
+                    return (
                     <button
                       key={q._id}
-                      onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
-                      className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
+                      type="button"
+                      onClick={() => goToQuestion(idx)}
+                      disabled={!reachable || interactionLocked || timeExpired}
+                      aria-label={`Question ${idx + 1}${selectedAnswers[q._id] ? ', answered' : ', not answered'}${markedForReview.has(q._id) ? ', marked for review' : ''}`}
+                      aria-current={index === idx ? 'true' : undefined}
+                      className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all relative group
+                        ${reachable ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed opacity-60'}
                         ${index === idx
                           ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
                           : selectedAnswers[q._id]
@@ -1031,12 +1244,16 @@ const BaseLineTest = () => {
                         }`}
                     >
                       {idx + 1}
+                      {markedForReview.has(q._id) && (
+                        <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+                      )}
                       {/* Tooltip on hover */}
                       <span className="hidden md:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20">
                         Q{idx + 1}
                       </span>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1391,13 +1608,95 @@ const BaseLineTest = () => {
         userName={user?.fullName || t("baseline_test.student", "Student")}
       />
 
-      {/* Activity Restriction Warning Modal */}
-      <ProctoringWarningModal
-        isOpen={isWarningVisible}
-        warningsCount={warningsCount}
+      {/* Submit confirmation. The last thing before an irreversible action is
+          a plain summary of what's being handed in — with the gaps clickable,
+          not merely counted. */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="submit-confirm-title"
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-2xl dark:border-white/10 dark:bg-[#00152E]"
+          >
+            <h3 id="submit-confirm-title" className="text-xl font-bold text-slate-900 dark:text-white">
+              {t("baseline_test.submit_confirm_title", "Submit your assessment?")}
+            </h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              {unansweredIndexes.length > 0 ? (
+                <>
+                  {t("baseline_test.submit_confirm_gaps", "You still have")}{' '}
+                  <strong className="text-slate-900 dark:text-white">
+                    {unansweredIndexes.length} {t("baseline_test.unanswered", "unanswered")}
+                  </strong>{' '}
+                  {t("baseline_test.and", "and")}{' '}
+                  <strong className="text-slate-900 dark:text-white">{formatCountdown(remainingSeconds)}</strong>{' '}
+                  {t("baseline_test.remaining_lower", "remaining")}.{' '}
+                  {t("baseline_test.tap_to_jump", "Select a number below to jump back to it.")}
+                </>
+              ) : (
+                t("baseline_test.submit_confirm_all", "All questions are answered. You can still go back and change any of them before submitting.")
+              )}
+            </p>
+
+            {unansweredIndexes.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {unansweredIndexes.map((i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => { setShowSubmitConfirm(false); goToQuestion(i); }}
+                    className="grid h-9 w-9 place-items-center rounded-lg border border-amber-300 bg-amber-50 text-xs font-bold text-amber-700 transition hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {markedForReview.size > 0 && (
+              <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                {markedForReview.size} {t("baseline_test.still_marked", "question(s) still marked for review.")}
+              </p>
+            )}
+
+            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
+              {t("baseline_test.submit_irreversible", "Once submitted you can't change your answers. Your score will appear in your dashboard when results are released.")}
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowSubmitConfirm(false); submit(); }}
+                disabled={submitting}
+                className="flex-1 rounded-xl bg-[#1a3884] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#277a84] disabled:opacity-60 dark:bg-blue-600 dark:hover:bg-blue-500"
+              >
+                {t("baseline_test.submit_all", "Submit all {{count}} questions", { count: questions.length })}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSubmitConfirm(false)}
+                className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/15 dark:text-slate-200 dark:hover:bg-white/5"
+              >
+                {t("baseline_test.keep_working", "Keep working")}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Tier 3 — the one blocking moment. Slate, not red, and the timer is
+          frozen while it is open (see the countdown effect above). */}
+      <ProctoringPause
+        isOpen={tier === 'pause'}
+        observations={pauseObservations}
+        warnings={warningsCount}
         maxWarnings={maxWarnings}
-        violationType={lastViolationType}
-        onAcknowledge={acknowledgeWarning}
+        onResume={resumeFromPause}
       />
 
       {/* Proctoring Overlay (Webcam PiP) */}
@@ -1422,6 +1721,14 @@ const BaseLineTest = () => {
         <AttentionCheck
           onPass={passAttentionCheck}
           onFail={failAttentionCheck}
+        />
+      )}
+
+      {/* Inactivity presence check — blurred overlay */}
+      {showInactivityOverlay && (
+        <InactivityOverlay
+          onDismiss={dismissInactivityOverlay}
+          onTimeout={failInactivityCheck}
         />
       )}
 

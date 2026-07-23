@@ -8,6 +8,78 @@ const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/as
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
+const { scoreResponse, shuffleOptionsForQuestion } = require('../services/mcqScoring');
+
+/**
+ * The subset of mcqConfig the exam UI is allowed to know.
+ *
+ * Marks, negative marking and passing marks are deliberately withheld: they
+ * are grading policy, and publishing them lets a candidate reason about which
+ * questions are worth guessing on. Only presentation flags go out.
+ */
+const publicMcqConfig = (assessment) => {
+    const c = assessment?.mcqConfig || {};
+    return {
+        allowBackNavigation: c.allowBackNavigation !== false,
+        allowMarkForReview: c.allowMarkForReview !== false,
+        multipleCorrect: !!c.multipleCorrect
+    };
+};
+
+/**
+ * Apply this attempt's option order to the outgoing questions, persisting it
+ * the first time so every later serve is identical.
+ *
+ * Persistence is not optional. A stored answer of "B" is meaningless without
+ * knowing which option B was for THIS candidate — without the map the attempt
+ * cannot be graded or replayed, and a refresh would move the letters under an
+ * already-selected answer.
+ *
+ * Returns the questions with options reordered. Untouched when the assessment
+ * does not enable randomizeOptions, so Likert flows are unaffected.
+ */
+const applyOptionOrder = async (questions, result, assessment) => {
+    if (!assessment?.mcqConfig?.randomizeOptions) return questions;
+    if (!Array.isArray(questions) || questions.length === 0) return questions;
+
+    const stored = result.optionOrder || new Map();
+    let mutated = false;
+
+    const ordered = questions.map((q) => {
+        const qId = String(q._id);
+        const options = q.options || [];
+        if (options.length < 2) return q;
+
+        const savedOrder = stored.get ? stored.get(qId) : stored[qId];
+
+        if (savedOrder && savedOrder.length === options.length) {
+            // Replay the persisted order.
+            const byValue = new Map(options.map((o) => [String(o.value), o]));
+            const replayed = savedOrder.map((v) => byValue.get(String(v))).filter(Boolean);
+            if (replayed.length === options.length) return { ...q, options: replayed };
+        }
+
+        // First serve for this question — generate and remember.
+        const shuffled = shuffleOptionsForQuestion(options, `${result._id}:${qId}`);
+        if (stored.set) stored.set(qId, shuffled.map((o) => String(o.value)));
+        mutated = true;
+        return { ...q, options: shuffled };
+    });
+
+    if (mutated) {
+        result.optionOrder = stored;
+        try {
+            await result.save();
+        } catch (err) {
+            // Never fail the exam over a shuffle bookkeeping error — fall back
+            // to the canonical order rather than blocking the candidate.
+            console.error('⚠️ Could not persist optionOrder, serving canonical order:', err.message);
+            return questions;
+        }
+    }
+
+    return ordered;
+};
 const resultController = require('../controllers/resultController');
 
 const router = express.Router();
@@ -204,15 +276,18 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 assessmentId
             });
 
+            const orderedQuestions = await applyOptionOrder(questions, existingResult, assessment);
+
             return res.json({
                 success: true,
                 message: 'Resuming existing attempt',
                 data: {
                     resultId: existingResult._id,
-                    questions,
+                    questions: orderedQuestions,
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
-                    assessmentToken
+                    assessmentToken,
+                    mcqConfig: publicMcqConfig(assessment)
                 }
             });
         }
@@ -335,14 +410,17 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 assessmentId: assessment._id
             });
 
+        const orderedQuestions = await applyOptionOrder(shuffledQuestions, result, assessment);
+
         res.status(201).json({
             success: true,
             message: 'Assessment started successfully',
             data: {
                 resultId: result._id,
-                questions: shuffledQuestions,
+                questions: orderedQuestions,
                 totalQuestions: totalQuestions,
-                assessmentToken
+                assessmentToken,
+                mcqConfig: publicMcqConfig(assessment)
             }
         });
     } catch (err) {
@@ -393,8 +471,17 @@ router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
         if (assessment) {
             const question = assessment.questions.id(questionId);
             if (question && question.correctAnswer !== undefined) {
-                isCorrect = question.correctAnswer === selectedValue;
-                score = isCorrect ? (question.points || 1) : 0;
+                // Was `question.correctAnswer === selectedValue`, a strict
+                // compare on a Mixed field: a stored number 2 never equalled
+                // the string "2" that arrives over JSON, and a multi-correct
+                // array never equalled anything. Both graded silently wrong.
+                const graded = scoreResponse({
+                    question,
+                    selectedValue,
+                    config: assessment.mcqConfig || {}
+                });
+                isCorrect = graded.isCorrect;
+                score = graded.score;
             }
         }
 
