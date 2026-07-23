@@ -57,12 +57,18 @@ const stageResultSchema = new mongoose.Schema({
         max: 100,
         default: 0
     },
-    // Overall Stage Band
+    // Overall Stage Band (per-quotient 5-band scale, kept for richness/back-compat)
     stageBand: {
         type: String,
         required: true,
         enum: ['Emerging', 'Developing', 'Progressing', 'Strong', 'Advanced'],
         default: 'Emerging'
+    },
+    // Blueprint v1.0 overall-stage competence classification
+    competenceTier: {
+        type: String,
+        enum: ['Distinction', 'Pass', 'Not Yet Competent', 'Baseline'],
+        required: false
     },
     // Pass status
     passed: {

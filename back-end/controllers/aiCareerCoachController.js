@@ -1,6 +1,5 @@
 const AIProfile = require('../models/AIProfile');
 const ChatMessage = require('../models/ChatMessage');
-const Registration = require('../models/Registration');
 const User = require('../models/User');
 const openRouterService = require('../services/openRouterService');
 const { v4: uuidv4 } = require('uuid');
@@ -17,26 +16,22 @@ const getRichProfile = async (userId) => {
     // 1. Try to fetch documents by ID
     let user = await User.findById(userId);
     let student = await Student.findById(userId).populate('college');
-    let registration = await Registration.findOne({ userId });
     let profile = await AIProfile.findOne({ userId });
 
     // 2. Cross-link detection: If userId didn't find everything, search by email
-    const email = user?.email || student?.email || registration?.email;
+    const email = user?.email || student?.email;
 
     if (email) {
         if (!user) user = await User.findOne({ email });
         if (!student) student = await Student.findOne({ email }).populate('college');
-        if (!registration) registration = await Registration.findOne({ email });
 
         // If we found a user or student by email, try to find the AIProfile using their IDs
         if (!profile && user) profile = await AIProfile.findOne({ userId: user._id });
         if (!profile && student) profile = await AIProfile.findOne({ userId: student._id });
-
-        // If registration was found by email but not linked by userId, link it now for this session context
-        if (!registration && (user || student)) {
-            registration = await Registration.findOne({ userId: user?._id || student?._id });
-        }
     }
+
+    // Registration data is embedded on the merged student document.
+    const registration = student?.registration || null;
 
     // Comprehensive Student Data Capture
     const richProfile = {

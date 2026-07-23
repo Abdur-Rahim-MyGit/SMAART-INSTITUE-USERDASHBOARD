@@ -873,7 +873,7 @@ const CareerAgentOnboarding = () => {
             updatedEdu = [{
               level: '',
               domain: '',
-              degreeGroup: user.qualification || user.department || '',
+              degreeGroup: user.qualification || (typeof user.department === 'object' ? (user.department.fullName || user.department.name || '') : user.department) || '',
               specialisation: user.specialization ? [user.specialization] : [],
               university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
               graduationYear: user.yearOfPassing || user.batch || '',

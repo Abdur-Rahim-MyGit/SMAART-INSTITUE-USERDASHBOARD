@@ -14,6 +14,7 @@ import {
     IconEye as Eye,
     IconFileText as FileText,
     IconInfoCircle as Info,
+    IconAlertTriangle as AlertTriangle,
     IconStack2 as Layers,
     IconPlayerPlayFilled as Play,
     IconRefresh as RotateCcw,
@@ -51,7 +52,7 @@ const DEFAULT_STAGES = [
         subtitle: "Applied Skills",
         description:
             "Evaluate your applied capability and professional readiness with advanced challenges.",
-        totalQuestions: 36,
+        totalQuestions: 34,
         duration: "45 min",
     },
     {
@@ -61,7 +62,7 @@ const DEFAULT_STAGES = [
         subtitle: "Mastery",
         description:
             "Demonstrate your leadership potential and mastery across all competency dimensions.",
-        totalQuestions: 34,
+        totalQuestions: 36,
         duration: "40 min",
     },
     {
@@ -75,6 +76,19 @@ const DEFAULT_STAGES = [
         duration: "45 min",
     },
 ];
+
+const getStageFallback = (key) =>
+    DEFAULT_STAGES.find((stage) => stage.key === key) || {
+        title: key,
+        subtitle: "Assessment",
+        description: "Take this evaluation to measure your professional quotients.",
+    };
+
+const getDurationLabel = (duration, t) => {
+    const minutes = String(duration || "").match(/\d+/)?.[0];
+    if (!minutes) return duration || "";
+    return t("assessments_dashboard.duration_minutes", "{{count}} min", { count: minutes });
+};
 
 const mapAssessmentToStage = (ass) => {
     let key = "T1";
@@ -97,8 +111,8 @@ const mapAssessmentToStage = (ass) => {
     const targetQuestionsMap = {
         T1: 36,
         T2: 34,
-        T3: 36,
-        T4: 34,
+        T3: 34,
+        T4: 36,
         AIQ: 36,
     };
     const totalQuestions = targetQuestionsMap[key] || ass.totalQuestions || 36;
@@ -141,13 +155,15 @@ const mapAssessmentToStage = (ass) => {
         description = standardDescriptions[key] || "Take this evaluation to measure your professional quotients.";
     }
 
+    const fallbackStage = getStageFallback(key);
+
     return {
         _id: ass._id,
         key: key,
         code: ass.assessmentCode || "",
-        title: ass.assessmentName,
-        subtitle: subtitle,
-        description: description,
+        title: fallbackStage.title || ass.assessmentName,
+        subtitle: fallbackStage.subtitle || subtitle,
+        description: fallbackStage.description || description,
         totalQuestions: totalQuestions,
         duration: durationStr,
     };
@@ -392,7 +408,7 @@ const AssessmentsDashboard = () => {
                                     </p>
                                     <div className="mt-4 flex flex-wrap items-center gap-2">
                                         <InfoChip icon={FileText} label={`${selectedStage.totalQuestions} ${t("assessments_dashboard.questions", "Qs")}`} />
-                                        <InfoChip icon={Clock} label={selectedStage.duration.replace("min", t("assessments_dashboard.min", "min"))} />
+                                        <InfoChip icon={Clock} label={getDurationLabel(selectedStage.duration, t)} />
                                     </div>
                                 </div>
 
@@ -489,7 +505,7 @@ const AssessmentsDashboard = () => {
 const StageCard = ({ stage, index, completed, stageData, onAction }) => {
     const { t } = useTranslation();
     const score = stageData?.score;
-    const durationLabel = stage.duration.replace("min", t("assessments_dashboard.min", "min"));
+    const durationLabel = getDurationLabel(stage.duration, t);
 
     return (
         <motion.div

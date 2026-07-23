@@ -43,9 +43,9 @@ import InactivityOverlay from "@/components/proctoring/InactivityOverlay";
 // Stage configuration map
 const STAGE_MAP = {
   T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 1, passingPercentage: 0 },
-  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
-  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
-  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 34, durationMinutes: 45, maxAttempts: 3, passingPercentage: 60 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 36, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
   AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
   SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
   PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
@@ -184,6 +184,7 @@ const BaseLineTest = () => {
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  const [registrationMetadata, setRegistrationMetadata] = useState(null); // quality/model info for backend persistence
 
   // ── MCQ interaction ────────────────────────────────────────────────────
   // Presentation flags come from the server. Marks and negative marking are
@@ -724,17 +725,11 @@ const BaseLineTest = () => {
   useEffect(() => {
     if (loading || submitted || !resultId || !setupCompleted) return;
 
-    let persistedStartTime = Number(localStorage.getItem(timerStartStorageKey));
-    if (!Number.isFinite(persistedStartTime) || persistedStartTime <= 0 || persistedStartTime > Date.now()) {
-      persistedStartTime = Date.now();
-      localStorage.setItem(timerStartStorageKey, String(persistedStartTime));
-    }
-
-    timerStartRef.current = persistedStartTime;
     oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
 
-    const updateCountdown = () => {
-      if (!timerStartRef.current) return;
+    const timer = setInterval(() => {
+      setRemainingSeconds((prev) => {
+        const next = Math.max(prev - 1, 0);
 
       // Tier 3 stops the clock. Time spent in a proctoring pause is not
       // charged to the candidate, which removes any argument that being
@@ -765,27 +760,27 @@ const BaseLineTest = () => {
         toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
       }
 
-      if (nextRemainingSeconds === 0 && !timeoutSubmitTriggeredRef.current) {
-        timeoutSubmitTriggeredRef.current = true;
-        setTimeExpired(true);
-        setInteractionLocked(true);
-        setShowExitWarning(false);
-        toast.error(t("baseline_test.time_up_submitting", "Time is up. Submitting your assessment..."));
-        submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
-      }
-    };
+        if (next === 0 && !timeoutSubmitTriggeredRef.current) {
+          timeoutSubmitTriggeredRef.current = true;
+          clearInterval(timer);
+          setTimeExpired(true);
+          setInteractionLocked(true);
+          setShowExitWarning(false);
+          toast.error(t("baseline_test.time_up_submitting", "Time is up. Submitting your assessment..."));
+          submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
+        }
 
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
+        return next;
+      });
+    }, 1000);
 
     return () => clearInterval(timer);
   }, [
     loading,
     resultId,
-    stageDurationSeconds,
+    setupCompleted,
     submitted,
     submit,
-    timerStartStorageKey,
     timerWarningStorageKey,
     t
   ]);
@@ -830,7 +825,8 @@ const BaseLineTest = () => {
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor
+    registeredFaceDescriptor,
+    registrationMetadata,
   });
 
   // Keep the countdown's view of the pause state current without re-running
@@ -961,8 +957,15 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={({ faceDescriptor }) => {
+          onComplete={({ faceDescriptor, registrationQualityScore, registrationCropUrl }) => {
             setRegisteredFaceDescriptor(faceDescriptor);
+            setRegistrationMetadata({
+              model: 'arcface-r50-onnx',
+              qualityScore: registrationQualityScore || null,
+              framesCaptured: 5,
+              antispoofPassed: true,
+              registrationCropUrl: registrationCropUrl || null,
+            });
             setSetupCompleted(true);
           }}
           assessmentTitle={translatedTitle}
@@ -1334,6 +1337,25 @@ const BaseLineTest = () => {
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
                 </h2>
+
+                {/* Blueprint v1.0 competence tier — headline classification (T2-T4) */}
+                {testResults?.competenceTier && testResults.competenceTier !== 'Baseline' && (
+                  <div className="mb-3">
+                    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border ${
+                      testResults.competenceTier === 'Distinction'
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20'
+                        : testResults.competenceTier === 'Pass'
+                        ? 'bg-[#1a3884]/5 dark:bg-[#1a3884]/10 text-[#1a3884] dark:text-blue-300 border-[#1a3884]/20'
+                        : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20'
+                    }`}>
+                      {testResults.competenceTier === 'Distinction'
+                        ? t("baseline_test.tier.distinction", "Pass with Distinction")
+                        : testResults.competenceTier === 'Pass'
+                        ? t("baseline_test.tier.pass", "Pass")
+                        : t("baseline_test.tier.not_yet_competent", "Not Yet Competent")}
+                    </span>
+                  </div>
+                )}
 
                 {/* Pass/Fail Badge for multi-attempt stages */}
                 {stageConfig.maxAttempts > 1 && testResults && (

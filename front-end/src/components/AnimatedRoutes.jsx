@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 
 // Layout Components
 import DashboardLayout from '@/components/DashboardLayout';
+import PrivateRoute from '@/components/PrivateRoute';
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import('@/pages/LandingPage'));
@@ -51,6 +52,7 @@ const Help = lazy(() => import('@/pages/Help'));
 const LockedOut = lazy(() => import('@/pages/LockedOut'));
 const AssessmentHeld = lazy(() => import('@/components/proctoring/AssessmentHeld'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
+const GrievancesPage = lazy(() => import('@/pages/GrievancesPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyPassport = lazy(() => import('@/pages/VerifyPassport'));
@@ -64,6 +66,7 @@ const Legal = lazy(() => import('@/pages/Legal'));
 const AdminCourses = lazy(() => import('@/pages/AdminCourses'));
 const AdminCourseForm = lazy(() => import('@/pages/AdminCourseForm'));
 const AdminProctoringDashboard = lazy(() => import('@/pages/ProctoringDashboard'));
+const SkillAssessmentPlayer = lazy(() => import('@/pages/SkillAssessmentPlayer'));
 
 
 // Career Agent (Integrated from Career-Agent standalone system)
@@ -117,7 +120,8 @@ const AnimatedRoutes = () => {
                     <Route path="/complete-registration" element={<ComprehensiveSignup />} />
                     <Route path="/signup-success" element={<SignupSuccess />} />
 
-                    {/* Protected Dashboard Routes - Using DashboardLayout */}
+                    {/* Protected Dashboard Routes - Auth guard + DashboardLayout */}
+                    <Route element={<PrivateRoute />}>
                     <Route element={<ProtectedDashboardLayout />}>
                         {/* Home */}
                         <Route path="/dashboard" element={<DashboardHome />} />
@@ -161,9 +165,7 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
                         <Route path="/dashboard/cgpa-calculator" element={<CGPACalculator />} />
 
-                        {/* Skills Vault */}
-                        <Route path="/skills-vault" element={<SkillsVault />} />
-                        <Route path="/dashboard/skills-vault" element={<SkillsVault />} />
+
 
                         {/* Community */}
                         <Route path="/community" element={<Community />} />
@@ -185,6 +187,8 @@ const AnimatedRoutes = () => {
                         <Route path="/help" element={<Help />} />
                         <Route path="/tickets" element={<SupportTicketsPage />} />
                         <Route path="/dashboard/support" element={<SupportTicketsPage />} />
+                        <Route path="/grievances" element={<GrievancesPage />} />
+                        <Route path="/dashboard/grievances" element={<GrievancesPage />} />
 
                         {/* Admin — Course management */}
                         <Route path="/dashboard/admin/courses" element={<AdminCourses />} />
@@ -220,6 +224,7 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/career-agent/onboarding" element={<CareerAgentOnboarding />} />
                         <Route path="/dashboard/career-agent/dashboard" element={<CareerAgentDashboard />} />
                     </Route>
+                    </Route>
                     <Route path="/assessment/:stage" element={<BaseLineTest />} />
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
@@ -229,6 +234,7 @@ const AnimatedRoutes = () => {
                         lockout dead-end — answers are saved, only the score
                         is withheld. */}
                     <Route path="/assessment-held" element={<AssessmentHeld />} />
+                    <Route path="/skill-assessment/:skillName" element={<SkillAssessmentPlayer />} />
 
                     {/* Fallback */}
                     <Route path="*" element={<NotFound />} />

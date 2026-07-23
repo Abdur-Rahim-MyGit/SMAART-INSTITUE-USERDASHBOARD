@@ -23,7 +23,7 @@ const captureScreenshot = (videoElement) => {
       ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         resolve(blob);
-      }, 'image/jpeg', 0.75); // 75% quality JPEG
+      }, 'image/jpeg', 0.75);
     } catch (e) {
       console.error('[ProctoringEngine] Canvas capture failed:', e);
       resolve(null);
@@ -49,8 +49,8 @@ export const useProctoringEngine = ({
   resultId = null,
   assessmentId = null,
   isActive = false,
-  registeredFaceDescriptor = null, // NEW: Face embedding from ProctoringSetup
-  onLockout = null // Custom submit callback
+  registeredFaceDescriptor = null,
+  onLockout = null
 }) => {
   const [warningsCount, setWarningsCount] = useState(0);
   const [isWarningVisible, setIsWarningVisible] = useState(false);
@@ -67,7 +67,6 @@ export const useProctoringEngine = ({
   const nudgeRef = useRef('');
   const serverTierRef = useRef('ok');
   
-  // Camera & Face State
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isFaceDetected, setIsFaceDetected] = useState(false);
   const [faceCount, setFaceCount] = useState(0);
@@ -83,12 +82,9 @@ export const useProctoringEngine = ({
   // Audio Monitor State (NEW)
   const [isMicActive, setIsMicActive] = useState(false);
   const [isAudioCalibrated, setIsAudioCalibrated] = useState(false);
-
-  // Fullscreen State
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [fullscreenCountdown, setFullscreenCountdown] = useState(0);
 
-  // Attention Check State
   const [showAttentionCheck, setShowAttentionCheck] = useState(false);
   const attentionTimerRef = useRef(null);
 
@@ -103,7 +99,9 @@ export const useProctoringEngine = ({
   const hasLockedOutRef = useRef(false);
   const warningsCountRef = useRef(0);
   const inactivityTimerRef = useRef(null);
-  const faceIntervalRef = useRef(null);
+  
+  // Timeout reference for adaptive checking
+  const faceTimeoutRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
   const heartbeatIntervalRef = useRef(null);
   const verifyInFlightRef = useRef(false);
@@ -127,22 +125,29 @@ export const useProctoringEngine = ({
     isActiveRef.current = isActive;
   }, [isActive]);
 
-  // Keep descriptor ref in sync
   useEffect(() => {
     registeredFaceDescriptorRef.current = registeredFaceDescriptor;
   }, [registeredFaceDescriptor]);
 
-  // Initialize and stop camera stream
-  const startCamera = async () => {
+  // Initialize and stop camera stream with automatic retries for release delays
+  const startCamera = async (retryCount = 0) => {
     if (streamRef.current) return;
+
+    // On the very first attempt, wait for the setup stream to fully release.
+    // ProctoringSetup already waits 1800ms before mounting this component,
+    // but some OS/browser combos need an additional buffer.
+    if (retryCount === 0) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+    }
+
     try {
-      console.log('[ProctoringEngine] Requesting media stream...');
+      console.log(`[ProctoringEngine] Requesting media stream (attempt ${retryCount + 1})...`);
       const constraints = {
         video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
-        audio: false // No audio processing needed to protect privacy
+        audio: false
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      // Handle race condition: component might have unmounted or isActive became false while waiting for camera permission
+      // Handle race condition: component might have unmounted or isActive became false
       if (!isActiveRef.current || hasLockedOutRef.current) {
         stream.getTracks().forEach((track) => track.stop());
         return;
@@ -166,12 +171,15 @@ export const useProctoringEngine = ({
           video.play().catch(e => console.warn('Video play interrupted', e));
           resolve();
         };
+        // Safety timeout in case onloadedmetadata never fires
+        setTimeout(resolve, 3000);
       });
 
       setIsCameraActive(true);
       setCameraError(null);
+      console.log('[ProctoringEngine] ✅ Camera stream acquired.');
 
-      // Ensure face-api models are loaded
+      // Ensure ONNX models are loaded
       if (!isReady()) {
         try {
           await loadModels();
@@ -180,37 +188,39 @@ export const useProctoringEngine = ({
         }
       }
     } catch (error) {
-      console.error('[ProctoringEngine] Webcam init failed:', error);
+      const isPermissionDenied = 
+        error.name === 'NotAllowedError' || 
+        error.name === 'PermissionDeniedError' || 
+        error.name === 'SecurityError';
+
+      if (!isPermissionDenied && retryCount < 6) {
+        // AbortError = hardware still locked by previous stream. Wait progressively longer.
+        const retryDelay = retryCount < 2 ? 1500 : 2500;
+        console.warn(`[ProctoringEngine] Camera locked/busy. Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/6)`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        return startCamera(retryCount + 1);
+      }
+
       setCameraError(error.name || 'WebcamAccessDenied');
       setIsCameraActive(false);
-      
-      // Soft-gate fallback: let the user proceed but display a warning
-      toast.warning('Camera permissions are required. Denying webcam access lowers your session trust score.');
+      toast.warning('Camera unavailable. Please check that no other app is using your webcam.');
     }
   };
 
   const stopCamera = useCallback(() => {
+    // Stop tracks on the stream ref
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => {
-        track.stop();
-      });
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
+    // Null out the hidden video element
     if (videoRef.current) {
-      const srcStream = videoRef.current.srcObject;
-      if (srcStream && srcStream.getTracks) {
-        srcStream.getTracks().forEach(track => track.stop());
-      }
       videoRef.current.srcObject = null;
       videoRef.current = null;
     }
-    
-    // As a nuclear fallback, stop any lingering media streams requested by this window
-    try {
-        navigator.mediaDevices?.getUserMedia({ video: true, audio: false })
-            .then(stream => stream.getTracks().forEach(track => track.stop()))
-            .catch(() => {});
-    } catch(e) {}
+    // NOTE: Do NOT call getUserMedia here as a "nuclear fallback" —
+    // acquiring and immediately stopping a stream re-locks the hardware
+    // and causes AbortError on the next legitimate getUserMedia call.
 
     setIsCameraActive(false);
     setIsFaceDetected(false);
@@ -414,7 +424,6 @@ export const useProctoringEngine = ({
     }
   }, [applyDecision]);
 
-  // Reset inactivity timer
   const resetInactivityTimer = useCallback(() => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
 
@@ -449,7 +458,6 @@ export const useProctoringEngine = ({
     if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
     if (!isActiveRef.current || hasLockedOutRef.current) return;
     
-    // Trigger random attention check between 2.5 and 4.5 minutes (150000 to 270000 ms)
     const delay = Math.floor(Math.random() * 120000) + 150000; 
     attentionTimerRef.current = setTimeout(() => {
       if (isActiveRef.current && !hasLockedOutRef.current) {
@@ -470,7 +478,6 @@ export const useProctoringEngine = ({
     scheduleAttentionCheck();
   }, [reportViolation, scheduleAttentionCheck]);
 
-  // Request Fullscreen
   const requestFullscreen = useCallback(() => {
     const element = document.documentElement;
     try {
@@ -486,7 +493,15 @@ export const useProctoringEngine = ({
     }
   }, []);
 
-  // ─── FACE VERIFICATION TICK (replaces old runFaceCheck) ────────────
+  // Forward schedule wrapper helper
+  const scheduleNextFaceCheck = useCallback((delay) => {
+    if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
+    if (isActiveRef.current && !hasLockedOutRef.current) {
+      faceTimeoutRef.current = setTimeout(runFaceVerification, delay);
+    }
+  }, []);
+
+  // ─── ADAPTIVE FACE VERIFICATION SCHEDULER ───────────────────────────
   const runFaceVerification = async () => {
     if (!videoRef.current || !isActiveRef.current || hasLockedOutRef.current) return;
     if (videoRef.current.readyState < 2) return;
@@ -498,14 +513,15 @@ export const useProctoringEngine = ({
     verifyInFlightRef.current = true;
 
     const descriptor = registeredFaceDescriptorRef.current;
+    let nextDelay = INTERVAL_DEFAULT_MS;
 
     try {
-      // If we have a registered face descriptor, run full verification
       if (descriptor) {
         const result = await verifyFace(videoRef.current, descriptor);
 
         if (result.error) {
           console.warn('[ProctoringEngine] Face verification error:', result.error);
+          scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
           return;
         }
 
@@ -549,6 +565,9 @@ export const useProctoringEngine = ({
                 clearCondition('looking_down');
               }
             }
+            
+            // Stable State -> Check every 5.0 seconds
+            nextDelay = INTERVAL_STABLE_MS;
             break;
 
           case VerificationStatus.NO_FACE:
@@ -574,6 +593,11 @@ export const useProctoringEngine = ({
           default:
             break;
         }
+
+        // Active violation state -> poll rapidly at 1.0 second intervals
+        if (activeInfraction) {
+          nextDelay = INTERVAL_INFRACTION_MS;
+        }
       } else {
         // No registered descriptor — fallback to basic detection (legacy
         // behavior). Presence-only: this branch reads nothing but faceCount,
@@ -582,6 +606,7 @@ export const useProctoringEngine = ({
 
         if (result.error) {
           console.warn('[ProctoringEngine] Face detection error:', result.error);
+          scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
           return;
         }
 
@@ -608,24 +633,23 @@ export const useProctoringEngine = ({
     } finally {
       verifyInFlightRef.current = false;
     }
+
+    scheduleNextFaceCheck(nextDelay);
   };
 
-  // Visibility changes
   const handleVisibilityChange = useCallback(() => {
     if (document.hidden) {
       reportViolation('tab_switch', 'Warning: Tab switching is forbidden.');
     }
   }, [reportViolation]);
 
-  // Focus changes
   const handleBlur = useCallback(() => {
     setTimeout(() => {
-      if (document.hidden) return; // Handled by visibility change
+      if (document.hidden) return;
       reportViolation('minimize', 'Warning: Window focus lost.');
     }, 150);
   }, [reportViolation]);
 
-  // Fullscreen changes
   const handleFullscreenChange = useCallback(() => {
     const active = !!(
       document.fullscreenElement ||
@@ -637,7 +661,6 @@ export const useProctoringEngine = ({
     setIsFullScreen(active);
 
     if (!active && isActiveRef.current && !hasLockedOutRef.current) {
-      // Trigger grace period timer
       setFullscreenCountdown(15);
       
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
@@ -656,7 +679,6 @@ export const useProctoringEngine = ({
         });
       }, 1000);
     } else {
-      // Returned to fullscreen, clear timer
       if (fullscreenTimerRef.current) {
         clearInterval(fullscreenTimerRef.current);
         fullscreenTimerRef.current = null;
@@ -674,7 +696,6 @@ export const useProctoringEngine = ({
     setPauseObservations([]);
   }, []);
 
-  // Stable refs for event handlers so the main effect doesn't re-fire
   const handleVisibilityChangeRef = useRef(handleVisibilityChange);
   const handleBlurRef = useRef(handleBlur);
   const handleFullscreenChangeRef = useRef(handleFullscreenChange);
@@ -695,7 +716,6 @@ export const useProctoringEngine = ({
   useEffect(() => { clearNudgeRef.current = clearNudge; }, [clearNudge]);
   useEffect(() => { applyDecisionRef.current = applyDecision; }, [applyDecision]);
 
-  // Sync / Fetch initial warning count on activation
   useEffect(() => {
     if (!isActive) {
       if (proctoringSessionIdRef.current) {
@@ -709,7 +729,7 @@ export const useProctoringEngine = ({
       stopCamera();
       stopAudioMonitoring();
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (faceIntervalRef.current)    clearInterval(faceIntervalRef.current);
+      if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (heartbeatIntervalRef.current) clearInterval(heartbeatIntervalRef.current);
       if (environmentIntervalRef.current) clearInterval(environmentIntervalRef.current);
@@ -757,6 +777,23 @@ export const useProctoringEngine = ({
               details: 'Face identity registered during setup',
               descriptor: Array.from(registeredFaceDescriptorRef.current)
             }).catch(err => console.warn('[ProctoringEngine] Failed to log face_registered event:', err));
+
+          } else {
+            // ── No descriptor in memory — try to recover from backend ─────────
+            // This happens after a page refresh where the in-memory descriptor is lost
+            console.warn('[ProctoringEngine] No face descriptor in memory. Attempting recovery from backend...');
+            try {
+              const embeddingRes = await proctoringApi.getEmbedding(sessionId);
+              if (embeddingRes && embeddingRes.success && embeddingRes.embedding) {
+                const recovered = new Float32Array(embeddingRes.embedding);
+                registeredFaceDescriptorRef.current = recovered;
+                console.log('[ProctoringEngine] ✅ Face embedding recovered from backend session.');
+              } else {
+                console.warn('[ProctoringEngine] No face embedding found in backend. Identity verification will be detection-only.');
+              }
+            } catch (fetchErr) {
+              console.warn('[ProctoringEngine] Could not recover face embedding from backend:', fetchErr);
+            }
           }
 
           // ── Environment integrity ──────────────────────────────────────
@@ -856,19 +893,16 @@ export const useProctoringEngine = ({
     // Start Attention Check Scheduler
     scheduleAttentionCheckRef.current();
 
-    // Stable wrapper functions that delegate to latest refs
     const onVisibilityChange = () => handleVisibilityChangeRef.current();
     const onBlur = () => handleBlurRef.current();
     const onFullscreenChange = () => handleFullscreenChangeRef.current();
     const onActivity = () => resetInactivityTimerRef.current();
 
-    // Set up tab / window listeners
     document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('blur', onBlur);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
-    // Set up inactivity events
     const activityEvents = ['mousemove', 'keydown', 'click', 'scroll', 'mousedown', 'touchstart'];
     activityEvents.forEach(event => {
       window.addEventListener(event, onActivity);
@@ -876,10 +910,9 @@ export const useProctoringEngine = ({
 
     resetInactivityTimerRef.current();
 
-    // Face Verification Interval (replaces old face check)
-    faceIntervalRef.current = setInterval(runFaceVerification, FACE_CHECK_INTERVAL);
+    // Trigger initial adaptive check
+    scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
 
-    // Initial fullscreen check
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
     setIsFullScreen(isNowFull);
     if (!isNowFull) {
@@ -911,7 +944,7 @@ export const useProctoringEngine = ({
       });
 
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (faceIntervalRef.current) clearInterval(faceIntervalRef.current);
+      if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (heartbeatIntervalRef.current) clearInterval(heartbeatIntervalRef.current);
       if (environmentIntervalRef.current) clearInterval(environmentIntervalRef.current);
@@ -930,9 +963,7 @@ export const useProctoringEngine = ({
         proctoringSessionIdRef.current = null;
       }
     };
-  // Only re-run when these stable values change, not on every callback recreation
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, resultId, assessmentId]);
+  }, [isActive, resultId, assessmentId, scheduleNextFaceCheck]);
 
   return {
     warningsCount,
@@ -973,12 +1004,10 @@ export const useProctoringEngine = ({
     isMicActive,
     isAudioCalibrated,
     
-    // Fullscreen status
     isFullScreen,
     fullscreenCountdown,
     requestFullscreen,
 
-    // Attention check
     showAttentionCheck,
     passAttentionCheck,
     failAttentionCheck,

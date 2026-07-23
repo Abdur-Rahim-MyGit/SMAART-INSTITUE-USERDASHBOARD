@@ -25,18 +25,33 @@ const AssessmentFlowGuard = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // === PROCTORING: Active only on assessment routes ===
-  const isAssessmentRoute =
-    (location.pathname.startsWith("/assessment/") ||
+  // === PROCTORING: Active on assessment and course player routes ===
+  const isCourseRoute =
+    location.pathname.includes("/courses/") &&
+    location.pathname.includes("/player");
+
+  const isProctoredRoute =
+    ((location.pathname.startsWith("/assessment/") ||
       location.pathname.startsWith("/dashboard/assessments/")) &&
-    !location.pathname.endsWith("/report");
+      !location.pathname.endsWith("/report")) ||
+    isCourseRoute;
 
   const handleAutoSubmit = useCallback(() => {
-    // Navigate back to dashboard with a flag indicating auto-submission
-    navigate("/dashboard", {
-      replace: true,
-      state: { assessmentAutoSubmitted: true }
-    });
+    const isCurrentCourse =
+      window.location.pathname.includes("/courses/") &&
+      window.location.pathname.includes("/player");
+
+    if (isCurrentCourse) {
+      navigate("/dashboard/courses", {
+        replace: true,
+        state: { courseClosedByProctor: true }
+      });
+    } else {
+      navigate("/dashboard", {
+        replace: true,
+        state: { assessmentAutoSubmitted: true }
+      });
+    }
   }, [navigate]);
 
   const {
@@ -45,7 +60,7 @@ const AssessmentFlowGuard = ({ children }) => {
     clearWarning,
     violations,
     maxWarnings,
-  } = useTabSwitchProctor(isAssessmentRoute, handleAutoSubmit);
+  } = useTabSwitchProctor(isProctoredRoute, handleAutoSubmit);
 
   // Configuration for assessment order - Only Base Line Test required
   const assessmentOrder = [
@@ -195,12 +210,18 @@ const AssessmentFlowGuard = ({ children }) => {
         //   1. parsedUser.hasRegistration = true  (self-signup student with Registration record)
         //   2. parsedUser.isRegistered = true      (admin-created student, marked registered in Student model)
         //   3. parsedUser.userType === 'registration' (legacy self-signup flow)
-        //   4. parsedUser.college exists           (admin-assigned student — always has a college ObjectId)
         const studentIsRegistered =
           parsedUser.hasRegistration === true ||
           parsedUser.isRegistered === true ||
-          parsedUser.userType === 'registration' ||
-          (parsedUser.college && parsedUser.college !== null); // Admin-provisioned students always have a college
+          parsedUser.userType === 'registration';
+
+        const isBypassed = sessionStorage.getItem('bypassRegistrationGuard') === 'true';
+
+        if (isBypassed) {
+          setAssessmentData({ skipped: true });
+          setLoading(false);
+          return;
+        }
 
         if (parsedUser.role === 'student' && !studentIsRegistered) {
           // Allow access ONLY to registration pages
@@ -287,8 +308,7 @@ const AssessmentFlowGuard = ({ children }) => {
       }
     }
 
-    // setNextPath(requiredPath); // Removed blocking redirection
-    setNextPath(null);
+    setNextPath(requiredPath);
 
   }, [location.pathname, assessmentData]);
 
@@ -328,13 +348,16 @@ const AssessmentFlowGuard = ({ children }) => {
       if (path.includes('/placement')) return "Placement";
       if (path.includes('/reports')) return "Reports";
       if (path.includes('/career-agent/dashboard')) return "Career Directions";
+      if (path.includes('/career-agent')) return "Career Directions";
+      if (path.includes('/grievances')) return "Grievances";
+      if (path.includes('/performance')) return "Performance";
       return "DashBoard";
     };
 
     return (
-      <DashboardLoader 
-        title={getLoaderTitle()} 
-        onComplete={() => setSplashComplete(true)} 
+      <DashboardLoader
+        title={getLoaderTitle()}
+        onComplete={() => setSplashComplete(true)}
       />
     );
   }
@@ -345,10 +368,9 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If there's a required assessment path
-  // Removed auto-redirect to required assessment to allow free navigation
-  // if (location.pathname !== nextPath) {
-  //   return <Navigate to={nextPath} replace />;
-  // }
+  if (nextPath && location.pathname !== nextPath) {
+    return <Navigate to={nextPath} replace />;
+  }
 
   // If NOT authenticated (logged out user pressing back button), redirect to login
   if (!isAuthenticated) {

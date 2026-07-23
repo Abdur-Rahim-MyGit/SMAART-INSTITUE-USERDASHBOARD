@@ -43,6 +43,8 @@ const DashboardHeader = () => {
       '/notifications': t('sidebar.notifications', 'Notifications'),
       '/dashboard/support': t('sidebar.help', 'Support Tickets'),
       '/tickets': t('sidebar.help', 'Support Tickets'),
+      '/dashboard/grievances': t('sidebar.grievances', 'Grievance Redressal'),
+      '/grievances': t('sidebar.grievances', 'Grievance Redressal'),
       '/dashboard/add-details': t('sidebar.add_details', 'Add Details'),
       '/add-details': t('sidebar.add_details', 'Add Details'),
       '/dashboard/skills-vault': t('sidebar.skills_vault', 'Skills Vault'),

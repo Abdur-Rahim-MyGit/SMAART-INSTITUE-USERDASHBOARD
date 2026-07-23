@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import ContactAdminModal from "./auth/ContactAdminModal";
 
 const LoginCard = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { login } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(true);
@@ -62,17 +64,17 @@ const LoginCard = () => {
     e.preventDefault();
 
     if (!selectedInstitution) {
-      toast.error("Please select your institution first");
+      toast.error(t("login.toast.select_institution_first", "Please select your institution first"));
       return;
     }
 
     if (!loginEmail.trim()) {
-      toast.error("Please enter your Email or Student ID");
+      toast.error(t("login.toast.enter_email", "Please enter your Email or Student ID"));
       return;
     }
 
     if (loginPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t("login.toast.password_min", "Password must be at least 8 characters"));
       return;
     }
 
@@ -91,7 +93,7 @@ const LoginCard = () => {
       });
 
       if (data.requirePasswordChange) {
-        toast.info("Please change your password to continue");
+        toast.info(t("login.toast.change_password", "Please change your password to continue"));
         setPasswordChangeData({
           tempToken: data.tempToken,
           email: data.email,
@@ -103,7 +105,7 @@ const LoginCard = () => {
       }
 
       if (data.requireOtp) {
-        toast.success("OTP sent to your email!");
+        toast.success(t("login.toast.otp_sent", "OTP sent to your email!"));
         setOtpData({ tempToken: data.tempToken, email: data.email });
         setShowOtpModal(true);
         setIsLoading(false);
@@ -114,7 +116,7 @@ const LoginCard = () => {
 
 
 
-      toast.success("Login successful!");
+      toast.success(t("login.toast.login_success", "Login successful!"));
 
       if (data.user.hasRegistration) {
         navigate("/dashboard", { replace: true });
@@ -126,18 +128,18 @@ const LoginCard = () => {
     } catch (error) {
       console.error("Login detail error:", error);
       if (error.message.includes("not completed")) {
-        toast.error("Registration not completed. Please complete your registration.");
+        toast.error(t("login.toast.registration_incomplete", "Registration not completed. Please complete your registration."));
       } else if (error.message.includes("Invalid credentials")) {
-        toast.error("Invalid email or password");
+        toast.error(t("login.toast.invalid_credentials", "Invalid email or password"));
       } else if (error.message.includes("unauthorized")) {
-        toast.error("Invalid credentials or unauthorized for this institution");
+        toast.error(t("login.toast.unauthorized", "Invalid credentials or unauthorized for this institution"));
       } else if (
         error.message.includes("Failed to fetch") ||
         error.message.includes("NetworkError")
       ) {
-        toast.error("Failed to connect to server. Please ensure backend is running.");
+        toast.error(t("login.toast.server_error", "Failed to connect to server. Please ensure backend is running."));
       } else {
-        toast.error(error.message || "Login failed");
+        toast.error(error.message || t("login.toast.login_failed", "Login failed"));
       }
     } finally {
       setIsLoading(false);
@@ -268,10 +270,10 @@ const LoginCard = () => {
                 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
                 style={{ letterSpacing: "-0.02em" }}
               >
-                Select Your Institution
+                {t("institution_select.title", "Select Your Institution")}
               </h2>
               <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center max-w-[260px] leading-relaxed">
-                Find your college to access your personalised career dashboard.
+                {t("login.select_subtitle", "Find your college to access your personalised career dashboard.")}
               </p>
             </div>
 
@@ -345,7 +347,7 @@ const LoginCard = () => {
           onClick={handleChangeInstitution}
           className="text-[11px] font-bold uppercase tracking-widest text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300 transition-colors shrink-0 px-1"
         >
-          Change
+          {t("login.change", "Change")}
         </button>
       </motion.div>
 
@@ -385,10 +387,10 @@ const LoginCard = () => {
               className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1 text-[#112b6b] dark:text-white"
               style={{ letterSpacing: "-0.02em" }}
             >
-              Welcome Back
+              {t("login.welcome_back", "Welcome Back")}
             </h2>
             <p className="text-gray-500 dark:text-slate-300 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
-              Access your personalized learning and career dashboard
+              {t("login.welcome_subtitle", "Access your personalized learning and career dashboard")}
             </p>
           </div>
 
@@ -396,10 +398,10 @@ const LoginCard = () => {
           <form
             className="flex flex-col gap-5"
             onSubmit={handleLogin}
-            aria-label="Login form"
+            aria-label={t("login.form_aria", "Login form")}
           >
             <div role="status" aria-live="polite" className="sr-only" id="login-status">
-              {isLoading ? "Logging in, please wait..." : ""}
+              {isLoading ? t("login.logging_in", "Logging in, please wait...") : ""}
             </div>
 
             {/* Email / Student ID */}
@@ -408,7 +410,7 @@ const LoginCard = () => {
                 htmlFor="login-email"
                 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
               >
-                Email or Student ID
+                {t("login.email_label", "Email or Student ID")}
               </label>
               <div
                 className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
@@ -419,7 +421,7 @@ const LoginCard = () => {
                 <input
                   id="login-email"
                   type="text"
-                  placeholder="Email or Student ID (e.g. STU123)"
+                  placeholder={t("login.email_placeholder", "Email or Student ID (e.g. STU123)")}
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   aria-required="true"
@@ -437,28 +439,28 @@ const LoginCard = () => {
                   htmlFor="login-password"
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500"
                 >
-                  Password
+                  {t("login.password_label", "Password")}
                 </label>
                 <button
                   type="button"
                   onClick={() => {
                     if (!selectedInstitution) {
-                      toast.error("Please select your institution first");
+                      toast.error(t("login.toast.select_institution_first", "Please select your institution first"));
                       return;
                     }
                     if (!loginEmail.trim()) {
-                      toast.error("Please enter your registered email address first");
+                      toast.error(t("login.toast.enter_registered_email", "Please enter your registered email address first"));
                       return;
                     }
                     if (!validateEmail(loginEmail.trim())) {
-                      toast.error("Please enter a valid email address to reset your password");
+                      toast.error(t("login.toast.invalid_email_reset", "Please enter a valid email address to reset your password"));
                       return;
                     }
                     setShowForgotPassword(true);
                   }}
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300"
                 >
-                  Forgot?
+                  {t("login.forgot", "Forgot?")}
                 </button>
               </div>
               <div
@@ -481,7 +483,7 @@ const LoginCard = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("login.hide_password", "Hide password") : t("login.show_password", "Show password")}
                   className="shrink-0 transition-colors text-gray-400 hover:text-[#1a3884] p-1"
                 >
                   {showPassword ? (
@@ -514,7 +516,7 @@ const LoginCard = () => {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Access Portal
+                  {t("login.access_portal", "Access Portal")}
                   <motion.div
                     animate={{ x: [0, 4, 0] }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
@@ -524,6 +526,18 @@ const LoginCard = () => {
                 </>
               )}
             </button>
+
+            {/* Registration Link */}
+            <div className="mt-6 text-center">
+              <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
+              <button
+                type="button"
+                onClick={() => navigate("/signup-initial")}
+                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
+              >
+                Sign Up
+              </button>
+            </div>
 
             {/* Contact Admin Link */}
             <div className="mt-4 text-center">

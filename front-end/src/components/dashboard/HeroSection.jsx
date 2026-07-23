@@ -5,10 +5,13 @@ import { BookOpen, ArrowRight, TrendingUp, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ANIMATION_DELAYS, ANIMATION_DURATIONS } from "@/constants/dashboard";
 import { resolveStaticCourseTitle, compareCourseIds } from "@/utils/courseUnlock";
+import useUser from "@/hooks/useUser";
 
 const HeroSection = memo(({ userName, paths = [], pathsLoading = false, pendingAssessment = null }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useUser();
+  const userId = user?._id || user?.id || 'anon';
 
   const averageProgress = useMemo(() =>
     paths.length > 0
@@ -21,10 +24,10 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false, pendingA
   const activePath = paths.length > 0
     ? (paths.find(p => (p.progress || 0) < 100) ?? paths[0])
     : null;
-  const lastWatchedCourse = localStorage.getItem("smaart_last_watched_course");
-  const storedProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
+  const lastWatchedCourse = localStorage.getItem(`${userId}_smaart_last_watched_course`) || localStorage.getItem("smaart_last_watched_course");
+  const storedProgress = parseInt(localStorage.getItem(`${userId}_smaart_course_progress`) || localStorage.getItem("smaart_course_progress") || "0", 10);
   
-  const rawTitle = activePath ? activePath.title : (localStorage.getItem("smaart_last_watched_title") || lastWatchedCourse || "Capacity: Foundations");
+  const rawTitle = activePath ? activePath.title : (localStorage.getItem(`${userId}_smaart_last_watched_title`) || localStorage.getItem("smaart_last_watched_title") || lastWatchedCourse || "Capacity: Foundations");
   const displayTitle = resolveStaticCourseTitle(rawTitle) || resolveStaticCourseTitle(activePath?.id) || resolveStaticCourseTitle(activePath?.courseCode) || rawTitle;
 
   const isLastWatched = activePath

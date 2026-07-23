@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { apiCall } from '../services/api';
 
 const ThemeContext = createContext({
-  theme: 'system',
+  theme: 'light',
   setTheme: () => {},
   loading: true,
 });
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('system');
+  const [theme, setTheme] = useState('light');
   const [loading, setLoading] = useState(true);
 
   const applyTheme = (themeValue) => {
@@ -56,7 +56,7 @@ export const ThemeProvider = ({ children }) => {
     let isMounted = true;
 
     const loadTheme = async () => {
-      const fallbackTheme = localStorage.getItem('theme') || 'system';
+      const fallbackTheme = localStorage.getItem('theme') || 'light';
       if (isMounted) {
         setTheme(fallbackTheme);
         applyTheme(fallbackTheme);

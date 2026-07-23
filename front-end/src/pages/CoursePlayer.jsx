@@ -444,11 +444,12 @@ const CoursePlayer = () => {
     window.scrollTo(0, 0);
 
     if (courseId) {
+      const userId = currentUser?._id || currentUser?.id || 'anon';
       const courseData = staticCourse || { title: learningFlowData?.overviewTitle || courseId };
-      localStorage.setItem("smaart_last_watched_course", courseId);
-      localStorage.setItem("smaart_last_watched_title", courseData.title || courseId);
-      localStorage.setItem("smaart_last_watched_lesson", courseData.title || courseId);
-      localStorage.setItem("smaart_course_progress", "0");
+      localStorage.setItem(`${userId}_smaart_last_watched_course`, courseId);
+      localStorage.setItem(`${userId}_smaart_last_watched_title`, courseData.title || courseId);
+      localStorage.setItem(`${userId}_smaart_last_watched_lesson`, courseData.title || courseId);
+      localStorage.setItem(`${userId}_smaart_course_progress`, "0");
     }
 
     // ── Fetch detailed user progress from backend ──
@@ -501,7 +502,8 @@ const CoursePlayer = () => {
     if (!courseId || totalSteps <= 0) return;
     const stepsDone = Object.keys(completedSteps).length;
     const pct = Math.round((stepsDone / totalSteps) * 100);
-    localStorage.setItem('smaart_course_progress', String(pct));
+    const userId = currentUser?._id || currentUser?.id || 'anon';
+    localStorage.setItem(`${userId}_smaart_course_progress`, String(pct));
   }, [completedSteps, totalSteps, courseId]);
 
   const handleStartStep = async (stepNumber) => {
@@ -601,8 +603,9 @@ const CoursePlayer = () => {
     const pct = Math.round((stepsDone / totalSteps) * 100);
     const courseData = staticCourse || { title: courseId };
     const currentStepData = learningFlowData?.steps?.[stepNumber];
-    localStorage.setItem('smaart_course_progress', String(pct));
-    localStorage.setItem('smaart_last_watched_lesson',
+    const userId = currentUser?._id || currentUser?.id || 'anon';
+    localStorage.setItem(`${userId}_smaart_course_progress`, String(pct));
+    localStorage.setItem(`${userId}_smaart_last_watched_lesson`,
       currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
     );
 
@@ -626,7 +629,8 @@ const CoursePlayer = () => {
     if (allCompleted) {
       setShowCongratulation(true);
       setActiveStep(null);
-      localStorage.setItem('smaart_course_progress', '100');
+      const userId = currentUser?._id || currentUser?.id || 'anon';
+      localStorage.setItem(`${userId}_smaart_course_progress`, '100');
       markCourseCompleted(courseId);
     } else if (autoAdvance) {
       // Auto-advance to next step
@@ -1255,7 +1259,7 @@ const CoursePlayer = () => {
                                 <Target className="w-4.5 h-4.5" />
                               </div>
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Step-by-step progress</p>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t("course_player.step_by_step_progress", "Step-by-step progress")}</p>
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
                                   {t("course_player.guideline_step", "Complete each step sequentially to validate your progress and unlock the next lesson.")}
                                 </p>
@@ -1266,7 +1270,7 @@ const CoursePlayer = () => {
                                 <Activity className="w-4.5 h-4.5" />
                               </div>
                               <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Engagement monitor</p>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t("course_player.engagement_monitor", "Engagement monitor")}</p>
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-relaxed">
                                   {t("course_player.guideline_active", "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.")}
                                 </p>
@@ -1286,7 +1290,7 @@ const CoursePlayer = () => {
                             </div>
                             <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 shrink-0">
                               <span className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-red-500 animate-pulse" />
-                              <span className="text-[8px] sm:text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Live Monitor</span>
+                              <span className="text-[8px] sm:text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">{t("course_player.live_monitor", "Live Monitor")}</span>
                             </div>
                           </div>
                           
@@ -1325,7 +1329,7 @@ const CoursePlayer = () => {
                         
                         <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mt-1">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                          Secure session protocol initialized.
+                          {t("course_player.secure_session_protocol", "Secure session protocol initialized.")}
                         </p>
                       </div>
                     </motion.div>

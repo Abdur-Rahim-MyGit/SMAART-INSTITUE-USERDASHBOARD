@@ -34,8 +34,8 @@ test('1. landing page loads and the SPA renders', async ({ page }) => {
 
   await page.screenshot({ path: `${OUT}/01-landing.png`, fullPage: true });
 
-  // Ignore benign third-party / websocket noise (sockets hardcode :5000).
-  const fatal = problems.filter((p) => !/:5000|socket|websocket|favicon|supabase|sitemap|robots/i.test(p));
+  // Ignore benign third-party / websocket noise (sockets hardcode :5000), and missing gitignored ONNX models/WASM.
+  const fatal = problems.filter((p) => !/:5000|socket|websocket|favicon|supabase|sitemap|robots|onnx-wasm|models\/onnx|ort\.min\.js/i.test(p));
   console.log(`[landing] problems=${problems.length} fatal=${fatal.length}`);
   if (problems.length) console.log(problems.slice(0, 8).join('\n'));
   expect(fatal, 'fatal browser errors').toHaveLength(0);

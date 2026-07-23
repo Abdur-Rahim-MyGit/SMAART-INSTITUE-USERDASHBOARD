@@ -173,7 +173,7 @@ export function NotificationProvider({ children }) {
 
     const socket = io(SOCKET_URL, {
       path: '/socket.io',
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       auth: { token },
       reconnection: true,
       reconnectionAttempts: Infinity,

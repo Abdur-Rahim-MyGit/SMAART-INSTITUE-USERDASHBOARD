@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -16,10 +16,27 @@ import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
+import { clearCareerAgentStorage } from "@/contexts/UserContextFixed";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const { user, loading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (location.state?.assessmentAutoSubmitted) {
+      toast({
+        title: t("dashboard.assessment_submitted_title", "Assessment Auto-Submitted"),
+        description: t("dashboard.assessment_submitted_desc", "Your assessment was automatically submitted due to repeated tab switching."),
+        variant: "destructive",
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, toast, navigate, t, location.pathname]);
+
   const { paths, enrolledCourses, inProgressCourses, nextCourse, loading: pathsLoading } = useLearningPaths(user?._id);
   const { userProgress, loading: progressLoading, refresh: refreshProgress } = useSmaartCourseProgress(user?._id || user?.id);
 
@@ -42,7 +59,6 @@ const DashboardHome = () => {
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
@@ -52,13 +68,13 @@ const DashboardHome = () => {
   useEffect(() => {
     // If loading is finished and user is still null, redirect to login
     if (!userLoading && !user) {
-      console.warn('[DashboardHome] No authenticated user found, redirecting to login');
+      if (import.meta.env.DEV) console.warn('[DashboardHome] No authenticated user found, redirecting to login');
       navigate('/');
       return;
     }
 
     if (user && !userLoading) {
-      console.log('[DashboardHome] User loaded, setting dashboard loading to false');
+      if (import.meta.env.DEV) console.log('[DashboardHome] User loaded, setting dashboard loading to false');
       setDashboardLoading(false);
     }
   }, [user, userLoading, navigate]);
@@ -69,9 +85,9 @@ const DashboardHome = () => {
     // Only set timeout if we are actually waiting for data and have an active session intent
     const hasToken = sessionStorage.getItem('token');
     if ((userLoading || dashboardLoading) && hasToken) {
-      console.log(`[DashboardHome] Setting timeout for userLoading:${userLoading}, dashboardLoading:${dashboardLoading}`);
+      if (import.meta.env.DEV) console.log(`[DashboardHome] Setting timeout for userLoading:${userLoading}, dashboardLoading:${dashboardLoading}`);
       timeout = setTimeout(() => {
-        console.warn('[DashboardHome] Loading timeout reached - showing connection error screen');
+        if (import.meta.env.DEV) console.warn('[DashboardHome] Loading timeout reached - showing connection error screen');
         setLoadingError(true);
       }, 30000); // 30 seconds max wait
     }
@@ -124,8 +140,16 @@ const DashboardHome = () => {
           </button>
           <button
             onClick={() => {
+              let userId = 'anon';
+              try {
+                const u = JSON.parse(sessionStorage.getItem('user') || 'null');
+                if (u) userId = u._id || u.id || 'anon';
+              } catch {}
+
               sessionStorage.clear();
-              localStorage.clear();
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+              clearCareerAgentStorage(userId);
               window.location.href = '/';
             }}
             className="px-6 py-2.5 bg-white dark:bg-[#002147] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
@@ -160,6 +184,8 @@ const DashboardHome = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full space-y-4 sm:space-y-6"
           >
+
+
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}

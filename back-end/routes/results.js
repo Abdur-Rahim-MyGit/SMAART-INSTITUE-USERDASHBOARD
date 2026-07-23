@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const ProctoringSession = require('../models/ProctoringSession');
@@ -136,7 +137,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         console.log(`🚀 Starting/Resuming assessment ${assessmentId} for user ${userId}`);
 
         // Fetch the assessment
-        const assessment = await Assessment.findById(assessmentId);
+        let assessment = await Assessment.findById(assessmentId);
+        if (!assessment) {
+            const db = mongoose.connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new mongoose.Types.ObjectId(assessmentId) });
+        }
 
         if (!assessment) {
             console.error(`❌ Assessment ${assessmentId} not found`);
@@ -149,7 +154,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         // Create a fast lookup map for questions by ID
         const questionMap = new Map();
         assessment.questions.forEach(q => {
-            questionMap.set(q._id.toString(), q);
+            const qId = q._id || q.questionId;
+            if (qId) {
+                questionMap.set(qId.toString(), q);
+            }
         });
 
         // --- PROCTORING LOCK CHECK ---
@@ -183,7 +191,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         // --- END PROCTORING LOCK CHECK ---
 
         // Check if user already has an in-progress attempt
-        const existingResult = await Result.findOne({
+        let existingResult = await Result.findOne({
             userId,
             assessmentId,
             completionStatus: 'in-progress'
@@ -194,6 +202,48 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         const stageKey = stageInfo ? stageInfo.stage : null;
         const expectedQuestions = stageInfo ? stageInfo.totalQuestions : assessment.questions.length;
 
+        // Stage configurations (copied from frontend)
+        const STAGE_MAP = {
+          T1: { durationMinutes: 45 },
+          T2: { durationMinutes: 40 },
+          T3: { durationMinutes: 45 },
+          T4: { durationMinutes: 40 },
+          AIQ: { durationMinutes: 45 },
+          SQ: { durationMinutes: 45 },
+          PIQ: { durationMinutes: 45 },
+        };
+        const durationMinutes = stageKey ? (STAGE_MAP[stageKey]?.durationMinutes || 45) : (assessment.duration || 45);
+
+        if (existingResult) {
+            const elapsedSeconds = Math.floor((Date.now() - existingResult.startedAt.getTime()) / 1000);
+            const remainingSeconds = Math.max(durationMinutes * 60 - elapsedSeconds, 0);
+
+            if (remainingSeconds <= 0) {
+                console.log(`⌛ [AUTO-SUBMIT] Resumed attempt ${existingResult._id} has expired (${elapsedSeconds}s elapsed). Auto-submitting and starting fresh...`);
+                existingResult.completionStatus = 'completed';
+                existingResult.submittedAt = new Date();
+
+                // Grade unanswered questions as UNANSWERED
+                const unansweredQuestions = assessment.questions.filter(
+                    q => !existingResult.responses.some(r => r.questionId.toString() === q._id.toString())
+                );
+                unansweredQuestions.forEach(q => {
+                    existingResult.responses.push({
+                        questionId: q._id,
+                        questionText: q.questionText || '',
+                        selectedValue: 'UNANSWERED',
+                        isCorrect: false,
+                        score: 0,
+                        answeredAt: new Date()
+                    });
+                });
+                existingResult.updateAnsweredCount();
+                await existingResult.save();
+
+                existingResult = null; // Forces creation of a fresh attempt below
+            }
+        }
+
         if (existingResult) {
             console.log(`🔄 [DEBUG] Resuming result ${existingResult._id}`);
 
@@ -202,7 +252,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             // Failsafe 1: If questionOrder is empty
             if (questionOrder.length === 0) {
                 console.log("⚠️ [DEBUG] questionOrder is empty, using assessment logic");
-                questionOrder = assessment.questions.map(q => q._id);
+                questionOrder = assessment.questions.map(q => q._id || q.questionId);
             }
 
             let questions = questionOrder.map(qId => {
@@ -211,7 +261,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 if (!question) return null;
 
                 return {
-                    _id: question._id,
+                    _id: question._id || question.questionId,
                     questionText: question.questionText || "Question text missing",
                     type: question.type || "mcq",
                     options: question.options || [],
@@ -224,14 +274,14 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             if (questions.length === 0 && assessment.questions && assessment.questions.length > 0) {
                 console.log("⚠️ [DEBUG] No questions matched order. Falling back to all assessment questions.");
                 questions = assessment.questions.map((q, idx) => ({
-                    _id: q._id,
+                    _id: q._id || q.questionId,
                     questionText: q.questionText,
                     type: q.type,
                     options: q.options,
                     order: q.order || idx
                 }));
 
-                const validIds = new Set(assessment.questions.map(q => q._id.toString()));
+                const validIds = new Set(assessment.questions.map(q => (q._id || q.questionId).toString()));
                 const originalResponseCount = existingResult.responses.length;
 
                 existingResult.responses = existingResult.responses.filter(r =>
@@ -251,7 +301,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 const freshAssessment = await Assessment.findById(assessment._id).lean();
                 if (freshAssessment && freshAssessment.questions) {
                     questions = freshAssessment.questions.map((q, idx) => ({
-                        _id: q._id,
+                        _id: q._id || q.questionId,
                         questionText: q.questionText,
                         type: q.type,
                         options: q.options,
@@ -268,6 +318,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             }
 
             console.log(`📤 [DEBUG] Final question count to send: ${questions.length}`);
+
+            // Calculate remaining seconds for the resumed session
+            const elapsedSeconds = Math.floor((Date.now() - existingResult.startedAt.getTime()) / 1000);
+            const remainingSeconds = Math.max(durationMinutes * 60 - elapsedSeconds, 0);
 
             // Sign assessment token for existing result
             const assessmentToken = signAssessmentToken({
@@ -370,7 +424,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         } else {
 
             // Other assessments: Random shuffle, all questions
-            const questionIds = assessment.questions.map(q => q._id);
+            const questionIds = assessment.questions.map(q => q._id || q.questionId);
             shuffledQuestionIds = shuffleArray(questionIds);
             totalQuestions = assessment.questions.length;
         }
@@ -379,7 +433,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         const result = new Result({
             userId,
             assessmentId: assessment._id,
-            assessmentCode: assessment.assessmentCode,
+            assessmentCode: assessment.assessmentCode || ("SKILL-" + assessment._id.toString().slice(-6).toUpperCase()),
             assessmentName: assessment.assessmentName,
             questionOrder: shuffledQuestionIds,
             totalQuestions: totalQuestions,
@@ -393,11 +447,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             const idStr = qId.toString();
             const question = questionMap.get(idStr);
             return {
-                _id: question._id,
-                questionText: question.questionText,
-                type: question.type,
-                options: question.options,
-                order: question.order || 0
+                _id: question?._id || question?.questionId,
+                questionText: question?.questionText,
+                type: question?.type,
+                options: question?.options,
+                order: question?.order || 0
             };
         });
 
@@ -464,12 +518,18 @@ router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
         }
 
         // Fetch assessment to check for correct answers (Real-time grading)
-        const assessment = await Assessment.findById(result.assessmentId);
+        let assessment = await Assessment.findById(result.assessmentId);
+        if (!assessment) {
+            const db = require('mongoose').connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new mongoose.Types.ObjectId(result.assessmentId) });
+        }
         let isCorrect = undefined;
         let score = 0;
 
         if (assessment) {
-            const question = assessment.questions.id(questionId);
+            const question = (assessment.questions && typeof assessment.questions.id === 'function')
+                ? assessment.questions.id(questionId)
+                : (assessment.questions || []).find(q => q._id.toString() === questionId);
             if (question && question.correctAnswer !== undefined) {
                 // Was `question.correctAnswer === selectedValue`, a strict
                 // compare on a Mixed field: a stored number 2 never equalled

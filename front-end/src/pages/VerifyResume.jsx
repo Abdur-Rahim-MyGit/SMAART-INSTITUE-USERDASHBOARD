@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileText, Loader2, ShieldCheck } from 'lucide-react';
 import resumeApi from '@/services/resumeApi';
+import ResumeBuilder from './AICareerCoach/ResumeBuilder';
 
 const VerifyResume = () => {
     const { resumeId = '' } = useParams();
@@ -76,9 +77,26 @@ const VerifyResume = () => {
     const isVerified = verification.status === 'verified';
     const Icon = loading ? Loader2 : isVerified ? CheckCircle2 : AlertTriangle;
 
+    // If verified and we have the resume data, just show the resume itself
+    if (isVerified && verification.record?.resumeData) {
+        return (
+            <main className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-6 sm:py-10 px-4">
+                <div className="w-full max-w-4xl mx-auto rounded-[2rem] border border-slate-200 bg-white shadow-2xl overflow-hidden relative">
+                    <div className="w-full h-full">
+                        <ResumeBuilder 
+                            embedded={true} 
+                            viewOnly={true} 
+                            preloadedData={verification.record.resumeData} 
+                        />
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
     return (
-        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 py-10">
-            <div className="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl overflow-hidden">
+        <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center py-10 px-4">
+            <div className="w-full max-w-3xl rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl overflow-hidden shrink-0">
                 <div className="p-6 sm:p-8 border-b border-white/10 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div

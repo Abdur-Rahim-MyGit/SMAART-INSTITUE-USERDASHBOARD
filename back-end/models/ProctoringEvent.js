@@ -39,7 +39,15 @@ const ProctoringEventSchema = new mongoose.Schema({
   severity: { type: String, enum: ['info', 'low', 'medium', 'high', 'critical'], default: 'low' },
   timestamp: { type: Date, default: Date.now },
   details: { type: String },
-  screenshotUrl: { type: String } // Path to stored webcam snapshot image file
+  screenshotUrl: { type: String },
+  // v2: Structured metadata for ONNX pipeline events
+  metadata: {
+    qualityScore:    { type: Number },   // 0–100 frame quality at time of event
+    similarityScore: { type: Number },   // cosine similarity 0–1
+    antispoofScore:  { type: Number },   // liveness score 0–1
+    model:           { type: String },   // e.g. 'arcface-r50-onnx'
+    framesCaptured:  { type: Number },   // for registration_quality event
+  }
 }, { timestamps: true });
 
 // Index for query performance

@@ -5,6 +5,7 @@ import FloatingDictionary from "@/components/FloatingDictionary";
 import FloatingNotes from "@/components/FloatingNotes";
 import blueLogo from "@/assets/blue.png";
 import { Link } from "react-router-dom";
+import useUser from "@/hooks/useUser";
 
 const StarIcon = ({ color }) => (
   <svg 
@@ -37,9 +38,12 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
     { id: 10, title: "Final Review & Grading", level: 10 },
   ];
 
+  const { user } = useUser();
+  const userId = user?._id || user?.id || 'anon';
+
   const [localProgress, setLocalProgress] = useState(() => {
     try {
-      const saved = localStorage.getItem('smaart_demo_progress');
+      const saved = localStorage.getItem(`${userId}_smaart_demo_progress`);
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -61,12 +65,40 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
   const actualActiveLevel = displayModules.find(m => m.progress < 100)?.level || 10;
   
   const [visualActiveLevel, setVisualActiveLevel] = useState(() => {
-    const lastActive = parseInt(localStorage.getItem('smaart_last_active') || '1', 10);
+    const lastActive = parseInt(localStorage.getItem(`${userId}_smaart_last_active`) || '1', 10);
     return Math.min(lastActive, actualActiveLevel); // Start from what they saw last
   });
 
   // Safe state initialization
   const [selectedModule, setSelectedModule] = useState(displayModules.find(m => m.progress < 100) || displayModules[0]);
+
+  // Sync state when userId changes (account switch) or on mount
+  useEffect(() => {
+    let progress = {};
+    try {
+      const saved = localStorage.getItem(`${userId}_smaart_demo_progress`);
+      progress = saved ? JSON.parse(saved) : {};
+    } catch {}
+    setLocalProgress(progress);
+
+    const updatedModules = Array.from({ length: 10 }, (_, i) => {
+      const level = i + 1;
+      const m = courseData?.modules?.[i];
+      return {
+        id: m?.id || level,
+        level: level,
+        title: m?.title || defaultModules[i].title,
+        progress: progress[level] ? 100 : 0,
+      };
+    });
+
+    const actActive = updatedModules.find(m => m.progress < 100)?.level || 10;
+    const lastActive = parseInt(localStorage.getItem(`${userId}_smaart_last_active`) || '1', 10);
+    setVisualActiveLevel(Math.min(lastActive, actActive));
+
+    const initSelected = updatedModules.find(m => m.progress < 100) || updatedModules[0];
+    setSelectedModule(initSelected);
+  }, [userId, courseData]);
 
   const scrollRef = useRef(null);
 
@@ -89,7 +121,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       // 3. Trigger the unlock sequence state exactly when the camera arrives
       const unlockTimer = setTimeout(() => {
         setVisualActiveLevel(actualActiveLevel);
-        localStorage.setItem('smaart_last_active', actualActiveLevel.toString());
+        localStorage.setItem(`${userId}_smaart_last_active`, actualActiveLevel.toString());
       }, 1600);
 
       return () => { clearTimeout(scrollTimer); clearTimeout(unlockTimer); };
@@ -97,14 +129,14 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       // Normal map load, just center on current
       ele.scrollLeft = Math.max(0, (250 + (actualActiveLevel - 1) * 350) - (window.innerWidth / 2));
       setVisualActiveLevel(actualActiveLevel);
-      localStorage.setItem('smaart_last_active', actualActiveLevel.toString());
+      localStorage.setItem(`${userId}_smaart_last_active`, actualActiveLevel.toString());
     }
-  }, [actualActiveLevel, visualActiveLevel]);
+  }, [actualActiveLevel, visualActiveLevel, userId]);
 
   const handleModuleClick = (module) => {
     const newProgress = { ...localProgress, [module.level]: 100 };
     setLocalProgress(newProgress);
-    localStorage.setItem('smaart_demo_progress', JSON.stringify(newProgress));
+    localStorage.setItem(`${userId}_smaart_demo_progress`, JSON.stringify(newProgress));
     
     if (onModuleSelect) {
       onModuleSelect(module);

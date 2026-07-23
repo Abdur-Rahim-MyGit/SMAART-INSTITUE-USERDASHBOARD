@@ -1,9 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import InstitutionSelector from "@/components/InstitutionSelector";
 import { useState } from "react";
 
 const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
+  const { t } = useTranslation();
   const [previewInstitution, setPreviewInstitution] = useState(null);
 
   return (
@@ -48,7 +50,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               <button
                 onClick={onClose}
                 className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-dark-elevated shadow-sm border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-300 hover:bg-[#1a3884] dark:hover:bg-[#1a3884] hover:text-white hover:border-[#1a3884] dark:hover:border-blue-600 transition-all duration-300 group z-20"
-                aria-label="Close modal"
+                aria-label={t("institution_select.close", "Close modal")}
               >
                 <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
               </button>
@@ -84,10 +86,10 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
                 className="relative z-10 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
                 style={{ letterSpacing: "-0.02em" }}
               >
-                Select Your Institution
+                {t("institution_select.title", "Select Your Institution")}
               </h2>
               <p className="relative z-10 text-gray-500 dark:text-slate-300 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
-                Find your college to access your personalized learning and career dashboard.
+                {t("institution_select.subtitle", "Find your college to access your personalized learning and career dashboard.")}
               </p>
             </div>
 

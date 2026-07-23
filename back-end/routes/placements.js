@@ -496,10 +496,12 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       portfolioUrl,
       linkedInUrl,
       coverLetter,
+      activeBacklog,
+      resumeUrl: bodyResumeUrl
     } = req.body || {};
 
     // If a resume file was uploaded, derive a resumeUrl from the stored file info
-    let resumeUrl = null;
+    let resumeUrl = bodyResumeUrl || null;
     if (req.file) {
       // For Cloudinary registration storage, multer-storage-cloudinary sets path/secure_url
       resumeUrl = req.file.path || req.file.secure_url || req.file.url || `/uploads/${req.file.filename}`;
@@ -522,16 +524,17 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       portfolioUrl: portfolioUrl?.trim() || null,
       linkedInUrl: linkedInUrl?.trim() || null,
       coverLetter: coverLetter?.trim() || '',
+      activeBacklog: activeBacklog !== undefined && activeBacklog !== '' && activeBacklog !== null ? Number(activeBacklog) : null,
       status: 'applied',
       appliedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    if (!application.studentName || !application.studentEmail || !application.studentMobile) {
+    if (!application.studentName || !application.studentEmail || !application.studentMobile || application.activeBacklog === null || application.activeBacklog === undefined) {
       return res.status(400).json({
         success: false,
-        error: 'Name, email, and mobile number are required',
+        error: 'Name, email, mobile number, and active backlogs count are required',
       });
     }
 
@@ -559,8 +562,10 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
 router.get('/applications', protect, async (req, res) => {
   try {
     const { job, jobSource } = req.query;
-    console.log('[DEBUG /applications] incoming query params:', { job, jobSource });
-    console.log('[DEBUG /applications] req.user:', { id: req.user?._id, role: req.user?.role });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DEBUG /applications] incoming query params:', { job, jobSource });
+      console.log('[DEBUG /applications] req.user:', { id: req.user?._id, role: req.user?.role });
+    }
     const query = {};
     if (job && mongoose.Types.ObjectId.isValid(job)) query.job = new mongoose.Types.ObjectId(job);
     if (jobSource) query.jobSource = jobSource;
@@ -571,10 +576,10 @@ router.get('/applications', protect, async (req, res) => {
       query.student = new mongoose.Types.ObjectId(req.user._id);
     }
 
-    console.log('[DEBUG /applications] final query:', query);
+    if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] final query:', query);
     const applicationCollection = mongoose.connection.db.collection('placementapplications');
     const docs = await applicationCollection.find(query).sort({ createdAt: -1 }).limit(200).toArray();
-    console.log('[DEBUG /applications] found docs count:', docs.length);
+    if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] found docs count:', docs.length);
     res.json({ success: true, data: docs });
   } catch (err) {
     console.error('[Placements] list applications error:', err);
@@ -657,6 +662,137 @@ router.post('/saved-jobs', protect, async (req, res) => {
   } catch (error) {
     console.error('[Placements] toggle saved job error:', error);
     res.status(500).json({ success: false, error: 'Failed to toggle saved job' });
+  }
+});
+
+// Get companies (SMAART Partners + College Partners)
+router.get('/companies', protect, async (req, res) => {
+  try {
+    const userCollegeId = req.user.college?._id || req.user.college;
+    const db = mongoose.connection.db;
+
+    // 1. Fetch College Partners
+    let collegePartners = [];
+    if (userCollegeId && mongoose.Types.ObjectId.isValid(userCollegeId)) {
+      collegePartners = await db.collection('companies')
+        .find({ college: new mongoose.Types.ObjectId(userCollegeId) })
+        .toArray();
+    }
+
+    // 2. Fetch SMAART Partners (recruiters without a specific college)
+    const smaartPartners = await db.collection('recruiters')
+      .find({ role: 'recruiter', status: { $ne: 'inactive' }, $or: [{ college: null }, { college: { $exists: false } }] })
+      .toArray();
+
+    // Map them to a common format
+    const formattedCollegePartners = collegePartners.map(p => ({
+      _id: p._id.toString(),
+      name: p.name || p.companyName,
+      logo: p.logo || p.companyLogo || p.logoUrl,
+      website: p.website,
+      description: p.description || p.aboutCompany,
+      partnerType: 'college',
+      collegeId: p.college
+    }));
+
+    const formattedSmaartPartners = smaartPartners.map(p => ({
+      _id: p._id.toString(),
+      name: p.qualification || p.fullName || p.companyName || 'SMAART Partner',
+      logo: p.profileImage || p.logo,
+      website: p.website,
+      description: p.aboutCompany || p.bio,
+      partnerType: 'smaart'
+    }));
+
+    const allPartners = [...formattedSmaartPartners, ...formattedCollegePartners];
+
+    res.json({
+      success: true,
+      count: allPartners.length,
+      data: allPartners
+    });
+  } catch (error) {
+    console.error('[Placements] get companies error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch companies' });
+  }
+});
+
+// Get all job fairs for the student's college
+router.get('/job-fairs', protect, async (req, res) => {
+  try {
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        error: 'Only student accounts can view job fairs',
+      });
+    }
+
+    const collegeId = getId(req.user.college);
+    if (!collegeId) {
+      return res.json({ success: true, count: 0, data: [] });
+    }
+
+    // Query jobfairs collection directly
+    const fairs = await mongoose.connection.db
+      .collection('jobfairs')
+      .find({
+        $or: [
+          { college: new mongoose.Types.ObjectId(collegeId) },
+          { label: 'smaart job fair' }
+        ]
+      })
+      .sort({ startDate: -1 })
+      .toArray();
+
+    res.json({ success: true, count: fairs.length, data: fairs });
+  } catch (err) {
+    console.error('[Placements] get job fairs error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load job fairs' });
+  }
+});
+
+// Register student for job fair
+router.post('/job-fairs/:id/register', protect, async (req, res) => {
+  try {
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        error: 'Only student accounts can register for job fairs',
+      });
+    }
+
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid job fair ID' });
+    }
+
+    const fairCollection = mongoose.connection.db.collection('jobfairs');
+    const fair = await fairCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    if (!fair) {
+      return res.status(404).json({ success: false, error: 'Job Fair not found' });
+    }
+
+    // Check if student is already registered
+    const registeredStudents = fair.registeredStudents || [];
+    const isAlreadyRegistered = registeredStudents.some(s => s.toString() === req.user._id.toString());
+
+    if (isAlreadyRegistered) {
+      return res.status(400).json({ success: false, error: 'Already registered for this Job Fair' });
+    }
+
+    // Add student ID to registeredStudents array
+    await fairCollection.updateOne(
+      { _id: new mongoose.Types.ObjectId(id) },
+      { $push: { registeredStudents: req.user._id } }
+    );
+
+    // Retrieve updated job fair
+    const updatedFair = await fairCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+
+    res.json({ success: true, message: 'Successfully registered for Job Fair', data: updatedFair });
+  } catch (err) {
+    console.error('[Placements] register job fair error:', err);
+    res.status(500).json({ success: false, error: 'Failed to register for job fair' });
   }
 });
 

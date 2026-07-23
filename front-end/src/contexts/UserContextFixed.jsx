@@ -6,12 +6,19 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { API_BASE_URL } from '@/services/api';
+import { API_BASE_URL, startTokenRenewal, stopTokenRenewal } from '@/services/api';
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const UserContext = createContext(null);
 
-const clearCareerAgentStorage = () => {
+export const clearCareerAgentStorage = (userId = 'anon') => {
+  if (userId === 'anon') {
+    try {
+      const u = JSON.parse(sessionStorage.getItem('user') || 'null');
+      if (u) userId = u._id || u.id || 'anon';
+    } catch {}
+  }
+
   const explicitKeys = [
     'smaart_student_name',
     'smaart_student_email',
@@ -34,14 +41,23 @@ const clearCareerAgentStorage = () => {
     'smaart_demo_progress',
     'smaart_capacity_dev_unlocked'
   ];
-  explicitKeys.forEach((key) => localStorage.removeItem(key));
 
-  // Dynamically clear specific prefixes to prevent cross-user data bleed
-  Object.keys(localStorage).forEach(key => {
-    if (key.startsWith('course-notes-') || 
-        key.startsWith('passport_demo_') || 
-        key.startsWith('note_color_')) {
-      localStorage.removeItem(key);
+  explicitKeys.forEach((key) => {
+    localStorage.removeItem(key);
+    if (userId !== 'anon') {
+      localStorage.removeItem(`${userId}_${key}`);
+    }
+  });
+
+  // Consolidate the scan of all localStorage keys into a single pass
+  Object.keys(localStorage).forEach((k) => {
+    const matchesExplicit = explicitKeys.some(key => k.endsWith(`_${key}`));
+    const matchesDynamic = k.startsWith('course-notes-') || 
+                           k.startsWith('passport_demo_') || 
+                           k.startsWith('note_color_') ||
+                           k.endsWith('_communityLastSeenCount');
+    if (matchesExplicit || matchesDynamic) {
+      localStorage.removeItem(k);
     }
   });
 };
@@ -55,7 +71,7 @@ export const UserProvider = ({ children }) => {
 
     const token = sessionStorage.getItem('token');
     if (!token) {
-      console.log('[UserContext] No token found, skipping background fetch');
+      if (import.meta.env.DEV) console.log('[UserContext] No token found, skipping background fetch');
       return;
     }
 
@@ -90,10 +106,10 @@ export const UserProvider = ({ children }) => {
           return updated;
         });
       } else {
-        console.log('[UserContext] Background fetch failed, using cached data');
+        if (import.meta.env.DEV) console.log('[UserContext] Background fetch failed, using cached data');
       }
     } catch (error) {
-      console.error("Error fetching user details:", error);
+      if (import.meta.env.DEV) console.error("Error fetching user details:", error);
     }
   }, []);
 
@@ -125,7 +141,7 @@ export const UserProvider = ({ children }) => {
     // Multi-tab sync listener via localStorage
     const handleStorageChange = (e) => {
       if (e.key === "logout-event") {
-        console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
+        if (import.meta.env.DEV) console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
 
         // Clear storages safely
         sessionStorage.clear();
@@ -133,6 +149,7 @@ export const UserProvider = ({ children }) => {
         localStorage.removeItem("token");
         clearCareerAgentStorage();
         clearAssessmentTimerStorage();
+        stopTokenRenewal();
 
         // Set a flag so the LandingPage can show a clean toast message
         sessionStorage.setItem("logged_out_other_tab", "true");
@@ -153,8 +170,11 @@ export const UserProvider = ({ children }) => {
   }, [user?.email, fetchUserDetails]);
 
   const login = useCallback((userData, token) => {
-    console.log('[UserContext] Login function called with user:', userData?.email);
-    if (token) sessionStorage.setItem("token", token);
+    if (import.meta.env.DEV) console.log('[UserContext] Login function called with user:', userData?.email);
+    if (token) {
+      sessionStorage.setItem("token", token);
+      startTokenRenewal();
+    }
     clearCareerAgentStorage();
     if (userData) {
       const userToStore = { ...userData };
@@ -208,6 +228,7 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem('token');
     clearCareerAgentStorage();
     clearAssessmentTimerStorage();
+    stopTokenRenewal();
 
     // Step 3: Set flag for clean logout message
     sessionStorage.setItem('logged_out_other_tab', 'true');
