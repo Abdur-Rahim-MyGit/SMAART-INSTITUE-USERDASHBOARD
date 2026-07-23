@@ -1597,7 +1597,7 @@ router.post('/first-login-change-password', async (req, res) => {
     });
 
     res.json({
-      message: 'Password changed successfully! Welcome to SMAART Minds.',
+      message: 'Password changed successfully! Welcome to SMAART Institute.',
       token,
       sessionExpiresAt,
       user: userResponse

@@ -1,6 +1,7 @@
 const express = require('express');
 const Course = require('../models/Course');
 const College = require('../models/College');
+const Student = require('../models/Student');
 const { protect, authorize } = require('../middleware/auth');
 const {
     COURSE_STAGE_TITLES,
@@ -55,7 +56,21 @@ const getAllowedCategories = async (user) => {
     if (!user || user.role === 'admin' || user.role === 'moderator') {
         return null; 
     }
-    if (user.college) {
+
+    let subscriptionPlan = null;
+
+    if (user.role === 'student') {
+        try {
+            const student = await Student.findById(user._id);
+            if (student && student.department?.batch?.subscriptionPlan) {
+                subscriptionPlan = student.department.batch.subscriptionPlan;
+            }
+        } catch (err) {
+            console.error('Error fetching student subscription plan:', err.message);
+        }
+    }
+
+    if (!subscriptionPlan && user.college) {
         // PERF: `protect` already populated req.user.college WITH subscriptionPlan,
         // so reuse it and avoid a redundant College.findById() on every request.
         // Fall back to a DB fetch only if it wasn't populated.
@@ -64,21 +79,23 @@ const getAllowedCategories = async (user) => {
             collegeDoc = await College.findById(user.college);
         }
         if (collegeDoc && collegeDoc.subscriptionPlan) {
-            const { plan, addons } = collegeDoc.subscriptionPlan;
-            const hasAIQ = !!addons?.aiq;
-            if (hasAIQ) allowed.push('AIQ');
-
-            const hasSQ = plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq;
-            if (hasSQ) allowed.push('SQ');
-
-            const hasPIQ = plan === 'Smaart Complete' || !!addons?.piq;
-            if (hasPIQ) allowed.push('PIQ');
-
-            const hasBC = !!addons?.britishCouncil;
-            if (hasBC) allowed.push('British Council');
-        } else {
-            allowed.push('AIQ');
+            subscriptionPlan = collegeDoc.subscriptionPlan;
         }
+    }
+
+    if (subscriptionPlan) {
+        const { plan, addons } = subscriptionPlan;
+        const hasAIQ = !!addons?.aiq;
+        if (hasAIQ) allowed.push('AIQ');
+
+        const hasSQ = plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq;
+        if (hasSQ) allowed.push('SQ');
+
+        const hasPIQ = plan === 'Smaart Complete' || !!addons?.piq;
+        if (hasPIQ) allowed.push('PIQ');
+
+        const hasBC = !!addons?.britishCouncil;
+        if (hasBC) allowed.push('British Council');
     } else {
         allowed.push('AIQ');
     }

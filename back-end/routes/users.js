@@ -204,7 +204,7 @@ router.post('/register-details', upload.fields([
         qualificationLevel: he.qualificationLevel || '',
         degree: he.degree || '',
         degreeFullName: he.degreeFullName || '',
-        specialization: he.specialization || '',
+        specialization: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || ''),
         institutionName: he.institutionName || '',
         university: he.university || '',
         location: he.location || '',
@@ -362,7 +362,7 @@ router.post('/register-details', upload.fields([
         degreeLevel: he.qualificationLevel || '',
         domain: he.degree || '',
         degreeGroup: he.degreeFullName || '',
-        specialisation: he.specialization || ''
+        specialisation: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || '')
       };
     }
 
@@ -526,10 +526,14 @@ router.patch('/register-section', async (req, res) => {
       },
       'higherEducation': async () => {
         // For array of higher education entries
-        registration.higherEducation = data;
+        const mappedData = Array.isArray(data) ? data.map(he => ({
+          ...he,
+          specialization: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || '')
+        })) : data;
+        registration.higherEducation = mappedData;
 
-        if (student && Array.isArray(data) && data.length > 0) {
-          const he = data[0];
+        if (student && Array.isArray(mappedData) && mappedData.length > 0) {
+          const he = mappedData[0];
           student.academic = {
             degreeLevel: he.qualificationLevel || he.level || '',
             domain: he.degree || he.domain || '',
