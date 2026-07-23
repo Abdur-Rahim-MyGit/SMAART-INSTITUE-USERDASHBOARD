@@ -35,6 +35,9 @@ const buildFlatRegistration = (studentDoc) => {
     gender: doc.gender,
     cgpa: doc.cgpa,
     batch: doc.batch,
+    studentId: doc.studentId,
+    rollNumber: doc.rollNumber,
+    admissionDate: doc.admissionDate,
     address: doc.address,
     status: doc.profileStatus,
   };
@@ -865,6 +868,9 @@ router.get('/register-details/:email', async (req, res) => {
     }
     res.json({
       ...userObj,
+      studentId: userObj.studentId || studentForDetails?.studentId || '',
+      rollNumber: userObj.rollNumber || studentForDetails?.rollNumber || '',
+      admissionDate: userObj.admissionDate || studentForDetails?.admissionDate || '',
       degree: populatedDegree,
       academic,
       department: studentDept,
