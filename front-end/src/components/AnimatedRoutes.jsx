@@ -50,6 +50,7 @@ const Settings = lazy(() => import('@/pages/Settings'));
 const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
 const LockedOut = lazy(() => import('@/pages/LockedOut'));
+const AssessmentHeld = lazy(() => import('@/components/proctoring/AssessmentHeld'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const GrievancesPage = lazy(() => import('@/pages/GrievancesPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
@@ -229,6 +230,10 @@ const AnimatedRoutes = () => {
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
                     <Route path="/locked-out" element={<LockedOut />} />
+                    {/* Tier 4: submitted and awaiting review. Replaces the
+                        lockout dead-end — answers are saved, only the score
+                        is withheld. */}
+                    <Route path="/assessment-held" element={<AssessmentHeld />} />
                     <Route path="/skill-assessment/:skillName" element={<SkillAssessmentPlayer />} />
 
                     {/* Fallback */}
