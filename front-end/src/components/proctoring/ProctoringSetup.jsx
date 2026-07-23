@@ -19,8 +19,13 @@ import {
   loadModels,
   registerFace,
   detectFaces,
+  detectFacesFast,
   isReady as isModelsReady
 } from '@/services/faceVerificationService';
+
+// Gap between presence scans. Measured from the END of the previous scan, so
+// this is genuine idle time rather than a deadline the device may miss.
+const SCAN_INTERVAL_MS = 500;
 
 export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const { t } = useTranslation();
@@ -121,6 +126,19 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
+  // PERFORMANCE: start fetching the models the moment setup opens, rather than
+  // waiting until the candidate reaches step 3. The download then overlaps with
+  // the permission prompts and the rules screen — by the time they reach face
+  // registration the weights are usually already cached, which is most of the
+  // "Detecting your face..." wait people were seeing.
+  useEffect(() => {
+    if (!isModelsReady()) {
+      loadModels().catch((err) =>
+        console.warn('[ProctoringSetup] Model preload failed, will retry at step 3:', err)
+      );
+    }
+  }, []);
+
   // Load AI Models when entering step 3
   const loadAIModels = useCallback(async () => {
     if (isModelsReady()) {
@@ -204,15 +222,17 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     }
 
     setRegistrationState('registering');
-    setRegistrationProgress({ current: 0, total: 5 });
+    setRegistrationProgress({ current: 0, total: 3 });
     setFaceCheckError(null);
     setQualityIssues([]);
 
     try {
       const result = await registerFace(videoRef.current, {
-        frameCount: 5,
-        intervalMs: 600,
-        onFrameCaptured: (frameIndex, totalFrames, _descriptor, face) => {
+        // 3 frames at 400ms rather than 5 at 600ms: ~1.2s instead of ~3s.
+        // Averaging 3 embeddings still absorbs pose and lighting jitter.
+        frameCount: 3,
+        intervalMs: 400,
+        onFrameCaptured: (frameIndex, totalFrames, descriptor, face) => {
           setRegistrationProgress({ current: frameIndex, total: totalFrames });
           setQualityIssues([]);
           if (face) drawFaceFeedback([face]);
@@ -258,11 +278,19 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setFaceCheckError(null);
     faceStableCountRef.current = 0;
 
-    faceCheckIntervalRef.current = setInterval(async () => {
-      if (!videoRef.current) return;
+    // Self-scheduling loop rather than setInterval.
+    //
+    // With a fixed interval, a detection that takes longer than the period
+    // stacks up behind the previous one and the feed gets progressively more
+    // laggy. Scheduling the next pass only after the current one finishes
+    // keeps latency bounded no matter how slow the device is.
+    const scanOnce = async () => {
+      if (!videoRef.current || faceCheckIntervalRef.current === null) return;
 
       try {
-        const result = await detectFaces(videoRef.current, true);
+        // Presence-only: skips the 6.4 MB recognition net, which we do not
+        // need until the candidate actually registers.
+        const result = await detectFacesFast(videoRef.current);
 
         if (result.error) {
           return; // Skip frame
@@ -294,9 +322,20 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         }
       } catch (err) {
         console.error('[ProctoringSetup] Face scanning error:', err);
+      } finally {
+        // Reschedule only if we were not cancelled (either by teardown or by
+        // registration starting).
+        if (faceCheckIntervalRef.current !== null) {
+          faceCheckIntervalRef.current = setTimeout(scanOnce, SCAN_INTERVAL_MS);
+        }
       }
-    }, 800);
-  }, [startFaceRegistration, drawFaceFeedback, clearCanvas, t]);
+    };
+
+    // Sentinel so the first scanOnce sees an active scan; replaced by the real
+    // timer id on the first reschedule. clearInterval/clearTimeout share an id
+    // space, so existing teardown calls keep working unchanged.
+    faceCheckIntervalRef.current = setTimeout(scanOnce, 0);
+  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
 
   // Step 3: Load models then start scanning
   useEffect(() => {
@@ -509,8 +548,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       <RiCameraLine size={20} className="text-slate-600 dark:text-slate-300" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('proctoring_setup.webcam_access', 'Webcam Access')}</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{t('proctoring_setup.webcam_required', 'Required for identity verification')}</p>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Webcam Access</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">To check your identity during the test</p>
                     </div>
                   </div>
                   {cameraState === 'allowed' ? (
@@ -599,20 +638,59 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
             </motion.div>
           )}
 
-          {/* STEP 2: Compliance Consent */}
+          {/* STEP 2: Compliance Consent + Assessment Rules */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                 <RiShieldCheckLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.security_consent_title', 'Security Compliance Consent')}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
-                {t('proctoring_setup.security_consent_desc', 'By ticking the consent statement below, you acknowledge that this assessment utilizes AI Proctoring with face verification. Your face will be registered at the start and continuously verified throughout the assessment. Dynamic snapshots, liveness indicators, and screen focus are continuously logged under the Digital Personal Data Protection Act (DPDPA 2023). All session records are securely processed and auto-purged within 30 days of attempt completion.')}
-              </p>
+
+              {/* Why each permission is required */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">This assessment requires the following access:</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Camera access</strong> — We use your camera to check your identity at the start and throughout the test.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Browser monitoring</strong> — We check if you leave the test tab or switch to another window, so the session stays fair.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Full-screen mode</strong> — Full-screen removes distractions and prevents access to other apps while you test.</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                  All session records are securely processed under the Digital Personal Data Protection Act (DPDPA 2023) and auto-purged within 30 days of attempt completion.
+                </p>
+              </div>
+
+              {/* Assessment Rules */}
+              <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl p-4">
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-2 uppercase tracking-wide">Assessment Rules</p>
+                <ul className="space-y-1.5">
+                  {[
+                    'Keep your camera on.',
+                    'Keep your face visible.',
+                    'Only one person is allowed.',
+                    'Do not switch tabs or windows.',
+                    'Stay in full-screen mode.',
+                    'Do not use your phone or look away repeatedly.'
+                  ].map((rule, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+                      <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-slate-500" />
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               <div className="bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40 rounded-2xl p-4 flex gap-3 items-start">
                 <RiInformationLine size={20} className="text-[#1a3884] dark:text-cyan-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <strong>{t('proctoring_setup.strict_actions_label', 'Strict Actions:')}</strong> {t('proctoring_setup.strict_actions_desc', 'Minimizing window focus, opening browser DevTools, exiting fullscreen mode, or showing a different face will trigger warnings and can lead to immediate lockout disqualification.')}
+                  Violations are reviewed by a human before any serious action is taken. The system flags behaviour for review — it does not make automatic failure decisions.
                 </div>
               </div>
 
@@ -624,7 +702,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="w-4 h-4 rounded mt-0.5 accent-[#1a3884] dark:accent-cyan-400"
                 />
                 <span className="text-xs text-slate-700 dark:text-slate-300">
-                  {t('proctoring_setup.consent_checkbox', 'I consent to face registration, identity verification, and agree to the integrity checks.')}
+                  I understand why these permissions are required, accept the assessment rules, and consent to face registration and identity verification.
                 </span>
               </label>
             </motion.div>
@@ -656,9 +734,25 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1]"
                 />
                 
-                {/* Scanning overlay */}
-                {registrationState === 'detecting' && (
-                  <div className="absolute inset-0 border-2 border-dashed border-cyan-400/50 rounded-2xl animate-pulse" />
+                {/* Oval face guide overlay */}
+                {(registrationState === 'detecting' || registrationState === 'idle') && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    <svg className="w-full h-full" viewBox="0 0 224 168" preserveAspectRatio="xMidYMid slice">
+                      {/* Semi-transparent mask with oval cutout */}
+                      <defs>
+                        <mask id="face-oval-mask">
+                          <rect width="100%" height="100%" fill="white" />
+                          <ellipse cx="112" cy="80" rx="48" ry="62" fill="black" />
+                        </mask>
+                      </defs>
+                      <rect width="100%" height="100%" fill="rgba(0,0,0,0.45)" mask="url(#face-oval-mask)" />
+                      {/* Oval guide border */}
+                      <ellipse cx="112" cy="80" rx="48" ry="62" fill="none" stroke="rgba(34,211,238,0.6)" strokeWidth="2" strokeDasharray="6 4" className="animate-[spin_8s_linear_infinite]" style={{ transformOrigin: '112px 80px' }} />
+                    </svg>
+                    <div className="absolute bottom-2 inset-x-0 text-center">
+                      <span className="text-[9px] font-bold text-cyan-300/80 uppercase tracking-wider">Center your face in the oval</span>
+                    </div>
+                  </div>
                 )}
 
                 {/* Registration progress overlay */}
@@ -820,7 +914,18 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Footer controls */}
-        <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-end gap-3">
+        <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3">
+          {/* Skip face registration — dev/testing convenience only */}
+          {step === 3 && registrationState !== 'registered' && (
+            <button
+              onClick={() => setStep(4)}
+              className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 underline underline-offset-2 transition-colors"
+            >
+              Skip for now
+            </button>
+          )}
+
+          <div className="ml-auto flex gap-3">
           {step < 4 ? (
             <button
               onClick={handleNextStep}
@@ -847,6 +952,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               {t('proctoring_setup.start_assessment_now', 'Start Assessment Now')}
             </button>
           )}
+          </div>
         </div>
       </div>
     </div>
