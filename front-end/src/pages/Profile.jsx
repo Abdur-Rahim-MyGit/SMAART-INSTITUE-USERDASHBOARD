@@ -639,6 +639,12 @@ const Profile = () => {
         clonedData = {};
       }
     }
+    if (section === 'higherEducation' && Array.isArray(clonedData)) {
+      clonedData = clonedData.map(item => ({
+        ...item,
+        specialization: Array.isArray(item.specialization) ? (item.specialization[0] || "") : (item.specialization || "")
+      }));
+    }
     setEditFormData(clonedData);
     setShowSectionModal(true);
 
