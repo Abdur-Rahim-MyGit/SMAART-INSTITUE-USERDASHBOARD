@@ -19,8 +19,13 @@ import {
   loadModels,
   registerFace,
   detectFaces,
+  detectFacesFast,
   isReady as isModelsReady
 } from '@/services/faceVerificationService';
+
+// Gap between presence scans. Measured from the END of the previous scan, so
+// this is genuine idle time rather than a deadline the device may miss.
+const SCAN_INTERVAL_MS = 500;
 
 export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const { t } = useTranslation();
@@ -37,11 +42,17 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const [modelLoadState, setModelLoadState] = useState('idle'); // 'idle' | 'loading' | 'loaded' | 'error'
   const [registrationState, setRegistrationState] = useState('idle');
   // 'idle' | 'detecting' | 'face_found' | 'registering' | 'registered' | 'error'
+  const registrationStateRef = useRef(registrationState);
+  useEffect(() => {
+    registrationStateRef.current = registrationState;
+  }, [registrationState]);
+
   const [registrationProgress, setRegistrationProgress] = useState({ current: 0, total: 5 });
   const [registrationConfidence, setRegistrationConfidence] = useState(0);
   const [registeredDescriptor, setRegisteredDescriptor] = useState(null);
   const [faceCheckError, setFaceCheckError] = useState(null);
   const [faceStableCount, setFaceStableCount] = useState(0);
+  const [qualityIssues, setQualityIssues] = useState([]);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -73,7 +84,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setCameraState('checking');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } }
+        video: true
       });
       localStreamRef.current = stream;
       if (videoRef.current) {
@@ -82,8 +93,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       }
       setCameraState('allowed');
     } catch (err) {
-      console.error('[ProctoringSetup] Camera access denied:', err);
       setCameraState('denied');
+      setFaceCheckError('Camera access failed: ' + (err.message || err.toString()));
     }
   };
 
@@ -103,13 +114,30 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
 
   // Auto-request both on first render (common flow)
   useEffect(() => {
-    if (step === 1 && micState === 'pending') {
-      // Stagger by 1s after camera prompt to avoid permission-denial cascade
-      const t = setTimeout(requestMicAccess, 1200);
-      return () => clearTimeout(t);
+    if (step === 1 && cameraState === 'pending') {
+      const initMedia = async () => {
+        await requestWebcamAccess();
+        // Temporarily bypassing mic request as per user request
+        // await requestMicAccess();
+        setMicState('allowed');
+      };
+      initMedia();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
+
+  // PERFORMANCE: start fetching the models the moment setup opens, rather than
+  // waiting until the candidate reaches step 3. The download then overlaps with
+  // the permission prompts and the rules screen — by the time they reach face
+  // registration the weights are usually already cached, which is most of the
+  // "Detecting your face..." wait people were seeing.
+  useEffect(() => {
+    if (!isModelsReady()) {
+      loadModels().catch((err) =>
+        console.warn('[ProctoringSetup] Model preload failed, will retry at step 3:', err)
+      );
+    }
+  }, []);
 
   // Load AI Models when entering step 3
   const loadAIModels = useCallback(async () => {
@@ -131,7 +159,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     } catch (err) {
       console.error('[ProctoringSetup] Model loading failed:', err);
       setModelLoadState('error');
-      setFaceCheckError(t('proctoring_setup.error_model_load', 'Failed to load AI models. Please check your connection and try again.'));
+      setFaceCheckError(t('proctoring_setup.error_model_load', 'Failed to load AI models. Please check your connection and try again.') + ' (' + (err.message || err.toString()) + ')');
     }
   }, [t]);
 
@@ -149,30 +177,37 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     const displaySize = { width: video.clientWidth, height: video.clientHeight };
     if (displaySize.width === 0 || displaySize.height === 0) return;
 
-    faceapi.matchDimensions(canvas, displaySize);
+    // Make canvas same size as the display size of the video
+    canvas.width = displaySize.width;
+    canvas.height = displaySize.height;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!faces || faces.length === 0) return;
 
-    const resizedDetections = faceapi.resizeResults(faces.map(f => f.detection), displaySize);
-    const resizedLandmarks = faces.map(f => faceapi.resizeResults(f.landmarks, displaySize));
-
-    resizedDetections.forEach(detection => {
-      const box = detection.box;
+    faces.forEach(f => {
+      // Draw Bounding Box
+      const box = f.box; // {x, y, width, height}
+      // Scale to canvas display size
+      const scaleX = displaySize.width / video.videoWidth;
+      const scaleY = displaySize.height / video.videoHeight;
+      
       ctx.strokeStyle = '#22d3ee';
       ctx.lineWidth = 2;
-      ctx.strokeRect(box.x, box.y, box.width, box.height);
-    });
+      ctx.strokeRect(box.x * scaleX, box.y * scaleY, box.width * scaleX, box.height * scaleY);
 
-    resizedLandmarks.forEach(landmarks => {
-      ctx.fillStyle = '#10b981';
-      const points = landmarks.positions;
-      points.forEach(pt => {
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 2, 0, 2 * Math.PI);
-        ctx.fill();
-      });
+      // Draw Landmarks (ONNX format: [[x,y], ...])
+      if (f.landmarks) {
+        ctx.fillStyle = '#10b981';
+        f.landmarks.forEach(pt => {
+          ctx.beginPath();
+          // The points are arrays [x, y]
+          const lx = pt.x !== undefined ? pt.x : pt[0];
+          const ly = pt.y !== undefined ? pt.y : pt[1];
+          ctx.arc(lx * scaleX, ly * scaleY, 2, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+      }
     });
   }, []);
 
@@ -180,36 +215,58 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const startFaceRegistration = useCallback(async () => {
     if (!videoRef.current) return;
 
+    // Stop scanning interval — registration takes over the camera loop
+    if (faceCheckIntervalRef.current) {
+      clearInterval(faceCheckIntervalRef.current);
+      faceCheckIntervalRef.current = null;
+    }
+
     setRegistrationState('registering');
-    setRegistrationProgress({ current: 0, total: 5 });
+    setRegistrationProgress({ current: 0, total: 3 });
     setFaceCheckError(null);
+    setQualityIssues([]);
 
     try {
       const result = await registerFace(videoRef.current, {
-        frameCount: 5,
-        intervalMs: 600,
+        // 3 frames at 400ms rather than 5 at 600ms: ~1.2s instead of ~3s.
+        // Averaging 3 embeddings still absorbs pose and lighting jitter.
+        frameCount: 3,
+        intervalMs: 400,
         onFrameCaptured: (frameIndex, totalFrames, descriptor, face) => {
           setRegistrationProgress({ current: frameIndex, total: totalFrames });
-          if (face) {
-            drawFaceFeedback([face]);
-          }
+          setQualityIssues([]);
+          if (face) drawFaceFeedback([face]);
         },
-        onError: (err) => {
-          console.warn('[ProctoringSetup] Registration frame issue:', err);
-        }
+        onError: (msg) => {
+          console.warn('[ProctoringSetup] Registration frame issue:', msg);
+        },
+        onQualityIssue: (issues) => {
+          setQualityIssues(issues);
+        },
       });
 
       setRegisteredDescriptor(result.descriptor);
       setRegistrationConfidence(result.confidence);
+      setRegistrationProgress({ current: result.framesCaptured, total: 5 });
       setRegistrationState('registered');
+      setQualityIssues([]);
       clearCanvas();
 
       console.log(`[ProctoringSetup] ✅ Face registered: ${result.framesCaptured} frames, confidence: ${(result.confidence * 100).toFixed(1)}%`);
     } catch (err) {
       console.error('[ProctoringSetup] Face registration failed:', err);
       setRegistrationState('error');
-      setFaceCheckError(err.message || t('proctoring_setup.error_registration_failed_retry', 'Face registration failed. Please try again.'));
       clearCanvas();
+      setQualityIssues([]);
+
+      // Show specific error messages for hard-stop conditions
+      if (err.code === 'NO_FACE_DETECTED') {
+        setFaceCheckError('Face not detected. Please position your face properly and try again.');
+      } else if (err.code === 'MULTIPLE_FACES_DETECTED') {
+        setFaceCheckError('Multiple faces detected. Registration cannot continue. Please ensure only one person is visible.');
+      } else {
+        setFaceCheckError(err.message || t('proctoring_setup.error_registration_failed_retry', 'Face registration failed. Please try again.'));
+      }
     }
   }, [drawFaceFeedback, clearCanvas, t]);
 
@@ -221,24 +278,32 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setFaceCheckError(null);
     faceStableCountRef.current = 0;
 
-    faceCheckIntervalRef.current = setInterval(async () => {
-      if (!videoRef.current) return;
+    // Self-scheduling loop rather than setInterval.
+    //
+    // With a fixed interval, a detection that takes longer than the period
+    // stacks up behind the previous one and the feed gets progressively more
+    // laggy. Scheduling the next pass only after the current one finishes
+    // keeps latency bounded no matter how slow the device is.
+    const scanOnce = async () => {
+      if (!videoRef.current || faceCheckIntervalRef.current === null) return;
 
       try {
-        const result = await detectFaces(videoRef.current);
+        // Presence-only: skips the 6.4 MB recognition net, which we do not
+        // need until the candidate actually registers.
+        const result = await detectFacesFast(videoRef.current);
 
         if (result.error) {
           return; // Skip frame
         }
 
-        if (result.faceCount === 1 && result.faces[0].hasDescriptor) {
+        if (result.faceCount === 1) {
           faceStableCountRef.current += 1;
           setFaceStableCount(faceStableCountRef.current);
           setFaceCheckError(null);
           drawFaceFeedback(result.faces);
 
           // Face stable for 2+ consecutive checks (~1.6 seconds) → ready to register
-          if (faceStableCountRef.current >= 2 && registrationState !== 'registering' && registrationState !== 'registered') {
+          if (faceStableCountRef.current >= 2 && registrationStateRef.current !== 'registering' && registrationStateRef.current !== 'registered') {
             // Auto-start registration
             clearInterval(faceCheckIntervalRef.current);
             faceCheckIntervalRef.current = null;
@@ -257,15 +322,26 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         }
       } catch (err) {
         console.error('[ProctoringSetup] Face scanning error:', err);
+      } finally {
+        // Reschedule only if we were not cancelled (either by teardown or by
+        // registration starting).
+        if (faceCheckIntervalRef.current !== null) {
+          faceCheckIntervalRef.current = setTimeout(scanOnce, SCAN_INTERVAL_MS);
+        }
       }
-    }, 800);
-  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas, t]);
+    };
+
+    // Sentinel so the first scanOnce sees an active scan; replaced by the real
+    // timer id on the first reschedule. clearInterval/clearTimeout share an id
+    // space, so existing teardown calls keep working unchanged.
+    faceCheckIntervalRef.current = setTimeout(scanOnce, 0);
+  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
 
   // Step 3: Load models then start scanning
   useEffect(() => {
     if (step === 3) {
-      // Bind video stream
-      if (localStreamRef.current && videoRef.current) {
+      // Bind video stream only if not already bound to avoid stream reload interruption
+      if (localStreamRef.current && videoRef.current && videoRef.current.srcObject !== localStreamRef.current) {
         videoRef.current.srcObject = localStreamRef.current;
         videoRef.current.play().catch(err => console.warn('Video playback failed:', err));
       }
@@ -273,6 +349,14 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       // Load AI models first, then start scanning
       const init = async () => {
         await loadAIModels();
+        // Wait for video element to be ready
+        if (videoRef.current) {
+          let waitCount = 0;
+          while (videoRef.current && videoRef.current.readyState < 2 && waitCount < 25) {
+            await new Promise(r => setTimeout(r, 100));
+            waitCount++;
+          }
+        }
         // Only start scanning if models loaded successfully
         if (isModelsReady()) {
           startFaceScanning();
@@ -319,18 +403,34 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     } else if (step === 2 && consentGranted) {
       setStep(3);
     } else if (step === 3 && registrationState === 'registered') {
+      // Stop the setup camera stream immediately before unmounting the video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(t => t.stop());
+        localStreamRef.current = null;
+      }
+      if (faceCheckIntervalRef.current) {
+        clearInterval(faceCheckIntervalRef.current);
+        faceCheckIntervalRef.current = null;
+      }
       setStep(4);
     }
   };
 
   const handleStartTest = () => {
-    // Release setup streams
+    // Release setup streams — stop video src first, then kill tracks
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(t => t.stop());
       localStreamRef.current = null;
     }
     if (faceCheckIntervalRef.current) {
       clearInterval(faceCheckIntervalRef.current);
+      faceCheckIntervalRef.current = null;
     }
 
     // Check fullscreen
@@ -338,22 +438,34 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       triggerFullscreen();
     }
 
-    // Pass the registered face descriptor to the parent
-    onComplete({ faceDescriptor: registeredDescriptor });
+    // 1800ms delay: OS camera drivers need time to fully release the hardware
+    // before the exam engine's getUserMedia call can succeed
+    setTimeout(() => {
+      onComplete({ faceDescriptor: registeredDescriptor });
+    }, 1800);
   };
 
-  // Retry registration (reset state and rescan)
+  // Retry registration (full reset — back to detecting state)
   const retryRegistration = () => {
+    // Clear any running interval
+    if (faceCheckIntervalRef.current) {
+      clearInterval(faceCheckIntervalRef.current);
+      faceCheckIntervalRef.current = null;
+    }
+    clearCanvas();
     setRegistrationState('idle');
     setRegisteredDescriptor(null);
     setRegistrationConfidence(0);
+    setRegistrationProgress({ current: 0, total: 5 });
     setFaceCheckError(null);
+    setQualityIssues([]);
     faceStableCountRef.current = 0;
     setFaceStableCount(0);
 
-    if (isModelsReady()) {
-      startFaceScanning();
-    }
+    // Restart scanning after a short delay to let camera settle
+    setTimeout(() => {
+      if (isModelsReady()) startFaceScanning();
+    }, 400);
   };
 
   // ─── Render ────────────────────────────────────────────────────────
@@ -436,8 +548,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       <RiCameraLine size={20} className="text-slate-600 dark:text-slate-300" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('proctoring_setup.webcam_access', 'Webcam Access')}</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{t('proctoring_setup.webcam_required', 'Required for identity verification')}</p>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Webcam Access</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">To check your identity during the test</p>
                     </div>
                   </div>
                   {cameraState === 'allowed' ? (
@@ -459,7 +571,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   )}
                 </div>
 
-              {/* Microphone Row (NEW) */}
+                {/* Microphone Row (NEW) (Temporarily Hidden)
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-slate-200/50 dark:bg-white/5 rounded-xl">
@@ -497,6 +609,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </button>
                   )}
                 </div>
+                */}
 
                 {/* Network Row */}
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
@@ -525,20 +638,59 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
             </motion.div>
           )}
 
-          {/* STEP 2: Compliance Consent */}
+          {/* STEP 2: Compliance Consent + Assessment Rules */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                 <RiShieldCheckLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.security_consent_title', 'Security Compliance Consent')}
               </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
-                {t('proctoring_setup.security_consent_desc', 'By ticking the consent statement below, you acknowledge that this assessment utilizes AI Proctoring with face verification. Your face will be registered at the start and continuously verified throughout the assessment. Dynamic snapshots, liveness indicators, and screen focus are continuously logged under the Digital Personal Data Protection Act (DPDPA 2023). All session records are securely processed and auto-purged within 30 days of attempt completion.')}
-              </p>
+
+              {/* Why each permission is required */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">This assessment requires the following access:</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Camera access</strong> — We use your camera to check your identity at the start and throughout the test.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Browser monitoring</strong> — We check if you leave the test tab or switch to another window, so the session stays fair.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span><strong>Full-screen mode</strong> — Full-screen removes distractions and prevents access to other apps while you test.</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                  All session records are securely processed under the Digital Personal Data Protection Act (DPDPA 2023) and auto-purged within 30 days of attempt completion.
+                </p>
+              </div>
+
+              {/* Assessment Rules */}
+              <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl p-4">
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-2 uppercase tracking-wide">Assessment Rules</p>
+                <ul className="space-y-1.5">
+                  {[
+                    'Keep your camera on.',
+                    'Keep your face visible.',
+                    'Only one person is allowed.',
+                    'Do not switch tabs or windows.',
+                    'Stay in full-screen mode.',
+                    'Do not use your phone or look away repeatedly.'
+                  ].map((rule, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+                      <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-slate-500" />
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               <div className="bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40 rounded-2xl p-4 flex gap-3 items-start">
                 <RiInformationLine size={20} className="text-[#1a3884] dark:text-cyan-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <strong>{t('proctoring_setup.strict_actions_label', 'Strict Actions:')}</strong> {t('proctoring_setup.strict_actions_desc', 'Minimizing window focus, opening browser DevTools, exiting fullscreen mode, or showing a different face will trigger warnings and can lead to immediate lockout disqualification.')}
+                  Violations are reviewed by a human before any serious action is taken. The system flags behaviour for review — it does not make automatic failure decisions.
                 </div>
               </div>
 
@@ -550,7 +702,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="w-4 h-4 rounded mt-0.5 accent-[#1a3884] dark:accent-cyan-400"
                 />
                 <span className="text-xs text-slate-700 dark:text-slate-300">
-                  {t('proctoring_setup.consent_checkbox', 'I consent to face registration, identity verification, and agree to the integrity checks.')}
+                  I understand why these permissions are required, accept the assessment rules, and consent to face registration and identity verification.
                 </span>
               </label>
             </motion.div>
@@ -582,9 +734,25 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1]"
                 />
                 
-                {/* Scanning overlay */}
-                {registrationState === 'detecting' && (
-                  <div className="absolute inset-0 border-2 border-dashed border-cyan-400/50 rounded-2xl animate-pulse" />
+                {/* Oval face guide overlay */}
+                {(registrationState === 'detecting' || registrationState === 'idle') && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    <svg className="w-full h-full" viewBox="0 0 224 168" preserveAspectRatio="xMidYMid slice">
+                      {/* Semi-transparent mask with oval cutout */}
+                      <defs>
+                        <mask id="face-oval-mask">
+                          <rect width="100%" height="100%" fill="white" />
+                          <ellipse cx="112" cy="80" rx="48" ry="62" fill="black" />
+                        </mask>
+                      </defs>
+                      <rect width="100%" height="100%" fill="rgba(0,0,0,0.45)" mask="url(#face-oval-mask)" />
+                      {/* Oval guide border */}
+                      <ellipse cx="112" cy="80" rx="48" ry="62" fill="none" stroke="rgba(34,211,238,0.6)" strokeWidth="2" strokeDasharray="6 4" className="animate-[spin_8s_linear_infinite]" style={{ transformOrigin: '112px 80px' }} />
+                    </svg>
+                    <div className="absolute bottom-2 inset-x-0 text-center">
+                      <span className="text-[9px] font-bold text-cyan-300/80 uppercase tracking-wider">Center your face in the oval</span>
+                    </div>
+                  </div>
                 )}
 
                 {/* Registration progress overlay */}
@@ -652,13 +820,18 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     exit={{ opacity: 0, y: -5 }}
                     className="flex flex-col items-center gap-2 w-full"
                   >
-                    <div className="text-xs text-red-500 dark:text-red-400 font-medium text-center">
-                      {faceCheckError || t('proctoring_setup.error_registration_failed_retry', 'Registration failed. Please try again.')}
+                    <div className="flex items-start gap-2 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/25 rounded-xl px-3 py-2 max-w-full">
+                      <RiAlertLine size={14} className="text-red-500 dark:text-red-400 shrink-0 mt-0.5" />
+                      <span className="text-xs text-red-600 dark:text-red-400 font-medium text-center leading-snug">
+                        {faceCheckError || t('proctoring_setup.error_registration_failed_retry', 'Registration failed. Please try again.')}
+                      </span>
                     </div>
                     <button
                       onClick={retryRegistration}
-                      className="px-4 py-1.5 border border-[#1a3884]/30 text-[#1a3884] hover:bg-[#1a3884]/5 dark:text-cyan-400 dark:border-cyan-400/30 dark:hover:bg-cyan-400/5 rounded-xl text-xs font-bold transition-all active:scale-95"
-                    >{t('proctoring_setup.retry_registration', 'Retry Registration')}</button>
+                      className="px-5 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center gap-1.5"
+                    >
+                      <RiLoader4Line size={13} /> {t('proctoring_setup.retry_registration', 'Retry Registration')}
+                    </button>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -669,12 +842,35 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     className="flex flex-col items-center gap-1.5 w-full"
                   >
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-center animate-pulse">
-                      {faceCheckError || getRegistrationStatusText()}
+                      {getRegistrationStatusText()}
                     </div>
+                    {/* Quality feedback during capturing */}
+                    {registrationState === 'registering' && qualityIssues.length > 0 && (
+                      <div className="text-[10px] text-amber-500 dark:text-amber-400 text-center">
+                        ⚠ {qualityIssues[0]}
+                      </div>
+                    )}
                     {registrationState === 'detecting' && faceStableCount > 0 && (
                       <div className="flex items-center gap-1.5 text-[10px] text-emerald-500 font-medium">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         {t('proctoring_setup.face_detected_hold', 'Face detected — hold still...')}
+                      </div>
+                    )}
+                    {/* Frame progress dots during registration */}
+                    {registrationState === 'registering' && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                              idx < registrationProgress.current
+                                ? 'bg-emerald-500 scale-110'
+                                : idx === registrationProgress.current
+                                ? 'bg-cyan-400 animate-pulse'
+                                : 'bg-slate-200 dark:bg-white/10'
+                            }`}
+                          />
+                        ))}
                       </div>
                     )}
                   </motion.div>
@@ -718,7 +914,18 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Footer controls */}
-        <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-end gap-3">
+        <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3">
+          {/* Skip face registration — dev/testing convenience only */}
+          {import.meta.env.DEV && step === 3 && registrationState !== 'registered' && (
+            <button
+              onClick={() => setStep(4)}
+              className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 underline underline-offset-2 transition-colors"
+            >
+              Skip for now
+            </button>
+          )}
+
+          <div className="ml-auto flex gap-3">
           {step < 4 ? (
             <button
               onClick={handleNextStep}
@@ -745,6 +952,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               {t('proctoring_setup.start_assessment_now', 'Start Assessment Now')}
             </button>
           )}
+          </div>
         </div>
       </div>
     </div>

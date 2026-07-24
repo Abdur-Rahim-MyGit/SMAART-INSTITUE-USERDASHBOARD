@@ -52,7 +52,7 @@ const DEFAULT_STAGES = [
         subtitle: "Applied Skills",
         description:
             "Evaluate your applied capability and professional readiness with advanced challenges.",
-        totalQuestions: 36,
+        totalQuestions: 34,
         duration: "45 min",
     },
     {
@@ -62,7 +62,7 @@ const DEFAULT_STAGES = [
         subtitle: "Mastery",
         description:
             "Demonstrate your leadership potential and mastery across all competency dimensions.",
-        totalQuestions: 34,
+        totalQuestions: 36,
         duration: "40 min",
     },
     {
@@ -111,8 +111,8 @@ const mapAssessmentToStage = (ass) => {
     const targetQuestionsMap = {
         T1: 36,
         T2: 34,
-        T3: 36,
-        T4: 34,
+        T3: 34,
+        T4: 36,
         AIQ: 36,
     };
     const totalQuestions = targetQuestionsMap[key] || ass.totalQuestions || 36;

@@ -7,7 +7,7 @@ const Badge = require('../models/Badge');
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const defaultMongoURI = 'mongodb+srv://smaartmind:smaartmind123@smaartminds.hhyscvh.mongodb.net/?appName=SmaartMinds';
+const defaultMongoURI = process.env.MONGODB_URI;
 const mongoURI = process.env.MONGODB_URI || defaultMongoURI;
 
 async function seedCourseBadges() {

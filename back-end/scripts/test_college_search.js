@@ -6,7 +6,7 @@ const College = require('./models/College');
 
 async function testSearch() {
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://souban:souban123@cluster0.bkxwjdl.mongodb.net/?appName=Cluster0';
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
     await mongoose.connect(mongoUri);
     console.log('Connected to MongoDB\n');
 

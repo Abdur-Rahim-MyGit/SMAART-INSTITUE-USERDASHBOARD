@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
+    const navigate = useNavigate();
     const { theme } = useTheme();
     const [roadmap, setRoadmap] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -123,7 +125,20 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
 
     const handleStatusChange = async (skillName, newStatus) => {
         if (newStatus === 'Completed') {
-            // Open certificate modal instead of marking directly
+            try {
+                const res = await fetch(`/api/assessments/skill/${encodeURIComponent(skillName)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.data) {
+                        // Assessment exists, navigate to the skill assessment player!
+                        navigate(`/skill-assessment/${encodeURIComponent(skillName)}`);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error("Error checking skill assessment:", e);
+            }
+            // Open certificate modal instead of marking directly (fallback)
             setCertModal({ skillName });
             return;
         }

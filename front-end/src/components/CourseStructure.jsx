@@ -723,17 +723,22 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       t.totalCourses = t.courses.length;
     });
 
-    // Check active subscription plans and addons
-    const plan = user?.college?.subscriptionPlan?.plan || 'Smaart Core';
-    const addons = user?.college?.subscriptionPlan?.addons || {};
+    // Check active subscription plans and addons from student's department batch or college
+    const student = user;
+    const isStudent = student?.role === 'student' || (!student?.role && student?.college);
 
-    const isStudent = user?.role === 'student' || (!user?.role && user?.college);
+    const studentSubscriptionPlan = isStudent
+      ? (student?.department?.batch?.subscriptionPlan || user?.department?.batch?.subscriptionPlan || user?.college?.subscriptionPlan)
+      : null;
+
+    const plan = studentSubscriptionPlan?.plan || 'Smaart Core';
+    const addons = studentSubscriptionPlan?.addons || {};
 
     // Determine visibility flags
-    const hasPIQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Complete' || !!addons?.piq) : true;
-    const hasAIQ = isStudent && user?.college?.subscriptionPlan ? !!addons?.aiq : true;
-    const hasSQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq) : true;
-    const hasBC = isStudent && user?.college?.subscriptionPlan ? !!addons?.britishCouncil : true;
+    const hasPIQ = isStudent && studentSubscriptionPlan ? (plan === 'Smaart Complete' || !!addons?.piq) : true;
+    const hasAIQ = isStudent && studentSubscriptionPlan ? !!addons?.aiq : true;
+    const hasSQ = isStudent && studentSubscriptionPlan ? (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq) : true;
+    const hasBC = isStudent && studentSubscriptionPlan ? !!addons?.britishCouncil : true;
 
     const filteredTracks = [];
     if (hasPIQ) filteredTracks.push(templateTracks[0]);

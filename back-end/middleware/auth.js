@@ -15,6 +15,7 @@ const protect = async (req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     if (
       req.headers['x-admin-bypass'] === 'true' &&
+      process.env.ADMIN_SYSTEM_SECRET &&
       req.headers['x-admin-secret'] === process.env.ADMIN_SYSTEM_SECRET
     ) {
       req.user = {
@@ -49,7 +50,8 @@ const protect = async (req, res, next) => {
       } else if (userType === 'teacher') {
         UserModel = require('../models/Teacher');
       } else if (userType === 'registration') {
-        UserModel = require('../models/Registration');
+        // Legacy 'registration' tokens now resolve against the merged Student model.
+        UserModel = require('../models/Student');
       }
 
       // Attach user to request (excluding password)
@@ -152,7 +154,8 @@ const optionalAuth = async (req, res, next) => {
       const userType = decoded.userType || 'user';
       if (userType === 'student') UserModel = require('../models/Student');
       else if (userType === 'teacher') UserModel = require('../models/Teacher');
-      else if (userType === 'registration') UserModel = require('../models/Registration');
+      // Legacy 'registration' tokens now resolve against the merged Student model.
+      else if (userType === 'registration') UserModel = require('../models/Student');
 
       req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName').select('-password');
 
@@ -179,19 +182,22 @@ const optionalAuth = async (req, res, next) => {
  * logged-in users.
  */
 const protectOrBypass = (req, res, next) => {
-  const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
-  if (
-    req.headers['x-admin-bypass'] === 'true' &&
-    adminSecret &&
-    req.headers['x-admin-secret'] === adminSecret
-  ) {
-    req.user = {
-      role: 'admin',
-      roles: ['admin'],
-      _id: new mongoose.Types.ObjectId(),
-      id: 'admin-bypass'
-    };
-    return next();
+  // ADMIN BYPASS - DEV ONLY (disabled in production)
+  if (process.env.NODE_ENV !== 'production') {
+    const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
+    if (
+      req.headers['x-admin-bypass'] === 'true' &&
+      adminSecret &&
+      req.headers['x-admin-secret'] === adminSecret
+    ) {
+      req.user = {
+        role: 'admin',
+        roles: ['admin'],
+        _id: new mongoose.Types.ObjectId(),
+        id: 'admin-bypass'
+      };
+      return next();
+    }
   }
   return protect(req, res, next);
 };

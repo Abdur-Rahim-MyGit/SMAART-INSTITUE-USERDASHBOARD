@@ -137,6 +137,38 @@ const assessmentSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  /**
+   * MCQ behaviour. Grouped so admin settings stay together and every default
+   * is backwards-compatible with the existing Likert assessments, which must
+   * keep working untouched.
+   */
+  mcqConfig: {
+    // Falls back to a question's own `points` when that is set.
+    marksPerQuestion: { type: Number, default: 1 },
+
+    // Applied ONLY to wrong answers, never to blanks — penalising a blank
+    // punishes honesty and pushes candidates to guess.
+    negativeMarksPerWrong: { type: Number, default: 0 },
+
+    // Absolute marks needed to pass. Complements the percentage passingScore.
+    passingMarks: { type: Number, default: 0 },
+
+    // Off by default: it breaks any question whose options read
+    // "All of the above" or "Both A and B".
+    randomizeOptions: { type: Boolean, default: false },
+
+    // When false the Previous control is HIDDEN rather than disabled —
+    // a dead button invites clicking.
+    allowBackNavigation: { type: Boolean, default: true },
+
+    allowMarkForReview: { type: Boolean, default: true },
+
+    // Switches correctAnswer handling to set comparison.
+    multipleCorrect: { type: Boolean, default: false },
+
+    // When false, results wait for an explicit release.
+    releaseScoresImmediately: { type: Boolean, default: true }
+  },
   // Tags and categories
   tags: [{
     type: String,

@@ -26,7 +26,8 @@ import { getBackendUrl } from '@/services/api';
 const ProctoringDashboard = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [activeTab, setActiveTab] = useState('held');
+  const [statusFilter, setStatusFilter] = useState('locked'); // Default to showing locked/held sessions
   const [searchTerm, setSearchTerm] = useState('');
   
   // Selected session for detailed view
@@ -36,6 +37,10 @@ const ProctoringDashboard = () => {
   
   // Lightbox modal state
   const [activeImage, setActiveImage] = useState(null);
+
+  // Review states
+  const [reviewNote, setReviewNote] = useState('');
+  const [submittingDecision, setSubmittingDecision] = useState(false);
 
   const fetchSessions = async () => {
     setLoading(true);
@@ -61,6 +66,7 @@ const ProctoringDashboard = () => {
   const loadSessionDetails = async (id) => {
     setDetailsLoading(true);
     setSelectedSessionId(id);
+    setReviewNote('');
     try {
       const res = await proctoringApi.getSessionDetails(id);
       if (res && res.success) {
@@ -72,6 +78,27 @@ const ProctoringDashboard = () => {
       setSelectedSessionId(null);
     } finally {
       setDetailsLoading(false);
+    }
+  };
+
+  const handleReviewDecision = async (decision) => {
+    if (!sessionDetails?.session?._id) return;
+    setSubmittingDecision(true);
+    try {
+      const res = await proctoringApi.unlockSession(sessionDetails.session._id, decision, reviewNote);
+      if (res && res.success) {
+        toast.success(`Session successfully resolved: ${decision}`);
+        // Reload details and list
+        await loadSessionDetails(sessionDetails.session._id);
+        fetchSessions();
+      } else {
+        toast.error(res.error || 'Failed to submit review decision');
+      }
+    } catch (err) {
+      console.error('Failed to submit review decision:', err);
+      toast.error('Failed to submit review decision');
+    } finally {
+      setSubmittingDecision(false);
     }
   };
 
@@ -99,6 +126,12 @@ const ProctoringDashboard = () => {
         return (
           <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
             <XCircle size={12} /> Terminated
+          </span>
+        );
+      case 'locked':
+        return (
+          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30">
+            <ShieldAlert size={12} /> Held / Locked
           </span>
         );
       default:
@@ -191,6 +224,36 @@ const ProctoringDashboard = () => {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-slate-150 dark:border-white/5 mb-6">
+          <button
+            onClick={() => {
+              setActiveTab('held');
+              setStatusFilter('locked');
+            }}
+            className={`px-5 py-3 text-xs font-black tracking-wider uppercase border-b-2 transition-all ${
+              activeTab === 'held'
+                ? 'border-[#1a3884] dark:border-cyan-400 text-[#1a3884] dark:text-cyan-400'
+                : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350'
+            }`}
+          >
+            Held / Pending Review
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('all');
+              setStatusFilter('');
+            }}
+            className={`px-5 py-3 text-xs font-black tracking-wider uppercase border-b-2 transition-all ${
+              activeTab === 'all'
+                ? 'border-[#1a3884] dark:border-cyan-400 text-[#1a3884] dark:text-cyan-400'
+                : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350'
+            }`}
+          >
+            All Sessions
+          </button>
+        </div>
+
         {/* Filters and List */}
         <div className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-150 dark:border-white/5 shadow-[0_15px_50px_-15px_rgba(0,0,0,0.04)] overflow-hidden">
           
@@ -212,12 +275,14 @@ const ProctoringDashboard = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#00152E] text-xs font-bold text-[#112b6b] dark:text-white focus:outline-none"
+                disabled={activeTab === 'held'}
+                className="px-3 py-2 border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#00152E] text-xs font-bold text-[#112b6b] dark:text-white focus:outline-none disabled:opacity-50"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
                 <option value="completed">Completed / Passed</option>
                 <option value="flagged">Flagged</option>
+                <option value="locked">Held / Locked</option>
                 <option value="terminated">Terminated</option>
               </select>
             </div>
@@ -367,6 +432,78 @@ const ProctoringDashboard = () => {
                         Score calculated dynamically based on severity weightings of infractions.
                       </p>
                     </div>
+
+                    {/* Action Section */}
+                    {sessionDetails.session?.status === 'locked' ? (
+                      <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-2xl space-y-4 shadow-sm">
+                        <div>
+                          <h4 className="text-xs font-extrabold text-[#112b6b] dark:text-amber-305 uppercase tracking-widest flex items-center gap-1.5">
+                            <ShieldAlert size={14} className="text-amber-600 dark:text-amber-450" />
+                            Review Action Required
+                          </h4>
+                          <p className="text-[11px] text-slate-650 dark:text-slate-400 mt-1.5 font-medium bg-[#112b6b]/5 dark:bg-white/5 p-2.5 rounded-xl">
+                            <strong>Reason:</strong> {sessionDetails.session?.lockReason || 'Held for review'}
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reviewer Note / Decision Reason</label>
+                          <textarea
+                            placeholder="Explain the reasoning for this decision. This note will be recorded in the student's notification..."
+                            value={reviewNote}
+                            onChange={(e) => setReviewNote(e.target.value)}
+                            className="w-full p-2.5 border border-slate-200 dark:border-white/10 rounded-xl bg-white dark:bg-[#00152E] text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#1a3884] dark:focus:ring-cyan-400 transition-all placeholder:text-slate-400 min-h-[75px] resize-none"
+                          />
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <button
+                            onClick={() => handleReviewDecision('released')}
+                            disabled={submittingDecision}
+                            className="flex-1 min-w-[120px] px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1 shadow-sm disabled:opacity-60"
+                          >
+                            <CheckCircle2 size={13} /> Release Score
+                          </button>
+                          <button
+                            onClick={() => handleReviewDecision('retake')}
+                            disabled={submittingDecision}
+                            className="flex-1 min-w-[120px] px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1 shadow-sm disabled:opacity-60"
+                          >
+                            <RefreshCw size={13} /> Allow Retake
+                          </button>
+                          <button
+                            onClick={() => handleReviewDecision('invalidated')}
+                            disabled={submittingDecision}
+                            className="flex-1 min-w-[120px] px-3 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1 shadow-sm disabled:opacity-60"
+                          >
+                            <XCircle size={13} /> Invalidate
+                          </button>
+                        </div>
+                      </div>
+                    ) : sessionDetails.session?.decision?.state ? (
+                      <div className="p-4 bg-slate-50 dark:bg-[#002147]/30 border border-slate-150 dark:border-white/5 rounded-2xl space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Review Outcome</span>
+                          <span className={`inline-flex px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider ${
+                            sessionDetails.session?.decision?.state === 'released'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900/30'
+                              : sessionDetails.session?.decision?.state === 'retake'
+                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-450 border border-blue-100 dark:border-blue-900/30'
+                              : 'bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-450 border border-rose-100 dark:border-rose-900/30'
+                          }`}>
+                            {sessionDetails.session?.decision?.state}
+                          </span>
+                        </div>
+                        {sessionDetails.session?.decision?.note && (
+                          <div className="text-xs text-slate-650 dark:text-slate-350 font-medium bg-white dark:bg-[#00152E] p-3 rounded-xl border border-slate-150 dark:border-white/5 italic">
+                            "{sessionDetails.session?.decision?.note}"
+                          </div>
+                        )}
+                        <div className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold flex justify-between">
+                          <span>Resolved at: {new Date(sessionDetails.session?.decision?.decidedAt).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ) : null}
 
                     {/* Environment check details */}
                     <div>

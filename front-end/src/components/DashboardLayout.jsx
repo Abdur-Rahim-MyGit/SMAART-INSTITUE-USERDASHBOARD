@@ -424,8 +424,8 @@ const DashboardLayout = () => {
   }, [location.pathname]);
 
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
-  const isFullScreenPage = isCareerAgentDashboard;
   const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
+  const isFullScreenPage = isCareerAgentDashboard || location.pathname === '/dashboard/assessments/baseline' || isImmersiveRoute;
 
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
@@ -546,7 +546,8 @@ const DashboardLayout = () => {
     { code: 'ml', name: 'Malayalam', native: 'മലയാളം', shortLabel: 'ML' },
     { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', shortLabel: 'PA' },
     { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
-    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
+    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' },
+    { code: 'ar', name: 'Arabic', native: 'العربية', shortLabel: 'AR' }
   ];
   const activeLanguageCode = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const activeLanguage = languageOptions.find((lang) => lang.code === activeLanguageCode) || languageOptions[0];

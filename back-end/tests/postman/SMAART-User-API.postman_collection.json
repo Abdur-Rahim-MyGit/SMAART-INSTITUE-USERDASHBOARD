@@ -1,0 +1,138 @@
+{
+  "info": {
+    "name": "SMAART User Dashboard API",
+    "description": "Smoke and security tests for the SMAART User Dashboard back-end (port 5000). Run with newman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check returns 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('GET /api/health responds with status 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "Protected route without token returns 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('GET /api/users/settings without a token responds with status 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/users/settings",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "users", "settings"]
+        }
+      }
+    },
+    {
+      "name": "Login with wrong credentials fails cleanly (no 500, no stack trace)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Wrong credentials return 400/401/403/429 (not 500)', function () {",
+              "    pm.expect([400, 401, 403, 429]).to.include(pm.response.code);",
+              "});",
+              "",
+              "pm.test('Response does not leak a stack trace', function () {",
+              "    pm.expect(pm.response.text()).to.not.include('at Object.');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"nobody@example.com\",\"password\":\"wrong-password\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login rejects NoSQL injection payload",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('NoSQL injection payload is rejected (status is not 200)', function () {",
+              "    pm.expect(pm.response.code).to.not.eql(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":{\"$gt\":\"\"},\"password\":{\"$gt\":\"\"}}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    }
+  ]
+}

@@ -175,13 +175,19 @@ const ComprehensiveSignup = () => {
             // Pre-populate Higher Education
             let initialHigherEdArray = [];
             if (regData.higherEducation && Array.isArray(regData.higherEducation) && regData.higherEducation.length > 0) {
-              initialHigherEdArray = [...regData.higherEducation];
+              initialHigherEdArray = regData.higherEducation.map(item => ({
+                ...item,
+                specialization: Array.isArray(item.specialization) ? (item.specialization[0] || "") : (item.specialization || "")
+              }));
             }
 
             const dbLevel = studentDept.level || studentAcademic.degreeLevel || studentDegree.level || "";
             const dbDomain = studentDept.domain || studentAcademic.domain || studentDegree.domain || "";
             const dbFullName = studentDept.fullName || studentDept.abbreviation || studentAcademic.degreeGroup || studentDegree.fullName || studentDegree.abbreviation || "";
-            const dbSpecialization = studentDept.specialization || studentAcademic.specialisation || studentDegree.specialization || "";
+            let dbSpecialization = studentDept.specialization || studentAcademic.specialisation || studentDegree.specialization || "";
+            if (Array.isArray(dbSpecialization)) {
+              dbSpecialization = dbSpecialization[0] || "";
+            }
 
             if (initialHigherEdArray.length === 0) {
               initialHigherEdArray.push({
@@ -200,7 +206,8 @@ const ComprehensiveSignup = () => {
                 qualificationLevel: dbLevel || initialHigherEdArray[0].qualificationLevel || "",
                 degree: dbDomain || initialHigherEdArray[0].degree || "",
                 degreeFullName: dbFullName || initialHigherEdArray[0].degreeFullName || "",
-                specialization: dbSpecialization || initialHigherEdArray[0].specialization || ""
+                specialization: dbSpecialization || initialHigherEdArray[0].specialization || "",
+                degreeStatus: "pursuing"
               };
             }
 
@@ -320,7 +327,7 @@ const ComprehensiveSignup = () => {
   const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "India", district: "", pincode: "" }, cgpa: "", batch: "" });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", board: "", yearOfPassing: "", percentage: "" });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", board: "", yearOfPassing: "", percentage: "" });
-  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "" }]);
+  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "pursuing" }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
   const [jobPreferences, setJobPreferences] = useState({ items: [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation1: "", preferredLocation2: "", preferredLocation3: "", willingToRelocate: "", expectedSalary: "" }] });
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
@@ -381,6 +388,7 @@ const ComprehensiveSignup = () => {
     if (!tenthDetails.percentage) { toast.error(t("comp_signup.toast.tenth_pct_req", "10th Percentage/CGPA is required")); return false; }
     const pct = parseFloat(tenthDetails.percentage);
     if (isNaN(pct) || pct < 0 || pct > 100) { toast.error(t("comp_signup.toast.pct_range", "Percentage/CGPA must be between 0 and 100")); return false; }
+    if (pct > 10 && pct < 30) { toast.error(t("comp_signup.toast.pct_invalid_range", "Please enter a valid Percentage (30-100) or CGPA (0-10).")); return false; }
     return true;
   };
 
@@ -392,6 +400,7 @@ const ComprehensiveSignup = () => {
     if (!twelfthDetails.percentage) { toast.error(t("comp_signup.toast.twelfth_pct_req", "12th Percentage/CGPA is required")); return false; }
     const pct = parseFloat(twelfthDetails.percentage);
     if (isNaN(pct) || pct < 0 || pct > 100) { toast.error(t("comp_signup.toast.pct_range", "Percentage/CGPA must be between 0 and 100")); return false; }
+    if (pct > 10 && pct < 30) { toast.error(t("comp_signup.toast.pct_invalid_range", "Please enter a valid Percentage (30-100) or CGPA (0-10).")); return false; }
     return true;
   };
 
@@ -454,12 +463,14 @@ const ComprehensiveSignup = () => {
     if (!workExperience.isApplicable) return true;
     for (let i = 0; i < workExperience.items.length; i++) {
       const w = workExperience.items[i];
-      if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate || !w.keyResponsibilities?.trim() || !w.significantAccomplishments?.trim()) { toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 })); return false; }
-      if (w.selectedDocs.length === 0) { toast.error(t("comp_signup.toast.exp_doc_req", "Experience {{idx}}: Please select and upload at least one document", { idx: i + 1 })); return false; }
-      for (const docType of w.selectedDocs) {
-        if (!w.documents[docType]) {
-          const label = docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-          toast.error(t("comp_signup.toast.exp_doc_specific", "Experience {{idx}}: Please upload your {{name}}", { idx: i + 1, name: label }));
+      if (w.currentlyWorking) {
+        if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate) {
+          toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 }));
+          return false;
+        }
+      } else {
+        if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate || !w.keyResponsibilities?.trim() || !w.significantAccomplishments?.trim()) {
+          toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 }));
           return false;
         }
       }
@@ -473,7 +484,17 @@ const ComprehensiveSignup = () => {
     if (!projects.isApplicable) return true;
     for (let i = 0; i < projects.items.length; i++) {
       const p = projects.items[i];
-      if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim() || !p.significantAchievements?.trim()) { toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 })); return false; }
+      if (p.currentlyWorking) {
+        if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate) {
+          toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 }));
+          return false;
+        }
+      } else {
+        if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim() || !p.significantAchievements?.trim()) {
+          toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 }));
+          return false;
+        }
+      }
       if (p.projectUrl?.trim()) {
         const url = p.projectUrl.toLowerCase();
         if (!url.includes("github.com") && !url.includes("docs.google.com")) {
@@ -491,7 +512,7 @@ const ComprehensiveSignup = () => {
     if (!certificates.isApplicable) return true;
     for (let i = 0; i < certificates.items.length; i++) {
       const c = certificates.items[i];
-      if (!c.title?.trim() || !c.issuingOrg?.trim() || !c.certificateFile || !c.verificationType) { toast.error(t("comp_signup.toast.cert_req", "Certificate {{idx}}: All fields marked * are required", { idx: i + 1 })); return false; }
+      if (!c.title?.trim() || !c.issuingOrg?.trim() || !c.verificationType) { toast.error(t("comp_signup.toast.cert_req", "Certificate {{idx}}: All fields marked * are required", { idx: i + 1 })); return false; }
       if (c.verificationType === "url" && !c.verificationUrl?.trim()) { toast.error(t("comp_signup.toast.cert_url_req", "Certificate {{idx}}: Verification URL is required when 'URL' is selected", { idx: i + 1 })); return false; }
     }
     return true;
@@ -785,13 +806,13 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Full Name</Label>
                       <div className="relative group">
-                        <Input value={personalDetails.fullName} disabled={preFilledFields.fullName} onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass} />
+                        <Input value={personalDetails.fullName} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
                       </div>
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
                       <div className="relative">
-                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
+                        <Input type="date" value={personalDetails.dob} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <User className="w-4 h-4 text-slate-400" />
                         </div>
@@ -800,7 +821,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Gender *</Label>
                       <div className="relative">
-                        <select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}>
+                        <select value={personalDetails.gender} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass + " opacity-60 cursor-not-allowed"}>
                           <option value="">Select</option>
                           <option value="male">Male</option>
                           <option value="female">Female</option>
@@ -822,7 +843,7 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Mobile Number</Label>
                       <div className="relative">
-                        <Input value={personalDetails.mobileNumber} disabled={preFilledFields.mobileNumber} onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass} />
+                        <Input value={personalDetails.mobileNumber} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <FileText className="w-4 h-4 text-slate-400" />
                         </div>
@@ -844,7 +865,7 @@ const ComprehensiveSignup = () => {
                       <Home className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                       <h3 className="text-lg font-bold tracking-tight">{t("comp_signup.personal.address", "Address")}</h3>
                     </div>
-                    
+
                     {/* Row 1: COUNTRY and STATE/PROVINCE */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-1">
@@ -1055,7 +1076,13 @@ const ComprehensiveSignup = () => {
                       </select>
                     </div>
                     <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.year_of_passing", "Year of Passing *")}</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">{t("comp_signup.tenth.select_year", "Select Year")}</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                    <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.percentage", "Percentage / CGPA *")}</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} className={inputClass} /></div>
+                    <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.percentage", "Percentage / CGPA *")}</Label><Input type="number" min="0" max="100" step="0.01" value={tenthDetails.percentage} onChange={(e) => {
+                      const val = e.target.value;
+                      const parts = val.split('.');
+                      if (parts[0] && parts[0].length > 3) return;
+                      if (parts[1] && parts[1].length > 2) return;
+                      setTenthDetails({ ...tenthDetails, percentage: val });
+                    }} className={inputClass} placeholder="e.g. 95.5 or 9.8" /></div>
                   </div>
                 </motion.div>
               )}
@@ -1082,7 +1109,13 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.specify_group", "Specify your group *")}</Label><Input value={twelfthDetails.customStream || ''} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, customStream: e.target.value })} className={inputClass} placeholder={t("comp_signup.twelfth.specify_group_placeholder", "Enter your group")} /></div>
                     )}
                     <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.year_of_passing", "Year of Passing *")}</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">{t("comp_signup.twelfth.select_year", "Select Year")}</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.percentage", "Percentage / CGPA *")}</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} className={inputClass} /></div>
+                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.percentage", "Percentage / CGPA *")}</Label><Input type="number" min="0" max="100" step="0.01" value={twelfthDetails.percentage} onChange={(e) => {
+                      const val = e.target.value;
+                      const parts = val.split('.');
+                      if (parts[0] && parts[0].length > 3) return;
+                      if (parts[1] && parts[1].length > 2) return;
+                      setTwelfthDetails({ ...twelfthDetails, percentage: val });
+                    }} className={inputClass} placeholder="e.g. 95.5 or 9.8" /></div>
                   </div>
                 </motion.div>
               )}
@@ -1193,23 +1226,25 @@ const ComprehensiveSignup = () => {
                             className={inputClass + (index === 0 ? " opacity-60 cursor-not-allowed" : "")}
                           />
                         </div>
-                        <div>
-                          <Label className={"text-sm text-slate-500 dark:text-slate-400 font-medium " + (item.degreeStatus === 'pursuing' ? "opacity-60" : "")}>
-                            {item.degreeStatus === 'pursuing' ? t("comp_signup.higher.cgpa_pct", "CGPA / Percentage") : t("comp_signup.higher.cgpa_pct_req", "CGPA / Percentage *")}
-                          </Label>
-                          <Input
-                            type="number"
-                            max="100"
-                            value={item.cgpaPercentage || ""}
-                            disabled={item.degreeStatus === 'pursuing'}
-                            onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }}
-                            className={inputClass + (item.degreeStatus === 'pursuing' ? " opacity-60 cursor-not-allowed" : "")}
-                          />
-                        </div>
+                        {item.degreeStatus !== 'pursuing' && (
+                          <div>
+                            <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                              {t("comp_signup.higher.cgpa_pct_req", "CGPA / Percentage *")}
+                            </Label>
+                            <Input
+                              type="number"
+                              max="100"
+                              value={item.cgpaPercentage || ""}
+                              onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }}
+                              className={inputClass}
+                            />
+                          </div>
+                        )}
                         <div>
                           <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.status", "Status *")}</Label>
                           <select
                             value={item.degreeStatus}
+                            disabled={index === 0}
                             onChange={(e) => {
                               const val = e.target.value;
                               const n = [...higherEducation];
@@ -1219,7 +1254,7 @@ const ComprehensiveSignup = () => {
                               }
                               setHigherEducation(n);
                             }}
-                            className={selectClass}
+                            className={selectClass + (index === 0 ? " opacity-60 cursor-not-allowed" : "")}
                           >
                             <option value="">{t("comp_signup.higher.select", "Select")}</option>
                             <option value="pursuing">{t("comp_signup.higher.pursuing", "Pursuing")}</option>
@@ -1336,59 +1371,14 @@ const ComprehensiveSignup = () => {
                         <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.industry", "Industry / Sector *")}</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.industry_placeholder", "e.g. IT, Healthcare")} /></div>
                         <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
                         {!item.currentlyWorking && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
-                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setWorkExperience(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.work.currently_working", "Currently working")}</Label></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.responsibilities", "Key Responsibilities *")}</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.responsibilities_placeholder", "Outline your primary duties and the scope of your work in this role.")} /></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.accomplishments", "Significant Accomplishments *")}</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.accomplishments_placeholder", "Highlight major achievements, contributions, or impacts you made during your tenure.")} /></div>
-                        <div className="md:col-span-2 space-y-4">
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.doc_type_select", "Document Type (Select all that apply) *")}</Label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
-                            {[
-                              { id: "offerLetter", label: t("comp_signup.work.offer_letter", "Offer Letter") },
-                              { id: "appointmentLetter", label: t("comp_signup.work.appointment_letter", "Appointment Letter") },
-                              { id: "appreciationLetter", label: t("comp_signup.work.appreciation_letter", "Appreciation Letter") },
-                              { id: "experienceLetter", label: t("comp_signup.work.experience_letter", "Experience Letter") }
-                            ].map(doc => (
-                              <label key={doc.id} className="flex items-center gap-2 cursor-pointer group">
-                                <input
-                                  type="checkbox"
-                                  checked={item.selectedDocs.includes(doc.id)}
-                                  onChange={(e) => {
-                                    const n = { ...workExperience, items: [...workExperience.items] };
-                                    if (e.target.checked) {
-                                      n.items[index].selectedDocs = [...n.items[index].selectedDocs, doc.id];
-                                    } else {
-                                      n.items[index].selectedDocs = n.items[index].selectedDocs.filter(t => t !== doc.id);
-                                      n.items[index].documents[doc.id] = null;
-                                    }
-                                    setWorkExperience(n);
-                                  }}
-                                  className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]"
-                                />
-                                <span className="text-sm font-medium text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">{doc.label}</span>
-                              </label>
-                            ))}
-                          </div>
-
-                          {item.selectedDocs.length > 0 && (
-                            <div className="grid md:grid-cols-2 gap-6 pt-2">
-                              {item.selectedDocs.map(docId => (
-                                <div key={docId} className="space-y-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/30 dark:bg-white/5 shadow-sm">
-                                  <Label className="text-[#1a3884] dark:text-blue-400 font-semibold">
-                                    {t("comp_signup.work.upload_doc", "Upload {{name}} *", { name: t("comp_signup.work." + docId.replace(/([A-Z])/g, '_$1').toLowerCase()) })}
-                                  </Label>
-                                  <FileUpload
-                                    value={item.documents[docId]}
-                                    onChange={(fid, fdata) => {
-                                      const n = { ...workExperience, items: [...workExperience.items] };
-                                      n.items[index].documents[docId] = fdata?.url || fid;
-                                      setWorkExperience(n);
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; n.items[index].keyResponsibilities = ""; n.items[index].significantAccomplishments = ""; } setWorkExperience(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.work.currently_working", "Currently working")}</Label></div>
+                        {!item.currentlyWorking && (
+                          <>
+                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.responsibilities", "Key Responsibilities *")}</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.responsibilities_placeholder", "Outline your primary duties and the scope of your work in this role.")} /></div>
+                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.accomplishments", "Significant Accomplishments *")}</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.accomplishments_placeholder", "Highlight major achievements, contributions, or impacts you made during your tenure.")} /></div>
+                          </>
+                        )}
+                        
                       </div>
                     </div>
                   )) : <div className="p-10 text-center text-slate-500 dark:text-slate-400">{t("comp_signup.work.no_items", "No experience to add.")}</div>}
@@ -1417,10 +1407,14 @@ const ComprehensiveSignup = () => {
                         <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.team_type", "Team Type *")}</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">{t("comp_signup.projects.select", "Select")}</option><option value="Individual">{t("comp_signup.projects.individual", "Individual")}</option><option value="Team">{t("comp_signup.projects.team", "Team")}</option></select></div>
                         <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
                         {!item.currentlyWorking && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`proj-current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setProjects(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`proj-current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.projects.currently_working", "Currently working on project")}</Label></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.description", "Project Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.description_placeholder", "Describe your role and the technologies used...")} /></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.achievements", "Significant Achievements *")}</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.achievements_placeholder", "Highlight key results, performance wins, or unique contributions...")} /></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.project_url", "Professional Project Link (GitHub / Google Docs Link Only)")}</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_url_placeholder", "e.g. github.com/username/repo or docs.google.com/...")} /></div>
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`proj-current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; n.items[index].description = ""; n.items[index].significantAchievements = ""; n.items[index].projectUrl = ""; } setProjects(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`proj-current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.projects.currently_working", "Currently working on project")}</Label></div>
+                        {!item.currentlyWorking && (
+                          <>
+                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.description", "Project Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.description_placeholder", "Describe your role and the technologies used...")} /></div>
+                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.achievements", "Significant Achievements *")}</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.achievements_placeholder", "Highlight key results, performance wins, or unique contributions...")} /></div>
+                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.project_url", "Professional Project Link (GitHub / Google Docs Link Only)")}</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_url_placeholder", "e.g. github.com/username/repo or docs.google.com/...")} /></div>
+                          </>
+                        )}
                       </div>
                     </div>
                   )) : <div className="p-10 text-center text-slate-500 dark:text-slate-400">{t("comp_signup.projects.no_items", "No projects to add.")}</div>}
@@ -1456,17 +1450,9 @@ const ComprehensiveSignup = () => {
                       )}
                       <h3 className="font-semibold mb-4 text-[#1a3884] dark:text-blue-400">{t("comp_signup.certificates.cert_num", "Certificate #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div className="md:col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/30 dark:bg-white/5">
-                          <div className="grid md:grid-cols-2 gap-6 items-center">
-                            <div>
-                              <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.cert_title", "Certificate Name / Title *")}</Label>
-                              <Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} placeholder={t("comp_signup.certificates.cert_title_placeholder", "e.g. AWS Certified Solutions Architect")} />
-                            </div>
-                            <div>
-                              <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.upload_cert", "Upload Certificate *")}</Label>
-                              <FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} />
-                            </div>
-                          </div>
+                        <div className="md:col-span-2">
+                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.cert_title", "Certificate Name / Title *")}</Label>
+                          <Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} placeholder={t("comp_signup.certificates.cert_title_placeholder", "e.g. AWS Certified Solutions Architect")} />
                         </div>
                         <div>
                           <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.issuing_org", "Issuing Organization *")}</Label>
@@ -1583,6 +1569,7 @@ const ComprehensiveSignup = () => {
                 <button
                   onClick={() => {
                     setShowDashboardWarning(false);
+                    sessionStorage.setItem('bypassRegistrationGuard', 'true');
                     navigate("/dashboard", { replace: true });
                   }}
                   className="w-full h-11 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-white hover:bg-slate-50 dark:bg-transparent dark:hover:bg-white/5 border border-slate-200 dark:border-white/10 transition-all shadow-sm flex items-center justify-center"

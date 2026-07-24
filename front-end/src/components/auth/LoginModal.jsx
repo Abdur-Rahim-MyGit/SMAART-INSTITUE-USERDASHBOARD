@@ -238,7 +238,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
               <div className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email / Student ID</label>
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email</label>
                     <div
                       className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
                       onFocusCapture={(e) => {
@@ -262,7 +262,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                         autoComplete="username"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="your@email.com or Student ID"
+                        placeholder="your@email.com"
                         className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                         required
                       />

@@ -435,7 +435,7 @@ const LeftSidebar = () => {
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider">
-                                    {i18n.language === 'en' ? 'EN' : i18n.language === 'hi' ? 'HI' : i18n.language === 'ta' ? 'TA' : i18n.language === 'ur' ? 'UR' : i18n.language === 'fr' ? 'FR' : i18n.language.toUpperCase()}
+                                    {i18n.language === 'en' ? 'EN' : i18n.language === 'hi' ? 'HI' : i18n.language === 'ta' ? 'TA' : i18n.language === 'ur' ? 'UR' : i18n.language === 'fr' ? 'FR' : i18n.language === 'ar' ? 'AR' : i18n.language.toUpperCase()}
                                   </span>
                                   <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${showLanguages ? 'rotate-180' : ''}`} />
                                 </div>
@@ -458,7 +458,8 @@ const LeftSidebar = () => {
                                       { code: 'ml', name: 'Malayalam (മലയാളം)' },
                                       { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)' },
                                       { code: 'ur', name: 'Urdu (اردو)' },
-                                      { code: 'fr', name: 'French (Français)' }
+                                      { code: 'fr', name: 'French (Français)' },
+                                      { code: 'ar', name: 'Arabic (العربية)' }
                                     ].map((lang) => (
                                       <button
                                         key={lang.code}
