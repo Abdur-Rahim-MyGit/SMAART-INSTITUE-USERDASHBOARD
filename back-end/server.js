@@ -215,7 +215,7 @@ app.use('/api/avatar', require('./routes/avatar'));
 
 // AI Career Coach Routes - Inline to avoid module loading issues
 const aiCareerCoachController = require('./controllers/aiCareerCoachController');
-const { protect: authMiddleware } = require('./middleware/auth');
+const { protect: authMiddleware, authorize } = require('./middleware/auth');
 // Cost guard for paid-LLM endpoints (OpenRouter/Anthropic). Keyed per user/IP.
 const { aiLimiter } = require('./middleware/rateLimiter');
 
@@ -246,7 +246,7 @@ app.get('/api/career-intelligence/latest', authMiddleware, careerIntelligenceCon
 app.get('/api/career-intelligence/excel-data', authMiddleware, careerIntelligenceController.getExcelData);
 app.get('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.getReportById);
 app.delete('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.deleteReport);
-app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelligenceController.refreshExcelCache);
+app.post('/api/career-intelligence/refresh-cache', authMiddleware, authorize('admin'), careerIntelligenceController.refreshExcelCache);
 
 // Career Simulation Engine Routes (isolated, no AI cost)
 const careerSimulationController = require('./controllers/careerSimulationController');

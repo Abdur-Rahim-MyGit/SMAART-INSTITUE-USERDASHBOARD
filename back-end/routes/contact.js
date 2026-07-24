@@ -5,6 +5,17 @@ router.use(generalLimiter);
 
 const nodemailer = require('nodemailer');
 
+// SECURITY (audit MEDIUM): the contact form interpolates user input into HTML
+// email bodies. Escape every user-supplied value to prevent HTML/link injection
+// (phishing content) into the admin notification and the confirmation email.
+const escapeHtml = (v) =>
+  String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 // Create transporter for sending emails
 const createTransporter = () => {
   return nodemailer.createTransport({
@@ -49,6 +60,13 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Escape all user-supplied values before embedding them in HTML email bodies.
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeInstitution = escapeHtml(institution || 'Not provided');
+    const safePhone = escapeHtml(phone || 'Not provided');
+    const safeQuery = escapeHtml(query);
+
     // Create transporter
     const transporter = createTransporter();
 
@@ -61,12 +79,12 @@ router.post('/', async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #002147;">New Contact Form Submission</h2>
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Institution:</strong> ${institution || 'Not provided'}</p>
-            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+            <p><strong>Name:</strong> ${safeName}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Institution:</strong> ${safeInstitution}</p>
+            <p><strong>Phone:</strong> ${safePhone}</p>
             <p><strong>Message:</strong></p>
-            <p style="background: white; padding: 15px; border-radius: 4px;">${query}</p>
+            <p style="background: white; padding: 15px; border-radius: 4px;">${safeQuery}</p>
           </div>
           <p style="color: #666; font-size: 12px; margin-top: 20px;">
             This message was sent from the SMAART Minds website contact form.
@@ -83,11 +101,11 @@ router.post('/', async (req, res) => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #30919D;">Thank you for reaching out!</h2>
-          <p>Dear ${name},</p>
+          <p>Dear ${safeName},</p>
           <p>We have received your message and will get back to you within 24-48 hours.</p>
           <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <p><strong>Your message:</strong></p>
-            <p>${query}</p>
+            <p>${safeQuery}</p>
           </div>
           <p>Best regards,<br/>The SMAART Minds Team</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">

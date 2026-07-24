@@ -58,10 +58,23 @@ const isValidObjectId = (id) => {
   return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
+// SECURITY (audit HIGH): vision boards are per-user. Enforce object ownership on
+// every :id route so an authenticated user cannot read/update/delete another
+// user's board. Admins are exempt.
+const currentUserId = (req) => String(req.user?._id || req.user?.id || "");
+const isAdmin = (req) =>
+  req.user?.role === "admin" ||
+  (Array.isArray(req.user?.roles) && req.user.roles.includes("admin"));
+const canAccessBoard = (board, req) =>
+  isAdmin(req) || String(board.userId) === currentUserId(req);
+
 // Get all vision boards for a user
 router.get("/", async (req, res) => {
   try {
-    const userId = req.query.userId;
+    // SECURITY: never trust a client-supplied userId. Non-admins may only list
+    // their own boards; an admin may optionally scope to a specific userId.
+    const userId =
+      isAdmin(req) && req.query.userId ? req.query.userId : currentUserId(req);
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
@@ -88,6 +101,9 @@ router.get("/:id", async (req, res) => {
     if (!visionBoard) {
       return res.status(404).json({ message: "Vision board not found" });
     }
+    if (!canAccessBoard(visionBoard, req)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
     res.json(visionBoard);
   } catch (error) {
     console.error("Error fetching vision board:", error);
@@ -101,6 +117,9 @@ router.get("/:id/collection", async (req, res) => {
     const visionBoard = await VisionBoard.findById(req.params.id);
     if (!visionBoard) {
       return res.status(404).json({ message: "Vision board not found" });
+    }
+    if (!canAccessBoard(visionBoard, req)) {
+      return res.status(403).json({ message: "Not authorized" });
     }
 
     if (!visionBoard.cloudinaryCollection) {
@@ -139,16 +158,19 @@ router.post(
       const {
         title,
         description,
-        userId,
         templateId,
         templateName,
         boardData,
       } = req.body;
 
+      // SECURITY: derive ownership from the authenticated session, never from
+      // the request body — otherwise a user can create boards under another id.
+      const userId = currentUserId(req);
+
       if (!title || !userId) {
         return res
           .status(400)
-          .json({ message: "Title and userId are required" });
+          .json({ message: "Title is required" });
       }
 
       // Generate unique collection ID for this vision board
@@ -266,6 +288,9 @@ router.put("/:id", memoryUpload.array("images", 10), async (req, res) => {
     if (!existingBoard) {
       return res.status(404).json({ message: "Vision board not found" });
     }
+    if (!canAccessBoard(existingBoard, req)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
 
     // Ensure we have a collection ID
     let collectionId = existingBoard.cloudinaryCollection;
@@ -361,6 +386,9 @@ router.delete("/:id", async (req, res) => {
     if (!visionBoard) {
       return res.status(404).json({ message: "Vision board not found" });
     }
+    if (!canAccessBoard(visionBoard, req)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
 
     // Delete the entire Cloudinary folder if collection exists
     if (visionBoard.cloudinaryCollection) {
@@ -405,6 +433,9 @@ router.post("/:id/consolidate", async (req, res) => {
     const visionBoard = await VisionBoard.findById(req.params.id);
     if (!visionBoard) {
       return res.status(404).json({ message: "Vision board not found" });
+    }
+    if (!canAccessBoard(visionBoard, req)) {
+      return res.status(403).json({ message: "Not authorized" });
     }
 
     // Generate new collection ID if doesn't exist
