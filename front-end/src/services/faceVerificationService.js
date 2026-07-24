@@ -202,7 +202,6 @@ export const detectFaces = async (input, withDescriptors = true) => {
     return { faceCount: 0, faces: [], isFacePresent: false, error: 'Models not loaded' };
   }
 
-  const t0 = performance.now();
   try {
     let raw;
     if (withDescriptors) {
@@ -263,8 +262,7 @@ export const registerFace = async (videoEl, options = {}) => {
     frameCount = REGISTRATION_FRAMES,
     intervalMs = REGISTRATION_INTERVAL_MS,
     onFrameCaptured,
-    onError,
-    onQualityIssue,
+    onError
   } = options;
 
   if (!isReady()) throw new Error('Models not loaded. Call loadModels() first.');
@@ -437,7 +435,6 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
     console.error('[FaceVerification] verifyFace error:', err);
     return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: err?.message };
   }
-};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────────
 /** Element-wise average of a set of 128-d descriptors → one Float32Array. */
@@ -467,3 +464,8 @@ const captureAlignedCrop = (videoEl, box) => {
     return null;
   }
 };
+
+/**
+ * Get the match threshold used for verification.
+ */
+export const getMatchThreshold = () => MATCH_THRESHOLD;

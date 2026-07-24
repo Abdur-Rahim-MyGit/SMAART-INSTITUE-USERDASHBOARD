@@ -17,6 +17,36 @@ const { createDefaultUserSettings, userSettingsSchema } = require('./schemas/use
 // (back-end/models/Student.js).
 // ---------------------------------------------------------------------------
 
+const batchSubSchema = new mongoose.Schema({
+  batch: { 
+    type: String
+  },
+  startYear: String,
+  endYear: String,
+  validityDuration: { 
+    type: String, 
+    default: '1' 
+  },
+  subscriptionPlan: {
+    plan: {
+      type: String,
+      enum: ['Smaart Core', 'Smaart Standard', 'Smaart Complete'],
+      default: 'Smaart Core'
+    },
+    addons: {
+      aiq: { type: Boolean, default: true },
+      piq: { type: Boolean, default: false },
+      sq: { type: Boolean, default: false },
+      britishCouncil: { type: Boolean, default: false }
+    }
+  },
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive'],
+    default: 'Active'
+  }
+}, { _id: false });
+
 const departmentSubSchema = new mongoose.Schema({
   degreeId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -52,7 +82,15 @@ const departmentSubSchema = new mongoose.Schema({
     default: 'N/A'
   },
   batch: {
-    type: String
+    type: batchSubSchema,
+    default: undefined,
+    set: function(v) {
+      if (typeof v === 'string') {
+        if (v.trim() === '') return undefined;
+        return { batch: v };
+      }
+      return v;
+    }
   }
 }, { _id: false });
 
@@ -507,6 +545,9 @@ const studentSchema = new mongoose.Schema({
 studentSchema.pre('init', function (obj) {
   if (obj && typeof obj.department === 'string') {
     delete obj.department;
+  }
+  if (obj && obj.department && typeof obj.department.batch === 'string') {
+    obj.department.batch = { batch: obj.department.batch };
   }
 });
 

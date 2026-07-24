@@ -3,7 +3,7 @@ echo Testing OpenRouter API...
 echo.
 
 curl -X POST "https://openrouter.ai/api/v1/chat/completions" ^
-  -H "Authorization: Bearer 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" ^
+  -H "Authorization: Bearer %OPENROUTER_API_KEY%" ^
   -H "Content-Type: application/json" ^
   -H "HTTP-Referer: https://smaartminds.com" ^
   -H "X-Title: SMAART Test" ^

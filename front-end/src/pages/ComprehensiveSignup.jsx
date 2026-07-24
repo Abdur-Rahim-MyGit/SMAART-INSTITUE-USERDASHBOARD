@@ -175,13 +175,19 @@ const ComprehensiveSignup = () => {
             // Pre-populate Higher Education
             let initialHigherEdArray = [];
             if (regData.higherEducation && Array.isArray(regData.higherEducation) && regData.higherEducation.length > 0) {
-              initialHigherEdArray = [...regData.higherEducation];
+              initialHigherEdArray = regData.higherEducation.map(item => ({
+                ...item,
+                specialization: Array.isArray(item.specialization) ? (item.specialization[0] || "") : (item.specialization || "")
+              }));
             }
 
             const dbLevel = studentDept.level || studentAcademic.degreeLevel || studentDegree.level || "";
             const dbDomain = studentDept.domain || studentAcademic.domain || studentDegree.domain || "";
             const dbFullName = studentDept.fullName || studentDept.abbreviation || studentAcademic.degreeGroup || studentDegree.fullName || studentDegree.abbreviation || "";
-            const dbSpecialization = studentDept.specialization || studentAcademic.specialisation || studentDegree.specialization || "";
+            let dbSpecialization = studentDept.specialization || studentAcademic.specialisation || studentDegree.specialization || "";
+            if (Array.isArray(dbSpecialization)) {
+              dbSpecialization = dbSpecialization[0] || "";
+            }
 
             if (initialHigherEdArray.length === 0) {
               initialHigherEdArray.push({
@@ -200,7 +206,8 @@ const ComprehensiveSignup = () => {
                 qualificationLevel: dbLevel || initialHigherEdArray[0].qualificationLevel || "",
                 degree: dbDomain || initialHigherEdArray[0].degree || "",
                 degreeFullName: dbFullName || initialHigherEdArray[0].degreeFullName || "",
-                specialization: dbSpecialization || initialHigherEdArray[0].specialization || ""
+                specialization: dbSpecialization || initialHigherEdArray[0].specialization || "",
+                degreeStatus: "pursuing"
               };
             }
 
@@ -320,7 +327,7 @@ const ComprehensiveSignup = () => {
   const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "India", district: "", pincode: "" }, cgpa: "", batch: "" });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", board: "", yearOfPassing: "", percentage: "" });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", board: "", yearOfPassing: "", percentage: "" });
-  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "" }]);
+  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "pursuing" }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
   const [jobPreferences, setJobPreferences] = useState({ items: [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation1: "", preferredLocation2: "", preferredLocation3: "", willingToRelocate: "", expectedSalary: "" }] });
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
@@ -1237,6 +1244,7 @@ const ComprehensiveSignup = () => {
                           <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.status", "Status *")}</Label>
                           <select
                             value={item.degreeStatus}
+                            disabled={index === 0}
                             onChange={(e) => {
                               const val = e.target.value;
                               const n = [...higherEducation];
@@ -1246,7 +1254,7 @@ const ComprehensiveSignup = () => {
                               }
                               setHigherEducation(n);
                             }}
-                            className={selectClass}
+                            className={selectClass + (index === 0 ? " opacity-60 cursor-not-allowed" : "")}
                           >
                             <option value="">{t("comp_signup.higher.select", "Select")}</option>
                             <option value="pursuing">{t("comp_signup.higher.pursuing", "Pursuing")}</option>
