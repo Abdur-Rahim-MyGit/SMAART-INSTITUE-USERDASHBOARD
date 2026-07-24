@@ -263,7 +263,7 @@ const BaseLineTest = () => {
   const selectedValue = selectedAnswers[currentQuestionId] || null;
   const activeUserId = user?.id || user?._id || "anonymous";
   const { startTimeKey: timerStartStorageKey, warningShownKey: timerWarningStorageKey } =
-    buildAssessmentTimerStorageKeys(stageKey, activeUserId);
+    buildAssessmentTimerStorageKeys(stageKey, activeUserId, resultId);
 
   // Calculate progress based on answered questions
   const answeredCount = Object.keys(selectedAnswers).length;
@@ -727,6 +727,31 @@ const BaseLineTest = () => {
 
     oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
 
+    // Initialise the authoritative start timestamp exactly once. Without this,
+    // timerStartRef stays null and `Date.now() - null` reads as ~1.7 billion
+    // seconds elapsed, so the timer reports "time's up" the instant it starts.
+    //
+    // On a genuine mid-exam refresh a valid start is still in storage and within
+    // the exam window, so we resume that clock (a refresh can't reset the timer).
+    // Anything missing, malformed, in the future, or already past the full
+    // duration is treated as a fresh start.
+    if (timerStartRef.current === null) {
+      const stored = Number(localStorage.getItem(timerStartStorageKey));
+      const now = Date.now();
+      const isResumable =
+        Number.isFinite(stored) &&
+        stored > 0 &&
+        stored <= now &&
+        (now - stored) < stageDurationSeconds * 1000;
+
+      timerStartRef.current = isResumable ? stored : now;
+      localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+
+      // Reflect immediately so the display doesn't wait a full second.
+      const elapsed = Math.floor((now - timerStartRef.current) / 1000);
+      setRemainingSeconds(Math.max(stageDurationSeconds - elapsed, 0));
+    }
+
     const timer = setInterval(() => {
       setRemainingSeconds((prev) => {
         const next = Math.max(prev - 1, 0);
@@ -811,6 +836,7 @@ const BaseLineTest = () => {
     failAttentionCheck,
     verificationStatus,
     similarityScore,
+    isCameraWarmingUp,
     // Escalation ladder
     tier,
     nudgeMessage,
@@ -1735,6 +1761,7 @@ const BaseLineTest = () => {
           onRequestFullscreen={requestFullscreen}
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
+          isCameraWarmingUp={isCameraWarmingUp}
         />
       )}
 

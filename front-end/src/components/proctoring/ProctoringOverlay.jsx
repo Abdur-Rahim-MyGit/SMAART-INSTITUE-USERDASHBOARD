@@ -53,6 +53,15 @@ const STATUS_CONFIG = {
     dotColor: 'bg-slate-400',
     textColor: 'text-slate-400',
     icon: RiCameraOffLine
+  },
+  // Transient state while the camera stream and face-api models are initialising.
+  // Never penalised — shown instead of "No Face" during the first few seconds.
+  warming_up: {
+    label: 'Starting',
+    fullLabel: 'Initializing…',
+    dotColor: 'bg-slate-400 animate-pulse',
+    textColor: 'text-slate-400',
+    icon: RiCameraOffLine
   }
 };
 
@@ -68,7 +77,8 @@ export const ProctoringOverlay = ({
   onRequestFullscreen,
   // NEW props
   verificationStatus = 'no_face',
-  similarityScore = 0
+  similarityScore = 0,
+  isCameraWarmingUp = false
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const videoRef = useRef(null);

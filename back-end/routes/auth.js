@@ -536,6 +536,15 @@ router.post('/login',
       // students collection, so self-registered users resolve via the Student
       // branch above.)
 
+      // ── STUDENT-ONLY PORTAL ───────────────────────────────────────────────
+      // This is the student-facing user dashboard. Teachers, admins, moderators
+      // and all other roles must use the admin panel instead. We reject non-students
+      // with a generic "User not found" so role names are not leaked to callers.
+      if (user && userType !== 'student') {
+        console.warn(`[Auth/Login] Non-student login attempt blocked: ${identifier} (type: ${userType})`);
+        return res.status(400).json({ error: 'User not found.' });
+      }
+
       console.log('User found after cross-checking:', {
         id: user?._id,
         email: user?.email,
@@ -948,6 +957,16 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // === SECURITY: SINGLE SESSION ENFORCEMENT ===
     // Fetch fresh user record to check currentSessionId
     let userModelName = 'User';
+    // ── STUDENT-ONLY PORTAL (secondary guard) ────────────────────────────────
+    // Reject any OTP that was issued for a non-student account.
+    // Primary enforcement is in the /login handler; this is defense-in-depth
+    // for any stale OTP records created before the restriction was applied.
+    if (user.userType && user.userType !== 'student' && user.userType !== 'registration') {
+      await LoginOtp.deleteOne({ _id: loginOtp._id });
+      console.warn(`[Auth/OTP] Non-student OTP attempt blocked: ${loginOtp.email} (type: ${user.userType})`);
+      return res.status(400).json({ error: 'User not found.' });
+    }
+
     if (user.userType === 'student') userModelName = 'Student';
     else if (user.userType === 'teacher') userModelName = 'Teacher';
     // Legacy 'registration' tokens now resolve against the merged Student model.

@@ -63,6 +63,14 @@ export const proctoringApi = {
     return apiCall(`/proctoring/admin/session/${sessionId}`);
   },
 
+  // Admin: Unlock / review a session (decision can be 'released', 'invalidated', or 'retake')
+  unlockSession: async (sessionId, decision, note) => {
+    return apiCall('/proctoring/webhook/unlock', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, decision, note })
+    });
+  },
+
   // v2: Persist ArcFace registration embedding to the session record
   // embedding: Float32Array | number[]
   saveRegistration: async (sessionId, registrationData) => {
