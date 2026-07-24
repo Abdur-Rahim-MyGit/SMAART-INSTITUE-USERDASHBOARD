@@ -6,7 +6,7 @@ const College = require('./models/College');
 
 async function listColleges() {
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://souban:souban123@cluster0.bkxwjdl.mongodb.net/?appName=Cluster0';
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
     console.log('Connecting to:', mongoUri.replace(/\/\/.*:.*@/, '//****:****@'));
     
     await mongoose.connect(mongoUri);

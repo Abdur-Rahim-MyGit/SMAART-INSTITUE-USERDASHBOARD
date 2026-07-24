@@ -20,10 +20,15 @@ function getUserIdFromToken(token) {
 function initWebSocket(httpServer) {
   const wss = new WebSocketServer({ noServer: true });
 
+  // In production, only the configured frontend origin may open a credentialed
+  // socket connection. In development, any localhost origin is allowed.
+  const isProduction = process.env.NODE_ENV === 'production';
+  const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+
   io = new SocketIOServer(httpServer, {
     path: '/socket.io',
     cors: {
-      origin: true,
+      origin: isProduction ? (allowedOrigins.length ? allowedOrigins : false) : true,
       credentials: true,
     },
   });
