@@ -1,9 +1,15 @@
 const ASSESSMENT_TIMER_PREFIX = "assessment_timer__";
 
-export const buildAssessmentTimerStorageKeys = (stageKey, userId = "anonymous") => {
+export const buildAssessmentTimerStorageKeys = (stageKey, userId = "anonymous", resultId = "") => {
   const normalizedStage = String(stageKey || "T1").toUpperCase();
   const normalizedUser = String(userId || "anonymous");
-  const baseKey = `${ASSESSMENT_TIMER_PREFIX}${normalizedStage}__${normalizedUser}`;
+  // Scope the clock to the specific attempt. A genuine mid-exam refresh keeps
+  // the same resultId and so resumes the same clock (anti-cheat), while a fresh
+  // attempt gets a new resultId and therefore a clean, full-duration timer —
+  // instead of inheriting a previous attempt's already-elapsed clock.
+  const normalizedResult = String(resultId || "");
+  const attemptSuffix = normalizedResult ? `__${normalizedResult}` : "";
+  const baseKey = `${ASSESSMENT_TIMER_PREFIX}${normalizedStage}__${normalizedUser}${attemptSuffix}`;
 
   return {
     startTimeKey: `${baseKey}__startTime`,

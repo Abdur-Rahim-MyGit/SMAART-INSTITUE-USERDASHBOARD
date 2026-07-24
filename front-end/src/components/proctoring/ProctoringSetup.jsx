@@ -916,7 +916,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         {/* Footer controls */}
         <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3">
           {/* Skip face registration — dev/testing convenience only */}
-          {step === 3 && registrationState !== 'registered' && (
+          {import.meta.env.DEV && step === 3 && registrationState !== 'registered' && (
             <button
               onClick={() => setStep(4)}
               className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 underline underline-offset-2 transition-colors"

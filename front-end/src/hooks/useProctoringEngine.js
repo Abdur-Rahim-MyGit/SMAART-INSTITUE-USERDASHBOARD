@@ -39,8 +39,21 @@ const FACE_CHECK_INTERVAL = 1000; // 1 second
 // sensible count if a response is ever missing.
 const MAX_WARNINGS = 3;
 
-// Liveness ping. Must stay well under the server's HEARTBEAT_GAP_MS (30s).
+// Liveness pings & face scan delay settings
 const HEARTBEAT_INTERVAL = 10 * 1000;
+const INTERVAL_DEFAULT_MS = 1000;      // 1.0 second default check
+const INTERVAL_STABLE_MS = 5000;       // 5.0 seconds if state is stable
+const INTERVAL_INFRACTION_MS = 1000;   // 1.0 second check if actively in infraction
+
+// How long after engine activation before focus/blur/visibility violations are
+// allowed to fire. Prevents normal browser focus shifts at page-load from
+// being recorded as the candidate's first infraction.
+const STARTUP_GRACE_MS = 6000;
+
+// How long after the camera starts before face-absent is reported. Gives the
+// face-api models time to load and the video stream time to stabilize.
+const CAMERA_WARMUP_MS = 5000;
+
 
 // Escalation thresholds and copy now live in the ladder module, which is pure
 // and unit-tested. See services/proctoringLadder.js.
@@ -91,6 +104,10 @@ export const useProctoringEngine = ({
   // Inactivity Overlay State
   const [showInactivityOverlay, setShowInactivityOverlay] = useState(false);
 
+  // True while the camera/models are still warming up — suppresses the
+  // "No Face Detected" label during the first few seconds.
+  const [isCameraWarmingUp, setIsCameraWarmingUp] = useState(false);
+
   const navigate = useNavigate();
 
   const videoRef = useRef(null);
@@ -99,6 +116,9 @@ export const useProctoringEngine = ({
   const hasLockedOutRef = useRef(false);
   const warningsCountRef = useRef(0);
   const inactivityTimerRef = useRef(null);
+  // True for the first STARTUP_GRACE_MS after activation — blocks blur/focus
+  // violations that are caused by normal page-load browser behaviour.
+  const startupGraceActiveRef = useRef(false);
   
   // Timeout reference for adaptive checking
   const faceTimeoutRef = useRef(null);
@@ -164,6 +184,22 @@ export const useProctoringEngine = ({
       video.playsInline = true;
       video.muted = true;
       videoRef.current = video;
+
+      // Attach OFF-SCREEN (not display:none, which pauses decoding). A fully
+      // detached <video> can stop advancing frames, so face-api draws a blank
+      // frame and reports "No Face". Keeping it in the DOM but invisible makes
+      // the browser keep decoding, which is what the detector needs.
+      video.setAttribute('aria-hidden', 'true');
+      Object.assign(video.style, {
+        position: 'fixed',
+        top: '-9999px',
+        left: '-9999px',
+        width: '2px',
+        height: '2px',
+        opacity: '0',
+        pointerEvents: 'none',
+      });
+      if (!video.isConnected) document.body.appendChild(video);
       
       // Wait for metadata to load
       await new Promise((resolve) => {
@@ -178,6 +214,13 @@ export const useProctoringEngine = ({
       setIsCameraActive(true);
       setCameraError(null);
       console.log('[ProctoringEngine] ✅ Camera stream acquired.');
+
+      // Start the camera warmup window — the UI will show a neutral "initializing"
+      // state instead of "No Face Detected" while models load and the stream stabilizes.
+      setIsCameraWarmingUp(true);
+      setTimeout(() => {
+        setIsCameraWarmingUp(false);
+      }, CAMERA_WARMUP_MS);
 
       // Ensure ONNX models are loaded
       if (!isReady()) {
@@ -213,9 +256,11 @@ export const useProctoringEngine = ({
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
-    // Null out the hidden video element
+    // Null out the hidden video element and detach it from the DOM (we append
+    // it off-screen so the browser keeps decoding frames for detection).
     if (videoRef.current) {
       videoRef.current.srcObject = null;
+      if (videoRef.current.parentNode) videoRef.current.parentNode.removeChild(videoRef.current);
       videoRef.current = null;
     }
     // NOTE: Do NOT call getUserMedia here as a "nuclear fallback" —
@@ -638,12 +683,19 @@ export const useProctoringEngine = ({
   };
 
   const handleVisibilityChange = useCallback(() => {
+    // Skip during the startup grace window — tab-visibility flickers on many
+    // browsers while the page is first painting and should not be penalised.
+    if (startupGraceActiveRef.current) return;
     if (document.hidden) {
       reportViolation('tab_switch', 'Warning: Tab switching is forbidden.');
     }
   }, [reportViolation]);
 
   const handleBlur = useCallback(() => {
+    // Ignore blur events during the startup grace window. The browser commonly
+    // fires blur/focus pairs while establishing fullscreen or when dev-tools
+    // briefly steal focus on page load.
+    if (startupGraceActiveRef.current) return;
     setTimeout(() => {
       if (document.hidden) return;
       reportViolation('minimize', 'Warning: Window focus lost.');
@@ -910,28 +962,44 @@ export const useProctoringEngine = ({
 
     resetInactivityTimerRef.current();
 
+    // ── Startup grace window ───────────────────────────────────────────
+    // Block all focus/blur/visibility violations for the first few seconds.
+    // This prevents normal browser page-load focus shifts from being recorded
+    // as the candidate's very first infraction.
+    startupGraceActiveRef.current = true;
+    const graceTimer = setTimeout(() => {
+      startupGraceActiveRef.current = false;
+    }, STARTUP_GRACE_MS);
+
     // Trigger initial adaptive check
     scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
 
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
     setIsFullScreen(isNowFull);
     if (!isNowFull) {
-      setFullscreenCountdown(15);
-      fullscreenTimerRef.current = setInterval(() => {
-        setFullscreenCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(fullscreenTimerRef.current);
-            if (reportViolationRef.current) {
-              reportViolationRef.current('fullscreen_exit', 'Warning: Fullscreen exit detected.');
+      // Delay the initial fullscreen countdown so it doesn't fire the moment
+      // the engine activates — give the candidate time to settle in.
+      setTimeout(() => {
+        if (hasLockedOutRef.current || !isActiveRef.current) return;
+        setFullscreenCountdown(15);
+        fullscreenTimerRef.current = setInterval(() => {
+          setFullscreenCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(fullscreenTimerRef.current);
+              if (reportViolationRef.current) {
+                reportViolationRef.current('fullscreen_exit', 'Warning: Fullscreen exit detected.');
+              }
+              return 0;
             }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+            return prev - 1;
+          });
+        }, 1000);
+      }, STARTUP_GRACE_MS);
     }
 
     return () => {
+      clearTimeout(graceTimer);
+      startupGraceActiveRef.current = false;
       stopCamera();
       stopAudioMonitoring();
       document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -987,14 +1055,18 @@ export const useProctoringEngine = ({
 
     // Webcam & Face tracking
     isCameraActive,
-    isFaceDetected,
+    // Suppress "not detected" during the camera warm-up window so the UI
+    // does not flash a false "No Face Detected" while models are still loading.
+    isFaceDetected: isCameraWarmingUp ? true : isFaceDetected,
     faceCount,
     cameraError,
+    isCameraWarmingUp,
     videoElement: videoRef.current,
     stream: streamRef.current,
 
     // Face Verification
-    verificationStatus,
+    // Return 'warming_up' during warm-up so the overlay can show a neutral state.
+    verificationStatus: isCameraWarmingUp ? 'warming_up' : verificationStatus,
     similarityScore,
 
     // Eye Gaze (NEW)

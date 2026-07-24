@@ -15,7 +15,10 @@
  */
 
 // onnxruntime-web is loaded globally via index.html <script src="/onnx-wasm/ort.min.js">
-const ort = window.ort;
+// Captured lazily: the runtime assets live in public/onnx-wasm/. If that folder
+// is missing the script 404s and window.ort is undefined — which is exactly the
+// "Model loading failed" state. initPipeline() re-reads it and fails loudly.
+let ort = window.ort;
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MODEL_BASE = '/models/onnx';
@@ -81,11 +84,24 @@ export const initPipeline = async (onProgress) => {
   initError = null;
 
   try {
+    // Re-read in case this module was imported before ort.min.js executed, and
+    // fail with a clear message rather than a cryptic "cannot read 'env' of
+    // undefined" when the runtime asset is missing.
+    ort = window.ort;
+    if (!ort) {
+      throw new Error(
+        'ONNX Runtime is unavailable — /onnx-wasm/ort.min.js failed to load. ' +
+        'Ensure the files exist in front-end/public/onnx-wasm/ and hard-refresh the page (Ctrl+Shift+R).'
+      );
+    }
+
     configureOrtEnv();
     report(5, 'Configuring ONNX Runtime...');
 
+    // 'webgpu' is the modern GPU provider in ORT-Web 1.27 (the old 'webgl'
+    // backend was removed); 'wasm' is the universal fallback.
     const sessionOpts = {
-      executionProviders: ['webgl', 'wasm'],
+      executionProviders: ['webgpu', 'wasm'],
       graphOptimizationLevel: 'all',
       enableCpuMemArena: true,
       enableMemPattern: true,
@@ -277,7 +293,9 @@ const decodeSCRFD = (outputs, origW, origH) => {
 
   // Map of stride → actual output tensor key names (discovered at runtime)
   // Layout: per-stride groups of [score, bbox, kps] in ascending stride order
-  const keys = Object.keys(outputs);
+  // Use scrfdSession.outputNames to preserve the correct model-defined order,
+  // as Object.keys() will sort numeric string output names (like '446', '466') numerically.
+  const keys = scrfdSession?.outputNames || Object.keys(outputs);
 
   for (let si = 0; si < SCRFD_STRIDES.length; si++) {
     const stride = SCRFD_STRIDES[si];
@@ -422,7 +440,7 @@ export const detectAndEmbed = async (videoEl) => {
 
     const arcfaceInputName = arcfaceSession.inputNames[0];
     const arcfaceOutputs = await arcfaceSession.run({ [arcfaceInputName]: arcfaceTensor });
-    const rawEmbedding = arcfaceOutputs[Object.keys(arcfaceOutputs)[0]].data;
+    const rawEmbedding = arcfaceOutputs[arcfaceSession.outputNames[0] || Object.keys(arcfaceOutputs)[0]].data;
     const embedding = l2Normalize(Array.from(rawEmbedding));
 
     const tEmbed = performance.now() - tEmbed0;
