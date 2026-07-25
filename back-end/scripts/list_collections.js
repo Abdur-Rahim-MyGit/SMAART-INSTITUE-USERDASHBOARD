@@ -1,30 +1,33 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-mongoose.connect('mongodb://localhost:27017/smaart-dashboard', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(async () => {
-    console.log('MongoDB Connected');
+async function main() {
+  try {
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected!');
+
     const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log('Collections:', collections.map(c => c.name));
+    console.log('Collections in database:');
+    collections.forEach(c => console.log(` - ${c.name}`));
 
-    // Also try to find any document in likely user collections
-    const collectionsToCheck = ['users', 'students', 'User', 'Student'];
-    for (const colName of collectionsToCheck) {
-        try {
-            const count = await mongoose.connection.db.collection(colName).countDocuments();
-            console.log(`${colName} count: ${count}`);
-            if (count > 0) {
-                const doc = await mongoose.connection.db.collection(colName).findOne();
-                console.log(`Sample document from ${colName}:`, doc);
-            }
-        } catch (e) {
-            console.log(`Error checking ${colName}: ${e.message}`);
-        }
+    // Search for collections containing 'assessment' or 'skill'
+    const matching = collections.filter(c => c.name.toLowerCase().includes('assessment') || c.name.toLowerCase().includes('skill'));
+    console.log('\nMatching collections:');
+    for (const coll of matching) {
+      console.log(`\n--- Collection: ${coll.name} ---`);
+      const count = await mongoose.connection.db.collection(coll.name).countDocuments();
+      console.log(`Count: ${count}`);
+      if (count > 0) {
+        const samples = await mongoose.connection.db.collection(coll.name).find().limit(2).toArray();
+        console.log('Sample documents:', JSON.stringify(samples, null, 2));
+      }
     }
-
-    mongoose.disconnect();
-}).catch(err => {
+  } catch (err) {
     console.error('Error:', err);
-    mongoose.disconnect();
-});
+  } finally {
+    await mongoose.disconnect();
+  }
+}
+
+main();

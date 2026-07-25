@@ -16,7 +16,7 @@ class OpenRouterService {
      */
     async chat(messages, systemPrompt = null, options = {}) {
         try {
-            console.log('🔑 OpenRouter API Key:', OPENROUTER_API_KEY ? `${OPENROUTER_API_KEY.substring(0, 20)}...` : 'NOT SET');
+            console.log('🔑 OpenRouter API Key:', OPENROUTER_API_KEY ? 'SET' : 'NOT SET');
             console.log('🤖 AI Model:', AI_MODEL);
 
             const formattedMessages = [];

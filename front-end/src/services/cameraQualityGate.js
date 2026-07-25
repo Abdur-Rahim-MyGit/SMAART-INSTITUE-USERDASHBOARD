@@ -18,7 +18,7 @@
  */
 
 import { checkBrightness, checkBlur, checkFaceSize, checkFaceCentering } from './faceQualityService';
-import { detectOnly } from './onnxPipeline';
+import { detectFacesFast } from './faceVerificationService';
 
 // ─── Resolution Check ─────────────────────────────────────────────────────────
 
@@ -159,7 +159,7 @@ export const runCameraQualityGate = async (videoEl, stream, onProgress) => {
   let faceCount = 0;
 
   for (let i = 0; i < 3; i++) {
-    const faces = await detectOnly(videoEl);
+    const faces = (await detectFacesFast(videoEl)).faces;
     faceCount = faces.length;
     if (faces.length === 1) {
       const f = faces[0];

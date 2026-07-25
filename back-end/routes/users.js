@@ -35,6 +35,9 @@ const buildFlatRegistration = (studentDoc) => {
     gender: doc.gender,
     cgpa: doc.cgpa,
     batch: doc.batch,
+    studentId: doc.studentId,
+    rollNumber: doc.rollNumber,
+    admissionDate: doc.admissionDate,
     address: doc.address,
     status: doc.profileStatus,
   };
@@ -201,7 +204,7 @@ router.post('/register-details', upload.fields([
         qualificationLevel: he.qualificationLevel || '',
         degree: he.degree || '',
         degreeFullName: he.degreeFullName || '',
-        specialization: he.specialization || '',
+        specialization: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || ''),
         institutionName: he.institutionName || '',
         university: he.university || '',
         location: he.location || '',
@@ -359,7 +362,7 @@ router.post('/register-details', upload.fields([
         degreeLevel: he.qualificationLevel || '',
         domain: he.degree || '',
         degreeGroup: he.degreeFullName || '',
-        specialisation: he.specialization || ''
+        specialisation: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || '')
       };
     }
 
@@ -523,10 +526,14 @@ router.patch('/register-section', async (req, res) => {
       },
       'higherEducation': async () => {
         // For array of higher education entries
-        registration.higherEducation = data;
+        const mappedData = Array.isArray(data) ? data.map(he => ({
+          ...he,
+          specialization: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || '')
+        })) : data;
+        registration.higherEducation = mappedData;
 
-        if (student && Array.isArray(data) && data.length > 0) {
-          const he = data[0];
+        if (student && Array.isArray(mappedData) && mappedData.length > 0) {
+          const he = mappedData[0];
           student.academic = {
             degreeLevel: he.qualificationLevel || he.level || '',
             domain: he.degree || he.domain || '',
@@ -752,6 +759,22 @@ router.get('/register-details/:email', async (req, res) => {
     const Student = require('../models/Student');
     const normalizedEmail = email.toLowerCase().trim();
 
+    // SECURITY (audit CRITICAL): this endpoint spreads full Mongo documents into
+    // the response. Strip credential/session/secret fields so the bcrypt password
+    // hash and live session ids are never disclosed (this route is reachable
+    // during the pre-auth registration flow).
+    const stripSensitive = (o) => {
+      if (!o || typeof o !== 'object') return o;
+      const c = { ...o };
+      for (const k of [
+        'password', 'currentSessionId', 'sessionExpiresAt',
+        'resetPasswordToken', 'resetPasswordExpires', 'resetToken', 'resetTokenExpiry',
+        'otp', 'otpExpiry', 'otpExpires', 'loginOtp', 'twoFactorSecret', 'mfaSecret',
+        '__v'
+      ]) delete c[k];
+      return c;
+    };
+
     // First try to find in User collection
     let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
     let userSource = 'User';
@@ -767,6 +790,18 @@ router.get('/register-details/:email', async (req, res) => {
           user = student;
           userSource = 'Student';
         }
+      }
+    }
+
+    // If still not found, check Registration collection by email
+    if (!user) {
+      const regByEmail = await Registration.findOne({ email: normalizedEmail });
+      if (regByEmail) {
+        return res.json({
+          ...stripSensitive(regByEmail.toObject()),
+          fullName: regByEmail.fullName,
+          gender: regByEmail.gender
+        });
       }
     }
 
@@ -844,6 +879,7 @@ router.get('/register-details/:email', async (req, res) => {
 
     if (registration) {
       return res.json({
+        ...stripSensitive(registration.toObject()),
         ...registration,
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
@@ -859,12 +895,15 @@ router.get('/register-details/:email', async (req, res) => {
     }
 
     // Return user data without registration — include all available fields
-    const userObj = user.toObject ? user.toObject() : user;
+    const userObj = stripSensitive(user.toObject ? user.toObject() : user);
     if (fallbackCollege && !userObj.college) {
       userObj.college = fallbackCollege;
     }
     res.json({
       ...userObj,
+      studentId: userObj.studentId || studentForDetails?.studentId || '',
+      rollNumber: userObj.rollNumber || studentForDetails?.rollNumber || '',
+      admissionDate: userObj.admissionDate || studentForDetails?.admissionDate || '',
       degree: populatedDegree,
       academic,
       department: studentDept,

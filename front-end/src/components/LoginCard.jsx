@@ -69,7 +69,7 @@ const LoginCard = () => {
     }
 
     if (!loginEmail.trim()) {
-      toast.error(t("login.toast.enter_email", "Please enter your Email or Student ID"));
+      toast.error(t("login.toast.enter_email", "Please enter your Email"));
       return;
     }
 
@@ -410,7 +410,7 @@ const LoginCard = () => {
                 htmlFor="login-email"
                 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
               >
-                {t("login.email_label", "Email or Student ID")}
+                {t("login.email_label", "Email")}
               </label>
               <div
                 className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
@@ -421,7 +421,7 @@ const LoginCard = () => {
                 <input
                   id="login-email"
                   type="text"
-                  placeholder={t("login.email_placeholder", "Email or Student ID (e.g. STU123)")}
+                  placeholder={t("login.email_placeholder", "your@email.com")}
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   aria-required="true"
@@ -527,17 +527,7 @@ const LoginCard = () => {
               )}
             </button>
 
-            {/* Registration Link */}
-            <div className="mt-6 text-center">
-              <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
-              <button
-                type="button"
-                onClick={() => navigate("/signup-initial")}
-                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
-              >
-                Sign Up
-              </button>
-            </div>
+
 
             {/* Contact Admin Link */}
             <div className="mt-4 text-center">

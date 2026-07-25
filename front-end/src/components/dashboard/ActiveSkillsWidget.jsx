@@ -4,8 +4,10 @@ import { useTheme } from '../../contexts/ThemeContext';
 import CertificateModal from '../CertificateModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const ActiveSkillsWidget = ({ userEmail, paths }) => {
+    const navigate = useNavigate();
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [userSkills, setUserSkills] = useState([]);
@@ -129,6 +131,24 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
         } catch (e) {
             console.error('Failed to update status:', e);
         }
+    };
+
+    const handleMarkDone = async (skillName) => {
+        try {
+            const res = await fetch(`/api/assessments/skill/${encodeURIComponent(skillName)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.data) {
+                    // Assessment exists, navigate to the player!
+                    navigate(`/skill-assessment/${encodeURIComponent(skillName)}`);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error("Error checking skill assessment:", e);
+        }
+        // Fallback: Open certificate modal
+        setCertModal({ skillName });
     };
 
     if (!validPaths || validPaths.length === 0) {
@@ -288,7 +308,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                                 key={`skill-${idx}`}
                                 skill={skill}
                                 isDark={isDark}
-                                onMarkDone={() => setCertModal({ skillName: skill.skillName })}
+                                onMarkDone={() => handleMarkDone(skill.skillName)}
                             />
                         ))}
                     </div>

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BaseLineResult = require('../models/BaseLineResult');
 const Result = require('../models/Result');
 
-const mongoUri = "mongodb+srv://smaartmind:smaartmind123@smaartminds.hhyscvh.mongodb.net/?appName=SmaartMinds";
+const mongoUri = process.env.MONGODB_URI;
 const userId = '691c4a243408254901245d8d';
 
 async function resetData() {

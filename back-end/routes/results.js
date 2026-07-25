@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const ProctoringSession = require('../models/ProctoringSession');
@@ -8,6 +9,78 @@ const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/as
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
+const { scoreResponse, shuffleOptionsForQuestion } = require('../services/mcqScoring');
+
+/**
+ * The subset of mcqConfig the exam UI is allowed to know.
+ *
+ * Marks, negative marking and passing marks are deliberately withheld: they
+ * are grading policy, and publishing them lets a candidate reason about which
+ * questions are worth guessing on. Only presentation flags go out.
+ */
+const publicMcqConfig = (assessment) => {
+    const c = assessment?.mcqConfig || {};
+    return {
+        allowBackNavigation: c.allowBackNavigation !== false,
+        allowMarkForReview: c.allowMarkForReview !== false,
+        multipleCorrect: !!c.multipleCorrect
+    };
+};
+
+/**
+ * Apply this attempt's option order to the outgoing questions, persisting it
+ * the first time so every later serve is identical.
+ *
+ * Persistence is not optional. A stored answer of "B" is meaningless without
+ * knowing which option B was for THIS candidate — without the map the attempt
+ * cannot be graded or replayed, and a refresh would move the letters under an
+ * already-selected answer.
+ *
+ * Returns the questions with options reordered. Untouched when the assessment
+ * does not enable randomizeOptions, so Likert flows are unaffected.
+ */
+const applyOptionOrder = async (questions, result, assessment) => {
+    if (!assessment?.mcqConfig?.randomizeOptions) return questions;
+    if (!Array.isArray(questions) || questions.length === 0) return questions;
+
+    const stored = result.optionOrder || new Map();
+    let mutated = false;
+
+    const ordered = questions.map((q) => {
+        const qId = String(q._id);
+        const options = q.options || [];
+        if (options.length < 2) return q;
+
+        const savedOrder = stored.get ? stored.get(qId) : stored[qId];
+
+        if (savedOrder && savedOrder.length === options.length) {
+            // Replay the persisted order.
+            const byValue = new Map(options.map((o) => [String(o.value), o]));
+            const replayed = savedOrder.map((v) => byValue.get(String(v))).filter(Boolean);
+            if (replayed.length === options.length) return { ...q, options: replayed };
+        }
+
+        // First serve for this question — generate and remember.
+        const shuffled = shuffleOptionsForQuestion(options, `${result._id}:${qId}`);
+        if (stored.set) stored.set(qId, shuffled.map((o) => String(o.value)));
+        mutated = true;
+        return { ...q, options: shuffled };
+    });
+
+    if (mutated) {
+        result.optionOrder = stored;
+        try {
+            await result.save();
+        } catch (err) {
+            // Never fail the exam over a shuffle bookkeeping error — fall back
+            // to the canonical order rather than blocking the candidate.
+            console.error('⚠️ Could not persist optionOrder, serving canonical order:', err.message);
+            return questions;
+        }
+    }
+
+    return ordered;
+};
 const resultController = require('../controllers/resultController');
 
 const router = express.Router();
@@ -64,7 +137,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         console.log(`🚀 Starting/Resuming assessment ${assessmentId} for user ${userId}`);
 
         // Fetch the assessment
-        const assessment = await Assessment.findById(assessmentId);
+        let assessment = await Assessment.findById(assessmentId);
+        if (!assessment) {
+            const db = mongoose.connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new mongoose.Types.ObjectId(assessmentId) });
+        }
 
         if (!assessment) {
             console.error(`❌ Assessment ${assessmentId} not found`);
@@ -77,7 +154,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         // Create a fast lookup map for questions by ID
         const questionMap = new Map();
         assessment.questions.forEach(q => {
-            questionMap.set(q._id.toString(), q);
+            const qId = q._id || q.questionId;
+            if (qId) {
+                questionMap.set(qId.toString(), q);
+            }
         });
 
         // --- PROCTORING LOCK CHECK ---
@@ -172,7 +252,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             // Failsafe 1: If questionOrder is empty
             if (questionOrder.length === 0) {
                 console.log("⚠️ [DEBUG] questionOrder is empty, using assessment logic");
-                questionOrder = assessment.questions.map(q => q._id);
+                questionOrder = assessment.questions.map(q => q._id || q.questionId);
             }
 
             let questions = questionOrder.map(qId => {
@@ -181,7 +261,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 if (!question) return null;
 
                 return {
-                    _id: question._id,
+                    _id: question._id || question.questionId,
                     questionText: question.questionText || "Question text missing",
                     type: question.type || "mcq",
                     options: question.options || [],
@@ -194,14 +274,14 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             if (questions.length === 0 && assessment.questions && assessment.questions.length > 0) {
                 console.log("⚠️ [DEBUG] No questions matched order. Falling back to all assessment questions.");
                 questions = assessment.questions.map((q, idx) => ({
-                    _id: q._id,
+                    _id: q._id || q.questionId,
                     questionText: q.questionText,
                     type: q.type,
                     options: q.options,
                     order: q.order || idx
                 }));
 
-                const validIds = new Set(assessment.questions.map(q => q._id.toString()));
+                const validIds = new Set(assessment.questions.map(q => (q._id || q.questionId).toString()));
                 const originalResponseCount = existingResult.responses.length;
 
                 existingResult.responses = existingResult.responses.filter(r =>
@@ -221,7 +301,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 const freshAssessment = await Assessment.findById(assessment._id).lean();
                 if (freshAssessment && freshAssessment.questions) {
                     questions = freshAssessment.questions.map((q, idx) => ({
-                        _id: q._id,
+                        _id: q._id || q.questionId,
                         questionText: q.questionText,
                         type: q.type,
                         options: q.options,
@@ -250,17 +330,18 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 assessmentId
             });
 
+            const orderedQuestions = await applyOptionOrder(questions, existingResult, assessment);
+
             return res.json({
                 success: true,
                 message: 'Resuming existing attempt',
                 data: {
                     resultId: existingResult._id,
-                    questions,
+                    questions: orderedQuestions,
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
-                    startedAt: existingResult.startedAt,
-                    remainingSeconds, // exact seconds remaining based on server clock
-                    assessmentToken
+                    assessmentToken,
+                    mcqConfig: publicMcqConfig(assessment)
                 }
             });
         }
@@ -343,7 +424,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         } else {
 
             // Other assessments: Random shuffle, all questions
-            const questionIds = assessment.questions.map(q => q._id);
+            const questionIds = assessment.questions.map(q => q._id || q.questionId);
             shuffledQuestionIds = shuffleArray(questionIds);
             totalQuestions = assessment.questions.length;
         }
@@ -352,7 +433,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         const result = new Result({
             userId,
             assessmentId: assessment._id,
-            assessmentCode: assessment.assessmentCode,
+            assessmentCode: assessment.assessmentCode || ("SKILL-" + assessment._id.toString().slice(-6).toUpperCase()),
             assessmentName: assessment.assessmentName,
             questionOrder: shuffledQuestionIds,
             totalQuestions: totalQuestions,
@@ -366,11 +447,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             const idStr = qId.toString();
             const question = questionMap.get(idStr);
             return {
-                _id: question._id,
-                questionText: question.questionText,
-                type: question.type,
-                options: question.options,
-                order: question.order || 0
+                _id: question?._id || question?.questionId,
+                questionText: question?.questionText,
+                type: question?.type,
+                options: question?.options,
+                order: question?.order || 0
             };
         });
 
@@ -383,16 +464,17 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 assessmentId: assessment._id
             });
 
+        const orderedQuestions = await applyOptionOrder(shuffledQuestions, result, assessment);
+
         res.status(201).json({
             success: true,
             message: 'Assessment started successfully',
             data: {
                 resultId: result._id,
-                questions: shuffledQuestions,
+                questions: orderedQuestions,
                 totalQuestions: totalQuestions,
-                startedAt: result.startedAt,
-                remainingSeconds: durationMinutes * 60, // exact full duration in seconds
-                assessmentToken
+                assessmentToken,
+                mcqConfig: publicMcqConfig(assessment)
             }
         });
     } catch (err) {
@@ -436,15 +518,30 @@ router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
         }
 
         // Fetch assessment to check for correct answers (Real-time grading)
-        const assessment = await Assessment.findById(result.assessmentId);
+        let assessment = await Assessment.findById(result.assessmentId);
+        if (!assessment) {
+            const db = require('mongoose').connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new mongoose.Types.ObjectId(result.assessmentId) });
+        }
         let isCorrect = undefined;
         let score = 0;
 
         if (assessment) {
-            const question = assessment.questions.id(questionId);
+            const question = (assessment.questions && typeof assessment.questions.id === 'function')
+                ? assessment.questions.id(questionId)
+                : (assessment.questions || []).find(q => q._id.toString() === questionId);
             if (question && question.correctAnswer !== undefined) {
-                isCorrect = question.correctAnswer === selectedValue;
-                score = isCorrect ? (question.points || 1) : 0;
+                // Was `question.correctAnswer === selectedValue`, a strict
+                // compare on a Mixed field: a stored number 2 never equalled
+                // the string "2" that arrives over JSON, and a multi-correct
+                // array never equalled anything. Both graded silently wrong.
+                const graded = scoreResponse({
+                    question,
+                    selectedValue,
+                    config: assessment.mcqConfig || {}
+                });
+                isCorrect = graded.isCorrect;
+                score = graded.score;
             }
         }
 

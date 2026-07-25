@@ -1,13 +1,27 @@
+const crypto = require('crypto');
+
+// Constant-time string comparison — avoids leaking the secret via response
+// timing. Returns false on any type/length mismatch instead of throwing.
+const safeEqual = (a, b) => {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+};
+
 const requireRole = (...allowedRoles) => {
   const roles = allowedRoles.flat().filter(Boolean);
 
   return (req, res, next) => {
-    // Bypass for trusted admin system (used by external dashboard)
+    // Bypass for the trusted admin system (the User<->Admin service interlink).
+    // NOTE: this path is only as safe as ADMIN_SYSTEM_SECRET — it MUST be a
+    // strong, rotated value that is never committed to the repo.
     if (req.headers['x-admin-bypass'] === 'true') {
       const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
       // SECURITY: never allow the bypass when the secret is unset/empty,
       // otherwise `undefined === undefined` would grant admin to anyone.
-      if (adminSecret && req.headers['x-admin-secret'] === adminSecret) {
+      if (adminSecret && safeEqual(req.headers['x-admin-secret'], adminSecret)) {
         const mongoose = require('mongoose');
         req.user = {
           role: 'admin',

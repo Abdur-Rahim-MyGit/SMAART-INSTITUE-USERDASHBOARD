@@ -29,9 +29,15 @@ router.get('/', async (req, res) => {
         const { student, course, college, status, limit = 50 } = req.query;
         let query = {};
 
-        if (student) query.student = student;
+        // SECURITY (audit CRITICAL): non-staff may only see their OWN enrollments.
+        // Otherwise any student can harvest every student's name/email/progress.
+        if (isStaff(req.user)) {
+            if (student) query.student = student;
+            if (college) query.college = college;
+        } else {
+            query.student = String(req.user._id);
+        }
         if (course) query.course = course;
-        if (college) query.college = college;
         if (status) query.status = status;
 
         const enrollments = await CourseEnrollment.find(query)
@@ -70,6 +76,12 @@ router.get('/:id', async (req, res) => {
             });
         }
 
+        // SECURITY: only staff or the owning student may read an enrollment.
+        const ownerId = String(enrollment.student?._id || enrollment.student || '');
+        if (!isStaff(req.user) && ownerId !== String(req.user._id)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
+
         res.json({
             success: true,
             data: enrollment
@@ -86,7 +98,21 @@ router.get('/:id', async (req, res) => {
 // Create new course enrollment
 router.post('/', async (req, res) => {
     try {
-        const enrollment = new CourseEnrollment(req.body);
+        // SECURITY (audit CRITICAL): a non-staff user may only enroll THEMSELVES,
+        // and may not seed a forged completion/score/progress via mass assignment.
+        const payload = isStaff(req.user)
+            ? req.body
+            : {
+                ...req.body,
+                student: String(req.user._id),
+                status: 'in_progress',
+                progress: 0,
+                moduleProgress: [],
+                score: undefined,
+                grade: undefined,
+                completedAt: undefined,
+            };
+        const enrollment = new CourseEnrollment(payload);
         await enrollment.save();
 
 
@@ -107,6 +133,13 @@ router.post('/', async (req, res) => {
 // Update course enrollment progress
 router.put('/:id', async (req, res) => {
     try {
+        // SECURITY (audit CRITICAL): direct enrollment mutation is staff-only.
+        // Students update progress ONLY through the server-computed
+        // /task-progress, /video-progress, /quiz-progress, /task-result routes;
+        // an open PUT here let any student forge status:'completed'/score.
+        if (!isStaff(req.user)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
         const enrollment = await CourseEnrollment.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -137,6 +170,10 @@ router.put('/:id', async (req, res) => {
 // Delete course enrollment
 router.delete('/:id', async (req, res) => {
     try {
+        // SECURITY (audit CRITICAL): deleting enrollments is staff-only.
+        if (!isStaff(req.user)) {
+            return res.status(403).json({ success: false, error: 'Not authorized' });
+        }
         const enrollment = await CourseEnrollment.findByIdAndDelete(req.params.id);
 
         if (!enrollment) {

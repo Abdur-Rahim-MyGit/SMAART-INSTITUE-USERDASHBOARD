@@ -3,6 +3,7 @@ const Assessment = require('../models/Assessment');
 const { getStageByCode } = require('../config/stage_distributions');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { isFeatureEnabled } = require('../helpers/featureFlag');
+const { evaluateAttempt, applyHold, buildHeldResponse } = require('../services/proctoringGate');
 
 const determineLevel = (pct) => {
     if (pct >= 81) return 'Advanced';
@@ -10,6 +11,19 @@ const determineLevel = (pct) => {
     if (pct >= 41) return 'Progressing';
     if (pct >= 21) return 'Developing';
     return 'Emerging';
+};
+
+// Blueprint v1.0 competence classification for the OVERALL stage score.
+// This is separate from the per-quotient 5-band `determineLevel` above:
+//   Pass with Distinction: score >= 75
+//   Pass:                   passScore (60) <= score < 75
+//   Not Yet Competent:      score < passScore
+// T1 is a baseline diagnostic (passScore 0) and has no competence tier.
+const competenceTier = (score, passScore = 60, distinctionScore = 75) => {
+    if (passScore === 0) return 'Baseline';
+    if (distinctionScore && score >= distinctionScore) return 'Distinction';
+    if (score >= passScore) return 'Pass';
+    return 'Not Yet Competent';
 };
 
 /**
@@ -23,13 +37,13 @@ const submitAssessment = async (req, res) => {
             submissionReason = 'manual',
             completeMissingAnswers = false
         } = req.body || {};
-        // SECURITY (audit CRITICAL): forcePassDev/forceFailDev are grading
-        // shortcuts for LOCAL testing only. Force them OFF in production so a
-        // student cannot self-grade a 70% pass by sending {forcePassDev:true}
-        // in the submit body. Dev behaviour is unchanged.
-        const isProd = process.env.NODE_ENV === 'production';
-        const forcePassDev = isProd ? false : !!(req.body && req.body.forcePassDev);
-        const forceFailDev = isProd ? false : !!(req.body && req.body.forceFailDev);
+        // SECURITY (audit CRITICAL): the forcePassDev/forceFailDev grading
+        // shortcuts are permanently disabled. They are NEVER read from the
+        // request body, in any environment, so a student cannot self-grade a
+        // 70% pass by sending {forcePassDev:true}. Do not re-wire these to
+        // req.body — relying on NODE_ENV alone re-opens the self-grade hole.
+        const forcePassDev = false;
+        const forceFailDev = false;
 
         const result = await Result.findById(resultId);
 
@@ -47,8 +61,24 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // A held attempt is finished too — it must not be re-submitted to try
+        // for a different verdict.
+        if (result.completionStatus === 'pending_review') {
+            return res.status(400).json({
+                success: false,
+                held: true,
+                status: 'pending_review',
+                error: 'This assessment has already been submitted and is awaiting review.'
+            });
+        }
+
         // Fetch the assessment
-        const assessment = await Assessment.findById(result.assessmentId);
+        let assessment = await Assessment.findById(result.assessmentId);
+        if (!assessment) {
+            const db = require('mongoose').connection.db;
+            assessment = await db.collection('skillassessments').findOne({ _id: new (require('mongoose').Types.ObjectId)(result.assessmentId) });
+        }
+
         console.log('🔍 Assessment details:', {
             code: assessment?.assessmentCode,
             name: assessment?.assessmentName,
@@ -62,8 +92,37 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // ── PROCTORING SUBMIT GATE ──────────────────────────────────────────
+        // Evaluated before any grading path so both the feature-flag branch and
+        // the normal branch are covered. Answers are always kept; only
+        // PUBLICATION of the score is conditional.
+        const proctoringVerdict = await evaluateAttempt(result);
+
+        const holdAttempt = async () => {
+            applyHold(result, proctoringVerdict);
+            result.submittedAt = new Date();
+            result.timeTaken = Math.floor((Date.now() - result.startedAt.getTime()) / 1000);
+            await result.save();
+
+            // The timing pass may have added a violation, so persist the
+            // session's updated counters too.
+            if (proctoringVerdict.session) {
+                await proctoringVerdict.session.save();
+            }
+
+            console.log(
+                `🔍 Attempt ${result._id} unverified (${proctoringVerdict.outcome}) — ` +
+                `risk ${proctoringVerdict.riskScore}, retries left ${proctoringVerdict.retriesRemaining}`
+            );
+            return res.json(buildHeldResponse(result, proctoringVerdict));
+        };
+
         // Check if the new assessment evaluation feature flag is enabled
         const useNewEvaluation = await isFeatureEnabled('NEW_ASSESSMENT_EVALUATION');
+
+        if (useNewEvaluation && proctoringVerdict.hold) {
+            return holdAttempt();
+        }
 
         if (useNewEvaluation) {
             console.log(`🚀 [NEW_ASSESSMENT_EVALUATION] Feature flag is ENABLED. Routing to new evaluation placeholder.`);
@@ -240,11 +299,28 @@ const submitAssessment = async (req, res) => {
             });
         }
 
+        // ── PROCTORING SUBMIT GATE (normal grading path) ────────────────────
+        // Every answer is already persisted. If the session was held, stop here:
+        // record the attempt as pending_review and publish nothing. Stage
+        // progression, badges and notifications below are all skipped, so a
+        // held attempt cannot unlock the next stage before a human clears it.
+        if (proctoringVerdict.hold) {
+            return holdAttempt();
+        }
+
         // Calculate time taken
         const timeTaken = Math.floor((Date.now() - result.startedAt.getTime()) / 1000);
 
         // Update result
         result.completionStatus = 'completed';
+        result.scoreReleased = true;
+        if (proctoringVerdict.session) {
+            result.proctoringSessionId = proctoringVerdict.session._id;
+            // The gate recomputed riskScore (and may have logged a timing
+            // anomaly) — persist that even on a clean pass, so the audit trail
+            // reflects what was actually evaluated.
+            await proctoringVerdict.session.save();
+        }
         result.submittedAt = new Date();
         result.timeTaken = timeTaken;
 
@@ -349,10 +425,13 @@ const submitAssessment = async (req, res) => {
 
             const stageBand = determineLevel(stageScore);
 
-            // Use stage-specific passing percentage (defaults to 70%)
-            const passingPercentage = stageInfo.passingPercentage !== undefined ? stageInfo.passingPercentage : 70;
-            // T1 (Baseline) always passes (passingPercentage=0), T2-T4+ require 70%
+            // Use stage-specific passing percentage (Blueprint v1.0: pass = 60; defaults to 60)
+            const passingPercentage = stageInfo.passingPercentage !== undefined ? stageInfo.passingPercentage : 60;
+            const distinctionPercentage = stageInfo.distinctionPercentage !== undefined ? stageInfo.distinctionPercentage : 75;
+            // T1 (Baseline) always passes (passingPercentage=0), T2-T4+ require the pass threshold
             const passed = passingPercentage === 0 ? true : stageScore >= passingPercentage;
+            // Blueprint v1.0 overall-stage competence tier (Distinction / Pass / Not Yet Competent)
+            const tier = competenceTier(stageScore, passingPercentage, distinctionPercentage);
 
             // Count existing attempts for this user+stage to set attemptNumber
             const StageResult = require('../models/StageResult');
@@ -367,6 +446,7 @@ const submitAssessment = async (req, res) => {
             responseData.baselineScore = stageScore; // Keep backward compat
             responseData.stageScore = stageScore;
             responseData.stageBand = stageBand;
+            responseData.competenceTier = tier;
             responseData.passed = passed;
             responseData.stage = stageInfo.stage;
             responseData.assessmentType = `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`;
@@ -384,6 +464,7 @@ const submitAssessment = async (req, res) => {
                     stage: stageInfo.stage,
                     stageScore,
                     stageBand,
+                    competenceTier: tier,
                     passed,
                     attemptNumber,
                     quotientProfile: finalProfile,
@@ -473,6 +554,20 @@ const submitAssessment = async (req, res) => {
                         message: blError.message
                     });
                 }
+            }
+
+            // Check if this is a skill assessment (either from skillassessments collection or type === 'skill')
+            const isSkillAssessment = assessment && (assessment.assessmentType === 'skill' || !assessment.assessmentCode);
+            if (isSkillAssessment) {
+                const passMark = 70;
+                const passed = percentage >= passMark;
+                
+                responseData.assessmentType = 'skill';
+                responseData.passed = passed;
+                responseData.passingPercentage = passMark;
+                responseData.skillName = assessment.instructions || assessment.questionCategory;
+                
+                console.log(`🎯 Skill assessment completed: ${responseData.skillName}. Score: ${percentage}%, Passed: ${passed}`);
             }
         }
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const Course = require('../models/Course');
 const College = require('../models/College');
+const Student = require('../models/Student');
 const { protect, authorize } = require('../middleware/auth');
 const {
     COURSE_STAGE_TITLES,
@@ -55,33 +56,61 @@ const getAllowedCategories = async (user) => {
     if (!user || user.role === 'admin' || user.role === 'moderator') {
         return null; 
     }
-    if (user.college) {
-        // PERF: `protect` already populated req.user.college WITH subscriptionPlan,
-        // so reuse it and avoid a redundant College.findById() on every request.
-        // Fall back to a DB fetch only if it wasn't populated.
-        let collegeDoc = user.college;
-        if (!collegeDoc || collegeDoc.subscriptionPlan === undefined) {
-            collegeDoc = await College.findById(user.college);
+
+    let studentPlan = null;
+    let collegePlan = null;
+
+    if (user.role === 'student') {
+        try {
+            const student = await Student.findById(user._id);
+            if (student && student.department?.batch?.subscriptionPlan) {
+                studentPlan = student.department.batch.subscriptionPlan;
+            }
+        } catch (err) {
+            console.error('Error fetching student subscription plan:', err.message);
         }
-        if (collegeDoc && collegeDoc.subscriptionPlan) {
-            const { plan, addons } = collegeDoc.subscriptionPlan;
-            const hasAIQ = !!addons?.aiq;
-            if (hasAIQ) allowed.push('AIQ');
-
-            const hasSQ = plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq;
-            if (hasSQ) allowed.push('SQ');
-
-            const hasPIQ = plan === 'Smaart Complete' || !!addons?.piq;
-            if (hasPIQ) allowed.push('PIQ');
-
-            const hasBC = !!addons?.britishCouncil;
-            if (hasBC) allowed.push('British Council');
-        } else {
-            allowed.push('AIQ');
-        }
-    } else {
-        allowed.push('AIQ');
     }
+
+    if (user.college) {
+        try {
+            let collegeDoc = user.college;
+            if (!collegeDoc || typeof collegeDoc !== 'object' || !collegeDoc.departments) {
+                collegeDoc = await College.findById(user.college);
+            }
+            if (collegeDoc) {
+                if (user.department?.degreeId || user.department?.fullName) {
+                    const dept = collegeDoc.departments?.find(d => 
+                        String(d.degreeId || '') === String(user.department?.degreeId || '') || 
+                        d.fullName === user.department?.fullName
+                    );
+                    const b = dept?.batches?.find(b => b.batch === (user.department?.batch?.batch || user.batch));
+                    if (b?.subscriptionPlan) {
+                        collegePlan = b.subscriptionPlan;
+                    }
+                }
+                if (!collegePlan && collegeDoc.subscriptionPlan) {
+                    collegePlan = collegeDoc.subscriptionPlan;
+                }
+            }
+        } catch (cErr) {
+            console.error('Error fetching college subscription plan:', cErr.message);
+        }
+    }
+
+    const activePlanObj = studentPlan || collegePlan;
+    const plan = activePlanObj?.plan || 'Smaart Core';
+    const addons = activePlanObj?.addons || {};
+
+    const hasAIQ = addons.aiq !== undefined ? !!addons.aiq : true;
+    const hasSQ = plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons.sq;
+    const hasPIQ = plan === 'Smaart Complete' || !!addons.piq;
+    const hasBC = !!addons.britishCouncil;
+
+    if (hasAIQ) allowed.push('AIQ');
+    if (hasSQ) allowed.push('SQ');
+    if (hasPIQ) allowed.push('PIQ');
+    if (hasBC) allowed.push('British Council');
+
     return allowed;
 };
 
