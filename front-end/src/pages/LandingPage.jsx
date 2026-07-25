@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
@@ -31,6 +31,7 @@ const LandingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSplash, setShowSplash] = useState(true);
   const [isInstitutionSelectOpen, setIsInstitutionSelectOpen] = useState(false);
+  const hasRedirectedRef = useRef(false);
 
   // If user is already logged in, we need to redirect — start as false only in that case
   const isLoggedIn = !!sessionStorage.getItem("user");
@@ -44,18 +45,6 @@ const LandingPage = () => {
       setSearchParams({}, { replace: true });
       return;
     }
-
-    // 2. Auto-trigger on first visit if not logged in and no institution selected
-    // Disabled per user request - no longer auto-triggering the popup
-    // const userData = sessionStorage.getItem("user");
-    // const selectedInst = sessionStorage.getItem("selectedInstitution");
-    // 
-    // if (!userData && !selectedInst && !showSplash) {
-    //   const timer = setTimeout(() => {
-    //     setIsInstitutionSelectOpen(true);
-    //   }, 1000);
-    //   return () => clearTimeout(timer);
-    // }
   }, [searchParams, setSearchParams, showSplash]);
 
   useEffect(() => {
@@ -109,7 +98,10 @@ const LandingPage = () => {
 
     const userData = sessionStorage.getItem("user");
     if (userData) {
-      navigate("/dashboard", { replace: true });
+      if (!hasRedirectedRef.current) {
+        hasRedirectedRef.current = true;
+        navigate("/dashboard", { replace: true });
+      }
     } else {
       setIsReady(true);
     }

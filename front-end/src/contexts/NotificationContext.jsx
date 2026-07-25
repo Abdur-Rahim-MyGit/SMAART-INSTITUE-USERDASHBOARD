@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { apiCall, getBackendUrl } from '@/services/api';
 import useUser from '@/hooks/useUser';
@@ -244,22 +244,22 @@ export function NotificationProvider({ children }) {
     };
   }, [applyNotificationState, applyUnreadFilter, fetchNotifications, fetchUnreadCount, user?._id, user?.id]);
 
+  const value = useMemo(() => ({
+    notifications,
+    unreadCount,
+    isLoading,
+    wsStatus,
+    pagination,
+    fetchNotifications,
+    refresh,
+    markRead,
+    markAllRead,
+    deleteNotification,
+    clearAll,
+  }), [notifications, unreadCount, isLoading, wsStatus, pagination, fetchNotifications, refresh, markRead, markAllRead, deleteNotification, clearAll]);
+
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        unreadCount,
-        isLoading,
-        wsStatus,
-        pagination,
-        fetchNotifications,
-        refresh,
-        markRead,
-        markAllRead,
-        deleteNotification,
-        clearAll,
-      }}
-    >
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );

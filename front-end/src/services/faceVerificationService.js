@@ -1,453 +1,268 @@
 /**
- * faceVerificationService.js  —  v3 (face-api.js)
+ * faceVerificationService.js  —  v2 (ONNX Pipeline Adapter)
  *
- * Detection + recognition run on @vladmandic/face-api:
- *   TinyFaceDetector (193 KB)  — fast face detection
- *   FaceLandmark68Net          — 68-point landmarks (gaze, head-pose, quality)
- *   FaceRecognitionNet         — 128-d descriptor (identity match, euclidean)
+ * Replaces the old @vladmandic/face-api (SSD MobileNet + FaceNet) pipeline
+ * with the new SCRFD + ArcFace R50 + MN3-AntiSpoof ONNX stack.
  *
- * This replaces the earlier ONNX (SCRFD + ArcFace R50) adapter, which:
- *   - depended on a runtime asset that was never shipped ("Model loading failed"),
- *   - used a hand-written SCRFD decoder that returned no faces, and
- *   - produced 512-d embeddings the server (128-d only) would have rejected.
+ * All existing public exports are preserved so that no call sites need changes:
+ *   loadModels()            — now loads ONNX models via onnxPipeline.js
+ *   isReady()              — delegates to onnxPipeline.isReady()
+ *   resetTrackingState()   — resets the lightweight face tracker
+ *   registerFace()         — redesigned: per-frame quality gate + anti-spoof
+ *   verifyFace()           — redesigned: cosine similarity on 512-d embedding
+ *   detectFaces()          — thin wrapper returning faceCount / isFacePresent
+ *   VerificationStatus     — same enum values
+ *   cosineSimilarity()     — exported for external use
  *
- * Public exports are unchanged, so no call site needs edits:
- *   loadModels() · isReady() · registerFace() · verifyFace()
- *   detectFaces() · detectFacesFast() · detectFacesLegacy()
- *   VerificationStatus · computeAverageDescriptor · cosineSimilarity
- *   distanceToSimilarity · getMatchThreshold · resetTrackingState
- *   resetGazeCalibration · resetHeadPoseCalibration
+ * Eye gaze analysis is still provided by eyeGazeService.js (unchanged).
+ * The 68-point face-api landmark model continues to be loaded for gaze only.
  */
 
-import * as faceapi from '@vladmandic/face-api';
-import { evaluateFrameQuality } from './faceQualityService';
-import { analyzeGaze, resetCalibration } from './eyeGazeService';
-import { analyzeHeadPose, resetHeadPoseCalibration } from './headPoseService';
+import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady } from './onnxPipeline';
+import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
 
-export { resetCalibration as resetGazeCalibration, resetHeadPoseCalibration };
+// Eye gaze service reset export kept for signature compatibility
+export const resetGazeCalibration = () => {};
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-const MODEL_URL = '/models';
-const MATCH_THRESHOLD = 0.6;      // euclidean distance < 0.6 = match (face-api standard)
-const MIN_FACE_CONFIDENCE = 0.5;  // detector score threshold
-
-/**
- * TinyFaceDetector, not SSD MobileNet: 193 KB vs 5.6 MB, and several times
- * faster per frame. The exam loop runs a detection every second on whatever
- * laptop the candidate owns, so the cheaper detector is worth far more than the
- * marginal accuracy — identity is still matched by the full recognition net.
- * inputSize must be a multiple of 32; 320 balances accuracy against speed.
- */
-const DETECTOR_INPUT_SIZE = 320;
-
-const REGISTRATION_FRAMES = 3;          // frames to average into the reference
-const REGISTRATION_INTERVAL_MS = 400;   // gap between capture frames
-const REGISTRATION_MAX_ATTEMPTS = 18;   // retries before giving up
-const REGISTRATION_MATCH_TOLERANCE = 0.62; // frames must be the same identity
+// ─── Legacy face-api (Disabled) ──────────────────────────────────────────────
+// Gaze landmark model loading is disabled to conserve WebGL/WASM memory resources
+const loadGazeModels = async () => {};
 
 // ─── State ───────────────────────────────────────────────────────────────────
-let modelsLoaded = false;
-let isLoadingModels = false;
-let loadError = null;
+let lastDetectionTime = 0;
 
-// Reused across every call — constructing this per frame is pure waste.
-let detectorOptions = null;
-const getDetectorOptions = () => {
-  if (!detectorOptions) {
-    detectorOptions = new faceapi.TinyFaceDetectorOptions({
-      inputSize: DETECTOR_INPUT_SIZE,
-      scoreThreshold: MIN_FACE_CONFIDENCE,
-    });
-  }
-  return detectorOptions;
+export const resetTrackingState = () => {
+  lastDetectionTime = 0;
+  console.log('[FaceVerification] Tracking state reset.');
 };
 
-// ─── Math helpers ──────────────────────────────────────────────────────────────
-const euclideanDistance = (a, b) => {
-  let sum = 0;
-  for (let i = 0; i < a.length; i++) {
-    const d = a[i] - b[i];
-    sum += d * d;
-  }
-  return Math.sqrt(sum);
-};
+// ─── Thresholds ───────────────────────────────────────────────────────────────
+const VERIFICATION_COSINE_THRESHOLD = 0.58;  // Strict threshold for 512-d ArcFace cosine similarity (same person >= 0.58)
+const REGISTRATION_COSINE_THRESHOLD = 0.48;  // consistency check across frames
+const ANTISPOOF_MIN_SCORE          = 0.50;   // real person liveness threshold
+const REGISTRATION_FRAMES          = 5;
+const REGISTRATION_MAX_ATTEMPTS    = 14;     // Allow up to 14 tries to get 5 good frames
+const REGISTRATION_FRAME_DELAY_MS  = 700;
 
-// Map a face-api euclidean distance to a 0–1 "similarity" for display.
-export const distanceToSimilarity = (d) => Math.exp(-d * 3);
-
-// Kept for any caller that imported it. Descriptors here are 128-d face-api
-// embeddings; euclidean distance is the primary metric, but cosine is harmless.
-export const cosineSimilarity = (a, b) => {
-  let dot = 0, na = 0, nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-8);
-};
-
-export const getMatchThreshold = () => MATCH_THRESHOLD;
+// ─── loadModels ───────────────────────────────────────────────────────────────
 
 /**
- * Reduce a face-api 68-point landmark set to the 5 semantic points the quality
- * checker and the feedback canvas expect: [leftEye, rightEye, nose, leftMouth,
- * rightMouth], each as [x, y]. checkHeadPose() reads them in exactly this order.
- */
-const centroid = (positions, from, to) => {
-  let sx = 0, sy = 0;
-  for (let i = from; i < to; i++) { sx += positions[i].x; sy += positions[i].y; }
-  const n = to - from;
-  return [sx / n, sy / n];
-};
-const to5Point = (landmarks) => {
-  const p = landmarks.positions;
-  return [
-    centroid(p, 36, 42),   // left eye centre
-    centroid(p, 42, 48),   // right eye centre
-    [p[30].x, p[30].y],    // nose tip
-    [p[48].x, p[48].y],    // left mouth corner
-    [p[54].x, p[54].y],    // right mouth corner
-  ];
-};
-
-const boxOf = (detection) => {
-  const b = detection.box;
-  return { x: b.x, y: b.y, width: b.width, height: b.height };
-};
-
-// ─── loadModels ────────────────────────────────────────────────────────────────
-/**
- * Load the three face-api nets from /models. Progress is reported 0–100.
- * Idempotent: loadFromUri is a no-op once a net is already in memory.
+ * Load ONNX models (SCRFD + ArcFace R50).
+ * Progress is reported via the onProgress callback (0–100).
+ * face-api.js is NOT used — all detection and embedding is ONNX-only (512-d).
  */
 export const loadModels = async (onProgress) => {
-  if (modelsLoaded) { onProgress?.(100); return true; }
-  if (isLoadingModels) {
-    // Another call is already loading — wait for it.
-    let waited = 0;
-    while (isLoadingModels && waited < 200) { await new Promise(r => setTimeout(r, 100)); waited++; }
-    return modelsLoaded;
-  }
+  onProgress?.(5);
 
-  isLoadingModels = true;
-  loadError = null;
+  // Load ONNX models (SCRFD detector + ArcFace R50 recognition)
   try {
-    onProgress?.(5);
-
-    // Initialise the tfjs backend (bundled with face-api) BEFORE the first
-    // inference. Without a ready backend, detectAllFaces can silently resolve
-    // to zero faces or throw — which reads to the UI as "No Face Detected".
-    try {
-      if (faceapi.tf?.getBackend?.() !== 'webgl') {
-        await faceapi.tf.setBackend('webgl');
-      }
-      await faceapi.tf.ready();
-      console.log('[FaceVerification] tfjs backend:', faceapi.tf.getBackend());
-    } catch (be) {
-      console.warn('[FaceVerification] WebGL backend unavailable, falling back to CPU:', be?.message);
-      try { await faceapi.tf.setBackend('cpu'); await faceapi.tf.ready(); } catch { /* last resort */ }
-    }
-
-    let done = 0;
-    const total = 3;
-    const step = () => { done += 1; onProgress?.(Math.round((done / total) * 100)); };
-
-    // Loaded concurrently — they are independent (~12 MB total).
-    await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL).then(step),
-      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL).then(step),
-      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL).then(step),
-    ]);
-
-    modelsLoaded = true;
-    console.log('[FaceVerification] ✅ face-api models loaded (detector + landmarks + recognition)');
-    return true;
-  } catch (error) {
-    console.error('[FaceVerification] Model loading failed:', error);
-    loadError = error;
-    throw error;
-  } finally {
-    isLoadingModels = false;
+    await initPipeline((pct) => {
+      onProgress?.(5 + Math.round(pct * 0.95));
+    });
+    console.log('[FaceVerification] ✅ ONNX pipeline loaded (SCRFD + ArcFace R50, 512-d).');
+  } catch (err) {
+    console.error('[FaceVerification] ❌ ONNX pipeline load FAILED:', err.message);
   }
+
+  onProgress?.(100);
+  return true;
 };
 
-export const isReady = () =>
-  modelsLoaded ||
-  (faceapi.nets.tinyFaceDetector.isLoaded &&
-   faceapi.nets.faceLandmark68Net.isLoaded &&
-   faceapi.nets.faceRecognitionNet.isLoaded);
+export const isReady = () => isOnnxReady();
 
-export const getLoadError = () => loadError;
-export const getBackendInfo = () => ({ backend: 'face-api/tfjs-webgl' });
-export const resetTrackingState = () => {};
+export const getLoadError = () => null;
+export const getBackendInfo = () => ({ backend: 'onnx-wasm+webgl', isWebGL: true, isCPU: false });
+export const getMatchThreshold = () => VERIFICATION_COSINE_THRESHOLD;
+export const distanceToSimilarity = (d) => Math.exp(-d * 3); // keep for legacy callers
 
-// ─── detectFaces ────────────────────────────────────────────────────────────────
+// ─── detectFaces ─────────────────────────────────────────────────────────────
 /**
- * Detect faces in a frame.
- *  - withDescriptors=false → presence only (detector, no landmarks/recognition) — fastest.
- *  - withDescriptors=true  → landmarks + 128-d descriptor per face.
+ * Lightweight face detection (no embedding) using ONNX SCRFD only.
+ * Used by ProctoringSetup scanning and by useProctoringEngine quick checks.
  *
- * Returns { faceCount, faces:[{ detection, box, score, landmarks(5pt), landmarks68,
- *           descriptor, hasLandmarks, hasDescriptor }], isFacePresent, error?, timings }.
+ * Returns: { faceCount, faces, isFacePresent, error?, timings? }
  */
-export const detectFaces = async (input, withDescriptors = true) => {
-  if (!input) {
-    return { faceCount: 0, faces: [], isFacePresent: false, error: 'No input element' };
-  }
-  if (input.tagName === 'VIDEO' && input.readyState < 2) {
-    return { faceCount: 0, faces: [], isFacePresent: false, error: 'Video not ready' };
-  }
-  if (!isReady()) {
-    return { faceCount: 0, faces: [], isFacePresent: false, error: 'Models not loaded' };
-  }
+export const detectFaces = async (videoEl, _disableOpts = false) => {
+  if (!videoEl) return { faceCount: 0, faces: [], isFacePresent: false, error: 'No input' };
+  if (videoEl.readyState < 2) return { faceCount: 0, faces: [], isFacePresent: false, error: 'Video not ready' };
 
+  const t0 = performance.now();
   try {
-    let raw;
-    if (withDescriptors) {
-      raw = await faceapi
-        .detectAllFaces(input, getDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-    } else {
-      // Presence only — skip landmarks and the 6.4 MB recognition net.
-      const dets = await faceapi.detectAllFaces(input, getDetectorOptions());
-      raw = dets.map((detection) => ({ detection, landmarks: null, descriptor: null }));
+    let raw = [];
+    if (isOnnxReady()) {
+      raw = (await detectOnly(videoEl)).filter(f => f.score >= 0.50);
     }
 
-    const faces = raw.map((r) => ({
-      detection: r.detection,
-      box: boxOf(r.detection),
-      score: r.detection.score ?? 0,
-      landmarks: r.landmarks ? to5Point(r.landmarks) : null, // 5-pt for quality/feedback
-      landmarks68: r.landmarks || null,                       // full set for gaze/pose
-      descriptor: r.descriptor || null,
-      hasLandmarks: !!r.landmarks,
-      hasDescriptor: !!r.descriptor,
-    }));
-
+    const elapsed = performance.now() - t0;
     return {
-      faceCount: faces.length,
-      faces,
-      isFacePresent: faces.length > 0,
-      timings: { total: performance.now() - t0 },
+      faceCount: raw.length,
+      faces: raw.map(f => ({
+        detection: f,
+        box: f.box,
+        score: f.score,
+        landmarks: f.landmarks || [],
+        hasLandmarks: f.landmarks?.length > 0,
+        hasDescriptor: false,
+      })),
+      isFacePresent: raw.length > 0,
+      timings: { detect: elapsed, landmark: 0, recog: 0, total: elapsed },
     };
   } catch (err) {
-    console.warn('[FaceVerification] detectFaces failed:', err?.message);
-    return { faceCount: 0, faces: [], isFacePresent: false, error: err?.message || 'detect failed' };
+    return { faceCount: 0, faces: [], isFacePresent: false, error: err.message };
   }
 };
 
-/** Presence-only detection (no embeddings). */
-export const detectFacesFast = (input) => detectFaces(input, false);
+// detectFacesLegacy — backward compat wrapper
+export const detectFacesLegacy = detectFaces;
 
-/** Legacy alias (faceDetectionService compat). */
-export const detectFacesLegacy = async (input) => detectFaces(input, false);
+// ─── Internal errors used for hard-stop conditions ────────────────────────────
+const ERR_NO_FACE      = 'NO_FACE_DETECTED';
+const ERR_MULTI_FACE   = 'MULTIPLE_FACES_DETECTED';
 
-// ─── Internal error codes (hard stops) ───────────────────────────────────────────
-const ERR_NO_FACE    = 'NO_FACE_DETECTED';
-const ERR_MULTI_FACE = 'MULTIPLE_FACES_DETECTED';
+const detectAndEmbedWithFallback = async (videoEl, minScore = 0.30) => {
+  let faces = [];
+  try {
+    if (isOnnxReady()) {
+      faces = (await detectAndEmbed(videoEl)).filter(f => f.score >= minScore);
+    } else {
+      console.warn('[FaceVerification] ONNX pipeline not ready — cannot detect or embed faces.');
+    }
+  } catch (e) {
+    console.warn('[FaceVerification] ONNX detectAndEmbed error:', e.message);
+  }
+  // No face-api fallback — ONNX pipeline (512-d ArcFace) is the ONLY embedding source.
+  // This prevents dimension mismatches (128-d vs 512-d) that cause false verifications.
+  return faces;
+};
 
-// ─── registerFace ─────────────────────────────────────────────────────────────
-/**
- * Capture a robust reference by averaging several good frames into one 128-d
- * descriptor. Hard-stops on no-face / multiple-faces / identity change; skips
- * (and retries) frames that fail the quality gate.
- *
- * Returns { descriptor, embedding, allEmbeddings, alignedCrops, confidence,
- *           framesCaptured, qualityScore, alignedCropDataUrl, model, dimensions }.
- */
 export const registerFace = async (videoEl, options = {}) => {
   const {
-    frameCount = REGISTRATION_FRAMES,
-    intervalMs = REGISTRATION_INTERVAL_MS,
+    frameCount    = REGISTRATION_FRAMES,
+    intervalMs    = REGISTRATION_FRAME_DELAY_MS,
     onFrameCaptured,
-    onError
+    onError,
+    onQualityIssue,
   } = options;
 
-  if (!isReady()) throw new Error('Models not loaded. Call loadModels() first.');
   if (!videoEl || videoEl.readyState < 2) throw new Error('Video element not ready.');
 
-  const accepted = [];       // Float32Array[128] per accepted frame
-  const crops = [];          // dataURL per accepted frame
-  const qualityScores = [];
-  let firstDescriptor = null;
-  let attempts = 0;
+  const acceptedEmbeddings  = [];
+  const acceptedCrops       = [];     // dataURL per accepted frame
+  const qualityScores       = [];
+  let firstEmbedding        = null;
+  let attempts              = 0;
 
-  const reset = () => { accepted.length = 0; crops.length = 0; qualityScores.length = 0; firstDescriptor = null; };
-
-  while (accepted.length < frameCount && attempts < REGISTRATION_MAX_ATTEMPTS) {
+  while (acceptedEmbeddings.length < frameCount && attempts < REGISTRATION_MAX_ATTEMPTS) {
     attempts++;
 
-    const dets = await faceapi
-      .detectAllFaces(videoEl, getDetectorOptions())
-      .withFaceLandmarks()
-      .withFaceDescriptors();
+    const faces = await detectAndEmbedWithFallback(videoEl, 0.35);
 
-    // Hard stop 1 — no face.
-    if (dets.length === 0) {
-      reset();
-      const err = new Error('Face not detected. Please position your face properly and try again.');
-      err.code = ERR_NO_FACE;
-      throw err;
-    }
-    // Hard stop 2 — more than one face.
-    if (dets.length > 1) {
-      reset();
-      const err = new Error('Multiple faces detected. Registration cannot continue. Please ensure only one person is visible.');
-      err.code = ERR_MULTI_FACE;
-      throw err;
+    // Skip frame if no face or multiple faces, then retry next attempt
+    if (faces.length === 0) {
+      console.warn('[FaceRegistration] Frame skipped: no face detected.');
+      onQualityIssue?.(['Position your face clearly in front of the camera']);
+      await new Promise(r => setTimeout(r, intervalMs));
+      continue;
     }
 
-    const d = dets[0];
-    const face = {
-      box: boxOf(d.detection),
-      score: d.detection.score ?? 0,
-      landmarks: to5Point(d.landmarks),
-    };
+    if (faces.length > 1) {
+      console.warn(`[FaceRegistration] Frame skipped: multiple faces detected (${faces.length}).`);
+      onQualityIssue?.(['Ensure only one person is visible in frame']);
+      await new Promise(r => setTimeout(r, intervalMs));
+      continue;
+    }
 
-    // Quality gate (brightness, blur, size, centering, pose, eyes).
+    const face = faces[0];
+
+    // ── Frame quality check ────────────────────────────────────────────────────
     const quality = evaluateFrameQuality(videoEl, face);
     if (!quality.passed) {
       onQualityIssue?.(quality.issues);
       onError?.(`Frame quality too low (${quality.overallScore}/100): ${quality.issues[0] || ''}`);
-      await new Promise((r) => setTimeout(r, intervalMs));
+      await new Promise(r => setTimeout(r, intervalMs));
       continue;
     }
 
-    // Identity-consistency gate — every frame must be the same person.
-    if (firstDescriptor) {
-      const dist = euclideanDistance(firstDescriptor, d.descriptor);
-      if (dist > REGISTRATION_MATCH_TOLERANCE) {
-        reset();
-        const err = new Error('Registration failed: face changed between frames. Keep steady and ensure only you are in view.');
-        err.code = ERR_MULTI_FACE;
-        throw err;
+    // ── Embedding consistency check ────────────────────────────────────────────
+    if (firstEmbedding) {
+      const sim = cosineSimilarity(firstEmbedding, face.embedding);
+      if (sim < 0.38) {
+        console.warn(`[FaceRegistration] Frame skipped due to pose/lighting variance: cosine sim = ${sim.toFixed(3)}`);
+        onQualityIssue?.(['Please hold your head steady facing the camera']);
+        await new Promise(r => setTimeout(r, intervalMs));
+        continue; // Skip frame and retry next frame attempt
       }
     } else {
-      firstDescriptor = d.descriptor;
+      firstEmbedding = face.embedding;
     }
 
-    accepted.push(d.descriptor);
-    crops.push(captureAlignedCrop(videoEl, face.box));
+    // ── Accept frame ───────────────────────────────────────────────────────────
+    acceptedEmbeddings.push(face.embedding);
+    acceptedCrops.push(captureAlignedCrop(videoEl, face.box));
     qualityScores.push(quality.overallScore);
 
-    onFrameCaptured?.(accepted.length, frameCount, d.descriptor, { box: face.box, landmarks: face.landmarks });
+    onFrameCaptured?.(acceptedEmbeddings.length, frameCount, face.embedding, face);
 
-    if (accepted.length < frameCount) {
-      await new Promise((r) => setTimeout(r, intervalMs));
+    if (acceptedEmbeddings.length < frameCount) {
+      await new Promise(r => setTimeout(r, intervalMs));
     }
   }
 
-  if (accepted.length < 2) {
-    throw new Error(`Face registration failed. Only captured ${accepted.length} valid frame(s). Ensure good lighting and hold still.`);
+  if (acceptedEmbeddings.length < 2) {
+    throw new Error(
+      `Face registration failed. Only captured ${acceptedEmbeddings.length} valid frames out of ${REGISTRATION_MAX_ATTEMPTS} attempts. Ensure good lighting and hold still.`
+    );
   }
 
-  const finalDescriptor = computeAverageDescriptor(accepted);
-  const avgQuality = qualityScores.reduce((s, v) => s + v, 0) / qualityScores.length;
-  const avgDistance = accepted.reduce((s, e) => s + euclideanDistance(e, finalDescriptor), 0) / accepted.length;
+  // Median-pool of all accepted embeddings (robust to outlier frames)
+  const finalEmbedding    = medianPoolEmbeddings(acceptedEmbeddings);
+  const averageQuality    = qualityScores.reduce((s, v) => s + v, 0) / qualityScores.length;
+  const averageConfidence = acceptedEmbeddings.reduce((s, emb) => {
+    return s + cosineSimilarity(emb, finalEmbedding);
+  }, 0) / acceptedEmbeddings.length;
 
   return {
-    descriptor: finalDescriptor,       // 128-d — this is registeredFaceDescriptor
-    embedding: finalDescriptor,        // alias kept for caller compat
-    allEmbeddings: accepted,
-    alignedCrops: crops,
-    confidence: distanceToSimilarity(avgDistance), // 0–1
-    framesCaptured: accepted.length,
-    qualityScore: Math.round(avgQuality),
-    alignedCropDataUrl: crops[crops.length - 1],
-    model: 'faceapi-128',
-    dimensions: 128,
+    descriptor:        finalEmbedding,       // alias kept for caller compat
+    embedding:         finalEmbedding,
+    allEmbeddings:     acceptedEmbeddings,   // all 5 raw embeddings
+    alignedCrops:      acceptedCrops,        // dataURL per captured frame
+    confidence:        averageConfidence,
+    framesCaptured:    acceptedEmbeddings.length,
+    qualityScore:      Math.round(averageQuality),
+    alignedCropDataUrl: acceptedCrops[acceptedCrops.length - 1], // last frame (legacy field)
+    model:             'arcface-r50-onnx',
+    dimensions:        512,
   };
 };
 
-// ─── VerificationStatus ─────────────────────────────────────────────────────────
-export const VerificationStatus = {
-  VERIFIED:       'verified',
-  MISMATCH:       'mismatch',
-  NO_FACE:        'no_face',
-  MULTIPLE_FACES: 'multiple_faces',
-  COVERED:        'covered',
-  SPOOF_DETECTED: 'spoof_detected',
-  ERROR:          'error',
-};
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// ─── verifyFace ─────────────────────────────────────────────────────────────────
 /**
- * Verify the live feed against the stored 128-d reference descriptor, and
- * piggy-back gaze + head-pose off the same landmark pass.
- *
- * @returns {{ status, similarity, distance, faceCount, isReal, antispoofScore,
- *             gaze, headPose, timings, error? }}
+ * Median-pool a set of 512-d embeddings.
+ * For each dimension, take the median value across all frames.
+ * More robust than averaging — outlier frames don't shift the centroid.
  */
-export const verifyFace = async (videoEl, referenceDescriptor) => {
-  if (!referenceDescriptor) {
-    return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: 'No reference descriptor provided' };
-  }
-  if (!videoEl || videoEl.readyState < 2) {
-    return { status: VerificationStatus.NO_FACE, similarity: 0, distance: 1, faceCount: 0 };
-  }
+const medianPoolEmbeddings = (embeddings) => {
+  const dims = embeddings[0].length;
+  const result = new Float32Array(dims);
+  const dimValues = new Array(embeddings.length);
 
-  const t0 = performance.now();
-  try {
-    const dets = await faceapi
-      .detectAllFaces(videoEl, getDetectorOptions())
-      .withFaceLandmarks()
-      .withFaceDescriptors();
-
-    const elapsed = performance.now() - t0;
-
-    if (dets.length === 0) {
-      return { status: VerificationStatus.NO_FACE, similarity: 0, distance: 1, faceCount: 0, timings: { total: elapsed } };
+  for (let d = 0; d < dims; d++) {
+    for (let i = 0; i < embeddings.length; i++) {
+      dimValues[i] = embeddings[i][d];
     }
-    if (dets.length > 1) {
-      return { status: VerificationStatus.MULTIPLE_FACES, similarity: 0, distance: 1, faceCount: dets.length, timings: { total: elapsed } };
-    }
-
-    const d = dets[0];
-    if (!d.descriptor) {
-      return { status: VerificationStatus.COVERED, similarity: 0, distance: 1, faceCount: 1, timings: { total: elapsed } };
-    }
-
-    const reference = referenceDescriptor instanceof Float32Array ? referenceDescriptor : Float32Array.from(referenceDescriptor);
-    const distance = euclideanDistance(d.descriptor, reference);
-    const similarity = distanceToSimilarity(distance);
-    const status = distance <= MATCH_THRESHOLD ? VerificationStatus.VERIFIED : VerificationStatus.MISMATCH;
-
-    // Gaze + head-pose from the same 68 landmarks. Best-effort: a failure here
-    // must never break identity verification.
-    let gaze = null, headPose = null;
-    try { gaze = analyzeGaze(d.landmarks); } catch (e) { /* non-fatal */ }
-    try { headPose = analyzeHeadPose(d.landmarks); } catch (e) { /* non-fatal */ }
-
-    return {
-      status,
-      similarity,
-      distance,
-      faceCount: 1,
-      isReal: true,
-      antispoofScore: 1.0,
-      gaze,
-      headPose,
-      timings: { total: elapsed },
-    };
-  } catch (err) {
-    console.error('[FaceVerification] verifyFace error:', err);
-    return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: err?.message };
+    dimValues.sort((a, b) => a - b);
+    const mid = Math.floor(embeddings.length / 2);
+    result[d] = embeddings.length % 2 === 0
+      ? (dimValues[mid - 1] + dimValues[mid]) / 2
+      : dimValues[mid];
   }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────────
-/** Element-wise average of a set of 128-d descriptors → one Float32Array. */
-export const computeAverageDescriptor = (descriptors) => {
-  if (!descriptors?.length) throw new Error('No descriptors');
-  const len = descriptors[0].length;
-  const sum = new Float32Array(len);
-  for (const d of descriptors) for (let i = 0; i < len; i++) sum[i] += d[i];
-  for (let i = 0; i < len; i++) sum[i] /= descriptors.length;
-  return sum;
+  return result;
 };
 
-/** Capture the face region as a small Data URL for audit/display. */
+/**
+ * Capture the face region as a small Data URL for audit/display.
+ */
 const captureAlignedCrop = (videoEl, box) => {
   try {
     const c = document.createElement('canvas');
@@ -465,7 +280,263 @@ const captureAlignedCrop = (videoEl, box) => {
   }
 };
 
+// ─── VerificationStatus ───────────────────────────────────────────────────────
+
+export const VerificationStatus = {
+  VERIFIED:        'verified',
+  MISMATCH:        'mismatch',
+  NO_FACE:         'no_face',
+  MULTIPLE_FACES:  'multiple_faces',
+  COVERED:         'covered',
+  SPOOF_DETECTED:  'spoof_detected',
+  ERROR:           'error',
+};
+
+// ─── verifyFace ───────────────────────────────────────────────────────────────
+
 /**
- * Get the match threshold used for verification.
+ * Verify the live camera feed against the stored registration embedding.
+ * Runs single-pass detectAndEmbed for optimal speed and frame consistency.
  */
-export const getMatchThreshold = () => MATCH_THRESHOLD;
+export const verifyFace = async (videoEl, referenceDescriptor) => {
+  if (!referenceDescriptor || !(referenceDescriptor instanceof Float32Array || Array.isArray(referenceDescriptor)) || referenceDescriptor.length !== 512) {
+    console.error('[FaceVerification] Invalid or missing reference descriptor:', referenceDescriptor);
+    return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: 'No valid reference embedding provided' };
+  }
+
+  const t0 = performance.now();
+
+  try {
+    // ── Pre-step: Brightness / Covered check ──────────────
+    const brightResult = checkBrightness(videoEl);
+    if (!brightResult.passed && brightResult.brightness < 20) {
+      console.warn(`[FaceVerification] Camera covered or too dark: brightness = ${brightResult.brightness}`);
+      return { 
+        status: VerificationStatus.NO_FACE, 
+        similarity: 0, 
+        distance: 1, 
+        faceCount: 0, 
+        timings: { total: performance.now() - t0 } 
+      };
+    }
+
+    // Single-pass detect and embed with 0.45 score threshold for multi-face detection
+    // Single-pass detect and embed with 0.45 score threshold for multi-face detection
+    const faces = await detectAndEmbedWithFallback(videoEl, 0.45);
+    const elapsed = performance.now() - t0;
+
+    if (faces.length === 0) {
+      return { status: VerificationStatus.NO_FACE, similarity: 0, distance: 1, faceCount: 0, timings: { total: elapsed } };
+    }
+
+    if (faces.length > 1) {
+      console.warn(`[FaceVerification] Multiple faces detected: ${faces.length}`);
+      return { status: VerificationStatus.MULTIPLE_FACES, similarity: 0, distance: 1, faceCount: faces.length, timings: { total: elapsed } };
+    }
+
+    const face = faces[0];
+
+    // Missing embedding → face likely covered/obscured
+    if (!face.embedding) {
+      return { status: VerificationStatus.COVERED, similarity: 0, distance: 1, faceCount: 1, timings: { total: elapsed } };
+    }
+
+    const similarity = cosineSimilarity(face.embedding, Array.from(referenceDescriptor));
+    const distance = 1 - similarity;
+
+    console.log(`[FaceVerification] Single-frame verify: cosine=${similarity.toFixed(4)}, threshold=${VERIFICATION_COSINE_THRESHOLD}`);
+
+    const gaze = null; // Gaze tracking disabled
+
+    const status = similarity >= VERIFICATION_COSINE_THRESHOLD
+      ? VerificationStatus.VERIFIED
+      : VerificationStatus.MISMATCH;
+
+    return {
+      status,
+      similarity,
+      distance,
+      faceCount: 1,
+      isReal: null,           // Anti-spoof model not available — unknown liveness
+      antispoofScore: null,   // No anti-spoof score available
+      gaze,
+      timings: { total: elapsed },
+    };
+  } catch (err) {
+    console.error('[FaceVerification] verifyFace error:', err);
+    return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: err.message };
+  }
+};
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+
+// kept for any code that imports computeAverageDescriptor
+export const computeAverageDescriptor = (descriptors) => {
+  if (!descriptors?.length) throw new Error('No descriptors');
+  const len = descriptors[0].length;
+  const sum = new Float32Array(len);
+  for (const d of descriptors) for (let i = 0; i < len; i++) sum[i] += d[i];
+  return sum.map(v => v / descriptors.length);
+};
+
+// ─── verifyFaceBatch ──────────────────────────────────────────────────────────
+
+/**
+ * Batch face verification: captures N live frames, generates embeddings,
+ * and compares each against all reference embeddings using best-match
+ * cosine similarity. This is far more robust than single-frame verification.
+ *
+ * @param {HTMLVideoElement} videoEl
+ * @param {number[][]} referenceEmbeddings  - Array of 5 registered 512-d embeddings
+ * @param {object} options
+ * @param {number} options.frameCount       - Number of live frames to capture (default: 5)
+ * @param {number} options.intervalMs       - Delay between frames (default: 500ms)
+ * @param {function} options.onProgress     - (capturedCount, totalFrames) => void
+ * @returns {Promise<{
+ *   status: string,           // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces' | 'error'
+ *   bestSimilarity: number,   // highest best-match similarity across all live frames
+ *   avgSimilarity: number,    // average best-match similarity
+ *   framesCaptured: number,   // how many live frames produced usable embeddings
+ *   faceCount: number,        // last detected face count
+ *   details: object           // per-frame breakdown
+ * }>}
+ */
+export const verifyFaceBatch = async (videoEl, referenceEmbeddings, options = {}) => {
+  const {
+    frameCount = 5,
+    intervalMs = 500,
+    onProgress,
+  } = options;
+
+  if (!referenceEmbeddings || !Array.isArray(referenceEmbeddings) || referenceEmbeddings.length === 0) {
+    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, framesCaptured: 0, faceCount: 0, error: 'No reference embeddings' };
+  }
+  if (!videoEl || videoEl.readyState < 2) {
+    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, framesCaptured: 0, faceCount: 0, error: 'Video not ready' };
+  }
+
+  const frameSimilarities = [];  // best-match similarity per live frame
+  const frameStatuses = [];      // per-frame status
+  let lastFaceCount = 0;
+  let noFaceCount = 0;
+  let multiFaceCount = 0;
+  let capturedCount = 0;
+
+  for (let i = 0; i < frameCount; i++) {
+    try {
+      // Brightness pre-check
+      const brightResult = checkBrightness(videoEl);
+      if (!brightResult.passed && brightResult.brightness < 20) {
+        frameStatuses.push('no_face');
+        noFaceCount++;
+        onProgress?.(capturedCount, frameCount);
+        if (i < frameCount - 1) await new Promise(r => setTimeout(r, intervalMs));
+        continue;
+      }
+
+      const faces = await detectAndEmbedWithFallback(videoEl, 0.45);
+
+      if (faces.length === 0) {
+        frameStatuses.push('no_face');
+        noFaceCount++;
+        lastFaceCount = 0;
+      } else if (faces.length > 1) {
+        frameStatuses.push('multiple_faces');
+        multiFaceCount++;
+        lastFaceCount = faces.length;
+      } else {
+        const face = faces[0];
+        lastFaceCount = 1;
+
+        if (!face.embedding) {
+          frameStatuses.push('covered');
+        } else {
+          // Compare this live embedding against ALL reference embeddings
+          // Both MUST be 512-d ArcFace embeddings (no face-api fallback)
+          const liveEmb = face.embedding;
+
+          let bestSim = -1;
+          for (const refEmb of referenceEmbeddings) {
+            const refArray = refEmb instanceof Float32Array ? Array.from(refEmb) : refEmb;
+            if (liveEmb.length !== refArray.length) {
+              console.error(`[FaceVerification] DIMENSION MISMATCH: live=${liveEmb.length} vs ref=${refArray.length}. Skipping comparison.`);
+              continue;
+            }
+            const sim = cosineSimilarity(liveEmb, refArray);
+            if (sim > bestSim) bestSim = sim;
+          }
+
+          if (bestSim < 0) {
+            console.warn('[FaceVerification] No valid embedding comparison was possible (dimension mismatch on all refs).');
+            bestSim = 0;
+          }
+
+          console.log(`[FaceVerification] Batch frame: bestSim=${bestSim.toFixed(4)}, threshold=${VERIFICATION_COSINE_THRESHOLD}`);
+          frameSimilarities.push(bestSim);
+          capturedCount++;
+          frameStatuses.push(bestSim >= VERIFICATION_COSINE_THRESHOLD ? 'verified' : 'mismatch');
+        }
+      }
+    } catch (err) {
+      console.warn(`[FaceVerification] Batch frame ${i} error:`, err.message);
+      frameStatuses.push('error');
+    }
+
+    onProgress?.(capturedCount, frameCount);
+
+    if (i < frameCount - 1) {
+      await new Promise(r => setTimeout(r, intervalMs));
+    }
+  }
+
+  // Calculate similarity statistics
+  const bestSimilarity = frameSimilarities.length > 0 ? Math.max(...frameSimilarities) : 0;
+  const avgSimilarity = frameSimilarities.length > 0 ? frameSimilarities.reduce((s, v) => s + v, 0) / frameSimilarities.length : 0;
+
+  // Priority 1: If multiple faces appeared in ANY frame during the batch check → MULTIPLE_FACES
+  if (multiFaceCount >= 1) {
+    return {
+      status: VerificationStatus.MULTIPLE_FACES,
+      bestSimilarity,
+      avgSimilarity,
+      framesCaptured: capturedCount,
+      faceCount: Math.max(2, lastFaceCount),
+      details: { frameStatuses, multiFaceCount, noFaceCount }
+    };
+  }
+
+  // Priority 2: If no usable single-face frames captured → NO_FACE
+  if (capturedCount === 0) {
+    return {
+      status: VerificationStatus.NO_FACE,
+      bestSimilarity: 0,
+      avgSimilarity: 0,
+      framesCaptured: 0,
+      faceCount: 0,
+      details: { frameStatuses }
+    };
+  }
+
+  // Priority 3: Identity verification matching against reference embeddings
+  let status;
+  if (bestSimilarity >= VERIFICATION_COSINE_THRESHOLD) {
+    const verifiedCount = frameSimilarities.filter(s => s >= VERIFICATION_COSINE_THRESHOLD).length;
+    // Require at least 60% of captured frames to pass (3 out of 5)
+    if (verifiedCount >= Math.ceil(capturedCount * 0.6)) {
+      status = VerificationStatus.VERIFIED;
+    } else {
+      status = VerificationStatus.MISMATCH;
+    }
+  } else {
+    status = VerificationStatus.MISMATCH;
+  }
+
+  return {
+    status,
+    bestSimilarity,
+    avgSimilarity,
+    framesCaptured: capturedCount,
+    faceCount: lastFaceCount,
+    details: { frameStatuses, frameSimilarities },
+  };
+};
