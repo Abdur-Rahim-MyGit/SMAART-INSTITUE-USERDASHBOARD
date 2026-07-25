@@ -181,6 +181,7 @@ const BaseLineTest = () => {
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  const [registeredAllEmbeddings, setRegisteredAllEmbeddings] = useState(null);
   const [registrationMetadata, setRegistrationMetadata] = useState(null); // quality/model info for backend persistence
 
   const timerStartRef = useRef(null);
@@ -253,6 +254,11 @@ const BaseLineTest = () => {
   const isLastFiveMinutes = remainingSeconds <= 300;
   const allQuestionsAnswered = questions.length > 0 && questions.every(q => selectedAnswers[q._id]);
 
+  const selectedAnswersRef = useRef(selectedAnswers);
+  useEffect(() => {
+    selectedAnswersRef.current = selectedAnswers;
+  }, [selectedAnswers]);
+
   const clearTimerPersistence = useCallback(() => {
     localStorage.removeItem(timerStartStorageKey);
     localStorage.removeItem(timerWarningStorageKey);
@@ -276,7 +282,8 @@ const BaseLineTest = () => {
   const finalizeUnansweredQuestions = useCallback(async () => {
     if (!resultId || questions.length === 0) return;
 
-    const unansweredQuestions = questions.filter((question) => !selectedAnswers[question._id]);
+    const currentAnswers = selectedAnswersRef.current;
+    const unansweredQuestions = questions.filter((question) => !currentAnswers[question._id]);
     if (unansweredQuestions.length === 0) return;
 
     const fallbackAnswers = {};
@@ -296,7 +303,7 @@ const BaseLineTest = () => {
         )
       )
     );
-  }, [questions, resultId, selectedAnswers]);
+  }, [questions, resultId]);
 
   const handleRestartCourse = async () => {
     try {
@@ -714,12 +721,14 @@ const BaseLineTest = () => {
     passAttentionCheck,
     failAttentionCheck,
     verificationStatus,
-    similarityScore
+    similarityScore,
+    gazeDirection
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
     registeredFaceDescriptor,
+    registeredAllEmbeddings,
     registrationMetadata,
   });
 
@@ -845,14 +854,16 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={({ faceDescriptor, registrationQualityScore, registrationCropUrl }) => {
+          onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, registrationCropUrl }) => {
             setRegisteredFaceDescriptor(faceDescriptor);
+            setRegisteredAllEmbeddings(allEmbeddings || null);
             setRegistrationMetadata({
               model: 'arcface-r50-onnx',
               qualityScore: registrationQualityScore || null,
               framesCaptured: 5,
               antispoofPassed: true,
               registrationCropUrl: registrationCropUrl || null,
+              alignedCrops: alignedCrops || null,
             });
             setSetupCompleted(true);
           }}
@@ -1421,6 +1432,7 @@ const BaseLineTest = () => {
           onRequestFullscreen={requestFullscreen}
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
+          gazeDirection={gazeDirection}
         />
       )}
 

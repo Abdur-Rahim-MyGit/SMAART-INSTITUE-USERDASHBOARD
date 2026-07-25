@@ -119,13 +119,9 @@ const connectWithFallback = async () => {
   const primaryURI = process.env.MONGODB_URI;
   const fallbackURI = process.env.MONGODB_FALLBACK_URI || 'mongodb://127.0.0.1:27017/minds';
 
-  const isLocal = primaryURI.includes('127.0.0.1') || primaryURI.includes('localhost');
+  const isLocal = primaryURI?.includes('127.0.0.1') || primaryURI?.includes('localhost');
   const options = isLocal ? {} : {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 50,
-    minPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 15000,
     socketTimeoutMS: 45000,
     retryWrites: true,
     retryReads: true
@@ -133,10 +129,21 @@ const connectWithFallback = async () => {
 
   try {
     await mongoose.connect(primaryURI, options);
-    logger.info('✅ MongoDB connected successfully');
+    logger.info('✅ MongoDB connected successfully to primary database');
   } catch (err) {
-    logger.error('❌ MongoDB connection error:', err.message);
-    logger.warn('⚠️ Server will remain running. Mongoose will automatically retry connecting in the background.');
+    logger.error('❌ Primary MongoDB connection error:', err.message);
+    if (fallbackURI && fallbackURI !== primaryURI) {
+      try {
+        logger.info('🔄 Attempting fallback MongoDB connection...');
+        await mongoose.connect(fallbackURI, { serverSelectionTimeoutMS: 5000 });
+        logger.info('✅ MongoDB connected to fallback database');
+        return;
+      } catch (fallbackErr) {
+        logger.error('❌ Fallback MongoDB connection error:', fallbackErr.message);
+      }
+    }
+    logger.warn('⚠️ Retrying MongoDB connection in 5 seconds...');
+    setTimeout(connectWithFallback, 5000);
   }
 };
 

@@ -26,14 +26,29 @@ const ProctoringSessionSchema = new mongoose.Schema({
   totalFaceChecks: { type: Number, default: 0 },
   faceChecksPassed: { type: Number, default: 0 },
 
-  // ── Face Embedding Persistence (v2: ArcFace ONNX) ──────────────────────────
-  faceEmbedding: { type: String, default: null },       // JSON-stringified Float32Array[512]
+  // ── Face Embedding Persistence (v3: Multi-Embedding ArcFace ONNX) ───────────
+  faceEmbedding: { type: String, default: null },       // JSON-stringified Float32Array[512] (merged/median-pooled)
   faceEmbeddingModel: { type: String, default: null },  // e.g. 'arcface-r50-onnx'
   faceEmbeddingDims: { type: Number, default: null },   // 512
   faceRegistrationQuality: { type: Number, default: null }, // 0–100 quality score at registration
   faceRegistrationFrames: { type: Number, default: null },  // frames captured (should be 5)
-  faceAlignedCropUrl: { type: String, default: null },  // Cloudinary / local URL of registration crop
+  faceAlignedCropUrl: { type: String, default: null },  // last frame crop URL (legacy compat)
   antispoofPassed: { type: Boolean, default: null },    // Anti-spoof result at registration
+
+  // All 5 individual registration embeddings (JSON-stringified number[][512])
+  allFaceEmbeddings: { type: String, default: null },
+  // 5 registration crop images stored as base64 data URLs (~5-10 KB each)
+  registrationImages: [{ type: String }],
+  // Rolling verification history (last 50 batch verifications)
+  verificationHistory: [{
+    timestamp: { type: Date, default: Date.now },
+    similarity: { type: Number },          // best-match cosine similarity
+    status: { type: String },              // verified | mismatch | no_face | multiple_faces
+    framesCaptured: { type: Number },      // how many live frames were usable
+    _id: false
+  }],
+  // Warning count (warnings shown to user, separate from totalViolations)
+  warningCount: { type: Number, default: 0 },
 
   startedAt: { type: Date, default: Date.now },
   completedAt: { type: Date }

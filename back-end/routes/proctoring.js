@@ -50,6 +50,8 @@ router.post('/session/:sessionId/upload-snapshot', upload.single('snapshot'), pr
 // v2: Face embedding persistence routes
 router.post('/session/:sessionId/registration', proctoringController.saveRegistration);
 router.get('/session/:sessionId/embedding', proctoringController.getEmbedding);
+// v3: Batch verification logging
+router.post('/session/:sessionId/verification', proctoringController.logVerification);
 
 // Admin-only routes
 router.get('/admin/sessions', authorize('admin'), proctoringController.getSessions);

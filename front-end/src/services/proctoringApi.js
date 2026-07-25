@@ -54,14 +54,20 @@ export const proctoringApi = {
     return apiCall(`/proctoring/admin/session/${sessionId}`);
   },
 
-  // v2: Persist ArcFace registration embedding to the session record
-  // embedding: Float32Array | number[]
+  // v3: Persist ArcFace registration embedding(s) to the session record
+  // embedding: Float32Array | number[] (merged)
+  // allEmbeddings: number[][] (all 5 individual embeddings)
+  // registrationImages: string[] (base64 data URLs of 5 crops)
   saveRegistration: async (sessionId, registrationData) => {
-    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = registrationData;
+    const { embedding, allEmbeddings, registrationImages, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = registrationData;
     return apiCall(`/proctoring/session/${sessionId}/registration`, {
       method: 'POST',
       body: JSON.stringify({
         embedding: Array.from(embedding),  // Convert Float32Array → plain array for JSON
+        allEmbeddings: allEmbeddings
+          ? allEmbeddings.map(e => e instanceof Float32Array ? Array.from(e) : e)
+          : null,
+        registrationImages: registrationImages || null,
         model,
         qualityScore,
         framesCaptured,
@@ -71,9 +77,18 @@ export const proctoringApi = {
     });
   },
 
-  // v2: Retrieve stored embedding for session resume after page refresh
+  // v3: Retrieve stored embedding(s) for session resume after page refresh
   getEmbedding: async (sessionId) => {
     return apiCall(`/proctoring/session/${sessionId}/embedding`);
+  },
+
+  // v3: Log batch verification result
+  logVerification: async (sessionId, verificationData) => {
+    const { similarity, status, framesCaptured, warningIssued } = verificationData;
+    return apiCall(`/proctoring/session/${sessionId}/verification`, {
+      method: 'POST',
+      body: JSON.stringify({ similarity, status, framesCaptured, warningIssued }),
+    });
   },
 };
 

@@ -24,6 +24,9 @@ const ProctoringEventSchema = new mongoose.Schema({
       'registration_quality',    // Face registration quality score logged
       'tracker_loss',            // Lightweight tracker lost the face between verifications
       'identity_confidence',     // Per-verification cosine similarity score logged
+      // v3: Batch verification events
+      'verification_batch',      // 5-frame batch verification completed (info-level)
+      'face_absent_reminder',    // Gentle reminder shown (not a violation)
     ],
     required: true 
   },

@@ -5,7 +5,7 @@
  * Prevents infinite loops and buffering issues while restoring functionality
  */
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { API_BASE_URL, startTokenRenewal, stopTokenRenewal } from '@/services/api';
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
@@ -248,25 +248,36 @@ export const UserProvider = ({ children }) => {
     });
   }, []);
 
+  const value = useMemo(() => ({
+    user,
+    loading,
+    login,
+    refreshUser,
+    logout,
+    updateUser
+  }), [user, loading, login, refreshUser, logout, updateUser]);
+
   return (
-    <UserContext.Provider value={{ user, loading, login, refreshUser, logout, updateUser }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );
+};
+
+const FALLBACK_USER_CONTEXT = {
+  user: null,
+  loading: false,
+  login: () => { },
+  logout: () => { },
+  updateUser: () => { },
+  refreshUser: () => { }
 };
 
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
     console.warn('⚠️ useUser was called outside UserProvider (or Vite HMR split the context). Returning fallback to avoid crash.');
-    return {
-      user: null,
-      loading: false,
-      login: () => { },
-      logout: () => { },
-      updateUser: () => { },
-      refreshUser: () => { }
-    };
+    return FALLBACK_USER_CONTEXT;
   }
   return context;
 };

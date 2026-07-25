@@ -37,7 +37,8 @@ const FloatingCommunityButton = () => {
         const checkSplash = () => {
             // Look for the splash screen overlay (z-index 9999)
             const splashElement = document.querySelector('[class*="z-\\[9999\\]"]');
-            setIsSplashVisible(!!splashElement);
+            const visible = !!splashElement;
+            setIsSplashVisible(prev => (prev !== visible ? visible : prev));
         };
 
         checkSplash();

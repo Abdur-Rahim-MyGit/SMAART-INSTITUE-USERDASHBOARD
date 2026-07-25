@@ -15,7 +15,12 @@
  */
 
 // onnxruntime-web is loaded globally via index.html <script src="/onnx-wasm/ort.min.js">
-const ort = window.ort;
+const getOrt = () => {
+  if (typeof window !== 'undefined' && window.ort) {
+    return window.ort;
+  }
+  throw new Error('[OnnxPipeline] ONNX Runtime Web library (window.ort) is missing. Please ensure /onnx-wasm/ort.min.js is loaded.');
+};
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MODEL_BASE = '/models/onnx';
@@ -24,7 +29,7 @@ const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
 
 const SCRFD_INPUT_SIZE = 640;        // SCRFD input resolution
 const ARCFACE_INPUT_SIZE = 112;      // ArcFace aligned face crop size
-const NMS_THRESHOLD = 0.3;
+const NMS_THRESHOLD = 0.40;
 const SCORE_THRESHOLD = 0.5;
 
 // SCRFD anchor strides and base anchors
@@ -40,6 +45,12 @@ let isInitializing = false;
 let initError = null;
 let _progressCallback = null;
 
+// Reusable offscreen canvas singletons to prevent memory leaks / GC thrashing
+let _videoCanvas = null;
+let _videoCtx = null;
+let _alignCanvas = null;
+let _alignCtx = null;
+
 // ─── Initialization ──────────────────────────────────────────────────────────
 
 /**
@@ -47,6 +58,7 @@ let _progressCallback = null;
  * Must be called before any InferenceSession.create().
  */
 const configureOrtEnv = () => {
+  const ort = getOrt();
   // Point to the ort wasm files served from /public
   ort.env.wasm.wasmPaths = '/onnx-wasm/';
   // Prefer WebGL → WASM → CPU
@@ -67,11 +79,15 @@ const report = (pct, msg) => {
 export const initPipeline = async (onProgress) => {
   if (isInitialized) return true;
   if (isInitializing) {
-    // Wait for the ongoing init
+    // Wait for ongoing init with a 10s maximum timeout
     let wait = 0;
-    while (isInitializing && wait < 300) {
+    while (isInitializing && wait < 50) {
       await new Promise(r => setTimeout(r, 200));
       wait++;
+    }
+    if (isInitializing) {
+      isInitializing = false;
+      throw new Error('[OnnxPipeline] Pipeline initialization timed out after 10 seconds.');
     }
     return isInitialized;
   }
@@ -82,6 +98,7 @@ export const initPipeline = async (onProgress) => {
 
   try {
     configureOrtEnv();
+    const ort = getOrt();
     report(5, 'Configuring ONNX Runtime...');
 
     const sessionOpts = {
@@ -120,14 +137,20 @@ export const getInitError = () => initError;
 /**
  * Draw a video frame into an offscreen canvas at the given size and return
  * a normalised Float32Array in NCHW format (1 × 3 × H × W), BGR channel order.
+ * Reuses a single offscreen canvas to avoid GC allocations per frame.
  */
 const videoToTensor = (videoEl, width, height, bgr = true) => {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(videoEl, 0, 0, width, height);
-  const { data } = ctx.getImageData(0, 0, width, height);
+  if (!_videoCanvas) {
+    _videoCanvas = document.createElement('canvas');
+    _videoCtx = _videoCanvas.getContext('2d', { willReadFrequently: true });
+  }
+  if (_videoCanvas.width !== width || _videoCanvas.height !== height) {
+    _videoCanvas.width = width;
+    _videoCanvas.height = height;
+  }
+
+  _videoCtx.drawImage(videoEl, 0, 0, width, height);
+  const { data } = _videoCtx.getImageData(0, 0, width, height);
 
   const pixels = width * height;
   const tensor = new Float32Array(3 * pixels);
@@ -150,7 +173,6 @@ const videoToTensor = (videoEl, width, height, bgr = true) => {
 };
 
 /**
- * Affine-warp a face crop to 112×112 using 5-point landmarks.
  * Standard ArcFace alignment targets (mean face template).
  */
 const ARCFACE_DST = [
@@ -161,14 +183,102 @@ const ARCFACE_DST = [
   [70.7299, 92.3655],
 ];
 
-const cropAndAlignFace = (videoEl, landmarks) => {
-  // Compute similarity transform from detected 5-pt landmarks → ArcFace template
-  const src = landmarks; // [[x,y], [x,y], ...]
-  const dst = ARCFACE_DST;
+/**
+ * Solve 6-parameter 2D affine transform (m11, m12, m21, m22, dx, dy) mapping src -> dst:
+ * u = m11 * x + m21 * y + dx
+ * v = m12 * x + m22 * y + dy
+ * Correctly handles scale, rotation, translation, AND horizontal reflection.
+ */
+const estimateAffineTransform = (src, dst) => {
+  const N = src.length;
+  let S_xx = 0, S_yy = 0, S_xy = 0, S_x = 0, S_y = 0;
+  let S_xu = 0, S_yu = 0, S_u = 0;
+  let S_xv = 0, S_yv = 0, S_v = 0;
 
-  // Simplified: use bounding box of landmarks + a bit of padding as approximation
-  // when full affine warp isn't available. A proper similarity transform is computed
-  // below using least-squares.
+  for (let i = 0; i < N; i++) {
+    const x = src[i][0];
+    const y = src[i][1];
+    const u = dst[i][0];
+    const v = dst[i][1];
+
+    S_xx += x * x;
+    S_yy += y * y;
+    S_xy += x * y;
+    S_x  += x;
+    S_y  += y;
+
+    S_xu += x * u;
+    S_yu += y * u;
+    S_u  += u;
+
+    S_xv += x * v;
+    S_yv += y * v;
+    S_v  += v;
+  }
+
+  const a00 = S_xx, a01 = S_xy, a02 = S_x;
+  const a10 = S_xy, a11 = S_yy, a12 = S_y;
+  const a20 = S_x,  a21 = S_y,  a22 = N;
+
+  const det = a00 * (a11 * a22 - a12 * a21)
+            - a01 * (a10 * a22 - a12 * a20)
+            + a02 * (a10 * a21 - a11 * a20);
+
+  if (Math.abs(det) < 1e-6) return null;
+
+  const invDet = 1 / det;
+
+  const i00 = (a11 * a22 - a12 * a21) * invDet;
+  const i01 = (a02 * a21 - a01 * a22) * invDet;
+  const i02 = (a01 * a12 - a02 * a11) * invDet;
+
+  const i10 = (a12 * a20 - a10 * a22) * invDet;
+  const i11 = (a00 * a22 - a02 * a20) * invDet;
+  const i12 = (a02 * a10 - a00 * a12) * invDet;
+
+  const i20 = (a10 * a21 - a11 * a20) * invDet;
+  const i21 = (a01 * a20 - a00 * a21) * invDet;
+  const i22 = (a00 * a11 - a01 * a10) * invDet;
+
+  const m11 = i00 * S_xu + i01 * S_yu + i02 * S_u;
+  const m21 = i10 * S_xu + i11 * S_yu + i12 * S_u;
+  const dx  = i20 * S_xu + i21 * S_yu + i22 * S_u;
+
+  const m12 = i00 * S_xv + i01 * S_yv + i02 * S_v;
+  const m22 = i10 * S_xv + i11 * S_yv + i12 * S_v;
+  const dy  = i20 * S_xv + i21 * S_yv + i22 * S_v;
+
+  return { m11, m12, m21, m22, dx, dy };
+};
+
+/**
+ * Affine-warp a face crop to 112×112 using 5-point landmarks.
+ */
+const cropAndAlignFace = (videoEl, landmarks) => {
+  if (!_alignCanvas) {
+    _alignCanvas = document.createElement('canvas');
+    _alignCtx = _alignCanvas.getContext('2d', { willReadFrequently: true });
+    _alignCanvas.width = ARCFACE_INPUT_SIZE;
+    _alignCanvas.height = ARCFACE_INPUT_SIZE;
+  }
+
+  _alignCtx.fillStyle = '#000';
+  _alignCtx.fillRect(0, 0, ARCFACE_INPUT_SIZE, ARCFACE_INPUT_SIZE);
+
+  if (landmarks && landmarks.length >= 5) {
+    const transform = estimateAffineTransform(landmarks, ARCFACE_DST);
+    if (transform) {
+      const { m11, m12, m21, m22, dx, dy } = transform;
+      _alignCtx.save();
+      _alignCtx.setTransform(m11, m12, m21, m22, dx, dy);
+      _alignCtx.drawImage(videoEl, 0, 0);
+      _alignCtx.restore();
+      return _alignCanvas;
+    }
+  }
+
+  // Fallback crop if landmarks missing or transform degenerate
+  const src = landmarks || [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
   const xVals = src.map(p => p[0]);
   const yVals = src.map(p => p[1]);
   const minX = Math.min(...xVals);
@@ -176,29 +286,25 @@ const cropAndAlignFace = (videoEl, landmarks) => {
   const maxX = Math.max(...xVals);
   const maxY = Math.max(...yVals);
 
-  const faceW = (maxX - minX) * 2.2;
-  const faceH = (maxY - minY) * 2.8;
+  const faceW = Math.max(50, (maxX - minX) * 2.2);
+  const faceH = Math.max(50, (maxY - minY) * 2.8);
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2 + (maxY - minY) * 0.1;
 
   const cropX = Math.max(0, cx - faceW / 2);
   const cropY = Math.max(0, cy - faceH / 2);
 
-  const canvas = document.createElement('canvas');
-  canvas.width = ARCFACE_INPUT_SIZE;
-  canvas.height = ARCFACE_INPUT_SIZE;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(
+  _alignCtx.drawImage(
     videoEl,
     cropX, cropY, faceW, faceH,
     0, 0, ARCFACE_INPUT_SIZE, ARCFACE_INPUT_SIZE
   );
 
-  return canvas;
+  return _alignCanvas;
 };
 
 const canvasToArcFaceTensor = (canvas) => {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true }) || _alignCtx;
   const { data } = ctx.getImageData(0, 0, ARCFACE_INPUT_SIZE, ARCFACE_INPUT_SIZE);
   const pixels = ARCFACE_INPUT_SIZE * ARCFACE_INPUT_SIZE;
   const tensor = new Float32Array(3 * pixels);
@@ -264,8 +370,12 @@ const nms = (boxes, scores, threshold) => {
 /**
  * Decode SCRFD raw outputs into [{box, score, landmarks}].
  *
- * SCRFD outputs 3 pairs of tensors at strides [8, 16, 32]:
- *   score_8/16/32, bbox_8/16/32, kps_8/16/32
+ * SCRFD outputs 9 tensors — 3 per stride [8, 16, 32]:
+ *   score, bbox (×4), kps (×10)
+ *
+ * CRITICAL: Tensor-to-stride mapping uses ONNX `.dims` shape (last dimension)
+ * to distinguish tensor types, because data.length alone is AMBIGUOUS:
+ *   e.g. bbox_stride16 (3200×4=12800) collides with score_stride8 (12800×1=12800)
  */
 const decodeSCRFD = (outputs, origW, origH) => {
   const scaleX = origW / SCRFD_INPUT_SIZE;
@@ -275,38 +385,122 @@ const decodeSCRFD = (outputs, origW, origH) => {
   const allScores = [];
   const allLandmarks = [];
 
-  // Map of stride → actual output tensor key names (discovered at runtime)
-  // Layout: per-stride groups of [score, bbox, kps] in ascending stride order
-  const keys = Object.keys(outputs);
-
-  for (let si = 0; si < SCRFD_STRIDES.length; si++) {
-    const stride = SCRFD_STRIDES[si];
+  // ── 1. Build numAnchors → stride lookup ──────────────────────────────────
+  const anchorToStride = {};
+  const strideGrids = {};
+  for (const stride of SCRFD_STRIDES) {
     const gh = Math.ceil(SCRFD_INPUT_SIZE / stride);
     const gw = Math.ceil(SCRFD_INPUT_SIZE / stride);
+    const na = gh * gw * SCRFD_NUM_ANCHORS;
+    anchorToStride[na] = stride;
+    strideGrids[stride] = { gh, gw, numAnchors: na };
+  }
 
-    // Standard named outputs first, then positional fallback (score,bbox,kps grouped per stride)
-    const scoreKey = outputs[`score_${stride}`] || outputs[keys[si * 3]];
-    const bboxKey  = outputs[`bbox_${stride}`]  || outputs[keys[si * 3 + 1]];
-    const kpsKey   = outputs[`kps_${stride}`]   || outputs[keys[si * 3 + 2]];
+  // ── 2. Classify each output tensor by ONNX dims shape ────────────────────
+  const strideTensors = {};
+  for (const stride of SCRFD_STRIDES) {
+    strideTensors[stride] = { score: null, bbox: null, kps: null };
+  }
 
-    if (!scoreKey) continue;
+  const outputEntries = Object.entries(outputs).filter(([_, t]) => t?.data);
 
-    const scoreData = scoreKey.data;
-    const bboxData  = bboxKey?.data;
-    const kpsData   = kpsKey?.data;
+  // One-time diagnostic log
+  if (!decodeSCRFD._logged) {
+    decodeSCRFD._logged = true;
+    console.log('[SCRFD] Output tensor map:', outputEntries.map(([name, t]) =>
+      `${name}: dims=[${t.dims?.join(',')}] len=${t.data.length}`
+    ).join(' | '));
+  }
 
-    // SCRFD score tensor shape can be [N, 1] or flat [N]
-    // scoreKey.dims = e.g. [3200, 1] for stride 8 with 2 anchors
-    const scoreStride = (scoreKey.dims && scoreKey.dims[scoreKey.dims.length - 1] === 1) ? 1 : 0;
+  // Track which tensors have been assigned to prevent double-assignment
+  const usedTensors = new Set();
 
-    const centers = generateAnchorCenters(gh, gw, stride);
+  // Phase A: Try named outputs first (e.g. 'score_8', 'bbox_16')
+  for (const stride of SCRFD_STRIDES) {
+    for (const type of ['score', 'bbox', 'kps']) {
+      const key = `${type}_${stride}`;
+      if (outputs[key]?.data) {
+        strideTensors[stride][type] = outputs[key];
+        usedTensors.add(outputs[key]);
+      }
+    }
+  }
+
+  // Phase B: Classify unassigned tensors using dims shape
+  for (const [name, tensor] of outputEntries) {
+    if (usedTensors.has(tensor)) continue;
+    if (!tensor.dims || tensor.dims.length === 0) continue;
+
+    const lastDim = tensor.dims[tensor.dims.length - 1];
+    let type = null;
+    let numAnchors = 0;
+
+    if (lastDim === 4) {
+      type = 'bbox';
+      numAnchors = tensor.data.length / 4;
+    } else if (lastDim === 10) {
+      type = 'kps';
+      numAnchors = tensor.data.length / 10;
+    } else {
+      // lastDim is 1, 2, or flattened — treat as score
+      type = 'score';
+      numAnchors = (lastDim <= 2) ? tensor.data.length / lastDim : tensor.data.length;
+    }
+
+    const stride = anchorToStride[numAnchors];
+    if (stride && strideTensors[stride] && !strideTensors[stride][type]) {
+      strideTensors[stride][type] = tensor;
+      usedTensors.add(tensor);
+    }
+  }
+
+  // Phase C: Fallback for 1D (flattened) tensors — assign remaining by unique sizes
+  for (const [name, tensor] of outputEntries) {
+    if (usedTensors.has(tensor)) continue;
+    const len = tensor.data.length;
+
+    for (const stride of SCRFD_STRIDES) {
+      const na = strideGrids[stride].numAnchors;
+      if (!strideTensors[stride].kps && len === na * 10) {
+        strideTensors[stride].kps = tensor; usedTensors.add(tensor); break;
+      }
+      if (!strideTensors[stride].bbox && len === na * 4) {
+        strideTensors[stride].bbox = tensor; usedTensors.add(tensor); break;
+      }
+    }
+  }
+  // Scores last (to avoid collision with bbox of different stride)
+  for (const [name, tensor] of outputEntries) {
+    if (usedTensors.has(tensor)) continue;
+    const len = tensor.data.length;
+    for (const stride of SCRFD_STRIDES) {
+      const na = strideGrids[stride].numAnchors;
+      if (!strideTensors[stride].score && (len === na || len === na * 2)) {
+        strideTensors[stride].score = tensor; usedTensors.add(tensor); break;
+      }
+    }
+  }
+
+  // ── 3. Decode each stride ────────────────────────────────────────────────
+  for (const stride of SCRFD_STRIDES) {
+    const { score: scoreTensor, bbox: bboxTensor, kps: kpsTensor } = strideTensors[stride];
+    if (!scoreTensor || !bboxTensor) {
+      console.warn(`[SCRFD] Missing tensors for stride ${stride} — skipping`);
+      continue;
+    }
+
+    const { gh, gw } = strideGrids[stride];
+    const scoreData = scoreTensor.data;
+    const bboxData  = bboxTensor.data;
+    const kpsData   = kpsTensor?.data;
+    const centers   = generateAnchorCenters(gh, gw, stride);
+    const has2Classes = scoreData.length >= centers.length * 2;
 
     for (let i = 0; i < centers.length; i++) {
-      // dims=[N,1] → data is flat, so scoreData[i] is correct
-      const rawScore = scoreData[i];
-      const score = rawScore;  // scores are already probabilities (no sigmoid needed)
+      const rawScore = has2Classes ? scoreData[i * 2 + 1] : scoreData[i];
+      // SCRFD logits are always raw — apply sigmoid
+      const score = 1 / (1 + Math.exp(-rawScore));
 
-      // Confidence threshold — 0.5 prevents background patterns from triggering false faces
       if (score < 0.5) continue;
 
       const [cx, cy] = centers[i];
@@ -317,11 +511,12 @@ const decodeSCRFD = (outputs, origW, origH) => {
       const x2 = (cx + bboxData[i * 4 + 2] * stride) * scaleX;
       const y2 = (cy + bboxData[i * 4 + 3] * stride) * scaleY;
 
-      // Minimum face size filter: face must span at least 4% of frame width and height
-      // This prevents distant background textures from being counted as faces
       const faceW = x2 - x1;
       const faceH = y2 - y1;
-      if (faceW < origW * 0.04 || faceH < origH * 0.04) continue;
+
+      // Skip tiny detections and absurdly large background boxes
+      if (faceW < 30 || faceH < 30) continue;
+      if (faceW > origW * 0.75 || faceH > origH * 0.75) continue;
 
       // Decode 5-point keypoints
       const kps = [];
@@ -342,14 +537,30 @@ const decodeSCRFD = (outputs, origW, origH) => {
 
   if (allBoxes.length === 0) return [];
 
-  const keepIdx = nms(allBoxes, allScores, NMS_THRESHOLD);
+  let keepIdx = nms(allBoxes, allScores, NMS_THRESHOLD);
+
+  // Sort by confidence descending — primary face first
+  keepIdx.sort((a, b) => allScores[b] - allScores[a]);
+
+  // Keep only genuinely distinct high-confidence faces
+  if (keepIdx.length > 1) {
+    const filteredKeep = [keepIdx[0]];
+    for (let k = 1; k < keepIdx.length; k++) {
+      const idx = keepIdx[k];
+      // Secondary detection must be high-confidence AND non-overlapping with primary
+      if (allScores[idx] >= 0.6 && iou(allBoxes[keepIdx[0]], allBoxes[idx]) <= 0.15) {
+        filteredKeep.push(idx);
+      }
+    }
+    keepIdx = filteredKeep;
+  }
 
   return keepIdx.map(i => ({
     box: {
-      x: allBoxes[i][0],
-      y: allBoxes[i][1],
-      width:  allBoxes[i][2] - allBoxes[i][0],
-      height: allBoxes[i][3] - allBoxes[i][1],
+      x: Math.max(0, allBoxes[i][0]),
+      y: Math.max(0, allBoxes[i][1]),
+      width:  Math.min(origW, allBoxes[i][2] - allBoxes[i][0]),
+      height: Math.min(origH, allBoxes[i][3] - allBoxes[i][1]),
     },
     score: allScores[i],
     landmarks: allLandmarks[i], // [[x,y] × 5]
@@ -364,26 +575,21 @@ const l2Normalize = (vec) => {
 
 // ─── Cosine Similarity ───────────────────────────────────────────────────────
 export const cosineSimilarity = (a, b) => {
+  if (!a || !b || a.length !== b.length || a.length === 0) return 0;
   let dot = 0;
-  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
-  return dot; // Both are L2-normalised, so dot product = cosine similarity
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom > 0 ? Math.max(-1, Math.min(1, dot / denom)) : 0;
 };
 
 // ─── Main Pipeline Entry Point ───────────────────────────────────────────────
 
-/**
- * Detect all faces in a video frame, compute ArcFace embeddings, and run
- * anti-spoof check on each face.
- *
- * Returns: Array of {
- *   box: {x, y, width, height},
- *   score: number,
- *   landmarks: [[x,y]×5],
- *   embedding: Float32Array[512],   // L2-normalised ArcFace embedding
- *   isReal: boolean,                // Anti-spoof result
- *   antispoofScore: number,         // 0=fake, 1=real
- * }
- */
 export const detectAndEmbed = async (videoEl) => {
   if (!isInitialized) throw new Error('[OnnxPipeline] Not initialised. Call initPipeline() first.');
   if (!videoEl || videoEl.readyState < 2) return [];
@@ -394,7 +600,8 @@ export const detectAndEmbed = async (videoEl) => {
   const t0 = performance.now();
 
   // ── 1. SCRFD Detection ──────────────────────────────────────────────────
-  const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, true);
+  // Use RGB format (bgr = false) for standard SCRFD PyTorch ONNX model input
+  const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, false);
   const scrfdTensor = new ort.Tensor('float32', scrfdInput, [1, 3, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE]);
 
   const scrfdInputName = scrfdSession.inputNames[0];
@@ -427,8 +634,11 @@ export const detectAndEmbed = async (videoEl) => {
 
     const tEmbed = performance.now() - tEmbed0;
 
-    const isReal = true;
-    const antispoofScore = 1.0;
+    // Anti-spoof model (MN3-AntiSpoof) is NOT loaded — the file on disk is invalid.
+    // isReal=null signals to callers that liveness was NOT checked, rather than
+    // the previous lie of isReal=true which gave a false sense of security.
+    const isReal = null;
+    const antispoofScore = null;
 
     console.log(`[OnnxPipeline] ArcFace: ${tEmbed.toFixed(1)}ms`);
 
@@ -460,7 +670,7 @@ export const detectOnly = async (videoEl) => {
   const origH = videoEl.videoHeight || 480;
 
   try {
-    const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, true);
+    const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, false);
     const scrfdTensor = new ort.Tensor('float32', scrfdInput, [1, 3, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE]);
     const inputName = scrfdSession.inputNames[0];
     const outputs = await scrfdSession.run({ [inputName]: scrfdTensor });

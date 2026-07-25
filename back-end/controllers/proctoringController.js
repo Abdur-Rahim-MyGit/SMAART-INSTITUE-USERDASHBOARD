@@ -132,6 +132,8 @@ exports.logEvent = async (req, res) => {
       'face_registered', 'identity_verified',
       // v2 info events
       'camera_quality_check', 'registration_quality', 'identity_confidence',
+      // v3 batch verification events
+      'verification_batch', 'face_absent_reminder',
     ];
     const metadataPayload = req.body.metadata || {};
     
@@ -387,7 +389,7 @@ exports.saveRegistration = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const { sessionId } = req.params;
-    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
+    const { embedding, allEmbeddings, registrationImages, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
 
     if (!embedding || !Array.isArray(embedding)) {
       return res.status(400).json({ success: false, error: 'embedding (array) is required.' });
@@ -401,6 +403,7 @@ exports.saveRegistration = async (req, res) => {
       return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
+    // Single merged embedding (backward compat)
     session.faceEmbedding         = JSON.stringify(embedding);
     session.faceEmbeddingModel    = model || 'arcface-r50-onnx';
     session.faceEmbeddingDims     = 512;
@@ -410,6 +413,16 @@ exports.saveRegistration = async (req, res) => {
     session.faceAlignedCropUrl      = alignedCropUrl || null;
     session.faceRegistered          = true;
     session.faceRegisteredAt        = new Date();
+
+    // v3: Store all 5 individual embeddings for multi-reference verification
+    if (allEmbeddings && Array.isArray(allEmbeddings) && allEmbeddings.length > 0) {
+      session.allFaceEmbeddings = JSON.stringify(allEmbeddings);
+    }
+
+    // v3: Store 5 registration crop images as base64
+    if (registrationImages && Array.isArray(registrationImages)) {
+      session.registrationImages = registrationImages.filter(Boolean).slice(0, 5);
+    }
 
     await session.save();
 
@@ -433,7 +446,7 @@ exports.getEmbedding = async (req, res) => {
 
     const session = await ProctoringSession.findOne(
       { _id: sessionId, userId },
-      'faceEmbedding faceEmbeddingModel faceEmbeddingDims faceRegistered faceRegistrationQuality'
+      'faceEmbedding allFaceEmbeddings faceEmbeddingModel faceEmbeddingDims faceRegistered faceRegistrationQuality'
     );
 
     if (!session) {
@@ -444,10 +457,20 @@ exports.getEmbedding = async (req, res) => {
     }
 
     const embedding = JSON.parse(session.faceEmbedding);
+    // v3: Return all 5 individual embeddings if available
+    let allEmbeddings = null;
+    if (session.allFaceEmbeddings) {
+      try {
+        allEmbeddings = JSON.parse(session.allFaceEmbeddings);
+      } catch (e) {
+        console.warn('[ProctoringController] Failed to parse allFaceEmbeddings:', e);
+      }
+    }
 
     res.json({
       success: true,
       embedding,
+      allEmbeddings,
       model: session.faceEmbeddingModel,
       dimensions: session.faceEmbeddingDims,
       qualityScore: session.faceRegistrationQuality,
@@ -458,3 +481,58 @@ exports.getEmbedding = async (req, res) => {
   }
 };
 
+// ─── Log batch verification result to session history ──────────────────────
+/**
+ * POST /api/proctoring/sessions/:sessionId/verification
+ * Body: {
+ *   similarity: number,      // best-match cosine similarity (0–1)
+ *   status: string,          // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces'
+ *   framesCaptured: number,  // usable frames in this batch
+ *   warningIssued: boolean,  // whether a warning was shown to the user
+ * }
+ */
+exports.logVerification = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+    const { similarity, status, framesCaptured, warningIssued } = req.body;
+
+    const session = await ProctoringSession.findOne({ _id: sessionId, userId });
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Session not found.' });
+    }
+
+    // Append to verification history (cap at 50 entries)
+    if (!session.verificationHistory) session.verificationHistory = [];
+    session.verificationHistory.push({
+      timestamp: new Date(),
+      similarity: similarity ?? 0,
+      status: status || 'error',
+      framesCaptured: framesCaptured ?? 0,
+    });
+    if (session.verificationHistory.length > 50) {
+      session.verificationHistory = session.verificationHistory.slice(-50);
+    }
+
+    // Update face check stats
+    session.totalFaceChecks = (session.totalFaceChecks || 0) + 1;
+    if (status === 'verified') {
+      session.faceChecksPassed = (session.faceChecksPassed || 0) + 1;
+    }
+    session.faceVerificationPassRate = session.totalFaceChecks > 0
+      ? session.faceChecksPassed / session.totalFaceChecks
+      : 0;
+
+    // Increment warning count if a warning was shown
+    if (warningIssued) {
+      session.warningCount = (session.warningCount || 0) + 1;
+    }
+
+    await session.save();
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('[ProctoringController] logVerification error:', err);
+    res.status(500).json({ success: false, error: 'Server error logging verification.', message: err.message });
+  }
+};
