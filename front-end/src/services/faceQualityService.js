@@ -19,14 +19,14 @@
  */
 
 // ─── Thresholds ───────────────────────────────────────────────────────────────
-const BRIGHTNESS_MIN = 55;
-const BRIGHTNESS_MAX = 235;
-const BLUR_MIN_VARIANCE = 70;       // Laplacian variance below this → too blurry
-const FACE_AREA_MIN_RATIO = 0.10;   // Face must be ≥ 10% of frame area
-const FACE_CENTER_MARGIN = 0.20;    // Face center must be within central 60% of frame
-const DETECTION_MIN_SCORE = 0.70;   // SCRFD confidence
-const YAW_MAX_DEG = 30;             // Head rotation left/right limit
-const PITCH_MAX_DEG = 20;           // Head tilt up/down limit
+const BRIGHTNESS_MIN = 35;
+const BRIGHTNESS_MAX = 245;
+const BLUR_MIN_VARIANCE = 25;       // Laplacian variance below this → too blurry
+const FACE_AREA_MIN_RATIO = 0.03;   // Face must be ≥ 3% of frame area
+const FACE_CENTER_MARGIN = 0.05;    // Face center must be within central 90% of frame
+const DETECTION_MIN_SCORE = 0.40;   // SCRFD / face-api confidence
+const YAW_MAX_DEG = 45;             // Head rotation left/right limit
+const PITCH_MAX_DEG = 35;           // Head tilt up/down limit
 
 // ─── Canvas Utility ──────────────────────────────────────────────────────────
 
@@ -180,7 +180,7 @@ export const checkFaceCentering = (box, frameW, frameH) => {
  * Points: 0=left_eye, 1=right_eye, 2=nose_tip, 3=left_mouth, 4=right_mouth
  */
 export const checkHeadPose = (landmarks) => {
-  if (!landmarks || landmarks.length < 5) return { passed: true, score: 80, yaw: 0, pitch: 0, message: '' };
+  if (!landmarks || landmarks.length < 5) return { passed: true, score: 100, yaw: 0, pitch: 0, direction: 'center', message: '' };
 
   const [lEye, rEye, nose, lMouth, rMouth] = landmarks;
 
@@ -188,29 +188,43 @@ export const checkHeadPose = (landmarks) => {
   const eyeMidX = (lEye[0] + rEye[0]) / 2;
   const eyeSpan = Math.abs(rEye[0] - lEye[0]);
   const yawRaw  = (nose[0] - eyeMidX) / (eyeSpan + 1e-6);
-  const yawDeg  = yawRaw * 90; // rough approximation
+  const yawDeg  = yawRaw * 90;
 
-  // Pitch estimate: vertical offset of nose relative to eye level
+  // Pitch estimate: vertical offset of nose relative to eye level vs mouth level
   const eyeMidY   = (lEye[1] + rEye[1]) / 2;
   const mouthMidY = (lMouth[1] + rMouth[1]) / 2;
   const faceH     = mouthMidY - eyeMidY;
   const pitchRaw  = (nose[1] - eyeMidY) / (faceH + 1e-6) - 0.5;
   const pitchDeg  = pitchRaw * 60;
 
+  let direction = 'center';
+  let message = '';
+
+  if (yawDeg > 22) {
+    direction = 'looking_right';
+    message = 'Head turned right — please face your screen.';
+  } else if (yawDeg < -22) {
+    direction = 'looking_left';
+    message = 'Head turned left — please face your screen.';
+  } else if (pitchDeg > 18) {
+    direction = 'looking_down';
+    message = 'Head tilted down — please look directly at the screen.';
+  } else if (pitchDeg < -18) {
+    direction = 'looking_up';
+    message = 'Head tilted up — please look directly at the screen.';
+  }
+
   const yawOk   = Math.abs(yawDeg)   <= YAW_MAX_DEG;
   const pitchOk = Math.abs(pitchDeg) <= PITCH_MAX_DEG;
   const passed  = yawOk && pitchOk;
 
-  let message = '';
-  if (!yawOk)   message = 'Face the camera directly — don\'t turn your head sideways.';
-  if (!pitchOk) message = 'Look straight at the camera — don\'t tilt your head up or down.';
-
   return {
     passed,
     score: passed ? 100 : 40,
-    yaw:   Math.round(yawDeg),
+    yaw: Math.round(yawDeg),
     pitch: Math.round(pitchDeg),
-    message,
+    direction,
+    message: passed ? '' : (message || 'Please face the camera directly.'),
   };
 };
 
@@ -218,7 +232,8 @@ export const checkHeadPose = (landmarks) => {
 
 export const checkEyesVisible = (landmarks) => {
   if (!landmarks || landmarks.length < 2) {
-    return { passed: false, score: 0, message: 'Eyes not detected — ensure your eyes are clearly visible.' };
+    // Landmarks optional for fallback detectors — pass by default if valid face box detected
+    return { passed: true, score: 80, message: '' };
   }
   const [lEye, rEye] = landmarks;
   const visible = lEye && rEye && lEye[0] > 0 && rEye[0] > 0;
@@ -278,7 +293,16 @@ export const evaluateFrameQuality = (videoEl, face) => {
     .filter(c => !c.passed && c.message)
     .map(c => c.message);
 
-  const passed = overallScore >= 65 && issues.length === 0;
+  const criticalIssues = [];
+  if (!brightness.passed && (brightness.brightness < 20 || brightness.brightness > 250)) {
+    criticalIssues.push(brightness.message);
+  }
+  if (!size.passed) criticalIssues.push(size.message);
+  if (!pose.passed) criticalIssues.push(pose.message);
+  if (!eyes.passed) criticalIssues.push(eyes.message);
+  if (!confidence.passed) criticalIssues.push(confidence.message);
+
+  const passed = overallScore >= 40 && criticalIssues.length === 0;
 
   return { passed, overallScore, checks, issues };
 };

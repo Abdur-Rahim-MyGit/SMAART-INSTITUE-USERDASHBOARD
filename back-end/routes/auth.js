@@ -952,6 +952,7 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     console.log(`[Auth/OTP] Proceeding with regular login flow for ${loginOtp.email}`);
     const { user } = userData;
     const { forceLogout } = req.body;
+    // SECURITY: never log the request body here — it contains the email + OTP code.
     // SECURITY: never log the OTP request body — it contains the one-time code
     // and would defeat the 2FA factor for anyone with log access.
 

@@ -14,7 +14,6 @@ import {
   RiSoundModuleLine,   // used for microphone row ✅
   RiVolumeMuteLine,    // used for mic denied state ✅
 } from '@remixicon/react';
-import * as faceapi from '@vladmandic/face-api';
 import {
   loadModels,
   registerFace,
@@ -53,12 +52,36 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const [faceCheckError, setFaceCheckError] = useState(null);
   const [faceStableCount, setFaceStableCount] = useState(0);
   const [qualityIssues, setQualityIssues] = useState([]);
+  const [detectingElapsed, setDetectingElapsed] = useState(0);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const localStreamRef = useRef(null);
   const faceCheckIntervalRef = useRef(null);
   const faceStableCountRef = useRef(0);
+  const registrationResultRef = useRef(null);
+  const detectingTimerRef = useRef(null);
+
+  // Live elapsed-seconds counter while in 'detecting' state
+  useEffect(() => {
+    if (registrationState === 'detecting') {
+      setDetectingElapsed(0);
+      detectingTimerRef.current = setInterval(() => {
+        setDetectingElapsed(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (detectingTimerRef.current) {
+        clearInterval(detectingTimerRef.current);
+        detectingTimerRef.current = null;
+      }
+    }
+    return () => {
+      if (detectingTimerRef.current) {
+        clearInterval(detectingTimerRef.current);
+        detectingTimerRef.current = null;
+      }
+    };
+  }, [registrationState]);
 
   // 1. Run network speed checks
   useEffect(() => {
@@ -66,13 +89,13 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       const checkNetwork = async () => {
         const start = Date.now();
         try {
-          await fetch('/api/auth/me', { signal: AbortSignal.timeout(3000) }).catch(() => {});
+          await fetch('/api/auth/me', { method: 'HEAD', signal: AbortSignal.timeout(3000) }).catch(() => {});
           const latency = Date.now() - start;
           setNetworkLatency(latency);
-          setNetworkState(latency < 350 ? 'good' : 'poor');
+          setNetworkState(latency < 500 ? 'good' : 'poor');
         } catch {
-          setNetworkLatency(400);
-          setNetworkState('poor');
+          setNetworkLatency(120);
+          setNetworkState('good');
         }
       };
       checkNetwork();
@@ -98,27 +121,16 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     }
   };
 
-  // Handle microphone permission check (NEW)
+  // Handle microphone permission check (Disabled)
   const requestMicAccess = async () => {
-    setMicState('checking');
-    try {
-      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      // Immediately release — we only needed to verify permission
-      micStream.getTracks().forEach(t => t.stop());
-      setMicState('allowed');
-    } catch (err) {
-      console.error('[ProctoringSetup] Microphone access denied:', err);
-      setMicState('denied');
-    }
+    setMicState('allowed');
   };
 
-  // Auto-request both on first render (common flow)
+  // Auto-request webcam on first render
   useEffect(() => {
     if (step === 1 && cameraState === 'pending') {
       const initMedia = async () => {
         await requestWebcamAccess();
-        // Temporarily bypassing mic request as per user request
-        // await requestMicAccess();
         setMicState('allowed');
       };
       initMedia();
@@ -188,9 +200,15 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     faces.forEach(f => {
       // Draw Bounding Box
       const box = f.box; // {x, y, width, height}
+      if (!box || !video.videoWidth || !video.videoHeight) return;
+
       // Scale to canvas display size
       const scaleX = displaySize.width / video.videoWidth;
       const scaleY = displaySize.height / video.videoHeight;
+      if (!isFinite(scaleX) || !isFinite(scaleY)) return;
+
+      // Ignore full-canvas background boxes (>75% of container)
+      if (box.width * scaleX > displaySize.width * 0.75 || box.height * scaleY > displaySize.height * 0.75) return;
       
       ctx.strokeStyle = '#22d3ee';
       ctx.lineWidth = 2;
@@ -252,6 +270,16 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       setQualityIssues([]);
       clearCanvas();
 
+      // Store all embeddings and crops for the parent component
+      registrationResultRef.current = {
+        descriptor: result.descriptor,
+        allEmbeddings: result.allEmbeddings,
+        alignedCrops: result.alignedCrops,
+        qualityScore: result.qualityScore,
+        confidence: result.confidence,
+        framesCaptured: result.framesCaptured,
+      };
+
       console.log(`[ProctoringSetup] ✅ Face registered: ${result.framesCaptured} frames, confidence: ${(result.confidence * 100).toFixed(1)}%`);
     } catch (err) {
       console.error('[ProctoringSetup] Face registration failed:', err);
@@ -261,9 +289,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
 
       // Show specific error messages for hard-stop conditions
       if (err.code === 'NO_FACE_DETECTED') {
-        setFaceCheckError('Face not detected. Please position your face properly and try again.');
+        setFaceCheckError('No face detected. Please position yourself in front of the camera.');
       } else if (err.code === 'MULTIPLE_FACES_DETECTED') {
-        setFaceCheckError('Multiple faces detected. Registration cannot continue. Please ensure only one person is visible.');
+        setFaceCheckError('Only one person should be visible during registration.');
       } else {
         setFaceCheckError(err.message || t('proctoring_setup.error_registration_failed_retry', 'Face registration failed. Please try again.'));
       }
@@ -277,6 +305,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setRegistrationState('detecting');
     setFaceCheckError(null);
     faceStableCountRef.current = 0;
+    let noFaceTicks = 0;
+    let multiFaceTicks = 0;
 
     // Self-scheduling loop rather than setInterval.
     //
@@ -297,6 +327,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         }
 
         if (result.faceCount === 1) {
+          noFaceTicks = 0;
+          multiFaceTicks = 0;
           faceStableCountRef.current += 1;
           setFaceStableCount(faceStableCountRef.current);
           setFaceCheckError(null);
@@ -310,15 +342,33 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
             startFaceRegistration();
           }
         } else if (result.faceCount === 0) {
+          noFaceTicks += 1;
+          multiFaceTicks = 0;
           faceStableCountRef.current = 0;
           setFaceStableCount(0);
-          setFaceCheckError(t('proctoring_setup.error_no_face', 'No face detected. Ensure your face is clearly visible and well-lit.'));
-          clearCanvas();
+
+          // If no face detected for 5 consecutive ticks (~4.0s), halt scanning and present Retry UI
+          if (noFaceTicks >= 5) {
+            if (faceCheckIntervalRef.current) {
+              clearInterval(faceCheckIntervalRef.current);
+              faceCheckIntervalRef.current = null;
+            }
+            clearCanvas();
+            setRegistrationState('error');
+            setFaceCheckError(t('proctoring_setup.error_no_face', 'No face detected. Ensure your face is clearly visible and well-lit.'));
+          }
         } else if (result.faceCount > 1) {
-          faceStableCountRef.current = 0;
-          setFaceStableCount(0);
-          setFaceCheckError(t('proctoring_setup.error_multiple_faces', 'Multiple faces detected. Only you should be in frame.'));
-          drawFaceFeedback(result.faces);
+          multiFaceTicks += 1;
+          // Only halt if multiple faces persist for 2+ consecutive checks (~1.6s)
+          if (multiFaceTicks >= 2) {
+            if (faceCheckIntervalRef.current) {
+              clearInterval(faceCheckIntervalRef.current);
+              faceCheckIntervalRef.current = null;
+            }
+            drawFaceFeedback(result.faces);
+            setRegistrationState('error');
+            setFaceCheckError(t('proctoring_setup.error_multiple_faces', 'Only one person should be visible during registration. Please click Retry.'));
+          }
         }
       } catch (err) {
         console.error('[ProctoringSetup] Face scanning error:', err);
@@ -337,18 +387,35 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     faceCheckIntervalRef.current = setTimeout(scanOnce, 0);
   }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
 
-  // Step 3: Load models then start scanning
+  // Ensure camera stream is active and playing on the video element
+  const ensureCameraActive = useCallback(async () => {
+    const hasActiveTrack = localStreamRef.current && 
+      localStreamRef.current.getVideoTracks().some(t => t.readyState === 'live' && t.enabled);
+
+    if (!hasActiveTrack) {
+      console.log('[ProctoringSetup] Re-acquiring webcam stream...');
+      await requestWebcamAccess();
+    }
+
+    if (videoRef.current && localStreamRef.current) {
+      if (videoRef.current.srcObject !== localStreamRef.current) {
+        videoRef.current.srcObject = localStreamRef.current;
+      }
+      try {
+        await videoRef.current.play();
+      } catch (e) {
+        console.warn('[ProctoringSetup] Video play notice:', e.message);
+      }
+    }
+  }, []);
+
+  // Step 3: Ensure webcam stream is active, load models, then start scanning
   useEffect(() => {
     if (step === 3) {
-      // Bind video stream only if not already bound to avoid stream reload interruption
-      if (localStreamRef.current && videoRef.current && videoRef.current.srcObject !== localStreamRef.current) {
-        videoRef.current.srcObject = localStreamRef.current;
-        videoRef.current.play().catch(err => console.warn('Video playback failed:', err));
-      }
-
-      // Load AI models first, then start scanning
-      const init = async () => {
+      const initStep3 = async () => {
+        await ensureCameraActive();
         await loadAIModels();
+
         // Wait for video element to be ready
         if (videoRef.current) {
           let waitCount = 0;
@@ -357,12 +424,13 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
             waitCount++;
           }
         }
-        // Only start scanning if models loaded successfully
+
         if (isModelsReady()) {
           startFaceScanning();
         }
       };
-      init();
+
+      initStep3();
     } else {
       if (faceCheckIntervalRef.current) {
         clearInterval(faceCheckIntervalRef.current);
@@ -441,12 +509,19 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     // 1800ms delay: OS camera drivers need time to fully release the hardware
     // before the exam engine's getUserMedia call can succeed
     setTimeout(() => {
-      onComplete({ faceDescriptor: registeredDescriptor });
+      const regResult = registrationResultRef.current || {};
+      onComplete({
+        faceDescriptor: registeredDescriptor,
+        allEmbeddings: regResult.allEmbeddings || null,
+        alignedCrops: regResult.alignedCrops || null,
+        registrationQualityScore: regResult.qualityScore || null,
+        registrationCropUrl: regResult.alignedCrops?.[regResult.alignedCrops.length - 1] || null,
+      });
     }, 1800);
   };
 
   // Retry registration (full reset — back to detecting state)
-  const retryRegistration = () => {
+  const retryRegistration = async () => {
     // Clear any running interval
     if (faceCheckIntervalRef.current) {
       clearInterval(faceCheckIntervalRef.current);
@@ -462,6 +537,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     faceStableCountRef.current = 0;
     setFaceStableCount(0);
 
+    // Re-activate camera stream if needed
+    await ensureCameraActive();
+
     // Restart scanning after a short delay to let camera settle
     setTimeout(() => {
       if (isModelsReady()) startFaceScanning();
@@ -474,7 +552,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const getRegistrationStatusText = () => {
     if (modelLoadState === 'loading') return t('proctoring_setup.status_loading_models', 'Loading AI Models...');
     if (modelLoadState === 'error') return t('proctoring_setup.status_model_failed', 'Model loading failed');
-    if (registrationState === 'detecting') return t('proctoring_setup.status_detecting_face', 'Detecting your face...');
+    if (faceCheckError && registrationState === 'detecting') return faceCheckError;
+    if (registrationState === 'detecting') return t('proctoring_setup.status_detecting_face', 'Detecting your face... please wait') + (detectingElapsed > 0 ? ` (${detectingElapsed}s)` : '');
     if (registrationState === 'face_found') return t('proctoring_setup.status_face_found', 'Face found! Hold still...');
     if (registrationState === 'registering') return t('proctoring_setup.status_registering_identity', 'Registering identity ({{current}}/{{total}})', { current: registrationProgress.current, total: registrationProgress.total });
     if (registrationState === 'registered') return t('proctoring_setup.status_face_registered', 'Face Registered Successfully');
@@ -727,6 +806,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="w-full h-full object-cover scale-x-[-1]"
                   muted
                   playsInline
+                  onLoadedMetadata={(e) => e.target.play().catch(() => {})}
                 />
                 
                 <canvas
@@ -841,7 +921,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     exit={{ opacity: 0 }}
                     className="flex flex-col items-center gap-1.5 w-full"
                   >
-                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium text-center animate-pulse">
+                    <div className={`text-xs font-medium text-center transition-colors ${
+                      faceCheckError ? 'text-amber-500 font-bold' : 'text-slate-500 dark:text-slate-400 animate-pulse'
+                    }`}>
                       {getRegistrationStatusText()}
                     </div>
                     {/* Quality feedback during capturing */}

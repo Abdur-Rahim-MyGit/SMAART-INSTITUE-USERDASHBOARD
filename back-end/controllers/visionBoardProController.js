@@ -511,9 +511,6 @@ exports.duplicateVisionBoard = async (req, res) => {
 exports.setActiveVision = async (req, res) => {
   try {
     console.log('=== setActiveVision called ===');
-    console.log('req.body:', req.body);
-    console.log('req.query:', req.query);
-    console.log('req.params:', req.params);
 
     const userId = getUserId(req);
     const { id } = req.params;
