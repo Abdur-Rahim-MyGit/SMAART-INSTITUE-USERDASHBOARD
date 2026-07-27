@@ -200,10 +200,34 @@ export const useProctoringEngine = ({
       video.srcObject = stream;
       videoRef.current = video;
 
-      // Wait for metadata and frames to load
+      // Attach OFF-SCREEN/TINY (not display:none, which pauses decoding).
+      // Modern browsers optimize away off-screen elements (top: -9999px) and zero-opacity (opacity: 0) elements,
+      // suspending their video frame decoding. Placing it inside the viewport at 1x1 size, z-index -9999,
+      // and non-zero opacity (0.001) keeps decoding active while remaining completely invisible to the user.
+      video.setAttribute('aria-hidden', 'true');
+      Object.assign(video.style, {
+        position: 'fixed',
+        bottom: '0px',
+        right: '0px',
+        width: '1px',
+        height: '1px',
+        opacity: '0.001',
+        pointerEvents: 'none',
+        zIndex: '-9999',
+      });
+      if (!video.isConnected) document.body.appendChild(video);
+      
+      // Start playback immediately as a fail-safe
+      video.play().catch(e => console.warn('[ProctoringEngine] Immediate play failed:', e.message));
+
+      // Wait for metadata to load
       await new Promise((resolve) => {
-        const onReady = () => {
-          video.play().catch(e => console.warn('Video play interrupted', e));
+        if (video.readyState >= 2) {
+          resolve();
+          return;
+        }
+        video.onloadedmetadata = () => {
+          video.play().catch(e => console.warn('[ProctoringEngine] Video play interrupted in metadata event:', e));
           resolve();
         };
         if (video.readyState >= 2) {

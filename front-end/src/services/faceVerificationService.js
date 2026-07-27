@@ -141,7 +141,7 @@ export const registerFace = async (videoEl, options = {}) => {
     intervalMs    = REGISTRATION_FRAME_DELAY_MS,
     onFrameCaptured,
     onError,
-    onQualityIssue,
+    onQualityIssue
   } = options;
 
   if (!videoEl || videoEl.readyState < 2) throw new Error('Video element not ready.');
@@ -368,8 +368,6 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
   }
 };
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
-
 // kept for any code that imports computeAverageDescriptor
 export const computeAverageDescriptor = (descriptors) => {
   if (!descriptors?.length) throw new Error('No descriptors');
@@ -379,164 +377,20 @@ export const computeAverageDescriptor = (descriptors) => {
   return sum.map(v => v / descriptors.length);
 };
 
-// ─── verifyFaceBatch ──────────────────────────────────────────────────────────
-
-/**
- * Batch face verification: captures N live frames, generates embeddings,
- * and compares each against all reference embeddings using best-match
- * cosine similarity. This is far more robust than single-frame verification.
- *
- * @param {HTMLVideoElement} videoEl
- * @param {number[][]} referenceEmbeddings  - Array of 5 registered 512-d embeddings
- * @param {object} options
- * @param {number} options.frameCount       - Number of live frames to capture (default: 5)
- * @param {number} options.intervalMs       - Delay between frames (default: 500ms)
- * @param {function} options.onProgress     - (capturedCount, totalFrames) => void
- * @returns {Promise<{
- *   status: string,           // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces' | 'error'
- *   bestSimilarity: number,   // highest best-match similarity across all live frames
- *   avgSimilarity: number,    // average best-match similarity
- *   framesCaptured: number,   // how many live frames produced usable embeddings
- *   faceCount: number,        // last detected face count
- *   details: object           // per-frame breakdown
- * }>}
- */
-export const verifyFaceBatch = async (videoEl, referenceEmbeddings, options = {}) => {
-  const {
-    frameCount = 5,
-    intervalMs = 500,
-    onProgress,
-  } = options;
-
-  if (!referenceEmbeddings || !Array.isArray(referenceEmbeddings) || referenceEmbeddings.length === 0) {
-    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, framesCaptured: 0, faceCount: 0, error: 'No reference embeddings' };
+/** Capture the face region as a small Data URL for audit/display. */
+const captureAlignedCrop = (videoEl, box) => {
+  try {
+    const c = document.createElement('canvas');
+    const pad = 0.3;
+    const x = Math.max(0, box.x - box.width * pad);
+    const y = Math.max(0, box.y - box.height * pad);
+    const w = Math.min(videoEl.videoWidth - x, box.width * (1 + 2 * pad));
+    const h = Math.min(videoEl.videoHeight - y, box.height * (1 + 2 * pad));
+    c.width = 128;
+    c.height = 128;
+    c.getContext('2d').drawImage(videoEl, x, y, w, h, 0, 0, 128, 128);
+    return c.toDataURL('image/jpeg', 0.8);
+  } catch {
+    return null;
   }
-  if (!videoEl || videoEl.readyState < 2) {
-    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, framesCaptured: 0, faceCount: 0, error: 'Video not ready' };
-  }
-
-  const frameSimilarities = [];  // best-match similarity per live frame
-  const frameStatuses = [];      // per-frame status
-  let lastFaceCount = 0;
-  let noFaceCount = 0;
-  let multiFaceCount = 0;
-  let capturedCount = 0;
-
-  for (let i = 0; i < frameCount; i++) {
-    try {
-      // Brightness pre-check
-      const brightResult = checkBrightness(videoEl);
-      if (!brightResult.passed && brightResult.brightness < 20) {
-        frameStatuses.push('no_face');
-        noFaceCount++;
-        onProgress?.(capturedCount, frameCount);
-        if (i < frameCount - 1) await new Promise(r => setTimeout(r, intervalMs));
-        continue;
-      }
-
-      const faces = await detectAndEmbedWithFallback(videoEl, 0.45);
-
-      if (faces.length === 0) {
-        frameStatuses.push('no_face');
-        noFaceCount++;
-        lastFaceCount = 0;
-      } else if (faces.length > 1) {
-        frameStatuses.push('multiple_faces');
-        multiFaceCount++;
-        lastFaceCount = faces.length;
-      } else {
-        const face = faces[0];
-        lastFaceCount = 1;
-
-        if (!face.embedding) {
-          frameStatuses.push('covered');
-        } else {
-          // Compare this live embedding against ALL reference embeddings
-          // Both MUST be 512-d ArcFace embeddings (no face-api fallback)
-          const liveEmb = face.embedding;
-
-          let bestSim = -1;
-          for (const refEmb of referenceEmbeddings) {
-            const refArray = refEmb instanceof Float32Array ? Array.from(refEmb) : refEmb;
-            if (liveEmb.length !== refArray.length) {
-              console.error(`[FaceVerification] DIMENSION MISMATCH: live=${liveEmb.length} vs ref=${refArray.length}. Skipping comparison.`);
-              continue;
-            }
-            const sim = cosineSimilarity(liveEmb, refArray);
-            if (sim > bestSim) bestSim = sim;
-          }
-
-          if (bestSim < 0) {
-            console.warn('[FaceVerification] No valid embedding comparison was possible (dimension mismatch on all refs).');
-            bestSim = 0;
-          }
-
-          console.log(`[FaceVerification] Batch frame: bestSim=${bestSim.toFixed(4)}, threshold=${VERIFICATION_COSINE_THRESHOLD}`);
-          frameSimilarities.push(bestSim);
-          capturedCount++;
-          frameStatuses.push(bestSim >= VERIFICATION_COSINE_THRESHOLD ? 'verified' : 'mismatch');
-        }
-      }
-    } catch (err) {
-      console.warn(`[FaceVerification] Batch frame ${i} error:`, err.message);
-      frameStatuses.push('error');
-    }
-
-    onProgress?.(capturedCount, frameCount);
-
-    if (i < frameCount - 1) {
-      await new Promise(r => setTimeout(r, intervalMs));
-    }
-  }
-
-  // Calculate similarity statistics
-  const bestSimilarity = frameSimilarities.length > 0 ? Math.max(...frameSimilarities) : 0;
-  const avgSimilarity = frameSimilarities.length > 0 ? frameSimilarities.reduce((s, v) => s + v, 0) / frameSimilarities.length : 0;
-
-  // Priority 1: If multiple faces appeared in ANY frame during the batch check → MULTIPLE_FACES
-  if (multiFaceCount >= 1) {
-    return {
-      status: VerificationStatus.MULTIPLE_FACES,
-      bestSimilarity,
-      avgSimilarity,
-      framesCaptured: capturedCount,
-      faceCount: Math.max(2, lastFaceCount),
-      details: { frameStatuses, multiFaceCount, noFaceCount }
-    };
-  }
-
-  // Priority 2: If no usable single-face frames captured → NO_FACE
-  if (capturedCount === 0) {
-    return {
-      status: VerificationStatus.NO_FACE,
-      bestSimilarity: 0,
-      avgSimilarity: 0,
-      framesCaptured: 0,
-      faceCount: 0,
-      details: { frameStatuses }
-    };
-  }
-
-  // Priority 3: Identity verification matching against reference embeddings
-  let status;
-  if (bestSimilarity >= VERIFICATION_COSINE_THRESHOLD) {
-    const verifiedCount = frameSimilarities.filter(s => s >= VERIFICATION_COSINE_THRESHOLD).length;
-    // Require at least 60% of captured frames to pass (3 out of 5)
-    if (verifiedCount >= Math.ceil(capturedCount * 0.6)) {
-      status = VerificationStatus.VERIFIED;
-    } else {
-      status = VerificationStatus.MISMATCH;
-    }
-  } else {
-    status = VerificationStatus.MISMATCH;
-  }
-
-  return {
-    status,
-    bestSimilarity,
-    avgSimilarity,
-    framesCaptured: capturedCount,
-    faceCount: lastFaceCount,
-    details: { frameStatuses, frameSimilarities },
-  };
 };
