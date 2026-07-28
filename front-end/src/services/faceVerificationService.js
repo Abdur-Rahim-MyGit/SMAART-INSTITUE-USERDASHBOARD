@@ -435,6 +435,7 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
     console.error('[FaceVerification] verifyFace error:', err);
     return { status: VerificationStatus.ERROR, similarity: 0, distance: 1, faceCount: 0, error: err?.message };
   }
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────────
 /** Element-wise average of a set of 128-d descriptors → one Float32Array. */
@@ -464,8 +465,3 @@ const captureAlignedCrop = (videoEl, box) => {
     return null;
   }
 };
-
-/**
- * Get the match threshold used for verification.
- */
-export const getMatchThreshold = () => MATCH_THRESHOLD;

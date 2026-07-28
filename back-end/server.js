@@ -1,4 +1,5 @@
 const express = require('express');
+// Reconnected to MongoDB Atlas
 
 const http = require('http');
 const mongoose = require('mongoose');
@@ -137,20 +138,30 @@ const connectDB = async () => {
   const options = isLocal ? {} : {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 50,
-    minPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
+    maxPoolSize: 20,
+    serverSelectionTimeoutMS: 15000,
     socketTimeoutMS: 45000,
     retryWrites: true,
     retryReads: true
   };
 
-  try {
-    await mongoose.connect(primaryURI, options);
-    logger.info('✅ MongoDB connected successfully');
-  } catch (err) {
-    logger.error('❌ MongoDB connection error:', err.message);
-    logger.warn('⚠️ Server will remain running. Mongoose will automatically retry connecting in the background.');
+  let connected = false;
+  let attempts = 0;
+  while (!connected && attempts < 5) {
+    try {
+      attempts++;
+      await mongoose.connect(primaryURI, options);
+      connected = true;
+      logger.info('✅ MongoDB connected successfully');
+    } catch (err) {
+      logger.error(`❌ MongoDB connection attempt ${attempts} failed: ${err.message}`);
+      if (attempts < 5) {
+        logger.info('⏳ Retrying MongoDB connection in 3 seconds...');
+        await new Promise(r => setTimeout(r, 3000));
+      } else {
+        logger.error('❌ Failed to connect to MongoDB after 5 attempts.');
+      }
+    }
   }
 };
 

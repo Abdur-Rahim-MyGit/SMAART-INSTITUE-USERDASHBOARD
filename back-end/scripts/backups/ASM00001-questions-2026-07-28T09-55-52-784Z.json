@@ -1,0 +1,1082 @@
+[
+  {
+    "tags": [],
+    "questionId": "Q001",
+    "questionText": "What does HTML stand for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb913"
+  },
+  {
+    "tags": [],
+    "questionId": "Q002",
+    "questionText": "Which tag is used for images?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb914"
+  },
+  {
+    "tags": [],
+    "questionId": "Q003",
+    "questionText": "What is CSS used for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb915"
+  },
+  {
+    "tags": [],
+    "questionId": "Q004",
+    "questionText": "Which keyword declares a variable in JavaScript?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb916"
+  },
+  {
+    "tags": [],
+    "questionId": "Q005",
+    "questionText": "What does SQL stand for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb917"
+  },
+  {
+    "tags": [],
+    "questionId": "Q006",
+    "questionText": "Which device connects networks?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb918"
+  },
+  {
+    "tags": [],
+    "questionId": "Q007",
+    "questionText": "What is the full form of LAN?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "SEQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb919"
+  },
+  {
+    "tags": [],
+    "questionId": "Q008",
+    "questionText": "Which protocol is used for websites?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91a"
+  },
+  {
+    "tags": [],
+    "questionId": "Q009",
+    "questionText": "What is React used for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91b"
+  },
+  {
+    "tags": [],
+    "questionId": "Q010",
+    "questionText": "Which hook manages state in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91c"
+  },
+  {
+    "tags": [],
+    "questionId": "Q011",
+    "questionText": "What is MongoDB?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91d"
+  },
+  {
+    "tags": [],
+    "questionId": "Q012",
+    "questionText": "Which company developed Java?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91e"
+  },
+  {
+    "tags": [],
+    "questionId": "Q013",
+    "questionText": "What is the difference between == and === in JavaScript?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91f"
+  },
+  {
+    "tags": [],
+    "questionId": "Q014",
+    "questionText": "Explain normalization in DBMS.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SEQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb920"
+  },
+  {
+    "tags": [],
+    "questionId": "Q015",
+    "questionText": "What is the purpose of useEffect in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb921"
+  },
+  {
+    "tags": [],
+    "questionId": "Q016",
+    "questionText": "How does routing work in networking?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb922"
+  },
+  {
+    "tags": [],
+    "questionId": "Q017",
+    "questionText": "What is the role of DNS?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb923"
+  },
+  {
+    "tags": [],
+    "questionId": "Q018",
+    "questionText": "Explain primary key in SQL.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb924"
+  },
+  {
+    "tags": [],
+    "questionId": "Q019",
+    "questionText": "What is JSX in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb925"
+  },
+  {
+    "tags": [],
+    "questionId": "Q020",
+    "questionText": "Difference between HTTP and HTTPS.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb926"
+  },
+  {
+    "tags": [],
+    "questionId": "Q021",
+    "questionText": "What is API integration?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "SEQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb927"
+  },
+  {
+    "tags": [],
+    "questionId": "Q022",
+    "questionText": "Explain event bubbling in JavaScript.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb928"
+  },
+  {
+    "tags": [],
+    "questionId": "Q023",
+    "questionText": "What is responsive web design?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb929"
+  },
+  {
+    "tags": [],
+    "questionId": "Q024",
+    "questionText": "What is CRUD operation?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92a"
+  },
+  {
+    "tags": [],
+    "questionId": "Q025",
+    "questionText": "Explain virtual DOM in React.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92b"
+  },
+  {
+    "tags": [],
+    "questionId": "Q026",
+    "questionText": "How does JWT authentication work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92c"
+  },
+  {
+    "tags": [],
+    "questionId": "Q027",
+    "questionText": "Difference between SQL and NoSQL databases.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92d"
+  },
+  {
+    "tags": [],
+    "questionId": "Q028",
+    "questionText": "Explain OSI model layers.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SEQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92e"
+  },
+  {
+    "tags": [],
+    "questionId": "Q029",
+    "questionText": "How does REST API work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92f"
+  },
+  {
+    "tags": [],
+    "questionId": "Q030",
+    "questionText": "Explain asynchronous programming in JavaScript.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb930"
+  },
+  {
+    "tags": [],
+    "questionId": "Q031",
+    "questionText": "What is database indexing?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb931"
+  },
+  {
+    "tags": [],
+    "questionId": "Q032",
+    "questionText": "Explain Redux workflow.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb932"
+  },
+  {
+    "tags": [],
+    "questionId": "Q033",
+    "questionText": "Difference between TCP and UDP.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb933"
+  },
+  {
+    "tags": [],
+    "questionId": "Q034",
+    "questionText": "How does cloud deployment work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb934"
+  },
+  {
+    "tags": [],
+    "questionId": "Q035",
+    "questionText": "Explain microservices architecture.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "SEQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb935"
+  },
+  {
+    "tags": [],
+    "questionId": "Q036",
+    "questionText": "What is load balancing in servers?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb936"
+  }
+]

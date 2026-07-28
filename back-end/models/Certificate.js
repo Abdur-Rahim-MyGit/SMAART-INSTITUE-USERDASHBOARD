@@ -27,7 +27,17 @@ const certificateSchema = new mongoose.Schema({
   certificateType: {
     type: String,
     required: true,
-    enum: ['capacity', 'capability', 'leadership']
+    enum: ['capacity', 'capability', 'leadership', 'combined']
+  },
+  // Traceability: which assessment stage / attempt produced this certificate
+  stage: {
+    type: String,
+    enum: ['T2', 'T3', 'T4', null],
+    default: null
+  },
+  resultId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Result'
   },
   certificateTitle: {
     type: String,
