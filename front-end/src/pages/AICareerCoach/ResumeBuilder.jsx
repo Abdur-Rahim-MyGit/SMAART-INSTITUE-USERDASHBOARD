@@ -924,6 +924,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
         const defaultLoc = location || firstCleanValue(reg.address?.country, student.address?.country, user.address?.country);
 
+        const calculatedCgpa = student.academic?.overallCgpa || user.academic?.overallCgpa || data.academic?.overallCgpa;
+        const formattedCgpa = calculatedCgpa ? `${Number(calculatedCgpa).toFixed(2)} CGPA` : null;
+
         // Education
         const eduList = [];
         if (listFrom(reg.higherEducation).length > 0) {
@@ -932,16 +935,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
                     institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
                     year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
-                    grade: firstCleanValue(edu.cgpaPercentage, edu.percentage, edu.grade),
+                    grade: firstCleanValue(formattedCgpa, edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade),
                     location: firstCleanValue(edu.location, defaultLoc)
                 });
             });
-        } else if (reg.institution || data.college) {
+        } else if (reg.institution || data.college || formattedCgpa) {
             eduList.push({
                 degree: firstCleanValue(reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
                 institution: firstCleanValue(reg.institution, data.college, 'SMAART Institute'),
                 year: firstCleanValue(reg.yearOfPassing, data.batch),
-                grade: data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : '',
+                grade: firstCleanValue(formattedCgpa, data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : ''),
                 location: defaultLoc
             });
         }

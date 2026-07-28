@@ -16,8 +16,11 @@ const createTransporter = () => {
 
 const crypto = require('crypto');
 
-// Generate cryptographically secure 6-digit OTP
+// Generate cryptographically secure 6-digit OTP (or fallback in dev)
 const generateOTP = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return '123456';
+  }
   return crypto.randomInt(100000, 1000000).toString();
 };
 
@@ -30,6 +33,11 @@ const sendOTPEmail = async (email, otp, fullName = '', subject = '') => {
   console.log('-'.repeat(50));
 
   try {
+    if (process.env.NODE_ENV === 'development' && otp === '123456') {
+      console.log('⚠️ DEV MODE: Skipping actual email send. Use OTP 123456 to login.');
+      return { success: true, messageId: 'dev-mode-bypassed' };
+    }
+
     const transporter = createTransporter();
     
     const mailOptions = {

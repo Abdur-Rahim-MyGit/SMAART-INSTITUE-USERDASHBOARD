@@ -204,6 +204,12 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                   </AnimatePresence>
                 </div>
 
+                <a
+                  href={`${import.meta.env.VITE_ADMIN_URL || 'http://localhost:3000'}/employer/register`}
+                  className={`text-sm font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 ${scrolled ? 'text-[#1a3884] dark:text-white' : 'text-[#1a3884] dark:text-white'}`}
+                >
+                  For Employers
+                </a>
                 <button
                   onClick={() => onLoginClick ? onLoginClick() : navigate('/?modal=true')}
                   className={`text-sm font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 ${scrolled ? 'text-[#1a3884] dark:text-white' : 'text-[#1a3884] dark:text-white'}`}
@@ -292,6 +298,12 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             </div>
 
             <div className="pt-4 flex flex-col gap-3">
+              <a
+                href="http://localhost:3000/employer/register"
+                className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors"
+              >
+                For Employers
+              </a>
               <button
                 onClick={() => onLoginClick ? onLoginClick() : navigate('/?modal=true')}
                 className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors"
