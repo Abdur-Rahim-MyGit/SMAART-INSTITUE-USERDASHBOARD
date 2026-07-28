@@ -2,6 +2,8 @@ const express = require('express');
 const StageResult = require('../models/StageResult');
 const BaseLineResult = require('../models/BaseLineResult');
 const { protect } = require('../middleware/auth');
+const { computePLVI, totalGrowth } = require('../utils/plvi');
+const { countActiveLearningDays } = require('../utils/activeDays');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
@@ -74,9 +76,32 @@ router.get('/user/:userId', async (req, res) => {
             }
         });
 
+        // PLVI + growth (Blueprint v1.0) — computed on read against the T1 baseline.
+        // Denominator = distinct active LEARNING days (falls back to calendar days).
+        const t1 = resultMap.T1;
+        if (t1 && t1.stageScore != null) {
+            for (const k of ['T2', 'T3', 'T4']) {
+                const s = resultMap[k];
+                if (!s || s.stageScore == null) continue;
+                const activeDays = await countActiveLearningDays(userId, t1.completedAt, s.completedAt);
+                const p = computePLVI(t1.stageScore, s.stageScore, t1.completedAt, s.completedAt, activeDays);
+                if (p) { s.plvi = p.plvi; s.plviBand = p.band; s.tDays = p.tDays; s.tDaysBasis = p.tDaysBasis; }
+                s.growthDelta = totalGrowth(t1.stageScore, s.stageScore);
+            }
+        }
+
+        // Top-level summary for the passport (Total Growth Δ = T4 − T1, final PLVI band)
+        const meta = { totalGrowthDelta: null, finalPlvi: null, finalPlviBand: null };
+        if (t1 && resultMap.T4 && resultMap.T4.stageScore != null) {
+            meta.totalGrowthDelta = totalGrowth(t1.stageScore, resultMap.T4.stageScore);
+            meta.finalPlvi = resultMap.T4.plvi ?? null;
+            meta.finalPlviBand = resultMap.T4.plviBand ?? null;
+        }
+
         res.json({
             success: true,
-            data: resultMap
+            data: resultMap,
+            meta
         });
     } catch (err) {
         console.error('❌ Error fetching stage results:', err);
@@ -114,21 +139,29 @@ router.get('/user/:userId/stage/:stage', async (req, res) => {
                 });
             }
 
-            // Normalize the response
+            // Normalize the response (T1 is a baseline: pass 0, single attempt, no competence tier)
             const data = stageResult ? {
                 stage: 'T1',
                 stageScore: stageResult.stageScore,
                 stageBand: stageResult.stageBand,
+                competenceTier: stageResult.competenceTier || 'Baseline',
                 quotientProfile: stageResult.quotientProfile,
                 passed: stageResult.passed,
-                completedAt: stageResult.createdAt
+                completedAt: stageResult.createdAt,
+                passingPercentage: 0,
+                maxAttempts: 1,
+                remainingAttempts: 0
             } : {
                 stage: 'T1',
                 stageScore: baselineResult.baselineScore,
                 stageBand: baselineResult.stageBand,
+                competenceTier: 'Baseline',
                 quotientProfile: baselineResult.t1Profile,
                 passed: true,
-                completedAt: baselineResult.createdAt
+                completedAt: baselineResult.createdAt,
+                passingPercentage: 0,
+                maxAttempts: 1,
+                remainingAttempts: 0
             };
 
             return res.json({ success: true, data });
@@ -145,12 +178,31 @@ router.get('/user/:userId/stage/:stage', async (req, res) => {
             });
         }
 
+        // PLVI + growth vs the T1 baseline (active-learning-days denominator, calendar fallback).
+        let plvi = null, plviBand = null, tDays = null, tDaysBasis = null, growthDelta = null;
+        const baseline = await BaseLineResult.findOne({ userId }).sort({ createdAt: -1 })
+            || await StageResult.findOne({ userId, stage: 'T1' }).sort({ createdAt: -1 });
+        if (baseline) {
+            const t1Score = baseline.baselineScore != null ? baseline.baselineScore : baseline.stageScore;
+            const activeDays = await countActiveLearningDays(userId, baseline.createdAt, stageResult.createdAt);
+            const p = computePLVI(t1Score, stageResult.stageScore, baseline.createdAt, stageResult.createdAt, activeDays);
+            if (p) { plvi = p.plvi; plviBand = p.band; tDays = p.tDays; tDaysBasis = p.tDaysBasis; }
+            growthDelta = totalGrowth(t1Score, stageResult.stageScore);
+        }
+
+        // Attempt/threshold parity so a reloaded report matches a fresh submit.
+        const { getStageConfig } = require('../config/stage_distributions');
+        const cfg = getStageConfig(stageKey) || {};
+        const maxAttempts = cfg.maxAttempts || 3;
+        const attemptCount = await StageResult.countAttemptsForUserStage(userId, stageKey);
+
         res.json({
             success: true,
             data: {
                 stage: stageResult.stage,
                 stageScore: stageResult.stageScore,
                 stageBand: stageResult.stageBand,
+                competenceTier: stageResult.competenceTier,
                 quotientProfile: stageResult.quotientProfile,
                 passed: stageResult.passed,
                 attemptNumber: stageResult.attemptNumber || 1,
@@ -158,7 +210,15 @@ router.get('/user/:userId/stage/:stage', async (req, res) => {
                 score: stageResult.score,
                 totalScore: stageResult.totalScore,
                 percentage: stageResult.percentage,
-                totalQuestions: stageResult.totalQuestions
+                totalQuestions: stageResult.totalQuestions,
+                passingPercentage: cfg.passingPercentage !== undefined ? cfg.passingPercentage : 60,
+                maxAttempts,
+                remainingAttempts: stageResult.passed ? 0 : Math.max(0, maxAttempts - attemptCount),
+                plvi,
+                plviBand,
+                tDays,
+                tDaysBasis,
+                growthDelta
             }
         });
     } catch (err) {
@@ -188,10 +248,7 @@ router.get('/user/:userId/status', async (req, res) => {
             T1: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 1 },
             T2: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
             T3: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
-            T4: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
-            AIQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
-            SQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
-            PIQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 }
+            T4: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 }
         };
 
         // Check T1 from BaseLineResult
@@ -297,10 +354,7 @@ router.post('/restart-course', async (req, res) => {
         const stageCoursesMap = {
             'T2': ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10'],
             'T3': ['S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19'],
-            'T4': ['S20', 'S21', 'S22', 'S23', 'S24', 'S25'],
-            'AIQ': ['AIQ01', 'AIQ02', 'AIQ03', 'AIQ04', 'AIQ05'],
-            'SQ': ['SQ01', 'SQ02', 'SQ03', 'SQ04', 'SQ05'],
-            'PIQ': ['PIQ01', 'PIQ02', 'PIQ03', 'PIQ04', 'PIQ05']
+            'T4': ['S20', 'S21', 'S22', 'S23', 'S24', 'S25']
         };
 
         const courseCodes = stageCoursesMap[stageKey];

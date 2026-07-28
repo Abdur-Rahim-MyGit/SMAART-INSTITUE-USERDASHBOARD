@@ -8,8 +8,11 @@ const User = require('../models/User');
 const { protect, authorize } = require('../middleware/auth');
 const { notifyCertificateIssued } = require('../services/notificationService');
 
-// Generate and issue a new certificate (Protected - Student only)
-router.post('/issue', protect, async (req, res) => {
+// Generate and issue a new certificate.
+// NOTE: student self-issuance is RETIRED — certificates are now auto-issued on
+// assessment pass via services/certificateIssuanceService.js (gated by score +
+// prerequisites + proctoring integrity). This manual route is admin-only.
+router.post('/issue', protect, authorize('admin'), async (req, res) => {
     try {
         const {
             certificateType,
@@ -138,8 +141,14 @@ router.get('/my-certificates', protect, async (req, res) => {
                 certificateId: cert.certificateId,
                 certificateType: cert.certificateType,
                 certificateTitle: cert.certificateTitle,
+                fullName: cert.fullName,
+                studentId: cert.studentId,
                 issueDate: cert.issueDate,
                 readinessBand: cert.readinessBand,
+                assessmentWindow: cert.assessmentWindow,
+                validatedSkills: cert.validatedSkills,
+                issuingAuthority: cert.issuingAuthority,
+                stage: cert.stage,
                 verificationCount: cert.verificationCount,
                 verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-certificate/${cert.certificateId}`
             }))

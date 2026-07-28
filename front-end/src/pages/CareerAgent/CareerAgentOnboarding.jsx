@@ -1,5 +1,5 @@
 import './careerAgent.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import PageTransition from '@/components/PageTransition';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -20,7 +20,9 @@ import {
   IconBolt as Zap, 
   IconTrophy as Trophy, 
   IconSparkles as Sparkles,
-  IconLock as Lock 
+  IconLock as Lock,
+  IconChevronDown as ChevronDown,
+  IconCheck as Check
 } from '@tabler/icons-react';
 import dropdownData from './data/dropdownData.json';
 import jobRolesData from './data/jobRolesData.json';
@@ -76,10 +78,11 @@ const createEmptyValidationState = () => ({ messages: [], fields: {} });
 
 
 // MultiSelect — clean open chip grid, no scrollbox
-function MultiSelect({ options, selected = [], onChange, max = 3, placeholder }) {
+function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, disabled = false }) {
   const { t } = useTranslation();
 
   const toggle = (opt) => {
+    if (disabled) return;
     if (selected.includes(opt)) {
       onChange(selected.filter(s => s !== opt));
     } else if (selected.length < max) {
@@ -118,11 +121,13 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
               color: '#fff', border: '1px solid var(--accent)'
             }}>
               {s}
-              <button type="button" onClick={() => toggle(s)} style={{
-                background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%',
-                width: '14px', height: '14px', cursor: 'pointer', display: 'flex',
-                alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.6rem', fontWeight: 900, lineHeight: 1
-              }}>×</button>
+              {!disabled && (
+                <button type="button" onClick={() => toggle(s)} style={{
+                  background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%',
+                  width: '14px', height: '14px', cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.6rem', fontWeight: 900, lineHeight: 1
+                }}>×</button>
+              )}
             </span>
           ))}
         </div>
@@ -133,7 +138,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {options.map(opt => {
             const isSel = selected.includes(opt);
-            const isDisabled = !isSel && selected.length >= max;
+            const isDisabled = disabled || (!isSel && selected.length >= max);
             return (
               <button
                 key={opt} type="button"
@@ -165,49 +170,143 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
   );
 }
 
-// RoleSearchInput
-function RoleSearchInput({ value, onChange, sector, family, dbRoles = [] }) {
+// RoleSearchInput — Dropdown with search bar containing all DB job roles
+function RoleSearchInput({ value, onChange, sector, family, dbRoles = [], disabled = false }) {
   const { t } = useTranslation();
   const [show, setShow] = useState(false);
-  const [query, setQuery] = useState(value);
+  const [query, setQuery] = useState(value || '');
   const ref = useRef(null);
 
   const sectorRoles = getRoles(sector, family);
-  const pool = dbRoles.length > 0 ? dbRoles : (sectorRoles.length > 0 ? sectorRoles : ALL_ROLES);
-  const filtered = query.length > 0
-    ? pool.filter(r => r && typeof r === 'string' && r.toLowerCase().includes(query.toLowerCase())).slice(0, 12)
-    : [];
+  const pool = useMemo(() => {
+    const list = dbRoles.length > 0 ? dbRoles : (sectorRoles.length > 0 ? sectorRoles : ALL_ROLES);
+    return Array.from(new Set(list)).filter(Boolean);
+  }, [dbRoles, sectorRoles]);
 
-  useEffect(() => { setQuery(value); }, [value]);
+  const filtered = useMemo(() => {
+    if (!query.trim()) return pool.slice(0, 60);
+    const q = query.toLowerCase().trim();
+    return pool.filter(r => typeof r === 'string' && r.toLowerCase().includes(q)).slice(0, 60);
+  }, [pool, query]);
+
+  useEffect(() => { setQuery(value || ''); }, [value]);
+
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setShow(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const handleClear = (e) => {
+    e.stopPropagation();
+    setQuery('');
+    onChange('');
+  };
+
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <input
-        type="text"
-        placeholder={t('career_agent.onboarding.role_placeholder', 'Type or search a job role...')}
-        value={query}
-        onChange={e => { setQuery(e.target.value); onChange(e.target.value); setShow(true); }}
-        onFocus={() => setShow(true)}
-        style={{ width: '100%' }}
-      />
-      {show && filtered.length > 0 && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '180px', overflowY: 'auto', marginTop: '6px' }}>
-          {filtered.map(r => (
-            <div
-              key={r}
-              onClick={() => { setQuery(r); onChange(r); setShow(false); }}
-              style={{ padding: '0.75rem 1.1rem', cursor: 'pointer', fontSize: '0.85rem', color: '#334155', transition: 'background 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              {r}
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <input
+          type="text"
+          placeholder={disabled ? t('career_agent.onboarding.role_disabled_msg', 'Disabled — Career Direction selected above') : t('career_agent.onboarding.role_placeholder', 'Type or search a job role from database...')}
+          value={query}
+          disabled={disabled}
+          onChange={e => {
+            if (disabled) return;
+            const val = e.target.value;
+            setQuery(val);
+            onChange(val);
+            setShow(true);
+          }}
+          onFocus={() => { if (!disabled) setShow(true); }}
+          style={{
+            width: '100%',
+            paddingRight: '2.5rem',
+            opacity: disabled ? 0.6 : 1,
+            cursor: disabled ? 'not-allowed' : 'text',
+            backgroundColor: disabled ? 'rgba(0,0,0,0.04)' : 'transparent'
+          }}
+        />
+        {query && !disabled && (
+          <button
+            type="button"
+            onClick={handleClear}
+            title="Clear role"
+            style={{
+              position: 'absolute', right: '2rem', background: 'none', border: 'none',
+              color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center',
+              padding: '0.3rem', fontSize: '0.9rem', fontWeight: 'bold'
+            }}
+          >
+            ×
+          </button>
+        )}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => { if (!disabled) setShow(prev => !prev); }}
+          style={{
+            position: 'absolute', right: '0.75rem', background: 'none', border: 'none',
+            color: 'var(--muted)', cursor: disabled ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
+            padding: '0.3rem', opacity: disabled ? 0.5 : 1
+          }}
+        >
+          <ChevronDown size={16} style={{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        </button>
+      </div>
+
+      {disabled && (
+        <p style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '0.35rem', fontWeight: 500 }}>
+          💡 Desired Job Role input is disabled because a Career Direction is selected. Clear direction above to type a role.
+        </p>
+      )}
+
+      {show && !disabled && (
+        <div
+          style={{
+            position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 90,
+            background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px',
+            boxShadow: '0 12px 40px rgba(15,23,42,0.15)', maxHeight: '240px', overflowY: 'auto',
+            marginTop: '6px', padding: '0.35rem 0'
+          }}
+        >
+          <div style={{ padding: '0.45rem 0.9rem', fontSize: '0.68rem', fontWeight: 700, color: 'var(--accent)', background: 'rgba(var(--accent-rgb), 0.05)', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{t('career_agent.onboarding.database_roles', 'Database Job Roles')}</span>
+            <span>{pool.length} {t('career_agent.onboarding.available', 'available')}</span>
+          </div>
+
+          {filtered.length > 0 ? (
+            filtered.map(r => {
+              const isSelected = value === r;
+              return (
+                <div
+                  key={r}
+                  onClick={() => {
+                    setQuery(r);
+                    onChange(r);
+                    setShow(false);
+                  }}
+                  style={{
+                    padding: '0.65rem 1.1rem', cursor: 'pointer', fontSize: '0.85rem',
+                    fontWeight: isSelected ? 700 : 500,
+                    color: isSelected ? 'var(--accent)' : '#334155',
+                    background: isSelected ? 'rgba(var(--accent-rgb), 0.08)' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    transition: 'background 0.15s ease'
+                  }}
+                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#f8fafc'; }}
+                  onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <span>{r}</span>
+                  {isSelected && <Check size={14} color="var(--accent)" />}
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ padding: '0.8rem 1.1rem', fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center' }}>
+              {t('career_agent.onboarding.no_matching_roles', 'No matching DB roles found. Your custom role will be used.')}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
@@ -262,7 +361,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
 }
 
 // CareerDirectionSelector — clean dropdown + preview panel
-function CareerDirectionSelector({ directions = [], selected = null, onChange, loading = false, excludeRoles = [] }) {
+function CareerDirectionSelector({ directions = [], selected = null, onChange, loading = false, excludeRoles = [], disabled = false }) {
   const { t } = useTranslation();
   if (loading) {
     return (
@@ -284,7 +383,9 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
       <div style={{ position: 'relative' }}>
         <select
           value={selected?.directionId || ''}
+          disabled={disabled}
           onChange={e => {
+            if (disabled) return;
             const val = e.target.value;
             if (!val) { onChange(null); return; }
             const dir = directions.find(d => d.directionId === val);
@@ -298,16 +399,21 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
             fontSize: '0.85rem',
             fontWeight: 600,
             color: selected ? 'var(--text1)' : 'var(--muted)',
-            background: 'var(--navy2)',
+            background: disabled ? 'rgba(0,0,0,0.04)' : 'var(--navy2)',
             border: selected ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
             borderRadius: '12px',
-            cursor: 'pointer',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            opacity: disabled ? 0.6 : 1,
             outline: 'none',
             transition: 'border-color 0.2s ease',
             fontFamily: 'var(--font)',
           }}
         >
-          <option value="">{t('career_agent.onboarding.select_direction_placeholder', '— Select a career direction —')}</option>
+          <option value="">
+            {disabled
+              ? t('career_agent.onboarding.direction_disabled_msg', '— Disabled (Desired Job Role specified below) —')
+              : t('career_agent.onboarding.select_direction_placeholder', '— Select a career direction —')}
+          </option>
           {directions.map(dir => (
             <option key={dir.directionId} value={dir.directionId}>
               {dir.directionName}
@@ -315,10 +421,16 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
           ))}
         </select>
         {/* Dropdown arrow */}
-        <div style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: selected ? 'var(--accent)' : 'var(--muted)' }}>
+        <div style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: selected ? 'var(--accent)' : 'var(--muted)', opacity: disabled ? 0.5 : 1 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
+
+      {disabled && (
+        <p style={{ fontSize: '0.68rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+          💡 Career Directions dropdown is disabled because a Desired Job Role is typed/selected below. Clear the job role to select a direction.
+        </p>
+      )}
 
       {/* Preview Panel — appears only when a direction is chosen */}
       {selectedDir && (
@@ -403,6 +515,9 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
   const sectors = ALL_SECTORS;
   const up = (field, val) => onChange({ ...data, [field]: val });
 
+  const hasDirectionSelected = !!(data.careerDirection && (data.careerDirection.directionId || data.careerDirection.directionName));
+  const hasCustomRoleEntered = !!(data.role && data.role.trim() && !hasDirectionSelected);
+
   // Priority branding
   const theme = {
     primary: { glow: 'rgba(26,56,132, 0.08)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Trophy size={18} stroke={1.5} />, label: 'Primary Goal' },
@@ -437,26 +552,55 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
           {(directions.filter(d => !excludeDirections.includes(d.directionId)).length) > 0 ? (
             <div className="fgrid">
               <div className="fg full">
-                <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
-                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
-                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
-                </div>
-              </div>
-              <div className="fg full">
                 <label className="fl" style={{ marginBottom: '0.6rem', display: 'block' }}>{t('career_agent.onboarding.career_directions', 'Career Directions')}</label>
                 <CareerDirectionSelector
                   directions={directions.filter(d => !excludeDirections.includes(d.directionId))}
                   selected={data.careerDirection || null}
                   excludeRoles={excludeRoles}
-                  onChange={dir => onChange({
-                    ...data,
-                    careerDirection: dir,
-                    careerDirectionId: dir?.directionId || '',
-                    careerDirectionName: dir?.directionName || '',
-                    careerDirectionDescription: dir?.directionDescription || '',
-                    role: dir?.role || dir?.directionName || ''
-                  })}
+                  disabled={hasCustomRoleEntered}
+                  onChange={dir => {
+                    if (dir) {
+                      onChange({
+                        ...data,
+                        careerDirection: dir,
+                        careerDirectionId: dir?.directionId || '',
+                        careerDirectionName: dir?.directionName || '',
+                        careerDirectionDescription: dir?.directionDescription || '',
+                        role: dir?.role || dir?.directionName || ''
+                      });
+                    } else {
+                      onChange({
+                        ...data,
+                        careerDirection: null,
+                        careerDirectionId: '',
+                        careerDirectionName: '',
+                        careerDirectionDescription: '',
+                        role: ''
+                      });
+                    }
+                  }}
                 />
+              </div>
+
+              {/* OR Divider */}
+              <div className="fg full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.3rem 0' }}>
+                <div style={{ flex: 1, height: '1px', background: 'var(--border, rgba(226, 232, 240, 0.6))' }} />
+                <span style={{ padding: '0.2rem 0.9rem', fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent)', background: 'rgba(var(--accent-rgb), 0.08)', borderRadius: '100px', border: '1px solid rgba(var(--accent-rgb), 0.15)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  {t('career_agent.onboarding.or', 'OR')}
+                </span>
+                <div style={{ flex: 1, height: '1px', background: 'var(--border, rgba(226, 232, 240, 0.6))' }} />
+              </div>
+
+              <div className="fg full">
+                <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
+                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                  <RoleSearchInput
+                    value={data.role || ''}
+                    disabled={hasDirectionSelected}
+                    onChange={v => up('role', v)}
+                    dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
+                  />
+                </div>
               </div>
             </div>
           ) : directions.length > 0 ? (
@@ -475,7 +619,9 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
             <div className="fgrid">
               <div className="fg full">
                 <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.05)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                  {t('career_agent.onboarding.complete_edu_first_to_load', 'Complete your Education details first to load directions, or type a role below.')}
+                  {directionsLoading
+                    ? t('career_agent.onboarding.loading_directions', 'Loading career directions for your education...')
+                    : t('career_agent.onboarding.type_role_below', 'Type or search for your desired job role below.')}
                 </div>
                 <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
@@ -834,29 +980,115 @@ const CareerAgentOnboarding = () => {
 
   // ─── AUTO-FILL PERSONAL DETAILS & ACADEMIC RECORD FROM PROFILE ───
   useEffect(() => {
-    if (user) {
+    if (!user) return;
+
+    const fillEduFromHigherEdArray = (higherEdList, defaultUniv, defaultYear) => {
+      if (!Array.isArray(higherEdList) || higherEdList.length === 0) return null;
+
+      const availableLevels = Object.keys(eduData || {});
+
+      return higherEdList.map(item => {
+        let rawLevel = item.qualificationLevel || item.level || item.degreeLevel || '';
+        let level = rawLevel;
+
+        if (availableLevels.length > 0) {
+          if (!availableLevels.includes(level)) {
+            const lLower = rawLevel.toLowerCase();
+            const matchedL = availableLevels.find(al => {
+              const alLower = al.toLowerCase();
+              return alLower === lLower ||
+                     (lLower.includes('postgrad') && alLower.includes('postgrad')) ||
+                     (lLower.includes('undergrad') && alLower.includes('undergrad')) ||
+                     (lLower.includes('diploma') && alLower.includes('diploma')) ||
+                     (lLower.includes('phd') && alLower.includes('phd'));
+            });
+            if (matchedL) level = matchedL;
+          }
+        }
+
+        let domain = item.degree || item.domain || '';
+        if (level && eduData?.[level]) {
+          const availableDomains = Object.keys(eduData[level] || {});
+          if (!availableDomains.includes(domain)) {
+            const dMatch = availableDomains.find(ad => ad.toLowerCase() === domain.toLowerCase());
+            if (dMatch) domain = dMatch;
+          }
+        }
+
+        let degreeGroup = item.degreeFullName || item.degreeGroup || item.degree || '';
+        if (level && domain && eduData?.[level]?.[domain]) {
+          const availableGroups = Object.keys(eduData[level][domain] || {});
+          if (!availableGroups.includes(degreeGroup)) {
+            const gMatch = availableGroups.find(ag => ag.toLowerCase() === degreeGroup.toLowerCase());
+            if (gMatch) degreeGroup = gMatch;
+          }
+        }
+
+        let spec = [];
+        if (Array.isArray(item.specialization)) spec = item.specialization;
+        else if (item.specialization) spec = [item.specialization];
+        else if (Array.isArray(item.specialisation)) spec = item.specialisation;
+        else if (item.specialisation) spec = [item.specialisation];
+
+        if (level && domain && degreeGroup && eduData?.[level]?.[domain]?.[degreeGroup]) {
+          const validSpecs = eduData[level][domain][degreeGroup];
+          spec = spec.map(s => {
+            const matchedS = validSpecs.find(vs => vs.toLowerCase() === s.toLowerCase());
+            return matchedS || s;
+          });
+        }
+
+        let isPursuing = true;
+        if (typeof item.currentlyPursuing === 'boolean') {
+          isPursuing = item.currentlyPursuing;
+        } else if (item.degreeStatus) {
+          isPursuing = item.degreeStatus.toLowerCase().includes('pursu') || item.degreeStatus.toLowerCase().includes('ongoi');
+        }
+
+        return {
+          level: level,
+          domain: domain,
+          degreeGroup: degreeGroup,
+          specialisation: spec.filter(Boolean),
+          university: item.institutionName || item.university || item.college || defaultUniv,
+          graduationYear: item.yearOfPassing || item.graduationYear || defaultYear,
+          currentlyPursuing: isPursuing
+        };
+      });
+    };
+
+    const applyUserData = (regDetails) => {
       setFormData(prev => {
         const updatedPersonal = {
           ...prev.personalDetails,
-          name: prev.personalDetails.name || user.fullName || user.name || '',
-          email: prev.personalDetails.email || user.email || '',
-          phone: prev.personalDetails.phone || user.mobileNumber || user.mobile || user.phone || '',
-          registrationNumber: prev.personalDetails.registrationNumber || user.studentId || user.registrationNumber || ''
+          name: prev.personalDetails.name || user.fullName || user.name || regDetails?.fullName || '',
+          email: prev.personalDetails.email || user.email || regDetails?.email || '',
+          phone: prev.personalDetails.phone || user.mobileNumber || user.mobile || user.phone || regDetails?.alternateMobile || regDetails?.mobileNumber || '',
+          registrationNumber: prev.personalDetails.registrationNumber || user.studentId || user.registrationNumber || regDetails?.studentId || regDetails?.rollNumber || ''
         };
+
+        const defaultUniv = user.college?.collegeName || user.collegeName || user.institution || regDetails?.institution || 'Smaart Institute';
+        const defaultYear = user.yearOfPassing || user.batch || regDetails?.yearOfPassing || '';
+
+        // Priority 1: students.registration.higherEducation / regDetails.higherEducation
+        const higherEdList = regDetails?.higherEducation || regDetails?.registration?.higherEducation || user.registration?.higherEducation || user.higherEducation;
 
         let updatedEdu = prev.education;
         const firstEdu = prev.education[0];
         const isBlank = !firstEdu || (!firstEdu.level && !firstEdu.domain && !firstEdu.degreeGroup && (!firstEdu.specialisation || firstEdu.specialisation.length === 0));
-        
-        if (isBlank) {
+
+        const mappedHigherEd = fillEduFromHigherEdArray(higherEdList, defaultUniv, defaultYear);
+        if (mappedHigherEd && mappedHigherEd.length > 0) {
+          updatedEdu = mappedHigherEd;
+        } else if (isBlank) {
           if (user.academic && (user.academic.degreeLevel || user.academic.domain || user.academic.degreeGroup || user.academic.specialisation)) {
             updatedEdu = [{
               level: user.academic.degreeLevel || '',
               domain: user.academic.domain || '',
               degreeGroup: user.academic.degreeGroup || '',
               specialisation: user.academic.specialisation ? [user.academic.specialisation] : [],
-              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
-              graduationYear: user.yearOfPassing || user.batch || '',
+              university: defaultUniv,
+              graduationYear: defaultYear,
               currentlyPursuing: true
             }];
           } else if (user.degree) {
@@ -865,8 +1097,8 @@ const CareerAgentOnboarding = () => {
               domain: user.degree.domain || '',
               degreeGroup: user.degree.fullName || '',
               specialisation: user.degree.specialization ? [user.degree.specialization] : [],
-              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
-              graduationYear: user.yearOfPassing || user.batch || '',
+              university: defaultUniv,
+              graduationYear: defaultYear,
               currentlyPursuing: true
             }];
           } else if (user.qualification || user.specialization || user.department) {
@@ -875,8 +1107,8 @@ const CareerAgentOnboarding = () => {
               domain: '',
               degreeGroup: user.qualification || (typeof user.department === 'object' ? (user.department.fullName || user.department.name || '') : user.department) || '',
               specialisation: user.specialization ? [user.specialization] : [],
-              university: user.college?.collegeName || user.collegeName || user.institution || 'Smaart Institute',
-              graduationYear: user.yearOfPassing || user.batch || '',
+              university: defaultUniv,
+              graduationYear: defaultYear,
               currentlyPursuing: true
             }];
           }
@@ -888,8 +1120,22 @@ const CareerAgentOnboarding = () => {
           education: updatedEdu
         };
       });
+    };
+
+    // Apply immediate user context data first
+    applyUserData(null);
+
+    // Fetch full registration profile (higherEducation) via endpoint if email exists
+    if (user.email) {
+      axios.get(`/api/users/register-details/${encodeURIComponent(user.email)}`)
+        .then(res => {
+          if (res.data) {
+            applyUserData(res.data);
+          }
+        })
+        .catch(err => console.warn('Failed to fetch register-details for education auto-fill:', err));
     }
-  }, [user]);
+  }, [user, eduData]);
 
   const blankEdu = { level: '', domain: '', degreeGroup: '', specialisation: [], university: '', graduationYear: '', currentlyPursuing: false };
   const blankPref = { careerDirection: null, careerDirectionId: '', careerDirectionName: '', careerDirectionDescription: '', sectors: [], sector: '', family: '', role: '', type: 'Full-Time', salary: '', locations: [], location: '', orgTypes: [] };
@@ -1497,6 +1743,7 @@ const CareerAgentOnboarding = () => {
                   <input className={getFieldErrorClass('personal.name')} type="text" required placeholder="e.g. Priya Sharma"
                     value={formData.personalDetails.name}
                     onChange={e => updatePersonal('name', e.target.value)}
+                    disabled
                   />
                 </div>
 
@@ -1506,6 +1753,7 @@ const CareerAgentOnboarding = () => {
                   <input className={getFieldErrorClass('personal.email')} type="email" required placeholder="your@email.com"
                     value={formData.personalDetails.email}
                     onChange={e => updatePersonal('email', e.target.value)}
+                    disabled
                   />
                 </div>
 
@@ -1516,6 +1764,7 @@ const CareerAgentOnboarding = () => {
                     value={formData.personalDetails.phone}
                     onChange={e => updatePersonal('phone', e.target.value)}
                     maxLength={10}
+                    disabled
                   />
                 </div>
 
@@ -1525,6 +1774,7 @@ const CareerAgentOnboarding = () => {
                   <input className={getFieldErrorClass('personal.registrationNumber')} type="text" placeholder="e.g. REG-12345"
                     value={formData.personalDetails.registrationNumber}
                     onChange={e => updatePersonal('registrationNumber', e.target.value)}
+                    disabled
                   />
                 </div>
 
@@ -1550,9 +1800,23 @@ const CareerAgentOnboarding = () => {
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</span>
                     <span className="step-tag">STEP 2 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your academic background - you can add up to 3 qualifications.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your academic background - auto-filled from your student profile.</p>
                 </div>
               </div>
+
+              {user && (
+                <div
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-6"
+                  style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px' }}
+                >
+                  <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldCheck size={16} />
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
+                    Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your education details from your SMAART profile.</span>
+                  </div>
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {formData.education.map((edu, i) => (
@@ -1568,11 +1832,6 @@ const CareerAgentOnboarding = () => {
                           </span>
                           {i === 0 && <span style={{ color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Primary & Mandatory</span>}
                         </div>
-                        {i > 0 && (
-                          <button type="button" onClick={() => removeEdu(i)} style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '8px', padding: '0.35rem 0.8rem', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
-                            Remove
-                          </button>
-                        )}
                       </div>
                     </div>
 
@@ -1580,7 +1839,7 @@ const CareerAgentOnboarding = () => {
                         {/* Level */}
                         <div className="fg">
                           <label className="fl">Degree Level <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)} disabled>
                             <option value="">Select Level...</option>
                             {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
                           </select>
@@ -1589,7 +1848,7 @@ const CareerAgentOnboarding = () => {
                         {/* Domain */}
                         <div className="fg">
                           <label className="fl">Domain <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled>
                             <option value="">Select Domain...</option>
                             {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
                           </select>
@@ -1598,7 +1857,7 @@ const CareerAgentOnboarding = () => {
                         {/* Degree Group */}
                         <div className="fg">
                           <label className="fl">Degree Group <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled>
                             <option value="">Select Degree...</option>
                             {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
                           </select>
@@ -1607,7 +1866,7 @@ const CareerAgentOnboarding = () => {
                         {/* Graduation Year */}
                         <div className="fg">
                           <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
-                          <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} />
+                          <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} disabled />
                         </div>
 
                         {/* Specialisation (Multi) */}
@@ -1620,14 +1879,15 @@ const CareerAgentOnboarding = () => {
                               onChange={v => updateEdu(i, 'specialisation', v)}
                               max={2}
                               placeholder="Select specialisation(s)..."
+                              disabled
                             />
                           </div>
                         </div>
 
                         {/* Currently Pursuing */}
                         <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
-                            <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'pointer' }} />
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'not-allowed', opacity: 0.8, fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
+                            <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} disabled style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'not-allowed' }} />
                             Currently Pursuing this degree
                           </label>
                         </div>

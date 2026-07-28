@@ -226,12 +226,50 @@ router.get('/role-skills/roadmap/:jobFamily', async (req, res) => {
 
 /**
  * GET /api/career-agent/career-roles/names
- * Fetches a list of all role names for the onboarding selector.
+ * Fetches a list of all role names for the onboarding selector across all collections.
  */
 router.get('/career-roles/names', async (req, res) => {
   try {
+    const db = require('mongoose').connection.db;
+    const roleSet = new Set();
+
+    // 1. Collect roles from careerdirections collection (Job Role 1 .. 10)
+    if (db) {
+      const cdDocs = await db.collection('careerdirections').find({}, {
+        projection: {
+          'Job Role 1': 1, 'Job Role 2': 1, 'Job Role 3': 1, 'Job Role 4': 1, 'Job Role 5': 1,
+          'Job Role 6': 1, 'Job Role 7': 1, 'Job Role 8': 1, 'Job Role 9': 1, 'Job Role 10': 1
+        }
+      }).toArray();
+
+      cdDocs.forEach(doc => {
+        for (let i = 1; i <= 10; i++) {
+          const r = doc[`Job Role ${i}`];
+          if (r && typeof r === 'string' && r.trim()) {
+            roleSet.add(r.trim());
+          }
+        }
+      });
+
+      // 2. Collect roles from roleskillslist
+      try {
+        const rkRoles = await db.collection('roleskillslist').distinct('Job Role');
+        rkRoles.forEach(r => {
+          if (r && typeof r === 'string' && r.trim()) roleSet.add(r.trim());
+        });
+      } catch (e) { /* optional collection */ }
+    }
+
+    // 3. Collect roles from careerroles model
     const roles = await CareerRoleModel.find({}, 'role_name').lean();
-    const names = roles.map(r => r.role_name).sort();
+    roles.forEach(r => {
+      if (r?.role_name && typeof r.role_name === 'string' && r.role_name.trim()) {
+        roleSet.add(r.role_name.trim());
+      }
+    });
+
+    const names = Array.from(roleSet).sort();
+    console.log(`[career-agent/career-roles/names] Returning ${names.length} distinct DB job roles`);
     res.json(names);
   } catch (error) {
     console.error('[career-agent] Error fetching role names:', error);
@@ -509,7 +547,24 @@ router.get('/directions/:uniqueId', async (req, res) => {
       return res.status(400).json({ error: 'uniqueId is required' });
     }
 
-    const docs = await CareerAgentDataModel.find({ 'Spec ID': uniqueId }).lean();
+    let docs = await CareerAgentDataModel.find({ 'Spec ID': uniqueId }).lean();
+
+    // Fallback 1: If PG uniqueId (e.g. PG-005-001), try matching corresponding UG Spec ID (UG-005-001)
+    if ((!docs || docs.length === 0) && uniqueId.startsWith('PG-')) {
+      const ugSpecId = uniqueId.replace(/^PG-/, 'UG-');
+      console.log(`[career-agent/directions] Trying UG fallback Spec ID: "${ugSpecId}" for "${uniqueId}"`);
+      docs = await CareerAgentDataModel.find({ 'Spec ID': ugSpecId }).lean();
+    }
+
+    // Fallback 2: If still empty, try matching by domain code pattern (e.g. XX-005-*)
+    if (!docs || docs.length === 0) {
+      const parts = uniqueId.split('-');
+      if (parts.length >= 2) {
+        const domainPattern = new RegExp(`^U?P?G?-?${parts[1]}-`, 'i');
+        console.log(`[career-agent/directions] Trying domain pattern fallback: ${domainPattern}`);
+        docs = await CareerAgentDataModel.find({ 'Spec ID': { $regex: domainPattern } }).lean();
+      }
+    }
 
     if (!docs || docs.length === 0) {
       return res.json({ uniqueId, directions: [], found: false });

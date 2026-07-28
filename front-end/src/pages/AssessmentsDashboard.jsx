@@ -65,16 +65,6 @@ const DEFAULT_STAGES = [
         totalQuestions: 36,
         duration: "40 min",
     },
-    {
-        key: "AIQ",
-        code: "ASM00005",
-        title: "AIQ Assessment",
-        subtitle: "AI & Digital Literacy",
-        description:
-            "Evaluate your artificial intelligence quotient, digital literacy, and technology readiness.",
-        totalQuestions: 36,
-        duration: "45 min",
-    },
 ];
 
 const getStageFallback = (key) =>
@@ -95,7 +85,6 @@ const mapAssessmentToStage = (ass) => {
     if (ass.assessmentCode === "ASM00002") key = "T2";
     else if (ass.assessmentCode === "ASM00003") key = "T3";
     else if (ass.assessmentCode === "ASM00004") key = "T4";
-    else if (ass.assessmentCode === "ASM00005" || ass.questionCategory === "AIQ") key = "AIQ";
     else if (ass.assessmentCode === "ASM00001") key = "T1";
     else {
         key = ass.assessmentCode || ass._id;
@@ -106,14 +95,12 @@ const mapAssessmentToStage = (ass) => {
     else if (key === "T2") subtitle = "Growth";
     else if (key === "T3") subtitle = "Applied Skills";
     else if (key === "T4") subtitle = "Mastery";
-    else if (key === "AIQ") subtitle = "AI & Digital Literacy";
 
     const targetQuestionsMap = {
         T1: 36,
         T2: 34,
         T3: 34,
         T4: 36,
-        AIQ: 36,
     };
     const totalQuestions = targetQuestionsMap[key] || ass.totalQuestions || 36;
 
@@ -125,7 +112,6 @@ const mapAssessmentToStage = (ass) => {
                 T2: "40 min",
                 T3: "45 min",
                 T4: "40 min",
-                AIQ: "45 min",
             };
             durationStr = standardDurations[key] || "45 min";
         } else {
@@ -150,7 +136,6 @@ const mapAssessmentToStage = (ass) => {
             T2: "Measure your capacity for growth and development across cognitive and emotional domains.",
             T3: "Evaluate your applied capability and professional readiness with advanced challenges.",
             T4: "Demonstrate your leadership potential and mastery across all competency dimensions.",
-            AIQ: "Evaluate your artificial intelligence quotient, digital literacy, and technology readiness.",
         };
         description = standardDescriptions[key] || "Take this evaluation to measure your professional quotients.";
     }
@@ -170,7 +155,7 @@ const mapAssessmentToStage = (ass) => {
 };
 
 const METRICS = [
-    { label: "Guided Stages", value: "5", icon: Layers },
+    { label: "Guided Stages", value: "4", icon: Layers },
     { label: "Quotients", value: "6", icon: Brain },
     { label: "Reports", value: "Instant", icon: Award },
 ];
@@ -217,8 +202,13 @@ const AssessmentsDashboard = () => {
                 }
 
                 if (assessmentsRes && assessmentsRes.success && assessmentsRes.data) {
-                    const mappedStages = assessmentsRes.data.map(mapAssessmentToStage);
-                    const order = { T1: 1, T2: 2, T3: 3, T4: 4, AIQ: 5 };
+                    // Blueprint v1.0 is T1–T4 only; retired stages (ASM00005–07 / AIQ/SQ/PIQ) are excluded.
+                    const RETIRED_CODES = ["ASM00005", "ASM00006", "ASM00007"];
+                    const mappedStages = assessmentsRes.data
+                        .filter((ass) => !RETIRED_CODES.includes(ass.assessmentCode) && !["AIQ", "SQ", "PIQ"].includes(ass.questionCategory))
+                        .map(mapAssessmentToStage)
+                        .filter((s) => ["T1", "T2", "T3", "T4"].includes(s.key));
+                    const order = { T1: 1, T2: 2, T3: 3, T4: 4 };
                     mappedStages.sort((a, b) => (order[a.key] || 99) - (order[b.key] || 99));
                     setStages(mappedStages);
                 } else {

@@ -775,22 +775,14 @@ router.get('/register-details/:email', async (req, res) => {
       return c;
     };
 
-    // First try to find in User collection
-    let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
-    let userSource = 'User';
+    // First check Student collection (contains department and batch subscriptionPlan)
+    let user = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan').populate('degree');
+    let userSource = 'Student';
     let fallbackCollege = null;
 
-    // Even if User is found, if college is missing, check Student collection
-    if (!user || !user.college) {
-      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan').populate('degree');
-      if (student) {
-        if (user) {
-          fallbackCollege = student.college;
-        } else {
-          user = student;
-          userSource = 'Student';
-        }
-      }
+    if (!user) {
+      user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
+      if (user) userSource = 'User';
     }
 
     // If still not found, check Registration collection by email
@@ -879,8 +871,7 @@ router.get('/register-details/:email', async (req, res) => {
 
     if (registration) {
       return res.json({
-        ...stripSensitive(registration.toObject()),
-        ...registration,
+        ...stripSensitive(registration),
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
         batch: registration.batch || studentBatch || '',
