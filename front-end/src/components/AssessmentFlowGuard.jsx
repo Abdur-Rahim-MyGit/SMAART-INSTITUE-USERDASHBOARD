@@ -210,12 +210,18 @@ const AssessmentFlowGuard = ({ children }) => {
         //   1. parsedUser.hasRegistration = true  (self-signup student with Registration record)
         //   2. parsedUser.isRegistered = true      (admin-created student, marked registered in Student model)
         //   3. parsedUser.userType === 'registration' (legacy self-signup flow)
-        //   4. parsedUser.college exists           (admin-assigned student — always has a college ObjectId)
         const studentIsRegistered =
           parsedUser.hasRegistration === true ||
           parsedUser.isRegistered === true ||
-          parsedUser.userType === 'registration' ||
-          (parsedUser.college && parsedUser.college !== null); // Admin-provisioned students always have a college
+          parsedUser.userType === 'registration';
+
+        const isBypassed = sessionStorage.getItem('bypassRegistrationGuard') === 'true';
+
+        if (isBypassed) {
+          setAssessmentData({ skipped: true });
+          setLoading(false);
+          return;
+        }
 
         if (parsedUser.role === 'student' && !studentIsRegistered) {
           // Allow access ONLY to registration pages
@@ -302,8 +308,7 @@ const AssessmentFlowGuard = ({ children }) => {
       }
     }
 
-    // setNextPath(requiredPath); // Removed blocking redirection
-    setNextPath(null);
+    setNextPath(requiredPath);
 
   }, [location.pathname, assessmentData]);
 
@@ -363,10 +368,9 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If there's a required assessment path
-  // Removed auto-redirect to required assessment to allow free navigation
-  // if (location.pathname !== nextPath) {
-  //   return <Navigate to={nextPath} replace />;
-  // }
+  if (nextPath && location.pathname !== nextPath) {
+    return <Navigate to={nextPath} replace />;
+  }
 
   // If NOT authenticated (logged out user pressing back button), redirect to login
   if (!isAuthenticated) {

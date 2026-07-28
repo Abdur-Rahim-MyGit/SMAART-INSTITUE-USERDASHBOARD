@@ -538,6 +538,32 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   }, []);
 
   const { activeStages, activeTracks } = useMemo(() => {
+    // Check active subscription plans and addons from student's department batch or college
+    const student = user;
+    const isStudent = student?.role === 'student' || (!student?.role && student?.college);
+
+    const studentSubscriptionPlan = isStudent
+      ? (student?.department?.batch?.subscriptionPlan || user?.department?.batch?.subscriptionPlan || (!student?.department ? user?.college?.subscriptionPlan : null))
+      : null;
+
+    const plan = studentSubscriptionPlan?.plan || 'Smaart Core';
+    const addons = studentSubscriptionPlan?.addons || {};
+
+    // Determine visibility flags
+    const hasPIQ = !isStudent ? true : (plan === 'Smaart Complete' || !!addons?.piq);
+    const hasAIQ = !isStudent ? true : (addons?.aiq !== undefined ? !!addons?.aiq : true);
+    const hasSQ = !isStudent ? true : (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq);
+    const hasBC = !isStudent ? true : !!addons?.britishCouncil;
+
+    const filterTrackList = (tracks) => {
+      const filtered = [];
+      if (hasPIQ && tracks[0]) filtered.push(tracks[0]);
+      if (hasAIQ && tracks[1]) filtered.push(tracks[1]);
+      if (hasSQ && tracks[2]) filtered.push(tracks[2]);
+      if (hasBC && tracks[3]) filtered.push(tracks[3]);
+      return filtered;
+    };
+
     const templateStages = [
       {
         id: 1,
@@ -619,7 +645,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     ];
 
     if (!dbCourses || dbCourses.length === 0) {
-      return { activeStages: STAGES, activeTracks: templateTracks };
+      return { activeStages: STAGES, activeTracks: filterTrackList(templateTracks) };
     }
 
     dbCourses.forEach((dbCourse) => {
@@ -723,23 +749,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       t.totalCourses = t.courses.length;
     });
 
-    // Check active subscription plans and addons
-    const plan = user?.college?.subscriptionPlan?.plan || 'Smaart Core';
-    const addons = user?.college?.subscriptionPlan?.addons || {};
-
-    const isStudent = user?.role === 'student' || (!user?.role && user?.college);
-
-    // Determine visibility flags
-    const hasPIQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Complete' || !!addons?.piq) : true;
-    const hasAIQ = isStudent && user?.college?.subscriptionPlan ? !!addons?.aiq : true;
-    const hasSQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq) : true;
-    const hasBC = isStudent && user?.college?.subscriptionPlan ? !!addons?.britishCouncil : true;
-
-    const filteredTracks = [];
-    if (hasPIQ) filteredTracks.push(templateTracks[0]);
-    if (hasAIQ) filteredTracks.push(templateTracks[1]);
-    if (hasSQ) filteredTracks.push(templateTracks[2]);
-    if (hasBC) filteredTracks.push(templateTracks[3]);
+    const filteredTracks = filterTrackList(templateTracks);
 
     return {
       activeStages: templateStages.filter(s => s.courses.length > 0),

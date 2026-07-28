@@ -28,7 +28,13 @@ const calculateRiskScore = (violationsByType) => {
     gaze_away: 10,
     eyes_closed: 15,
     voice_detected: 25,
-    prolonged_silence: 10
+    prolonged_silence: 10,
+    // v2 ONNX events
+    spoof_detected: 40,        // Critical — photo/video replay attack
+    camera_quality_check: 0,   // Info
+    registration_quality: 0,   // Info
+    tracker_loss: 5,           // Low — brief tracking loss
+    identity_confidence: 0,    // Info
   };
   
   Object.keys(violations).forEach(type => {
@@ -121,8 +127,15 @@ exports.logEvent = async (req, res) => {
 
     await event.save();
 
-    // Info-only events (face_registered, identity_verified) don't count as violations
-    const infoOnlyEvents = ['face_registered', 'identity_verified'];
+    // Info-only events don't count as violations
+    const infoOnlyEvents = [
+      'face_registered', 'identity_verified',
+      // v2 info events
+      'camera_quality_check', 'registration_quality', 'identity_confidence',
+      // v3 batch verification events
+      'verification_batch', 'face_absent_reminder',
+    ];
+    const metadataPayload = req.body.metadata || {};
     
     if (infoOnlyEvents.includes(eventType)) {
       // Mark face registration on session
@@ -353,5 +366,173 @@ exports.webhookUnlock = async (req, res) => {
   } catch (err) {
     console.error('Webhook unlock error:', err);
     res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ─── Save face registration embedding to session ───────────────────────────
+/**
+ * POST /api/proctoring/sessions/:sessionId/registration
+ * Body: {
+ *   embedding: number[],        // Float32Array serialised to plain array
+ *   model: string,              // 'arcface-r50-onnx'
+ *   qualityScore: number,       // 0-100
+ *   framesCaptured: number,     // 5
+ *   antispoofPassed: boolean,   // true
+ *   alignedCropUrl?: string,    // optional preview URL
+ * }
+ *
+ * The embedding is serialised as JSON to fit in a String field.
+ * It is scoped to this proctoring session only and auto-deleted after 30 days
+ * via the TTL index on completedAt (DPDPA 2023 compliance).
+ */
+exports.saveRegistration = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+    const { embedding, allEmbeddings, registrationImages, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
+
+    if (!embedding || !Array.isArray(embedding)) {
+      return res.status(400).json({ success: false, error: 'embedding (array) is required.' });
+    }
+    if (embedding.length !== 512) {
+      return res.status(400).json({ success: false, error: `Expected 512-d embedding, got ${embedding.length}.` });
+    }
+
+    const session = await ProctoringSession.findOne({ _id: sessionId, userId });
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
+    }
+
+    // Single merged embedding (backward compat)
+    session.faceEmbedding         = JSON.stringify(embedding);
+    session.faceEmbeddingModel    = model || 'arcface-r50-onnx';
+    session.faceEmbeddingDims     = 512;
+    session.faceRegistrationQuality = qualityScore ?? null;
+    session.faceRegistrationFrames  = framesCaptured ?? null;
+    session.antispoofPassed         = antispoofPassed ?? null;
+    session.faceAlignedCropUrl      = alignedCropUrl || null;
+    session.faceRegistered          = true;
+    session.faceRegisteredAt        = new Date();
+
+    // v3: Store all 5 individual embeddings for multi-reference verification
+    if (allEmbeddings && Array.isArray(allEmbeddings) && allEmbeddings.length > 0) {
+      session.allFaceEmbeddings = JSON.stringify(allEmbeddings);
+    }
+
+    // v3: Store 5 registration crop images as base64
+    if (registrationImages && Array.isArray(registrationImages)) {
+      session.registrationImages = registrationImages.filter(Boolean).slice(0, 5);
+    }
+
+    await session.save();
+
+    res.status(200).json({ success: true, message: 'Face registration saved to session.' });
+  } catch (err) {
+    console.error('[ProctoringController] saveRegistration error:', err);
+    res.status(500).json({ success: false, error: 'Server error saving registration.', message: err.message });
+  }
+};
+
+// ─── Retrieve embedding for session resume ─────────────────────────────────
+/**
+ * GET /api/proctoring/sessions/:sessionId/embedding
+ * Returns the stored ArcFace embedding for this session so the client can
+ * resume verification after a page refresh without re-registering.
+ */
+exports.getEmbedding = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+
+    const session = await ProctoringSession.findOne(
+      { _id: sessionId, userId },
+      'faceEmbedding allFaceEmbeddings faceEmbeddingModel faceEmbeddingDims faceRegistered faceRegistrationQuality'
+    );
+
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Session not found.' });
+    }
+    if (!session.faceRegistered || !session.faceEmbedding) {
+      return res.status(404).json({ success: false, error: 'No face registration found for this session.' });
+    }
+
+    const embedding = JSON.parse(session.faceEmbedding);
+    // v3: Return all 5 individual embeddings if available
+    let allEmbeddings = null;
+    if (session.allFaceEmbeddings) {
+      try {
+        allEmbeddings = JSON.parse(session.allFaceEmbeddings);
+      } catch (e) {
+        console.warn('[ProctoringController] Failed to parse allFaceEmbeddings:', e);
+      }
+    }
+
+    res.json({
+      success: true,
+      embedding,
+      allEmbeddings,
+      model: session.faceEmbeddingModel,
+      dimensions: session.faceEmbeddingDims,
+      qualityScore: session.faceRegistrationQuality,
+    });
+  } catch (err) {
+    console.error('[ProctoringController] getEmbedding error:', err);
+    res.status(500).json({ success: false, error: 'Server error retrieving embedding.', message: err.message });
+  }
+};
+
+// ─── Log batch verification result to session history ──────────────────────
+/**
+ * POST /api/proctoring/sessions/:sessionId/verification
+ * Body: {
+ *   similarity: number,      // best-match cosine similarity (0–1)
+ *   status: string,          // 'verified' | 'mismatch' | 'no_face' | 'multiple_faces'
+ *   framesCaptured: number,  // usable frames in this batch
+ *   warningIssued: boolean,  // whether a warning was shown to the user
+ * }
+ */
+exports.logVerification = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { sessionId } = req.params;
+    const { similarity, status, framesCaptured, warningIssued } = req.body;
+
+    const session = await ProctoringSession.findOne({ _id: sessionId, userId });
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Session not found.' });
+    }
+
+    // Append to verification history (cap at 50 entries)
+    if (!session.verificationHistory) session.verificationHistory = [];
+    session.verificationHistory.push({
+      timestamp: new Date(),
+      similarity: similarity ?? 0,
+      status: status || 'error',
+      framesCaptured: framesCaptured ?? 0,
+    });
+    if (session.verificationHistory.length > 50) {
+      session.verificationHistory = session.verificationHistory.slice(-50);
+    }
+
+    // Update face check stats
+    session.totalFaceChecks = (session.totalFaceChecks || 0) + 1;
+    if (status === 'verified') {
+      session.faceChecksPassed = (session.faceChecksPassed || 0) + 1;
+    }
+    session.faceVerificationPassRate = session.totalFaceChecks > 0
+      ? session.faceChecksPassed / session.totalFaceChecks
+      : 0;
+
+    // Increment warning count if a warning was shown
+    if (warningIssued) {
+      session.warningCount = (session.warningCount || 0) + 1;
+    }
+
+    await session.save();
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('[ProctoringController] logVerification error:', err);
+    res.status(500).json({ success: false, error: 'Server error logging verification.', message: err.message });
   }
 };

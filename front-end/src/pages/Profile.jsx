@@ -58,14 +58,51 @@ import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL, getBackendUrl } from "@/services/api";
+import { API_BASE_URL, getBackendUrl, apiCall } from "@/services/api";
 import useUser from "@/hooks/useUser";
 import useAvatar from "@/hooks/useAvatar";
+import { getStates, getDistricts, getCities, getPincodeForCity } from "@/services/indiaLocationService";
 
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import PageTransition from "@/components/PageTransition";
 import ImageCropperModal from "@/components/ImageCropperModal";
+
+const yearOptions = Array.from({ length: 30 }, (_, i) => String(2010 + i));
+
+const formatDateForInput = (dateVal) => {
+  if (!dateVal) return "";
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split('T')[0];
+  } catch (e) {
+    return "";
+  }
+};
+
+const calculateDuration = (startDate, endDate, currentlyWorking) => {
+  if (!startDate) return "";
+  const start = new Date(startDate);
+  const end = currentlyWorking ? new Date() : (endDate ? new Date(endDate) : new Date());
+  const diffTime = Math.abs(end - start);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const months = Math.floor(diffDays / 30);
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  
+  let durationStr = "";
+  if (years > 0) {
+    durationStr += `${years} yr${years > 1 ? 's' : ''} `;
+  }
+  if (remainingMonths > 0 || years === 0) {
+    durationStr += `${remainingMonths} mo${remainingMonths > 1 ? 's' : ''}`;
+  }
+  if (currentlyWorking) {
+    durationStr += " (Present)";
+  }
+  return durationStr.trim();
+};
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -81,9 +118,12 @@ const Profile = () => {
     yearOfStudy: "",
     department: "",
     studentId: "",
+    rollNumber: "",
+    admissionDate: "",
     dateOfBirth: "",
     street: "",
     city: "",
+    district: "",
     state: "",
     country: "",
     address: "",
@@ -94,7 +134,6 @@ const Profile = () => {
     tenthDetails: null,
     twelfthDetails: null,
     higherEducation: null,
-    jobPreferences: null,
     sectorPreferences: null,
     careerGoals: null,
     personalDevelopmentGoals: null,
@@ -128,6 +167,47 @@ const Profile = () => {
   const [cropperImageSrc, setCropperImageSrc] = useState("");
   const fileInputRef = useRef(null);
 
+  // Degree Options State
+  const [degreeOptions, setDegreeOptions] = useState({
+    levels: [],
+    domains: {}, // mapped by index: [options]
+    fullNames: {}, // mapped by index: [options]
+    specializations: {} // mapped by index: [options]
+  });
+
+  // Generic Degree Option Fetcher
+  const fetchDegreeSubOptions = async (type, params, index) => {
+    try {
+      let endpoint = '';
+      if (type === 'domains') endpoint = '/degrees/domains';
+      else if (type === 'fullNames') endpoint = '/degrees/fullNames';
+      else if (type === 'specializations') endpoint = '/degrees/specializations';
+
+      const queryString = new URLSearchParams(params).toString();
+      const response = await apiCall(`${endpoint}?${queryString}`);
+
+      if (response?.success) {
+        setDegreeOptions(prev => ({
+          ...prev,
+          [type]: { ...prev[type], [index]: response.data }
+        }));
+      }
+    } catch (error) {
+      console.error(`Error fetching degree ${type}:`, error);
+    }
+  };
+
+  const fetchDegreeLevels = async () => {
+    try {
+      const response = await apiCall('/degrees/levels');
+      if (response?.success) {
+        setDegreeOptions(prev => ({ ...prev, levels: response.data }));
+      }
+    } catch (error) {
+      console.error("Error fetching degree levels:", error);
+    }
+  };
+
   // Section Editing State
   const [activeEditSection, setActiveEditSection] = useState(null); // e.g., 'personal', 'address', 'education', etc.
   const [editFormData, setEditFormData] = useState({});
@@ -143,10 +223,7 @@ const Profile = () => {
     expiryDate: "",
     verificationUrl: "",
     qrCodeIdentifier: "",
-    certificateFile: "",
   });
-  const [certDragActive, setCertDragActive] = useState(false);
-  const [uploadingCertFile, setUploadingCertFile] = useState(false);
 
   const handleOpenCertificateModal = (index = null) => {
     if (index !== null) {
@@ -155,22 +232,22 @@ const Profile = () => {
       setCertFormData({
         title: cert.title || "",
         issuer: cert.issuer || cert.issuingOrg || "",
-        issueDate: cert.issueDate ? new Date(cert.issueDate).toISOString().split('T')[0] : "",
-        expiryDate: cert.expiryDate ? new Date(cert.expiryDate).toISOString().split('T')[0] : "",
+        issuingOrg: cert.issuingOrg || cert.issuer || "",
+        yearOfCompletion: cert.yearOfCompletion || (cert.issueDate ? new Date(cert.issueDate).getFullYear().toString() : ""),
+        verificationType: cert.verificationType || (cert.verificationUrl ? "url" : (cert.qrCodeIdentifier ? "qr" : "none")),
         verificationUrl: cert.verificationUrl || cert.link || "",
         qrCodeIdentifier: cert.qrCodeIdentifier || cert.id || "",
-        certificateFile: cert.certificateFile || cert.link || "",
       });
     } else {
       setEditingCertIndex(null);
       setCertFormData({
         title: "",
         issuer: "",
-        issueDate: "",
-        expiryDate: "",
+        issuingOrg: "",
+        yearOfCompletion: "",
+        verificationType: "",
         verificationUrl: "",
         qrCodeIdentifier: "",
-        certificateFile: "",
       });
     }
     setShowCertModal(true);
@@ -189,14 +266,14 @@ const Profile = () => {
       const certPayload = {
         id: certFormData.qrCodeIdentifier || Math.random().toString(36).substr(2, 9),
         title: certFormData.title,
-        issuer: certFormData.issuer,
-        issuingOrg: certFormData.issuer,
-        issueDate: certFormData.issueDate,
-        expiryDate: certFormData.expiryDate,
-        verificationUrl: certFormData.verificationUrl,
-        link: certFormData.verificationUrl || certFormData.certificateFile,
-        qrCodeIdentifier: certFormData.qrCodeIdentifier,
-        certificateFile: certFormData.certificateFile,
+        issuer: certFormData.issuingOrg || certFormData.issuer,
+        issuingOrg: certFormData.issuingOrg || certFormData.issuer,
+        yearOfCompletion: certFormData.yearOfCompletion,
+        verificationType: certFormData.verificationType,
+        issueDate: certFormData.yearOfCompletion ? new Date(certFormData.yearOfCompletion, 0, 1).toISOString() : null,
+        verificationUrl: certFormData.verificationType === 'url' ? certFormData.verificationUrl : "",
+        link: certFormData.verificationType === 'url' ? certFormData.verificationUrl : "",
+        qrCodeIdentifier: certFormData.verificationType === 'qr' ? certFormData.qrCodeIdentifier : "",
       };
 
       if (editingCertIndex !== null) {
@@ -263,60 +340,7 @@ const Profile = () => {
     }
   };
 
-  const handleCertDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setCertDragActive(true);
-    } else if (e.type === "dragleave") {
-      setCertDragActive(false);
-    }
-  };
 
-  const handleCertDrop = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCertDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      await handleCertFileUpload(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleCertFileSelect = async (e) => {
-    if (e.target.files && e.target.files[0]) {
-      await handleCertFileUpload(e.target.files[0]);
-    }
-  };
-
-  const handleCertFileUpload = async (file) => {
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size should be less than 10MB');
-      return;
-    }
-
-    setUploadingCertFile(true);
-    const formDataUpload = new FormData();
-    formDataUpload.append('file', file);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/upload`, {
-        method: 'POST',
-        body: formDataUpload
-      });
-      const data = await response.json();
-      if (data.url) {
-        setCertFormData(prev => ({ ...prev, certificateFile: data.url }));
-        toast.success('Certificate file uploaded successfully');
-      } else {
-        toast.error('Failed to upload file');
-      }
-    } catch (error) {
-      console.error('Error uploading certificate file:', error);
-      toast.error('Failed to upload file');
-    } finally {
-      setUploadingCertFile(false);
-    }
-  };
 
   // Force refresh user details on mount to get latest badges/progress
   useEffect(() => {
@@ -371,9 +395,12 @@ const Profile = () => {
               ? ((user.department || reg.department).fullName || (user.department || reg.department).name || "")
               : (user.department || reg.department || ""),
             studentId: user.studentId || reg.studentId || "",
+            rollNumber: user.rollNumber || reg.rollNumber || "",
+            admissionDate: user.admissionDate || reg.admissionDate || "",
             dateOfBirth: (user.dob || reg.dob) ? new Date(user.dob || reg.dob).toISOString().split('T')[0] : "",
             street: (user.address || reg.address)?.street || "",
             city: (user.address || reg.address)?.city || "",
+            district: (user.address || reg.address)?.district || "",
             state: (user.address || reg.address)?.state || "",
             country: (user.address || reg.address)?.country || "",
             address: (user.address || reg.address) ?
@@ -390,7 +417,6 @@ const Profile = () => {
             tenthDetails: reg.tenthDetails || null,
             twelfthDetails: reg.twelfthDetails || null,
             higherEducation: reg.higherEducation || null,
-            jobPreferences: reg.jobPreferences || null,
             sectorPreferences: reg.sectorPreferences || null,
             careerGoals: reg.careerGoals || null,
             personalDevelopmentGoals: reg.personalDevelopmentGoals || null,
@@ -402,11 +428,12 @@ const Profile = () => {
 
           setFormData(newFormData);
 
-          if (user.createdAt) {
-            const date = new Date(user.createdAt);
+          const admissionDateVal = newFormData.admissionDate || user.admissionDate || reg.admissionDate || user.createdAt;
+          if (admissionDateVal) {
+            const date = new Date(admissionDateVal);
             setMemberSince(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-            // Check if account is less than 30 days old
-            const daysSinceCreation = (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+            const creationDateVal = user.createdAt || admissionDateVal;
+            const daysSinceCreation = (Date.now() - new Date(creationDateVal).getTime()) / (1000 * 60 * 60 * 24);
             setIsNewUser(daysSinceCreation < 30);
           }
 
@@ -598,10 +625,45 @@ const Profile = () => {
     }
   };
 
-  const handleOpenEditModal = (section, initialData) => {
+  const handleOpenEditModal = async (section, initialData) => {
     setActiveEditSection(section);
-    setEditFormData(JSON.parse(JSON.stringify(initialData))); // Deep clone
+    let clonedData;
+    if (initialData) {
+      clonedData = JSON.parse(JSON.stringify(initialData));
+    } else {
+      if (['careerGoals', 'personalDevelopmentGoals'].includes(section)) {
+        clonedData = { shortTerm: "", mediumTerm: "", longTerm: "" };
+      } else if (['workExperience', 'projects', 'extracurricular', 'higherEducation'].includes(section)) {
+        clonedData = [];
+      } else {
+        clonedData = {};
+      }
+    }
+    if (section === 'higherEducation' && Array.isArray(clonedData)) {
+      clonedData = clonedData.map(item => ({
+        ...item,
+        specialization: Array.isArray(item.specialization) ? (item.specialization[0] || "") : (item.specialization || "")
+      }));
+    }
+    setEditFormData(clonedData);
     setShowSectionModal(true);
+
+    if (section === 'higherEducation') {
+      await fetchDegreeLevels();
+      if (Array.isArray(clonedData)) {
+        clonedData.forEach(async (item, idx) => {
+          if (item.qualificationLevel) {
+            await fetchDegreeSubOptions('domains', { level: item.qualificationLevel }, idx);
+          }
+          if (item.qualificationLevel && item.degree) {
+            await fetchDegreeSubOptions('fullNames', { level: item.qualificationLevel, domain: item.degree }, idx);
+          }
+          if (item.qualificationLevel && item.degree && item.degreeFullName) {
+            await fetchDegreeSubOptions('specializations', { level: item.qualificationLevel, domain: item.degree, fullName: item.degreeFullName }, idx);
+          }
+        });
+      }
+    }
   };
 
   const handleSaveSection = async () => {
@@ -690,7 +752,7 @@ const Profile = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-[#002147] rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
+                className="relative bg-white dark:bg-[#002147] rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
               >
                 <div className="relative group flex-shrink-0">
                   <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-lg">
@@ -727,12 +789,12 @@ const Profile = () => {
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-full">
                       {formData.name || t("profile_page.student")}
                     </h2>
+                  </div>
 
-                     {/* Active Status Badge - Responsive next to name */}
-                    <div className="inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">{t("profile_page.active")}</span>
-                    </div>
+                  {/* Active Status Badge - Absolute top right corner */}
+                  <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">{t("profile_page.active")}</span>
                   </div>
                   <p className="font-medium text-lg text-slate-500 dark:text-slate-400">
                     {t("profile_page.student")}
@@ -786,8 +848,8 @@ const Profile = () => {
                           mobileNumber: formData.phone,
                           dob: formData.dateOfBirth,
                           gender: formData.gender,
-                          educationLevel: formData.educationLevel,
-                          department: formData.department
+                          studentId: formData.studentId,
+                          rollNumber: formData.rollNumber
                         })}
                         className="bg-[#f0f4ff] dark:bg-[#1a3884]/20 border border-[#1a3884]/20 dark:border-[#1a3884]/30 hover:bg-[#e0eaff] dark:hover:bg-[#1a3884]/30 text-[#1a3884] dark:text-blue-300 px-4 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all shadow-none"
                       >
@@ -803,8 +865,8 @@ const Profile = () => {
                       <InfoField label={t("profile_page.gender")} value={formData.gender || t("profile_page.not_set")} />
                       <InfoField label={t("profile_page.user_role")} value={t("profile_page.student")} />
                       <InfoField label={t("profile_page.member_since")} value={memberSince || t("profile_page.not_available")} />
-                      <InfoField label={t("profile_page.education_level")} value={formData.educationLevel || t("profile_page.not_set")} />
-                      <InfoField label={t("profile_page.department")} value={formData.department || t("profile_page.not_set")} />
+                      <InfoField label={t("profile_page.student_id", "Student ID")} value={formData.studentId || t("profile_page.not_set")} />
+                      <InfoField label={t("profile_page.roll_number", "Roll Number")} value={formData.rollNumber || t("profile_page.not_set")} />
                     </div>
                   </div>
 
@@ -821,6 +883,7 @@ const Profile = () => {
                         onClick={() => handleOpenEditModal('address', {
                           street: formData.street,
                           city: formData.city,
+                          district: formData.district,
                           state: formData.state,
                           country: formData.country
                         })}
@@ -830,9 +893,12 @@ const Profile = () => {
                       </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-white/10" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-y-8 gap-x-12">
                       <InfoField label={t("profile_page.street")} value={formData.street || t("profile_page.not_specified")} />
                       <InfoField label={t("profile_page.city")} value={formData.city || t("profile_page.not_specified")} />
+                      {formData.district && formData.district.trim() !== "" && (
+                        <InfoField label={t("profile_page.district", "District")} value={formData.district} />
+                      )}
                       <InfoField label={t("profile_page.state")} value={formData.state || t("profile_page.not_specified")} />
                       <InfoField label={t("profile_page.country")} value={formData.country || t("profile_page.not_specified")} />
                     </div>
@@ -857,14 +923,23 @@ const Profile = () => {
                                 <div className="flex flex-col gap-1 mb-2">
                                   <h5 className="font-bold text-gray-900 dark:text-white">{t("profile_page.higher_education")}</h5>
                                   <hr className="my-3 border-gray-200 dark:border-white/10" />
-                                  <h6 className="font-semibold text-gray-900 dark:text-white">
-                                    {edu.institutionName} {edu.location && <span className="text-gray-400 font-normal">| {edu.location}</span>}
+                                  <h6 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
+                                    <span>{edu.institutionName}</span>
+                                    {edu.location && <span className="text-gray-400 font-normal">| {edu.location}</span>}
+                                    {edu.degreeStatus && String(edu.degreeStatus).toLowerCase() === 'pursuing' && (
+                                      <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 rounded-full ml-1">
+                                        {t("profile_page.pursuing", "Pursuing")}
+                                      </span>
+                                    )}
                                   </h6>
                                 </div>
                                 <p className="text-sm text-gray-500 dark:text-slate-300">
+                                  {edu.qualificationLevel && <span>{edu.qualificationLevel} • </span>}
                                   {edu.degreeFullName || edu.degree} {edu.specialization && <span>• {edu.specialization}</span>}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1">{t("profile_page.passing_year")}: {edu.yearOfPassing} • {t("profile_page.grade")}: {edu.cgpaPercentage}%</p>
+                                {(!edu.degreeStatus || String(edu.degreeStatus).toLowerCase() !== 'pursuing') && (
+                                  <p className="text-xs text-gray-400 mt-1">{t("profile_page.passing_year")}: {edu.yearOfPassing} • {t("profile_page.grade")}: {edu.cgpaPercentage}%</p>
+                                )}
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
@@ -893,7 +968,10 @@ const Profile = () => {
                                 <h4 className="font-bold text-gray-900 dark:text-white">{t("profile_page.twelfth_standard")}</h4>
                                 <hr className="my-3 border-gray-200 dark:border-white/10" />
                                 <p className="text-sm text-gray-500 dark:text-slate-300">{formData.twelfthDetails.schoolName}</p>
-                                <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
+                                 <p className="text-xs text-gray-400 mt-1">
+                                    {formData.twelfthDetails.stream && <span>{formData.twelfthDetails.stream} • </span>}
+                                    {formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}
+                                 </p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('twelfthDetails', formData.twelfthDetails)}
@@ -1055,7 +1133,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenCertificateModal()}
-                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-[#859DF4] px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-black dark:text-white px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           {t("profile_page.add")} <Plus className="w-4 h-4" />
                         </button>
@@ -1157,53 +1235,14 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    {/* Career Preferences */}
-                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
-                      <div className="flex items-center justify-between gap-3 mb-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
-                            <Building className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                          </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_preferences")}</h3>
-                        </div>
-                        <button
-                          onClick={() => handleOpenEditModal('jobPreferences', formData.jobPreferences)}
-                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
-                        >
-                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="space-y-4">
-                        {formData.jobPreferences && formData.jobPreferences.length > 0 ? (
-                          formData.jobPreferences.map((job, idx) => (
-                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
-                              <h4 className="font-bold text-gray-900 dark:text-white">{job.preferredRole}</h4>
-                              <div className="grid grid-cols-2 gap-4 mt-3">
-                                <div>
-                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("profile_page.job_type")}</p>
-                                  <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.jobType}</p>
-                                </div>
-                                <div>
-                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("profile_page.preferred_location")}</p>
-                                  <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.preferredLocation}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_job_preferences")}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Goals */}
+                    {/* Career Goals */}
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
                             <Rocket className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_goals")}</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_goals", "Career Goals")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('careerGoals', formData.careerGoals)}
@@ -1215,11 +1254,42 @@ const Profile = () => {
                       <div className="space-y-4">
                         {formData.careerGoals ? (
                           <>
-                            <GoalItem label={t("profile_page.short_term")} value={formData.careerGoals.shortTerm} />
-                            <GoalItem label={t("profile_page.medium_term")} value={formData.careerGoals.mediumTerm} />
-                            <GoalItem label={t("profile_page.long_term")} value={formData.careerGoals.longTerm} />
+                            <GoalItem label={t("profile_page.short_term", "Short term (0–1 year)")} value={formData.careerGoals.shortTerm} />
+                            <GoalItem label={t("profile_page.medium_term", "Medium term (1–5 years)")} value={formData.careerGoals.mediumTerm} />
+                            <GoalItem label={t("profile_page.long_term", "Long term (5+ years)")} value={formData.careerGoals.longTerm} />
                           </>
-                        ) : null}
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_goals_set", "No goals set")}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Personal Development Goals */}
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-[#1a3884]/10 dark:bg-[#1a3884]/20 rounded-xl">
+                            <Users className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.personal_development_goals", "Personal Development Goals")}</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('personalDevelopmentGoals', formData.personalDevelopmentGoals)}
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {formData.personalDevelopmentGoals ? (
+                          <>
+                            <GoalItem label={t("profile_page.short_term", "Short term (0–1 year)")} value={formData.personalDevelopmentGoals.shortTerm} />
+                            <GoalItem label={t("profile_page.medium_term", "Medium term (1–5 years)")} value={formData.personalDevelopmentGoals.mediumTerm} />
+                            <GoalItem label={t("profile_page.long_term", "Long term (5+ years)")} value={formData.personalDevelopmentGoals.longTerm} />
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_goals_set", "No goals set")}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1319,46 +1389,194 @@ const Profile = () => {
                         {activeEditSection === 'personalDetails' && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                             <ModalInput label="Full Name" value={editFormData.fullName} onChange={(val) => setEditFormData({ ...editFormData, fullName: val })} />
-                            <ModalInput label="Nick Name" value={editFormData.nickname} onChange={(val) => setEditFormData({ ...editFormData, nickname: val })} />
                             <ModalInput label="Phone Number" value={editFormData.mobileNumber} onChange={(val) => setEditFormData({ ...editFormData, mobileNumber: val })} />
                             <ModalInput label="Date of Birth" type="date" value={editFormData.dob} onChange={(val) => setEditFormData({ ...editFormData, dob: val })} />
                             <ModalSelect label="Gender" value={editFormData.gender} options={['Male', 'Female', 'Other']} onChange={(val) => setEditFormData({ ...editFormData, gender: val })} />
-                            <ModalInput label="Education Level" value={editFormData.educationLevel} onChange={(val) => setEditFormData({ ...editFormData, educationLevel: val })} />
-                            <ModalInput label="Department" value={editFormData.department} onChange={(val) => setEditFormData({ ...editFormData, department: val })} />
                           </div>
                         )}
                         {activeEditSection === 'address' && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                            <ModalInput label="Street" value={editFormData.street} onChange={(val) => setEditFormData({ ...editFormData, street: val })} />
-                            <ModalInput label="City" value={editFormData.city} onChange={(val) => setEditFormData({ ...editFormData, city: val })} />
-                            <ModalInput label="State" value={editFormData.state} onChange={(val) => setEditFormData({ ...editFormData, state: val })} />
-                            <ModalInput label="Country" value={editFormData.country} onChange={(val) => setEditFormData({ ...editFormData, country: val })} />
+                            <ModalLocationSelect
+                              label="Country"
+                              value={editFormData.country}
+                              options={["India", "Afghanistan", "United States", "United Kingdom", "Canada", "Australia", "Germany", "France", "Japan", "China", "Others"]}
+                              onChange={(val) => setEditFormData({
+                                ...editFormData,
+                                country: val,
+                                state: "",
+                                district: "",
+                                city: ""
+                              })}
+                            />
+                            {editFormData.country === "India" ? (
+                              <ModalLocationSelect
+                                label="State"
+                                value={editFormData.state}
+                                options={getStates()}
+                                onChange={(val) => setEditFormData({
+                                  ...editFormData,
+                                  state: val,
+                                  district: "",
+                                  city: ""
+                                })}
+                              />
+                            ) : (
+                              <ModalInput
+                                label="State"
+                                value={editFormData.state}
+                                onChange={(val) => setEditFormData({ ...editFormData, state: val })}
+                              />
+                            )}
+                            {editFormData.country === "India" ? (
+                              <ModalLocationSelect
+                                label="District"
+                                value={editFormData.district}
+                                options={editFormData.state ? getDistricts(editFormData.state) : []}
+                                disabled={!editFormData.state}
+                                onChange={(val) => setEditFormData({
+                                  ...editFormData,
+                                  district: val,
+                                  city: ""
+                                })}
+                              />
+                            ) : (
+                              <ModalInput
+                                label="District"
+                                value={editFormData.district}
+                                onChange={(val) => setEditFormData({ ...editFormData, district: val })}
+                              />
+                            )}
+                            {editFormData.country === "India" ? (
+                              <ModalLocationSelect
+                                label="City"
+                                value={editFormData.city}
+                                options={editFormData.state && editFormData.district ? Array.from(new Set(getCities(editFormData.state, editFormData.district).map(c => c.city))).sort() : []}
+                                disabled={!editFormData.district}
+                                onChange={(val) => setEditFormData({
+                                  ...editFormData,
+                                  city: val
+                                })}
+                              />
+                            ) : (
+                              <ModalInput
+                                label="City"
+                                value={editFormData.city}
+                                onChange={(val) => setEditFormData({ ...editFormData, city: val })}
+                              />
+                            )}
+                            <ModalInput
+                              label="Street"
+                              value={editFormData.street}
+                              onChange={(val) => setEditFormData({ ...editFormData, street: val })}
+                            />
                           </div>
                         )}
                         {activeEditSection === 'twelfthDetails' && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
-                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
-                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
-                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
+                            <ModalInput
+                              label="School/College Name"
+                              value={editFormData.schoolName}
+                              onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })}
+                            />
+                            <ModalLocationSelect
+                              label="Board"
+                              value={editFormData.board}
+                              options={["State Board", "CBSE", "ISC", "IB", "Others"]}
+                              onChange={(val) => setEditFormData({ ...editFormData, board: val })}
+                            />
+                            <ModalLocationSelect
+                              label="Group"
+                              value={["Science", "Commerce", "Arts"].includes(editFormData.stream) ? editFormData.stream : (editFormData.stream ? "Others" : "")}
+                              options={["Science", "Commerce", "Arts", "Others"]}
+                              onChange={(val) => {
+                                if (val === "Others") {
+                                  setEditFormData({ ...editFormData, stream: "Others" });
+                                } else {
+                                  setEditFormData({ ...editFormData, stream: val });
+                                }
+                              }}
+                            />
+                            {(!["Science", "Commerce", "Arts"].includes(editFormData.stream) || editFormData.stream === "Others") && (
+                              <ModalInput
+                                label="Specify Group"
+                                value={editFormData.stream === "Others" ? "" : editFormData.stream}
+                                onChange={(val) => setEditFormData({ ...editFormData, stream: val })}
+                              />
+                            )}
+                            <ModalLocationSelect
+                              label="Year of Passing"
+                              value={editFormData.yearOfPassing}
+                              options={yearOptions}
+                              onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })}
+                            />
+                            <ModalInput
+                              label="Percentage / CGPA"
+                              type="number"
+                              value={editFormData.percentage}
+                              onChange={(val) => setEditFormData({ ...editFormData, percentage: val })}
+                            />
                           </div>
                         )}
                         {activeEditSection === 'tenthDetails' && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
-                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
-                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
-                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
+                            <ModalInput
+                              label="School Name"
+                              value={editFormData.schoolName}
+                              onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })}
+                            />
+                            <ModalLocationSelect
+                              label="Board"
+                              value={editFormData.board}
+                              options={["State Board", "CBSE", "ICSE", "IB", "Others"]}
+                              onChange={(val) => setEditFormData({ ...editFormData, board: val })}
+                            />
+                            <ModalLocationSelect
+                              label="Year of Passing"
+                              value={editFormData.yearOfPassing}
+                              options={yearOptions}
+                              onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })}
+                            />
+                            <ModalInput
+                              label="Percentage / CGPA"
+                              type="number"
+                              value={editFormData.percentage}
+                              onChange={(val) => setEditFormData({ ...editFormData, percentage: val })}
+                            />
                           </div>
                         )}
                         {activeEditSection === 'careerGoals' && (
                           <div className="space-y-5 sm:space-y-6">
-                            <ModalTextarea label="Short Term Goal" value={editFormData.shortTerm} onChange={(val) => setEditFormData({ ...editFormData, shortTerm: val })} />
-                            <ModalTextarea label="Medium Term Goal" value={editFormData.mediumTerm} onChange={(val) => setEditFormData({ ...editFormData, mediumTerm: val })} />
-                            <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.short_term_career_desc", "Short-term Goal (0-1 year)")}</label>
+                              <ModalTextarea label="Short Term Goal" value={editFormData.shortTerm} onChange={(val) => setEditFormData({ ...editFormData, shortTerm: val })} />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.medium_term_career_desc", "Medium-term Goal (1-5 years)")}</label>
+                              <ModalTextarea label="Medium Term Goal" value={editFormData.mediumTerm} onChange={(val) => setEditFormData({ ...editFormData, mediumTerm: val })} />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.long_term_career_desc", "Long-term Goal (5+ years)")}</label>
+                              <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
+                            </div>
                           </div>
                         )}
-                        {['higherEducation', 'workExperience', 'projects', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
+                        {activeEditSection === 'personalDevelopmentGoals' && (
+                          <div className="space-y-5 sm:space-y-6">
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.short_term_personal_desc", "Short term (0–1 year)")}</label>
+                              <ModalTextarea label="Short Term Goal" value={editFormData.shortTerm} onChange={(val) => setEditFormData({ ...editFormData, shortTerm: val })} />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.medium_term_personal_desc", "Medium term (1–5 years)")}</label>
+                              <ModalTextarea label="Medium Term Goal" value={editFormData.mediumTerm} onChange={(val) => setEditFormData({ ...editFormData, mediumTerm: val })} />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1 mb-1.5">{t("profile_page.long_term_personal_desc", "Long term (5+ years)")}</label>
+                              <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
+                            </div>
+                          </div>
+                        )}
+                        {['higherEducation', 'workExperience', 'projects', 'extracurricular'].includes(activeEditSection) && (
                           <div className="space-y-6 sm:space-y-8">
                             {Array.isArray(editFormData) && editFormData.map((item, idx) => (
                               <div key={idx} className="p-4 sm:p-6 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-[20px] sm:rounded-3xl border border-gray-100 dark:border-white/10 relative">
@@ -1368,42 +1586,455 @@ const Profile = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {activeEditSection === 'higherEducation' && (
                                     <>
-                                      <ModalInput label="Institution" value={item.institutionName} onChange={(v) => { const n = [...editFormData]; n[idx].institutionName = v; setEditFormData(n); }} />
-                                      <ModalInput label="Location" value={item.location} onChange={(v) => { const n = [...editFormData]; n[idx].location = v; setEditFormData(n); }} />
-                                      <ModalInput label="Degree" value={item.degreeFullName} onChange={(v) => { const n = [...editFormData]; n[idx].degreeFullName = v; setEditFormData(n); }} />
-                                      <ModalInput label="Specialization" value={item.specialization} onChange={(v) => { const n = [...editFormData]; n[idx].specialization = v; setEditFormData(n); }} />
-                                      <ModalInput label="Year" value={item.yearOfPassing} onChange={(v) => { const n = [...editFormData]; n[idx].yearOfPassing = v; setEditFormData(n); }} />
-                                      <ModalInput label="CGPA or Score" value={item.cgpaPercentage} onChange={(v) => { const n = [...editFormData]; n[idx].cgpaPercentage = v; setEditFormData(n); }} />
+                                      <ModalLocationSelect
+                                        label="Degree Level"
+                                        value={item.qualificationLevel}
+                                        options={degreeOptions.levels}
+                                        onChange={(val) => {
+                                          const n = [...editFormData];
+                                          n[idx].qualificationLevel = val;
+                                          n[idx].degree = "";
+                                          n[idx].degreeFullName = "";
+                                          n[idx].specialization = "";
+                                          setEditFormData(n);
+                                          if (val) fetchDegreeSubOptions('domains', { level: val }, idx);
+                                        }}
+                                      />
+                                      <ModalLocationSelect
+                                        label="Domain Field"
+                                        value={item.degree}
+                                        disabled={!item.qualificationLevel}
+                                        options={degreeOptions.domains[idx] || []}
+                                        onChange={(val) => {
+                                          const n = [...editFormData];
+                                          n[idx].degree = val;
+                                          n[idx].degreeFullName = "";
+                                          n[idx].specialization = "";
+                                          setEditFormData(n);
+                                          if (val) fetchDegreeSubOptions('fullNames', { level: item.qualificationLevel, domain: val }, idx);
+                                        }}
+                                      />
+                                      <ModalLocationSelect
+                                        label="Degree Full Name"
+                                        value={item.degreeFullName}
+                                        disabled={!item.degree}
+                                        options={degreeOptions.fullNames[idx] || []}
+                                        onChange={(val) => {
+                                          const n = [...editFormData];
+                                          n[idx].degreeFullName = val;
+                                          n[idx].specialization = "";
+                                          setEditFormData(n);
+                                          if (val) fetchDegreeSubOptions('specializations', { level: item.qualificationLevel, domain: item.degree, fullName: val }, idx);
+                                        }}
+                                      />
+                                      <ModalLocationSelect
+                                        label="Specialization"
+                                        value={item.specialization}
+                                        disabled={!item.degreeFullName}
+                                        options={degreeOptions.specializations[idx] || []}
+                                        onChange={(val) => {
+                                          const n = [...editFormData];
+                                          n[idx].specialization = val;
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      <ModalInput
+                                        label="Institution"
+                                        value={item.institutionName}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].institutionName = v;
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      <ModalLocationSelect
+                                        label="Status"
+                                        value={item.degreeStatus ? item.degreeStatus.charAt(0).toUpperCase() + item.degreeStatus.slice(1) : ""}
+                                        options={["Pursuing", "Completed"]}
+                                        onChange={(val) => {
+                                          const n = [...editFormData];
+                                          n[idx].degreeStatus = val.toLowerCase();
+                                          if (val.toLowerCase() === 'pursuing') {
+                                            n[idx].cgpaPercentage = '';
+                                          }
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      {item.degreeStatus !== 'pursuing' && (
+                                        <ModalInput
+                                          label="CGPA or Score"
+                                          value={item.cgpaPercentage}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].cgpaPercentage = v;
+                                            setEditFormData(n);
+                                          }}
+                                        />
+                                      )}
                                     </>
                                   )}
                                   {activeEditSection === 'workExperience' && (
                                     <>
-                                      <ModalInput label="Company" value={item.companyName || item.organization} onChange={(v) => { const n = [...editFormData]; n[idx].companyName = v; setEditFormData(n); }} />
-                                      <ModalInput label="Role" value={item.role || item.title} onChange={(v) => { const n = [...editFormData]; n[idx].role = v; setEditFormData(n); }} />
-                                      <ModalInput label="Location" value={item.location} onChange={(v) => { const n = [...editFormData]; n[idx].location = v; setEditFormData(n); }} />
-                                      <ModalInput label="Duration" value={item.duration} onChange={(v) => { const n = [...editFormData]; n[idx].duration = v; setEditFormData(n); }} />
-                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
+                                      <ModalLocationSelect
+                                        label="Experience Type"
+                                        value={item.experienceType ? item.experienceType.charAt(0).toUpperCase() + item.experienceType.slice(1) : ""}
+                                        options={["Full-Time", "Part-Time", "Internship", "Freelance", "Volunteering"]}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].experienceType = v.toLowerCase();
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      <ModalInput
+                                        label="Organization / Company Name"
+                                        value={item.organizationName || item.companyName}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].organizationName = v;
+                                          n[idx].companyName = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. Google, Startup Inc"
+                                      />
+                                      <ModalInput
+                                        label="Designation / Role"
+                                        value={item.jobTitle || item.role}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].jobTitle = v;
+                                          n[idx].role = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. Software Engineer"
+                                      />
+                                      <ModalInput
+                                        label="Industry / Sector"
+                                        value={item.industry}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].industry = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. IT, Healthcare"
+                                      />
+                                      <ModalInput
+                                        label="Location"
+                                        value={item.location}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].location = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. Remote, City Name"
+                                      />
+                                      <ModalInput
+                                        label="Start Date"
+                                        type="date"
+                                        value={formatDateForInput(item.startDate)}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].startDate = v;
+                                          n[idx].duration = calculateDuration(v, n[idx].endDate, n[idx].currentlyWorking);
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      {!item.currentlyWorking && (
+                                        <ModalInput
+                                          label="End Date"
+                                          type="date"
+                                          value={formatDateForInput(item.endDate)}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].endDate = v;
+                                            n[idx].duration = calculateDuration(n[idx].startDate, v, n[idx].currentlyWorking);
+                                            setEditFormData(n);
+                                          }}
+                                        />
+                                      )}
+                                      <div className="md:col-span-2 flex items-center gap-2 py-2">
+                                        <input
+                                          type="checkbox"
+                                          id={`current-${idx}`}
+                                          checked={!!item.currentlyWorking}
+                                          onChange={(e) => {
+                                            const n = [...editFormData];
+                                            n[idx].currentlyWorking = e.target.checked;
+                                            if (e.target.checked) {
+                                              n[idx].endDate = "";
+                                              n[idx].keyResponsibilities = "";
+                                              n[idx].significantAccomplishments = "";
+                                            }
+                                            n[idx].duration = calculateDuration(n[idx].startDate, n[idx].endDate, e.target.checked);
+                                            setEditFormData(n);
+                                          }}
+                                          className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884] dark:bg-slate-800"
+                                        />
+                                        <label htmlFor={`current-${idx}`} className="text-xs font-semibold text-gray-700 dark:text-slate-300 cursor-pointer">
+                                          Currently working here
+                                        </label>
+                                      </div>
+                                      {!item.currentlyWorking && (
+                                        <>
+                                          <div className="md:col-span-2">
+                                            <ModalTextarea
+                                              label="Key Responsibilities"
+                                              value={item.keyResponsibilities || item.description}
+                                              onChange={(v) => {
+                                                const n = [...editFormData];
+                                                n[idx].keyResponsibilities = v;
+                                                n[idx].description = v;
+                                                setEditFormData(n);
+                                              }}
+                                              placeholder="Outline your primary duties and the scope of your work in this role."
+                                            />
+                                          </div>
+                                          <div className="md:col-span-2">
+                                            <ModalTextarea
+                                              label="Significant Accomplishments"
+                                              value={item.significantAccomplishments}
+                                              onChange={(v) => {
+                                                const n = [...editFormData];
+                                                n[idx].significantAccomplishments = v;
+                                                setEditFormData(n);
+                                              }}
+                                              placeholder="Highlight major achievements, contributions, or impacts you made during your tenure."
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                      {item.currentlyWorking && (
+                                        <div className="md:col-span-2">
+                                          <ModalTextarea
+                                            label="Description"
+                                            value={item.description}
+                                            onChange={(v) => {
+                                              const n = [...editFormData];
+                                              n[idx].description = v;
+                                              setEditFormData(n);
+                                            }}
+                                            placeholder="Describe your role and activities here."
+                                          />
+                                        </div>
+                                      )}
                                     </>
                                   )}
                                   {activeEditSection === 'projects' && (
                                     <>
-                                      <ModalInput label="Project Title" value={item.title} onChange={(v) => { const n = [...editFormData]; n[idx].title = v; setEditFormData(n); }} />
-                                      <ModalInput label="Link" value={item.link} onChange={(v) => { const n = [...editFormData]; n[idx].link = v; setEditFormData(n); }} />
-                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
+                                      <ModalInput
+                                        label="Project Title"
+                                        value={item.title}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].title = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. E-commerce Website"
+                                      />
+                                      <ModalLocationSelect
+                                        label="Project developed in"
+                                        value={item.doneIn}
+                                        options={["Institution", "Organization", "Others"]}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].doneIn = v;
+                                          if (v !== 'Institution') n[idx].institution = "";
+                                          if (v !== 'Organization') n[idx].companyName = "";
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      {item.doneIn === 'Institution' && (
+                                        <ModalInput
+                                          label="College / University Name"
+                                          value={item.institution}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].institution = v;
+                                            setEditFormData(n);
+                                          }}
+                                          placeholder="e.g. Stanford University"
+                                        />
+                                      )}
+                                      {item.doneIn === 'Organization' && (
+                                        <ModalInput
+                                          label="Company / Organization Name"
+                                          value={item.companyName}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].companyName = v;
+                                            setEditFormData(n);
+                                          }}
+                                          placeholder="e.g. Acme Corp"
+                                        />
+                                      )}
+                                      <ModalLocationSelect
+                                        label="Team Type"
+                                        value={item.teamType}
+                                        options={["Individual", "Team"]}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].teamType = v;
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      <ModalInput
+                                        label="Start Date"
+                                        type="date"
+                                        value={formatDateForInput(item.startDate)}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].startDate = v;
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      {!item.currentlyWorking && (
+                                        <ModalInput
+                                          label="End Date"
+                                          type="date"
+                                          value={formatDateForInput(item.endDate)}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].endDate = v;
+                                            setEditFormData(n);
+                                          }}
+                                        />
+                                      )}
+                                      <div className="md:col-span-2 flex items-center gap-2 py-2">
+                                        <input
+                                          type="checkbox"
+                                          id={`proj-current-${idx}`}
+                                          checked={!!item.currentlyWorking}
+                                          onChange={(e) => {
+                                            const n = [...editFormData];
+                                            n[idx].currentlyWorking = e.target.checked;
+                                            if (e.target.checked) {
+                                              n[idx].endDate = "";
+                                              n[idx].description = "";
+                                              n[idx].significantAchievements = "";
+                                              n[idx].projectUrl = "";
+                                              n[idx].link = "";
+                                            }
+                                            setEditFormData(n);
+                                          }}
+                                          className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884] dark:bg-slate-800"
+                                        />
+                                        <label htmlFor={`proj-current-${idx}`} className="text-xs font-semibold text-gray-700 dark:text-slate-300 cursor-pointer">
+                                          Currently working on project
+                                        </label>
+                                      </div>
+                                      {!item.currentlyWorking && (
+                                        <>
+                                          <div className="md:col-span-2">
+                                            <ModalTextarea
+                                              label="Project Description"
+                                              value={item.description}
+                                              onChange={(v) => {
+                                                const n = [...editFormData];
+                                                n[idx].description = v;
+                                                setEditFormData(n);
+                                              }}
+                                              placeholder="Describe your role and the technologies used..."
+                                            />
+                                          </div>
+                                          <div className="md:col-span-2">
+                                            <ModalTextarea
+                                              label="Significant Achievements"
+                                              value={item.significantAchievements}
+                                              onChange={(v) => {
+                                                const n = [...editFormData];
+                                                n[idx].significantAchievements = v;
+                                                setEditFormData(n);
+                                              }}
+                                              placeholder="Highlight key results, performance wins, or unique contributions..."
+                                            />
+                                          </div>
+                                          <div className="md:col-span-2">
+                                            <ModalInput
+                                              label="Professional Project Link (GitHub / Google Docs Link Only)"
+                                              value={item.projectUrl || item.link}
+                                              onChange={(v) => {
+                                                const n = [...editFormData];
+                                                n[idx].projectUrl = v;
+                                                n[idx].link = v;
+                                                setEditFormData(n);
+                                              }}
+                                              placeholder="e.g. github.com/username/repo"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                      {item.currentlyWorking && (
+                                        <div className="md:col-span-2">
+                                          <ModalTextarea
+                                            label="Project Description"
+                                            value={item.description}
+                                            onChange={(v) => {
+                                              const n = [...editFormData];
+                                              n[idx].description = v;
+                                              setEditFormData(n);
+                                            }}
+                                            placeholder="Describe your project here."
+                                          />
+                                        </div>
+                                      )}
                                     </>
                                   )}
                                   {activeEditSection === 'extracurricular' && (
                                     <>
-                                      <ModalInput label="Activity Type" value={typeof item === 'string' ? item : item.activityType} onChange={(v) => { const n = [...editFormData]; n[idx] = typeof item === 'string' ? v : { ...item, activityType: v }; setEditFormData(n); }} />
-                                      <ModalInput label="Level" value={item.level} onChange={(v) => { const n = [...editFormData]; n[idx].level = v; setEditFormData(n); }} />
-                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
-                                    </>
-                                  )}
-                                  {activeEditSection === 'jobPreferences' && (
-                                    <>
-                                      <ModalInput label="Preferred Role" value={item.preferredRole} onChange={(v) => { const n = [...editFormData]; n[idx].preferredRole = v; setEditFormData(n); }} />
-                                      <ModalInput label="Location" value={item.preferredLocation || item.preferredLocation1} onChange={(v) => { const n = [...editFormData]; n[idx].preferredLocation = v; setEditFormData(n); }} />
-                                      <ModalSelect label="Job Type" value={item.jobType} options={['Full-time', 'Part-time', 'Internship', 'Contract', 'Remote']} onChange={(v) => { const n = [...editFormData]; n[idx].jobType = v; setEditFormData(n); }} />
+                                      <ModalLocationSelect
+                                        label="Activity Type"
+                                        value={item.activityType || ""}
+                                        options={["Sports", "Arts", "Volunteering", "Leadership roles", "Others"]}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].activityType = v;
+                                          if (v !== 'Others') n[idx].customActivityType = "";
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      {item.activityType === 'Others' && (
+                                        <ModalInput
+                                          label="Specify Activity Type"
+                                          value={item.customActivityType || ""}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].customActivityType = v;
+                                            setEditFormData(n);
+                                          }}
+                                          placeholder="e.g. Coding Club"
+                                        />
+                                      )}
+                                      <ModalLocationSelect
+                                        label="Level"
+                                        value={item.level || ""}
+                                        options={["School", "College", "District", "State", "National", "International"]}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].level = v;
+                                          setEditFormData(n);
+                                        }}
+                                      />
+                                      <ModalInput
+                                        label="Achievements"
+                                        value={item.achievements || ""}
+                                        onChange={(v) => {
+                                          const n = [...editFormData];
+                                          n[idx].achievements = v;
+                                          setEditFormData(n);
+                                        }}
+                                        placeholder="e.g. Won Gold Medal, Team Captain"
+                                      />
+                                      <div className="md:col-span-2">
+                                        <ModalTextarea
+                                          label="Description"
+                                          value={item.description || ""}
+                                          onChange={(v) => {
+                                            const n = [...editFormData];
+                                            n[idx].description = v;
+                                            setEditFormData(n);
+                                          }}
+                                          placeholder="Describe your role and what you did..."
+                                        />
+                                      </div>
                                     </>
                                   )}
                                 </div>
@@ -1411,11 +2042,10 @@ const Profile = () => {
                             ))}
                             <button
                               onClick={() => {
-                                const newItem = activeEditSection === 'extracurricular' ? { activityType: "", level: "", description: "" }
-                                  : activeEditSection === 'workExperience' ? { companyName: "", role: "", duration: "", description: "" }
-                                    : activeEditSection === 'projects' ? { title: "", link: "", description: "" }
-                                      : activeEditSection === 'jobPreferences' ? { preferredRole: "", preferredLocation: "", jobType: "" }
-                                        : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
+                                const newItem = activeEditSection === 'extracurricular' ? { id: String(Date.now()), activityType: "", customActivityType: "", level: "", achievements: "", description: "" }
+                                  : activeEditSection === 'workExperience' ? { id: String(Date.now()), experienceType: "", organizationName: "", companyName: "", jobTitle: "", role: "", duration: "", industry: "", location: "", startDate: "", endDate: "", currentlyWorking: false, keyResponsibilities: "", significantAccomplishments: "", description: "" }
+                                    : activeEditSection === 'projects' ? { id: String(Date.now()), title: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", significantAchievements: "", projectUrl: "", link: "" }
+                                      : { institutionName: "", degree: "", degreeFullName: "", specialization: "", qualificationLevel: "", cgpaPercentage: "", degreeStatus: "" };
                                 setEditFormData([...(Array.isArray(editFormData) ? editFormData : []), newItem]);
                               }}
                               className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[20px] sm:rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold text-sm"
@@ -1467,58 +2097,61 @@ const Profile = () => {
                         </button>
                       </div>
 
-                      <form onSubmit={handleSaveCertificate} className="p-5 sm:p-6 md:p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
-                          {/* Left Column: Form Fields */}
-                          <div className="space-y-4 sm:space-y-5">
-                            <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.certificate_title")}</label>
-                              <input
-                                required
-                                type="text"
-                                value={certFormData.title}
-                                onChange={(e) => setCertFormData({ ...certFormData, title: e.target.value })}
-                                placeholder="e.g. AWS Solutions Architect"
-                                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                              />
-                            </div>
+                      <form onSubmit={handleSaveCertificate} className="p-5 sm:p-6 md:p-8 max-w-xl mx-auto">
+                        <div className="space-y-4 sm:space-y-5">
+                          <div>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.certificate_title", "Certificate Name / Title *")}</label>
+                            <input
+                              required
+                              type="text"
+                              value={certFormData.title}
+                              onChange={(e) => setCertFormData({ ...certFormData, title: e.target.value })}
+                              placeholder="e.g. AWS Certified Solutions Architect"
+                              className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                            />
+                          </div>
 
-                            <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.issuer")}</label>
-                              <input
-                                required
-                                type="text"
-                                value={certFormData.issuer}
-                                onChange={(e) => setCertFormData({ ...certFormData, issuer: e.target.value })}
-                                placeholder="e.g. Amazon Web Services"
-                                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
-                              />
-                            </div>
+                          <div>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.issuer", "Issuing Organization *")}</label>
+                            <input
+                              required
+                              type="text"
+                              value={certFormData.issuingOrg || certFormData.issuer}
+                              onChange={(e) => setCertFormData({ ...certFormData, issuer: e.target.value, issuingOrg: e.target.value })}
+                              placeholder="e.g. Amazon Web Services, Coursera"
+                              className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                            />
+                          </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.issue_date")}</label>
-                                <input
-                                  required
-                                  type="date"
-                                  value={certFormData.issueDate}
-                                  onChange={(e) => setCertFormData({ ...certFormData, issueDate: e.target.value })}
-                                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs sm:text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.expiry_optional")}</label>
-                                <input
-                                  type="date"
-                                  value={certFormData.expiryDate}
-                                  onChange={(e) => setCertFormData({ ...certFormData, expiryDate: e.target.value })}
-                                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs sm:text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
-                                />
-                              </div>
-                            </div>
+                          <div>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.completion_year", "Year of Completion *")}</label>
+                            <select
+                              value={certFormData.yearOfCompletion}
+                              onChange={(e) => setCertFormData({ ...certFormData, yearOfCompletion: e.target.value })}
+                              className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                            >
+                              <option value="">{t("profile_page.select_year", "Select Year")}</option>
+                              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+                            </select>
+                          </div>
 
+                          <div>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_mode", "Verification Mode *")}</label>
+                            <select
+                              value={certFormData.verificationType}
+                              onChange={(e) => setCertFormData({ ...certFormData, verificationType: e.target.value })}
+                              className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                            >
+                              <option value="">{t("profile_page.select", "Select")}</option>
+                              <option value="url">{t("profile_page.verify_url", "Link / URL")}</option>
+                              <option value="qr">{t("profile_page.verify_qr", "QR Code")}</option>
+                              <option value="none">{t("profile_page.verify_none", "None")}</option>
+                            </select>
+                          </div>
+
+                          {certFormData.verificationType === "url" && (
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_url")}</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_url", "Verification Link / URL *")}</label>
                               <div className="relative">
                                 <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1530,9 +2163,11 @@ const Profile = () => {
                                 />
                               </div>
                             </div>
+                          )}
 
+                          {certFormData.verificationType === "qr" && (
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_code_qr")}</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_code_qr", "QR Code Identifier *")}</label>
                               <div className="relative">
                                 <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1544,59 +2179,7 @@ const Profile = () => {
                                 />
                               </div>
                             </div>
-                          </div>
-
-                          {/* Right Column: File Upload */}
-                          <div className="flex flex-col h-full">
-                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.certificate_file_pdf")}</label>
-                            <div
-                              onDragEnter={handleCertDrag}
-                              onDragLeave={handleCertDrag}
-                              onDragOver={handleCertDrag}
-                              onDrop={handleCertDrop}
-                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${certDragActive
-                                  ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
-                                  : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
-                                }`}
-                            >
-                              {certFormData.certificateFile ? (
-                                <div className="text-center p-4">
-                                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-3 sm:mb-4 border border-emerald-100 dark:border-emerald-800/30">
-                                    <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
-                                  </div>
-                                  <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[180px] sm:max-w-[220px]">
-                                    {certFormData.certificateFile.split('/').pop()}
-                                  </p>
-                                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500">{t("profile_page.file_attached_success")}</p>
-                                  <button
-                                    type="button"
-                                    onClick={() => setCertFormData({ ...certFormData, certificateFile: "" })}
-                                    className="mt-4 sm:mt-5 text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
-                                  >
-                                    {t("profile_page.remove_file")}
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="text-center flex flex-col items-center justify-center h-full">
-                                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                                    {uploadingCertFile ? (
-                                      <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 text-[#859DF4] animate-spin" />
-                                    ) : (
-                                      <Upload className="w-6 h-6 sm:w-7 sm:h-7 text-[#859DF4] dark:text-blue-400" />
-                                    )}
-                                  </div>
-                                  <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
-                                    {uploadingCertFile ? "Uploading certificate..." : t("profile_page.drag_drop_file")}
-                                  </p>
-                                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3 sm:mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
-                                  <label className="cursor-pointer px-4 py-2 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-[10px] sm:text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
-                                    {t("profile_page.browse_files")}
-                                    <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleCertFileSelect} disabled={uploadingCertFile} />
-                                  </label>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                          )}
                         </div>
 
                         {/* Footer Actions */}
@@ -1610,7 +2193,7 @@ const Profile = () => {
                           </button>
                           <button
                             type="submit"
-                            disabled={uploadingCertFile || (!certFormData.title)}
+                            disabled={savingProfile || (!certFormData.title)}
                             className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl bg-[#859DF4] hover:bg-[#728BE8] text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none order-1 sm:order-2"
                           >
                             {savingProfile ? (
@@ -1673,7 +2256,7 @@ const ModalInput = ({ label, value, onChange, type = "text", disabled = false })
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-        placeholder={`${t("profile_page.enter")} ${label}`}
+        placeholder={`${t("profile_page.enter", "Enter")} ${label}`}
       />
     </div>
   );
@@ -1689,11 +2272,38 @@ const ModalSelect = ({ label, value, options, onChange }) => {
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
       >
-        <option value="">{t("profile_page.select")} {label}</option>
+        <option value="">{t("profile_page.select", "Select")} {label}</option>
         {options.map((opt) => (
           <option key={opt} value={opt.toLowerCase()}>{opt}</option>
         ))}
       </select>
+    </div>
+  );
+};
+
+const ModalLocationSelect = ({ label, value, options, onChange, disabled = false }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
+      <div className="relative">
+        <select
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="">{t("profile_page.select", "Select")} {label}</option>
+          {options.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1708,7 +2318,7 @@ const ModalTextarea = ({ label, value, onChange }) => {
         onChange={(e) => onChange(e.target.value)}
         rows={3}
         className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
-        placeholder={`${t("profile_page.enter_your")} ${label}...`}
+        placeholder={`${t("profile_page.enter_your", "Enter your")} ${label}...`}
       />
     </div>
   );

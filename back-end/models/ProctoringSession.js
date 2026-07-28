@@ -20,18 +20,69 @@ const ProctoringSessionSchema = new mongoose.Schema({
   totalViolations: { type: Number, default: 0 },
   violationsByType: { type: Map, of: Number, default: {} },
   riskScore: { type: Number, default: 0 }, // 0-100 composite score calculated on backend
+
+  // Liveness ping from the exam client. A gap here is itself a violation —
+  // the candidate cannot forge an absence, so going offline is incriminating
+  // rather than exculpatory.
+  heartbeat: {
+    lastAt: { type: Date },
+    sequence: { type: Number, default: 0 },
+    missedCount: { type: Number, default: 0 }
+  },
+
+  // Face embedding captured at setup, held SERVER-side. Previously the
+  // descriptor lived only in React state, so the server had no way to know
+  // whether the registered candidate actually sat the exam.
+  referenceDescriptor: { type: [Number], default: undefined, select: false },
+
+  // Outcome of the human review for a held attempt.
+  decision: {
+    state: { type: String, enum: ['pending', 'released', 'invalidated', 'retake'], default: 'pending' },
+    decidedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    decidedAt: { type: Date },
+    note: { type: String }
+  },
+
   faceRegistered: { type: Boolean, default: false },
   faceRegisteredAt: { type: Date },
   faceVerificationPassRate: { type: Number, default: 0 }, // 0-1 ratio of verified checks vs total
   totalFaceChecks: { type: Number, default: 0 },
   faceChecksPassed: { type: Number, default: 0 },
+
+  // ── Face Embedding Persistence (v3: Multi-Embedding ArcFace ONNX) ───────────
+  faceEmbedding: { type: String, default: null },       // JSON-stringified Float32Array[512] (merged/median-pooled)
+  faceEmbeddingModel: { type: String, default: null },  // e.g. 'arcface-r50-onnx'
+  faceEmbeddingDims: { type: Number, default: null },   // 512
+  faceRegistrationQuality: { type: Number, default: null }, // 0–100 quality score at registration
+  faceRegistrationFrames: { type: Number, default: null },  // frames captured (should be 5)
+  faceAlignedCropUrl: { type: String, default: null },  // last frame crop URL (legacy compat)
+  antispoofPassed: { type: Boolean, default: null },    // Anti-spoof result at registration
+
+  // All 5 individual registration embeddings (JSON-stringified number[][512])
+  allFaceEmbeddings: { type: String, default: null },
+  // 5 registration crop images stored as base64 data URLs (~5-10 KB each)
+  registrationImages: [{ type: String }],
+  // Rolling verification history (last 50 batch verifications)
+  verificationHistory: [{
+    timestamp: { type: Date, default: Date.now },
+    similarity: { type: Number },          // best-match cosine similarity
+    status: { type: String },              // verified | mismatch | no_face | multiple_faces
+    framesCaptured: { type: Number },      // how many live frames were usable
+    _id: false
+  }],
+  // Warning count (warnings shown to user, separate from totalViolations)
+  warningCount: { type: Number, default: 0 },
+
   startedAt: { type: Date, default: Date.now },
   completedAt: { type: Date }
 }, { timestamps: true });
 
-// Index for fast lookups
+// Indexes for fast lookups
 ProctoringSessionSchema.index({ userId: 1, assessmentId: 1 });
 ProctoringSessionSchema.index({ resultId: 1 });
 ProctoringSessionSchema.index({ status: 1 });
+// TTL index: auto-delete completed sessions (and their embedded face data) after 30 days
+// Satisfies DPDPA 2023 requirement: session records purged within 30 days of completion
+ProctoringSessionSchema.index({ completedAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
 
 module.exports = mongoose.model('ProctoringSession', ProctoringSessionSchema);

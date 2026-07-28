@@ -435,7 +435,7 @@ const exportToExcel = async (req, res) => {
         const { reportId, batchId } = req.body;
         const userId = req.user.id || req.user._id;
 
-        let query = { userId: new require('mongoose').Types.ObjectId(userId) };
+        let query = { userId: new (require('mongoose').Types.ObjectId)(userId) };
         if (batchId) {
             query.simulationBatchId = batchId;
         } else if (reportId) {

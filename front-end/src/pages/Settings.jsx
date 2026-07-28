@@ -361,6 +361,7 @@ const Settings = () => {
                 <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
                 <option value="ur">Urdu (اردو)</option>
                 <option value="fr">French (Français)</option>
+                <option value="ar">Arabic (العربية)</option>
               </select>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { apiCall } from '../services/api';
 
 const ThemeContext = createContext({
@@ -46,11 +46,11 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const handleThemeChange = (newTheme) => {
+  const handleThemeChange = useCallback((newTheme) => {
     setTheme(newTheme);
     applyTheme(newTheme);
     persistThemePreference(newTheme);
-  };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -104,8 +104,14 @@ export const ThemeProvider = ({ children }) => {
     };
   }, [theme]);
 
+  const value = useMemo(() => ({
+    theme,
+    setTheme: handleThemeChange,
+    loading
+  }), [theme, handleThemeChange, loading]);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: handleThemeChange, loading }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

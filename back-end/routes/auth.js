@@ -1,8 +1,8 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
 
@@ -14,69 +14,69 @@ const Log = require('../models/Log');
  * Non-blocking — never crashes the login flow.
  */
 const writeAuthLog = async ({ action, userId, userName, userEmail, userRole, details, success, req, targetEmail }) => {
-    try {
-        // ── IP Detection ──────────────────────────────────────────────────────
-        // req.ip respects the 'trust proxy' setting (set in server.js).
-        // Falls back through raw headers for extra resilience.
-        let ipAddress = req.ip
-            || req.headers['x-forwarded-for']
-            || req.headers['x-real-ip']
-            || req.headers['cf-connecting-ip']
-            || req.connection?.remoteAddress
-            || req.socket?.remoteAddress
-            || 'Unknown';
+  try {
+    // ── IP Detection ──────────────────────────────────────────────────────
+    // req.ip respects the 'trust proxy' setting (set in server.js).
+    // Falls back through raw headers for extra resilience.
+    let ipAddress = req.ip
+      || req.headers['x-forwarded-for']
+      || req.headers['x-real-ip']
+      || req.headers['cf-connecting-ip']
+      || req.connection?.remoteAddress
+      || req.socket?.remoteAddress
+      || 'Unknown';
 
-        // Take the FIRST IP from a comma-separated list (proxy chain)
-        if (ipAddress && ipAddress.includes(',')) {
-            ipAddress = ipAddress.split(',')[0].trim();
-        }
-        // Strip IPv6 localhost prefix (::ffff:127.0.0.1 → 127.0.0.1)
-        if (ipAddress && ipAddress.startsWith('::ffff:')) {
-            ipAddress = ipAddress.substring(7);
-        }
-        // Normalise pure IPv6 loopback
-        if (ipAddress === '::1') ipAddress = '127.0.0.1';
+    // Take the FIRST IP from a comma-separated list (proxy chain)
+    if (ipAddress && ipAddress.includes(',')) {
+      ipAddress = ipAddress.split(',')[0].trim();
+    }
+    // Strip IPv6 localhost prefix (::ffff:127.0.0.1 → 127.0.0.1)
+    if (ipAddress && ipAddress.startsWith('::ffff:')) {
+      ipAddress = ipAddress.substring(7);
+    }
+    // Normalise pure IPv6 loopback
+    if (ipAddress === '::1') ipAddress = '127.0.0.1';
 
-        // ── User-Agent / Device Info ──────────────────────────────────────────
-        const userAgent = req.headers['user-agent'] || '';
-        let deviceInfo = '';
-        if (userAgent) {
-            const browser = userAgent.includes('Edg/')   ? 'Edge'
-                : userAgent.includes('OPR/')  ? 'Opera'
-                : userAgent.includes('Chrome') ? 'Chrome'
-                : userAgent.includes('Firefox') ? 'Firefox'
-                : userAgent.includes('Safari') ? 'Safari'
+    // ── User-Agent / Device Info ──────────────────────────────────────────
+    const userAgent = req.headers['user-agent'] || '';
+    let deviceInfo = '';
+    if (userAgent) {
+      const browser = userAgent.includes('Edg/') ? 'Edge'
+        : userAgent.includes('OPR/') ? 'Opera'
+          : userAgent.includes('Chrome') ? 'Chrome'
+            : userAgent.includes('Firefox') ? 'Firefox'
+              : userAgent.includes('Safari') ? 'Safari'
                 : 'Browser';
 
-            const os = userAgent.includes('Windows NT') ? 'Windows'
-                : userAgent.includes('Mac OS X') ? 'macOS'
-                : userAgent.includes('Android') ? 'Android'
-                : userAgent.includes('iPhone') || userAgent.includes('iPad') ? 'iOS'
-                : userAgent.includes('Linux') ? 'Linux'
+      const os = userAgent.includes('Windows NT') ? 'Windows'
+        : userAgent.includes('Mac OS X') ? 'macOS'
+          : userAgent.includes('Android') ? 'Android'
+            : userAgent.includes('iPhone') || userAgent.includes('iPad') ? 'iOS'
+              : userAgent.includes('Linux') ? 'Linux'
                 : 'Unknown OS';
 
-            const device = /Mobi|Android|iPhone|iPad/i.test(userAgent) ? 'Mobile' : 'Desktop';
-            deviceInfo = `${browser} / ${os} / ${device}`;
-        }
-
-        await Log.create({
-            action,
-            module: 'Auth',
-            user: userId || undefined,
-            userName,
-            userEmail,
-            userRole: userRole || 'student',
-            targetEmail,
-            details,
-            ipAddress,
-            userAgent,
-            deviceInfo,
-            success: success !== undefined ? success : true,
-        });
-    } catch (err) {
-        // Non-critical — never block the login flow
-        console.error('⚠️ Auth log write failed:', err.message);
+      const device = /Mobi|Android|iPhone|iPad/i.test(userAgent) ? 'Mobile' : 'Desktop';
+      deviceInfo = `${browser} / ${os} / ${device}`;
     }
+
+    await Log.create({
+      action,
+      module: 'Auth',
+      user: userId || undefined,
+      userName,
+      userEmail,
+      userRole: userRole || 'student',
+      targetEmail,
+      details,
+      ipAddress,
+      userAgent,
+      deviceInfo,
+      success: success !== undefined ? success : true,
+    });
+  } catch (err) {
+    // Non-critical — never block the login flow
+    console.error('⚠️ Auth log write failed:', err.message);
+  }
 };
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
 const { notifyWelcome } = require('../services/notificationService');
@@ -157,12 +157,12 @@ router.post('/send-signup-otp', passwordResetLimiter, async (req, res) => {
     }
 
     // Check if email already registered across all user collections
+    // (registrations were merged into students).
     const Student = require('../models/Student');
     const existingStudent = await Student.findOne({ email: normalizedEmail });
     const existingUser = await User.findOne({ email: normalizedEmail });
-    const existingReg = await Registration.findOne({ email: normalizedEmail });
 
-    if (existingStudent || existingUser || existingReg) {
+    if (existingStudent || existingUser) {
       return res.status(400).json({ error: 'An account with this email already exists. Please login instead.' });
     }
 
@@ -345,26 +345,36 @@ router.post('/register',
         });
       }
 
-      // Check if user exists
-      let registration = await Registration.findOne({ email });
-      if (registration) {
+      // Registration and Student are now the same collection. A self-service
+      // signup creates a `pending` Student (no college/rollNumber yet); an admin
+      // later provisions it.
+      const Student = require('../models/Student');
+      const normalizedSignupEmail = String(email || '').trim().toLowerCase();
+
+      let student = await Student.findOne({ email: normalizedSignupEmail });
+      if (student) {
         return res.status(400).json({ error: 'User already exists' });
       }
 
-      // Create new registration
-      registration = new Registration({
+      // Create new self-registered student. Let the model's pre-save hook hash
+      // the fresh plaintext password.
+      student = new Student({
         fullName,
-        email,
-        mobileNumber,
+        email: normalizedSignupEmail,
+        mobile: mobileNumber,
         password,
-        institution,
+        status: 'pending',
+        profileStatus: 'pending',
+        isRegistered: false,
+        mustChangePassword: false,
+        registration: institution ? { institution } : undefined,
       });
 
-      await registration.save();
+      await student.save();
 
       // Send welcome notification
       try {
-        await notifyWelcome(registration._id, fullName);
+        await notifyWelcome(student._id, fullName);
         console.log(`🔔 Welcome notification sent to ${fullName}`);
       } catch (notifyError) {
         console.error("⚠️ Error sending welcome notification:", notifyError);
@@ -372,7 +382,7 @@ router.post('/register',
 
       // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
       const token = jwt.sign(
-        { userId: registration._id, email: registration.email },
+        { userId: student._id, email: student.email, userType: 'student', role: 'student' },
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
       );
@@ -389,10 +399,10 @@ router.post('/register',
         message: 'User registered successfully',
         token,
         user: {
-          id: registration._id,
-          fullName: registration.fullName,
-          email: registration.email,
-          institution: registration.institution,
+          id: student._id,
+          fullName: student.fullName,
+          email: student.email,
+          institution: student.registration ? student.registration.institution : institution,
         },
       });
     } catch (err) {
@@ -468,9 +478,14 @@ router.post('/login',
           $or: [
             { studentId: identifier },
             { studentId: identifier.toUpperCase() },
-            { userId: identifier } // In case they use the generic userId
           ]
         };
+        // `userId` is an ObjectId ref to the legacy User — only match it when the
+        // identifier is actually a valid ObjectId, otherwise Mongoose throws a
+        // CastError (e.g. for a username like "hamdan@123").
+        if (mongoose.Types.ObjectId.isValid(identifier)) {
+          studentQuery.$or.push({ userId: identifier });
+        }
       }
 
       if (collegeId) {
@@ -517,26 +532,17 @@ router.post('/login',
         }
       }
 
-      // If still not found, try Registration collection (legacy) - with institution filter
-      if (!user) {
-        if (institutionToCheck) {
-          // Check if institution matches the college name or code
-          user = await Registration.findOne({
-            email: normalizedEmail,
-            $or: [
-              { institution: institutionToCheck },
-              { institution: collegeInfo?.collegeName }
-            ]
-          });
-          console.log('Registration (with inst) found:', !!user);
-        } else {
-          user = await Registration.findOne({ email: normalizedEmail });
-          console.log('Registration (no inst) found:', !!user);
-        }
-        if (user) {
-          userType = 'registration';
-          userModel = 'Registration';
-        }
+      // (Former Registration fallback removed: registrations were merged into the
+      // students collection, so self-registered users resolve via the Student
+      // branch above.)
+
+      // ── STUDENT-ONLY PORTAL ───────────────────────────────────────────────
+      // This is the student-facing user dashboard. Teachers, admins, moderators
+      // and all other roles must use the admin panel instead. We reject non-students
+      // with a generic "User not found" so role names are not leaked to callers.
+      if (user && userType !== 'student') {
+        console.warn(`[Auth/Login] Non-student login attempt blocked: ${identifier} (type: ${userType})`);
+        return res.status(400).json({ error: 'User not found.' });
       }
 
       console.log('User found after cross-checking:', {
@@ -568,16 +574,22 @@ router.post('/login',
       // === SECURITY FIX #1: Check account status before allowing login ===
       if (user.status && !['active'].includes(user.status)) {
         if (user.status === 'pending') {
-          return res.status(400).json({ error: 'User not found.' });
+          // Self-registered students live as `pending` until an admin provisions
+          // them (admin-created students are `active`), so any pending student
+          // may log in to complete registration. Non-students stay hidden.
+          if (userType !== 'student') {
+            return res.status(400).json({ error: 'User not found.' });
+          }
+        } else {
+          const statusMessages = {
+            inactive: 'Your account has been deactivated. Please contact your administrator.',
+            suspended: 'Your account has been suspended. Please contact your administrator.',
+            graduated: 'Your account has been archived. Please contact your administrator.'
+          };
+          return res.status(403).json({
+            error: statusMessages[user.status] || `Account status '${user.status}' does not allow login. Please contact your administrator.`
+          });
         }
-        const statusMessages = {
-          inactive: 'Your account has been deactivated. Please contact your administrator.',
-          suspended: 'Your account has been suspended. Please contact your administrator.',
-          graduated: 'Your account has been archived. Please contact your administrator.'
-        };
-        return res.status(403).json({
-          error: statusMessages[user.status] || `Account status '${user.status}' does not allow login. Please contact your administrator.`
-        });
       }
 
       // === SECURITY FIX #12: Check account lock BEFORE password verification ===
@@ -634,12 +646,17 @@ router.post('/login',
       }
 
       // Check if student must change password on first login
-      // BUT only if they don't already have a registration record (returning user)
+      // BUT only if they haven't already completed the ComprehensiveSignup flow.
+      // Admin-onboarded students have isRegistered:true but NO registration subdoc —
+      // they still need to set a password and go through ComprehensiveSignup.
+      // Self-registered students who completed ComprehensiveSignup have a populated
+      // registration subdoc AND isRegistered:true — they skip this.
       if (userType === 'student' && user.mustChangePassword) {
-        // First check if student already exists in Registration collection
-        const existingRegistration = await Registration.findOne({
-          email: { $regex: new RegExp(`^${escapeRegex(loginEmail)}$`, 'i') }
-        });
+        // Only skip if the student actually completed the registration form
+        // (i.e. has a populated embedded registration subdoc).
+        const existingRegistration = !!(user.registration && Object.keys(
+          (user.registration.toObject ? user.registration.toObject() : user.registration)
+        ).length > 0);
 
         if (existingRegistration) {
           // Student already registered - skip password change, update flags, proceed normally
@@ -679,7 +696,7 @@ router.post('/login',
               userType: userType,
               fullName: user.fullName,
               mustChangePassword: true,
-              isRegistered: false,
+              isRegistered: user.isRegistered === true,
               isAssessmentCompleted: false,
               college: user.college ? (user.college.toObject ? user.college.toObject() : user.college) : null
             },
@@ -726,18 +743,7 @@ router.post('/login',
       let finalGender = user.gender;
       console.log(`[Auth/Login] User type: ${userType}, Initial gender: ${finalGender} for ${normalizedEmail}`);
 
-      if (!finalGender) {
-        console.log(`[Auth/Login] Gender missing for ${normalizedEmail}. Attempting Registration lookup...`);
-        const regRecord = await Registration.findOne({
-          $or: [
-            { userId: user._id },
-            { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } }
-          ]
-        });
-        finalGender = regRecord?.gender;
-        console.log(`[Auth/Login] Registration record for ${normalizedEmail}:`, regRecord ? { gender: regRecord.gender } : 'NOT FOUND');
-      }
-
+      // Gender is now a top-level field on the (merged) student document.
       console.log(`[Auth/Login] Final resolved gender for ${normalizedEmail}: ${finalGender}`);
 
       const userResponse = {
@@ -752,47 +758,16 @@ router.post('/login',
         previousLogin: user.previousLogin || null
       };
 
-      // Check if user has completed registration (exists in both students and registration collections)
+      // Registration data now lives embedded on the student document.
       let hasRegistration = false;
       if (userType === 'student') {
-        // Check if this student also has a registration record for the same institution
-        const studentEmail = user.email.toLowerCase();
+        const registrationRecord = user.registration || null;
+        // "Completed registration" is authoritative via isRegistered (set on the
+        // final register-details submit). A partial/embedded registration
+        // sub-object (e.g. an institution hint from signup) must NOT count.
+        hasRegistration = user.isRegistered === true;
 
-        // First, just find by email (case-insensitive)
-        const registrationRecord = await Registration.findOne({
-          email: { $regex: new RegExp(`^${studentEmail}$`, 'i') }
-        });
-
-        if (registrationRecord) {
-          // Check if institution matches (handle both string and JSON formats)
-          if (collegeInfo) {
-            const regInstitution = registrationRecord.institution || '';
-
-            // Try to parse as JSON if it looks like JSON
-            let institutionName = regInstitution;
-            try {
-              if (regInstitution.startsWith('{')) {
-                const parsed = JSON.parse(regInstitution);
-                institutionName = parsed.name || regInstitution;
-              }
-            } catch (e) {
-              // Not JSON, use as-is
-            }
-
-            // Check if institution matches
-            hasRegistration = (
-              institutionName === collegeInfo.collegeName ||
-              institutionName === collegeInfo.collegeCode ||
-              regInstitution === collegeInfo.collegeName ||
-              regInstitution === collegeInfo.collegeCode
-            );
-          } else {
-            // No college filter, just having registration is enough
-            hasRegistration = true;
-          }
-        }
-
-        console.log(`Student login - Email: ${studentEmail}, College: ${collegeInfo?.collegeName || 'N/A'}, Registration found: ${hasRegistration}`);
+        console.log(`Student login - Email: ${user.email.toLowerCase()}, College: ${collegeInfo?.collegeName || 'N/A'}, Registration found: ${hasRegistration}`);
 
         userResponse.fullName = user.fullName;
         userResponse.nickname = registrationRecord ? registrationRecord.nickname : null;
@@ -977,14 +952,27 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     console.log(`[Auth/OTP] Proceeding with regular login flow for ${loginOtp.email}`);
     const { user } = userData;
     const { forceLogout } = req.body;
-    console.log(`[Auth/OTP] Request body:`, req.body);
+    // SECURITY: never log the request body here — it contains the email + OTP code.
+    // SECURITY: never log the OTP request body — it contains the one-time code
+    // and would defeat the 2FA factor for anyone with log access.
 
     // === SECURITY: SINGLE SESSION ENFORCEMENT ===
     // Fetch fresh user record to check currentSessionId
     let userModelName = 'User';
+    // ── STUDENT-ONLY PORTAL (secondary guard) ────────────────────────────────
+    // Reject any OTP that was issued for a non-student account.
+    // Primary enforcement is in the /login handler; this is defense-in-depth
+    // for any stale OTP records created before the restriction was applied.
+    if (user.userType && user.userType !== 'student' && user.userType !== 'registration') {
+      await LoginOtp.deleteOne({ _id: loginOtp._id });
+      console.warn(`[Auth/OTP] Non-student OTP attempt blocked: ${loginOtp.email} (type: ${user.userType})`);
+      return res.status(400).json({ error: 'User not found.' });
+    }
+
     if (user.userType === 'student') userModelName = 'Student';
     else if (user.userType === 'teacher') userModelName = 'Teacher';
-    else if (user.userType === 'registration') userModelName = 'Registration';
+    // Legacy 'registration' tokens now resolve against the merged Student model.
+    else if (user.userType === 'registration') userModelName = 'Student';
 
     const UserModel = require(`../models/${userModelName}`);
     const freshUser = await UserModel.findById(user._id);
@@ -1085,14 +1073,14 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
 
     // ─── Write to shared Admin Auth Log ────────────────────────────────────
     writeAuthLog({
-        action: 'Login',
-        userId: user._id,
-        userName: user.fullName,
-        userEmail: user.email,
-        userRole: user.role || user.userType || 'student',
-        details: `User logged in via 2FA from ${user.userType || 'student'} portal`,
-        success: true,
-        req
+      action: 'Login',
+      userId: user._id,
+      userName: user.fullName,
+      userEmail: user.email,
+      userRole: user.role || user.userType || 'student',
+      details: `User logged in via 2FA from ${user.userType || 'student'} portal`,
+      success: true,
+      req
     });
 
     res.json({
@@ -1187,7 +1175,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
         ]
       });
       console.log('[Forgot Password] College lookup result:', college ? college.collegeName : 'NOT FOUND'); // DEBUG
-      
+
       if (!college) {
         return res.status(404).json({
           error: 'Email not found at this institution.',
@@ -1201,7 +1189,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
           wrongCollege: true
         });
       }
-      
+
       collegeId = college._id;
     } else {
       console.log('[Forgot Password] No collegeCode provided - using fallback mode'); // DEBUG
@@ -1210,36 +1198,11 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
     // Find user - if collegeCode provided, STRICTLY search within that college only
     let user = null;
     if (collegeCode && collegeId) {
-      const Registration = require('../models/Registration');
       const User = require('../models/User');
 
       if (college) {
-        // 1. Search in Student
+        // 1. Search in Student (registration data is now embedded here)
         user = await Student.findOne({ email: normalizedEmail, college: collegeId });
-
-        // 2. Search in Registration (matching institution name or code context)
-        if (!user) {
-          const registration = await Registration.findOne({ email: normalizedEmail });
-          if (registration) {
-            const regInst = registration.institution || '';
-            let regInstName = regInst;
-            try {
-              if (regInst.startsWith('{')) {
-                const parsed = JSON.parse(regInst);
-                regInstName = parsed.name || regInst;
-              }
-            } catch (e) {}
-
-            if (
-              regInstName === college.collegeName ||
-              regInstName === college.collegeCode ||
-              regInst === college.collegeName ||
-              regInst === college.collegeCode
-            ) {
-              user = registration;
-            }
-          }
-        }
 
         // 3. Search in User
         if (!user) {
@@ -1264,12 +1227,8 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
       }
     } else {
       // Backwards compatibility: No college specified, search all collections
-      const Registration = require('../models/Registration');
       const User = require('../models/User');
       user = await Student.findOne({ email: normalizedEmail });
-      if (!user) {
-        user = await Registration.findOne({ email: normalizedEmail });
-      }
       if (!user) {
         user = await User.findOne({ email: normalizedEmail });
       }
@@ -1441,10 +1400,9 @@ router.post('/reset-password', async (req, res) => {
       passwordChangedAt: new Date() // SECURITY FIX: Invalidates old JWT tokens
     };
 
-    if (userModel === 'Student') {
+    if (userModel === 'Student' || userModel === 'Registration') {
+      // Legacy 'Registration' accounts are now Students.
       await Student.findByIdAndUpdate(userId, passwordUpdate);
-    } else if (userModel === 'Registration') {
-      await Registration.findByIdAndUpdate(userId, passwordUpdate);
     } else if (userModel === 'User') {
       await User.findByIdAndUpdate(userId, passwordUpdate);
     } else if (userModel === 'Teacher') {
@@ -1519,11 +1477,9 @@ router.post('/first-login-change-password', async (req, res) => {
       return res.status(404).json({ error: 'Student not found' });
     }
 
-    // Check if student already exists in Registration collection
-    // If they do, they shouldn't be changing password - redirect to dashboard
-    const existingRegistration = await Registration.findOne({
-      email: { $regex: new RegExp(`^${escapeRegex(student.email)}$`, 'i') }
-    });
+    // If the student already completed self-registration, they shouldn't be
+    // changing password - redirect to dashboard (authoritative via isRegistered).
+    const existingRegistration = student.isRegistered === true;
 
     if (existingRegistration) {
       console.log(`[Auth] Student ${student.email} already registered - denying password change, redirecting to dashboard`);
@@ -1626,10 +1582,8 @@ router.post('/first-login-change-password', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Get registration record for complete user data
-    const registration = await Registration.findOne({
-      email: { $regex: new RegExp(`^${student.email}$`, 'i') }
-    });
+    // Registration data is embedded on the student document.
+    const registration = student.registration || null;
 
     const userResponse = {
       id: student._id,
@@ -1644,7 +1598,8 @@ router.post('/first-login-change-password', async (req, res) => {
       mobileNumber: student.mobile,
       college: student.college,
       profileImage: student.profileImage,
-      hasRegistration: !!registration,
+      hasRegistration: student.isRegistered === true,
+      isRegistered: student.isRegistered === true,
       mustChangePassword: false,   // SECURITY: Explicitly cleared so frontend guard doesn't fire
       isFirstLogin: true,          // Flag to trigger welcome/assessment flow
       passwordJustChanged: true,   // Used by frontend for smart routing
@@ -1663,7 +1618,7 @@ router.post('/first-login-change-password', async (req, res) => {
     });
 
     res.json({
-      message: 'Password changed successfully! Welcome to SMAART Minds.',
+      message: 'Password changed successfully! Welcome to SMAART Institute.',
       token,
       sessionExpiresAt,
       user: userResponse
@@ -1718,13 +1673,13 @@ router.post('/logout', protect, async (req, res) => {
     if (req.user && req.user._id) {
       const Student = require('../models/Student');
       const Teacher = require('../models/Teacher');
-      const Registration = require('../models/Registration');
       const userType = req.user.userType || req.user.role || 'user';
 
       let UserModel = User;
       if (userType === 'student') UserModel = Student;
       else if (userType === 'teacher') UserModel = Teacher;
-      else if (userType === 'registration') UserModel = Registration;
+      // Legacy 'registration' tokens now resolve against the merged Student model.
+      else if (userType === 'registration') UserModel = Student;
 
       const result = await UserModel.findByIdAndUpdate(req.user._id, { currentSessionId: null });
       console.log(`[Auth] Cleared session for ${userType} user ${req.user._id}:`, result ? 'Success' : 'User not found');
@@ -1760,13 +1715,10 @@ router.post('/logout', protect, async (req, res) => {
 // Check Session (for frontend to validate cookie)
 router.get('/me', protect, async (req, res) => {
   try {
-    const Registration = require('../models/Registration');
-    const registration = await Registration.findOne({
-      $or: [
-        { userId: req.user._id },
-        { email: req.user.email }
-      ]
-    }).lean();
+    // Registration data is embedded on the merged student document.
+    const Student = require('../models/Student');
+    const studentDoc = await Student.findById(req.user._id).select('registration').lean();
+    const registration = studentDoc ? (studentDoc.registration || null) : null;
 
     res.status(200).json({
       success: true,
@@ -1803,9 +1755,8 @@ router.post('/clear-session', protect, async (req, res) => {
     const Student = require('../models/Student');
     const Teacher = require('../models/Teacher');
 
-    // Try to clear session in all user models
+    // Try to clear session in all user models (registrations merged into students)
     const results = await Promise.all([
-      Registration.findOneAndUpdate({ email }, { currentSessionId: null }),
       Student.findOneAndUpdate({ email }, { currentSessionId: null }),
       Teacher.findOneAndUpdate({ email }, { currentSessionId: null }),
       User.findOneAndUpdate({ email }, { currentSessionId: null })

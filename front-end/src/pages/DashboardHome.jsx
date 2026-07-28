@@ -17,6 +17,7 @@ import CollegeBanners from "@/components/CollegeBanners";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
+import { clearCareerAgentStorage } from "@/contexts/UserContextFixed";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
@@ -148,36 +149,7 @@ const DashboardHome = () => {
               sessionStorage.clear();
               localStorage.removeItem('user');
               localStorage.removeItem('token');
-              // Clear career agent and assessment keys (matching logout logic)
-              const careerKeys = [
-                'smaart_student_name', 'smaart_student_email', 'smaart_analysis',
-                'smaart_analysis_id', 'smaart_pref_primary', 'smaart_pref_secondary',
-                'smaart_pref_tertiary', 'smaart_onboarding_draft', 'smaart_user_degree',
-                'smaart_user_specialisation', 'smaart_user_skills', 'smaart_user',
-                'smaart_completed_courses', 'smaart_last_watched_course',
-                'smaart_last_watched_title', 'smaart_last_watched_lesson',
-                'smaart_course_progress', 'smaart_last_active', 'smaart_demo_progress',
-                'smaart_capacity_dev_unlocked'
-              ];
-              careerKeys.forEach(k => {
-                localStorage.removeItem(k);
-                if (userId !== 'anon') {
-                  localStorage.removeItem(`${userId}_${k}`);
-                }
-                Object.keys(localStorage).forEach((key) => {
-                  if (key.endsWith(`_${k}`)) {
-                    localStorage.removeItem(key);
-                  }
-                });
-              });
-              Object.keys(localStorage).forEach(k => {
-                if (k.startsWith('course-notes-') || 
-                    k.startsWith('passport_demo_') || 
-                    k.startsWith('note_color_') ||
-                    k.endsWith('_communityLastSeenCount')) {
-                  localStorage.removeItem(k);
-                }
-              });
+              clearCareerAgentStorage(userId);
               window.location.href = '/';
             }}
             className="px-6 py-2.5 bg-white dark:bg-[#002147] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
@@ -212,22 +184,7 @@ const DashboardHome = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full space-y-4 sm:space-y-6"
           >
-            {user && (!user.academic || !user.academic.overallCgpa || user.academic.overallCgpa === 0) && (
-              <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 dark:from-[#001630] dark:to-[#001024] dark:border-blue-900/30">
-                 <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 text-blue-600 p-2 rounded-full dark:bg-blue-900/30 dark:text-blue-400">
-                       <RiAlertLine size={20} />
-                    </div>
-                    <div>
-                       <h4 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Complete Your Academic Profile</h4>
-                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Please update your semester-wise CGPA. This will be automatically reflected in your ATS Resume.</p>
-                    </div>
-                 </div>
-                 <button onClick={() => navigate('/dashboard/cgpa-calculator')} className="shrink-0 px-4 py-2 bg-[#1a3884] text-white text-xs font-bold rounded-xl hover:bg-[#112b6b] transition-colors shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700">
-                    Update CGPA Now
-                 </button>
-              </motion.div>
-            )}
+
 
             {/* Hero */}
             <HeroSection

@@ -189,6 +189,41 @@ router.get('/by-description/:description', async (req, res) => {
     }
 });
 
+// Get skill assessment by skill name
+router.get('/skill/:skillName', async (req, res) => {
+    try {
+        const { skillName } = req.params;
+        const db = require('mongoose').connection.db;
+
+        const escapedSkillName = require('../utils/escapeRegex')(skillName);
+        const skillAssessment = await db.collection('skillassessments').findOne({
+            status: 'active',
+            $or: [
+                { instructions: { $regex: new RegExp('^' + escapedSkillName + '$', 'i') } },
+                { questionCategory: { $regex: new RegExp('^' + escapedSkillName + '$', 'i') } }
+            ]
+        });
+
+        if (!skillAssessment) {
+            return res.json({
+                success: false,
+                message: 'No skill assessment found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: sanitizeAssessment(skillAssessment, req.user)
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch skill assessment',
+            message: err.message
+        });
+    }
+});
+
 // Get assessment by ID
 router.get('/:id', async (req, res) => {
     try {

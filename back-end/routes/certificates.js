@@ -5,7 +5,7 @@ router.use(generalLimiter);
 
 const Certificate = require('../models/Certificate');
 const User = require('../models/User');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const { notifyCertificateIssued } = require('../services/notificationService');
 
 // Generate and issue a new certificate (Protected - Student only)
@@ -243,10 +243,9 @@ router.get('/details/:certificateId', protect, async (req, res) => {
     }
 });
 
-// Revoke a certificate (Admin only - you can add admin middleware)
-router.patch('/revoke/:certificateId', protect, async (req, res) => {
+// Revoke a certificate (Admin only)
+router.patch('/revoke/:certificateId', protect, authorize('admin'), async (req, res) => {
     try {
-        // Add admin check here if needed
         const { certificateId } = req.params;
 
         const certificate = await Certificate.findOne({ certificateId });

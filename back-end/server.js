@@ -112,19 +112,30 @@ app.use(express.urlencoded({ limit: '16mb', extended: true }));
 // paths, ...) from all request input before it reaches any query. Must run
 // AFTER the body parsers so req.body is populated.
 app.use(require('./middleware/sanitizeMongo'));
+// PRIVACY (proctoring): webcam stills of identifiable candidates live in
+// uploads/proctoring. Both static mounts below would otherwise expose them to
+// anyone who guessed a filename — the second mount serves the uploads folder at
+// the site root, so /proctoring/<file>.jpg worked too. Deny both spellings and
+// force callers through GET /api/proctoring/snapshot/:filename, which proves
+// the requester is the candidate or an admin.
+app.use((req, res, next) => {
+  if (/^\/(uploads\/)?proctoring(\/|$)/i.test(req.path)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Proctoring snapshots are not publicly accessible.'
+    });
+  }
+  next();
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-const connectWithFallback = async () => {
+const connectDB = async () => {
   const primaryURI = process.env.MONGODB_URI;
-  const fallbackURI = process.env.MONGODB_URI;
 
-  const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 50,
-    minPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
+  const isLocal = primaryURI?.includes('127.0.0.1') || primaryURI?.includes('localhost');
+  const options = isLocal ? {} : {
+    serverSelectionTimeoutMS: 15000,
     socketTimeoutMS: 45000,
     retryWrites: true,
     retryReads: true
@@ -132,27 +143,25 @@ const connectWithFallback = async () => {
 
   try {
     await mongoose.connect(primaryURI, options);
-    logger.info('✅ MongoDB connected successfully');
+    logger.info('✅ MongoDB connected successfully to primary database');
   } catch (err) {
     logger.error('❌ Primary MongoDB connection error:', err.message);
-    if (primaryURI !== fallbackURI) {
-      logger.info(`🔄 Attempting to connect to fallback MongoDB at ${fallbackURI}`);
+    if (fallbackURI && fallbackURI !== primaryURI) {
       try {
-        await mongoose.connect(fallbackURI, options);
-        logger.info('✅ Fallback MongoDB connected successfully');
+        logger.info('🔄 Attempting fallback MongoDB connection...');
+        await mongoose.connect(fallbackURI, { serverSelectionTimeoutMS: 5000 });
+        logger.info('✅ MongoDB connected to fallback database');
+        return;
       } catch (fallbackErr) {
         logger.error('❌ Fallback MongoDB connection error:', fallbackErr.message);
-        // Don't exit process if we can run without DB, or exit if DB is strictly required.
-        // As per plan, we keep process.exit(1) if both fail.
-        process.exit(1);
       }
-    } else {
-      process.exit(1);
     }
+    logger.warn('⚠️ Retrying MongoDB connection in 5 seconds...');
+    setTimeout(connectWithFallback, 5000);
   }
 };
 
-connectWithFallback();
+connectDB();
 
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -213,7 +222,7 @@ app.use('/api/avatar', require('./routes/avatar'));
 
 // AI Career Coach Routes - Inline to avoid module loading issues
 const aiCareerCoachController = require('./controllers/aiCareerCoachController');
-const { protect: authMiddleware } = require('./middleware/auth');
+const { protect: authMiddleware, authorize } = require('./middleware/auth');
 // Cost guard for paid-LLM endpoints (OpenRouter/Anthropic). Keyed per user/IP.
 const { aiLimiter } = require('./middleware/rateLimiter');
 
@@ -244,7 +253,7 @@ app.get('/api/career-intelligence/latest', authMiddleware, careerIntelligenceCon
 app.get('/api/career-intelligence/excel-data', authMiddleware, careerIntelligenceController.getExcelData);
 app.get('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.getReportById);
 app.delete('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.deleteReport);
-app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelligenceController.refreshExcelCache);
+app.post('/api/career-intelligence/refresh-cache', authMiddleware, authorize('admin'), careerIntelligenceController.refreshExcelCache);
 
 // Career Simulation Engine Routes (isolated, no AI cost)
 const careerSimulationController = require('./controllers/careerSimulationController');

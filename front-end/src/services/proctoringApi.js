@@ -52,7 +52,44 @@ export const proctoringApi = {
   // Admin: Get detailed proctoring session
   getSessionDetails: async (sessionId) => {
     return apiCall(`/proctoring/admin/session/${sessionId}`);
-  }
+  },
+
+  // v3: Persist ArcFace registration embedding(s) to the session record
+  // embedding: Float32Array | number[] (merged)
+  // allEmbeddings: number[][] (all 5 individual embeddings)
+  // registrationImages: string[] (base64 data URLs of 5 crops)
+  saveRegistration: async (sessionId, registrationData) => {
+    const { embedding, allEmbeddings, registrationImages, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = registrationData;
+    return apiCall(`/proctoring/session/${sessionId}/registration`, {
+      method: 'POST',
+      body: JSON.stringify({
+        embedding: Array.from(embedding),  // Convert Float32Array → plain array for JSON
+        allEmbeddings: allEmbeddings
+          ? allEmbeddings.map(e => e instanceof Float32Array ? Array.from(e) : e)
+          : null,
+        registrationImages: registrationImages || null,
+        model,
+        qualityScore,
+        framesCaptured,
+        antispoofPassed,
+        alignedCropUrl: alignedCropUrl || null,
+      }),
+    });
+  },
+
+  // v3: Retrieve stored embedding(s) for session resume after page refresh
+  getEmbedding: async (sessionId) => {
+    return apiCall(`/proctoring/session/${sessionId}/embedding`);
+  },
+
+  // v3: Log batch verification result
+  logVerification: async (sessionId, verificationData) => {
+    const { similarity, status, framesCaptured, warningIssued } = verificationData;
+    return apiCall(`/proctoring/session/${sessionId}/verification`, {
+      method: 'POST',
+      body: JSON.stringify({ similarity, status, framesCaptured, warningIssued }),
+    });
+  },
 };
 
 export default proctoringApi;

@@ -66,16 +66,16 @@ export const ProctoringOverlay = ({
   isFullScreen,
   fullscreenCountdown,
   onRequestFullscreen,
-  // NEW props
   verificationStatus = 'no_face',
-  similarityScore = 0
+  similarityScore = 0,
+  gazeDirection = 'center'
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const videoRef = useRef(null);
 
   // Bind the camera stream to the video element
   useEffect(() => {
-    if (videoRef.current && stream && isCameraActive) {
+    if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
       videoRef.current.play().catch(err => {
         console.warn('[ProctoringOverlay] Error playing webcam stream:', err);
@@ -127,12 +127,13 @@ export const ProctoringOverlay = ({
         {/* Video stream panel (Hidden if minimized) */}
         {!isMinimized && (
           <div className="relative aspect-[4/3] bg-slate-950 rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 mb-1.5">
-            {isCameraActive && stream ? (
+            {stream ? (
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover scale-x-[-1]"
                 muted
                 playsInline
+                onLoadedMetadata={(e) => e.target.play().catch(() => {})}
               />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-slate-500">
@@ -175,6 +176,28 @@ export const ProctoringOverlay = ({
             <span className="text-slate-500 dark:text-slate-400 font-medium">Status:</span>
             <span className={`font-black ${statusConfig.textColor}`}>
               {statusConfig.fullLabel}
+            </span>
+          </div>
+
+          {/* 3D Head Pose Gaze Direction Row */}
+          <div className="flex justify-between items-center bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 px-2 py-1.5 rounded">
+            <span className="text-slate-500 dark:text-slate-400 font-medium">Gaze:</span>
+            <span className={`font-bold ${
+              gazeDirection === 'center'
+                ? 'text-emerald-500'
+                : gazeDirection === 'looking_down'
+                ? 'text-red-500 font-black'
+                : 'text-amber-500 font-black'
+            }`}>
+              {gazeDirection === 'center'
+                ? 'Center ✓'
+                : gazeDirection === 'looking_left'
+                ? '← Left'
+                : gazeDirection === 'looking_right'
+                ? 'Right →'
+                : gazeDirection === 'looking_down'
+                ? '↓ Down'
+                : '↑ Up'}
             </span>
           </div>
 
