@@ -134,7 +134,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 const connectDB = async () => {
   const primaryURI = process.env.MONGODB_URI;
 
-  const isLocal = primaryURI.includes('127.0.0.1') || primaryURI.includes('localhost');
+  const isLocal = primaryURI?.includes('127.0.0.1') || primaryURI?.includes('localhost');
   const options = isLocal ? {} : {
     useNewUrlParser: true,
     useUnifiedTopology: true,
