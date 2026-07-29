@@ -30,55 +30,27 @@ const captureScreenshot = (videoElement) => {
   });
 };
 
-<<<<<<< HEAD
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 const MAX_WARNINGS = 3;
-=======
-const INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds before showing presence check
-const FACE_CHECK_INTERVAL = 1000; // 1 second
-
-// Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
-// and tells us the tier on every event; this is used purely to render a
-// sensible count if a response is ever missing.
-const MAX_WARNINGS = 10;
->>>>>>> 458e3707 (procotor face detection)
 
 // v3: Batch Verification & Fast Violation Constants
 const BATCH_INTERVAL_MS = 6000;   // 6 seconds between batch verification cycles
 const BATCH_INITIAL_DELAY_MS = 2000;   // 2 seconds after start before first batch
 const QUICK_CHECK_INTERVAL_MS = 1000;  // 1 second for lightweight face presence checks between batches
 
-<<<<<<< HEAD
 // v3: Responsive Grace Period Constants
 const NO_FACE_REMINDER_MS = 2000;   // 2 seconds no face → gentle toast reminder
 const NO_FACE_VIOLATION_MS = 5000;   // 5 seconds sustained absence → violation logged
 const MULTI_FACE_GRACE_MS = 1000;   // 1 second grace before multiple-face violation
 const MISMATCH_RETRY_COUNT = 1;      // retry verification 1 time before warning
 const MISMATCH_FLAG_COUNT = 2;      // flag for review after 2 confirmed mismatches
-=======
-// How long after engine activation before focus/blur/visibility violations are
-// allowed to fire. Prevents normal browser focus shifts at page-load from
-// being recorded as the candidate's first infraction.
-const STARTUP_GRACE_MS = 15000;
-
-// How long after the camera starts before face-absent is reported. Gives the
-// face-api models time to load and the video stream time to stabilize.
-const CAMERA_WARMUP_MS = 5000;
-
-
-// Escalation thresholds and copy now live in the ladder module, which is pure
-// and unit-tested. See services/proctoringLadder.js.
->>>>>>> 458e3707 (procotor face detection)
 
 export const useProctoringEngine = ({
   resultId = null,
   assessmentId = null,
   isActive = false,
   registeredFaceDescriptor = null,
-<<<<<<< HEAD
   registeredAllEmbeddings = null,
-=======
->>>>>>> 458e3707 (procotor face detection)
   registrationMetadata = null,
   onLockout = null
 }) => {
@@ -87,22 +59,6 @@ export const useProctoringEngine = ({
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lastViolationType, setLastViolationType] = useState('');
   const [proctoringSessionId, setProctoringSessionId] = useState(null);
-<<<<<<< HEAD
-=======
-
-  // ── Escalation ladder state ────────────────────────────────────────────
-  // tier is authoritative from the server for warn/pause/held. 'nudge' is a
-  // purely local, unrecorded coaching state that never reaches the backend.
-  const [tier, setTier] = useState('ok');
-  const [nudgeMessage, setNudgeMessage] = useState('');
-  const [pauseObservations, setPauseObservations] = useState([]);
-  const nudgeRef = useRef('');
-  const serverTierRef = useRef('ok');
-  const registrationMetadataRef = useRef(registrationMetadata);
-  useEffect(() => {
-    registrationMetadataRef.current = registrationMetadata;
-  }, [registrationMetadata]);
->>>>>>> 458e3707 (procotor face detection)
 
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [mediaStream, setMediaStream] = useState(null);
@@ -138,17 +94,6 @@ export const useProctoringEngine = ({
   // Timeout reference for adaptive checking
   const faceTimeoutRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
-<<<<<<< HEAD
-=======
-  const heartbeatIntervalRef = useRef(null);
-  const cameraRetryTimeoutRef = useRef(null);
-  const verifyInFlightRef = useRef(false);
-  const environmentIntervalRef = useRef(null);
-  const duplicateWindowCleanupRef = useRef(null);
-  // Each environment signal is reported once per session — a second monitor
-  // that stays plugged in is one fact, not one per minute.
-  const environmentReportedRef = useRef(new Set());
->>>>>>> 458e3707 (procotor face detection)
   const proctoringSessionIdRef = useRef(null);
   const registeredFaceDescriptorRef = useRef(registeredFaceDescriptor);
   const registeredAllEmbeddingsRef = useRef(registeredAllEmbeddings);
@@ -325,24 +270,11 @@ export const useProctoringEngine = ({
         error.name === 'PermissionDeniedError' ||
         error.name === 'SecurityError';
 
-<<<<<<< HEAD
       if (!isPermissionDenied && retryCount < 5) {
         const retryDelay = 800;
         console.warn(`[ProctoringEngine] Camera busy. Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/5)`);
         await new Promise(resolve => setTimeout(resolve, retryDelay));
         return startCamera(retryCount + 1);
-=======
-      if (!isPermissionDenied && retryCount < 6 && isActiveRef.current && !hasLockedOutRef.current) {
-        // AbortError = hardware still locked by previous stream. Wait progressively longer.
-        const retryDelay = retryCount < 2 ? 1500 : 2500;
-        console.warn(`[ProctoringEngine] Camera locked/busy. Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/6)`);
-
-        if (cameraRetryTimeoutRef.current) clearTimeout(cameraRetryTimeoutRef.current);
-        cameraRetryTimeoutRef.current = setTimeout(() => {
-          startCamera(retryCount + 1);
-        }, retryDelay);
-        return;
->>>>>>> 458e3707 (procotor face detection)
       }
 
       setCameraError(error.name || 'WebcamAccessDenied');
@@ -407,112 +339,6 @@ export const useProctoringEngine = ({
 
   triggerLockoutRef.current = triggerLockout;
 
-<<<<<<< HEAD
-=======
-  /**
-   * Tier 1 — a nudge.
-   *
-   * Purely local coaching. Nothing is sent to the server, nothing is counted,
-   * and it clears itself the moment the condition resolves. This is where most
-   * anomalies should die.
-   */
-  const setNudge = useCallback((copy) => {
-    if (hasLockedOutRef.current) return;
-    // Coaching still applies after a warning has been recorded — it is only
-    // suppressed once the exam is blocked or held, where a different surface
-    // is already speaking to the candidate.
-    if (serverTierRef.current === 'pause' || serverTierRef.current === 'held') return;
-
-    if (!copy || nudgeRef.current === copy) return;
-    nudgeRef.current = copy;
-    setNudgeMessage(copy);
-
-    // Only promote the tier when nothing has been recorded yet. Otherwise keep
-    // the server's tier (so the warning count keeps its styling) and just
-    // update the coaching text.
-    if (serverTierRef.current === 'ok') setTier(copy ? 'nudge' : 'ok');
-  }, []);
-
-  const clearNudge = useCallback(() => {
-    if (!nudgeRef.current) return;
-    nudgeRef.current = '';
-    setNudgeMessage('');
-    if (serverTierRef.current === 'ok') setTier('ok');
-  }, []);
-
-  /**
-   * Feed one observation of a condition into the duration ladder.
-   *
-   * Green below the first threshold, amber (local coaching, nothing recorded)
-   * in the middle, red once a stage carries a server event. Each stage fires at
-   * most once per continuous episode, so a single long absence produces one
-   * escalating sequence rather than a warning every few seconds.
-   */
-  const observeCondition = useCallback((type) => {
-    const { colour, message, fire } = ladderRef.current.observe(type, Date.now());
-
-    if (fire) {
-      nudgeRef.current = '';
-      setNudgeMessage('');
-      reportViolationRef.current?.(fire, message);
-      return;
-    }
-
-    if (colour === COLOUR.AMBER) {
-      setNudgeRef.current?.(message);
-    }
-  }, []);
-
-  /** The condition cleared — end its episode so it can escalate afresh later. */
-  const clearCondition = useCallback((...types) => {
-    types.forEach((t) => ladderRef.current.clear(t));
-    if (ladderRef.current.active().length === 0) clearNudgeRef.current?.();
-  }, []);
-
-  /**
-   * Apply the server's decision. The browser renders a tier; it never derives
-   * one. This is the whole point of the redesign — a candidate who tampers
-   * with the client can no longer talk their way out of being held.
-   */
-  const applyDecision = useCallback((decision) => {
-    if (!decision) return;
-
-    const previousWarnings = warningsCountRef.current;
-    serverTierRef.current = decision.tier || 'ok';
-    const newWarnings = decision.warnings ?? 0;
-    setWarningsCount(newWarnings);
-    warningsCountRef.current = newWarnings;
-
-    // ── Hard stop: warnings reached the limit ────────────────────────────────
-    // The server should send held:true at this point, but enforce it on the
-    // client as well so the assessment ends even if the network request fails.
-    if (newWarnings >= MAX_WARNINGS && !hasLockedOutRef.current) {
-      console.warn(`[ProctoringEngine] ⛔ MAX_WARNINGS (${MAX_WARNINGS}) reached — ending assessment.`);
-      if (enterHeldRef.current) enterHeldRef.current(decision);
-      return;
-    }
-
-    if (decision.held || decision.tier === 'held') {
-      setTier('held');
-      if (enterHeldRef.current) enterHeldRef.current(decision);
-      return;
-    }
-
-    // A pending nudge is superseded by anything the server has recorded.
-    if (decision.tier !== 'ok') {
-      nudgeRef.current = '';
-      setNudgeMessage('');
-    }
-    setTier(decision.tier || 'ok');
-
-    // Show warning notice if tier is warn/pause OR if warnings count increased
-    if (decision.tier === 'warn' || decision.tier === 'pause' || newWarnings > previousWarnings) {
-      setIsWarningVisible(true);
-    }
-  }, []);
-
-  // Tier 2+ — record a violation with the server and obey what it returns.
->>>>>>> 458e3707 (procotor face detection)
   const reportViolation = useCallback(async (eventType, displayMessage) => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
 
@@ -665,24 +491,9 @@ export const useProctoringEngine = ({
     });
 
     if (videoRef.current.readyState < 2) {
-<<<<<<< HEAD
       scheduleNextFaceCheck(QUICK_CHECK_INTERVAL_MS);
       return;
     }
-=======
-      scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
-      return;
-    }
-
-    // Drop the tick if the previous inference is still running. On a slow
-    // device a fixed 1s interval would otherwise queue overlapping passes and
-    // the whole exam UI would get progressively more sluggish.
-    if (verifyInFlightRef.current) return;
-    verifyInFlightRef.current = true;
-
-    const descriptor = registeredFaceDescriptorRef.current;
-    let nextDelay = INTERVAL_DEFAULT_MS;
->>>>>>> 458e3707 (procotor face detection)
 
     try {
       const result = await detectFaces(videoRef.current);
@@ -863,87 +674,7 @@ export const useProctoringEngine = ({
               consecutiveMismatchRef.current = 0;
               reportViolation('face_mismatch', 'Suspected identity substitution detected.');
             }
-<<<<<<< HEAD
           }
-=======
-
-            // ── Head pose ────────────────────────────────────────────────
-            // Sustained downward tilt is the best available proxy for reading
-            // a phone in the lap. It is inference, never proof — which is why
-            // it only feeds a flag and needs a long window to fire.
-            if (result.headPose?.calibrated) {
-              if (result.headPose.pose === 'down') {
-                observeCondition('looking_down');
-              } else {
-                clearCondition('looking_down');
-              }
-            }
-
-            // Stable State -> Check every 5.0 seconds
-            nextDelay = INTERVAL_STABLE_MS;
-            break;
-
-          case VerificationStatus.NO_FACE:
-            clearCondition('multiple_faces', 'face_mismatch', 'face_covered');
-            observeCondition('face_absent');
-            break;
-
-          case VerificationStatus.MULTIPLE_FACES:
-            clearCondition('face_absent', 'face_mismatch', 'face_covered');
-            observeCondition('multiple_faces');
-            break;
-
-          case VerificationStatus.MISMATCH:
-            clearCondition('face_absent', 'multiple_faces', 'face_covered');
-            observeCondition('face_mismatch');
-            break;
-
-          case VerificationStatus.COVERED:
-            clearCondition('face_absent', 'multiple_faces', 'face_mismatch');
-            observeCondition('face_covered');
-            break;
-
-          default:
-            break;
-        }
-
-        const activeInfraction = result.status !== VerificationStatus.VERIFIED;
-
-        // Active violation state -> poll rapidly at 1.0 second intervals
-        if (activeInfraction) {
-          nextDelay = INTERVAL_INFRACTION_MS;
-        }
-      } else {
-        // No registered descriptor — fallback to basic detection (legacy
-        // behavior). Presence-only: this branch reads nothing but faceCount,
-        // so there is no reason to run the recognition net every second.
-        console.log('[ProctoringEngine] Running detectFacesFast (fallback)');
-        const result = await detectFacesFast(videoRef.current);
-        console.log('[ProctoringEngine] detectFacesFast result:', result);
-
-        if (result.error) {
-          console.warn('[ProctoringEngine] Face detection error:', result.error);
-          scheduleNextFaceCheck(INTERVAL_DEFAULT_MS);
-          return;
-        }
-
-        setFaceCount(result.faceCount);
-        setIsFaceDetected(result.isFacePresent);
-        setVerificationStatus(result.isFacePresent ? 'verified' : 'no_face');
-
-        // Same ladder as the verified path — one escalating episode per
-        // condition rather than a repeating counter.
-        if (result.faceCount === 0) {
-          observeCondition('face_absent');
-        } else {
-          clearCondition('face_absent');
-        }
-
-        if (result.faceCount > 1) {
-          observeCondition('multiple_faces');
-        } else {
-          clearCondition('multiple_faces');
->>>>>>> 458e3707 (procotor face detection)
         }
       }
     } catch (err) {
@@ -1124,60 +855,6 @@ export const useProctoringEngine = ({
               console.warn('[ProctoringEngine] Could not recover face embedding from backend:', fetchErr);
             }
           }
-<<<<<<< HEAD
-=======
-
-          // ── Environment integrity ──────────────────────────────────────
-          // A second monitor or a virtual camera is worth far more than most
-          // face signals: there is no innocent reason to pipe OBS into a
-          // proctored exam. Re-checked periodically because a monitor can be
-          // plugged in after the exam starts.
-          const reportEnvironment = async () => {
-            try {
-              const findings = await runEnvironmentChecks(streamRef.current);
-              findings.forEach((f) => {
-                if (!environmentReportedRef.current.has(f.eventType)) {
-                  environmentReportedRef.current.add(f.eventType);
-                  reportViolationRef.current?.(f.eventType, f.details);
-                }
-              });
-            } catch (err) {
-              console.warn('[ProctoringEngine] Environment check failed:', err);
-            }
-          };
-          reportEnvironment();
-          environmentIntervalRef.current = setInterval(reportEnvironment, 60 * 1000);
-
-          // Same attempt open in two windows splits the proctoring signal and
-          // lets one window hold the questions while the other is worked on.
-          duplicateWindowCleanupRef.current = watchForDuplicateWindows(resultId, () => {
-            if (!environmentReportedRef.current.has('multiple_exam_windows')) {
-              environmentReportedRef.current.add('multiple_exam_windows');
-              reportViolationRef.current?.(
-                'multiple_exam_windows',
-                'This assessment is open in more than one window.'
-              );
-            }
-          });
-
-          // ── Liveness ping ──────────────────────────────────────────────
-          // Closes the "block the endpoint and stay clean" hole: the server
-          // measures the gap between pings and records a violation when
-          // contact lapses. The signal is the MISSING request, so a candidate
-          // cannot suppress it.
-          if (heartbeatIntervalRef.current) clearInterval(heartbeatIntervalRef.current);
-          heartbeatIntervalRef.current = setInterval(() => {
-            if (!isActiveRef.current || hasLockedOutRef.current) return;
-            proctoringApi
-              .heartbeat(sessionId)
-              .then((res) => {
-                if (res?.proctoring) applyDecisionRef.current?.(res.proctoring);
-              })
-              .catch((err) => {
-                if (err?.data?.proctoring) applyDecisionRef.current?.(err.data.proctoring);
-              });
-          }, HEARTBEAT_INTERVAL);
->>>>>>> 458e3707 (procotor face detection)
         }
       } catch (err) {
         console.error('Error starting proctoring session:', err);
@@ -1237,7 +914,6 @@ export const useProctoringEngine = ({
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
     setIsFullScreen(isNowFull);
     if (!isNowFull) {
-<<<<<<< HEAD
       setFullscreenCountdown(15);
       fullscreenTimerRef.current = setInterval(() => {
         setFullscreenCountdown((prev) => {
@@ -1245,37 +921,6 @@ export const useProctoringEngine = ({
             clearInterval(fullscreenTimerRef.current);
             if (reportViolationRef.current) {
               reportViolationRef.current('fullscreen_exit', 'Warning: Fullscreen exit detected.');
-=======
-      // Delay the initial fullscreen countdown so it doesn't fire the moment
-      // the engine activates — give the candidate time to settle in.
-      setTimeout(() => {
-        if (hasLockedOutRef.current || !isActiveRef.current) return;
-
-        // Re-check fullscreen state before starting countdown
-        const currentFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
-        if (currentFull) return; // Already in fullscreen, do not start countdown
-
-        setFullscreenCountdown(15);
-        if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
-
-        fullscreenTimerRef.current = setInterval(() => {
-          // Re-check fullscreen state inside interval to see if they entered it
-          const nowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
-          if (nowFull) {
-            clearInterval(fullscreenTimerRef.current);
-            fullscreenTimerRef.current = null;
-            setFullscreenCountdown(0);
-            return;
-          }
-
-          setFullscreenCountdown((prev) => {
-            if (prev <= 1) {
-              clearInterval(fullscreenTimerRef.current);
-              if (reportViolationRef.current) {
-                reportViolationRef.current('fullscreen_exit', 'Warning: Fullscreen exit detected.');
-              }
-              return 0;
->>>>>>> 458e3707 (procotor face detection)
             }
             return 0;
           }
