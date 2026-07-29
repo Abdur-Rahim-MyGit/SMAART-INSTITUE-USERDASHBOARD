@@ -6,12 +6,12 @@ const fs = require('fs');
 // Private helper to calculate session risk score based on violations count & severity
 const calculateRiskScore = (violationsByType) => {
   let score = 0;
-  
+
   // Convert map or object to iterate
   const violations = violationsByType instanceof Map ? Object.fromEntries(violationsByType) : violationsByType;
-  
+
   if (!violations) return 0;
-  
+
   // Weight formula
   const weights = {
     tab_switch: 15,
@@ -36,13 +36,13 @@ const calculateRiskScore = (violationsByType) => {
     tracker_loss: 5,           // Low — brief tracking loss
     identity_confidence: 0,    // Info
   };
-  
+
   Object.keys(violations).forEach(type => {
     const count = violations[type] || 0;
     const weight = weights[type] || 10;
     score += count * weight;
   });
-  
+
   // Cap risk score at 100
   return Math.min(score, 100);
 };
@@ -60,11 +60,11 @@ exports.startSession = async (req, res) => {
     // Check if there is an existing locked session for this assessment and user
     const existingLockedSession = await ProctoringSession.findOne({ userId, assessmentId, isLocked: true });
     if (existingLockedSession) {
-      return res.status(403).json({ 
-        success: false, 
-        error: 'Assessment is locked. A support ticket is pending.', 
-        isLocked: true, 
-        activeTicketId: existingLockedSession.activeTicketId 
+      return res.status(403).json({
+        success: false,
+        error: 'Assessment is locked. A support ticket is pending.',
+        isLocked: true,
+        activeTicketId: existingLockedSession.activeTicketId
       });
     }
 
@@ -136,7 +136,7 @@ exports.logEvent = async (req, res) => {
       'verification_batch', 'face_absent_reminder',
     ];
     const metadataPayload = req.body.metadata || {};
-    
+
     if (infoOnlyEvents.includes(eventType)) {
       // Mark face registration on session
       if (eventType === 'face_registered') {
@@ -150,7 +150,7 @@ exports.logEvent = async (req, res) => {
     } else {
       // Increment violation counts on session
       session.totalViolations += 1;
-      
+
       // Update map counters
       const currentCount = session.violationsByType.get(eventType) || 0;
       session.violationsByType.set(eventType, currentCount + 1);
@@ -192,7 +192,7 @@ exports.completeSession = async (req, res) => {
     }
 
     session.completedAt = new Date();
-    
+
     // Keep as 'flagged' if already flagged, else 'completed'
     if (session.status === 'active') {
       session.status = session.riskScore >= 60 ? 'flagged' : 'completed';
@@ -214,7 +214,7 @@ exports.completeSession = async (req, res) => {
 exports.uploadSnapshot = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    
+
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' });
     }
@@ -299,7 +299,7 @@ exports.triggerLock = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { lockReason } = req.body;
-    
+
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
       return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
@@ -318,9 +318,9 @@ exports.triggerLock = async (req, res) => {
     const { createLog } = require('./logController');
     const { broadcastToAll, sendNotificationToUser } = require('../services/websocketService');
     const wsService = require('../services/websocketService'); // get user details
-    const User = require('../models/User'); 
+    const User = require('../models/User');
     const user = await User.findById(session.userId);
-    
+
     const newTicket = new SupportTicket({
       userId: session.userId,
       userModel: 'Student',
@@ -352,14 +352,14 @@ exports.webhookUnlock = async (req, res) => {
   try {
     const { ticketId, userId } = req.body;
     if (userId) {
-        const Notification = require('../models/Notification');
-        await Notification.createNotification({
-            userId,
-            title: 'Assessment Unlocked',
-            message: 'Your assessment has been unlocked by IT support. You may now resume.',
-            type: 'system',
-            metadata: { ticketId, action: 'assessment_unlocked' }
-        });
+      const Notification = require('../models/Notification');
+      await Notification.createNotification({
+        userId,
+        title: 'Assessment Unlocked',
+        message: 'Your assessment has been unlocked by IT support. You may now resume.',
+        type: 'system',
+        metadata: { ticketId, action: 'assessment_unlocked' }
+      });
     }
 
     res.status(200).json({ success: true });
@@ -369,7 +369,6 @@ exports.webhookUnlock = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 // ─── Save face registration embedding to session ───────────────────────────
 /**
  * POST /api/proctoring/sessions/:sessionId/registration
@@ -405,15 +404,15 @@ exports.saveRegistration = async (req, res) => {
     }
 
     // Single merged embedding (backward compat)
-    session.faceEmbedding         = JSON.stringify(embedding);
-    session.faceEmbeddingModel    = model || 'arcface-r50-onnx';
-    session.faceEmbeddingDims     = 512;
+    session.faceEmbedding = JSON.stringify(embedding);
+    session.faceEmbeddingModel = model || 'arcface-r50-onnx';
+    session.faceEmbeddingDims = 512;
     session.faceRegistrationQuality = qualityScore ?? null;
-    session.faceRegistrationFrames  = framesCaptured ?? null;
-    session.antispoofPassed         = antispoofPassed ?? null;
-    session.faceAlignedCropUrl      = alignedCropUrl || null;
-    session.faceRegistered          = true;
-    session.faceRegisteredAt        = new Date();
+    session.faceRegistrationFrames = framesCaptured ?? null;
+    session.antispoofPassed = antispoofPassed ?? null;
+    session.faceAlignedCropUrl = alignedCropUrl || null;
+    session.faceRegistered = true;
+    session.faceRegisteredAt = new Date();
 
     // v3: Store all 5 individual embeddings for multi-reference verification
     if (allEmbeddings && Array.isArray(allEmbeddings) && allEmbeddings.length > 0) {
@@ -536,91 +535,4 @@ exports.logVerification = async (req, res) => {
     console.error('[ProctoringController] logVerification error:', err);
     res.status(500).json({ success: false, error: 'Server error logging verification.', message: err.message });
   }
-=======
-// Save face registration descriptor & upload registration crop to Cloudinary
-exports.saveRegistration = async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
-
-    const { session, error, status } = await loadOwnedSession(sessionId, req.user);
-    if (error) {
-      return res.status(status).json({ success: false, error });
-    }
-
-    let uploadedUrl = null;
-    if (alignedCropUrl && alignedCropUrl.startsWith('data:image')) {
-      const { uploadBase64Image } = require('../helpers/cloudinaryHelper');
-      const uploadResult = await uploadBase64Image(alignedCropUrl, 'proctoring-registrations', `reg-${sessionId}`);
-      if (uploadResult.success) {
-        uploadedUrl = uploadResult.url;
-      } else {
-        console.error('Failed to upload registration image to Cloudinary:', uploadResult.error);
-      }
-    } else {
-      uploadedUrl = alignedCropUrl;
-    }
-
-    session.referenceDescriptor = embedding;
-    session.faceEmbedding = JSON.stringify(embedding);
-    session.faceEmbeddingModel = model || 'faceapi-128';
-    session.faceEmbeddingDims = embedding ? embedding.length : 128;
-    session.faceRegistrationQuality = qualityScore || 100;
-    session.faceRegistrationFrames = framesCaptured || 3;
-    session.antispoofPassed = antispoofPassed !== undefined ? antispoofPassed : true;
-    session.referencePhotoUrl = uploadedUrl;
-    session.faceAlignedCropUrl = uploadedUrl;
-    session.faceRegistered = true;
-    session.faceRegisteredAt = new Date();
-
-    await session.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Face registration saved successfully.',
-      referencePhotoUrl: uploadedUrl
-    });
-  } catch (err) {
-    console.error('Error saving proctoring registration:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-
-// Get registered face embedding for session restore
-exports.getEmbedding = async (req, res) => {
-  try {
-    const { sessionId } = req.params;
-    const { session, error, status } = await loadOwnedSession(sessionId, req.user);
-    if (error) {
-      return res.status(status).json({ success: false, error });
-    }
-
-    let embedding = null;
-    if (session.faceEmbedding) {
-      try {
-        embedding = JSON.parse(session.faceEmbedding);
-      } catch (e) {
-        // Parse error fallback
-      }
-    }
-
-    res.status(200).json({
-      success: true,
-      embedding,
-      referencePhotoUrl: session.referencePhotoUrl
-    });
-  } catch (err) {
-    console.error('Error getting proctoring embedding:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
-
-// Exposed for unit tests. These are pure decision helpers with no I/O, and
-// they encode the rules that matter most, so they are worth asserting on.
-exports._internals = {
-  calculateRiskScore,
-  applyServerDecision,
-  buildDecision,
-  resolveSnapshotUrl
->>>>>>> 458e3707 (procotor face detection)
 };
