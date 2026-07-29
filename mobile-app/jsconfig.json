@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "maxNodeModuleJsDepth": 0,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules",
+    ".expo",
+    "web-build"
+  ]
+}
