@@ -31,6 +31,7 @@ const SkillsVault = () => {
     const [courses, setCourses] = useState([]);
     const [stageStatus, setStageStatus] = useState({});
     const [earnedBadgesCount, setEarnedBadgesCount] = useState(0);
+    const [earnedCerts, setEarnedCerts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeFlashcardCategory, setActiveFlashcardCategory] = useState("all");
 
@@ -55,6 +56,13 @@ const SkillsVault = () => {
                         } catch (e) {
                             console.error("Failed to fetch badges count", e);
                         }
+
+                        try {
+                            const certRes = await apiCall('/certificates/my-certificates');
+                            if (certRes?.certificates) setEarnedCerts(certRes.certificates);
+                        } catch (e) {
+                            console.error("Failed to fetch certificates", e);
+                        }
                     }
                 }
             } catch {
@@ -75,6 +83,21 @@ const SkillsVault = () => {
         { id: "leadership", title: t("skills_vault.certificates.names.leadership", "Diploma in Employability & Leadership"), code: "ELR", level: t("skills_vault.certificates.levels.leadership", "Level 3") },
         { id: "combined", title: t("skills_vault.certificates.names.combined", "Master Diploma in Comprehensive Readiness"), code: "MPD", level: t("skills_vault.certificates.levels.combined", "Master") },
     ];
+
+    // Only certificates the student has actually EARNED (auto-issued on assessment pass),
+    // enriched with catalog meta (code/level) by certificateType.
+    const earnedCertificates = earnedCerts.map((ec) => {
+        const meta = certificateTypes.find((c) => c.id === ec.certificateType) || {};
+        return {
+            id: ec.certificateType,
+            title: ec.certificateTitle || meta.title,
+            code: meta.code,
+            level: meta.level,
+            certificateId: ec.certificateId,
+            issueDate: ec.issueDate,
+            readinessBand: ec.readinessBand,
+        };
+    });
 
     const defaultFlashcards = [
         { term: t("skills_vault.flashcards.cards.crq.term", "Cognitive Reasoning (CRQ)"), definition: t("skills_vault.flashcards.cards.crq.definition", "The ability to analyze, synthesize, and evaluate information to derive meaningful conclusions and solve complex problems."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
@@ -270,7 +293,7 @@ const SkillsVault = () => {
                                     <Award className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                                 </div>
                                 <div className="flex flex-col justify-center">
-                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{certificateTypes.length}</p>
+                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{earnedCertificates.length}</p>
                                     <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.certificates", "Certificates")}</p>
                                 </div>
                             </div>
@@ -377,35 +400,56 @@ const SkillsVault = () => {
                                         </button>
                                     </div>
 
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                        {certificateTypes.map((cert) => (
-                                            <div
-                                                key={cert.id}
-                                                onClick={() => navigate("/dashboard/certificate", { state: { selectedCertId: cert.id } })}
-                                                className="group flex cursor-pointer items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
-                                            >
-                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
-                                                    <Award className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <h4 className="mb-1.5 text-[13.5px] font-bold leading-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400">
-                                                        {cert.title}
-                                                    </h4>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="rounded-md border border-[#d8e6f7] bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-slate-400">
-                                                            {cert.code}
-                                                        </span>
-                                                        <span className="rounded-md border border-blue-200 bg-[#eef4ff] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#1a3884] dark:border-blue-500/20 dark:bg-[#1a3884]/20 dark:text-blue-400">
-                                                            {cert.level}
-                                                        </span>
+                                    {earnedCertificates.length > 0 ? (
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            {earnedCertificates.map((cert) => (
+                                                <div
+                                                    key={cert.certificateId}
+                                                    onClick={() => navigate("/dashboard/certificate", { state: { selectedCertId: cert.id } })}
+                                                    className="group flex cursor-pointer items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
+                                                >
+                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
+                                                        <Award className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h4 className="mb-1.5 text-[13.5px] font-bold leading-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400">
+                                                            {cert.title}
+                                                        </h4>
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            {cert.code && (
+                                                                <span className="rounded-md border border-[#d8e6f7] bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-slate-400">
+                                                                    {cert.code}
+                                                                </span>
+                                                            )}
+                                                            <span className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
+                                                                <Award className="h-2.5 w-2.5" /> {t("skills_vault.certificates.earned", "Earned")}
+                                                            </span>
+                                                            {cert.issueDate && (
+                                                                <span className="text-[10px] font-semibold text-slate-400">
+                                                                    {new Date(cert.issueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="hidden h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white opacity-0 transition-opacity group-hover:opacity-100 sm:flex dark:border-[#1a3884]/20 dark:bg-[#001630]">
+                                                        <ChevronRight className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                                                     </div>
                                                 </div>
-                                                <div className="hidden h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white opacity-0 transition-opacity group-hover:opacity-100 sm:flex dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                                    <ChevronRight className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
-                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center dark:border-white/10 dark:bg-white/[0.02]">
+                                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-white/5">
+                                                <Award className="h-7 w-7 text-slate-300 dark:text-slate-600" />
                                             </div>
-                                        ))}
-                                    </div>
+                                            <h4 className="mb-1 text-[14px] font-bold text-slate-600 dark:text-slate-300">
+                                                {t("skills_vault.certificates.none_title", "No certificates earned yet")}
+                                            </h4>
+                                            <p className="max-w-sm text-[12.5px] font-medium text-slate-400 dark:text-slate-500">
+                                                {t("skills_vault.certificates.none_desc", "Pass your stage assessments (T2–T4) to earn professional certificates. They'll appear here automatically.")}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">

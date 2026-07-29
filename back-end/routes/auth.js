@@ -774,6 +774,7 @@ router.post('/login',
         userResponse.studentId = user.studentId;
         userResponse.mobileNumber = user.mobile; // Student model uses 'mobile' field
         userResponse.college = user.college ? (user.college.toObject ? user.college.toObject() : user.college) : null;
+        userResponse.department = user.department ? (user.department.toObject ? user.department.toObject() : user.department) : null;
         userResponse.profileImage = user.profileImage; // Include profile picture
         userResponse.hasRegistration = hasRegistration;
         userResponse.isRegistered = user.isRegistered === true; // Admin-created students: isRegistered flag from Student model

@@ -232,6 +232,75 @@ export const generateAssessmentReport = (user, testResults) => {
 
     addFooter();
 
+    // ── Section 5: stage-specific (Blueprint v1.0 five-section architecture) ──
+    // New page so it never collides with the quotient grid.
+    doc.addPage();
+    addHeader();
+    const stage = testResults?.stage;
+    const s5BarWidth = pageWidth - margin * 2;
+    let s5y = 65;
+
+    const drawStatBox = (x, w, label, value, sub) => {
+        doc.setFillColor(245, 248, 255);
+        doc.roundedRect(x, s5y + 4, w, 26, 2, 2, 'F');
+        doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(120, 120, 120);
+        doc.text(String(label).toUpperCase(), x + 4, s5y + 12);
+        doc.setFontSize(13); doc.setTextColor(...navy);
+        doc.text(doc.splitTextToSize(String(value), w - 8).slice(0, 1), x + 4, s5y + 21);
+        if (sub) { doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(140, 140, 140); doc.text(sub, x + 4, s5y + 27); }
+    };
+
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(...navy);
+
+    if (stage === 'T4') {
+        doc.text('Growth & Velocity — Final Summary', margin, s5y);
+        s5y += 6;
+        const delta = testResults?.growthDelta;
+        const band = testResults?.plviBand || '—';
+        const half = (s5BarWidth - 6) / 2;
+        drawStatBox(margin, half, 'Total Growth (T1 → T4)', delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta} pts`, 'since baseline');
+        drawStatBox(margin + half + 6, half, 'Learning Velocity', band, 'rate of growth');
+        s5y += 42;
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(70, 70, 70);
+        const t4txt = `This concludes your four-stage journey. Total Growth reflects the change from your T1 baseline to your final Leadership readiness score. Your Learning Velocity band (${band}) signals the pace at which you acquired and applied new competencies across the programme.`;
+        doc.text(doc.splitTextToSize(t4txt, s5BarWidth), margin, s5y);
+    } else if (stage === 'T2' || stage === 'T3') {
+        doc.text('Certification Status', margin, s5y);
+        s5y += 6;
+        const passed = testResults?.passed;
+        const certName = stage === 'T2'
+            ? 'Professional Certificate in Capacity & Work Readiness (C1)'
+            : 'Advanced Professional Certificate in Applied Capability (C2)';
+        drawStatBox(margin, s5BarWidth, passed ? 'Certificate Earned' : 'Certificate — Not Yet Eligible', certName, passed ? 'Auto-issued on passing this stage' : 'Reach the pass threshold to earn');
+        s5y += 42;
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(70, 70, 70);
+        const ctxt = passed
+            ? `Passing this stage automatically issued your ${certName}. View and download it from your Skills Vault.`
+            : `You have not yet met the pass threshold for this stage. Once you do, this certificate is issued automatically and appears in your Skills Vault.`;
+        doc.text(doc.splitTextToSize(ctxt, s5BarWidth), margin, s5y);
+    } else {
+        doc.text('Baseline Snapshot & Focus Areas', margin, s5y);
+        s5y += 10;
+        const focus = Object.entries(testResults?.quotientProfile || testResults?.t1Profile || {})
+            .map(([k, v]) => ({ k, name: quotientInfo[k]?.name || k, score: v?.rawScore ?? 0 }))
+            .sort((a, b) => a.score - b.score)
+            .slice(0, 3);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(70, 70, 70);
+        doc.text(doc.splitTextToSize('Your baseline establishes S_baseline — the starting point for measuring growth. Prioritise these lower-scoring quotients:', s5BarWidth), margin, s5y);
+        s5y += 12;
+        focus.forEach((f) => {
+            doc.setFillColor(245, 248, 255);
+            doc.roundedRect(margin, s5y, s5BarWidth, 12, 2, 2, 'F');
+            doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(...navy);
+            doc.text(f.name, margin + 4, s5y + 8);
+            doc.setTextColor(...teal);
+            doc.text(`${f.score}%`, pageWidth - margin - 16, s5y + 8);
+            s5y += 16;
+        });
+    }
+
+    addFooter();
+
     // Save
     const fileStageName = testResults?.stage === 'T1' ? 'Baseline' : testResults?.stage === 'T2' ? 'Capacity' : testResults?.stage === 'T3' ? 'Capability' : testResults?.stage === 'T4' ? 'Leadership' : 'Report';
     doc.save(`SMAART_${fileStageName}_Analysis_${user?.studentId || 'Report'}.pdf`);

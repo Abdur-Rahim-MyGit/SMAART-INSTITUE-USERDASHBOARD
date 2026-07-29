@@ -1,4 +1,5 @@
 const express = require('express');
+// Reconnected to MongoDB Atlas
 
 const http = require('http');
 const mongoose = require('mongoose');
@@ -135,29 +136,32 @@ const connectDB = async () => {
 
   const isLocal = primaryURI?.includes('127.0.0.1') || primaryURI?.includes('localhost');
   const options = isLocal ? {} : {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 20,
     serverSelectionTimeoutMS: 15000,
     socketTimeoutMS: 45000,
     retryWrites: true,
     retryReads: true
   };
 
-  try {
-    await mongoose.connect(primaryURI, options);
-    logger.info('✅ MongoDB connected successfully to primary database');
-  } catch (err) {
-    logger.error('❌ Primary MongoDB connection error:', err.message);
-    if (fallbackURI && fallbackURI !== primaryURI) {
-      try {
-        logger.info('🔄 Attempting fallback MongoDB connection...');
-        await mongoose.connect(fallbackURI, { serverSelectionTimeoutMS: 5000 });
-        logger.info('✅ MongoDB connected to fallback database');
-        return;
-      } catch (fallbackErr) {
-        logger.error('❌ Fallback MongoDB connection error:', fallbackErr.message);
+  let connected = false;
+  let attempts = 0;
+  while (!connected && attempts < 5) {
+    try {
+      attempts++;
+      await mongoose.connect(primaryURI, options);
+      connected = true;
+      logger.info('✅ MongoDB connected successfully');
+    } catch (err) {
+      logger.error(`❌ MongoDB connection attempt ${attempts} failed: ${err.message}`);
+      if (attempts < 5) {
+        logger.info('⏳ Retrying MongoDB connection in 3 seconds...');
+        await new Promise(r => setTimeout(r, 3000));
+      } else {
+        logger.error('❌ Failed to connect to MongoDB after 5 attempts.');
       }
     }
-    logger.warn('⚠️ Retrying MongoDB connection in 5 seconds...');
-    setTimeout(connectWithFallback, 5000);
   }
 };
 

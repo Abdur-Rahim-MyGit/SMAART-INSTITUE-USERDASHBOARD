@@ -1,0 +1,4 @@
+stage,certificateType,code,certificateTitle,prerequisites
+T2,capacity,CAP,Professional Certificate in Capacity & Work Readiness,
+T3,capability,APC,Advanced Professional Certificate in Applied Capability,capacity
+T4,leadership,ELR,Professional Diploma in Employability & Leadership Readiness,capacity;capability
