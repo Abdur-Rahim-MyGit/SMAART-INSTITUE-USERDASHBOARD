@@ -47,7 +47,7 @@ export default function FaceVerificationTestScreen() {
   }, []);
 
   const capturePhoto = useCallback(async () => {
-    const result = await photoOutput.capturePhotoToFile({});
+    const result = await photoOutput.capturePhotoToFile({}, {});
     const path = result.filePath;
     return path.startsWith('file://') ? path : `file://${path}`;
   }, [photoOutput]);

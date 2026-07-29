@@ -5,7 +5,7 @@ import AppButton from '../../components/AppButton';
 import { useAuth } from '../../context/AuthContext';
 import { colors } from '../../theme';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +19,13 @@ export default function ProfileScreen() {
     <ScreenContainer>
       <Text style={styles.title}>{user?.fullName || 'Profile'}</Text>
       <Text style={styles.subtitle}>{user?.email}</Text>
+
+      <AppButton
+        title="Face Verification Test (Beta)"
+        variant="secondary"
+        onPress={() => navigation.navigate('FaceVerificationTest')}
+      />
+
       <AppButton title="Log Out" variant="secondary" onPress={handleLogout} loading={loading} />
     </ScreenContainer>
   );

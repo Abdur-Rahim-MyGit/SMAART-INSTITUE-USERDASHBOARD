@@ -6,21 +6,30 @@
  * once, then resize/align/read-back pixels from that single decode to build
  * the same normalized tensors the ONNX models expect.
  *
- * ⚠️ VERIFY ON FIRST DEVICE BUILD: this file was written against Skia's
- * documented (but not locally build-verified — no Android/iOS SDK in the dev
- * environment this was written in) API surface. The riskiest calls are:
- *   1. `Skia.Matrix([...])` taking a flat row-major 9-value array — this is
- *      standard SkMatrix layout (scaleX, skewX, transX, skewY, scaleY, transY,
- *      persp0, persp1, persp2), used here for the ArcFace affine alignment.
- *   2. `image.readPixels(...)` returning a Uint8Array of raw RGBA bytes.
- * If face registration produces visibly wrong crops, render the aligned crop
- * to an <Image> on screen first (see FaceVerificationTestScreen) to confirm
- * whether the bug is in this alignment step before suspecting the model math.
+ * Every Skia call here (Data.fromURI, Image.MakeImageFromEncoded, Surface.
+ * MakeOffscreen, Matrix(number[]), canvas.concat/drawImage/drawImageRect,
+ * image.readPixels, ColorType.RGBA_8888) was cross-checked against the
+ * installed @shopify/react-native-skia@2.6.2 TypeScript source
+ * (node_modules/@shopify/react-native-skia/src/skia/types/*.ts), not just
+ * docs — including the row-major 9-value layout Matrix() expects
+ * (scaleX, skewX, transX, skewY, scaleY, transY, persp0, persp1, persp2),
+ * confirmed via Matrix4.ts's convertToColumnMajor3.
+ *
+ * ⚠️ STILL VERIFY ON FIRST DEVICE BUILD: type signatures were checked, but
+ * this has not actually been *run* — no Android/iOS SDK was available in the
+ * environment this was written in. If face registration produces visibly
+ * wrong crops, render the aligned crop to an <Image> on screen first (see
+ * FaceVerificationTestScreen) to confirm whether the bug is in this
+ * alignment step before suspecting the model math.
  */
 import { Skia, ColorType, AlphaType } from '@shopify/react-native-skia';
 import { estimateAffineTransform, ARCFACE_DST } from './geometry';
 
 export const ARCFACE_INPUT_SIZE = 112;
+
+// drawImageRect's `paint` param is typed as required (not `paint?`), unlike
+// drawImage's — reuse one default paint rather than risking `null` there.
+const defaultPaint = () => Skia.Paint();
 
 /** Decode a captured photo once; reuse the returned handle for every step below. */
 export async function decodePhoto(fileUri) {
@@ -46,7 +55,7 @@ function drawResized(image, srcRect, size) {
   if (!surface) throw new Error('Failed to create offscreen Skia surface.');
   const canvas = surface.getCanvas();
   canvas.clear(Skia.Color('black'));
-  canvas.drawImageRect(image, srcRect, Skia.XYWHRect(0, 0, size.width, size.height), null);
+  canvas.drawImageRect(image, srcRect, Skia.XYWHRect(0, 0, size.width, size.height), defaultPaint());
   return readRgbaPixels(surface.makeImageSnapshot(), size.width, size.height);
 }
 
@@ -129,7 +138,7 @@ export function alignFaceAsArcFaceTensor(image, landmarks) {
       image,
       Skia.XYWHRect(cropX, cropY, faceW, faceH),
       Skia.XYWHRect(0, 0, size, size),
-      null
+      defaultPaint()
     );
   }
 
