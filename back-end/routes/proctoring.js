@@ -46,6 +46,8 @@ router.post('/session/:sessionId/event', proctoringController.logEvent);
 router.post('/session/:sessionId/complete', proctoringController.completeSession);
 router.post('/session/:sessionId/lock', proctoringController.triggerLock);
 router.post('/session/:sessionId/upload-snapshot', upload.single('snapshot'), proctoringController.uploadSnapshot);
+router.post('/session/:sessionId/registration', proctoringController.saveRegistration);
+router.get('/session/:sessionId/embedding', proctoringController.getEmbedding);
 
 // v2: Face embedding persistence routes
 router.post('/session/:sessionId/registration', proctoringController.saveRegistration);

@@ -58,6 +58,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const canvasRef = useRef(null);
   const localStreamRef = useRef(null);
   const faceCheckIntervalRef = useRef(null);
+  const registeredCropDataUrlRef = useRef(null);
   const faceStableCountRef = useRef(0);
   const registrationResultRef = useRef(null);
   const detectingTimerRef = useRef(null);
@@ -264,6 +265,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       });
 
       setRegisteredDescriptor(result.descriptor);
+      registeredCropDataUrlRef.current = result.alignedCropDataUrl;
       setRegistrationConfidence(result.confidence);
       setRegistrationProgress({ current: result.framesCaptured, total: 5 });
       setRegistrationState('registered');
@@ -509,6 +511,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     // 1800ms delay: OS camera drivers need time to fully release the hardware
     // before the exam engine's getUserMedia call can succeed
     setTimeout(() => {
+<<<<<<< HEAD
       const regResult = registrationResultRef.current || {};
       onComplete({
         faceDescriptor: registeredDescriptor,
@@ -516,6 +519,11 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         alignedCrops: regResult.alignedCrops || null,
         registrationQualityScore: regResult.qualityScore || null,
         registrationCropUrl: regResult.alignedCrops?.[regResult.alignedCrops.length - 1] || null,
+=======
+      onComplete({ 
+        faceDescriptor: registeredDescriptor,
+        alignedCropDataUrl: registeredCropDataUrlRef.current
+>>>>>>> 458e3707 (procotor face detection)
       });
     }, 1800);
   };
