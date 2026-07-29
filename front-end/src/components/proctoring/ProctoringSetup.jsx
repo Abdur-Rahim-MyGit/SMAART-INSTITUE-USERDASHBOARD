@@ -90,7 +90,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       const checkNetwork = async () => {
         const start = Date.now();
         try {
-          await fetch('/api/auth/me', { method: 'HEAD', signal: AbortSignal.timeout(3000) }).catch(() => {});
+          await fetch('/api/auth/me', { method: 'HEAD', signal: AbortSignal.timeout(3000) }).catch(() => { });
           const latency = Date.now() - start;
           setNetworkLatency(latency);
           setNetworkState(latency < 500 ? 'good' : 'poor');
@@ -136,7 +136,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       };
       initMedia();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   // PERFORMANCE: start fetching the models the moment setup opens, rather than
@@ -210,7 +210,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
 
       // Ignore full-canvas background boxes (>75% of container)
       if (box.width * scaleX > displaySize.width * 0.75 || box.height * scaleY > displaySize.height * 0.75) return;
-      
+
       ctx.strokeStyle = '#22d3ee';
       ctx.lineWidth = 2;
       ctx.strokeRect(box.x * scaleX, box.y * scaleY, box.width * scaleX, box.height * scaleY);
@@ -391,7 +391,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
 
   // Ensure camera stream is active and playing on the video element
   const ensureCameraActive = useCallback(async () => {
-    const hasActiveTrack = localStreamRef.current && 
+    const hasActiveTrack = localStreamRef.current &&
       localStreamRef.current.getVideoTracks().some(t => t.readyState === 'live' && t.enabled);
 
     if (!hasActiveTrack) {
@@ -445,7 +445,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         faceCheckIntervalRef.current = null;
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   // Monitor Fullscreen Status
@@ -511,7 +511,6 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     // 1800ms delay: OS camera drivers need time to fully release the hardware
     // before the exam engine's getUserMedia call can succeed
     setTimeout(() => {
-<<<<<<< HEAD
       const regResult = registrationResultRef.current || {};
       onComplete({
         faceDescriptor: registeredDescriptor,
@@ -519,11 +518,6 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         alignedCrops: regResult.alignedCrops || null,
         registrationQualityScore: regResult.qualityScore || null,
         registrationCropUrl: regResult.alignedCrops?.[regResult.alignedCrops.length - 1] || null,
-=======
-      onComplete({ 
-        faceDescriptor: registeredDescriptor,
-        alignedCropDataUrl: registeredCropDataUrlRef.current
->>>>>>> 458e3707 (procotor face detection)
       });
     }, 1800);
   };
@@ -586,7 +580,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   return (
     <div className="fixed inset-0 z-50 bg-[#0F172A]/40 dark:bg-[#000F24]/80 backdrop-blur-lg flex items-center justify-center p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
       <div className="w-full max-w-xl bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)] dark:shadow-2xl relative overflow-hidden">
-        
+
         {/* Glow decorative effects */}
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#1a3884]/5 dark:bg-[#1a3884]/20 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -604,13 +598,12 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           {[1, 2, 3, 4].map(s => (
             <div
               key={s}
-              className={`h-1.5 rounded-full flex-1 transition-all duration-300 ${
-                s === step
+              className={`h-1.5 rounded-full flex-1 transition-all duration-300 ${s === step
                   ? 'bg-[#1a3884] dark:bg-cyan-400 w-12'
                   : s < step
-                  ? 'bg-emerald-500'
-                  : 'bg-slate-100 dark:bg-white/10'
-              }`}
+                    ? 'bg-emerald-500'
+                    : 'bg-slate-100 dark:bg-white/10'
+                }`}
             />
           ))}
         </div>
@@ -814,14 +807,14 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   className="w-full h-full object-cover scale-x-[-1]"
                   muted
                   playsInline
-                  onLoadedMetadata={(e) => e.target.play().catch(() => {})}
+                  onLoadedMetadata={(e) => e.target.play().catch(() => { })}
                 />
-                
+
                 <canvas
                   ref={canvasRef}
                   className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1]"
                 />
-                
+
                 {/* Oval face guide overlay */}
                 {(registrationState === 'detecting' || registrationState === 'idle') && (
                   <div className="absolute inset-0 pointer-events-none">
@@ -929,9 +922,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     exit={{ opacity: 0 }}
                     className="flex flex-col items-center gap-1.5 w-full"
                   >
-                    <div className={`text-xs font-medium text-center transition-colors ${
-                      faceCheckError ? 'text-amber-500 font-bold' : 'text-slate-500 dark:text-slate-400 animate-pulse'
-                    }`}>
+                    <div className={`text-xs font-medium text-center transition-colors ${faceCheckError ? 'text-amber-500 font-bold' : 'text-slate-500 dark:text-slate-400 animate-pulse'
+                      }`}>
                       {getRegistrationStatusText()}
                     </div>
                     {/* Quality feedback during capturing */}
@@ -952,13 +944,12 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                         {Array.from({ length: 5 }).map((_, idx) => (
                           <div
                             key={idx}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                              idx < registrationProgress.current
+                            className={`w-2 h-2 rounded-full transition-all duration-300 ${idx < registrationProgress.current
                                 ? 'bg-emerald-500 scale-110'
                                 : idx === registrationProgress.current
-                                ? 'bg-cyan-400 animate-pulse'
-                                : 'bg-slate-200 dark:bg-white/10'
-                            }`}
+                                  ? 'bg-cyan-400 animate-pulse'
+                                  : 'bg-slate-200 dark:bg-white/10'
+                              }`}
                           />
                         ))}
                       </div>
@@ -1016,32 +1007,31 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           )}
 
           <div className="ml-auto flex gap-3">
-          {step < 4 ? (
-            <button
-              onClick={handleNextStep}
-              disabled={
-                (step === 1 && cameraState !== 'allowed') ||
-                (step === 2 && !consentGranted) ||
-                (step === 3 && registrationState !== 'registered')
-              }
-              className={`px-6 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
-                ((step === 1 && cameraState === 'allowed') ||
-                 (step === 2 && consentGranted) ||
-                 (step === 3 && registrationState === 'registered'))
-                  ? 'bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'
-                  : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent'
-              }`}
-            >
-              {t('proctoring_setup.continue_button', 'Continue')} <RiArrowRightLine size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={handleStartTest}
-              className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-xs"
-            >
-              {t('proctoring_setup.start_assessment_now', 'Start Assessment Now')}
-            </button>
-          )}
+            {step < 4 ? (
+              <button
+                onClick={handleNextStep}
+                disabled={
+                  (step === 1 && cameraState !== 'allowed') ||
+                  (step === 2 && !consentGranted) ||
+                  (step === 3 && registrationState !== 'registered')
+                }
+                className={`px-6 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${((step === 1 && cameraState === 'allowed') ||
+                    (step === 2 && consentGranted) ||
+                    (step === 3 && registrationState === 'registered'))
+                    ? 'bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent'
+                  }`}
+              >
+                {t('proctoring_setup.continue_button', 'Continue')} <RiArrowRightLine size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={handleStartTest}
+                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-xs"
+              >
+                {t('proctoring_setup.start_assessment_now', 'Start Assessment Now')}
+              </button>
+            )}
           </div>
         </div>
       </div>
