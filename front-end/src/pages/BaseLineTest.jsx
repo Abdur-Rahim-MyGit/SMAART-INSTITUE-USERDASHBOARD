@@ -185,6 +185,9 @@ const BaseLineTest = () => {
   const timeoutSubmitTriggeredRef = useRef(false);
   const oneMinuteAlertShownRef = useRef(false);
   const initRef = useRef(false);
+  const isPausedRef = useRef(false);
+  const pauseStartedAtRef = useRef(null);
+  const pausedMsRef = useRef(0);
 
   // Manual navigation guard for standard BrowserRouter
   useEffect(() => {
@@ -663,47 +666,49 @@ const BaseLineTest = () => {
 
     oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
 
+    if (timerStartRef.current === null) {
+      const stored = Number(localStorage.getItem(timerStartStorageKey));
+      const now = Date.now();
+      const isResumable =
+        Number.isFinite(stored) &&
+        stored > 0 &&
+        stored <= now &&
+        (now - stored) < stageDurationSeconds * 1000;
+
+      timerStartRef.current = isResumable ? stored : now;
+      localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+
+      // Reflect immediately so the display doesn't wait a full second.
+      const elapsed = Math.floor((now - timerStartRef.current) / 1000);
+      setRemainingSeconds(Math.max(stageDurationSeconds - elapsed, 0));
+    }
+
     const timer = setInterval(() => {
       setRemainingSeconds((prev) => {
-        const next = Math.max(prev - 1, 0);
+        if (isPausedRef.current) {
+          if (pauseStartedAtRef.current === null) pauseStartedAtRef.current = Date.now();
+          return prev;
+        }
+        if (pauseStartedAtRef.current !== null) {
+          pausedMsRef.current += Date.now() - pauseStartedAtRef.current;
+          pauseStartedAtRef.current = null;
+        }
 
-<<<<<<< HEAD
+        if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
+          localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+        }
+
+        const elapsedSeconds = Math.floor(
+          (Date.now() - timerStartRef.current - pausedMsRef.current) / 1000
+        );
+        const next = Math.max(stageDurationSeconds - elapsedSeconds, 0);
+
         if (next <= 60 && next > 0 && !oneMinuteAlertShownRef.current) {
           oneMinuteAlertShownRef.current = true;
           localStorage.setItem(timerWarningStorageKey, "1");
           alert(t("baseline_test.one_minute_left", "Only 1 minute left!"));
           toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
         }
-=======
-      // Tier 3 stops the clock. Time spent in a proctoring pause is not
-      // charged to the candidate, which removes any argument that being
-      // interrupted cost them marks.
-      if (isPausedRef.current) {
-        if (pauseStartedAtRef.current === null) pauseStartedAtRef.current = Date.now();
-        return prev;
-      }
-      if (pauseStartedAtRef.current !== null) {
-        pausedMsRef.current += Date.now() - pauseStartedAtRef.current;
-        pauseStartedAtRef.current = null;
-      }
-
-      if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
-        localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
-      }
-
-      const elapsedSeconds = Math.floor(
-        (Date.now() - timerStartRef.current - pausedMsRef.current) / 1000
-      );
-      const nextRemainingSeconds = Math.max(stageDurationSeconds - elapsedSeconds, 0);
-      setRemainingSeconds(nextRemainingSeconds);
-
-      if (nextRemainingSeconds <= 60 && nextRemainingSeconds > 0 && !oneMinuteAlertShownRef.current) {
-        oneMinuteAlertShownRef.current = true;
-        localStorage.setItem(timerWarningStorageKey, "1");
-        alert(t("baseline_test.one_minute_left", "Only 1 minute left!"));
-        toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
-      }
->>>>>>> 458e3707 (procotor face detection)
 
         if (next === 0 && !timeoutSubmitTriggeredRef.current) {
           timeoutSubmitTriggeredRef.current = true;
@@ -727,6 +732,8 @@ const BaseLineTest = () => {
     submitted,
     submit,
     timerWarningStorageKey,
+    timerStartStorageKey,
+    stageDurationSeconds,
     t
   ]);
 
@@ -750,9 +757,6 @@ const BaseLineTest = () => {
     failAttentionCheck,
     verificationStatus,
     similarityScore,
-<<<<<<< HEAD
-    gazeDirection
-=======
     isCameraWarmingUp,
     gazeDirection,
     // Escalation ladder
@@ -765,7 +769,6 @@ const BaseLineTest = () => {
     showInactivityOverlay,
     dismissInactivityOverlay,
     failInactivityCheck
->>>>>>> 458e3707 (procotor face detection)
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
@@ -774,6 +777,12 @@ const BaseLineTest = () => {
     registeredAllEmbeddings,
     registrationMetadata,
   });
+
+  // Keep the countdown's view of the pause state current without re-running
+  // the timer effect.
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   useEffect(() => {
     if (submitted || loading) return;
@@ -897,24 +906,16 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-<<<<<<< HEAD
           onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, registrationCropUrl }) => {
-=======
-          onComplete={({ faceDescriptor, alignedCropDataUrl }) => {
->>>>>>> 458e3707 (procotor face detection)
             setRegisteredFaceDescriptor(faceDescriptor);
             setRegisteredAllEmbeddings(allEmbeddings || null);
             setRegistrationMetadata({
-              model: 'faceapi-128',
-              qualityScore: 100,
-              framesCaptured: 3,
+              model: 'arcface-r50-onnx',
+              qualityScore: registrationQualityScore || null,
+              framesCaptured: 5,
               antispoofPassed: true,
-<<<<<<< HEAD
               registrationCropUrl: registrationCropUrl || null,
               alignedCrops: alignedCrops || null,
-=======
-              registrationCropUrl: alignedCropDataUrl || null,
->>>>>>> 458e3707 (procotor face detection)
             });
             setSetupCompleted(true);
           }}
@@ -1515,10 +1516,7 @@ const BaseLineTest = () => {
           onRequestFullscreen={requestFullscreen}
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
-<<<<<<< HEAD
-=======
           isCameraWarmingUp={isCameraWarmingUp}
->>>>>>> 458e3707 (procotor face detection)
           gazeDirection={gazeDirection}
         />
       )}

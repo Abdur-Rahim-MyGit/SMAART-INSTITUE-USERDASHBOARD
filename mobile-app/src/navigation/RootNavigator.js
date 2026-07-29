@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import AuthStack from './AuthStack';
-import MainTabs from './MainTabs';
+import AppStack from './AppStack';
 import { colors } from '../theme';
 
 export default function RootNavigator() {
@@ -17,7 +17,7 @@ export default function RootNavigator() {
     );
   }
 
-  return <NavigationContainer>{user ? <MainTabs /> : <AuthStack />}</NavigationContainer>;
+  return <NavigationContainer>{user ? <AppStack /> : <AuthStack />}</NavigationContainer>;
 }
 
 const styles = StyleSheet.create({
