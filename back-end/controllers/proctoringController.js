@@ -369,6 +369,7 @@ exports.webhookUnlock = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 // ─── Save face registration embedding to session ───────────────────────────
 /**
  * POST /api/proctoring/sessions/:sessionId/registration
@@ -535,4 +536,91 @@ exports.logVerification = async (req, res) => {
     console.error('[ProctoringController] logVerification error:', err);
     res.status(500).json({ success: false, error: 'Server error logging verification.', message: err.message });
   }
+=======
+// Save face registration descriptor & upload registration crop to Cloudinary
+exports.saveRegistration = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { embedding, model, qualityScore, framesCaptured, antispoofPassed, alignedCropUrl } = req.body;
+
+    const { session, error, status } = await loadOwnedSession(sessionId, req.user);
+    if (error) {
+      return res.status(status).json({ success: false, error });
+    }
+
+    let uploadedUrl = null;
+    if (alignedCropUrl && alignedCropUrl.startsWith('data:image')) {
+      const { uploadBase64Image } = require('../helpers/cloudinaryHelper');
+      const uploadResult = await uploadBase64Image(alignedCropUrl, 'proctoring-registrations', `reg-${sessionId}`);
+      if (uploadResult.success) {
+        uploadedUrl = uploadResult.url;
+      } else {
+        console.error('Failed to upload registration image to Cloudinary:', uploadResult.error);
+      }
+    } else {
+      uploadedUrl = alignedCropUrl;
+    }
+
+    session.referenceDescriptor = embedding;
+    session.faceEmbedding = JSON.stringify(embedding);
+    session.faceEmbeddingModel = model || 'faceapi-128';
+    session.faceEmbeddingDims = embedding ? embedding.length : 128;
+    session.faceRegistrationQuality = qualityScore || 100;
+    session.faceRegistrationFrames = framesCaptured || 3;
+    session.antispoofPassed = antispoofPassed !== undefined ? antispoofPassed : true;
+    session.referencePhotoUrl = uploadedUrl;
+    session.faceAlignedCropUrl = uploadedUrl;
+    session.faceRegistered = true;
+    session.faceRegisteredAt = new Date();
+
+    await session.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Face registration saved successfully.',
+      referencePhotoUrl: uploadedUrl
+    });
+  } catch (err) {
+    console.error('Error saving proctoring registration:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Get registered face embedding for session restore
+exports.getEmbedding = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { session, error, status } = await loadOwnedSession(sessionId, req.user);
+    if (error) {
+      return res.status(status).json({ success: false, error });
+    }
+
+    let embedding = null;
+    if (session.faceEmbedding) {
+      try {
+        embedding = JSON.parse(session.faceEmbedding);
+      } catch (e) {
+        // Parse error fallback
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      embedding,
+      referencePhotoUrl: session.referencePhotoUrl
+    });
+  } catch (err) {
+    console.error('Error getting proctoring embedding:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Exposed for unit tests. These are pure decision helpers with no I/O, and
+// they encode the rules that matter most, so they are worth asserting on.
+exports._internals = {
+  calculateRiskScore,
+  applyServerDecision,
+  buildDecision,
+  resolveSnapshotUrl
+>>>>>>> 458e3707 (procotor face detection)
 };

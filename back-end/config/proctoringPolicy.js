@@ -19,14 +19,14 @@
  * Now flags accumulate silently, the candidate finishes uninterrupted, and the
  * server decides once at submit. Set false to restore mid-exam holds.
  */
-const FLAG_ONLY_MODE = true;
+const FLAG_ONLY_MODE = false;
 
 module.exports = {
   FLAG_ONLY_MODE,
 
   // Recorded warnings before the attempt is marked unverified. Only enforced
   // mid-exam when FLAG_ONLY_MODE is false; otherwise it is evaluated at submit.
-  MAX_WARNINGS: 3,
+  MAX_WARNINGS: 10,
 
   // Risk score at/above which an attempt cannot be verified.
   RISK_FLAG_THRESHOLD: 60,

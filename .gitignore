@@ -76,6 +76,8 @@ coverage/
 *.tmp
 *.temp
 .cache/
+~$*
+~$*.docx
 
 # OS
 Thumbs.db

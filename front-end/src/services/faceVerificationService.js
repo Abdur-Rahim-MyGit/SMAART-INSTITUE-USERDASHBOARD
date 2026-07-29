@@ -18,15 +18,50 @@
  * The 68-point face-api landmark model continues to be loaded for gaze only.
  */
 
+<<<<<<< HEAD
 import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady } from './onnxPipeline';
 import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
+=======
+import * as faceapi from '@vladmandic/face-api';
+import { analyzeGaze, resetCalibration } from './eyeGazeService';
+import { analyzeHeadPose, resetHeadPoseCalibration } from './headPoseService';
+>>>>>>> 458e3707 (procotor face detection)
 
 // Eye gaze service reset export kept for signature compatibility
 export const resetGazeCalibration = () => {};
 
+<<<<<<< HEAD
 // ─── Legacy face-api (Disabled) ──────────────────────────────────────────────
 // Gaze landmark model loading is disabled to conserve WebGL/WASM memory resources
 const loadGazeModels = async () => {};
+=======
+const evaluateFrameQuality = (videoEl, face) => {
+  return {
+    passed: true,
+    overallScore: 100,
+    issues: []
+  };
+};
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+const MODEL_URL = '/models';
+const MATCH_THRESHOLD = 0.6;      // euclidean distance < 0.6 = match (face-api standard)
+const MIN_FACE_CONFIDENCE = 0.3;  // detector score threshold
+
+/**
+ * TinyFaceDetector, not SSD MobileNet: 193 KB vs 5.6 MB, and several times
+ * faster per frame. The exam loop runs a detection every second on whatever
+ * laptop the candidate owns, so the cheaper detector is worth far more than the
+ * marginal accuracy — identity is still matched by the full recognition net.
+ * inputSize must be a multiple of 32; 320 balances accuracy against speed.
+ */
+const DETECTOR_INPUT_SIZE = 320;
+
+const REGISTRATION_FRAMES = 3;          // frames to average into the reference
+const REGISTRATION_INTERVAL_MS = 400;   // gap between capture frames
+const REGISTRATION_MAX_ATTEMPTS = 18;   // retries before giving up
+const REGISTRATION_MATCH_TOLERANCE = 0.62; // frames must be the same identity
+>>>>>>> 458e3707 (procotor face detection)
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let lastDetectionTime = 0;
@@ -392,5 +427,41 @@ const captureAlignedCrop = (videoEl, box) => {
     return c.toDataURL('image/jpeg', 0.8);
   } catch {
     return null;
+  }
+};
+
+/** Fast detection with landmarks but without face descriptor computation. */
+export const detectFacesWithLandmarks = async (input) => {
+  if (!input) {
+    return { faceCount: 0, faces: [], isFacePresent: false, error: 'No input element' };
+  }
+  if (input.tagName === 'VIDEO' && input.readyState < 2) {
+    return { faceCount: 0, faces: [], isFacePresent: false, error: 'Video not ready' };
+  }
+  if (!isReady()) {
+    return { faceCount: 0, faces: [], isFacePresent: false, error: 'Models not loaded' };
+  }
+
+  try {
+    const raw = await faceapi
+      .detectAllFaces(input, getDetectorOptions())
+      .withFaceLandmarks();
+
+    const faces = raw.map((r) => ({
+      detection: r.detection,
+      box: boxOf(r.detection),
+      score: r.detection.score ?? 0,
+      landmarks: r.landmarks ? to5Point(r.landmarks) : null,
+      landmarks68: r.landmarks || null,
+    }));
+
+    return {
+      faceCount: faces.length,
+      faces,
+      isFacePresent: faces.length > 0,
+    };
+  } catch (err) {
+    console.warn('[FaceVerification] detectFacesWithLandmarks failed:', err?.message);
+    return { faceCount: 0, faces: [], isFacePresent: false, error: err?.message || 'detect failed' };
   }
 };
