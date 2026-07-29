@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   RiCameraOffLine,
   RiSubtractLine,
@@ -13,15 +14,15 @@ import {
 // Map verification statuses to display info
 const STATUS_CONFIG = {
   verified: {
-    label: 'Verified',
-    fullLabel: 'Identity Verified',
+    label: 'Face Detected',
+    fullLabel: 'Face Detected',
     dotColor: 'bg-emerald-500',
     textColor: 'text-emerald-500',
     icon: RiShieldCheckLine
   },
   mismatch: {
-    label: 'Mismatch',
-    fullLabel: 'Face Not Matched',
+    label: 'Face Mismatch',
+    fullLabel: 'Face Mismatch',
     dotColor: 'bg-red-500',
     textColor: 'text-red-500',
     icon: RiUserUnfollowLine
@@ -29,21 +30,21 @@ const STATUS_CONFIG = {
   no_face: {
     label: 'No Face',
     fullLabel: 'No Face Detected',
-    dotColor: 'bg-rose-500',
-    textColor: 'text-rose-500',
+    dotColor: 'bg-red-500 animate-pulse',
+    textColor: 'text-red-500',
     icon: RiCameraOffLine
   },
   multiple_faces: {
-    label: 'Multiple',
-    fullLabel: 'Multiple Faces',
-    dotColor: 'bg-red-500',
+    label: 'Multiple Faces',
+    fullLabel: 'Multiple Faces Detected',
+    dotColor: 'bg-red-500 animate-pulse',
     textColor: 'text-red-500',
     icon: RiGroupLine
   },
   covered: {
-    label: 'Covered',
+    label: 'Face Blocked',
     fullLabel: 'Face Obstructed',
-    dotColor: 'bg-amber-500',
+    dotColor: 'bg-amber-500 animate-pulse',
     textColor: 'text-amber-500',
     icon: RiEyeOffLine
   },
@@ -53,6 +54,16 @@ const STATUS_CONFIG = {
     dotColor: 'bg-slate-400',
     textColor: 'text-slate-400',
     icon: RiCameraOffLine
+<<<<<<< HEAD
+=======
+  },
+  warming_up: {
+    label: 'Starting',
+    fullLabel: 'Initializing…',
+    dotColor: 'bg-slate-400 animate-pulse',
+    textColor: 'text-slate-400',
+    icon: RiCameraOffLine
+>>>>>>> 458e3707 (procotor face detection)
   }
 };
 
@@ -68,8 +79,13 @@ export const ProctoringOverlay = ({
   onRequestFullscreen,
   verificationStatus = 'no_face',
   similarityScore = 0,
+<<<<<<< HEAD
+=======
+  isCameraWarmingUp = false,
+>>>>>>> 458e3707 (procotor face detection)
   gazeDirection = 'center'
 }) => {
+  const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState(false);
   const videoRef = useRef(null);
 
@@ -88,46 +104,52 @@ export const ProctoringOverlay = ({
   // Similarity bar segments (like a signal strength indicator)
   const getSignalBars = () => {
     if (verificationStatus !== 'verified') return 0;
-    if (similarityScore >= 0.8) return 4;
-    if (similarityScore >= 0.5) return 3;
-    if (similarityScore >= 0.2) return 2;
-    if (similarityScore > 0) return 1;
-    return 0;
+    if (similarityScore > 0.85) return 4;
+    if (similarityScore > 0.70) return 3;
+    if (similarityScore > 0.55) return 2;
+    return 1;
   };
 
   const signalBars = getSignalBars();
 
   return (
-    <div className="fixed z-40 pointer-events-none inset-0">
-      {/* Draggable PIP Webcam Container */}
+    <div className="fixed bottom-6 right-6 z-[9999] select-none pointer-events-none">
       <motion.div
         drag
         dragMomentum={false}
-        dragElastic={0.1}
-        initial={{ x: 'calc(100vw - 190px)', y: 'calc(100vh - 240px)' }}
-        className="absolute w-[170px] bg-white/95 dark:bg-[#00152E]/90 border border-slate-200 dark:border-[#1a3884]/40 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] dark:shadow-2xl p-2 pointer-events-auto backdrop-blur-md select-none text-slate-800 dark:text-slate-100 transition-colors duration-300"
+        dragElastic={0}
+        dragConstraints={{ left: -window.innerWidth + 220, right: 0, top: -window.innerHeight + 180, bottom: 0 }}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="pointer-events-auto w-[180px] bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3 flex flex-col gap-2 relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
       >
-        {/* Header bar for dragging / actions */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-white/5 pb-1.5 mb-2 cursor-move">
+        {/* Header */}
+        <div className="flex justify-between items-center pb-1.5 border-b border-slate-100 dark:border-white/5">
           <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${statusConfig.dotColor} animate-pulse`} />
-            <span className="text-[10px] font-black text-slate-700 dark:text-slate-350 tracking-wider uppercase">
-              {isMinimized ? 'Proctor' : 'AI Proctoring'}
+            <span className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`} />
+            <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 tracking-wide uppercase">
+              AI Proctoring
             </span>
           </div>
           <button
-            onClick={() => setIsMinimized(prev => !prev)}
-            className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded text-slate-400 hover:text-slate-655 dark:hover:text-white transition-colors"
-            title={isMinimized ? 'Expand feed' : 'Minimize feed'}
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded transition text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            title={isMinimized ? "Expand Camera" : "Minimize Camera"}
           >
-            <RiSubtractLine size={12} className={isMinimized ? 'rotate-90' : ''} />
+            <RiSubtractLine size={12} />
           </button>
         </div>
 
-        {/* Video stream panel (Hidden if minimized) */}
+        {/* Video Box */}
         {!isMinimized && (
+<<<<<<< HEAD
           <div className="relative aspect-[4/3] bg-slate-950 rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 mb-1.5">
             {stream ? (
+=======
+          <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-950 shadow-inner group border border-slate-250 dark:border-slate-800">
+            {isCameraActive && stream ? (
+>>>>>>> 458e3707 (procotor face detection)
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover scale-x-[-1]"
@@ -161,7 +183,7 @@ export const ProctoringOverlay = ({
                     ))}
                   </div>
                 )}
-                <div className="px-1.5 py-0.5 rounded bg-black/60 text-[8px] font-bold text-slate-200">
+                <div className={`px-1.5 py-0.5 rounded bg-black/60 text-[8px] font-bold ${statusConfig.textColor}`}>
                   {statusConfig.label}
                 </div>
               </div>
@@ -205,7 +227,7 @@ export const ProctoringOverlay = ({
           <div className="flex justify-between items-center bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 px-2 py-1.5 rounded">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Warnings:</span>
             <span className={`font-black ${warningsCount > 0 ? 'text-red-500' : 'text-slate-700 dark:text-slate-350'}`}>
-              {warningsCount} / {maxWarnings + 1}
+              {warningsCount} / {maxWarnings}
             </span>
           </div>
 
