@@ -486,6 +486,36 @@ const submitAssessment = async (req, res) => {
                 responseData.maxAttempts = stageInfo.maxAttempts || 3;
                 responseData.passingPercentage = passingPercentage;
 
+                // Blueprint v1.0: auto-issue certificate on a passed stage gate
+                // (server-gated: score + prerequisite stack + proctoring integrity).
+                if (passed && ['T2', 'T3', 'T4'].includes(stageInfo.stage)) {
+                    try {
+                        const { issueCertificateForStage } = require('../services/certificateIssuanceService');
+                        const certRes = await issueCertificateForStage({
+                            userId: result.userId,
+                            stageInfo,
+                            stageScore,
+                            stageBand,
+                            quotientProfile: finalProfile,
+                            resultId: result._id
+                        });
+                        if (certRes && (certRes.issued || certRes.reason === 'already-earned')) {
+                            responseData.certificateIssued = certRes.issued === true;
+                            responseData.certificateId = certRes.certificate?.certificateId;
+                            responseData.certificateType = certRes.certificate?.certificateType;
+                            if (certRes.combined) {
+                                responseData.masterDiplomaIssued = true;
+                                responseData.masterDiplomaId = certRes.combined.certificateId;
+                            }
+                        } else {
+                            responseData.certificateIssued = false;
+                            responseData.certificateReason = certRes?.reason;
+                        }
+                    } catch (certErr) {
+                        console.error(`⚠️ Certificate issuance error for ${stageInfo.stage}:`, certErr);
+                    }
+                }
+
                 // Calculate remaining attempts
                 if (!passed) {
                     const maxAttempts = stageInfo.maxAttempts || 3;

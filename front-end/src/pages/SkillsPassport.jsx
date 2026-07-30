@@ -685,6 +685,7 @@ const SkillsPassport = () => {
     const [registrationProfile, setRegistrationProfile] = useState(null);
     const [baselineResult, setBaselineResult] = useState(null);
     const [stageResults, setStageResults] = useState({});
+    const [stageMeta, setStageMeta] = useState({});
     const [courseEnrollments, setCourseEnrollments] = useState([]);
     const [externalCertificates, setExternalCertificates] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -738,6 +739,7 @@ const SkillsPassport = () => {
 
                 if (stageRes.status === "fulfilled" && stageRes.value?.success) {
                     setStageResults(stageRes.value.data || {});
+                    setStageMeta(stageRes.value.meta || {});
                 }
 
                 if (enrollmentRes.status === "fulfilled" && enrollmentRes.value) {
@@ -1099,6 +1101,18 @@ const SkillsPassport = () => {
         return <SkillsPassportSkeleton />;
     }
 
+    // Learning Velocity summary (Blueprint v1.0 PLVI + Total Growth Δ).
+    const latestVelocityStage = ["T4", "T3", "T2"].find((k) => stageResults?.[k]?.plviBand);
+    const velocity = {
+        band: stageMeta?.finalPlviBand || stageResults?.[latestVelocityStage]?.plviBand || null,
+        delta: (stageMeta?.totalGrowthDelta ?? stageResults?.[latestVelocityStage]?.growthDelta) ?? null,
+        isFinal: !!stageResults?.T4?.plviBand,
+        stage: latestVelocityStage || null,
+        tDays: stageResults?.[latestVelocityStage]?.tDays ?? null,
+        basis: stageResults?.[latestVelocityStage]?.tDaysBasis ?? null,
+    };
+    const hasVelocity = velocity.band != null || velocity.delta != null;
+
     return (
         <div className="min-h-screen bg-transparent p-8" style={documentFont}>
             <motion.div
@@ -1189,6 +1203,36 @@ const SkillsPassport = () => {
                                     badgeText={`${passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length} Verified`}
                                 />
                             </div>
+
+                            {/* Learning Velocity — PLVI + Total Growth Δ (T1 → latest stage) */}
+                            {hasVelocity ? (
+                                <div className="mt-6 rounded-2xl border border-[#d6dfef] bg-[#f5f8ff] p-4">
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <h4 className="text-[0.8rem] font-[800] uppercase tracking-[0.12em] text-[#10285a]">
+                                            Learning Velocity
+                                        </h4>
+                                        <span className="rounded-md border border-[#1a3884]/20 bg-[#eef4ff] px-2 py-0.5 text-[0.6rem] font-[800] uppercase tracking-wider text-[#1a3884]">
+                                            {velocity.isFinal ? "Final" : (velocity.stage || "Current")}
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="rounded-xl border border-[#d6dfef] bg-white px-3 py-2.5">
+                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Total Growth</p>
+                                            <p className="text-[1.15rem] font-[800] text-[#10285a]">
+                                                {velocity.delta == null ? "—" : `${velocity.delta >= 0 ? "+" : ""}${velocity.delta} pts`}
+                                            </p>
+                                            <p className="text-[0.6rem] font-[500] text-slate-400">since baseline (T1)</p>
+                                        </div>
+                                        <div className="rounded-xl border border-[#d6dfef] bg-white px-3 py-2.5">
+                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Velocity Band</p>
+                                            <p className="text-[1.15rem] font-[800] text-[#1a3884]">{velocity.band || "—"}</p>
+                                            <p className="text-[0.6rem] font-[500] text-slate-400">
+                                                {velocity.tDays ? `over ${velocity.tDays} ${velocity.basis === "active" ? "active learning days" : "days"}` : "rate of growth"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
                         </PassportPage>
                     </div>
                 ) : null}

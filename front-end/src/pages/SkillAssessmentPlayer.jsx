@@ -27,7 +27,10 @@ import {
 import useProctoringEngine from "@/hooks/useProctoringEngine";
 import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
 import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
-import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningModal";
+import ProctoringPause from "@/components/proctoring/ProctoringPause";
+import ProctoringNotice from "@/components/proctoring/ProctoringNotice";
+import ProctoringStatusPill from "@/components/proctoring/ProctoringStatusPill";
+import InactivityOverlay from "@/components/proctoring/InactivityOverlay";
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
 import CertificateModal from "@/components/CertificateModal";
 
@@ -45,6 +48,7 @@ const SkillAssessmentPlayer = () => {
   const [error, setError] = useState(null);
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  const [registrationMetadata, setRegistrationMetadata] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -67,6 +71,9 @@ const SkillAssessmentPlayer = () => {
   const initRef = useRef(false);
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
+  const pausedMsRef = useRef(0);
+  const pauseStartedAtRef = useRef(null);
+  const isPausedRef = useRef(false);
   const [user, setUser] = useState(null);
 
   // Synced user details
@@ -196,7 +203,18 @@ const SkillAssessmentPlayer = () => {
     const durationSeconds = (assessment?.duration || 30) * 60;
 
     const updateCountdown = () => {
-      const elapsedSeconds = Math.floor((Date.now() - timerStartRef.current) / 1000);
+      if (isPausedRef.current) {
+        if (pauseStartedAtRef.current === null) {
+          pauseStartedAtRef.current = Date.now();
+        }
+        return;
+      }
+      if (pauseStartedAtRef.current !== null) {
+        pausedMsRef.current += Date.now() - pauseStartedAtRef.current;
+        pauseStartedAtRef.current = null;
+      }
+
+      const elapsedSeconds = Math.floor((Date.now() - timerStartRef.current - pausedMsRef.current) / 1000);
       const nextRemainingSeconds = Math.max(durationSeconds - elapsedSeconds, 0);
       setRemainingSeconds(nextRemainingSeconds);
 
@@ -212,7 +230,7 @@ const SkillAssessmentPlayer = () => {
 
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
-  }, [loading, resultId, setupCompleted, submitted, assessment]);
+  }, [loading, resultId, setupCompleted, submitted, assessment, submit]);
 
   // Proctoring Hook
   const {
@@ -233,13 +251,30 @@ const SkillAssessmentPlayer = () => {
     passAttentionCheck,
     failAttentionCheck,
     verificationStatus,
-    similarityScore
+    similarityScore,
+    gazeDirection,
+    // Escalation ladder
+    tier,
+    nudgeMessage,
+    pauseObservations,
+    isPaused,
+    resumeFromPause,
+    // Inactivity presence check
+    showInactivityOverlay,
+    dismissInactivityOverlay,
+    failInactivityCheck
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
-    registeredFaceDescriptor
+    registeredFaceDescriptor,
+    registrationMetadata
   });
+
+  // Keep the countdown's view of the pause state current without re-running the timer effect.
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   // Local anti-cheat keyboard listeners
   useEffect(() => {
@@ -393,8 +428,15 @@ const SkillAssessmentPlayer = () => {
   if (!setupCompleted) {
     return (
       <ProctoringSetup
-        onComplete={({ faceDescriptor }) => {
+        onComplete={({ faceDescriptor, alignedCropDataUrl }) => {
           setRegisteredFaceDescriptor(faceDescriptor);
+          setRegistrationMetadata({
+            model: 'faceapi-128',
+            qualityScore: 100,
+            framesCaptured: 3,
+            antispoofPassed: true,
+            registrationCropUrl: alignedCropDataUrl || null,
+          });
           setSetupCompleted(true);
         }}
         assessmentTitle={`${decodedSkillName} Assessment`}
@@ -535,13 +577,23 @@ const SkillAssessmentPlayer = () => {
                     {decodedSkillName} <span className="text-[#1a3884] dark:text-blue-400">Skill Test</span>
                   </h2>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-slate-400" />
-                    Time Left:{" "}
-                    <span className={`font-mono font-bold ${remainingSeconds <= 300 ? "text-red-500 animate-pulse" : "text-[#1a3884] dark:text-blue-400"}`}>
-                      {timeFormatted}
-                    </span>
+                <div className="flex items-center gap-3">
+                  {setupCompleted && (
+                    <ProctoringStatusPill
+                      tier={tier}
+                      message={nudgeMessage}
+                      warnings={warningsCount}
+                      maxWarnings={maxWarnings}
+                    />
+                  )}
+                  <div className="text-right">
+                    <div className="text-xs md:text-sm font-semibold text-slate-550 dark:text-slate-400 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-slate-400" />
+                      Time Left:{" "}
+                      <span className={`font-mono font-bold ${remainingSeconds <= 300 ? "text-red-500 animate-pulse" : "text-[#1a3884] dark:text-blue-400"}`}>
+                        {timeFormatted}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -734,13 +786,26 @@ const SkillAssessmentPlayer = () => {
         </div>
       )}
 
-      {/* Proctoring warnings overlay and modals */}
-      <ProctoringWarningModal
-        isOpen={isWarningVisible}
-        warningsCount={warningsCount}
+      {/* Tier 2 — a recorded warning. Non-blocking on purpose */}
+      {!submitted && !loading && setupCompleted && (
+        <ProctoringNotice
+          isOpen={tier === 'warn' && isWarningVisible}
+          violationType={lastViolationType}
+          warnings={warningsCount}
+          maxWarnings={maxWarnings}
+          onFix={!isFullScreen ? requestFullscreen : null}
+          fixLabel="Return to fullscreen"
+          onDismiss={acknowledgeWarning}
+        />
+      )}
+
+      {/* Tier 3 — the one blocking moment. Slate, not red, and the timer is frozen */}
+      <ProctoringPause
+        isOpen={tier === 'pause'}
+        observations={pauseObservations}
+        warnings={warningsCount}
         maxWarnings={maxWarnings}
-        violationType={lastViolationType}
-        onAcknowledge={acknowledgeWarning}
+        onResume={resumeFromPause}
       />
 
       {!submitted && !loading && setupCompleted && (
@@ -756,6 +821,7 @@ const SkillAssessmentPlayer = () => {
           onRequestFullscreen={requestFullscreen}
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
+          gazeDirection={gazeDirection}
         />
       )}
 
@@ -763,6 +829,14 @@ const SkillAssessmentPlayer = () => {
         <AttentionCheck
           onPass={passAttentionCheck}
           onFail={failAttentionCheck}
+        />
+      )}
+
+      {/* Inactivity presence check — blurred overlay */}
+      {showInactivityOverlay && (
+        <InactivityOverlay
+          onDismiss={dismissInactivityOverlay}
+          onTimeout={failInactivityCheck}
         />
       )}
 

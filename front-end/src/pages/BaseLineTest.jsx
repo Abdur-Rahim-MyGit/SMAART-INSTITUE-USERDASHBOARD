@@ -40,12 +40,9 @@ import AttentionCheck from "@/components/proctoring/AttentionCheck";
 // Stage configuration map
 const STAGE_MAP = {
   T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 1, passingPercentage: 0 },
-  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
-  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
-  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
-  AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
-  SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
-  PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 34, durationMinutes: 45, maxAttempts: 3, passingPercentage: 60 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 36, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
 };
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
@@ -188,6 +185,9 @@ const BaseLineTest = () => {
   const timeoutSubmitTriggeredRef = useRef(false);
   const oneMinuteAlertShownRef = useRef(false);
   const initRef = useRef(false);
+  const isPausedRef = useRef(false);
+  const pauseStartedAtRef = useRef(null);
+  const pausedMsRef = useRef(0);
 
   // Manual navigation guard for standard BrowserRouter
   useEffect(() => {
@@ -666,9 +666,42 @@ const BaseLineTest = () => {
 
     oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
 
+    if (timerStartRef.current === null) {
+      const stored = Number(localStorage.getItem(timerStartStorageKey));
+      const now = Date.now();
+      const isResumable =
+        Number.isFinite(stored) &&
+        stored > 0 &&
+        stored <= now &&
+        (now - stored) < stageDurationSeconds * 1000;
+
+      timerStartRef.current = isResumable ? stored : now;
+      localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+
+      // Reflect immediately so the display doesn't wait a full second.
+      const elapsed = Math.floor((now - timerStartRef.current) / 1000);
+      setRemainingSeconds(Math.max(stageDurationSeconds - elapsed, 0));
+    }
+
     const timer = setInterval(() => {
       setRemainingSeconds((prev) => {
-        const next = Math.max(prev - 1, 0);
+        if (isPausedRef.current) {
+          if (pauseStartedAtRef.current === null) pauseStartedAtRef.current = Date.now();
+          return prev;
+        }
+        if (pauseStartedAtRef.current !== null) {
+          pausedMsRef.current += Date.now() - pauseStartedAtRef.current;
+          pauseStartedAtRef.current = null;
+        }
+
+        if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
+          localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+        }
+
+        const elapsedSeconds = Math.floor(
+          (Date.now() - timerStartRef.current - pausedMsRef.current) / 1000
+        );
+        const next = Math.max(stageDurationSeconds - elapsedSeconds, 0);
 
         if (next <= 60 && next > 0 && !oneMinuteAlertShownRef.current) {
           oneMinuteAlertShownRef.current = true;
@@ -699,6 +732,8 @@ const BaseLineTest = () => {
     submitted,
     submit,
     timerWarningStorageKey,
+    timerStartStorageKey,
+    stageDurationSeconds,
     t
   ]);
 
@@ -722,7 +757,18 @@ const BaseLineTest = () => {
     failAttentionCheck,
     verificationStatus,
     similarityScore,
-    gazeDirection
+    isCameraWarmingUp,
+    gazeDirection,
+    // Escalation ladder
+    tier,
+    nudgeMessage,
+    pauseObservations,
+    isPaused,
+    resumeFromPause,
+    // Inactivity presence check
+    showInactivityOverlay,
+    dismissInactivityOverlay,
+    failInactivityCheck
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
@@ -731,6 +777,12 @@ const BaseLineTest = () => {
     registeredAllEmbeddings,
     registrationMetadata,
   });
+
+  // Keep the countdown's view of the pause state current without re-running
+  // the timer effect.
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   useEffect(() => {
     if (submitted || loading) return;
@@ -1160,6 +1212,18 @@ const BaseLineTest = () => {
                   </div>
                 )}
 
+                {/* Certificate earned chip (auto-issued on passing a stage gate) */}
+                {testResults?.passed && ['T2', 'T3', 'T4'].includes(stageKey) && (
+                  <div className="mb-3">
+                    <button
+                      onClick={() => navigate('/dashboard/skills-vault')}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/5 dark:bg-[#1a3884]/10 text-[#1a3884] dark:text-blue-300 text-sm font-bold border border-[#1a3884]/20 hover:bg-[#1a3884]/10 transition"
+                    >
+                      <Award className="w-4 h-4" /> {t("baseline_test.certificate_earned", "Certificate Earned — View in Skills Vault")}
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                   <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
                   <span>|</span>
@@ -1198,6 +1262,26 @@ const BaseLineTest = () => {
                   )}
                 </div>
               </div>
+
+              {/* T4 Final: Total Growth Δ + Learning Velocity (Blueprint v1.0) */}
+              {stageKey === 'T4' && (testResults?.growthDelta != null || testResults?.plviBand) && (
+                <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-12">
+                  <div className="flex-1 text-center bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-5 border border-slate-100 dark:border-white/10">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{t("baseline_test.total_growth", "Total Growth (T1 → T4)")}</div>
+                    <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">
+                      {testResults.growthDelta == null ? '—' : `${testResults.growthDelta >= 0 ? '+' : ''}${testResults.growthDelta} pts`}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{t("baseline_test.since_baseline", "since your baseline")}</div>
+                  </div>
+                  <div className="flex-1 text-center bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-5 border border-slate-100 dark:border-white/10">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{t("baseline_test.learning_velocity", "Learning Velocity")}</div>
+                    <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">{testResults.plviBand || '—'}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      {testResults.tDays ? `over ${testResults.tDays} ${testResults.tDaysBasis === 'active' ? 'active learning days' : 'days'}` : t("baseline_test.rate_of_growth", "rate of growth")}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Quotient Cards Grid */}
               <div className="mb-12 relative z-10">
@@ -1432,6 +1516,7 @@ const BaseLineTest = () => {
           onRequestFullscreen={requestFullscreen}
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
+          isCameraWarmingUp={isCameraWarmingUp}
           gazeDirection={gazeDirection}
         />
       )}

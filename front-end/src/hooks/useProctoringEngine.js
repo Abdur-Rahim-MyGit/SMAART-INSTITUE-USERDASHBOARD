@@ -34,16 +34,16 @@ const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 const MAX_WARNINGS = 3;
 
 // v3: Batch Verification & Fast Violation Constants
-const BATCH_INTERVAL_MS      = 6000;   // 6 seconds between batch verification cycles
+const BATCH_INTERVAL_MS = 6000;   // 6 seconds between batch verification cycles
 const BATCH_INITIAL_DELAY_MS = 2000;   // 2 seconds after start before first batch
 const QUICK_CHECK_INTERVAL_MS = 1000;  // 1 second for lightweight face presence checks between batches
 
 // v3: Responsive Grace Period Constants
-const NO_FACE_REMINDER_MS    = 2000;   // 2 seconds no face → gentle toast reminder
-const NO_FACE_VIOLATION_MS   = 5000;   // 5 seconds sustained absence → violation logged
-const MULTI_FACE_GRACE_MS    = 1000;   // 1 second grace before multiple-face violation
-const MISMATCH_RETRY_COUNT   = 1;      // retry verification 1 time before warning
-const MISMATCH_FLAG_COUNT    = 2;      // flag for review after 2 confirmed mismatches
+const NO_FACE_REMINDER_MS = 2000;   // 2 seconds no face → gentle toast reminder
+const NO_FACE_VIOLATION_MS = 5000;   // 5 seconds sustained absence → violation logged
+const MULTI_FACE_GRACE_MS = 1000;   // 1 second grace before multiple-face violation
+const MISMATCH_RETRY_COUNT = 1;      // retry verification 1 time before warning
+const MISMATCH_FLAG_COUNT = 2;      // flag for review after 2 confirmed mismatches
 
 export const useProctoringEngine = ({
   resultId = null,
@@ -59,7 +59,7 @@ export const useProctoringEngine = ({
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lastViolationType, setLastViolationType] = useState('');
   const [proctoringSessionId, setProctoringSessionId] = useState(null);
-  
+
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [mediaStream, setMediaStream] = useState(null);
   const [isFaceDetected, setIsFaceDetected] = useState(false);
@@ -90,7 +90,7 @@ export const useProctoringEngine = ({
   const hasLockedOutRef = useRef(false);
   const warningsCountRef = useRef(0);
   const inactivityTimerRef = useRef(null);
-  
+
   // Timeout reference for adaptive checking
   const faceTimeoutRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
@@ -111,20 +111,20 @@ export const useProctoringEngine = ({
   const isBatchRunningRef = useRef(false);      // Prevent overlapping batch runs
 
   // Legacy streak refs (kept for non-batch quick-check mode)
-  const faceAbsentStreak    = useRef(0);
+  const faceAbsentStreak = useRef(0);
   const multipleFacesStreak = useRef(0);
-  const faceMismatchStreak  = useRef(0);
-  const faceCoveredStreak   = useRef(0);
+  const faceMismatchStreak = useRef(0);
+  const faceCoveredStreak = useRef(0);
   // Eye gaze streaks
-  const gazeAwayStreak      = useRef(0);
-  const eyesClosedStreak    = useRef(0);
+  const gazeAwayStreak = useRef(0);
+  const eyesClosedStreak = useRef(0);
   // Grace timer: track when no-face was first detected (ms timestamp)
   const noFaceGraceStartRef = useRef(null);
-  const GRACE_PERIOD_MS     = 5000;  // v3: 5 seconds grace before logging no-face violation
-  const MISMATCH_LOCKOUT    = 2;     // 2 consecutive mismatches → suspected impersonation violation
+  const GRACE_PERIOD_MS = 5000;  // v3: 5 seconds grace before logging no-face violation
+  const MISMATCH_LOCKOUT = 2;     // 2 consecutive mismatches → suspected impersonation violation
 
   // Initialization grace period (8 seconds) to prevent false focus/fullscreen flags while loading
-  const isInitializingRef   = useRef(true);
+  const isInitializingRef = useRef(true);
 
   useEffect(() => {
     isInitializingRef.current = true;
@@ -149,6 +149,7 @@ export const useProctoringEngine = ({
 
   // Initialize and stop camera stream with automatic retries for release delays
   const startCamera = async (retryCount = 0) => {
+    if (!isActiveRef.current || hasLockedOutRef.current) return;
     if (streamRef.current) return;
 
     // On the very first attempt, wait for the setup stream to fully release.
@@ -177,7 +178,7 @@ export const useProctoringEngine = ({
 
       streamRef.current = stream;
       setMediaStream(stream);
-      
+
       // Create hidden video element in the DOM for live face verification
       const video = document.createElement('video');
       video.width = 640;
@@ -200,23 +201,35 @@ export const useProctoringEngine = ({
       video.srcObject = stream;
       videoRef.current = video;
 
-      // Attach OFF-SCREEN/TINY (not display:none, which pauses decoding).
-      // Modern browsers optimize away off-screen elements (top: -9999px) and zero-opacity (opacity: 0) elements,
-      // suspending their video frame decoding. Placing it inside the viewport at 1x1 size, z-index -9999,
-      // and non-zero opacity (0.001) keeps decoding active while remaining completely invisible to the user.
+      // The detection video MUST stay inside the viewport — Chromium suspends
+      // frame decoding for any element positioned outside the viewport bounds
+      // (right: -9999px, top: -9999px, etc.), even with non-zero opacity.
+      // Solution: place it at a real decoded size (120×90 is enough for
+      // TinyFaceDetector's 320-px input), with opacity 0.001 and z-index -1
+      // so it is inside the viewport but completely invisible under all content.
+      //
+      // Corner choice matters: ProctoringOverlay renders a fully opaque panel
+      // fixed at bottom-right for the entire exam. Placing this video in that
+      // same corner put it permanently behind (and fully covered by) that
+      // panel, which is enough for some browsers to treat it as occluded and
+      // stop delivering fresh frames to the detector — the overlay's own
+      // preview (a separate <video> bound to the same stream) kept rendering
+      // live, so the face was visibly present while detection saw a frozen
+      // frame and reported "No Face Detected" forever. Top-left is empty on
+      // every exam route, so nothing ever stacks on top of it.
       video.setAttribute('aria-hidden', 'true');
       Object.assign(video.style, {
         position: 'fixed',
-        bottom: '0px',
-        right: '0px',
-        width: '1px',
-        height: '1px',
-        opacity: '0.001',
+        top: '0px',
+        left: '0px',
+        width: '640px',     // Match source resolution to prevent browser from downscaling video decoding quality
+        height: '480px',
+        opacity: '0.01',   // Non-zero keeps Chromium decoding frames
         pointerEvents: 'none',
-        zIndex: '-9999',
+        zIndex: '99999',   // Sit on top of all elements to prevent occlusion suspension
       });
       if (!video.isConnected) document.body.appendChild(video);
-      
+
       // Start playback immediately as a fail-safe
       video.play().catch(e => console.warn('[ProctoringEngine] Immediate play failed:', e.message));
 
@@ -252,9 +265,9 @@ export const useProctoringEngine = ({
         }
       }
     } catch (error) {
-      const isPermissionDenied = 
-        error.name === 'NotAllowedError' || 
-        error.name === 'PermissionDeniedError' || 
+      const isPermissionDenied =
+        error.name === 'NotAllowedError' ||
+        error.name === 'PermissionDeniedError' ||
         error.name === 'SecurityError';
 
       if (!isPermissionDenied && retryCount < 5) {
@@ -271,6 +284,11 @@ export const useProctoringEngine = ({
   };
 
   const stopCamera = useCallback(() => {
+    // Clear camera retry timeouts
+    if (cameraRetryTimeoutRef.current) {
+      clearTimeout(cameraRetryTimeoutRef.current);
+      cameraRetryTimeoutRef.current = null;
+    }
     // Stop tracks on the stream ref
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -414,8 +432,8 @@ export const useProctoringEngine = ({
   const scheduleAttentionCheck = useCallback(() => {
     if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
     if (!isActiveRef.current || hasLockedOutRef.current || !isCameraActive) return;
-    
-    const delay = Math.floor(Math.random() * 120000) + 150000; 
+
+    const delay = Math.floor(Math.random() * 120000) + 150000;
     attentionTimerRef.current = setTimeout(() => {
       if (isActiveRef.current && !hasLockedOutRef.current && isCameraActive) {
         setShowAttentionCheck(true);
@@ -463,6 +481,15 @@ export const useProctoringEngine = ({
   // Manages grace periods for no-face and multiple-face conditions.
   const runQuickFaceCheck = async () => {
     if (!videoRef.current || !isActiveRef.current || hasLockedOutRef.current) return;
+
+    console.log('[ProctoringEngine] Checking video state:', {
+      readyState: videoRef.current.readyState,
+      paused: videoRef.current.paused,
+      videoWidth: videoRef.current.videoWidth,
+      videoHeight: videoRef.current.videoHeight,
+      srcObject: !!videoRef.current.srcObject,
+    });
+
     if (videoRef.current.readyState < 2) {
       scheduleNextFaceCheck(QUICK_CHECK_INTERVAL_MS);
       return;
@@ -524,7 +551,7 @@ export const useProctoringEngine = ({
               eventType: 'face_absent_reminder',
               severity: 'info',
               details: 'Gentle reminder: face absent for 5+ seconds',
-            }).catch(() => {});
+            }).catch(() => { });
           }
         }
 
@@ -599,7 +626,7 @@ export const useProctoringEngine = ({
             status: result.status,
             framesCaptured: result.framesCaptured,
             warningIssued: false, // Will be updated below if a warning fires
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         // Handle batch result
@@ -680,14 +707,14 @@ export const useProctoringEngine = ({
       document.mozFullScreenElement ||
       document.msFullscreenElement
     );
-    
+
     setIsFullScreen(active);
 
     if (!active && isActiveRef.current && !hasLockedOutRef.current) {
       setFullscreenCountdown(15);
-      
+
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
-      
+
       fullscreenTimerRef.current = setInterval(() => {
         setFullscreenCountdown((prev) => {
           if (prev <= 1) {
@@ -741,8 +768,8 @@ export const useProctoringEngine = ({
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
       if (faceTimeoutRef.current) clearTimeout(faceTimeoutRef.current);
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
-      if (attentionTimerRef.current)  clearTimeout(attentionTimerRef.current);
-      if (batchIntervalRef.current)   clearInterval(batchIntervalRef.current);
+      if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
+      if (batchIntervalRef.current) clearInterval(batchIntervalRef.current);
       return;
     }
 
@@ -794,6 +821,19 @@ export const useProctoringEngine = ({
               details: `Face identity registered: ${allEmbs?.length || 1} embeddings persisted`
             }).catch(err => console.warn('[ProctoringEngine] Failed to log face_registered event:', err));
 
+            // Call saveRegistration to upload crop image to Cloudinary & save descriptor!
+            proctoringApi.saveRegistration(sessionId, {
+              embedding: Array.from(registeredFaceDescriptorRef.current),
+              model: registrationMetadataRef.current?.model || 'faceapi-128',
+              qualityScore: registrationMetadataRef.current?.qualityScore || 100,
+              framesCaptured: registrationMetadataRef.current?.framesCaptured || 3,
+              antispoofPassed: registrationMetadataRef.current?.antispoofPassed !== undefined ? registrationMetadataRef.current.antispoofPassed : true,
+              alignedCropUrl: registrationMetadataRef.current?.registrationCropUrl || null
+            }).then(regRes => {
+              if (regRes && regRes.success && regRes.referencePhotoUrl) {
+                console.log('[ProctoringEngine] ✅ Face registration & Cloudinary image saved to server:', regRes.referencePhotoUrl);
+              }
+            }).catch(err => console.error('[ProctoringEngine] Failed to save registration:', err));
           } else {
             console.warn('[ProctoringEngine] No face descriptor in memory. Attempting recovery from backend...');
             try {
@@ -819,7 +859,7 @@ export const useProctoringEngine = ({
       } catch (err) {
         console.error('Error starting proctoring session:', err);
         if (err.data && err.data.isLocked) {
-           navigate('/locked-out', { replace: true, state: { reason: 'Assessment Locked due to multiple violations. A support ticket has been raised for IT Support.' } });
+          navigate('/locked-out', { replace: true, state: { reason: 'Assessment Locked due to multiple violations. A support ticket has been raised for IT Support.' } });
         }
       }
     };
@@ -897,7 +937,7 @@ export const useProctoringEngine = ({
       window.removeEventListener('blur', onBlur);
       document.removeEventListener('fullscreenchange', onFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
-      
+
       activityEvents.forEach(event => {
         window.removeEventListener(event, onActivity);
       });
@@ -907,10 +947,10 @@ export const useProctoringEngine = ({
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
       if (batchIntervalRef.current) clearInterval(batchIntervalRef.current);
-      
+
       // Nuclear fix to ensure any running track is killed on unmount
       if (window.localStream) {
-         window.localStream.getTracks().forEach(t => t.stop());
+        window.localStream.getTracks().forEach(t => t.stop());
       }
 
       if (proctoringSessionIdRef.current) {
@@ -929,7 +969,7 @@ export const useProctoringEngine = ({
     isLockedOut,
     lastViolationType,
     acknowledgeWarning,
-    
+
     isCameraActive,
     isFaceDetected,
     faceCount,
@@ -947,7 +987,7 @@ export const useProctoringEngine = ({
     // Audio Monitor (NEW)
     isMicActive,
     isAudioCalibrated,
-    
+
     isFullScreen,
     fullscreenCountdown,
     requestFullscreen,

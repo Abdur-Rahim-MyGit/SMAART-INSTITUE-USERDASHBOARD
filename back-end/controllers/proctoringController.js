@@ -6,12 +6,12 @@ const fs = require('fs');
 // Private helper to calculate session risk score based on violations count & severity
 const calculateRiskScore = (violationsByType) => {
   let score = 0;
-  
+
   // Convert map or object to iterate
   const violations = violationsByType instanceof Map ? Object.fromEntries(violationsByType) : violationsByType;
-  
+
   if (!violations) return 0;
-  
+
   // Weight formula
   const weights = {
     tab_switch: 15,
@@ -36,13 +36,13 @@ const calculateRiskScore = (violationsByType) => {
     tracker_loss: 5,           // Low — brief tracking loss
     identity_confidence: 0,    // Info
   };
-  
+
   Object.keys(violations).forEach(type => {
     const count = violations[type] || 0;
     const weight = weights[type] || 10;
     score += count * weight;
   });
-  
+
   // Cap risk score at 100
   return Math.min(score, 100);
 };
@@ -60,11 +60,11 @@ exports.startSession = async (req, res) => {
     // Check if there is an existing locked session for this assessment and user
     const existingLockedSession = await ProctoringSession.findOne({ userId, assessmentId, isLocked: true });
     if (existingLockedSession) {
-      return res.status(403).json({ 
-        success: false, 
-        error: 'Assessment is locked. A support ticket is pending.', 
-        isLocked: true, 
-        activeTicketId: existingLockedSession.activeTicketId 
+      return res.status(403).json({
+        success: false,
+        error: 'Assessment is locked. A support ticket is pending.',
+        isLocked: true,
+        activeTicketId: existingLockedSession.activeTicketId
       });
     }
 
@@ -136,7 +136,7 @@ exports.logEvent = async (req, res) => {
       'verification_batch', 'face_absent_reminder',
     ];
     const metadataPayload = req.body.metadata || {};
-    
+
     if (infoOnlyEvents.includes(eventType)) {
       // Mark face registration on session
       if (eventType === 'face_registered') {
@@ -150,7 +150,7 @@ exports.logEvent = async (req, res) => {
     } else {
       // Increment violation counts on session
       session.totalViolations += 1;
-      
+
       // Update map counters
       const currentCount = session.violationsByType.get(eventType) || 0;
       session.violationsByType.set(eventType, currentCount + 1);
@@ -192,7 +192,7 @@ exports.completeSession = async (req, res) => {
     }
 
     session.completedAt = new Date();
-    
+
     // Keep as 'flagged' if already flagged, else 'completed'
     if (session.status === 'active') {
       session.status = session.riskScore >= 60 ? 'flagged' : 'completed';
@@ -214,7 +214,7 @@ exports.completeSession = async (req, res) => {
 exports.uploadSnapshot = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    
+
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' });
     }
@@ -299,7 +299,7 @@ exports.triggerLock = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { lockReason } = req.body;
-    
+
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
       return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
@@ -318,9 +318,9 @@ exports.triggerLock = async (req, res) => {
     const { createLog } = require('./logController');
     const { broadcastToAll, sendNotificationToUser } = require('../services/websocketService');
     const wsService = require('../services/websocketService'); // get user details
-    const User = require('../models/User'); 
+    const User = require('../models/User');
     const user = await User.findById(session.userId);
-    
+
     const newTicket = new SupportTicket({
       userId: session.userId,
       userModel: 'Student',
@@ -352,14 +352,14 @@ exports.webhookUnlock = async (req, res) => {
   try {
     const { ticketId, userId } = req.body;
     if (userId) {
-        const Notification = require('../models/Notification');
-        await Notification.createNotification({
-            userId,
-            title: 'Assessment Unlocked',
-            message: 'Your assessment has been unlocked by IT support. You may now resume.',
-            type: 'system',
-            metadata: { ticketId, action: 'assessment_unlocked' }
-        });
+      const Notification = require('../models/Notification');
+      await Notification.createNotification({
+        userId,
+        title: 'Assessment Unlocked',
+        message: 'Your assessment has been unlocked by IT support. You may now resume.',
+        type: 'system',
+        metadata: { ticketId, action: 'assessment_unlocked' }
+      });
     }
 
     res.status(200).json({ success: true });
@@ -404,15 +404,15 @@ exports.saveRegistration = async (req, res) => {
     }
 
     // Single merged embedding (backward compat)
-    session.faceEmbedding         = JSON.stringify(embedding);
-    session.faceEmbeddingModel    = model || 'arcface-r50-onnx';
-    session.faceEmbeddingDims     = 512;
+    session.faceEmbedding = JSON.stringify(embedding);
+    session.faceEmbeddingModel = model || 'arcface-r50-onnx';
+    session.faceEmbeddingDims = 512;
     session.faceRegistrationQuality = qualityScore ?? null;
-    session.faceRegistrationFrames  = framesCaptured ?? null;
-    session.antispoofPassed         = antispoofPassed ?? null;
-    session.faceAlignedCropUrl      = alignedCropUrl || null;
-    session.faceRegistered          = true;
-    session.faceRegisteredAt        = new Date();
+    session.faceRegistrationFrames = framesCaptured ?? null;
+    session.antispoofPassed = antispoofPassed ?? null;
+    session.faceAlignedCropUrl = alignedCropUrl || null;
+    session.faceRegistered = true;
+    session.faceRegisteredAt = new Date();
 
     // v3: Store all 5 individual embeddings for multi-reference verification
     if (allEmbeddings && Array.isArray(allEmbeddings) && allEmbeddings.length > 0) {

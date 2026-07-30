@@ -75,6 +75,9 @@ const Certificate = () => {
     const [certId, setCertId] = useState('');
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [earnedCerts, setEarnedCerts] = useState([]);
+    const [certsLoaded, setCertsLoaded] = useState(false);
+    const [activeCert, setActiveCert] = useState(null);
     const [scale, setScale] = useState(1);
     const containerRef = useRef(null);
 
@@ -110,68 +113,49 @@ const Certificate = () => {
         }
     }, [activeTab, refreshUser]);
 
-    // Generate certificate and QR code when type is selected
+    // Load the certificates the student has actually EARNED (issued on assessment pass).
     useEffect(() => {
-        if (selectedType) {
-            generateCertificate();
-        }
-    }, [selectedType]);
+        (async () => {
+            try {
+                const res = await apiCall('/certificates/my-certificates');
+                if (res?.certificates) setEarnedCerts(res.certificates);
+            } catch (error) {
+                console.error('Failed to load certificates:', error);
+            } finally {
+                setCertsLoaded(true);
+            }
+        })();
+    }, []);
 
-    const generateCertificate = async () => {
+    const isEarned = (typeId) => earnedCerts.some(c => c.certificateType === typeId);
+
+    // When a type is opened, show the real earned certificate (no minting).
+    useEffect(() => {
+        if (!selectedType || !certsLoaded) return;
+        const earned = earnedCerts.find(c => c.certificateType === selectedType.id);
+        if (!earned) {
+            toast.error('You have not earned this certificate yet. Pass the corresponding assessment to unlock it.');
+            setSelectedType(null);
+            return;
+        }
+        openCertificate(earned);
+    }, [selectedType, certsLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const openCertificate = async (cert) => {
         setIsGenerating(true);
         try {
-            // Issue certificate through backend
-            const response = await apiCall('/certificates/issue', {
-                method: 'POST',
-                body: JSON.stringify({
-                    certificateType: selectedType.id,
-                    certificateTitle: selectedType.title,
-                    validatedSkills: skills.map(s => ({ label: s.label, score: 85 })),
-                    readinessBand: 'Proficient',
-                    assessmentWindow: `TST-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
-                })
-            });
-
-            if (response.success) {
-                const { certificateId } = response.certificate;
-                setCertId(certificateId);
-
-                // Always use dynamic local origin so scanning the QR in dev points to localhost
-                const dynamicUrl = `${window.location.origin}/verify-certificate/${certificateId}`;
-
-                // Generate QR code with verification URL
-                const qrDataUrl = await QRCode.toDataURL(dynamicUrl, {
-                    width: 150,
-                    margin: 1,
-                    color: {
-                        dark: '#002147',
-                        light: '#FFFFFF'
-                    }
-                });
-                setQrCodeDataUrl(qrDataUrl);
-
-                toast.success('Certificate generated successfully!');
-            }
-        } catch (error) {
-            console.error('Error generating certificate:', error);
-            toast.error('Failed to generate certificate. Please try again.');
-
-            // Fallback to local generation if backend fails
-            const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-            const year = new Date().getFullYear();
-            const fallbackId = `SMAART-${selectedType.code}-${year}-${randomStr}`;
-            setCertId(fallbackId);
-
-            const fallbackUrl = `${window.location.origin}/verify-certificate/${fallbackId}`;
-            const qrDataUrl = await QRCode.toDataURL(fallbackUrl, {
+            setActiveCert(cert);
+            setCertId(cert.certificateId);
+            const dynamicUrl = `${window.location.origin}/verify-certificate/${cert.certificateId}`;
+            const qrDataUrl = await QRCode.toDataURL(dynamicUrl, {
                 width: 150,
                 margin: 1,
-                color: {
-                    dark: '#002147',
-                    light: '#FFFFFF'
-                }
+                color: { dark: '#002147', light: '#FFFFFF' }
             });
             setQrCodeDataUrl(qrDataUrl);
+        } catch (error) {
+            console.error('Error preparing certificate:', error);
+            toast.error('Failed to open certificate. Please try again.');
         } finally {
             setIsGenerating(false);
         }
@@ -309,37 +293,54 @@ const Certificate = () => {
                 >
                     <div className="space-y-8 animate-fade-in">
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                            {certificateTypes.map((cert) => (
+                            {certificateTypes.map((cert) => {
+                                const earned = isEarned(cert.id);
+                                return (
                                 <button
                                     key={cert.id}
-                                    onClick={() => setSelectedType(cert)}
-                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 sm:p-5 text-left transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
+                                    onClick={() => {
+                                        if (earned) {
+                                            setSelectedType(cert);
+                                        } else {
+                                            toast.error('Not yet earned — pass the corresponding assessment to unlock this certificate.');
+                                        }
+                                    }}
+                                    className={`group flex flex-col items-start gap-4 rounded-xl border p-4 sm:p-5 text-left transition-all ${earned
+                                        ? 'border-[#d8e6f7] bg-[#f5f8ff] hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]'
+                                        : 'border-dashed border-slate-200 bg-slate-50/60 opacity-70 dark:border-white/10 dark:bg-white/[0.02]'}`}
                                 >
                                     <div className="flex w-full items-start justify-between gap-4">
-                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
-                                            <Award className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
+                                        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-transform ${earned ? 'bg-[#eef4ff] border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 group-hover:scale-105' : 'bg-slate-100 border-slate-200 dark:bg-white/5 dark:border-white/10'}`}>
+                                            <Award className={`h-6 w-6 ${earned ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-400'}`} />
                                         </div>
-                                        <div className="flex h-8 items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
-                                            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-                                            Verified
-                                        </div>
+                                        {earned ? (
+                                            <div className="flex h-8 items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
+                                                <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                                                Earned
+                                            </div>
+                                        ) : (
+                                            <div className="flex h-8 items-center rounded-lg border border-slate-200 bg-slate-100 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:border-white/10 dark:bg-white/5">
+                                                Locked
+                                            </div>
+                                        )}
                                     </div>
-                                    
+
                                     <div className="mt-2">
-                                        <h3 className="mb-2 text-[15px] font-extrabold leading-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400">
+                                        <h3 className={`mb-2 text-[15px] font-extrabold leading-tight transition-colors ${earned ? 'text-[#0d1f4e] group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`}>
                                             {cert.title}
                                         </h3>
-                                        <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400">Level 1 Professional Credential</p>
+                                        <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400">{cert.level} Professional Credential</p>
                                     </div>
 
                                     <div className="mt-2 flex w-full items-center justify-between border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20">
-                                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a3884] dark:text-blue-400">
-                                            View Secure Document
+                                        <span className={`text-[11px] font-bold uppercase tracking-wider ${earned ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-400'}`}>
+                                            {earned ? 'View Secure Document' : 'Pass assessment to unlock'}
                                         </span>
-                                        <span className="text-lg text-[#1a3884] transition-transform group-hover:translate-x-1 dark:text-blue-400">→</span>
+                                        {earned && <span className="text-lg text-[#1a3884] transition-transform group-hover:translate-x-1 dark:text-blue-400">→</span>}
                                     </div>
                                 </button>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         {/* Verify Actions */}
@@ -364,6 +365,13 @@ const Certificate = () => {
 
     // --- RENDER CERTIFICATE VIEW ---
     const verificationUrl = qrCodeDataUrl ? `${window.location.origin}/verify-certificate/${certId}` : '';
+    const displayName = (activeCert?.fullName || userData.fullName || '').toUpperCase();
+    const displayBand = activeCert?.readinessBand || 'Proficient';
+    const displayWindow = activeCert?.assessmentWindow || certId || 'TST';
+    const displayAuthority = activeCert?.issuingAuthority || 'SMAART UK';
+    const displayIssueDate = activeCert?.issueDate
+        ? new Date(activeCert.issueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+        : issueDate;
 
     let courseList = [];
     if (selectedType) {
@@ -440,7 +448,7 @@ const Certificate = () => {
                                 <section className="recipient-block">
                                     <div className="this-certifies">This certifies that</div>
                                     <div className={`recipient-name ${selectedType.id === 'combined' ? 'combined-recipient' : ''}`}>
-                                        {userData.fullName.toUpperCase()}
+                                        {displayName}
                                     </div>
                                 </section>
 
@@ -498,15 +506,15 @@ const Certificate = () => {
                                         <div className="readiness-content">
                                             <div className="readiness-stat">
                                                 <span className="stat-label">Readiness Band</span>
-                                                <span className="stat-value band">Proficient</span>
+                                                <span className="stat-value band">{displayBand}</span>
                                             </div>
                                             <div className="readiness-stat">
                                                 <span className="stat-label">Assessment Window</span>
-                                                <span className="stat-value">TST-2025-003</span>
+                                                <span className="stat-value">{displayWindow}</span>
                                             </div>
                                             <div className="readiness-stat">
                                                 <span className="stat-label">Issuing Authority</span>
-                                                <span className="stat-value uppercase">SMAART UK</span>
+                                                <span className="stat-value uppercase">{displayAuthority}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -519,7 +527,7 @@ const Certificate = () => {
                                     <div className="signature-name">Ms. Rehana Banu Ameer</div>
                                     <div className="signature-title">Director of Academic Quality</div>
                                     <div className="signature-org">SMAART Institute (UK)</div>
-                                    <div className="issue-date">Issued this day: {issueDate}</div>
+                                    <div className="issue-date">Issued this day: {displayIssueDate}</div>
                                 </div>
 
                                 <div className="verification-zone">
