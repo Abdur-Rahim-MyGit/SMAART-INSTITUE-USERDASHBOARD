@@ -540,56 +540,7 @@ export const computeAverageDescriptor = (descriptors) => {
   return sum.map(v => v / descriptors.length);
 };
 
-export const verifyFaceBatch = async (videoEl, allEmbeddings, options = {}) => {
-  const { frameCount = 3, intervalMs = 400 } = options;
-  if (!allEmbeddings || allEmbeddings.length === 0) {
-    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, faceCount: 0, framesCaptured: 0, error: 'No embeddings provided' };
-  }
-  
-  // Use the first embedding as reference
-  const reference = allEmbeddings[0];
-  let bestSim = 0;
-  let sumSim = 0;
-  let finalStatus = VerificationStatus.NO_FACE;
-  let finalFaceCount = 0;
-  let framesCaptured = 0;
-  
-  for (let i = 0; i < frameCount; i++) {
-    const res = await verifyFace(videoEl, reference);
-    if (res.status === VerificationStatus.ERROR) {
-      return res; // immediate fail
-    }
-    
-    framesCaptured++;
-    
-    if (res.status === VerificationStatus.VERIFIED) {
-      bestSim = Math.max(bestSim, res.similarity);
-      return {
-        status: VerificationStatus.VERIFIED,
-        bestSimilarity: bestSim,
-        avgSimilarity: bestSim,
-        faceCount: 1,
-        framesCaptured
-      };
-    }
-    
-    // Accumulate best
-    bestSim = Math.max(bestSim, res.similarity || 0);
-    sumSim += (res.similarity || 0);
-    finalStatus = res.status;
-    finalFaceCount = res.faceCount;
-    
-    await new Promise(r => setTimeout(r, intervalMs));
-  }
-  
-  return {
-    status: finalStatus,
-    bestSimilarity: bestSim,
-    avgSimilarity: sumSim / frameCount,
-    faceCount: finalFaceCount,
-    framesCaptured
-  };
-};
+// (duplicate verifyFaceBatch removed — use the primary export above)
 
 /** Fast detection with landmarks but without face descriptor computation. */
 export const detectFacesWithLandmarks = detectFaces;

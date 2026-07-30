@@ -1170,7 +1170,7 @@ router.post('/applications/:id/respond-offer', protect, async (req, res) => {
     }
 
     const { id } = req.params;
-    const { status, eSignature } = req.body;
+    const { status, eSignature, declineReason } = req.body;
 
     if (!['Accepted', 'Declined'].includes(status)) {
       return res.status(400).json({ success: false, error: 'Invalid response status' });
@@ -1202,6 +1202,8 @@ router.post('/applications/:id/respond-offer', protect, async (req, res) => {
     if (status === 'Accepted') {
         updateData.eSignature = eSignature.trim();
         updateData.signatureDate = new Date();
+    } else if (status === 'Declined' && declineReason) {
+        updateData.declineReason = declineReason.trim();
     }
 
     await applicationCollection.updateOne(

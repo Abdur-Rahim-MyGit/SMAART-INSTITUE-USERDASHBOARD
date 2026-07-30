@@ -86,10 +86,12 @@ const getDocumentUrl = (job) => {
 };
 
 const formatStatus = (value, t) => {
-  if (!value) return t("placement.open", "Open");
-  const norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (!value) return t("placement.active", "Active");
+  let norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (norm === 'open') norm = 'active';
+  if (norm === 'closed') norm = 'inactive';
   const key = `placement.status_${norm}`;
-  const fallback = String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  const fallback = String(norm).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
   return t(key, fallback);
 };
 

@@ -556,10 +556,10 @@ export const placementsAPI = {
   deleteApplication: async (applicationId) => {
     return apiCall(`/placements/applications/${encodeURIComponent(applicationId)}`, { method: 'DELETE' });
   },
-  updateApplicationStatus: async (applicationId, status, eSignature = null) => {
+  updateApplicationStatus: async (applicationId, status, eSignature = null, declineReason = null) => {
     return apiCall(`/placements/applications/${encodeURIComponent(applicationId)}/respond-offer`, { 
       method: 'POST',
-      body: JSON.stringify({ status, eSignature })
+      body: JSON.stringify({ status, eSignature, declineReason })
     });
   },
   applyJob: async (source, id, payload) => {

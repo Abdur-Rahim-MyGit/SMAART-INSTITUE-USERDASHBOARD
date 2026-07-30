@@ -10,6 +10,8 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
   const [isProcessing, setIsProcessing] = useState(false);
   const [signatureText, setSignatureText] = useState("");
   const [showSignatureInput, setShowSignatureInput] = useState(false);
+  const [declineReason, setDeclineReason] = useState("");
+  const [showDeclineInput, setShowDeclineInput] = useState(false);
 
   if (!isOpen || !application) return null;
 
@@ -18,7 +20,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
     if (status === 'Accepted') {
       await onAccept(application._id || application.id, signatureText);
     } else if (status === 'Declined') {
-      await onDecline(application._id || application.id);
+      await onDecline(application._id || application.id, declineReason);
     } else if (status === 'In Progress') {
       if (onKeepInProgress) {
         await onKeepInProgress(application._id || application.id);
@@ -50,6 +52,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
     if (companyLogo && companyLogo.trim() !== '') return companyLogo;
     if (companyName) {
       const lowerName = companyName.toLowerCase();
+      if (lowerName.includes('smaart')) return '/smaart-logo.png';
       if (lowerName.includes('google')) return 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg';
       if (lowerName.includes('microsoft')) return 'https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg';
       if (lowerName.includes('amazon')) return 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg';
@@ -71,6 +74,11 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
   const handleInitiateAccept = () => {
     setShowSignatureInput(true);
     setSignatureText(candidateName);
+  };
+
+  const handleInitiateDecline = () => {
+    setShowDeclineInput(true);
+    setDeclineReason("");
   };
 
   return (
@@ -185,7 +193,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
               <div className="mt-16 flex justify-between pt-8">
                 <div className="text-center">
                   <div className="mb-2 h-12 flex items-end justify-center">
-                    <span className="signature-font text-4xl text-[#002147] dark:text-blue-300 opacity-90 pr-4" style={{ transform: 'rotate(-3deg)' }}>
+                    <span className="signature-font text-4xl text-black dark:text-white opacity-90 pr-4" style={{ transform: 'rotate(-3deg)' }}>
                       {recruiterSignature}
                     </span>
                   </div>
@@ -197,7 +205,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
                 <div className={`text-center transition-opacity duration-300 ${(application.status === 'Accepted' || signatureText) ? 'opacity-100' : 'opacity-40'}`}>
                   <div className="h-12 flex items-end justify-center mb-2">
                     {signatureText ? (
-                      <span className="signature-font text-4xl text-emerald-800 dark:text-emerald-300 pl-4" style={{ transform: 'rotate(-2deg)' }}>
+                      <span className="signature-font text-4xl text-black dark:text-white pl-4" style={{ transform: 'rotate(-2deg)' }}>
                         {signatureText}
                       </span>
                     ) : null}
@@ -218,7 +226,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
               </p>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
                 <button
-                  onClick={() => handleAction('Declined')}
+                  onClick={handleInitiateDecline}
                   disabled={isProcessing}
                   className="flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-5 py-2.5 text-[13px] font-semibold text-rose-600 shadow-sm hover:bg-rose-50 hover:border-rose-300 dark:border-rose-900/50 dark:bg-slate-800 dark:text-rose-400 dark:hover:bg-rose-900/20 whitespace-nowrap transition-all focus:ring-2 focus:ring-rose-500/20 outline-none"
                 >
@@ -244,7 +252,6 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
             </div>
           </div>
 
-          {/* Dedicated Signature Overlay */}
           <AnimatePresence>
             {showSignatureInput && (
               <motion.div 
@@ -279,7 +286,7 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
                           <div className="flex justify-between items-end px-2 pt-2">
                               <div className="text-xs text-slate-500 font-medium pb-2">Signature Preview:</div>
                               {signatureText ? (
-                                  <div className="signature-font text-3xl text-emerald-700 dark:text-emerald-400 tracking-wide" style={{ transform: 'rotate(-2deg)' }}>
+                                  <div className="signature-font text-3xl text-black dark:text-white tracking-wide" style={{ transform: 'rotate(-2deg)' }}>
                                       {signatureText}
                                   </div>
                               ) : (
@@ -308,6 +315,62 @@ const OfferLetterModal = ({ isOpen, onClose, application, onAccept, onDecline, o
                     >
                       <IconCheck size={18} stroke={3} />
                       {isProcessing ? 'Processing...' : 'Sign & Accept'}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+
+            {showDeclineInput && (
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-6"
+              >
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                  className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-8 border border-slate-200 dark:border-slate-700"
+                >
+                  <h3 className="text-2xl font-black text-rose-600 mb-2 tracking-tight">Decline Offer</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium">
+                    Please provide a reason for declining this employment offer. This feedback helps us and the employer.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Reason for Declining</label>
+                      <textarea 
+                          rows={4}
+                          placeholder="Why are you declining this offer? (e.g. Compensation, Location, Accepted another offer...)"
+                          className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all resize-none"
+                          value={declineReason}
+                          onChange={(e) => setDeclineReason(e.target.value)}
+                          autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-8">
+                    <button
+                      onClick={() => {
+                        setShowDeclineInput(false);
+                        setDeclineReason("");
+                      }}
+                      disabled={isProcessing}
+                      className="flex-1 px-4 py-3 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleAction('Declined')}
+                      disabled={isProcessing || !declineReason.trim()}
+                      className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-sm font-bold text-white hover:bg-rose-700 disabled:opacity-50 transition-colors shadow-lg shadow-rose-600/20"
+                    >
+                      <IconCross size={18} stroke={3} />
+                      {isProcessing ? 'Processing...' : 'Confirm Decline'}
                     </button>
                   </div>
                 </motion.div>

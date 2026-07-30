@@ -80,10 +80,12 @@ const getCompanyLogo = (job) => {
 };
 
 const formatStatus = (value, t) => {
-  if (!value) return t("placement.open", "Open");
-  const norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (!value) return t("placement.active", "Active");
+  let norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (norm === 'open') norm = 'active';
+  if (norm === 'closed') norm = 'inactive';
   const key = `placement.status_${norm}`;
-  const fallback = String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  const fallback = String(norm).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
   return t(key, fallback);
 };
 
@@ -362,10 +364,10 @@ const Placement = () => {
 
   const rolesSummary = loading
     ? t("placement.loading_roles", "Loading opportunities…")
-    : t("placement.open_roles_summary", {
+    : t("placement.active_roles_summary", {
         count: jobs.length,
         companies: companyCount,
-        defaultValue: `${jobs.length} roles from ${companyCount} companies`,
+        defaultValue: `${jobs.length} active roles from ${companyCount} companies`,
       });
   
   const internships = useMemo(() => jobs.filter(job => normalizeJobType(job) === 'internship').slice(0, 6), [jobs]);
@@ -383,9 +385,9 @@ const Placement = () => {
     }
   };
 
-  const handleUpdateStatus = async (applicationId, newStatus, eSignature = null) => {
+  const handleUpdateStatus = async (applicationId, newStatus, eSignature = null, declineReason = null) => {
     try {
-      await placementsAPI.updateApplicationStatus(applicationId, newStatus, eSignature);
+      await placementsAPI.updateApplicationStatus(applicationId, newStatus, eSignature, declineReason);
       toast({ title: t("placement.status_updated", "Status Updated"), description: `Offer ${newStatus.toLowerCase()} successfully.` });
       fetchApplied();
     } catch (err) {
@@ -410,6 +412,123 @@ const Placement = () => {
     if (!confirmAppId) return;
     await handleWithdraw(confirmAppId);
     closeConfirm();
+  };
+
+  const renderStatusCards = () => {
+    const renderCard = (app, origIdx) => {
+      const jobRef = app.job || app.jobId || app.jobPosting || {};
+      const title = app.jobTitle || app.displayTitle || (jobRef && jobRef.displayTitle) || 'Role';
+      const companyName = app.companyName || app.displayCompany || (jobRef && jobRef.displayCompany) || 'Company';
+      const displayType = app.displayType || (jobRef && (jobRef.displayType || jobRef.type)) || app.jobType || '';
+      const jobObj = jobRef && typeof jobRef === 'object' ? jobRef : {};
+      const companyLogo = getCompanyLogo(jobObj) || getCompanyLogo(app) || null;
+      const companyInitial = (companyName || 'C').trim().charAt(0).toUpperCase();
+      const appliedAt = app.appliedAt || app.createdAt;
+      const statusLabel = formatStatus(app.status || app.applicationStatus || 'applied', t);
+      const jobRemoved = app.jobRemoved === true;
+      const appSource = app.jobSource || jobObj.sourceCollection || '';
+      const isSmaartApp = jobObj.displaySource
+        ? jobObj.displaySource === 'smaart'
+        : app.displaySource
+          ? app.displaySource === 'smaart'
+          : appSource === 'smaartjobpostings' || /smaart/i.test(app.postingOrigin || '');
+      const isSmaartJobFairFallback = (appSource === 'jobpostings' || jobObj?.sourceCollection === 'jobpostings') && isSmaartApp;
+      const isJobFair = !!(app.jobFairId || app.jobFair || jobObj.jobFairId || jobObj.jobFair || jobObj.displayJobFairTitle || isSmaartJobFairFallback || /job[\s-]?fair/i.test(app.postingOrigin || '') || /job[\s-]?fair/i.test(jobObj.postingOrigin || '') || app.interviewLocation === 'Booth' || (app.statusHistory && app.statusHistory.some(h => /job[\s-]?fair/i.test(h.note))));
+      let sourceLabel = app.postingOrigin || '';
+      if (isJobFair) {
+        sourceLabel = isSmaartApp ? t("placement.source_smaart_job_fair", "SMAART JOB FAIR") : t("placement.source_college_job_fair", "COLLEGE JOB FAIR");
+      } else if (appSource) {
+        sourceLabel = isSmaartApp ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "COLLEGE");
+      }
+
+      // card key
+      const cardId = app._id || app.id || origIdx;
+      return (
+        <motion.article
+          key={cardId}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: Math.min(origIdx * 0.03, 0.3) }}
+          className="relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60"
+        >
+          {/* Header: logo + title + company */}
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
+              {companyLogo ? (
+                <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1.5" />
+              ) : (
+                <span>{companyInitial}</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 title={title} className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{title}</h2>
+              <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">{companyName}</p>
+            </div>
+            {sourceLabel && (
+              <span className={`mt-0.5 shrink-0 rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
+                isSmaartApp
+                  ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
+                  : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+              }`}>
+                {sourceLabel}
+              </span>
+            )}
+          </div>
+          <div className="mt-4 grow space-y-[7px] text-[13px] leading-tight text-slate-600 dark:text-slate-300">
+            {displayType && (
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+                <span className="truncate">{displayType}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+              <span className="truncate">{t("placement.applied", "Applied")} {formatDate(appliedAt, t)}</span>
+            </div>
+            {jobRemoved && (
+              <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+                <Building className="h-[15px] w-[15px] shrink-0" stroke={1.6} />
+                <span className="truncate">{t("placement.posting_removed", "Posting no longer listed")}</span>
+              </div>
+            )}
+          </div>
+          {app.status === 'Offer' && app.offeredPackage ? (
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#1a3884]/20">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-emerald-600 dark:text-emerald-400">{t("placement.offer_received", "Offer Received 🎉")}</span>
+                <span className="truncate text-[13.5px] font-semibold text-emerald-700 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</span>
+              </div>
+              <button
+                onClick={() => setOfferModalApp(app)}
+                className="h-8 shrink-0 rounded-lg bg-emerald-600 px-3.5 text-[12.5px] font-medium text-white transition-colors hover:bg-emerald-700"
+              >
+                {t("placement.view_offer_letter", "View Offer Letter")}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-[#1a3884]/20">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
+                <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
+              </div>
+              {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
+                <button
+                  onClick={() => openConfirm(app._id || app.id, title)}
+                  className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                >
+                  {t("placement.withdraw", "Withdraw")}
+                </button>
+              )}
+            </div>
+          )}
+        </motion.article>
+      );
+    };
+    return (
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {appliedJobs.map((app, origIdx) => renderCard(app, origIdx))}
+      </div>
+    );
   };
 
   return (
@@ -812,129 +931,8 @@ const Placement = () => {
                   {t("placement.browse_jobs", "Browse Jobs")}
                 </button>
               </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {appliedJobs.map((app, index) => {
-                  const jobRef = app.job || app.jobId || app.jobPosting || {};
-                  const title = app.jobTitle || app.displayTitle || (jobRef && jobRef.displayTitle) || 'Role';
-                  const companyName = app.companyName || app.displayCompany || (jobRef && jobRef.displayCompany) || 'Company';
-                  const displayType = app.displayType || (jobRef && (jobRef.displayType || jobRef.type)) || app.jobType || '';
-                  // jobRef is only an object once the posting resolves; a deleted posting
-                  // leaves a bare id, so guard before reading any nested field off it.
-                  const jobObj = jobRef && typeof jobRef === 'object' ? jobRef : {};
-                  const companyLogo = getCompanyLogo(jobObj) || getCompanyLogo(app) || null;
-                  const companyInitial = (companyName || 'C').trim().charAt(0).toUpperCase();
-                  const appliedAt = app.appliedAt || app.createdAt;
-                  const statusLabel = formatStatus(app.status || app.applicationStatus || 'applied', t);
-                  const jobRemoved = app.jobRemoved === true;
-                  const appSource = app.jobSource || jobObj.sourceCollection || '';
-                  const isSmaartApp = jobObj.displaySource
-                    ? jobObj.displaySource === 'smaart'
-                    : app.displaySource
-                      ? app.displaySource === 'smaart'
-                      : appSource === 'smaartjobpostings' || /smaart/i.test(app.postingOrigin || '');
-                  // Detect Job Fair: check jobFairId, postingOrigin, or interviewLocation
-                  // Also, if it's a smaart job but in the college jobpostings collection, it's definitely a SMAART Job Fair
-                  const isSmaartJobFairFallback = (appSource === 'jobpostings' || jobObj?.sourceCollection === 'jobpostings') && isSmaartApp;
-                  const isJobFair = !!(app.jobFairId || app.jobFair || jobObj.jobFairId || jobObj.jobFair || jobObj.displayJobFairTitle || isSmaartJobFairFallback || /job[\s-]?fair/i.test(app.postingOrigin || '') || /job[\s-]?fair/i.test(jobObj.postingOrigin || '') || app.interviewLocation === 'Booth' || (app.statusHistory && app.statusHistory.some(h => /job[\s-]?fair/i.test(h.note))));
-                  
-                  let sourceLabel = app.postingOrigin || '';
-                  if (isJobFair) {
-                    sourceLabel = isSmaartApp ? t("placement.source_smaart_job_fair", "SMAART JOB FAIR") : t("placement.source_college_job_fair", "COLLEGE JOB FAIR");
-                  } else if (appSource) {
-                    sourceLabel = isSmaartApp ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "COLLEGE");
-                  }
+            ) : renderStatusCards()}
 
-                  return (
-                    <motion.article
-                      key={app._id || app.id || index}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className="relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60"
-                    >
-                      {/* Header: logo + title + company */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
-                          {companyLogo ? (
-                            <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1.5" />
-                          ) : (
-                            <span>{companyInitial}</span>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h2 title={title} className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{title}</h2>
-                          <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">{companyName}</p>
-                        </div>
-                        {sourceLabel && (
-                          <span className={`mt-0.5 shrink-0 rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
-                            isSmaartApp
-                              ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
-                              : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
-                          }`}>
-                            {sourceLabel}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mt-4 space-y-[7px] text-[13px] leading-tight text-slate-600 dark:text-slate-300">
-                        {displayType && (
-                          <div className="flex items-center gap-2">
-                            <Briefcase className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                            <span className="truncate">{displayType}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                          <span className="truncate">{t("placement.applied", "Applied")} {formatDate(appliedAt, t)}</span>
-                        </div>
-                        {jobRemoved && (
-                          <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                            <Building className="h-[15px] w-[15px] shrink-0" stroke={1.6} />
-                            <span className="truncate">{t("placement.posting_removed", "Posting no longer listed")}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {app.status === 'Offer' && app.offeredPackage ? (
-                        <div className="mt-4 rounded-lg border border-emerald-200/70 bg-emerald-50/70 p-4 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07]">
-                          <div className="mb-2 flex items-center justify-between gap-2">
-                            <h4 className="text-[13.5px] font-semibold text-emerald-800 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</h4>
-                            <span className="shrink-0 rounded-md bg-emerald-100 px-2 py-[3px] text-[10.5px] font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
-                              {t("placement.action_required", "Action required")}
-                            </span>
-                          </div>
-                          <p className="mb-3.5 text-[12.5px] leading-snug text-emerald-800/80 dark:text-emerald-400/90">
-                            You have been offered the position of {title} at {companyName}. View the official offer letter to respond.
-                          </p>
-                          <button
-                            onClick={() => setOfferModalApp(app)}
-                            className="h-9 w-full rounded-lg bg-emerald-600 text-[13px] font-medium text-white transition-colors hover:bg-emerald-700"
-                          >
-                            {t("placement.view_offer_letter", "View Offer Letter")}
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-                          <div className="flex min-w-0 flex-col gap-0.5">
-                            <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
-                            <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
-                          </div>
-                          {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
-                            <button
-                              onClick={() => openConfirm(app._id || app.id, title)}
-                              className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-                            >
-                              {t("placement.withdraw", "Withdraw")}
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </motion.article>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
 
@@ -1213,10 +1211,10 @@ const Placement = () => {
           onClose={() => setOfferModalApp(null)}
           application={offerModalApp}
           onAccept={(id, signature) => handleUpdateStatus(id, 'Accepted', signature)}
-          onDecline={(id) => handleUpdateStatus(id, 'Declined')}
+          onDecline={(id, reason) => handleUpdateStatus(id, 'Declined', null, reason)}
           onKeepInProgress={(id) => handleUpdateStatus(id, 'In Progress')}
           companyName={offerModalApp ? (offerModalApp.job?.companyName || offerModalApp.job?.displayCompany || offerModalApp.job?.company?.name || 'Company Name') : ''}
-          companyLogo={offerModalApp ? (offerModalApp.job?.companyLogo || offerModalApp.job?.displayLogo || offerModalApp.job?.company?.logo) : null}
+          companyLogo={offerModalApp && offerModalApp.job ? getCompanyLogo(offerModalApp.job) : null}
         />
       </div>
     </div>
