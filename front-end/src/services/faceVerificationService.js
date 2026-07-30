@@ -114,6 +114,7 @@ export const detectFaces = async (videoEl, _disableOpts = false) => {
 
 // detectFacesLegacy — backward compat wrapper
 export const detectFacesLegacy = detectFaces;
+export const detectFacesFast = detectFaces;
 
 // ─── Internal errors used for hard-stop conditions ────────────────────────────
 const ERR_NO_FACE      = 'NO_FACE_DETECTED';
@@ -377,20 +378,53 @@ export const computeAverageDescriptor = (descriptors) => {
   return sum.map(v => v / descriptors.length);
 };
 
-/** Capture the face region as a small Data URL for audit/display. */
-const captureAlignedCrop = (videoEl, box) => {
-  try {
-    const c = document.createElement('canvas');
-    const pad = 0.3;
-    const x = Math.max(0, box.x - box.width * pad);
-    const y = Math.max(0, box.y - box.height * pad);
-    const w = Math.min(videoEl.videoWidth - x, box.width * (1 + 2 * pad));
-    const h = Math.min(videoEl.videoHeight - y, box.height * (1 + 2 * pad));
-    c.width = 128;
-    c.height = 128;
-    c.getContext('2d').drawImage(videoEl, x, y, w, h, 0, 0, 128, 128);
-    return c.toDataURL('image/jpeg', 0.8);
-  } catch {
-    return null;
+export const verifyFaceBatch = async (videoEl, allEmbeddings, options = {}) => {
+  const { frameCount = 3, intervalMs = 400 } = options;
+  if (!allEmbeddings || allEmbeddings.length === 0) {
+    return { status: VerificationStatus.ERROR, bestSimilarity: 0, avgSimilarity: 0, faceCount: 0, framesCaptured: 0, error: 'No embeddings provided' };
   }
+  
+  // Use the first embedding as reference
+  const reference = allEmbeddings[0];
+  let bestSim = 0;
+  let sumSim = 0;
+  let finalStatus = VerificationStatus.NO_FACE;
+  let finalFaceCount = 0;
+  let framesCaptured = 0;
+  
+  for (let i = 0; i < frameCount; i++) {
+    const res = await verifyFace(videoEl, reference);
+    if (res.status === VerificationStatus.ERROR) {
+      return res; // immediate fail
+    }
+    
+    framesCaptured++;
+    
+    if (res.status === VerificationStatus.VERIFIED) {
+      bestSim = Math.max(bestSim, res.similarity);
+      return {
+        status: VerificationStatus.VERIFIED,
+        bestSimilarity: bestSim,
+        avgSimilarity: bestSim,
+        faceCount: 1,
+        framesCaptured
+      };
+    }
+    
+    // Accumulate best
+    bestSim = Math.max(bestSim, res.similarity || 0);
+    sumSim += (res.similarity || 0);
+    finalStatus = res.status;
+    finalFaceCount = res.faceCount;
+    
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+  
+  return {
+    status: finalStatus,
+    bestSimilarity: bestSim,
+    avgSimilarity: sumSim / frameCount,
+    faceCount: finalFaceCount,
+    framesCaptured
+  };
 };

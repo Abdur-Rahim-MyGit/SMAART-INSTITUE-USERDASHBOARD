@@ -249,6 +249,12 @@ const SkillsPassportModal = ({ onClose, currentUser, baselineResult }) => {
                         AI Verified <span className="ml-1 font-medium text-slate-500 dark:text-slate-400">• {verifiedDate}</span>
                     </div>
                 </div>
+
+                <div className="mx-6 mb-8 text-center sm:mx-8">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 italic leading-tight">
+                        *This readiness score reflects verified skills. It is not a prediction or guarantee of employment. Hiring decisions depend on interviews, role availability, and employer policies.
+                    </p>
+                </div>
             </motion.div>
         </motion.div>
     );

@@ -28,6 +28,16 @@ const resumeSchema = new mongoose.Schema(
             min: 0,
             max: 100,
         },
+        // Which ATS template the resume renders with. The builder always sent this,
+        // but the field was undeclared here so Mongoose stripped it on save — every
+        // stored resume then re-rendered with the default style, which is why the
+        // recruiter's Application Pack showed a different template than the student
+        // picked. Value matches the ATS_TEMPLATES keys in ResumeBuilder.
+        template: {
+            type: String,
+            default: 'classicBW',
+            trim: true,
+        },
 
         // === Resume content sections ===
         personalInfo: {
