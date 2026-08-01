@@ -556,6 +556,12 @@ export const placementsAPI = {
   deleteApplication: async (applicationId) => {
     return apiCall(`/placements/applications/${encodeURIComponent(applicationId)}`, { method: 'DELETE' });
   },
+  updateApplicationStatus: async (applicationId, status, eSignature = null, declineReason = null) => {
+    return apiCall(`/placements/applications/${encodeURIComponent(applicationId)}/respond-offer`, { 
+      method: 'POST',
+      body: JSON.stringify({ status, eSignature, declineReason })
+    });
+  },
   applyJob: async (source, id, payload) => {
     // If payload is FormData (file upload), pass it through directly so apiCall can omit JSON headers
     const body = payload instanceof FormData ? payload : JSON.stringify(payload);
@@ -575,6 +581,9 @@ export const placementsAPI = {
   },
   getJobFairs: async () => {
     return apiCall('/placements/job-fairs');
+  },
+  getJobFair: async (id) => {
+    return apiCall(`/placements/job-fairs/${encodeURIComponent(id)}`);
   },
   registerJobFair: async (id) => {
     return apiCall(`/placements/job-fairs/${encodeURIComponent(id)}/register`, {

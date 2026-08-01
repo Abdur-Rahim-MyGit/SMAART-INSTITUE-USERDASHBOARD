@@ -540,5 +540,7 @@ export const computeAverageDescriptor = (descriptors) => {
   return sum.map(v => v / descriptors.length);
 };
 
+// (duplicate verifyFaceBatch removed — use the primary export above)
+
 /** Fast detection with landmarks but without face descriptor computation. */
 export const detectFacesWithLandmarks = detectFaces;

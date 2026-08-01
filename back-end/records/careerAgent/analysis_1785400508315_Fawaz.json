@@ -1,0 +1,771 @@
+{
+  "id": "1785400508315",
+  "timestamp": "2026-07-30T08:35:08.316Z",
+  "status": "completed",
+  "profile_hash": "eb96921e3c31e9e557d166edb680cf72d18201d405d3a8bf4be4d2eda7a07232",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Fawaz",
+      "email": "smaart.arcotfawaz@gmail.com",
+      "phone": "7338869705",
+      "registrationNumber": "STU012600018"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Commerce & Management",
+        "degreeGroup": "Bachelor of Business Administration",
+        "specialisation": [
+          "Finance"
+        ],
+        "university": "",
+        "graduationYear": "2026",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-006003-S01",
+          "directionName": "Financial Data Analytics",
+          "directionDescription": "Financial data analytics involves using data tools to analyse financial performance, model scenarios, and produce visualisations for decision support. Power BI and Tableau are used for financial dashboards; quantitative analysts build financial models; MIS analysts track key metrics. BBA Finance graduates who develop Excel, SQL, and BI tool skills can work at the intersection of finance and data analytics.",
+          "directionOverview": "Financial data analytics involves using data tools to analyse financial performance, model scenarios, and produce visualisations for decision support. Power BI and Tableau are used for financial dashboards; quantitative analysts build financial models; MIS analysts track key metrics. BBA Finance graduates who develop Excel, SQL, and BI tool skills can work at the intersection of finance and data analytics.",
+          "type": "Primary",
+          "uniqueId": "UG-006-003",
+          "roles": [
+            {
+              "role": "Data Analyst",
+              "id": "JF05-001"
+            },
+            {
+              "role": "Business Intelligence Analyst",
+              "id": "JF05-003"
+            },
+            {
+              "role": "Power BI Developer",
+              "id": "JF05-010"
+            },
+            {
+              "role": "Reporting Analyst",
+              "id": "JF05-013"
+            },
+            {
+              "role": "Data Visualization Analyst",
+              "id": "JF05-017"
+            },
+            {
+              "role": "MIS Analyst",
+              "id": "JF27-010"
+            },
+            {
+              "role": "FP&A Analyst",
+              "id": "JF09-014"
+            },
+            {
+              "role": "Financial Reporting Analyst",
+              "id": "JF09-013"
+            },
+            {
+              "role": "Quantitative Analyst",
+              "id": "JF05-006"
+            },
+            {
+              "role": "Database Analyst",
+              "id": "JF05-008"
+            }
+          ],
+          "role": "Business Intelligence Analyst"
+        },
+        "careerDirectionId": "CD-006003-S01",
+        "careerDirectionName": "Financial Data Analytics",
+        "careerDirectionDescription": "Financial data analytics involves using data tools to analyse financial performance, model scenarios, and produce visualisations for decision support. Power BI and Tableau are used for financial dashboards; quantitative analysts build financial models; MIS analysts track key metrics. BBA Finance graduates who develop Excel, SQL, and BI tool skills can work at the intersection of finance and data analytics.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Business Intelligence Analyst",
+        "type": "Full-Time",
+        "salary": "8-12 LPA",
+        "locations": [
+          "Chennai",
+          "Bangalore"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Open to any organization type"
+        ]
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-ENTRE-001",
+          "directionName": "Entrepreneurship",
+          "directionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+          "directionOverview": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+          "type": "Primary",
+          "uniqueId": "UG-006-003",
+          "roles": []
+        },
+        "careerDirectionId": "CD-ENTRE-001",
+        "careerDirectionName": "Entrepreneurship",
+        "careerDirectionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Commercial Pilot - Captain",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Anywhere in India"
+        ],
+        "location": "Anywhere in India",
+        "orgTypes": [
+          "Open to any organization type"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-006003-P03",
+          "directionName": "Accounting & Book-Keeping",
+          "directionDescription": "Accounting involves recording transactions, maintaining ledgers, processing payroll, and producing trial balances and financial statements. BBA Finance graduates are trained in financial and cost accounting, making accounts executive, payroll specialist, and accounts reconciliation roles direct entry points. SMEs, mid-market companies, and accounting firms employ finance graduates at scale in these roles.",
+          "directionOverview": "Accounting involves recording transactions, maintaining ledgers, processing payroll, and producing trial balances and financial statements. BBA Finance graduates are trained in financial and cost accounting, making accounts executive, payroll specialist, and accounts reconciliation roles direct entry points. SMEs, mid-market companies, and accounting firms employ finance graduates at scale in these roles.",
+          "type": "Primary",
+          "uniqueId": "UG-006-003",
+          "roles": [
+            {
+              "role": "Accounts Executive",
+              "id": "JF09-019"
+            },
+            {
+              "role": "Accounts Payable Executive",
+              "id": "JF09-010"
+            },
+            {
+              "role": "Accounts Receivable Executive",
+              "id": "JF09-011"
+            },
+            {
+              "role": "Payroll Executive",
+              "id": "JF09-022"
+            },
+            {
+              "role": "Accounts Reconciliation Analyst",
+              "id": "JF09-021"
+            },
+            {
+              "role": "Accounts Manager",
+              "id": "JF09-006"
+            },
+            {
+              "role": "GST Consultant",
+              "id": "JF09-012"
+            },
+            {
+              "role": "Tax Associate",
+              "id": "JF09-020"
+            },
+            {
+              "role": "Tax Consultant",
+              "id": "JF09-007"
+            },
+            {
+              "role": "Internal Auditor",
+              "id": "JF09-016"
+            }
+          ],
+          "role": "Internal Auditor"
+        },
+        "careerDirectionId": "CD-006003-P03",
+        "careerDirectionName": "Accounting & Book-Keeping",
+        "careerDirectionDescription": "Accounting involves recording transactions, maintaining ledgers, processing payroll, and producing trial balances and financial statements. BBA Finance graduates are trained in financial and cost accounting, making accounts executive, payroll specialist, and accounts reconciliation roles direct entry points. SMEs, mid-market companies, and accounting firms employ finance graduates at scale in these roles.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Internal Auditor",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Chennai",
+          "Vaniyambadi"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Open to any organization type"
+        ]
+      }
+    }
+  },
+  "output_generated_report": {
+    "status": "success_deterministic",
+    "generated_at": "2026-07-30T08:35:08.566Z",
+    "preVerified": {
+      "dataFilesReady": true,
+      "primaryZone": {
+        "employer_zone": "Amber",
+        "skill_coverage_pct": 35
+      },
+      "secondaryZone": {
+        "employer_zone": "Red"
+      },
+      "tertiaryZone": {
+        "employer_zone": "Red"
+      },
+      "primaryMarket": {
+        "demand_level": "High",
+        "salary_min_lpa": 6,
+        "salary_max_lpa": 18,
+        "ai_automation_risk": "Medium",
+        "emerging_roles": [
+          "AI Analyst",
+          "Data Scientist",
+          "Business Analyst"
+        ]
+      },
+      "primarySkillGap": {
+        "missing": [],
+        "matched": [],
+        "coveragePct": 0,
+        "dataReady": true,
+        "source": "local"
+      }
+    },
+    "primary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 15%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Business Intelligence Analyst",
+        "job_family": "Data Engineering & Analytics",
+        "role_description": "A Business Intelligence Analyst in India designs, builds, and maintains the reports and dashboards that help organisations track performance, identify trends, and make data-driven decisions. Core work involves gathering requirements from business stakeholders, designing data models, building dashboards in Power BI or Tableau, writing SQL queries, and ensuring report accuracy. BI Analysts are in strong demand across BFSI, e-commerce, manufacturing, and IT services in India, making this a widely accessible data career path for graduates with SQL skills and interest in business performance measurement.",
+        "narrative_para1": "A Business Intelligence Analyst in India designs, builds, and maintains the reports and dashboards that help organisations track performance, identify trends, and make data-driven decisions. Core work involves gathering requirements from business stakeholders, designing data models, building dashboards in Power BI or Tableau, writing SQL queries, and ensuring report accuracy. BI Analysts are in strong demand across BFSI, e-commerce, manufacturing, and IT services in India, making this a widely accessible data career path for graduates with SQL skills and interest in business performance measurement.",
+        "narrative_para2": "Power BI Copilot enables natural language dashboard creation, AI visual suggestions, and automated anomaly highlighting. Tableau AI generates auto-narratives and Ask Data natural language queries reduce manual report building. ChatGPT and Claude assist with SQL generation and KPI documentation. This is an AI-Evolving role with very high AI exposure — AI is automating significant portions of standard report creation. The distinctly human contribution — translating contradictory business requirements into coherent reporting frameworks and educating users on correct data interpretation — becomes more central as AI handles the mechanics.",
+        "narrative_para3": "BI Analysis suits people who enjoy making sense of business performance data and communicating it clearly to non-technical audiences. If you find yourself naturally curious about why metrics move, like designing clean and intuitive dashboards, and can facilitate productive requirement conversations with business stakeholders who don't always know what they want — this is a rewarding path. SQL fluency, attention to detail, and an interest in business processes are the core entry requirements. Power BI or Tableau certification alongside SQL skills is a strong starting point.",
+        "typical_employers_india": "Manufacturing Plants, PSUs, EPC Companies, Auto OEMs",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹3.8L - ₹7.5L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "67",
+        "ai_impact": "Power BI Copilot enables natural language dashboard creation, AI visual suggestions, and automated anomaly highlighting. Tableau AI generates auto-narratives and Ask Data natural language queries reduce manual report building. ChatGPT and Claude assist with SQL generation and KPI documentation. This is an AI-Evolving role with very high AI exposure — AI is automating significant portions of standard report creation. The distinctly human contribution — translating contradictory business requirements into coherent reporting frameworks and educating users on correct data interpretation — becomes more central as AI handles the mechanics.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Business Intelligence Analyst",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "67%",
+          "level": "High",
+          "tasks_assisted": "BI Analysts have high AI exposure with Power BI Copilot enabling natural language dashboard creation, AI visual suggestions, and automated anomaly highlighting. Tableau AI generates auto-narratives and Ask Data natural language queries reduce manual report building. ChatGPT/Claude assists with SQL query generation, KPI definition documentation, and business requirements translation into dashboard specs.",
+          "human_value": "BI Analysts translate complex, sometimes contradictory business requirements into coherent reporting frameworks, requiring stakeholder negotiation and contextual understanding AI cannot replicate. Deciding which metrics truly reflect business health, advocating for data quality investments, and educating non-technical users on correct data interpretation are distinctly human responsibilities."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Business Intelligence Analyst."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Business Intelligence Analyst portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Business Intelligence Analyst",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Business Intelligence Analyst Capstone",
+            "description": "Complete Business Intelligence Analyst end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "BI Analysis suits people who enjoy making sense of business performance data and communicating it clearly to non-technical audiences. If you find yourself naturally curious about why metrics move, like designing clean and intuitive dashboards, and can facilitate productive requirement conversations with business stakeholders who don't always know what they want — this is a rewarding path. SQL fluency, attention to detail, and an interest in business processes are the core entry requirements. Power BI or Tableau certification alongside SQL skills is a strong starting point.",
+        "target_audience": "UG/PG graduates with interest in Data Engineering & Analytics.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Business Intelligence Analyst",
+        "job_family": "Data Engineering & Analytics",
+        "narrative_para1": "A Business Intelligence Analyst in India designs, builds, and maintains the reports and dashboards that help organisations track performance, identify trends, and make data-driven decisions. Core work involves gathering requirements from business stakeholders, designing data models, building dashboards in Power BI or Tableau, writing SQL queries, and ensuring report accuracy. BI Analysts are in strong demand across BFSI, e-commerce, manufacturing, and IT services in India, making this a widely accessible data career path for graduates with SQL skills and interest in business performance measurement.",
+        "narrative_para2": "Power BI Copilot enables natural language dashboard creation, AI visual suggestions, and automated anomaly highlighting. Tableau AI generates auto-narratives and Ask Data natural language queries reduce manual report building. ChatGPT and Claude assist with SQL generation and KPI documentation. This is an AI-Evolving role with very high AI exposure — AI is automating significant portions of standard report creation. The distinctly human contribution — translating contradictory business requirements into coherent reporting frameworks and educating users on correct data interpretation — becomes more central as AI handles the mechanics.",
+        "narrative_para3": "BI Analysis suits people who enjoy making sense of business performance data and communicating it clearly to non-technical audiences. If you find yourself naturally curious about why metrics move, like designing clean and intuitive dashboards, and can facilitate productive requirement conversations with business stakeholders who don't always know what they want — this is a rewarding path. SQL fluency, attention to detail, and an interest in business processes are the core entry requirements. Power BI or Tableau certification alongside SQL skills is a strong starting point.",
+        "salary_range_low": "380000",
+        "salary_range_high": "750000",
+        "ai_exposure_pct": "67",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "BI Analysts have high AI exposure with Power BI Copilot enabling natural language dashboard creation, AI visual suggestions, and automated anomaly highlighting. Tableau AI generates auto-narratives and Ask Data natural language queries reduce manual report building. ChatGPT/Claude assists with SQL query generation, KPI definition documentation, and business requirements translation into dashboard specs.",
+        "human_value_tasks": "BI Analysts translate complex, sometimes contradictory business requirements into coherent reporting frameworks, requiring stakeholder negotiation and contextual understanding AI cannot replicate. Deciding which metrics truly reflect business health, advocating for data quality investments, and educating non-technical users on correct data interpretation are distinctly human responsibilities.",
+        "english_requirement": "Important"
+      },
+      "direction": {
+        "directionId": "CD-006003-S01",
+        "directionName": "Financial Data Analytics",
+        "directionDescription": "Financial data analytics involves using data tools to analyse financial performance, model scenarios, and produce visualisations for decision support.",
+        "directionOverview": "Power BI and Tableau are used for financial dashboards; quantitative analysts build financial models; MIS analysts track key metrics. BBA Finance graduates who develop Excel, SQL, and BI tool skills can work at the intersection of finance and data analytics.",
+        "type": "Primary",
+        "uniqueId": "UG-006-003",
+        "degreeLevel": "B.B.A.",
+        "domainField": "",
+        "degreeFullName": "B.B.A.",
+        "specialisation": "Finance",
+        "roles": [
+          {
+            "role": "Data Analyst",
+            "id": "JF05-001"
+          },
+          {
+            "role": "Business Intelligence Analyst",
+            "id": "JF05-003"
+          },
+          {
+            "role": "Power BI Developer",
+            "id": "JF05-010"
+          },
+          {
+            "role": "Reporting Analyst",
+            "id": "JF05-013"
+          },
+          {
+            "role": "Data Visualization Analyst",
+            "id": "JF05-017"
+          },
+          {
+            "role": "MIS Analyst",
+            "id": "JF27-010"
+          },
+          {
+            "role": "FP&A Analyst",
+            "id": "JF09-014"
+          },
+          {
+            "role": "Financial Reporting Analyst",
+            "id": "JF09-013"
+          },
+          {
+            "role": "Quantitative Analyst",
+            "id": "JF05-006"
+          },
+          {
+            "role": "Database Analyst",
+            "id": "JF05-008"
+          }
+        ]
+      }
+    },
+    "secondary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Commercial Pilot - Captain",
+        "job_family": "Aviation & Transportation",
+        "role_description": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para1": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para2": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "narrative_para3": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "₹24.0L - ₹50.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "25",
+        "ai_impact": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Commercial Pilot - Captain",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "25%",
+          "level": "Moderate",
+          "tasks_assisted": "Commercial Pilot Captains benefit from limited AI assistance — enhanced avionics autopilot systems, AI-powered flight management system (FMS) route optimisation, and AI weather analysis briefing tools. ChatGPT assists with pre-flight documentation. AI fatigue risk management systems assist with crew duty scheduling compliance. However, commercial aviation's safety-critical nature fundamentally restricts AI in flight control, and DGCA regulations require licensed human pilot-in-command authority for every flight.",
+          "human_value": "Commercial Pilot Captains exercise Pilot-in-Command authority — making final flight safety decisions, managing emergency situations through trained judgment, and carrying legal accountability for every passenger on board under the Aircraft Act 1934 and DGCA regulations. Flying the aircraft, managing crew resource management, and exercising the regulatory authority and professional accountability that aviation safety demands require irreplaceable human piloting expertise. AI cannot hold a DGCA ATPL licence or assume PIC responsibility."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Commercial Pilot - Captain."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Commercial Pilot - Captain portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Commercial Pilot - Captain",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Commercial Pilot - Captain Capstone",
+            "description": "Complete Commercial Pilot - Captain end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "target_audience": "UG/PG graduates with interest in Aviation & Transportation.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Commercial Pilot - Captain",
+        "job_family": "Aviation & Transportation",
+        "narrative_para1": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para2": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "narrative_para3": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "salary_range_low": "2400000",
+        "salary_range_high": "5000000",
+        "ai_exposure_pct": "25",
+        "ai_exposure_level": "Moderate",
+        "ai_exposure_detail": "Commercial Pilot Captains benefit from limited AI assistance — enhanced avionics autopilot systems, AI-powered flight management system (FMS) route optimisation, and AI weather analysis briefing tools. ChatGPT assists with pre-flight documentation. AI fatigue risk management systems assist with crew duty scheduling compliance. However, commercial aviation's safety-critical nature fundamentally restricts AI in flight control, and DGCA regulations require licensed human pilot-in-command authority for every flight.",
+        "human_value_tasks": "Commercial Pilot Captains exercise Pilot-in-Command authority — making final flight safety decisions, managing emergency situations through trained judgment, and carrying legal accountability for every passenger on board under the Aircraft Act 1934 and DGCA regulations. Flying the aircraft, managing crew resource management, and exercising the regulatory authority and professional accountability that aviation safety demands require irreplaceable human piloting expertise. AI cannot hold a DGCA ATPL licence or assume PIC responsibility.",
+        "english_requirement": "Essential"
+      },
+      "direction": {
+        "directionId": "CD-ENTRE-001",
+        "directionName": "Entrepreneurship",
+        "directionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee.",
+        "directionOverview": "Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+        "type": "Primary",
+        "uniqueId": "UG-005-001",
+        "degreeLevel": "B.Com.",
+        "domainField": "",
+        "degreeFullName": "B.Com.",
+        "specialisation": "General",
+        "roles": []
+      }
+    },
+    "tertiary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Internal Auditor",
+        "job_family": "Finance & Accounting",
+        "role_description": "An Internal Auditor in India independently evaluates the adequacy and effectiveness of an organisation's internal controls, risk management processes, and governance — planning and conducting audit assignments, testing control effectiveness, documenting findings, and reporting to the Audit Committee and senior management. Internal Audit is a mandatory function for listed companies and large corporates under the Companies Act 2013. In India, internal audit roles are found within in-house internal audit departments, Big 4 and mid-tier firms providing outsourced IA services, and the internal audit practices of BFSI organisations governed by RBI and SEBI requirements.",
+        "narrative_para1": "An Internal Auditor in India independently evaluates the adequacy and effectiveness of an organisation's internal controls, risk management processes, and governance — planning and conducting audit assignments, testing control effectiveness, documenting findings, and reporting to the Audit Committee and senior management. Internal Audit is a mandatory function for listed companies and large corporates under the Companies Act 2013. In India, internal audit roles are found within in-house internal audit departments, Big 4 and mid-tier firms providing outsourced IA services, and the internal audit practices of BFSI organisations governed by RBI and SEBI requirements.",
+        "narrative_para2": "AI tools are changing internal audit workflows. a major software platform Copilot for Finance assists with audit workpaper drafting and observation write-ups. ChatGPT and Claude generate audit programme checklists and report templates. AI enables continuous auditing by automating data analytics across large transaction populations. Power BI dashboards support ongoing control monitoring. This is an AI-Evolving role where AI handles documentation and analytics volume — the human core, exercising professional scepticism to detect fraud and control failures, making independent audit opinions, escalating uncomfortable findings to the audit committee with courage, requires judgment and credibility AI cannot provide.",
+        "narrative_para3": "Internal Audit suits people with analytical rigour, intellectual curiosity across business processes, and the professional independence to challenge governance weaknesses diplomatically but firmly. If you enjoy investigating how processes work (and fail), can maintain objectivity while building working relationships with auditees, and have the confidence to escalate sensitive findings to audit committees — this is a valued and intellectually diverse career. CA or CMA qualification alongside CIA (Certified Internal Auditor) certification are the primary credentials. IT audit specialisation (CISA) is particularly valued in India's large BFSI and IT services sectors.",
+        "typical_employers_india": "Banks, NBFCs, Audit Firms, Fintech Companies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "₹5.0L - ₹10.0L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "48",
+        "ai_impact": "AI tools are changing internal audit workflows. a major software platform Copilot for Finance assists with audit workpaper drafting and observation write-ups. ChatGPT and Claude generate audit programme checklists and report templates. AI enables continuous auditing by automating data analytics across large transaction populations. Power BI dashboards support ongoing control monitoring. This is an AI-Evolving role where AI handles documentation and analytics volume — the human core, exercising professional scepticism to detect fraud and control failures, making independent audit opinions, escalating uncomfortable findings to the audit committee with courage, requires judgment and credibility AI cannot provide.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Internal Auditor",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "48%",
+          "level": "Moderate",
+          "tasks_assisted": "Internal Auditors benefit from AI with Microsoft Copilot for Finance assisting in audit workpaper drafting and observation write-ups. ChatGPT/Claude helps generate audit programme checklists and internal audit report templates. AI tools support continuous auditing by automating data analytics on large transaction populations. Power BI dashboards with ratio analysis enable ongoing control monitoring.",
+          "human_value": "Internal Auditors conduct interviews, observe operations, and apply professional scepticism to detect fraud and control failures that require human judgment and situational awareness AI cannot replicate. Making independent audit opinions, escalating sensitive findings to the audit committee, and managing auditee relationships during difficult investigations require professional courage and interpersonal expertise."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Internal Auditor."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Internal Auditor portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Internal Auditor",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Internal Auditor Capstone",
+            "description": "Complete Internal Auditor end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Internal Audit suits people with analytical rigour, intellectual curiosity across business processes, and the professional independence to challenge governance weaknesses diplomatically but firmly. If you enjoy investigating how processes work (and fail), can maintain objectivity while building working relationships with auditees, and have the confidence to escalate sensitive findings to audit committees — this is a valued and intellectually diverse career. CA or CMA qualification alongside CIA (Certified Internal Auditor) certification are the primary credentials. IT audit specialisation (CISA) is particularly valued in India's large BFSI and IT services sectors.",
+        "target_audience": "UG/PG graduates with interest in Finance & Accounting.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Internal Auditor",
+        "job_family": "Finance & Accounting",
+        "narrative_para1": "An Internal Auditor in India independently evaluates the adequacy and effectiveness of an organisation's internal controls, risk management processes, and governance — planning and conducting audit assignments, testing control effectiveness, documenting findings, and reporting to the Audit Committee and senior management. Internal Audit is a mandatory function for listed companies and large corporates under the Companies Act 2013. In India, internal audit roles are found within in-house internal audit departments, Big 4 and mid-tier firms providing outsourced IA services, and the internal audit practices of BFSI organisations governed by RBI and SEBI requirements.",
+        "narrative_para2": "AI tools are changing internal audit workflows. a major software platform Copilot for Finance assists with audit workpaper drafting and observation write-ups. ChatGPT and Claude generate audit programme checklists and report templates. AI enables continuous auditing by automating data analytics across large transaction populations. Power BI dashboards support ongoing control monitoring. This is an AI-Evolving role where AI handles documentation and analytics volume — the human core, exercising professional scepticism to detect fraud and control failures, making independent audit opinions, escalating uncomfortable findings to the audit committee with courage, requires judgment and credibility AI cannot provide.",
+        "narrative_para3": "Internal Audit suits people with analytical rigour, intellectual curiosity across business processes, and the professional independence to challenge governance weaknesses diplomatically but firmly. If you enjoy investigating how processes work (and fail), can maintain objectivity while building working relationships with auditees, and have the confidence to escalate sensitive findings to audit committees — this is a valued and intellectually diverse career. CA or CMA qualification alongside CIA (Certified Internal Auditor) certification are the primary credentials. IT audit specialisation (CISA) is particularly valued in India's large BFSI and IT services sectors.",
+        "salary_range_low": "500000",
+        "salary_range_high": "1000000",
+        "ai_exposure_pct": "48",
+        "ai_exposure_level": "Moderate",
+        "ai_exposure_detail": "Internal Auditors benefit from AI with Microsoft Copilot for Finance assisting in audit workpaper drafting and observation write-ups. ChatGPT/Claude helps generate audit programme checklists and internal audit report templates. AI tools support continuous auditing by automating data analytics on large transaction populations. Power BI dashboards with ratio analysis enable ongoing control monitoring.",
+        "human_value_tasks": "Internal Auditors conduct interviews, observe operations, and apply professional scepticism to detect fraud and control failures that require human judgment and situational awareness AI cannot replicate. Making independent audit opinions, escalating sensitive findings to the audit committee, and managing auditee relationships during difficult investigations require professional courage and interpersonal expertise.",
+        "english_requirement": "Important"
+      },
+      "direction": {
+        "directionId": "CD-006003-P03",
+        "directionName": "Accounting & Book-Keeping",
+        "directionDescription": "Accounting involves recording transactions, maintaining ledgers, processing payroll, and producing trial balances and financial statements.",
+        "directionOverview": "BBA Finance graduates are trained in financial and cost accounting, making accounts executive, payroll specialist, and accounts reconciliation roles direct entry points. SMEs, mid-market companies, and accounting firms employ finance graduates at scale in these roles.",
+        "type": "Primary",
+        "uniqueId": "UG-006-003",
+        "degreeLevel": "B.B.A.",
+        "domainField": "",
+        "degreeFullName": "B.B.A.",
+        "specialisation": "Finance",
+        "roles": [
+          {
+            "role": "Accounts Executive",
+            "id": "JF09-019"
+          },
+          {
+            "role": "Accounts Payable Executive",
+            "id": "JF09-010"
+          },
+          {
+            "role": "Accounts Receivable Executive",
+            "id": "JF09-011"
+          },
+          {
+            "role": "Payroll Executive",
+            "id": "JF09-022"
+          },
+          {
+            "role": "Accounts Reconciliation Analyst",
+            "id": "JF09-021"
+          },
+          {
+            "role": "Accounts Manager",
+            "id": "JF09-006"
+          },
+          {
+            "role": "GST Consultant",
+            "id": "JF09-012"
+          },
+          {
+            "role": "Tax Associate",
+            "id": "JF09-020"
+          },
+          {
+            "role": "Tax Consultant",
+            "id": "JF09-007"
+          },
+          {
+            "role": "Internal Auditor",
+            "id": "JF09-016"
+          }
+        ]
+      }
+    },
+    "ml_success_probability": null,
+    "ml_semantic_skills": [],
+    "combined_tab4": {
+      "combined_pathway_summary": "Your immediate focus must be learning the missing fundamentals for Business Intelligence Analyst (Financial Data Analytics). Role success probability: Calculating",
+      "skill_gap": {
+        "current_skills": [
+          "Basic Academics",
+          "Communication"
+        ],
+        "missing_skills": []
+      },
+      "learning_roadmap": [
+        {
+          "step": "Step 1 - Foundation Skills",
+          "description": "Master prerequisites and theoretical fundamentals."
+        },
+        {
+          "step": "Step 2 - Core Technical Skills",
+          "description": "Learn core technologies."
+        },
+        {
+          "step": "Step 3 - Advanced Applications",
+          "description": "Apply skills in complex scenarios."
+        },
+        {
+          "step": "Step 4 - Projects & Portfolio",
+          "description": "Deploy market-ready portfolios demonstrating these skills."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Certified Business Intelligence Analyst Professional",
+          "issuer": "Industry Standard Provider",
+          "difficulty": "Intermediate",
+          "duration": "3 months"
+        }
+      ],
+      "courses": [
+        {
+          "course_name": "Business Intelligence Analyst Crash Course",
+          "platform": "YouTube / Coursera",
+          "link_status": "Free"
+        }
+      ],
+      "projects": [
+        {
+          "project_name": "Business Intelligence Analyst Capstone",
+          "description": "A complete end-to-end implementation.",
+          "skills_demonstrated": ""
+        }
+      ]
+    }
+  }
+}

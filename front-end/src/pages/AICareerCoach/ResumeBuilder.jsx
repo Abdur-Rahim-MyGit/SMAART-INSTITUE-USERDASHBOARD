@@ -377,6 +377,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [suggestedSkills, setSuggestedSkills] = useState([]);  // from role API only
     const [skillChipsLoading, setSkillChipsLoading] = useState(false);
     const [jobSkills, setJobSkills] = useState([]); // Skills from job posting
+    const [verifiedCgpa, setVerifiedCgpa] = useState(null);
 
     const [atsScore, setAtsScore] = useState(0);
     const [atsBreakdown, setAtsBreakdown] = useState([]);
@@ -482,11 +483,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 ? await hydrateProfileWithRegisteredDetails(profileRes)
                 : profileRes;
 
-            // Always capture student ID from profile (used in PDF footer for both branches)
+            let fetchedCgpa = null;
             if (hydratedProfileRes.success) {
                 const pData = hydratedProfileRes.richProfile || {};
                 const pReg = hydratedProfileRes.registration || {};
-                setStudentId(pData.studentId || pReg.studentId || hydratedProfileRes.student?.studentId || '');
+                const pStudent = hydratedProfileRes.student || {};
+                const pUser = hydratedProfileRes.user || {};
+                setStudentId(pData.studentId || pReg.studentId || pStudent.studentId || '');
+                
+                const rawCgpa = pStudent.academic?.overallCgpa || pUser.academic?.overallCgpa || pData.academic?.overallCgpa;
+                if (rawCgpa) {
+                    fetchedCgpa = `${Number(rawCgpa).toFixed(2)} CGPA`;
+                    setVerifiedCgpa(fetchedCgpa);
+                }
             }
 
             if (resumeRes.success && resumeRes.data && resumeRes.data.length > 0) {
@@ -502,11 +511,17 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                         )
                     );
                 }
+                
+                let loadedEdu = r.education || [];
+                if (fetchedCgpa && loadedEdu.length > 0) {
+                    loadedEdu[0] = { ...loadedEdu[0], grade: fetchedCgpa };
+                }
+                
                 setResumeData({
                     personalInfo: r.personalInfo || {},
                     summary: r.summary || '',
                     experience: r.experience || [],
-                    education: r.education || [],
+                    education: loadedEdu,
                     skills: r.skills || { technical: '', soft: '', languages: '' },
                     projects: r.projects || [],
                     achievements: r.achievements || [],
@@ -924,6 +939,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
         const defaultLoc = location || firstCleanValue(reg.address?.country, student.address?.country, user.address?.country);
 
+        const calculatedCgpa = student.academic?.overallCgpa || user.academic?.overallCgpa || data.academic?.overallCgpa;
+        const formattedCgpa = calculatedCgpa ? `${Number(calculatedCgpa).toFixed(2)} CGPA` : null;
+
         // Education
         const eduList = [];
         if (listFrom(reg.higherEducation).length > 0) {
@@ -932,16 +950,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
                     institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
                     year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
-                    grade: firstCleanValue(edu.cgpaPercentage, edu.percentage, edu.grade),
+                    grade: firstCleanValue(formattedCgpa, edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade),
                     location: firstCleanValue(edu.location, defaultLoc)
                 });
             });
-        } else if (reg.institution || data.college) {
+        } else if (reg.institution || data.college || formattedCgpa) {
             eduList.push({
                 degree: firstCleanValue(reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
                 institution: firstCleanValue(reg.institution, data.college, 'SMAART Institute'),
                 year: firstCleanValue(reg.yearOfPassing, data.batch),
-                grade: data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : '',
+                grade: firstCleanValue(formattedCgpa, data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : ''),
                 location: defaultLoc
             });
         }
@@ -1225,11 +1243,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             }
         }
 
+        let loadedEdu = resume.education || [];
+        if (verifiedCgpa && loadedEdu.length > 0) {
+            loadedEdu[0] = { ...loadedEdu[0], grade: verifiedCgpa };
+        }
+
         setResumeData({
             personalInfo: resume.personalInfo || {},
             summary: resume.summary || '',
             experience: resume.experience || [],
-            education: resume.education || [],
+            education: loadedEdu,
             skills: resume.skills || { technical: '', soft: '', languages: '' },
             projects: resume.projects || [],
             achievements: resume.achievements || [],
@@ -2228,7 +2251,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <div className="relative">
+                                                                    <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className={`w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 ${idx === 0 ? 'pr-10 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed text-emerald-800 dark:text-emerald-300 font-bold' : ''}`} readOnly={idx === 0} title={idx === 0 ? "Auto-synced from College Academic Records" : ""} />
+                                                                    {idx === 0 && (
+                                                                        <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" title="Auto-synced from College Academic Records" />
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>

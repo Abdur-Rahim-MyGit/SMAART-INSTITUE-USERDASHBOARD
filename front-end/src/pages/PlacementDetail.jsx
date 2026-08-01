@@ -22,6 +22,7 @@ import {
   IconGitBranch as GitBranch,
   IconWand as Wand,
   IconX as X,
+  IconFileDescription as FileDescription
 } from "@tabler/icons-react";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { usersAPI } from "@/services/api";
@@ -85,10 +86,12 @@ const getDocumentUrl = (job) => {
 };
 
 const formatStatus = (value, t) => {
-  if (!value) return t("placement.open", "Open");
-  const norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (!value) return t("placement.active", "Active");
+  let norm = String(value).toLowerCase().replace(/[-_]/g, "_");
+  if (norm === 'open') norm = 'active';
+  if (norm === 'closed') norm = 'inactive';
   const key = `placement.status_${norm}`;
-  const fallback = String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+  const fallback = String(norm).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
   return t(key, fallback);
 };
 
@@ -152,8 +155,47 @@ const PlacementDetail = () => {
     } catch (_) {}
     return null;
   });
+  const [applicationData, setApplicationData] = useState(null);
   const [withdrewConfirmOpen, setWithdrewConfirmOpen] = useState(false);
   const [withdrewPending, setWithdrewPending] = useState(false);
+  const [isBacklogReadOnly, setIsBacklogReadOnly] = useState(false);
+  
+  const [eSignature, setESignature] = useState('');
+  const [offerPending, setOfferPending] = useState(false);
+  
+  const handleOfferResponse = async (responseStatus) => {
+    if (responseStatus === 'Accepted' && !eSignature.trim()) {
+      toast({
+        title: t("placement.signature_required", "Signature Required"),
+        description: t("placement.signature_desc", "Please type your full name to accept the offer."),
+        variant: "destructive"
+      });
+      return;
+    }
+    try {
+      setOfferPending(true);
+      const res = await placementsAPI.api.post(`/placements/applications/${applicationId}/respond-offer`, {
+        status: responseStatus,
+        eSignature
+      });
+      if (res.data.success) {
+        toast({
+          title: responseStatus === 'Accepted' ? t("placement.offer_accepted", "Offer Accepted!") : t("placement.offer_declined", "Offer Declined"),
+          description: responseStatus === 'Accepted' ? t("placement.offer_accepted_desc", "Congratulations on your new job!") : t("placement.offer_declined_desc", "You have declined the offer.")
+        });
+        setApplicationData(prev => ({ ...prev, status: responseStatus }));
+      }
+    } catch (err) {
+       toast({ 
+         title: "Error", 
+         description: err.response?.data?.error || "Failed to respond to offer", 
+         variant: "destructive" 
+       });
+    } finally {
+      setOfferPending(false);
+    }
+  };
+
   const [applicationForm, setApplicationForm] = useState(() => {
     let user = {};
     try {
@@ -218,6 +260,7 @@ const PlacementDetail = () => {
 
           if (apps.length > 0) {
             setHasApplied(true);
+            setApplicationData(apps[0]);
             const possibleId = apps[0]._id || apps[0].id || null;
             setApplicationId(possibleId);
             
@@ -272,12 +315,35 @@ const PlacementDetail = () => {
   const details = useMemo(() => {
     if (!job) return [];
     const postedAgo = getPostedAgo(job.displayCreatedAt || job.createdAt, t);
+    // Publisher vs host college are different things and must not be conflated.
+    // When a recruiter published the role we name them; otherwise the college
+    // placement office did. The owning college is shown on its own row, labelled
+    // "Host College" — calling it "Posted By" credited SRM for a role that
+    // Google's recruiter posted into SRM's fair.
+    const viaRecruiter = job.displayPostedByType === 'recruiter';
+    const poster = job.displayPostedBy;
+    const posterIsCompany = poster && poster.trim().toLowerCase() === (job.displayCompany || '').trim().toLowerCase();
+    const postedByValue = poster && !posterIsCompany
+      ? poster
+      : (viaRecruiter ? t("placement.posted_via_smaart", "SMAART Recruiter") : t("placement.posted_via_college", "College Placement Office"));
+
+    // Only worth its own row when it is not already the publisher.
+    const hostCollege = job.displayHostCollege;
+    const showHostCollege = hostCollege && (viaRecruiter || hostCollege !== poster);
+
     return [
       { label: t("placement.label_company", "Company"), value: job.displayCompany, icon: Building },
+      { label: t("placement.label_posted_by", "Posted By"), value: postedByValue, icon: viaRecruiter ? Briefcase : School },
+      ...(job.displayJobFairTitle
+        ? [{ label: t("placement.label_job_fair", "Job Fair"), value: job.displayJobFairTitle, icon: Briefcase }]
+        : []),
+      ...(showHostCollege
+        ? [{ label: t("placement.label_host_college", "Host College"), value: hostCollege, icon: School }]
+        : []),
       { label: t("placement.label_location", "Location"), value: job.displayLocation, icon: MapPin },
       ...(postedAgo ? [{ label: t("placement.label_posted", "Posted"), value: postedAgo, icon: Clock }] : []),
       { label: t("placement.label_job_type", "Job Type"), value: job.displayType, icon: Briefcase },
-      { label: t("placement.label_deadline", "Deadline"), value: formatDate(job.displayDeadline, t), icon: CalendarDue },
+      { label: t("placement.label_deadline", "Deadline"), value: job.displayDeadline ? formatDate(job.displayDeadline, t) : t("placement.no_deadline_short", "No closing date set"), icon: CalendarDue },
       { label: t("placement.label_package", "Package"), value: job.displaySalary || job.salaryPackage || job.ctc || job.package, icon: Tag },
       { label: t("placement.label_work_mode", "Work Mode"), value: job.workMode, icon: Briefcase },
       ...(job.experience ? [{ label: t("placement.label_experience", "Experience"), value: job.experience, icon: Star }] : []),
@@ -319,6 +385,12 @@ const PlacementDetail = () => {
           const mobileFromReg = registration.mobileNumber || registration.mobile;
           const mobile = mobileFromUser || mobileFromReg;
           if (mobile) updateApplicationField('mobile', mobile);
+          
+          const rawBacklogs = user.academic?.activeBacklogs ?? registration.academic?.activeBacklogs ?? user.activeBacklogs;
+          if (rawBacklogs !== undefined && rawBacklogs !== null) {
+              updateApplicationField('activeBacklog', rawBacklogs);
+              setIsBacklogReadOnly(true);
+          }
         }
       } catch (err) {
         // Silent fail — keep existing value from session storage
@@ -332,20 +404,26 @@ const PlacementDetail = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
-        <div className="h-[520px] animate-pulse rounded-2xl border border-[#d8e6f7] bg-white dark:border-[#1a3884]/20 dark:bg-[#001630]" />
+      <div className="mx-auto mt-8 max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="h-[520px] animate-pulse rounded-2xl border border-slate-200 bg-slate-50 dark:border-[#1a3884]/25 dark:bg-[#001630]" />
       </div>
     );
   }
 
   if (!job) {
     return (
-      <div className="mx-auto max-w-4xl px-4 pb-12 text-center sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-[#d8e6f7] bg-white p-8 dark:border-[#1a3884]/20 dark:bg-[#001630]">
-          <h1 className="text-xl font-bold text-[#0d1f4e] dark:text-white">{t("placement.job_not_found", "Job not found")}</h1>
+      <div className="mx-auto mt-8 max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-[#d8e6f7] bg-white p-8 text-center shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f5f8ff] dark:bg-[#1a3884]/15">
+            <Briefcase className="h-6 w-6 text-[#1a3884] dark:text-blue-300" stroke={1.7} />
+          </div>
+          <h1 className="text-base font-semibold text-[#0d1f4e] dark:text-white">{t("placement.job_not_found", "Job not found")}</h1>
+          <p className="mt-1 max-w-md text-[13px] text-slate-500 dark:text-slate-400">
+            {t("placement.job_not_found_desc", "This posting may have been closed or removed.")}
+          </p>
           <button
             onClick={() => navigate("/dashboard/placement")}
-            className="mt-5 rounded-xl bg-[#1a3884] px-5 py-2 text-sm font-bold text-white"
+            className="mt-5 h-9 rounded-lg bg-[#0d1f4e] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1a3884]"
           >
             {t("placement.back_to_placement", "Back to Placement")}
           </button>
@@ -359,9 +437,17 @@ const PlacementDetail = () => {
   const skills = getSkills(job);
   const documentUrl = getDocumentUrl(job);
   const applyUrl = job.displayApplyUrl;
-  const companyAbout = job.displayCompanyAbout || job.aboutCompany || job.companyAbout;
+  const fallbackCompanyDesc = (job.displayCompany && job.displayCompany !== 'Company not listed')
+    ? `${job.displayCompany} is an active corporate hiring partner participating in this campus placement drive.`
+    : null;
+  const companyAbout = job.displayCompanyAbout || job.aboutCompany || job.companyAbout || job.about || fallbackCompanyDesc;
   const companyWebsite = job.displayCompanyWebsite || job.companyWebsite || job.website;
   const statusLabel = formatStatus(job.displayStatus || job.status, t);
+  const isSmaartSource = job.displaySource
+    ? job.displaySource === 'smaart'
+    : job.sourceCollection === 'smaartjobpostings';
+  const missedMustHaves = Array.isArray(job.missedMustHaves) ? job.missedMustHaves : [];
+  const hasSkillGap = missedMustHaves.length > 0;
 
 
 
@@ -480,7 +566,7 @@ const PlacementDetail = () => {
           <div className="border-b border-[#d8e6f7] p-6 dark:border-[#1a3884]/20">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex min-w-0 gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#d8e6f7] bg-[#f5f8ff] text-xl font-black text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-300">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-lg font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
                   {companyLogo ? (
                     <img src={companyLogo} alt={`${job.displayCompany} logo`} className="h-full w-full object-contain p-2" />
                   ) : (
@@ -488,38 +574,60 @@ const PlacementDetail = () => {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-extrabold uppercase tracking-wide text-[#1a3884] dark:text-blue-300">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1a3884] dark:text-blue-300">
                     {job.displayCompany}
                   </p>
-                  <h1 className="mt-1 text-2xl font-extrabold leading-tight text-[#0d1f4e] dark:text-white sm:text-3xl">
+                  <h1 className="mt-1 text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[#0d1f4e] dark:text-white sm:text-[26px]">
                     {job.displayTitle}
                   </h1>
-                  <p className="mt-1 text-sm font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                    {job.displayType}
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-slate-500 dark:text-slate-400">
+                    {job.displayType && <span>{job.displayType}</span>}
+                    {job.displayLocation && (
+                      <>
+                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                        <span>{job.displayLocation}</span>
+                      </>
+                    )}
+                    {getPostedAgo(job.displayCreatedAt || job.createdAt, t) && (
+                      <>
+                        <span className="text-slate-300 dark:text-slate-600">·</span>
+                        <span>{getPostedAgo(job.displayCreatedAt || job.createdAt, t)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
-                <span className="flex h-10 items-center justify-center rounded-xl bg-emerald-50 px-4 text-xs font-extrabold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 w-full sm:w-auto">
-                  {statusLabel}
-                </span>
+              <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:w-auto">
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#1a3884]/20 bg-white px-3 text-[11.5px] font-medium text-[#1a3884] dark:border-[#1a3884]/50 dark:bg-transparent dark:text-blue-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                    {statusLabel}
+                  </span>
+                  <span className={`flex h-9 items-center justify-center rounded-lg px-3 text-[11.5px] font-semibold uppercase tracking-[0.05em] ${
+                    isSmaartSource
+                      ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
+                      : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+                  }`}>
+                    {isSmaartSource ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College")}
+                  </span>
+                </div>
                 {documentUrl && (
                   <a
                     href={documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-10 items-center justify-center gap-2 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300 w-full sm:w-auto"
+                    className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-[#0d1f4e] transition-colors hover:border-[#1a3884]/40 hover:bg-[#f5f8ff] dark:border-[#1a3884]/30 dark:text-slate-200 dark:hover:bg-[#001a3d] sm:w-auto"
                   >
                     {t("placement.view_jd", "View JD")}
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3.5 w-3.5" stroke={1.8} />
                   </a>
                 )}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex w-full items-center gap-2 sm:w-auto">
                   {!hasApplied && (
                       <button
                         onClick={() => setBuildResumeOpen(true)}
-                        className="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#1a3884] hover:bg-[#132c6b] px-5 text-sm font-bold text-white w-full sm:w-auto transition-all"
+                        className="flex h-9 w-full items-center justify-center rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-[#0d1f4e] transition-colors hover:border-[#1a3884]/40 hover:bg-[#f5f8ff] dark:border-[#1a3884]/30 dark:text-slate-200 dark:hover:bg-[#001a3d] sm:w-auto"
                       >
                         {t("placement.generate_resume", "Build Resume")}
                       </button>
@@ -527,7 +635,7 @@ const PlacementDetail = () => {
                   <button
                     onClick={() => setApplyOpen(true)}
                     disabled={hasApplied}
-                    className={`h-10 rounded-xl px-5 text-sm font-bold text-white flex-1 sm:flex-initial justify-center items-center ${hasApplied ? 'bg-slate-400 cursor-not-allowed w-full sm:w-auto' : 'bg-[#1a3884] hover:bg-[#132c6b] w-full sm:w-auto'}`}
+                    className={`flex h-9 w-full flex-1 items-center justify-center rounded-lg px-5 text-[13px] font-medium text-white transition-colors sm:w-auto sm:flex-initial ${hasApplied ? 'cursor-not-allowed bg-slate-300 dark:bg-slate-700' : 'bg-[#0d1f4e] hover:bg-[#1a3884] active:scale-[0.98]'}`}
                   >
                     {hasApplied ? t("placement.applied", "Applied") : t("placement.apply", "Apply")}
                   </button>
@@ -535,19 +643,19 @@ const PlacementDetail = () => {
                     <>
                       <button
                         onClick={() => setWithdrewConfirmOpen(true)}
-                        className="h-10 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300 flex-1 sm:flex-initial justify-center items-center"
+                        className="flex h-9 w-full flex-1 items-center justify-center rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400 sm:w-auto sm:flex-initial"
                       >
                         {t("placement.withdraw", "Withdraw")}
                       </button>
                       {withdrewConfirmOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-                            <h3 className="text-lg font-bold text-[#0d1f4e]">{t("placement.confirm_withdraw", "Confirm withdraw")}</h3>
-                            <p className="mt-2 text-sm text-slate-600">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                          <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-[#1a3884]/30 dark:bg-[#001630]">
+                            <h3 className="text-[16px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{t("placement.confirm_withdraw", "Confirm withdraw")}</h3>
+                            <p className="mt-2 text-[13.5px] leading-relaxed text-slate-500 dark:text-slate-400">
                               {t("placement.withdraw_warning", { title: job.displayTitle, defaultValue: "Are you sure you want to withdraw your application for {{title}}? This action cannot be undone." })}
                             </p>
-                            <div className="mt-4 flex justify-end gap-3">
-                              <button onClick={() => setWithdrewConfirmOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold">{t("placement.cancel", "Cancel")}</button>
+                            <div className="mt-6 flex justify-end gap-2.5">
+                              <button onClick={() => setWithdrewConfirmOpen(false)} className="h-9 rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:bg-[#001a3d]">{t("placement.cancel", "Cancel")}</button>
                               <button
                                 onClick={async () => {
                                   if (withdrewPending) return;
@@ -587,7 +695,7 @@ const PlacementDetail = () => {
                                     setWithdrewPending(false);
                                   }
                                 }}
-                                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white"
+                                className="h-9 rounded-lg bg-red-600 px-4 text-[13px] font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-60"
                               >
                                 {withdrewPending ? t("placement.withdrawing", "Withdrawing...") : t("placement.withdraw", "Withdraw")}
                               </button>
@@ -602,15 +710,86 @@ const PlacementDetail = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <section className="space-y-8">
+          {/* Offer Banner UI */}
+          {hasApplied && applicationData && applicationData.status === 'Offer' && (
+            <div className="mx-6 mt-6 rounded-xl border border-sky-200 bg-sky-50/70 p-5 dark:border-sky-500/25 dark:bg-sky-500/[0.07]">
+                <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
+                    <div className="min-w-0 flex-1">
+                        <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-sky-900 dark:text-sky-300">
+                            You have received an offer
+                        </h2>
+                        <p className="mt-1 text-[13px] leading-relaxed text-sky-800/80 dark:text-sky-400/90">
+                            Congratulations! {job.displayTitle} has extended an offer to you. Review the details below.
+                        </p>
+
+                        <div className="mt-4 flex flex-col gap-6 rounded-lg border border-sky-100 bg-white p-4 dark:border-sky-500/20 dark:bg-[#001630] sm:flex-row">
+                            <div>
+                                <p className="mb-1 text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">Package Offered</p>
+                                <p className="text-[15px] font-semibold text-[#0d1f4e] dark:text-white">{applicationData.offeredPackage || 'Not specified'}</p>
+                            </div>
+                            <div>
+                                <p className="mb-1 text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">Offer Date</p>
+                                <p className="text-[15px] font-semibold text-[#0d1f4e] dark:text-white">
+                                    {applicationData.offerDate ? new Date(applicationData.offerDate).toLocaleDateString() : new Date().toLocaleDateString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex w-full flex-col gap-3 md:w-[260px] md:flex-shrink-0">
+                        <div>
+                            <label className="mb-1.5 block text-[10.5px] font-medium uppercase tracking-[0.07em] text-sky-700 dark:text-sky-400">E-Signature</label>
+                            <input
+                                type="text"
+                                placeholder="Type full name to sign"
+                                value={eSignature}
+                                onChange={(e) => setESignature(e.target.value)}
+                                className="h-10 w-full rounded-lg border border-sky-200 bg-white px-3.5 text-[13.5px] text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-sky-500 focus:ring-[3px] focus:ring-sky-500/10 dark:border-sky-500/25 dark:bg-[#001630] dark:text-white"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleOfferResponse('Declined')}
+                                disabled={offerPending}
+                                className="h-9 flex-1 rounded-lg border border-slate-200 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                            >
+                                Decline
+                            </button>
+                            <button
+                                onClick={() => handleOfferResponse('Accepted')}
+                                disabled={offerPending}
+                                className="h-9 flex-[2] rounded-lg bg-sky-600 text-[13px] font-medium text-white transition-colors hover:bg-sky-700 disabled:opacity-50"
+                            >
+                                {offerPending ? 'Processing…' : 'Accept Offer'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          )}
+
+          {/* Already Accepted/Hired Banner */}
+          {hasApplied && applicationData && (applicationData.status === 'Hired' || applicationData.status === 'Accepted') && (
+            <div className="mx-6 mt-6 flex items-start gap-3.5 rounded-xl border border-emerald-200/70 bg-emerald-50/70 p-4 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15">
+                    <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" stroke={1.7} />
+                </div>
+                <div className="min-w-0">
+                    <h3 className="text-[14.5px] font-semibold text-emerald-800 dark:text-emerald-300">Offer accepted</h3>
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-emerald-700/80 dark:text-emerald-400/90">You have successfully accepted the offer for {job.displayTitle}. Your signature was recorded on {applicationData.signatureDate ? new Date(applicationData.signatureDate).toLocaleDateString() : new Date().toLocaleDateString()}.</p>
+                </div>
+            </div>
+          )}
+
+          <div className="grid gap-6 p-6 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
+            <section className="space-y-7">
               <div>
-                <h2 className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
-                  <FileDescription stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                  <FileDescription stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
                   {t("placement.job_description", "Job Description")}
                 </h2>
-                <div className="mt-4 rounded-2xl border border-[#d8e6f7] bg-[#f8fbff] p-5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                  <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-slate-300 font-medium">
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                  <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
                     {getDescription(job, t)}
                   </p>
                 </div>
@@ -618,20 +797,20 @@ const PlacementDetail = () => {
 
               {eligibility && (
                 <div>
-                  <h2 className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
-                    <ShieldCheck stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <ShieldCheck stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
                     {t("placement.eligibility_criteria", "Eligibility Criteria")}
                   </h2>
-                  <div className="mt-4 rounded-2xl border border-[#d8e6f7] bg-[#f8fbff] p-5 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                    <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
                       {eligibility.map(({ label, value, icon: Icon }) => (
-                        <div key={label} className="flex gap-4">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm border border-[#d8e6f7] dark:bg-[#001630] dark:border-[#1a3884]/30">
-                            <Icon stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                        <div key={label} className="flex gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-[#1a3884]/30 dark:bg-[#001630]">
+                            <Icon stroke={1.7} className="h-[17px] w-[17px] text-[#1a3884] dark:text-blue-400" />
                           </div>
-                          <div className="min-w-0 flex flex-col justify-center">
-                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-                            <p className="mt-0.5 break-words text-sm font-extrabold text-[#0d1f4e] dark:text-white leading-tight">{formatValue(value, t)}</p>
+                          <div className="flex min-w-0 flex-col justify-center">
+                            <p className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{label}</p>
+                            <p className="mt-0.5 break-words text-[13.5px] font-semibold leading-tight text-[#0d1f4e] dark:text-white">{formatValue(value, t)}</p>
                           </div>
                         </div>
                       ))}
@@ -642,13 +821,13 @@ const PlacementDetail = () => {
 
               {skills.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
-                    <Star stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                  <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <Star stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
                     {t("placement.skills", "Skills & Technologies")}
                   </h3>
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     {skills.map((skill) => (
-                      <span key={skill} className="rounded-xl border border-[#d8e6f7] bg-white px-4 py-2 text-sm font-bold text-[#1a3884] shadow-sm dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-blue-300">
+                      <span key={skill} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#0d1f4e] dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-slate-200">
                         {skill}
                       </span>
                     ))}
@@ -656,10 +835,55 @@ const PlacementDetail = () => {
                 </div>
               )}
 
+              {/* ── Skill Gap Section ─────────────────────────────────── */}
+              {hasSkillGap && (
+                <div>
+                  <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <span className="text-[#1a3884] dark:text-blue-400 text-[18px] leading-none">⚠️</span>
+                    {t("placement.skill_gap", "Skill Gap Detected")}
+                  </h3>
+                  <div className="mt-3 rounded-xl border border-[#1a3884]/20 bg-[#001a3d]/5 p-5 dark:border-[#1a3884]/30 dark:bg-[#001a3d]/40">
+                    <p className="mb-4 text-[13px] leading-relaxed text-[#112b6b] dark:text-blue-200 font-medium">
+                      The following must-have skills are missing or below the required level. Closing these gaps will boost your chances.
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {missedMustHaves.map((skill, idx) => {
+                        // Handle both old string format and new object format gracefully
+                        const isObj = typeof skill === 'object' && skill !== null;
+                        const name = isObj ? skill.name : skill;
+                        const reqLvl = isObj ? skill.requiredLevel : '?';
+                        const stdLvl = isObj ? skill.studentLevel : '?';
+
+                        return (
+                          <div key={`${name}-${idx}`} className="flex flex-col rounded-xl border border-[#d8e6f7] bg-white p-3.5 shadow-sm dark:border-[#1a3884]/30 dark:bg-[#001630]">
+                            <p className="truncate text-[13.5px] font-bold text-[#0d1f4e] dark:text-white">{name}</p>
+                            <div className="mt-2 flex items-center gap-3">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Required</span>
+                                <span className="text-[12.5px] font-bold text-[#1a3884] dark:text-blue-300">Level {reqLvl}</span>
+                              </div>
+                              <div className="h-6 w-px bg-slate-200 dark:bg-[#1a3884]/30" />
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">You have</span>
+                                <span className="text-[12.5px] font-bold text-slate-600 dark:text-slate-300">Level {stdLvl}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-4 text-[11px] italic text-[#1a3884]/70 dark:text-blue-300/70">
+                      *Reflects verified skills only. Your application will still be reviewed.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {/* ──────────────────────────────────────────────────────── */}
+
               <div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
-                    <Building stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <Building stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
                     {t("placement.about_company", "About the Company")}
                   </h2>
                   {companyWebsite && (
@@ -667,35 +891,35 @@ const PlacementDetail = () => {
                       href={companyWebsite}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-bold text-[#1a3884] hover:text-[#132c6b] dark:text-blue-300"
+                      className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
                     >
                       {t("placement.website", "Website")}
-                      <ExternalLink stroke={2} className="h-4 w-4" />
+                      <ExternalLink stroke={1.8} className="h-3.5 w-3.5" />
                     </a>
                   )}
                 </div>
-                <div className="mt-4 rounded-2xl border border-[#d8e6f7] bg-[#f8fbff] p-5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                  <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-slate-300 font-medium">
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                  <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
                     {companyAbout || t("placement.no_company_info", "Company information has not been added yet.")}
                   </p>
                 </div>
               </div>
             </section>
 
-            <aside className="space-y-6">
-              <div className="rounded-2xl border border-[#d8e6f7] bg-[#f8fbff] p-6 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                <h2 className="text-sm font-extrabold uppercase tracking-[0.15em] text-[#1a3884] dark:text-blue-300 border-b border-[#d8e6f7] pb-4 mb-4 dark:border-[#1a3884]/20">
+            <aside className="space-y-6 lg:sticky lg:top-6">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                <h2 className="mb-4 border-b border-slate-200 pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#1a3884] dark:border-[#1a3884]/25 dark:text-blue-300">
                   {t("placement.job_information", "Job Information")}
                 </h2>
-                <div className="grid grid-cols-1 gap-5">
+                <div className="grid grid-cols-1 gap-4">
                   {details.map(({ label, value, icon: Icon }) => (
-                    <div key={label} className="flex gap-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm border border-[#d8e6f7] dark:bg-[#001630] dark:border-[#1a3884]/30">
-                        <Icon stroke={2} className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                    <div key={label} className="flex gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-[#1a3884]/30 dark:bg-[#001630]">
+                        <Icon stroke={1.7} className="h-[17px] w-[17px] text-[#1a3884] dark:text-blue-400" />
                       </div>
-                      <div className="min-w-0 flex flex-col justify-center">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-                        <p className="mt-0.5 break-words text-sm font-extrabold text-[#0d1f4e] dark:text-white leading-tight">{formatValue(value, t)}</p>
+                      <div className="flex min-w-0 flex-col justify-center">
+                        <p className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{label}</p>
+                        <p className="mt-0.5 break-words text-[13.5px] font-semibold leading-tight text-[#0d1f4e] dark:text-white">{formatValue(value, t)}</p>
                       </div>
                     </div>
                   ))}
@@ -707,20 +931,18 @@ const PlacementDetail = () => {
       </div>
 
       <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
-        <DialogContent className="w-[92%] sm:w-full max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+        <DialogContent className="sm:left-[calc(50%+128px)] w-[92%] sm:w-full max-h-[92vh] max-w-2xl overflow-y-auto rounded-2xl border-[#d8e6f7] bg-white p-0 dark:border-[#1a3884]/20 dark:bg-[#001630]">
           <DialogHeader className="border-b border-[#d8e6f7] px-6 py-5 text-left dark:border-[#1a3884]/20">
-            <DialogTitle className="text-xl font-extrabold text-[#0d1f4e] dark:text-white">
+            <DialogTitle className="text-[17px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
               {t("placement.apply_for", { title: job.displayTitle, defaultValue: "Apply for {{title}}" })}
             </DialogTitle>
-            <DialogDescription className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{job.displayCompany}</span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{job.displayLocation}</span>
-                </span>
+            <DialogDescription className="text-[13px] text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span>{job.displayCompany}</span>
+                <span className="text-slate-300 dark:text-slate-600">·</span>
+                <span>{job.displayLocation}</span>
                 {/* Source badge */}
-                <span className="ml-2 inline-flex items-center rounded-full bg-[#eef4ff] px-2 py-0.5 text-xs font-extrabold text-[#1a3884] dark:bg-[#072046] dark:text-blue-300">
+                <span className="ml-1 inline-flex items-center rounded-md bg-[#f1f5fd] px-2 py-[3px] text-[10.5px] font-medium text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
                   {job.sourceCollection === 'smaartjobpostings' ? t("placement.source_smaart", "SMAART") : job.sourceCollection === 'jobpostings' ? t("placement.source_college", "College") : (job.sourceCollection || 'External')}
                 </span>
               </div>
@@ -730,51 +952,58 @@ const PlacementDetail = () => {
           <form onSubmit={handleApplicationSubmit} className="space-y-5 px-6 py-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.full_name", "Full Name")}</span>
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.full_name", "Full Name")}</span>
                 <input
                   required
                   value={applicationForm.fullName}
                   onChange={(event) => updateApplicationField("fullName", event.target.value)}
-                  className="h-11 w-full rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-3 text-sm font-semibold text-[#0d1f4e] outline-none focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-[13.5px] text-slate-900 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white"
                 />
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.email", "Email")}</span>
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.email", "Email")}</span>
                 <input
                   required
                   type="email"
                   value={applicationForm.email}
                   onChange={(event) => updateApplicationField("email", event.target.value)}
-                  className="h-11 w-full rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-3 text-sm font-semibold text-[#0d1f4e] outline-none focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-[13.5px] text-slate-900 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white"
                 />
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.mobile", "Mobile")}</span>
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.mobile", "Mobile")}</span>
                 <input
                   required
                   value={applicationForm.mobile}
                   onChange={(event) => updateApplicationField("mobile", event.target.value)}
-                  className="h-11 w-full rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-3 text-sm font-semibold text-[#0d1f4e] outline-none focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-[13.5px] text-slate-900 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white"
                 />
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.active_backlog", "Active Backlogs")}</span>
-                <input
-                  required
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={applicationForm.activeBacklog}
-                  onChange={(event) => updateApplicationField("activeBacklog", event.target.value)}
-                  className="h-11 w-full rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-3 text-sm font-semibold text-[#0d1f4e] outline-none focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
-                />
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.active_backlog", "Active Backlogs")}</span>
+                <div className="relative">
+                    <input
+                      required
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={applicationForm.activeBacklog}
+                      readOnly={isBacklogReadOnly}
+                      onChange={(event) => updateApplicationField("activeBacklog", event.target.value)}
+                      className={`h-10 w-full rounded-lg border border-slate-200 px-3.5 text-[13.5px] text-slate-900 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white ${isBacklogReadOnly ? 'cursor-not-allowed border-emerald-200 bg-emerald-50/60 text-emerald-800 dark:border-emerald-800/50 dark:bg-emerald-900/10 dark:text-emerald-300' : 'bg-white'}`}
+                      title={isBacklogReadOnly ? "Auto-synced from Academic Records" : ""}
+                    />
+                    {isBacklogReadOnly && (
+                        <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" title="Auto-synced from Academic Records" />
+                    )}
+                </div>
               </label>
 
               <label className="space-y-1.5 sm:col-span-2">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{t("placement.resume", "Resume")}</span>
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.resume", "Resume")}</span>
                 <div className="flex items-center gap-3">
                   <input
                     id="resumeFileInput"
@@ -789,16 +1018,15 @@ const PlacementDetail = () => {
                   {!applicationForm.resumeFile && !applicationForm.resumeUrl ? (
                     <label
                       htmlFor="resumeFileInput"
-                      className="inline-flex h-11 w-full items-center justify-start
-                       rounded-xl border border-[#d8e6f7] bg-[#f8fbff] px-4 text-sm font-semibold text-[#0d1f4e] cursor-pointer hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                      className="inline-flex h-10 w-full cursor-pointer items-center justify-start rounded-lg border border-dashed border-slate-300 bg-white px-3.5 text-[13.5px] font-medium text-[#0d1f4e] transition-colors hover:border-[#1a3884]/50 hover:bg-[#f5f8ff] dark:border-[#1a3884]/40 dark:bg-[#001a3d] dark:text-slate-200"
                     >
-                      <UploadIcon className="mr-2 h-4 w-4 text-[#0d1f4e]" />
+                      <UploadIcon className="mr-2 h-4 w-4 text-slate-400" stroke={1.7} />
                       <span>{t("placement.upload_resume", "Upload Resume")}</span>
                     </label>
                   ) : (
-                    <div className="inline-flex w-full items-center justify-between gap-2 rounded-xl border border-[#d8e6f7] bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700">
+                    <div className="inline-flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 text-[13px] font-medium text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
                       <div className="flex items-center gap-2">
-                          <Checkbox className="h-4 w-4 text-emerald-600" />
+                          <Checkbox className="h-4 w-4 text-emerald-600" stroke={1.8} />
                           <span>{applicationForm.resumeUrl ? t("placement.smaart_resume_attached", "SMAART Resume Attached") : t("placement.uploaded", "Uploaded")}</span>
                       </div>
                       <button
@@ -825,27 +1053,40 @@ const PlacementDetail = () => {
                 href={applyUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[#1a3884] hover:text-[#132c6b] dark:text-blue-300"
+                className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
               >
                 {t("placement.external_link", "External application link")}
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-3.5 w-3.5" stroke={1.8} />
               </a>
             )}
 
-            <DialogFooter className="border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20 gap-2 sm:gap-0">
+            <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+              <label className="inline-flex cursor-pointer items-start gap-3 text-left">
+                <input
+                  type="checkbox"
+                  required
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884] dark:border-[#1a3884]/40 dark:bg-[#001630] dark:checked:bg-[#1a3884]"
+                />
+                <span className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
+                  {t("placement.consent_declare", "I hereby declare and grant permission to share my resume and profile details with the recruiter for this job application.")}
+                </span>
+              </label>
+            </div>
+
+            <DialogFooter className="mt-5 gap-2 border-t border-[#d8e6f7] pt-5 dark:border-[#1a3884]/20 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setApplyOpen(false)}
-                className="h-10 rounded-xl border border-[#d8e6f7] px-5 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300"
+                className="h-9 rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:bg-[#001a3d]"
               >
                 {t("placement.cancel", "Cancel")}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="h-10 rounded-xl bg-[#1a3884] px-5 text-sm font-bold text-white hover:bg-[#132c6b] disabled:cursor-not-allowed disabled:opacity-70"
+                className="h-9 rounded-lg bg-[#0d1f4e] px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#1a3884] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? t("placement.submitting", "Submitting...") : t("placement.submit_application", "Submit Application")}
+                {submitting ? t("placement.submitting", "Submitting…") : t("placement.submit_application", "Submit Application")}
               </button>
             </DialogFooter>
           </form>
@@ -853,29 +1094,29 @@ const PlacementDetail = () => {
       </Dialog>
 
       <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
-        <DialogContent className="w-[92%] sm:w-full max-w-md rounded-2xl border border-[#d8e6f7] bg-white p-6 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+        <DialogContent className="sm:left-[calc(50%+128px)] w-[92%] sm:w-full max-w-md rounded-2xl border border-[#d8e6f7] bg-white p-6 dark:border-[#1a3884]/20 dark:bg-[#001630]">
           <DialogHeader>
-            <DialogTitle className="text-lg font-extrabold text-[#0d1f4e] dark:text-white flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-amber-500" />
+            <DialogTitle className="flex items-center gap-2 text-[16px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+              <ShieldCheck className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" stroke={1.7} />
               {t("placement.terms_title", "Terms & Conditions")}
             </DialogTitle>
-            <DialogDescription className="mt-3 text-sm font-medium text-slate-650 dark:text-slate-400 leading-relaxed">
+            <DialogDescription className="mt-3 text-[13.5px] leading-relaxed text-slate-500 dark:text-slate-400">
               {t("placement.terms_text", "I hereby declare that all the information provided above is correct. Any misleading information will lead to rejection of my application.")}
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="mt-6 flex justify-end gap-3 border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20">
+          <DialogFooter className="mt-6 flex justify-end gap-2 border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20">
             <button
               type="button"
               onClick={() => setTermsOpen(false)}
-              className="h-10 rounded-xl border border-[#d8e6f7] px-4 text-sm font-bold text-[#1a3884] hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:text-blue-300"
+              className="h-9 rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:bg-[#001a3d]"
             >
               {t("placement.cancel", "Cancel")}
             </button>
             <button
               type="button"
               onClick={executeApplicationSubmit}
-              className="h-10 rounded-xl bg-amber-600 px-5 text-sm font-bold text-white hover:bg-amber-700 transition-colors"
+              className="h-9 rounded-lg bg-[#0d1f4e] px-5 text-[13px] font-medium text-white transition-colors hover:bg-[#1a3884]"
             >
               {t("placement.accept_submit", "Accept & Submit")}
             </button>

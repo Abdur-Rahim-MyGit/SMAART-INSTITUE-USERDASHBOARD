@@ -19,6 +19,7 @@ const MyNotes = lazy(() => import('@/pages/MyNotes'));
 const TodoTracker = lazy(() => import('@/pages/TodoTracker'));
 const Placement = lazy(() => import('@/pages/Placement'));
 const PlacementDetail = lazy(() => import('@/pages/PlacementDetail'));
+const JobFairDetail = lazy(() => import('@/pages/JobFairDetail'));
 const MyAssessments = lazy(() => import('@/pages/MyAssessments'));
 const SkillsPassport = lazy(() => import('@/pages/SkillsPassport'));
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -138,6 +139,9 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/notes" element={<MyNotes />} />
                         <Route path="/dashboard/todos" element={<TodoTracker />} />
                         <Route path="/dashboard/placement" element={<Placement />} />
+                        {/* Declared before the :source/:id pattern so "job-fair" is
+                            never captured as a job source. */}
+                        <Route path="/dashboard/placement/job-fair/:id" element={<JobFairDetail />} />
                         <Route path="/dashboard/placement/:source/:id" element={<PlacementDetail />} />
 
                         {/* Assessments */}
