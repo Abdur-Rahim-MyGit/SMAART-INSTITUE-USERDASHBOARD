@@ -1,0 +1,23 @@
+# Ignore frontend, backend, docs and load tests from EAS mobile build archive
+front-end/
+back-end/
+docs/
+loadtest/
+uploads/
+nginx/
+aws-deployment/
+.venv/
+venv/
+.venv-ocr/
+*.pdf
+*.docx
+*.zip
+*.log
+
+# Keep the upload tiny by ignoring build artifacts
+mobile-app/node_modules/
+mobile-app/android/
+mobile-app/ios/
+mobile-app/.expo/
+mobile-app/dist/
+mobile-app/web-build/

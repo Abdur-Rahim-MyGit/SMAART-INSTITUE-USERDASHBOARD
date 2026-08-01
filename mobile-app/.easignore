@@ -1,0 +1,23 @@
+# Ignore sibling directories if EAS runs from here
+../front-end/
+../back-end/
+../docs/
+../loadtest/
+../uploads/
+../nginx/
+../aws-deployment/
+../.venv/
+../venv/
+../.venv-ocr/
+../*.pdf
+../*.docx
+../*.zip
+../*.log
+
+# Local ignores
+node_modules/
+android/
+ios/
+.expo/
+dist/
+web-build/

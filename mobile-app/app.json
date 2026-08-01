@@ -23,7 +23,8 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.anonymous.smaartinstitutemobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +32,11 @@
     "plugins": [
       "expo-secure-store",
       "onnxruntime-react-native"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8ecffb41-af86-436b-82d3-e2d45fcd9610"
+      }
+    }
   }
 }
