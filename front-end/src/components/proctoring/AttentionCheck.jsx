@@ -1,103 +1,109 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RiHandCoinLine, RiTimeLine } from '@remixicon/react';
+import { RiHandCoinLine, RiShieldCheckLine } from '@remixicon/react';
 
 export const AttentionCheck = ({ onPass, onFail }) => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [buttonPos, setButtonPos] = useState({ top: '50%', left: '50%' });
 
-  // Randomize button position to defeat clicker scripts
+  // Randomize button position safely within the designated target area
   useEffect(() => {
-    const randomTop = Math.floor(Math.random() * 40) + 30; // 30% to 70%
-    const randomLeft = Math.floor(Math.random() * 60) + 20; // 20% to 80%
+    const randomTop = Math.floor(Math.random() * 20) + 40; // 40% to 60% inside action container
+    const randomLeft = Math.floor(Math.random() * 50) + 25; // 25% to 75%
     setButtonPos({ top: `${randomTop}%`, left: `${randomLeft}%` });
   }, []);
 
-  // Countdown timer
+  // Smooth timestamp-based countdown timer
   useEffect(() => {
+    const startTime = Date.now();
+    const duration = 15;
+
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onFail(); // Timeout counts as violation
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(duration - elapsed, 0);
+      setTimeLeft(remaining);
+
+      if (remaining <= 0) {
+        clearInterval(timer);
+        onFail(); // Timeout counts as violation
+      }
+    }, 200);
 
     return () => clearInterval(timer);
   }, [onFail]);
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/50 dark:bg-[#00152E]/95 backdrop-blur-lg flex items-center justify-center p-4 select-none transition-colors duration-300">
-      <div className="relative w-full max-w-lg h-[400px] bg-white dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/30 rounded-3xl p-8 overflow-hidden flex flex-col justify-between items-center text-center text-slate-800 dark:text-white shadow-[0_25px_60px_rgba(0,0,0,0.15)] dark:shadow-2xl">
-        
-        {/* Glow Effects */}
-        <div className="absolute top-12 left-12 w-32 h-32 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-12 right-12 w-32 h-32 bg-[#1a3884]/5 dark:bg-[#1a3884]/30 rounded-full blur-3xl pointer-events-none" />
+  const circumference = 2 * Math.PI * 44;
 
-        {/* Info Header */}
-        <div className="space-y-2 mt-4 z-10">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-cyan-400 flex items-center justify-center gap-1.5">
-            <RiTimeLine size={14} className="animate-spin" /> Liveness Verification Check
+  return (
+    <div className="fixed inset-0 z-[10000] bg-slate-900/60 dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none transition-colors duration-300">
+      <div className="relative w-full max-w-md bg-white dark:bg-[#00152E] border border-slate-200 dark:border-cyan-500/20 rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center overflow-hidden">
+        
+        {/* Ambient Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/10 rounded-full blur-[60px] pointer-events-none" />
+
+        {/* Top Header */}
+        <div className="space-y-2 mb-4 z-10">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[10px] font-black uppercase tracking-widest">
+            <RiShieldCheckLine size={14} /> Liveness Verification Check
           </span>
-          <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
             Are you still taking the assessment?
           </h3>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-350 max-w-sm font-medium">
-            To prevent automatic macro scripts, click the button that appears below before the timer runs out.
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto leading-relaxed font-medium">
+            To prevent automated macro scripts, click the button below before the timer runs out.
           </p>
         </div>
 
-        {/* Circular Countdown Progress */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <svg className="w-56 h-56 transform -rotate-90">
+        {/* Timer Circle */}
+        <div className="relative w-32 h-32 my-1 flex items-center justify-center z-10">
+          <svg className="w-full h-full transform -rotate-90">
             <circle
-              cx="112"
-              cy="112"
-              r="90"
-              className="stroke-slate-100 dark:stroke-white/5 fill-none"
-              strokeWidth="4"
+              cx="64"
+              cy="64"
+              r="44"
+              className="stroke-slate-100 dark:stroke-white/10 fill-none"
+              strokeWidth="5"
             />
             <motion.circle
-              cx="112"
-              cy="112"
-              r="90"
-              className="stroke-[#1a3884] dark:stroke-cyan-500 fill-none"
-              strokeWidth="4"
-              strokeDasharray="565.48"
-              animate={{ strokeDashoffset: 565.48 - (565.48 * timeLeft) / 15 }}
-              transition={{ duration: 1, ease: 'linear' }}
+              cx="64"
+              cy="64"
+              r="44"
+              className="stroke-cyan-500 fill-none"
+              strokeWidth="5"
+              strokeDasharray={circumference}
+              animate={{ strokeDashoffset: circumference - (circumference * timeLeft) / 15 }}
+              transition={{ duration: 0.2, ease: 'linear' }}
+              strokeLinecap="round"
             />
           </svg>
-          <div className="flex flex-col items-center">
-            <span className="text-5xl font-black text-slate-800 dark:text-white">{timeLeft}</span>
-            <span className="text-[10px] text-slate-400 dark:text-slate-450 font-bold uppercase tracking-widest mt-1">Seconds</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-3xl font-black text-slate-900 dark:text-white">{timeLeft}</span>
+            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Seconds</span>
           </div>
         </div>
 
-        {/* Randomized Click Target Button */}
-        <motion.button
-          onClick={onPass}
-          style={{
-            position: 'absolute',
-            top: buttonPos.top,
-            left: buttonPos.left,
-            transform: 'translate(-50%, -50%)',
-            zIndex: 20
-          }}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-5 py-3 bg-gradient-to-r from-[#1a3884] to-[#12275c] hover:from-[#152e6d] hover:to-[#0c1b3f] text-white dark:from-cyan-400 dark:to-blue-500 dark:text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-[#1a3884]/15 dark:shadow-cyan-400/20 flex items-center gap-1.5 cursor-pointer pointer-events-auto transition-all"
-        >
-          <RiHandCoinLine size={16} /> Confirm Presence
-        </motion.button>
+        {/* Action Area for Verification Button */}
+        <div className="relative w-full h-20 my-2 z-20 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden">
+          <motion.button
+            onClick={onPass}
+            style={{
+              position: 'absolute',
+              top: buttonPos.top,
+              left: buttonPos.left,
+              transform: 'translate(-50%, -50%)',
+            }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-cyan-500/20 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 shrink-0 whitespace-nowrap"
+          >
+            <RiHandCoinLine size={15} /> Confirm Presence
+          </motion.button>
+        </div>
 
-        {/* Security Warning Footer */}
-        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wide mb-2 z-10">
+        {/* Security Notice Footer */}
+        <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-1 z-10">
           Failing to verify counts as a security violation.
         </div>
       </div>
