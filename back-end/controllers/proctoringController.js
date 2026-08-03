@@ -1,9 +1,20 @@
 const ProctoringSession = require('../models/ProctoringSession');
 const ProctoringEvent = require('../models/ProctoringEvent');
+const {
+  RISK_WEIGHTS,
+  MAX_WARNINGS,
+  RISK_FLAG_THRESHOLD,
+  RISK_LOCK_THRESHOLD,
+  HEARTBEAT_GAP_MS,
+  FLAG_ONLY_MODE
+} = require('../config/proctoringPolicy');
 const path = require('path');
 const fs = require('fs');
 
-// Private helper to calculate session risk score based on violations count & severity
+// Private helper to calculate session risk score from violation counts.
+// Weights come from the single source of truth (config/proctoringPolicy.js) so
+// scoring can't drift from the enum/gate. NOTE: look up with `??` not `||` — an
+// info event weighted 0 must stay 0, not silently fall back to the default.
 const calculateRiskScore = (violationsByType) => {
   let score = 0;
 
@@ -12,39 +23,128 @@ const calculateRiskScore = (violationsByType) => {
 
   if (!violations) return 0;
 
-  // Weight formula
-  const weights = {
-    tab_switch: 15,
-    minimize: 15,
-    fullscreen_exit: 20,
-    face_absent: 15,
-    multiple_faces: 25,
-    face_mismatch: 30,      // High risk — different person
-    face_covered: 10,       // Low risk — obstruction
-    attention_check_fail: 35,
-    inactivity: 10,
-    face_registered: 0,     // Info event — no risk contribution
-    identity_verified: 0,   // Info event — no risk contribution
-    gaze_away: 10,
-    eyes_closed: 15,
-    voice_detected: 25,
-    prolonged_silence: 10,
-    // v2 ONNX events
-    spoof_detected: 40,        // Critical — photo/video replay attack
-    camera_quality_check: 0,   // Info
-    registration_quality: 0,   // Info
-    tracker_loss: 5,           // Low — brief tracking loss
-    identity_confidence: 0,    // Info
-  };
-
   Object.keys(violations).forEach(type => {
     const count = violations[type] || 0;
-    const weight = weights[type] || 10;
+    const weight = RISK_WEIGHTS[type] ?? 10; // unknown types default to 10; explicit 0s preserved
     score += count * weight;
   });
 
   // Cap risk score at 100
   return Math.min(score, 100);
+};
+
+/**
+ * Resolve a session AND verify the caller owns it (or is admin). Returns
+ * { session } on success or { error, status } so callers respond consistently.
+ * The not-owner message is identical to not-found so callers cannot probe for
+ * other students' sessions.
+ */
+const loadOwnedSession = async (sessionId, user) => {
+  if (!sessionId || !sessionId.match(/^[0-9a-fA-F]{24}$/)) {
+    return { error: 'Invalid session id.', status: 400 };
+  }
+  const session = await ProctoringSession.findById(sessionId);
+  if (!session) {
+    return { error: 'Proctoring session not found.', status: 404 };
+  }
+  const callerId = String(user?._id || user?.id || '');
+  const ownerId = String(session.userId || '');
+  const isAdmin = user?.role === 'admin';
+  if (!isAdmin && callerId !== ownerId) {
+    return { error: 'Proctoring session not found.', status: 404 };
+  }
+  return { session };
+};
+
+/**
+ * The server — not the browser — decides flag/lock outcomes, so a tampered
+ * client cannot talk its way out of being held.
+ */
+const applyServerDecision = (session) => {
+  // FLAG-ONLY MODE: never interrupt a live assessment; flags accumulate and
+  // the session is judged once at submit by the gate.
+  if (FLAG_ONLY_MODE) {
+    if (session.riskScore >= RISK_FLAG_THRESHOLD && session.status === 'active') {
+      session.status = 'flagged';
+    }
+    return;
+  }
+
+  const overWarningBudget = session.totalViolations > MAX_WARNINGS;
+  const overRiskBudget = session.riskScore >= RISK_LOCK_THRESHOLD;
+
+  if (overWarningBudget || overRiskBudget) {
+    session.isLocked = true;
+    session.status = 'locked';
+    if (!session.lockReason) {
+      session.lockReason = overRiskBudget
+        ? `Risk score ${session.riskScore} reached the automatic review threshold.`
+        : `Exceeded the ${MAX_WARNINGS}-warning limit.`;
+    }
+    return;
+  }
+
+  if (session.riskScore >= RISK_FLAG_THRESHOLD && session.status === 'active') {
+    session.status = 'flagged';
+  }
+};
+
+/**
+ * The client-facing contract: the browser renders a tier; it never derives one.
+ *   ok — nothing recorded · warn — recorded warning, exam usable ·
+ *   pause — budget reached, blocking card · held — under review, score withheld.
+ */
+const buildDecision = (session) => {
+  let tier = 'ok';
+  if (session.isLocked) tier = 'held';
+  else if (session.totalViolations >= MAX_WARNINGS) tier = 'pause';
+  else if (session.totalViolations > 0) tier = 'warn';
+
+  // In flag-only mode the client must never block — downgrade blocking tiers
+  // to the coaching banner.
+  if (FLAG_ONLY_MODE && (tier === 'pause' || tier === 'held')) {
+    tier = 'warn';
+  }
+
+  return {
+    tier,
+    warnings: session.totalViolations,
+    maxWarnings: MAX_WARNINGS,
+    riskScore: session.riskScore,
+    status: session.status,
+    held: !!session.isLocked,
+    reason: session.lockReason || '',
+    ticketId: session.activeTicketId || null
+  };
+};
+
+/**
+ * Single path for creating the support ticket that accompanies a hold, so a
+ * candidate never ends up held without a ticket, or with two.
+ */
+const raiseLockTicket = async (session) => {
+  const SupportTicket = require('../models/SupportTicket');
+  const User = require('../models/User');
+  const user = await User.findById(session.userId);
+
+  const newTicket = new SupportTicket({
+    userId: session.userId,
+    userModel: 'Student',
+    title: 'Assessment held for review: proctoring violation',
+    description:
+      `The assessment session ${session.assessmentId} for ${user?.fullName || session.userId} ` +
+      `was held for review by the proctoring system.\n` +
+      `Reason: ${session.lockReason}\n` +
+      `Violations: ${session.totalViolations}\n` +
+      `Risk score: ${session.riskScore}`,
+    category: 'course & assessment',
+    priority: 'high',
+    status: 'open'
+  });
+
+  await newTicket.save();
+  session.activeTicketId = newTicket._id;
+  return newTicket;
 };
 
 // Start a new proctoring session
@@ -104,7 +204,13 @@ exports.logEvent = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const { sessionId } = req.params;
-    const { eventType, severity, details, screenshotUrl } = req.body;
+    const { eventType, severity, details, snapshotId } = req.body;
+    // The engine sends an opaque snapshotId (returned by uploadSnapshot); the
+    // server resolves it to the stored file. A raw client-supplied URL is no
+    // longer trusted as evidence.
+    const screenshotUrl = snapshotId
+      ? `/uploads/proctoring/${path.basename(String(snapshotId))}`
+      : (req.body.screenshotUrl || undefined);
 
     if (!eventType) {
       return res.status(400).json({ success: false, error: 'eventType is required.' });
@@ -112,7 +218,7 @@ exports.logEvent = async (req, res) => {
 
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
-      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
     // Create the event log
@@ -158,9 +264,10 @@ exports.logEvent = async (req, res) => {
       // Re-calculate risk score
       session.riskScore = calculateRiskScore(session.violationsByType);
 
-      // Auto-flag session if risk score gets high
-      if (session.riskScore >= 60 && session.status === 'active') {
-        session.status = 'flagged';
+      // The server decides flag/lock — the browser is only told the outcome.
+      applyServerDecision(session);
+      if (session.isLocked && !session.activeTicketId) {
+        await raiseLockTicket(session);
       }
     }
 
@@ -169,11 +276,14 @@ exports.logEvent = async (req, res) => {
     res.status(201).json({
       success: true,
       data: event,
+      // Kept for backward compatibility with older clients
       sessionStatus: {
         totalViolations: session.totalViolations,
         riskScore: session.riskScore,
         status: session.status
-      }
+      },
+      // The decision contract the proctoring engine renders (tier/warnings/held)
+      proctoring: buildDecision(session)
     });
   } catch (err) {
     console.error('Error logging proctoring event:', err);
@@ -188,7 +298,7 @@ exports.completeSession = async (req, res) => {
 
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
-      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
     session.completedAt = new Date();
@@ -221,7 +331,7 @@ exports.uploadSnapshot = async (req, res) => {
 
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
-      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
     // Get the relative path for saving in DB and accessing statically
@@ -229,7 +339,10 @@ exports.uploadSnapshot = async (req, res) => {
 
     res.json({
       success: true,
-      screenshotUrl
+      screenshotUrl,
+      // Opaque id the engine attaches to violation events; the server resolves
+      // it back to a file — the client never dictates what gets stored.
+      snapshotId: req.file.filename
     });
   } catch (err) {
     console.error('Error uploading proctoring snapshot:', err);
@@ -276,7 +389,7 @@ exports.getSessionDetails = async (req, res) => {
       .populate('assessmentId', 'assessmentName assessmentCode durationMinutes');
 
     if (!session) {
-      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
     const events = await ProctoringEvent.find({ sessionId }).sort({ timestamp: 1 });
@@ -302,7 +415,7 @@ exports.triggerLock = async (req, res) => {
 
     const session = await ProctoringSession.findById(sessionId);
     if (!session) {
-      return res.status(444).json({ success: false, error: 'Proctoring session not found.' });
+      return res.status(404).json({ success: false, error: 'Proctoring session not found.' });
     }
 
     if (session.isLocked) {
@@ -347,11 +460,91 @@ exports.triggerLock = async (req, res) => {
   }
 };
 
-// Webhook to receive unlock signal from Admin and emit socket event
+/**
+ * POST /session/:sessionId/heartbeat — liveness ping.
+ *
+ * Deliberately not routed through logEvent: at one ping per 10s that would
+ * write hundreds of event documents per attempt. The signal is the MISSING
+ * request — a candidate who blocks the endpoint records a violation they
+ * cannot suppress.
+ */
+exports.heartbeat = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const { session, error, status } = await loadOwnedSession(sessionId, req.user);
+    if (error) {
+      return res.status(status).json({ success: false, error });
+    }
+
+    if (session.isLocked) {
+      return res.status(409).json({
+        success: false,
+        error: 'This session is already held for review.',
+        proctoring: buildDecision(session)
+      });
+    }
+
+    const now = new Date();
+    const previous = session.heartbeat?.lastAt;
+    const gapMs = previous ? now - new Date(previous) : 0;
+
+    session.heartbeat = session.heartbeat || {};
+    session.heartbeat.lastAt = now;
+    session.heartbeat.sequence = (session.heartbeat.sequence || 0) + 1;
+
+    // A lapse in contact is itself a recorded violation.
+    if (gapMs > HEARTBEAT_GAP_MS) {
+      const gapSeconds = Math.round(gapMs / 1000);
+      session.heartbeat.missedCount = (session.heartbeat.missedCount || 0) + 1;
+
+      await new ProctoringEvent({
+        sessionId: session._id,
+        userId: session.userId,
+        eventType: 'proctoring_offline',
+        severity: 'high',
+        details: `No contact from the exam client for ${gapSeconds}s.`
+      }).save();
+
+      session.totalViolations += 1;
+      const current = session.violationsByType.get('proctoring_offline') || 0;
+      session.violationsByType.set('proctoring_offline', current + 1);
+      session.riskScore = calculateRiskScore(session.violationsByType);
+
+      applyServerDecision(session);
+      if (session.isLocked && !session.activeTicketId) {
+        await raiseLockTicket(session);
+      }
+    }
+
+    await session.save();
+
+    res.json({
+      success: true,
+      serverTime: now.toISOString(),
+      proctoring: buildDecision(session)
+    });
+  } catch (err) {
+    console.error('Error processing proctoring heartbeat:', err);
+    res.status(500).json({ success: false, error: 'Server error processing heartbeat', message: err.message });
+  }
+};
+
+// Webhook to receive an unlock signal from the Admin backend.
+// Previously this ONLY sent a notification and never cleared the lock, so a
+// candidate told they were "unlocked" stayed locked at the assessment start-gate.
+// It now actually releases every locked session for the user.
 exports.webhookUnlock = async (req, res) => {
   try {
     const { ticketId, userId } = req.body;
+    let unlocked = 0;
     if (userId) {
+      const result = await ProctoringSession.updateMany(
+        { userId, isLocked: true },
+        { $set: { isLocked: false, status: 'active' }, $unset: { activeTicketId: '' } }
+      );
+      unlocked = result.modifiedCount ?? result.nModified ?? 0;
+
       const Notification = require('../models/Notification');
       await Notification.createNotification({
         userId,
@@ -362,7 +555,7 @@ exports.webhookUnlock = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true, unlocked });
   } catch (err) {
     console.error('Webhook unlock error:', err);
     res.status(500).json({ success: false, error: err.message });

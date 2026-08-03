@@ -963,13 +963,21 @@ router.get('/companies', protect, async (req, res) => {
     let collegePartners = [];
     if (userCollegeId && mongoose.Types.ObjectId.isValid(userCollegeId)) {
       collegePartners = await db.collection('companies')
-        .find({ college: new mongoose.Types.ObjectId(userCollegeId) })
+        .find({
+          college: new mongoose.Types.ObjectId(userCollegeId),
+          status: { $nin: ['inactive', 'Inactive', 'pending', 'Pending', 'rejected', 'Rejected', 'suspended', 'Suspended', 'in review', 'In review', 'In Review'] }
+        })
         .toArray();
     }
 
     // 2. Fetch SMAART Partners (recruiters without a specific college)
+    // Only approved and active partners should be shown to students (not pending / in review queue)
     const smaartPartners = await db.collection('recruiters')
-      .find({ role: 'recruiter', status: { $ne: 'inactive' }, $or: [{ college: null }, { college: { $exists: false } }] })
+      .find({
+        role: 'recruiter',
+        status: { $in: ['active', 'Active', 'approved', 'Approved'] },
+        $or: [{ college: null }, { college: { $exists: false } }]
+      })
       .toArray();
 
     // Map them to a common format
@@ -1010,19 +1018,72 @@ router.get('/companies', protect, async (req, res) => {
  * Postings that belong to the given fairs, normalised exactly like the Jobs tab
  * and scoped by the same audience rules — being able to see a fair does not
  * entitle a student to postings they are not targeted for.
+ *
+ * NOTE: The deadline/date filter from buildCollectionFilter is intentionally
+ * SKIPPED here. Job fair postings should always be visible inside the fair
+ * regardless of whether their individual application deadline has passed —
+ * the fair's own dates govern visibility, not each job's deadline.
  * Returns a Map keyed by stringified fair id.
  */
 const loadJobsForFairs = async (student, fairIds) => {
   const jobsByFair = new Map();
   if (!fairIds.length) return jobsByFair;
 
-  const audienceFilter = buildCollectionFilter(student);
+  // Build audience filter WITHOUT the date/deadline restriction.
+  // We do this by constructing the filter ourselves instead of calling
+  // buildCollectionFilter, which bundles a dateFilter that rejects expired jobs.
+  const collegeId = getId(student.college);
+  const degreeId = getId(student.degree || student.degreeId);
+
+  // Only keep the status + audience portion — no date filter.
+  const statusFilter = {
+    $or: [
+      { status: { $exists: false } },
+      { status: { $in: ['active', 'Active', 'published', 'Published', 'open', 'Open', 'approved', 'Approved', 'draft', 'Draft', 'inactive', 'Inactive', 'closed', 'Closed'] } },
+      { isActive: true },
+      { published: true },
+      { isPublished: true },
+    ],
+  };
+
+  const audienceOrClauses = [
+    { targetType: { $exists: false } },
+    { targetType: null },
+    { targetType: { $in: ['all', 'All', 'students', 'Students'] } },
+  ];
+
+  if (collegeId && mongoose.Types.ObjectId.isValid(collegeId)) {
+    const collegeObjectId = new mongoose.Types.ObjectId(collegeId);
+    audienceOrClauses.push(
+      { college: collegeObjectId },
+      { collegeId: collegeObjectId },
+      { targetCollege: collegeObjectId },
+      { targetCollegeIds: collegeObjectId },
+      { targetColleges: collegeObjectId },
+    );
+  }
+
+  if (degreeId && mongoose.Types.ObjectId.isValid(degreeId)) {
+    const degreeObjectId = new mongoose.Types.ObjectId(degreeId);
+    audienceOrClauses.push(
+      { degree: degreeObjectId },
+      { degreeId: degreeObjectId },
+      { targetDegrees: degreeObjectId },
+    );
+  }
+
+  const fairAudienceFilter = {
+    $and: [
+      statusFilter,
+      { $or: audienceOrClauses },
+    ],
+  };
 
   await Promise.all(['jobpostings', 'smaartjobpostings'].map(async (collectionName) => {
     try {
       const docs = await mongoose.connection.db
         .collection(collectionName)
-        .find({ $and: [audienceFilter, { jobFairId: { $in: fairIds } }] })
+        .find({ $and: [fairAudienceFilter, { jobFairId: { $in: fairIds } }] })
         .sort({ createdAt: -1 })
         .toArray();
 
@@ -1039,6 +1100,7 @@ const loadJobsForFairs = async (student, fairIds) => {
 
   return jobsByFair;
 };
+
 
 // Single job fair, with its postings attached.
 router.get('/job-fairs/:id', protect, async (req, res) => {
@@ -1160,6 +1222,87 @@ router.post('/job-fairs/:id/register', protect, async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to register for job fair' });
   }
 });
+
+// @route   GET /api/placements/job-fairs/:id/pass
+// @desc    Get student's digital pass & QR payload for a job fair
+// @access  Private (Student)
+router.get('/job-fairs/:id/pass', protect, async (req, res) => {
+  try {
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({ success: false, error: 'Only student accounts can access digital fair passes' });
+    }
+
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid job fair ID' });
+    }
+
+    const fairCollection = mongoose.connection.db.collection('jobfairs');
+    const fair = await fairCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    if (!fair) {
+      return res.status(404).json({ success: false, error: 'Job Fair not found' });
+    }
+
+    const registeredStudents = fair.registeredStudents || [];
+    const isRegistered = registeredStudents.some(s => s.toString() === req.user._id.toString());
+    if (!isRegistered) {
+      return res.status(400).json({ success: false, error: 'Student is not registered for this Job Fair' });
+    }
+
+    const checkIns = fair.checkIns || [];
+    const checkInRecord = checkIns.find(c => c.student && c.student.toString() === req.user._id.toString());
+
+    // Generate unique pass identifier
+    const passCode = `SJF-${String(fair._id).slice(-4).toUpperCase()}-${String(req.user._id).slice(-4).toUpperCase()}`;
+
+    // Secure QR payload
+    const qrPayload = JSON.stringify({
+      type: 'SMAART_JOB_FAIR_PASS',
+      fairId: fair._id.toString(),
+      studentId: req.user._id.toString(),
+      passCode,
+      name: req.user.fullName || req.user.name || req.user.firstName || 'Student',
+      rollNo: req.user.rollNumber || req.user.rollNo || req.user.studentId || '',
+      collegeId: getId(req.user.college),
+      issuedAt: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      data: {
+        passCode,
+        qrPayload,
+        isCheckedIn: !!checkInRecord,
+        checkedInAt: checkInRecord?.checkedInAt || null,
+        boothNumber: checkInRecord?.boothNumber || null,
+        fair: {
+          _id: fair._id,
+          title: fair.title,
+          startDate: fair.startDate,
+          endDate: fair.endDate,
+          location: fair.location,
+          mode: fair.mode,
+          label: fair.label
+        },
+        student: {
+          _id: req.user._id,
+          name: req.user.fullName || req.user.name || req.user.firstName || 'Student',
+          email: req.user.email || '',
+          phone: req.user.mobile || req.user.phone || '',
+          rollNo: req.user.rollNumber || req.user.rollNo || req.user.studentId || 'N/A',
+          degree: req.user.degree?.abbreviation || req.user.degree?.fullName || req.user.degree || 'B.Tech',
+          department: req.user.degree?.specialization || req.user.academic?.specialisation || req.user.department || req.user.branch || 'Engineering',
+          currentCGPA: req.user.cgpa ?? req.user.academic?.cgpa ?? req.user.currentCGPA ?? null,
+          profilePhoto: req.user.profilePic || req.user.profileImage || req.user.profilePhoto || req.user.avatar || null
+        }
+      }
+    });
+  } catch (err) {
+    console.error('[Placements] get fair pass error:', err);
+    res.status(500).json({ success: false, error: 'Failed to generate fair pass' });
+  }
+});
+
 // @route   POST /api/placements/applications/:id/respond-offer
 // @desc    Accept or decline an offer with e-signature
 // @access  Private (Student)

@@ -590,6 +590,9 @@ export const placementsAPI = {
       method: 'POST',
     });
   },
+  getJobFairPass: async (id) => {
+    return apiCall(`/placements/job-fairs/${encodeURIComponent(id)}/pass`);
+  },
 };
 
 // Users API

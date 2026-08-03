@@ -54,6 +54,71 @@ const VIOLATION_DETAILS = {
     title: 'Face Obstructed',
     description: 'Your face is not clearly visible. Remove any obstruction and look directly at the camera.',
     icon: <RiEyeOffLine className="text-red-500 w-12 h-12" />
+  },
+  gaze_away: {
+    title: 'Looking Away from Screen',
+    description: 'Keep your gaze focused directly on the assessment screen.',
+    icon: <RiEyeOffLine className="text-red-500 w-12 h-12" />
+  },
+  looking_down: {
+    title: 'Head Tilted Downward',
+    description: 'Keep your head upright and focused on the assessment screen.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  eyes_closed: {
+    title: 'Eyes Closed',
+    description: 'Keep your eyes open and visible to the proctoring camera.',
+    icon: <RiEyeOffLine className="text-red-500 w-12 h-12" />
+  },
+  phone_detected: {
+    title: 'Mobile Phone Detected',
+    description: 'Mobile devices are strictly prohibited during the assessment.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  book_detected: {
+    title: 'Prohibited Material Detected',
+    description: 'Notes, books, and external devices are not permitted.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  voice_detected: {
+    title: 'Voice Activity Detected',
+    description: 'Talking or speech is not permitted during the assessment.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  multiple_exam_windows: {
+    title: 'Multiple Windows Open',
+    description: 'The assessment is open in another browser window or tab.',
+    icon: <RiWindowLine className="text-red-500 w-12 h-12" />
+  },
+  student_absent_extended: {
+    title: 'Extended Absence Recorded',
+    description: 'You were absent from the camera view for an extended period.',
+    icon: <RiCameraLine className="text-red-500 w-12 h-12" />
+  },
+  camera_disabled: {
+    title: 'Webcam Stream Interrupted',
+    description: 'Camera access was turned off or lost. Continuous camera feed is required during the assessment.',
+    icon: <RiCameraLine className="text-red-500 w-12 h-12" />
+  },
+  camera_tamper: {
+    title: 'Camera Feed Tampered',
+    description: 'The webcam stream was disconnected or modified during the test.',
+    icon: <RiCameraLine className="text-red-500 w-12 h-12" />
+  },
+  proctoring_offline: {
+    title: 'Network Connection Interrupted',
+    description: 'Proctoring heartbeats were delayed due to connection loss.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  dev_tools_opened: {
+    title: 'Developer Tools Detected',
+    description: 'Opening browser developer tools or inspecting elements is forbidden.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  browser_focus_lost: {
+    title: 'Browser Focus Lost',
+    description: 'The assessment window lost active focus. Please remain on the exam screen.',
+    icon: <RiWindowLine className="text-red-500 w-12 h-12" />
   }
 };
 
@@ -66,29 +131,31 @@ export const ProctoringWarningModal = ({
 }) => {
   const [countdown, setCountdown] = useState(3);
   const details = VIOLATION_DETAILS[violationType] || {
-    title: 'Security Exception',
+    title: violationType ? violationType.replace(/_/g, ' ').toUpperCase() : 'Security Exception',
     description: 'A proctoring integrity rule violation was recorded.',
     icon: <RiAlertLine className="text-red-500 w-12 h-12" />
   };
 
-  // Button countdown lock to enforce reading
+  // Button countdown lock to enforce reading (timestamp based to prevent lag)
   useEffect(() => {
     if (isOpen) {
       setCountdown(3);
+      const startTime = Date.now();
       const timer = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(3 - elapsed, 0);
+        setCountdown(remaining);
+        if (remaining <= 0) {
+          clearInterval(timer);
+        }
+      }, 200);
       return () => clearInterval(timer);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const displayMax = maxWarnings || 3;
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0F172A]/50 dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-colors duration-300">
@@ -109,7 +176,7 @@ export const ProctoringWarningModal = ({
 
         {/* Warning Level */}
         <span className="text-xs font-black uppercase tracking-[0.25em] text-red-550 dark:text-red-400">
-          Security Warning {warningsCount} of {maxWarnings + 1}
+          Security Warning {Math.min(warningsCount, displayMax)} of {displayMax}
         </span>
         
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2 mb-3">

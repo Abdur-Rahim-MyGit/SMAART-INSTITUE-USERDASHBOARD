@@ -37,6 +37,17 @@ export default function InstitutionSelectorScreen({ navigation }) {
     navigation.navigate('Login');
   };
 
+  const formatAddress = (addr) => {
+    if (!addr) return null;
+    if (typeof addr === 'string') return addr;
+    if (typeof addr === 'object') {
+      const cityState = [addr.city, addr.state].filter(Boolean).join(', ');
+      if (cityState) return cityState;
+      return [addr.street, addr.city, addr.state, addr.pincode, addr.country].filter(Boolean).join(', ');
+    }
+    return null;
+  };
+
   return (
     <ScreenContainer contentStyle={styles.content}>
       <View style={styles.header}>

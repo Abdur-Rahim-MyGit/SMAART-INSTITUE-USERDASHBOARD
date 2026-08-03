@@ -12,6 +12,7 @@ import { colors, radius, shadow } from '../../theme';
 export default function OtpVerifyScreen({ route, navigation }) {
   const { tempToken, email } = route.params;
   const { signIn } = useAuth();
+  const [tempToken, setTempToken] = useState(initialTempToken);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
@@ -25,6 +26,7 @@ export default function OtpVerifyScreen({ route, navigation }) {
       return;
     }
     setError('');
+    setShowForceLogout(false);
     setLoading(true);
     try {
       const res = await verifyLoginOtp(tempToken, otp, forceLogout);
@@ -60,8 +62,12 @@ export default function OtpVerifyScreen({ route, navigation }) {
     setResending(true);
     setError('');
     setInfo('');
+    setShowForceLogout(false);
     try {
-      await resendLoginOtp(tempToken);
+      const res = await resendLoginOtp(tempToken);
+      if (res?.tempToken) {
+        setTempToken(res.tempToken);
+      }
       setInfo('A new OTP has been sent.');
     } catch (err) {
       setError(err.message);
