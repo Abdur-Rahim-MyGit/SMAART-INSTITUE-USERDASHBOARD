@@ -14,17 +14,82 @@ import {
   RiSoundModuleLine,   // used for microphone row ✅
   RiVolumeMuteLine,    // used for mic denied state ✅
 } from '@remixicon/react';
+// Registration uses the PROVEN main-thread detector (onnxPipeline via
+// faceVerificationService). The worker path was unreliable for the live
+// registration preview (createImageBitmap frame degraded SCRFD). The exam
+// itself still runs on the worker; registration is a one-time ~5 s step.
 import {
   loadModels,
   registerFace,
-  detectFaces,
   detectFacesFast,
-  isReady as isModelsReady
+  isReady as isModelsReady,
+  getModelLoadError,
 } from '@/services/faceVerificationService';
 
-// Gap between presence scans. Measured from the END of the previous scan, so
-// this is genuine idle time rather than a deadline the device may miss.
-const SCAN_INTERVAL_MS = 500;
+// Gap between presence scans. Measured from the END of the previous scan.
+// 50ms ensures smooth, real-time face tracking at ~20 FPS.
+const SCAN_INTERVAL_MS = 50;
+
+// Registration capture settings.
+const REGISTRATION_FRAMES = 3;
+const REGISTRATION_FRAME_GAP_MS = 350;
+
+// L2-normalize an embedding vector.
+const normalize = (v) => {
+  let n = 0;
+  for (let i = 0; i < v.length; i++) n += v[i] * v[i];
+  n = Math.sqrt(n) || 1;
+  const out = new Float32Array(v.length);
+  for (let i = 0; i < v.length; i++) out[i] = v[i] / n;
+  return out;
+};
+
+// Median-pool a set of (already-normalized) embeddings, then renormalize.
+// Median is more robust to a single bad frame than the mean.
+const medianPool = (embeddings) => {
+  const dim = embeddings[0].length;
+  const out = new Float32Array(dim);
+  const scratch = new Array(embeddings.length);
+  for (let d = 0; d < dim; d++) {
+    for (let e = 0; e < embeddings.length; e++) scratch[e] = embeddings[e][d];
+    scratch.sort((a, b) => a - b);
+    const mid = scratch.length >> 1;
+    out[d] = scratch.length % 2 ? scratch[mid] : (scratch[mid - 1] + scratch[mid]) / 2;
+  }
+  return normalize(out);
+};
+
+const cosine = (a, b) => {
+  let dot = 0;
+  for (let i = 0; i < a.length; i++) dot += a[i] * b[i];
+  return dot; // inputs are unit vectors
+};
+
+// Grab a JPEG data URL of the current video frame for the registration
+// thumbnail. Pure main-thread canvas draw — no model involved.
+const captureFrameDataUrl = (video) => {
+  try {
+    if (!video || video.readyState < 2) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 320;
+    canvas.height = video.videoHeight || 240;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', 0.7);
+  } catch {
+    return null;
+  }
+};
+
+// Mean pairwise cosine similarity among the captured frames — a real
+// intra-person consistency signal used as the registration "confidence".
+const meanPairwiseSimilarity = (embeddings) => {
+  if (embeddings.length < 2) return 1;
+  let sum = 0, pairs = 0;
+  for (let i = 0; i < embeddings.length; i++) {
+    for (let j = i + 1; j < embeddings.length; j++) { sum += cosine(embeddings[i], embeddings[j]); pairs++; }
+  }
+  return pairs ? sum / pairs : 1;
+};
 
 export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   const { t } = useTranslation();
@@ -46,7 +111,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     registrationStateRef.current = registrationState;
   }, [registrationState]);
 
-  const [registrationProgress, setRegistrationProgress] = useState({ current: 0, total: 5 });
+  const [registrationProgress, setRegistrationProgress] = useState({ current: 0, total: 3 });
   const [registrationConfidence, setRegistrationConfidence] = useState(0);
   const [registeredDescriptor, setRegisteredDescriptor] = useState(null);
   const [faceCheckError, setFaceCheckError] = useState(null);
@@ -108,7 +173,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setCameraState('checking');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } }
       });
       localStreamRef.current = stream;
       if (videoRef.current) {
@@ -146,13 +211,13 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   // "Detecting your face..." wait people were seeing.
   useEffect(() => {
     if (!isModelsReady()) {
-      loadModels().catch((err) =>
-        console.warn('[ProctoringSetup] Model preload failed, will retry at step 3:', err)
+      loadModels((progress) => setModelLoadProgress(progress)).catch((err) =>
+        console.warn('[ProctoringSetup] Model preload failed, will retry at step 3:', err?.message || err)
       );
     }
   }, []);
 
-  // Load AI Models when entering step 3
+  // Ensure the AI models are ready when entering step 3.
   const loadAIModels = useCallback(async () => {
     if (isModelsReady()) {
       setModelLoadState('loaded');
@@ -163,13 +228,25 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setModelLoadState('loading');
     setModelLoadProgress(0);
 
+    // Guard against a silent stall: surface an error + retry rather than sitting
+    // on "Detecting your face…" forever if the load neither resolves nor rejects.
+    const LOAD_TIMEOUT_MS = 120000;
+    let timedOut = false;
+    const timeout = setTimeout(() => { timedOut = true; }, LOAD_TIMEOUT_MS);
+
     try {
-      await loadModels((progress) => {
-        setModelLoadProgress(progress);
-      });
-      setModelLoadState('loaded');
-      console.log('[ProctoringSetup] ✅ AI models loaded successfully');
+      const ok = await loadModels((progress) => setModelLoadProgress(progress));
+      clearTimeout(timeout);
+      if (ok && !timedOut) {
+        setModelLoadState('loaded');
+        setModelLoadProgress(100);
+        console.log('[ProctoringSetup] ✅ AI models loaded');
+      } else {
+        const initErr = getModelLoadError?.();
+        throw new Error(timedOut ? 'Model load timed out.' : (initErr?.message || 'Face models failed to initialise.'));
+      }
     } catch (err) {
+      clearTimeout(timeout);
       console.error('[ProctoringSetup] Model loading failed:', err);
       setModelLoadState('error');
       setFaceCheckError(t('proctoring_setup.error_model_load', 'Failed to load AI models. Please check your connection and try again.') + ' (' + (err.message || err.toString()) + ')');
@@ -208,8 +285,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       const scaleY = displaySize.height / video.videoHeight;
       if (!isFinite(scaleX) || !isFinite(scaleY)) return;
 
-      // Ignore full-canvas background boxes (>75% of container)
-      if (box.width * scaleX > displaySize.width * 0.75 || box.height * scaleY > displaySize.height * 0.75) return;
+      // Ignore full-canvas background boxes (>98% of container)
+      if (box.width * scaleX > displaySize.width * 0.98 || box.height * scaleY > displaySize.height * 0.98) return;
 
       ctx.strokeStyle = '#22d3ee';
       ctx.lineWidth = 2;
@@ -220,10 +297,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         ctx.fillStyle = '#10b981';
         f.landmarks.forEach(pt => {
           ctx.beginPath();
-          // The points are arrays [x, y]
           const lx = pt.x !== undefined ? pt.x : pt[0];
           const ly = pt.y !== undefined ? pt.y : pt[1];
-          ctx.arc(lx * scaleX, ly * scaleY, 2, 0, 2 * Math.PI);
+          ctx.arc(lx * scaleX, ly * scaleY, 3, 0, 2 * Math.PI);
           ctx.fill();
         });
       }
@@ -241,38 +317,34 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     }
 
     setRegistrationState('registering');
-    setRegistrationProgress({ current: 0, total: 3 });
+    setRegistrationProgress({ current: 0, total: REGISTRATION_FRAMES });
     setFaceCheckError(null);
     setQualityIssues([]);
 
     try {
+      // Proven main-thread multi-frame registration (onnxPipeline via
+      // faceVerificationService). Handles retries, quality checks, alignment and
+      // median-pooled embedding internally.
       const result = await registerFace(videoRef.current, {
-        // 3 frames at 400ms rather than 5 at 600ms: ~1.2s instead of ~3s.
-        // Averaging 3 embeddings still absorbs pose and lighting jitter.
-        frameCount: 3,
-        intervalMs: 400,
+        frameCount: REGISTRATION_FRAMES,
+        intervalMs: REGISTRATION_FRAME_GAP_MS,
         onFrameCaptured: (frameIndex, totalFrames, descriptor, face) => {
           setRegistrationProgress({ current: frameIndex, total: totalFrames });
           setQualityIssues([]);
           if (face) drawFaceFeedback([face]);
         },
-        onError: (msg) => {
-          console.warn('[ProctoringSetup] Registration frame issue:', msg);
-        },
-        onQualityIssue: (issues) => {
-          setQualityIssues(issues);
-        },
+        onError: (msg) => console.warn('[ProctoringSetup] Registration frame issue:', msg),
+        onQualityIssue: (issues) => setQualityIssues(issues),
       });
 
       setRegisteredDescriptor(result.descriptor);
       registeredCropDataUrlRef.current = result.alignedCropDataUrl;
       setRegistrationConfidence(result.confidence);
-      setRegistrationProgress({ current: result.framesCaptured, total: 5 });
+      setRegistrationProgress({ current: result.framesCaptured, total: REGISTRATION_FRAMES });
       setRegistrationState('registered');
       setQualityIssues([]);
       clearCanvas();
 
-      // Store all embeddings and crops for the parent component
       registrationResultRef.current = {
         descriptor: result.descriptor,
         allEmbeddings: result.allEmbeddings,
@@ -309,6 +381,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     faceStableCountRef.current = 0;
     let noFaceTicks = 0;
     let multiFaceTicks = 0;
+    let scanLog = 0;
 
     // Self-scheduling loop rather than setInterval.
     //
@@ -320,12 +393,18 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       if (!videoRef.current || faceCheckIntervalRef.current === null) return;
 
       try {
-        // Presence-only: skips the 6.4 MB recognition net, which we do not
-        // need until the candidate actually registers.
+        // Presence-only (proven main-thread SCRFD): skips the recognition net
+        // until the candidate actually registers.
+        if (videoRef.current.readyState < 2) return;
         const result = await detectFacesFast(videoRef.current);
 
         if (result.error) {
           return; // Skip frame
+        }
+
+        // diag: log the live faceCount stream so we can see why it stalls.
+        if (scanLog++ % 6 === 0) {
+          console.log(`[Setup][diag] faceCount=${result.faceCount} stable=${faceStableCountRef.current} state=${registrationStateRef.current}`);
         }
 
         if (result.faceCount === 1) {
@@ -336,9 +415,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           setFaceCheckError(null);
           drawFaceFeedback(result.faces);
 
-          // Face stable for 2+ consecutive checks (~1.6 seconds) → ready to register
-          if (faceStableCountRef.current >= 2 && registrationStateRef.current !== 'registering' && registrationStateRef.current !== 'registered') {
-            // Auto-start registration
+          // Ready to register once we've accumulated enough single-face frames.
+          if (faceStableCountRef.current >= 3 && registrationStateRef.current !== 'registering' && registrationStateRef.current !== 'registered') {
+            console.log('[Setup][diag] → starting registration');
             clearInterval(faceCheckIntervalRef.current);
             faceCheckIntervalRef.current = null;
             startFaceRegistration();
@@ -346,30 +425,21 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         } else if (result.faceCount === 0) {
           noFaceTicks += 1;
           multiFaceTicks = 0;
-          faceStableCountRef.current = 0;
-          setFaceStableCount(0);
+          // Tolerant: DECAY rather than hard-reset, so a single dropped frame
+          // doesn't wipe out accumulated progress (detection can briefly blip).
+          faceStableCountRef.current = Math.max(0, faceStableCountRef.current - 1);
+          setFaceStableCount(faceStableCountRef.current);
+          clearCanvas();
 
-          // If no face detected for 5 consecutive ticks (~4.0s), halt scanning and present Retry UI
-          if (noFaceTicks >= 5) {
-            if (faceCheckIntervalRef.current) {
-              clearInterval(faceCheckIntervalRef.current);
-              faceCheckIntervalRef.current = null;
-            }
-            clearCanvas();
-            setRegistrationState('error');
+          // Show guidance banner after ~1 second (20 ticks) of no face, keeping scanning active!
+          if (noFaceTicks >= 20) {
             setFaceCheckError(t('proctoring_setup.error_no_face', 'No face detected. Ensure your face is clearly visible and well-lit.'));
           }
         } else if (result.faceCount > 1) {
           multiFaceTicks += 1;
-          // Only halt if multiple faces persist for 2+ consecutive checks (~1.6s)
-          if (multiFaceTicks >= 2) {
-            if (faceCheckIntervalRef.current) {
-              clearInterval(faceCheckIntervalRef.current);
-              faceCheckIntervalRef.current = null;
-            }
-            drawFaceFeedback(result.faces);
-            setRegistrationState('error');
-            setFaceCheckError(t('proctoring_setup.error_multiple_faces', 'Only one person should be visible during registration. Please click Retry.'));
+          faceStableCountRef.current = Math.max(0, faceStableCountRef.current - 1);
+          if (multiFaceTicks >= 5) {
+            setFaceCheckError(t('proctoring_setup.error_multiple_faces', 'Only one person should be visible during registration.'));
           }
         }
       } catch (err) {
@@ -533,7 +603,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     setRegistrationState('idle');
     setRegisteredDescriptor(null);
     setRegistrationConfidence(0);
-    setRegistrationProgress({ current: 0, total: 5 });
+    setRegistrationProgress({ current: 0, total: 3 });
     setFaceCheckError(null);
     setQualityIssues([]);
     faceStableCountRef.current = 0;
@@ -578,23 +648,23 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/40 dark:bg-[#000F24]/80 backdrop-blur-lg flex items-center justify-center p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <div className="w-full max-w-xl bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.12)] dark:shadow-2xl relative overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-[#0F172A]/40 dark:bg-[#000F24]/80 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+      <div className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col">
 
         {/* Glow decorative effects */}
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#1a3884]/5 dark:bg-[#1a3884]/20 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Header */}
-        <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-4">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-cyan-400">{t('proctoring_setup.badge', 'AI Integrity Setup')}</span>
-          <h2 className="text-xl sm:text-2xl font-black mt-1 leading-tight text-slate-900 dark:text-white">
+        <div className="mb-4 border-b border-slate-100 dark:border-white/5 pb-3 shrink-0">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-cyan-400">{t('proctoring_setup.badge', 'AI Integrity Setup')}</span>
+          <h2 className="text-lg sm:text-xl font-black mt-0.5 leading-tight text-slate-900 dark:text-white">
             {t('proctoring_setup.preparing', 'Preparing: {{title}}', { title: assessmentTitle || t('proctoring_setup.default_assessment_title', 'SMAART Assessment') })}
           </h2>
         </div>
 
         {/* Wizard Steps indicator */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-1.5 mb-4 shrink-0">
           {[1, 2, 3, 4].map(s => (
             <div
               key={s}
@@ -609,7 +679,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Step Contents */}
-        <div className="min-h-[280px]">
+        <div className="flex-1 overflow-y-auto pr-1 max-h-[55vh] custom-scrollbar">
           {/* STEP 1: Camera & Hardware Checks */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
@@ -810,11 +880,6 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   onLoadedMetadata={(e) => e.target.play().catch(() => { })}
                 />
 
-                <canvas
-                  ref={canvasRef}
-                  className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1]"
-                />
-
                 {/* Oval face guide overlay */}
                 {(registrationState === 'detecting' || registrationState === 'idle') && (
                   <div className="absolute inset-0 pointer-events-none">
@@ -835,6 +900,11 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </div>
                   </div>
                 )}
+
+                <canvas
+                  ref={canvasRef}
+                  className="absolute inset-0 w-full h-full pointer-events-none scale-x-[-1] z-10"
+                />
 
                 {/* Registration progress overlay */}
                 {registrationState === 'registering' && (
@@ -872,6 +942,26 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       />
                     </div>
                     <span className="text-[10px] text-slate-400 mt-1">{modelLoadProgress}%</span>
+                  </div>
+                )}
+
+                {/* Model loading FAILED overlay — surfaces the real error + retry
+                    instead of silently sitting on "Detecting your face…". */}
+                {modelLoadState === 'error' && (
+                  <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center px-4 text-center">
+                    <RiAlertLine size={24} className="text-red-400 mb-2" />
+                    <span className="text-xs text-red-300 font-bold mb-1">
+                      {t('proctoring_setup.status_model_failed', 'Model loading failed')}
+                    </span>
+                    <span className="text-[10px] text-slate-300 mb-3 max-w-[240px] leading-snug">
+                      {faceCheckError || t('proctoring_setup.error_model_load', 'Failed to load AI models. Please check your connection and try again.')}
+                    </span>
+                    <button
+                      onClick={loadAIModels}
+                      className="px-5 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+                    >
+                      <RiLoader4Line size={13} /> {t('proctoring_setup.retry_model_load', 'Retry')}
+                    </button>
                   </div>
                 )}
               </div>
@@ -941,7 +1031,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     {/* Frame progress dots during registration */}
                     {registrationState === 'registering' && (
                       <div className="flex items-center gap-1.5 mt-1">
-                        {Array.from({ length: 5 }).map((_, idx) => (
+                        {Array.from({ length: registrationProgress.total || 3 }).map((_, idx) => (
                           <div
                             key={idx}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${idx < registrationProgress.current
@@ -995,7 +1085,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Footer controls */}
-        <div className="mt-8 pt-4 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3">
+        <div className="mt-4 pt-3 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3 shrink-0">
           {/* Skip face registration — dev/testing convenience only */}
           {import.meta.env.DEV && step === 3 && registrationState !== 'registered' && (
             <button

@@ -1,9 +1,55 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import fs from "fs";
 import { componentTagger } from "lovable-tagger";
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import { VitePWA } from 'vite-plugin-pwa';
+
+// onnxruntime-web (loaded via <script src="/onnx-wasm/ort.min.js">) resolves its
+// wasm backend at runtime with a dynamic import() of e.g.
+// /onnx-wasm/ort-wasm-simd-threaded.jsep.mjs. Those files live in /public, and
+// Vite's dev server refuses to import a public file through the module graph
+// ("… should not be imported from source code"). This dev-only middleware serves
+// the ORT runtime assets raw, BEFORE Vite's transform middleware runs, so the
+// import() gets a valid module. Production builds serve /public statically and
+// never hit this path.
+const serveOnnxRuntimeAssets = () => ({
+  name: "serve-onnx-runtime-assets",
+  apply: "serve" as const,
+  configureServer(server: any) {
+    const contentTypeFor = (url: string) => {
+      if (url.endsWith(".wasm")) return "application/wasm";
+      if (url.endsWith(".mjs") || url.endsWith(".js")) return "text/javascript";
+      if (url.endsWith(".task") || url.endsWith(".data") || url.endsWith(".bin")) return "application/octet-stream";
+      return null;
+    };
+    server.middlewares.use((req: any, res: any, next: any) => {
+      const url = (req.url || "").split("?")[0];
+      // The AI worker loads two families of raw runtime assets that must be
+      // streamed as-is BEFORE Vite's transform middleware touches them:
+      //  - /onnx-wasm/*  (ONNX Runtime WASM/JSEP backend, dynamic import())
+      //  - /mediapipe/*  (MediaPipe tasks-vision wasm fileset + .task model)
+      const isOnnx = url.startsWith("/onnx-wasm/") && (url.endsWith(".mjs") || url.endsWith(".wasm"));
+      const isMediaPipe = url.startsWith("/mediapipe/");
+      if (isOnnx || isMediaPipe) {
+        const ct = contentTypeFor(url);
+        const filePath = path.join(__dirname, "public", url);
+        try {
+          if (ct && fs.existsSync(filePath)) {
+            res.setHeader("Content-Type", ct);
+            res.setHeader("Cache-Control", "no-cache");
+            fs.createReadStream(filePath).pipe(res);
+            return;
+          }
+        } catch (_) {
+          /* fall through to Vite */
+        }
+      }
+      next();
+    });
+  },
+});
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -27,6 +73,7 @@ export default defineConfig(({ mode }) => ({
     }
   },
   plugins: [
+    serveOnnxRuntimeAssets(),
     react(),
     mode === "development" && componentTagger(),
     ViteImageOptimizer({

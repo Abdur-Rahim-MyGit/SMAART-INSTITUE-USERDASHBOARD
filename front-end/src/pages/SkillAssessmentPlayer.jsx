@@ -228,7 +228,7 @@ const SkillAssessmentPlayer = () => {
       }
     };
 
-    const timer = setInterval(updateCountdown, 1000);
+    const timer = setInterval(updateCountdown, 250);
     return () => clearInterval(timer);
   }, [loading, resultId, setupCompleted, submitted, assessment, submit]);
 

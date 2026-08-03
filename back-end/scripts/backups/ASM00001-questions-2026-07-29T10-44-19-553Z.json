@@ -1,0 +1,6993 @@
+[
+  {
+    "tags": [],
+    "questionId": "Q001",
+    "questionText": "What does HTML stand for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "order": 0,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb913"
+  },
+  {
+    "tags": [],
+    "questionId": "Q002",
+    "questionText": "Which tag is used for images?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "order": 1,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb914"
+  },
+  {
+    "tags": [],
+    "questionId": "Q003",
+    "questionText": "What is CSS used for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "order": 2,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb915"
+  },
+  {
+    "tags": [],
+    "questionId": "Q004",
+    "questionText": "Which keyword declares a variable in JavaScript?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "order": 3,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb916"
+  },
+  {
+    "tags": [],
+    "questionId": "Q005",
+    "questionText": "What does SQL stand for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "order": 4,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb917"
+  },
+  {
+    "tags": [],
+    "questionId": "Q006",
+    "questionText": "Which device connects networks?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "order": 5,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb918"
+  },
+  {
+    "tags": [],
+    "questionId": "Q008",
+    "questionText": "Which protocol is used for websites?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "order": 6,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91a"
+  },
+  {
+    "tags": [],
+    "questionId": "Q009",
+    "questionText": "What is React used for?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "order": 7,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91b"
+  },
+  {
+    "tags": [],
+    "questionId": "Q010",
+    "questionText": "Which hook manages state in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "order": 8,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91c"
+  },
+  {
+    "tags": [],
+    "questionId": "Q011",
+    "questionText": "What is MongoDB?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "order": 9,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91d"
+  },
+  {
+    "tags": [],
+    "questionId": "Q012",
+    "questionText": "Which company developed Java?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "order": 10,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91e"
+  },
+  {
+    "tags": [],
+    "questionId": "Q013",
+    "questionText": "What is the difference between == and === in JavaScript?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "order": 11,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb91f"
+  },
+  {
+    "tags": [],
+    "questionId": "Q015",
+    "questionText": "What is the purpose of useEffect in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "order": 12,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb921"
+  },
+  {
+    "tags": [],
+    "questionId": "Q016",
+    "questionText": "How does routing work in networking?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "order": 13,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb922"
+  },
+  {
+    "tags": [],
+    "questionId": "Q017",
+    "questionText": "What is the role of DNS?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "order": 14,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb923"
+  },
+  {
+    "tags": [],
+    "questionId": "Q018",
+    "questionText": "Explain primary key in SQL.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "order": 15,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb924"
+  },
+  {
+    "tags": [],
+    "questionId": "Q019",
+    "questionText": "What is JSX in React?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "order": 16,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb925"
+  },
+  {
+    "tags": [],
+    "questionId": "Q020",
+    "questionText": "Difference between HTTP and HTTPS.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "order": 17,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb926"
+  },
+  {
+    "tags": [],
+    "questionId": "Q022",
+    "questionText": "Explain event bubbling in JavaScript.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "order": 18,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb928"
+  },
+  {
+    "tags": [],
+    "questionId": "Q023",
+    "questionText": "What is responsive web design?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "order": 19,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb929"
+  },
+  {
+    "tags": [],
+    "questionId": "Q024",
+    "questionText": "What is CRUD operation?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "HTML"
+      },
+      {
+        "value": "B",
+        "label": "CSS"
+      },
+      {
+        "value": "C",
+        "label": "JavaScript"
+      },
+      {
+        "value": "D",
+        "label": "Python"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "order": 20,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92a"
+  },
+  {
+    "tags": [],
+    "questionId": "Q025",
+    "questionText": "Explain virtual DOM in React.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "order": 21,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92b"
+  },
+  {
+    "tags": [],
+    "questionId": "Q026",
+    "questionText": "How does JWT authentication work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "B",
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "order": 22,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92c"
+  },
+  {
+    "tags": [],
+    "questionId": "Q027",
+    "questionText": "Difference between SQL and NoSQL databases.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "order": 23,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92d"
+  },
+  {
+    "tags": [],
+    "questionId": "Q029",
+    "questionText": "How does REST API work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "order": 24,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb92f"
+  },
+  {
+    "tags": [],
+    "questionId": "Q030",
+    "questionText": "Explain asynchronous programming in JavaScript.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "order": 25,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb930"
+  },
+  {
+    "tags": [],
+    "questionId": "Q031",
+    "questionText": "What is database indexing?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "order": 26,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb931"
+  },
+  {
+    "tags": [],
+    "questionId": "Q032",
+    "questionText": "Explain Redux workflow.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "correctAnswer": "A",
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "order": 27,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb932"
+  },
+  {
+    "tags": [],
+    "questionId": "Q033",
+    "questionText": "Difference between TCP and UDP.",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "order": 28,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb933"
+  },
+  {
+    "tags": [],
+    "questionId": "Q034",
+    "questionText": "How does cloud deployment work?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "correctAnswer": "D",
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "order": 29,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb934"
+  },
+  {
+    "tags": [],
+    "questionId": "Q036",
+    "questionText": "What is load balancing in servers?",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Option A"
+      },
+      {
+        "value": "B",
+        "label": "Option B"
+      },
+      {
+        "value": "C",
+        "label": "Option C"
+      },
+      {
+        "value": "D",
+        "label": "Option D"
+      }
+    ],
+    "correctAnswer": "C",
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "order": 30,
+    "points": 1,
+    "_id": "6a21b2474aed869deb9fb936"
+  },
+  {
+    "questionText": "What does HTML stand for? - Set 1",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 31,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8a"
+  },
+  {
+    "questionText": "Which HTML element is used for tables? - Set 8",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 32,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8b"
+  },
+  {
+    "questionText": "Which property is used for spacing inside an element? - Set 15",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 33,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8c"
+  },
+  {
+    "questionText": "Which method displays output in console? - Set 22",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 34,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8d"
+  },
+  {
+    "questionText": "Which keyword stops a loop? - Set 29",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 35,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8e"
+  },
+  {
+    "questionText": "What is a component in React? - Set 36",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 36,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f8f"
+  },
+  {
+    "questionText": "Which SQL command removes a table? - Set 43",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 37,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f90"
+  },
+  {
+    "questionText": "Which SQL function counts rows? - Set 50",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 38,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f91"
+  },
+  {
+    "questionText": "Which layer handles routing? - Set 57",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 39,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f92"
+  },
+  {
+    "questionText": "Which tag is used to insert an image? - Set 64",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 40,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f93"
+  },
+  {
+    "questionText": "Which CSS property changes text color? - Set 71",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 41,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f94"
+  },
+  {
+    "questionText": "Which property aligns text to center? - Set 78",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 42,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f95"
+  },
+  {
+    "questionText": "Which SQL clause filters rows? - Set 106",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 43,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f96"
+  },
+  {
+    "questionText": "Which protocol is used for websites? - Set 113",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 44,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f97"
+  },
+  {
+    "questionText": "Which topology uses a central hub? - Set 120",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 45,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f98"
+  },
+  {
+    "questionText": "Which tag creates a line break? - Set 127",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 46,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f99"
+  },
+  {
+    "questionText": "How do you select an element with id 'demo'? - Set 134",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 47,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9a"
+  },
+  {
+    "questionText": "Which keyword declares a variable in JavaScript? - Set 141",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 48,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9b"
+  },
+  {
+    "questionText": "Which event occurs when a button is clicked? - Set 148",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 49,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9c"
+  },
+  {
+    "questionText": "Which command creates a React app? - Set 155",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 50,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9d"
+  },
+  {
+    "questionText": "Which SQL command fetches data? - Set 162",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 51,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9e"
+  },
+  {
+    "questionText": "Which operator searches patterns in SQL? - Set 169",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 52,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4f9f"
+  },
+  {
+    "questionText": "What does IP stand for? - Set 176",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 53,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa0"
+  },
+  {
+    "questionText": "Which HTML tag is used for the largest heading? - Set 183",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 54,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa1"
+  },
+  {
+    "questionText": "Which tag defines a form in HTML? - Set 190",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 55,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa2"
+  },
+  {
+    "questionText": "Which value makes text bold? - Set 197",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 56,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa3"
+  },
+  {
+    "questionText": "Which keyword defines a function? - Set 204",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 57,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa4"
+  },
+  {
+    "questionText": "What is React mainly used for? - Set 211",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 58,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa5"
+  },
+  {
+    "questionText": "Which company developed React? - Set 218",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 59,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa6"
+  },
+  {
+    "questionText": "Which key uniquely identifies a record? - Set 225",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 60,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa7"
+  },
+  {
+    "questionText": "Which device connects networks? - Set 232",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 61,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa8"
+  },
+  {
+    "questionText": "What is the full form of DNS? - Set 239",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 62,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fa9"
+  },
+  {
+    "questionText": "What is the correct HTML tag for a paragraph? - Set 246",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 63,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4faa"
+  },
+  {
+    "questionText": "Which property changes background color? - Set 253",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 64,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fab"
+  },
+  {
+    "questionText": "Which symbol is used for class selector? - Set 260",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 65,
+    "tags": [],
+    "quotient": "CRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fac"
+  },
+  {
+    "questionText": "Which tag is used to create a hyperlink? - Set 2",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 66,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fad"
+  },
+  {
+    "questionText": "Which tag is used to create an ordered list? - Set 9",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 67,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fae"
+  },
+  {
+    "questionText": "Which property controls the outer margin? - Set 16",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 68,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4faf"
+  },
+  {
+    "questionText": "Which operator is used for strict equality? - Set 23",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 69,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb0"
+  },
+  {
+    "questionText": "Which function converts string to integer? - Set 30",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 70,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb1"
+  },
+  {
+    "questionText": "Which prop is mandatory for lists in React? - Set 37",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 71,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb2"
+  },
+  {
+    "questionText": "Which database is NoSQL? - Set 44",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 72,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb3"
+  },
+  {
+    "questionText": "What does LAN stand for? - Set 51",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 73,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb4"
+  },
+  {
+    "questionText": "Which device forwards packets? - Set 58",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 74,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb5"
+  },
+  {
+    "questionText": "Which attribute specifies an image path? - Set 65",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 75,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb6"
+  },
+  {
+    "questionText": "Which command updates existing records? - Set 107",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 76,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb7"
+  },
+  {
+    "questionText": "Which protocol is secure HTTP? - Set 114",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 77,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb8"
+  },
+  {
+    "questionText": "What does HTML stand for? - Set 121",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 78,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fb9"
+  },
+  {
+    "questionText": "Which HTML element is used for tables? - Set 128",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 79,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fba"
+  },
+  {
+    "questionText": "Which property is used for spacing inside an element? - Set 135",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 80,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fbb"
+  },
+  {
+    "questionText": "Which method displays output in console? - Set 142",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 81,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fbc"
+  },
+  {
+    "questionText": "Which keyword stops a loop? - Set 149",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 82,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fbd"
+  },
+  {
+    "questionText": "What is a component in React? - Set 156",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 83,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fbe"
+  },
+  {
+    "questionText": "Which SQL command removes a table? - Set 163",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 84,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fbf"
+  },
+  {
+    "questionText": "Which SQL function counts rows? - Set 170",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 85,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc0"
+  },
+  {
+    "questionText": "Which layer handles routing? - Set 177",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 86,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc1"
+  },
+  {
+    "questionText": "Which tag is used to insert an image? - Set 184",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 87,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc2"
+  },
+  {
+    "questionText": "Which CSS property changes text color? - Set 191",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 88,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc3"
+  },
+  {
+    "questionText": "Which property aligns text to center? - Set 198",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 89,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc4"
+  },
+  {
+    "questionText": "Which loop executes at least once? - Set 205",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 90,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc5"
+  },
+  {
+    "questionText": "Which hook is used for state management? - Set 212",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 91,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc6"
+  },
+  {
+    "questionText": "What does DOM stand for? - Set 219",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 92,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc7"
+  },
+  {
+    "questionText": "Which SQL clause filters rows? - Set 226",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 93,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc8"
+  },
+  {
+    "questionText": "Which protocol is used for websites? - Set 233",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 94,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fc9"
+  },
+  {
+    "questionText": "Which topology uses a central hub? - Set 240",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 95,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fca"
+  },
+  {
+    "questionText": "Which tag creates a line break? - Set 247",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 96,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fcb"
+  },
+  {
+    "questionText": "How do you select an element with id 'demo'? - Set 254",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 97,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fcc"
+  },
+  {
+    "questionText": "Which keyword declares a variable in JavaScript? - Set 261",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 98,
+    "tags": [],
+    "quotient": "SRQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fcd"
+  },
+  {
+    "questionText": "Which HTML tag is used for the largest heading? - Set 3",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 99,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fce"
+  },
+  {
+    "questionText": "Which tag defines a form in HTML? - Set 10",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 100,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fcf"
+  },
+  {
+    "questionText": "Which value makes text bold? - Set 17",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 101,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd0"
+  },
+  {
+    "questionText": "Which keyword defines a function? - Set 24",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 102,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd1"
+  },
+  {
+    "questionText": "What is React mainly used for? - Set 31",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 103,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd2"
+  },
+  {
+    "questionText": "Which company developed React? - Set 38",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 104,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd3"
+  },
+  {
+    "questionText": "Which key uniquely identifies a record? - Set 45",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 105,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd4"
+  },
+  {
+    "questionText": "Which device connects networks? - Set 52",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 106,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd5"
+  },
+  {
+    "questionText": "What is the full form of DNS? - Set 59",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 107,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd6"
+  },
+  {
+    "questionText": "What is the correct HTML tag for a paragraph? - Set 66",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 108,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd7"
+  },
+  {
+    "questionText": "What does SQL stand for? - Set 101",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 109,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd8"
+  },
+  {
+    "questionText": "What is normalization in DBMS? - Set 108",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 110,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fd9"
+  },
+  {
+    "questionText": "What is the default port of HTTP? - Set 115",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 111,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fda"
+  },
+  {
+    "questionText": "Which tag is used to create a hyperlink? - Set 122",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 112,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fdb"
+  },
+  {
+    "questionText": "Which tag is used to create an ordered list? - Set 129",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 113,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fdc"
+  },
+  {
+    "questionText": "Which property controls the outer margin? - Set 136",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 114,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fdd"
+  },
+  {
+    "questionText": "Which operator is used for strict equality? - Set 143",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 115,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fde"
+  },
+  {
+    "questionText": "Which function converts string to integer? - Set 150",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 116,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fdf"
+  },
+  {
+    "questionText": "Which prop is mandatory for lists in React? - Set 157",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 117,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fe0"
+  },
+  {
+    "questionText": "Which database is NoSQL? - Set 164",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 118,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fe1"
+  },
+  {
+    "questionText": "What does LAN stand for? - Set 171",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 119,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fe2"
+  },
+  {
+    "questionText": "Which device forwards packets? - Set 178",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 120,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fe3"
+  },
+  {
+    "questionText": "Which attribute specifies an image path? - Set 185",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 121,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca8a9ad05cf0bce4fe4"
+  },
+  {
+    "questionText": "Which property controls font size? - Set 192",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 122,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fe5"
+  },
+  {
+    "questionText": "Which CSS property changes border color? - Set 199",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 123,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fe6"
+  },
+  {
+    "questionText": "Which array method adds an element at the end? - Set 206",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 124,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fe7"
+  },
+  {
+    "questionText": "Which hook is used for side effects? - Set 213",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 125,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fe8"
+  },
+  {
+    "questionText": "Which hook handles context in React? - Set 220",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 126,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fe9"
+  },
+  {
+    "questionText": "Which command updates existing records? - Set 227",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 127,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fea"
+  },
+  {
+    "questionText": "Which protocol is secure HTTP? - Set 234",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 128,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4feb"
+  },
+  {
+    "questionText": "What does HTML stand for? - Set 241",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 129,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fec"
+  },
+  {
+    "questionText": "Which HTML element is used for tables? - Set 248",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 130,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fed"
+  },
+  {
+    "questionText": "Which property is used for spacing inside an element? - Set 255",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 131,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fee"
+  },
+  {
+    "questionText": "Which method displays output in console? - Set 262",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 132,
+    "tags": [],
+    "quotient": "LQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fef"
+  },
+  {
+    "questionText": "Which tag is used to insert an image? - Set 4",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 133,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff0"
+  },
+  {
+    "questionText": "Which CSS property changes text color? - Set 11",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 134,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff1"
+  },
+  {
+    "questionText": "Which property aligns text to center? - Set 18",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 135,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff2"
+  },
+  {
+    "questionText": "Which loop executes at least once? - Set 25",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 136,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff3"
+  },
+  {
+    "questionText": "Which hook is used for state management? - Set 32",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 137,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff4"
+  },
+  {
+    "questionText": "What does DOM stand for? - Set 39",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 138,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff5"
+  },
+  {
+    "questionText": "Which SQL clause filters rows? - Set 46",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 139,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff6"
+  },
+  {
+    "questionText": "Which protocol is used for websites? - Set 53",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 140,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff7"
+  },
+  {
+    "questionText": "Which topology uses a central hub? - Set 60",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 141,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff8"
+  },
+  {
+    "questionText": "Which tag creates a line break? - Set 67",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 142,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ff9"
+  },
+  {
+    "questionText": "Which SQL command fetches data? - Set 102",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 143,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ffa"
+  },
+  {
+    "questionText": "Which operator searches patterns in SQL? - Set 109",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 144,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ffb"
+  },
+  {
+    "questionText": "What does IP stand for? - Set 116",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 145,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ffc"
+  },
+  {
+    "questionText": "Which HTML tag is used for the largest heading? - Set 123",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 146,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ffd"
+  },
+  {
+    "questionText": "Which tag defines a form in HTML? - Set 130",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 147,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4ffe"
+  },
+  {
+    "questionText": "Which value makes text bold? - Set 137",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 148,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce4fff"
+  },
+  {
+    "questionText": "Which keyword defines a function? - Set 144",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 149,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5000"
+  },
+  {
+    "questionText": "What is React mainly used for? - Set 151",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 150,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5001"
+  },
+  {
+    "questionText": "Which company developed React? - Set 158",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 151,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5002"
+  },
+  {
+    "questionText": "Which key uniquely identifies a record? - Set 165",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 152,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5003"
+  },
+  {
+    "questionText": "Which device connects networks? - Set 172",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 153,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5004"
+  },
+  {
+    "questionText": "What is the full form of DNS? - Set 179",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 154,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5005"
+  },
+  {
+    "questionText": "What is the correct HTML tag for a paragraph? - Set 186",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 155,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5006"
+  },
+  {
+    "questionText": "Which property changes background color? - Set 193",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 156,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5007"
+  },
+  {
+    "questionText": "Which symbol is used for class selector? - Set 200",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 157,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5008"
+  },
+  {
+    "questionText": "Which method converts JSON to object? - Set 207",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 158,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5009"
+  },
+  {
+    "questionText": "What is JSX? - Set 214",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 159,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500a"
+  },
+  {
+    "questionText": "What does SQL stand for? - Set 221",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 160,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500b"
+  },
+  {
+    "questionText": "What is normalization in DBMS? - Set 228",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 161,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500c"
+  },
+  {
+    "questionText": "What is the default port of HTTP? - Set 235",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 162,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500d"
+  },
+  {
+    "questionText": "Which tag is used to create a hyperlink? - Set 242",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 163,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500e"
+  },
+  {
+    "questionText": "Which tag is used to create an ordered list? - Set 249",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 164,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce500f"
+  },
+  {
+    "questionText": "Which property controls the outer margin? - Set 256",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 165,
+    "tags": [],
+    "quotient": "SIQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5010"
+  },
+  {
+    "questionText": "Which attribute specifies an image path? - Set 5",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 166,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5011"
+  },
+  {
+    "questionText": "Which property controls font size? - Set 12",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 167,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5012"
+  },
+  {
+    "questionText": "Which CSS property changes border color? - Set 19",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 168,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5013"
+  },
+  {
+    "questionText": "Which array method adds an element at the end? - Set 26",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 169,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5014"
+  },
+  {
+    "questionText": "Which hook is used for side effects? - Set 33",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 170,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5015"
+  },
+  {
+    "questionText": "Which hook handles context in React? - Set 40",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 171,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5016"
+  },
+  {
+    "questionText": "Which command updates existing records? - Set 47",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 172,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5017"
+  },
+  {
+    "questionText": "Which protocol is secure HTTP? - Set 54",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 173,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5018"
+  },
+  {
+    "questionText": "What does HTML stand for? - Set 61",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 174,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5019"
+  },
+  {
+    "questionText": "Which HTML element is used for tables? - Set 68",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 175,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501a"
+  },
+  {
+    "questionText": "Which property is used for spacing inside an element? - Set 75",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 176,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501b"
+  },
+  {
+    "questionText": "Which method displays output in console? - Set 82",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 177,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501c"
+  },
+  {
+    "questionText": "Which keyword stops a loop? - Set 89",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 178,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501d"
+  },
+  {
+    "questionText": "Which SQL command removes a table? - Set 103",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 179,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501e"
+  },
+  {
+    "questionText": "Which SQL function counts rows? - Set 110",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 180,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce501f"
+  },
+  {
+    "questionText": "Which layer handles routing? - Set 117",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 181,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5020"
+  },
+  {
+    "questionText": "Which tag is used to insert an image? - Set 124",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 182,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5021"
+  },
+  {
+    "questionText": "Which CSS property changes text color? - Set 131",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 183,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5022"
+  },
+  {
+    "questionText": "Which property aligns text to center? - Set 138",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 184,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5023"
+  },
+  {
+    "questionText": "Which loop executes at least once? - Set 145",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 185,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5024"
+  },
+  {
+    "questionText": "Which hook is used for state management? - Set 152",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 186,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5025"
+  },
+  {
+    "questionText": "What does DOM stand for? - Set 159",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 187,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5026"
+  },
+  {
+    "questionText": "Which SQL clause filters rows? - Set 166",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 188,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5027"
+  },
+  {
+    "questionText": "Which protocol is used for websites? - Set 173",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 189,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5028"
+  },
+  {
+    "questionText": "Which topology uses a central hub? - Set 180",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 190,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5029"
+  },
+  {
+    "questionText": "Which tag creates a line break? - Set 187",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 191,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502a"
+  },
+  {
+    "questionText": "How do you select an element with id 'demo'? - Set 194",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 192,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502b"
+  },
+  {
+    "questionText": "Which keyword declares a variable in JavaScript? - Set 201",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 193,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502c"
+  },
+  {
+    "questionText": "Which event occurs when a button is clicked? - Set 208",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 194,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502d"
+  },
+  {
+    "questionText": "Which command creates a React app? - Set 215",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 195,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502e"
+  },
+  {
+    "questionText": "Which SQL command fetches data? - Set 222",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 196,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce502f"
+  },
+  {
+    "questionText": "Which operator searches patterns in SQL? - Set 229",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 197,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5030"
+  },
+  {
+    "questionText": "What does IP stand for? - Set 236",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 198,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5031"
+  },
+  {
+    "questionText": "Which HTML tag is used for the largest heading? - Set 243",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 199,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5032"
+  },
+  {
+    "questionText": "Which tag defines a form in HTML? - Set 250",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 200,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5033"
+  },
+  {
+    "questionText": "Which value makes text bold? - Set 257",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 201,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5034"
+  },
+  {
+    "questionText": "Which keyword defines a function? - Set 264",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 202,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5035"
+  },
+  {
+    "questionText": "What is React mainly used for? - Set 271",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 203,
+    "tags": [],
+    "quotient": "PEQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5036"
+  },
+  {
+    "questionText": "What is the correct HTML tag for a paragraph? - Set 6",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 204,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5037"
+  },
+  {
+    "questionText": "Which property changes background color? - Set 13",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 205,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5038"
+  },
+  {
+    "questionText": "Which symbol is used for class selector? - Set 20",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 206,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5039"
+  },
+  {
+    "questionText": "Which method converts JSON to object? - Set 27",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 207,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503a"
+  },
+  {
+    "questionText": "What is JSX? - Set 34",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 208,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503b"
+  },
+  {
+    "questionText": "What does SQL stand for? - Set 41",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 209,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503c"
+  },
+  {
+    "questionText": "What is normalization in DBMS? - Set 48",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 210,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503d"
+  },
+  {
+    "questionText": "What is the default port of HTTP? - Set 55",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 211,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503e"
+  },
+  {
+    "questionText": "Which tag is used to create a hyperlink? - Set 62",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 212,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce503f"
+  },
+  {
+    "questionText": "Which tag is used to create an ordered list? - Set 69",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 213,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5040"
+  },
+  {
+    "questionText": "Which property controls the outer margin? - Set 76",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 214,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5041"
+  },
+  {
+    "questionText": "Which operator is used for strict equality? - Set 83",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 215,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5042"
+  },
+  {
+    "questionText": "Which function converts string to integer? - Set 90",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 216,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Easy",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5043"
+  },
+  {
+    "questionText": "Which database is NoSQL? - Set 104",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 217,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5044"
+  },
+  {
+    "questionText": "What does LAN stand for? - Set 111",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 218,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5045"
+  },
+  {
+    "questionText": "Which device forwards packets? - Set 118",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 219,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5046"
+  },
+  {
+    "questionText": "Which attribute specifies an image path? - Set 125",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 220,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5047"
+  },
+  {
+    "questionText": "Which property controls font size? - Set 132",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 221,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5048"
+  },
+  {
+    "questionText": "Which CSS property changes border color? - Set 139",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 222,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5049"
+  },
+  {
+    "questionText": "Which array method adds an element at the end? - Set 146",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 223,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504a"
+  },
+  {
+    "questionText": "Which hook is used for side effects? - Set 153",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 224,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504b"
+  },
+  {
+    "questionText": "Which hook handles context in React? - Set 160",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 225,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504c"
+  },
+  {
+    "questionText": "Which command updates existing records? - Set 167",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 226,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504d"
+  },
+  {
+    "questionText": "Which protocol is secure HTTP? - Set 174",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 227,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504e"
+  },
+  {
+    "questionText": "What does HTML stand for? - Set 181",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "var"
+      },
+      {
+        "value": "B",
+        "label": "let"
+      },
+      {
+        "value": "C",
+        "label": "const"
+      },
+      {
+        "value": "D",
+        "label": "static"
+      }
+    ],
+    "order": 228,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce504f"
+  },
+  {
+    "questionText": "Which HTML element is used for tables? - Set 188",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 229,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5050"
+  },
+  {
+    "questionText": "Which property is used for spacing inside an element? - Set 195",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 230,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Medium",
+    "correctAnswer": "D",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5051"
+  },
+  {
+    "questionText": "Which method displays output in console? - Set 202",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Router"
+      },
+      {
+        "value": "B",
+        "label": "Switch"
+      },
+      {
+        "value": "C",
+        "label": "Hub"
+      },
+      {
+        "value": "D",
+        "label": "Bridge"
+      }
+    ],
+    "order": 231,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5052"
+  },
+  {
+    "questionText": "Which keyword stops a loop? - Set 209",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 232,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5053"
+  },
+  {
+    "questionText": "What is a component in React? - Set 216",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 233,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5054"
+  },
+  {
+    "questionText": "Which SQL command removes a table? - Set 223",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 234,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5055"
+  },
+  {
+    "questionText": "Which SQL function counts rows? - Set 230",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "Hyper Text Markup Language"
+      },
+      {
+        "value": "B",
+        "label": "High Text Machine Language"
+      },
+      {
+        "value": "C",
+        "label": "Hyperlinks Text Mark Language"
+      },
+      {
+        "value": "D",
+        "label": "Home Tool Markup Language"
+      }
+    ],
+    "order": 235,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5056"
+  },
+  {
+    "questionText": "Which layer handles routing? - Set 237",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "React"
+      },
+      {
+        "value": "B",
+        "label": "Angular"
+      },
+      {
+        "value": "C",
+        "label": "Vue"
+      },
+      {
+        "value": "D",
+        "label": "Svelte"
+      }
+    ],
+    "order": 236,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5057"
+  },
+  {
+    "questionText": "Which tag is used to insert an image? - Set 244",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 237,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "C",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5058"
+  },
+  {
+    "questionText": "Which CSS property changes text color? - Set 251",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "True"
+      },
+      {
+        "value": "B",
+        "label": "False"
+      },
+      {
+        "value": "C",
+        "label": "Maybe"
+      },
+      {
+        "value": "D",
+        "label": "None"
+      }
+    ],
+    "order": 238,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "A",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce5059"
+  },
+  {
+    "questionText": "Which property aligns text to center? - Set 258",
+    "type": "mcq",
+    "options": [
+      {
+        "value": "A",
+        "label": "MongoDB"
+      },
+      {
+        "value": "B",
+        "label": "MySQL"
+      },
+      {
+        "value": "C",
+        "label": "Oracle"
+      },
+      {
+        "value": "D",
+        "label": "PostgreSQL"
+      }
+    ],
+    "order": 239,
+    "tags": [],
+    "quotient": "DAQ",
+    "difficultyLevel": "Hard",
+    "correctAnswer": "B",
+    "points": 1,
+    "_id": "6a687ca9a9ad05cf0bce505a"
+  }
+]

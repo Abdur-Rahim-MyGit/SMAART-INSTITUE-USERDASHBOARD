@@ -14,18 +14,30 @@
  * All sessions are singletons — created once per page lifetime.
  */
 
-// onnxruntime-web is loaded globally via index.html <script src="/onnx-wasm/ort.min.js">
+import * as ortPackage from 'onnxruntime-web';
+
+// onnxruntime-web is loaded either via ESM import or index.html <script src="/onnx-wasm/ort.min.js">
 const getOrt = () => {
   if (typeof window !== 'undefined' && window.ort) {
     return window.ort;
   }
-  throw new Error('[OnnxPipeline] ONNX Runtime Web library (window.ort) is missing. Please ensure /onnx-wasm/ort.min.js is loaded.');
+  if (ortPackage && (ortPackage.InferenceSession || ortPackage.default?.InferenceSession)) {
+    return ortPackage.default || ortPackage;
+  }
+  throw new Error('[OnnxPipeline] ONNX Runtime Web library is missing. Please ensure /onnx-wasm/ort.min.js is loaded or onnxruntime-web is installed.');
 };
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const MODEL_BASE = '/models/onnx';
 const SCRFD_MODEL = `${MODEL_BASE}/scrfd_500m_bnkps.onnx`; // updated filename
 const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
+// Object detector (optional) — YOLOv8n exported to ONNX, COCO 80 classes.
+const YOLO_MODEL = `${MODEL_BASE}/yolov8n.onnx`;
+const YOLO_INPUT_SIZE = 640;
+const YOLO_SCORE_THRESHOLD = 0.40;
+const YOLO_NMS_THRESHOLD = 0.45;
+// COCO class id → violation label. Only these classes are reported.
+const YOLO_CLASSES_OF_INTEREST = { 67: 'phone', 73: 'book', 63: 'laptop' };
 
 const SCRFD_INPUT_SIZE = 640;        // SCRFD input resolution
 const ARCFACE_INPUT_SIZE = 112;      // ArcFace aligned face crop size
@@ -39,6 +51,10 @@ const SCRFD_NUM_ANCHORS = 2;         // 2 anchors per stride cell
 // ─── Module State ────────────────────────────────────────────────────────────
 let scrfdSession = null;
 let arcfaceSession = null;
+let yoloSession = null; // optional object detector
+
+let _yoloCanvas = null;
+let _yoloCtx = null;
 
 let isInitialized = false;
 let isInitializing = false;
@@ -61,8 +77,21 @@ const configureOrtEnv = () => {
   const ort = getOrt();
   // Point to the ort wasm files served from /public
   ort.env.wasm.wasmPaths = '/onnx-wasm/';
-  // Prefer WebGL → WASM → CPU
-  ort.env.wasm.numThreads = 1;
+  // NOTE: do NOT enable `ort.env.wasm.proxy` here. The proxy worker fails to
+  // initialise in this Vite dev setup, which stops SCRFD/ArcFace from returning
+  // detections (real-time face detection breaks). Main-thread blocking from the
+  // heavy 174 MB model is instead mitigated by running ArcFace identity checks
+  // at a lower cadence than the 1 s SCRFD presence check (see
+  // useProctoringEngine.runFaceVerification).
+  // Multi-threaded WASM needs SharedArrayBuffer, which requires cross-origin
+  // isolation (COOP/COEP headers). When available, use multiple threads — the
+  // single biggest SAFE speedup for the 174 MB ArcFace model and the likeliest
+  // cure for "face not detected" caused by a slow/stalled load on real machines.
+  // Otherwise stay single-threaded (previous behaviour), never crash.
+  // (SIMD is auto-detected by ORT 1.27 — no need to assert it.)
+  const isolated = (typeof self !== 'undefined' && self.crossOriginIsolated);
+  const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
+  ort.env.wasm.numThreads = isolated ? Math.min(cores, 8) : 1;
 };
 
 const report = (pct, msg) => {
@@ -102,7 +131,7 @@ export const initPipeline = async (onProgress) => {
     report(5, 'Configuring ONNX Runtime...');
 
     const sessionOpts = {
-      executionProviders: ['webgl', 'wasm'],
+      executionProviders: ['wasm'],
       graphOptimizationLevel: 'all',
       enableCpuMemArena: true,
       enableMemPattern: true,
@@ -114,7 +143,19 @@ export const initPipeline = async (onProgress) => {
 
     report(55, 'Loading face recognition model (ArcFace R50, ~80 MB)...');
     arcfaceSession = await ort.InferenceSession.create(ARCFACE_MODEL, sessionOpts);
-    report(100, 'ArcFace loaded ✓');
+    report(95, 'ArcFace loaded ✓');
+
+    // OPTIONAL object detector. Its absence must NEVER break the face pipeline —
+    // if the model file isn't present, object detection simply no-ops.
+    try {
+      report(97, 'Loading object detector (YOLO)...');
+      yoloSession = await ort.InferenceSession.create(YOLO_MODEL, sessionOpts);
+      console.log('[OnnxPipeline] ✅ YOLO object detector loaded.');
+    } catch (yoloErr) {
+      yoloSession = null;
+      console.warn('[OnnxPipeline] ⚠️ YOLO model unavailable — object detection disabled:', yoloErr.message);
+    }
+    report(100, 'Models ready ✓');
 
     isInitialized = true;
     console.log('[OnnxPipeline] ✅ All models ready.');
@@ -184,71 +225,51 @@ const ARCFACE_DST = [
 ];
 
 /**
- * Solve 6-parameter 2D affine transform (m11, m12, m21, m22, dx, dy) mapping src -> dst:
- * u = m11 * x + m21 * y + dx
- * v = m12 * x + m22 * y + dy
- * Correctly handles scale, rotation, translation, AND horizontal reflection.
+ * Solve 4-parameter 2D Similarity Transform (scale, rotation, translation) mapping src -> dst (Umeyama algorithm):
+ * u = a * x - b * y + tx
+ * v = b * x + a * y + ty
+ * Preserves rigid facial shape (no shear, skew, or non-uniform stretching) for ArcFace 112×112 crops.
  */
 const estimateAffineTransform = (src, dst) => {
   const N = src.length;
-  let S_xx = 0, S_yy = 0, S_xy = 0, S_x = 0, S_y = 0;
-  let S_xu = 0, S_yu = 0, S_u = 0;
-  let S_xv = 0, S_yv = 0, S_v = 0;
+  if (!N || N < 3) return null;
 
+  let sumX = 0, sumY = 0, sumU = 0, sumV = 0;
   for (let i = 0; i < N; i++) {
-    const x = src[i][0];
-    const y = src[i][1];
-    const u = dst[i][0];
-    const v = dst[i][1];
-
-    S_xx += x * x;
-    S_yy += y * y;
-    S_xy += x * y;
-    S_x  += x;
-    S_y  += y;
-
-    S_xu += x * u;
-    S_yu += y * u;
-    S_u  += u;
-
-    S_xv += x * v;
-    S_yv += y * v;
-    S_v  += v;
+    sumX += src[i][0];
+    sumY += src[i][1];
+    sumU += dst[i][0];
+    sumV += dst[i][1];
   }
 
-  const a00 = S_xx, a01 = S_xy, a02 = S_x;
-  const a10 = S_xy, a11 = S_yy, a12 = S_y;
-  const a20 = S_x,  a21 = S_y,  a22 = N;
+  const meanX = sumX / N;
+  const meanY = sumY / N;
+  const meanU = sumU / N;
+  const meanV = sumV / N;
 
-  const det = a00 * (a11 * a22 - a12 * a21)
-            - a01 * (a10 * a22 - a12 * a20)
-            + a02 * (a10 * a21 - a11 * a20);
+  let varX = 0;
+  let S_xu = 0, S_xv = 0;
 
-  if (Math.abs(det) < 1e-6) return null;
+  for (let i = 0; i < N; i++) {
+    const x = src[i][0] - meanX;
+    const y = src[i][1] - meanY;
+    const u = dst[i][0] - meanU;
+    const v = dst[i][1] - meanV;
 
-  const invDet = 1 / det;
+    varX += x * x + y * y;
+    S_xu += x * u + y * v;
+    S_xv += x * v - y * u;
+  }
 
-  const i00 = (a11 * a22 - a12 * a21) * invDet;
-  const i01 = (a02 * a21 - a01 * a22) * invDet;
-  const i02 = (a01 * a12 - a02 * a11) * invDet;
+  if (varX < 1e-6) return null;
 
-  const i10 = (a12 * a20 - a10 * a22) * invDet;
-  const i11 = (a00 * a22 - a02 * a20) * invDet;
-  const i12 = (a02 * a10 - a00 * a12) * invDet;
+  const a = S_xu / varX;
+  const b = S_xv / varX;
 
-  const i20 = (a10 * a21 - a11 * a20) * invDet;
-  const i21 = (a01 * a20 - a00 * a21) * invDet;
-  const i22 = (a00 * a11 - a01 * a10) * invDet;
+  const tx = meanU - (a * meanX - b * meanY);
+  const ty = meanV - (b * meanX + a * meanY);
 
-  const m11 = i00 * S_xu + i01 * S_yu + i02 * S_u;
-  const m21 = i10 * S_xu + i11 * S_yu + i12 * S_u;
-  const dx  = i20 * S_xu + i21 * S_yu + i22 * S_u;
-
-  const m12 = i00 * S_xv + i01 * S_yv + i02 * S_v;
-  const m22 = i10 * S_xv + i11 * S_yv + i12 * S_v;
-  const dy  = i20 * S_xv + i21 * S_yv + i22 * S_v;
-
-  return { m11, m12, m21, m22, dx, dy };
+  return { m11: a, m12: b, m21: -b, m22: a, dx: tx, dy: ty };
 };
 
 /**
@@ -501,7 +522,7 @@ const decodeSCRFD = (outputs, origW, origH) => {
       // SCRFD logits are always raw — apply sigmoid
       const score = 1 / (1 + Math.exp(-rawScore));
 
-      if (score < 0.5) continue;
+      if (score < 0.35) continue;
 
       const [cx, cy] = centers[i];
 
@@ -515,8 +536,8 @@ const decodeSCRFD = (outputs, origW, origH) => {
       const faceH = y2 - y1;
 
       // Skip tiny detections and absurdly large background boxes
-      if (faceW < 30 || faceH < 30) continue;
-      if (faceW > origW * 0.75 || faceH > origH * 0.75) continue;
+      if (faceW < 25 || faceH < 25) continue;
+      if (faceW > origW * 0.98 || faceH > origH * 0.98) continue;
 
       // Decode 5-point keypoints
       const kps = [];
@@ -601,6 +622,7 @@ export const detectAndEmbed = async (videoEl) => {
 
   // ── 1. SCRFD Detection ──────────────────────────────────────────────────
   // Use RGB format (bgr = false) for standard SCRFD PyTorch ONNX model input
+  const ort = getOrt();
   const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, false);
   const scrfdTensor = new ort.Tensor('float32', scrfdInput, [1, 3, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE]);
 
@@ -670,6 +692,7 @@ export const detectOnly = async (videoEl) => {
   const origH = videoEl.videoHeight || 480;
 
   try {
+    const ort = getOrt();
     const scrfdInput = videoToTensor(videoEl, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE, false);
     const scrfdTensor = new ort.Tensor('float32', scrfdInput, [1, 3, SCRFD_INPUT_SIZE, SCRFD_INPUT_SIZE]);
     const inputName = scrfdSession.inputNames[0];
@@ -677,6 +700,82 @@ export const detectOnly = async (videoEl) => {
     return decodeSCRFD(outputs, origW, origH);
   } catch (err) {
     console.warn('[OnnxPipeline] detectOnly failed:', err.message);
+    return [];
+  }
+};
+
+// ─── Object Detection (YOLOv8n) ──────────────────────────────────────────────
+
+export const isObjectDetectorReady = () => yoloSession !== null;
+
+// Preprocess a frame for YOLO: resize to 640×640, RGB, normalised 0–1, NCHW.
+const videoToYoloTensor = (videoEl) => {
+  if (!_yoloCanvas) {
+    _yoloCanvas = document.createElement('canvas');
+    _yoloCtx = _yoloCanvas.getContext('2d', { willReadFrequently: true });
+    _yoloCanvas.width = YOLO_INPUT_SIZE;
+    _yoloCanvas.height = YOLO_INPUT_SIZE;
+  }
+  _yoloCtx.drawImage(videoEl, 0, 0, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE);
+  const { data } = _yoloCtx.getImageData(0, 0, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE);
+  const pixels = YOLO_INPUT_SIZE * YOLO_INPUT_SIZE;
+  const t = new Float32Array(3 * pixels);
+  for (let i = 0; i < pixels; i++) {
+    t[i] = data[i * 4] / 255;                 // R
+    t[pixels + i] = data[i * 4 + 1] / 255;    // G
+    t[2 * pixels + i] = data[i * 4 + 2] / 255; // B
+  }
+  return t;
+};
+
+/**
+ * Detect prohibited objects (phone/book/laptop) in the current frame.
+ * No-ops (returns []) when the YOLO model isn't loaded.
+ * @returns {Promise<Array<{cls:number, label:string, score:number, box:number[]}>>}
+ */
+export const detectObjects = async (videoEl) => {
+  if (!yoloSession || !videoEl || videoEl.readyState < 2) return [];
+  try {
+    const ort = getOrt();
+    const input = videoToYoloTensor(videoEl);
+    const tensor = new ort.Tensor('float32', input, [1, 3, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE]);
+    const outputs = await yoloSession.run({ [yoloSession.inputNames[0]]: tensor });
+    const out = outputs[yoloSession.outputNames[0]];
+    const dims = out.dims;
+    const dataArr = out.data;
+
+    // Handle both export layouts: [1, attrs, anchors] and [1, anchors, attrs].
+    // attrs = 4 (box) + numClasses; it is the SMALLER of the two trailing dims.
+    const d1 = dims[1], d2 = dims[2];
+    const attrsFirst = d1 <= d2;
+    const numAttrs = attrsFirst ? d1 : d2;
+    const numAnchors = attrsFirst ? d2 : d1;
+    const at = (attr, a) => (attrsFirst ? dataArr[attr * numAnchors + a] : dataArr[a * numAttrs + attr]);
+
+    const boxes = [], scores = [], classes = [];
+    for (let a = 0; a < numAnchors; a++) {
+      let bestScore = 0, bestCls = -1;
+      for (const cid of Object.keys(YOLO_CLASSES_OF_INTEREST)) {
+        const c = Number(cid);
+        const s = at(4 + c, a);
+        if (s > bestScore) { bestScore = s; bestCls = c; }
+      }
+      if (bestScore < YOLO_SCORE_THRESHOLD || bestCls < 0) continue;
+      const cx = at(0, a), cy = at(1, a), w = at(2, a), h = at(3, a);
+      boxes.push([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]);
+      scores.push(bestScore);
+      classes.push(bestCls);
+    }
+    if (!boxes.length) return [];
+    const keep = nms(boxes, scores, YOLO_NMS_THRESHOLD);
+    return keep.map(i => ({
+      cls: classes[i],
+      label: YOLO_CLASSES_OF_INTEREST[classes[i]],
+      score: scores[i],
+      box: boxes[i]
+    }));
+  } catch (err) {
+    console.warn('[OnnxPipeline] detectObjects failed:', err.message);
     return [];
   }
 };

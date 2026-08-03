@@ -74,6 +74,17 @@ export const LADDER = {
     { afterSeconds: 12, colour: COLOUR.AMBER, message: 'Keep your head up toward the screen' },
     { afterSeconds: 35, colour: COLOUR.RED, event: 'looking_down',
       message: 'You have been looking down for a while' }
+  ],
+  // Prohibited items detected by the object detector (YOLO).
+  phone_detected: [
+    { afterSeconds: 2, colour: COLOUR.AMBER, message: 'Please put your phone away' },
+    { afterSeconds: 4, colour: COLOUR.RED, event: 'phone_detected',
+      message: 'A phone was visible during the assessment' }
+  ],
+  book_detected: [
+    { afterSeconds: 3, colour: COLOUR.AMBER, message: 'Notes and books are not allowed' },
+    { afterSeconds: 6, colour: COLOUR.RED, event: 'book_detected',
+      message: 'A book or notes were visible during the assessment' }
   ]
 };
 

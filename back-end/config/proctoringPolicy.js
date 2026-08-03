@@ -76,6 +76,14 @@ module.exports = {
     voice_detected: 25,
     prolonged_silence: 10,
 
+    // Prohibited items in frame (YOLO object detection)
+    phone_detected: 35,
+    book_detected: 30,
+
+    // Device tampering — camera/mic turned off mid-exam
+    microphone_disabled: 20,
+    camera_disabled: 30,
+
     // Environment — strong signals, hard to explain away
     second_screen_detected: 35,
     virtual_camera_detected: 45,
@@ -126,6 +134,16 @@ module.exports = {
       key: 'second_screen',
       label: 'A second screen was detected',
       events: ['second_screen_detected']
+    },
+    {
+      key: 'prohibited_item',
+      label: 'A prohibited item was visible',
+      events: ['phone_detected', 'book_detected']
+    },
+    {
+      key: 'device_disabled',
+      label: 'Your camera or microphone was disabled',
+      events: ['camera_disabled', 'microphone_disabled']
     },
     {
       key: 'attention',
