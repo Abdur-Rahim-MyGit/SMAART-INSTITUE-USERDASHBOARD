@@ -36,6 +36,17 @@ export default function InstitutionSelectorScreen({ navigation }) {
     navigation.navigate('Login');
   };
 
+  const formatAddress = (addr) => {
+    if (!addr) return null;
+    if (typeof addr === 'string') return addr;
+    if (typeof addr === 'object') {
+      const cityState = [addr.city, addr.state].filter(Boolean).join(', ');
+      if (cityState) return cityState;
+      return [addr.street, addr.city, addr.state, addr.pincode, addr.country].filter(Boolean).join(', ');
+    }
+    return null;
+  };
+
   return (
     <ScreenContainer>
       <Text style={styles.title}>Select your Institution</Text>
@@ -53,12 +64,15 @@ export default function InstitutionSelectorScreen({ navigation }) {
         keyExtractor={(item) => item._id}
         scrollEnabled={false}
         ListEmptyComponent={!loading && !error ? <Text style={styles.muted}>No colleges found.</Text> : null}
-        renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => selectCollege(item)}>
-            <Text style={styles.cardTitle}>{item.collegeName}</Text>
-            {item.address ? <Text style={styles.cardSubtitle}>{item.address}</Text> : null}
-          </Pressable>
-        )}
+        renderItem={({ item }) => {
+          const addressText = formatAddress(item.address);
+          return (
+            <Pressable style={styles.card} onPress={() => selectCollege(item)}>
+              <Text style={styles.cardTitle}>{item.collegeName}</Text>
+              {addressText ? <Text style={styles.cardSubtitle}>{addressText}</Text> : null}
+            </Pressable>
+          );
+        }}
       />
     </ScreenContainer>
   );

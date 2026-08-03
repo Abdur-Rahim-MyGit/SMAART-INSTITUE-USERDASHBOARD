@@ -9,23 +9,26 @@ import { colors } from '../../theme';
 
 // FR-AUTH-04 — OTP step-up verification.
 export default function OtpVerifyScreen({ route }) {
-  const { tempToken, email } = route.params;
+  const { tempToken: initialTempToken, email } = route.params;
   const { signIn } = useAuth();
+  const [tempToken, setTempToken] = useState(initialTempToken);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [showForceLogout, setShowForceLogout] = useState(false);
 
-  const handleVerify = async () => {
+  const handleVerify = async (forceLogout = false) => {
     if (!otp) {
       setError('Enter the OTP sent to your email.');
       return;
     }
     setError('');
+    setShowForceLogout(false);
     setLoading(true);
     try {
-      const res = await verifyLoginOtp(tempToken, otp);
+      const res = await verifyLoginOtp(tempToken, otp, forceLogout);
       if (res.requirePasswordChange) {
         // FR-AUTH-05 — first-login forced password change is a separate flow;
         // this basic scaffold surfaces it clearly rather than pretending to handle it.
@@ -39,7 +42,12 @@ export default function OtpVerifyScreen({ route }) {
         setError('Unexpected response from server.');
       }
     } catch (err) {
-      setError(err.message);
+      if (err?.status === 409 || err?.data?.requiresForceLogout) {
+        setShowForceLogout(true);
+        setError(err.message || 'You are already logged in on another device.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -49,8 +57,12 @@ export default function OtpVerifyScreen({ route }) {
     setResending(true);
     setError('');
     setInfo('');
+    setShowForceLogout(false);
     try {
-      await resendLoginOtp(tempToken);
+      const res = await resendLoginOtp(tempToken);
+      if (res?.tempToken) {
+        setTempToken(res.tempToken);
+      }
       setInfo('A new OTP has been sent.');
     } catch (err) {
       setError(err.message);
@@ -75,7 +87,15 @@ export default function OtpVerifyScreen({ route }) {
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
       {info ? <Text style={styles.infoText}>{info}</Text> : null}
 
-      <AppButton title="Verify" onPress={handleVerify} loading={loading} />
+      {showForceLogout ? (
+        <AppButton
+          title="Logout other device & Proceed"
+          onPress={() => handleVerify(true)}
+          loading={loading}
+        />
+      ) : (
+        <AppButton title="Verify" onPress={() => handleVerify(false)} loading={loading} />
+      )}
       <AppButton title="Resend OTP" variant="secondary" onPress={handleResend} loading={resending} />
     </ScreenContainer>
   );

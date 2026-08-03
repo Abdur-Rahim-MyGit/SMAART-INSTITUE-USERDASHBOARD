@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import * as storage from '../utils/storage';
 
 // Set EXPO_PUBLIC_API_URL in .env (see .env.example) — Metro exposes EXPO_PUBLIC_*
 // vars to the app automatically, no extra config needed.
@@ -13,14 +13,14 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-  const token = await SecureStore.getItemAsync(TOKEN_KEY);
+  const token = await storage.getItem(TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Normalize errors so screens can just read `err.message`.
+// Normalize errors so screens can just read `err.message` while preserving status and data.
 apiClient.interceptors.response.use(
   (res) => res,
   (err) => {
@@ -29,6 +29,9 @@ apiClient.interceptors.response.use(
       err?.response?.data?.message ||
       err?.message ||
       'Something went wrong. Please try again.';
-    return Promise.reject(new Error(message));
+    const customErr = new Error(message);
+    customErr.status = err?.response?.status;
+    customErr.data = err?.response?.data;
+    return Promise.reject(customErr);
   }
 );
