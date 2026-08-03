@@ -18,14 +18,22 @@ router.use(generalLimiter);
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Reconstruct the flat "registration" shape the frontend expects from a merged
-// student document (embedded `registration` sub-object + reconciled top-level
-// fields). Returns null when there's no student.
 const buildFlatRegistration = (studentDoc) => {
   if (!studentDoc) return null;
   const doc = studentDoc.toObject ? studentDoc.toObject() : studentDoc;
   const sub = doc.registration || {};
   return {
     ...sub,
+    personalDevelopmentGoals: sub.personalDevelopmentGoals || doc.personalDevelopmentGoals || null,
+    careerGoals: sub.careerGoals || doc.careerGoals || null,
+    workExperience: (sub.workExperience && sub.workExperience.length) ? sub.workExperience : (doc.workExperience || []),
+    projects: (sub.projects && sub.projects.length) ? sub.projects : (doc.projects || []),
+    certificates: (sub.certificates && sub.certificates.length) ? sub.certificates : (doc.certificates || []),
+    extracurricular: (sub.extracurricular && sub.extracurricular.length) ? sub.extracurricular : (doc.extracurricular || []),
+    sectorPreferences: sub.sectorPreferences || doc.sectorPreferences || null,
+    tenthDetails: sub.tenthDetails || doc.tenthDetails || null,
+    twelfthDetails: sub.twelfthDetails || doc.twelfthDetails || null,
+    higherEducation: sub.higherEducation || doc.higherEducation || null,
     userId: doc.userId,
     email: doc.email,
     fullName: doc.fullName,
@@ -136,6 +144,7 @@ router.post('/register-details', upload.fields([
     const parsedJobPreferences = parseJSON(registrationData.jobPreferences);
     const parsedSectorPreferences = parseJSON(registrationData.sectorPreferences);
     const parsedCareerGoals = parseJSON(registrationData.careerGoals);
+    const parsedPersonalDevelopmentGoals = parseJSON(registrationData.personalDevelopmentGoals);
     const parsedWorkExperience = parseJSON(registrationData.workExperience, []);
     const parsedProjects = parseJSON(registrationData.projects, []);
     const parsedCertificates = parseJSON(registrationData.certificates, []);
@@ -298,6 +307,13 @@ router.post('/register-details', upload.fields([
         longTerm: parsedCareerGoals?.longTerm || '',
       },
 
+      // Personal Development Goals
+      personalDevelopmentGoals: {
+        shortTerm: parsedPersonalDevelopmentGoals?.shortTerm || parsedCareerGoals?.personalDevelopmentGoals?.shortTerm || '',
+        mediumTerm: parsedPersonalDevelopmentGoals?.mediumTerm || parsedCareerGoals?.personalDevelopmentGoals?.mediumTerm || '',
+        longTerm: parsedPersonalDevelopmentGoals?.longTerm || parsedCareerGoals?.personalDevelopmentGoals?.longTerm || '',
+      },
+
       // Work Experience
       workExperience: Array.isArray(parsedWorkExperience) ? parsedWorkExperience : [],
 
@@ -364,6 +380,25 @@ router.post('/register-details', upload.fields([
         degreeGroup: he.degreeFullName || '',
         specialisation: Array.isArray(he.specialization) ? (he.specialization[0] || '') : (he.specialization || '')
       };
+    }
+
+    if (registrationPayload.workExperience && registrationPayload.workExperience.length) {
+      student.workExperience = registrationPayload.workExperience;
+    }
+    if (registrationPayload.projects && registrationPayload.projects.length) {
+      student.projects = registrationPayload.projects;
+    }
+    if (registrationPayload.certificates && registrationPayload.certificates.length) {
+      student.certificates = registrationPayload.certificates;
+    }
+    if (registrationPayload.extracurricular && registrationPayload.extracurricular.length) {
+      student.extracurricular = registrationPayload.extracurricular;
+    }
+    if (registrationPayload.careerGoals) {
+      student.careerGoals = registrationPayload.careerGoals;
+    }
+    if (registrationPayload.personalDevelopmentGoals) {
+      student.personalDevelopmentGoals = registrationPayload.personalDevelopmentGoals;
     }
 
     student.registration = registrationSubdoc;
@@ -611,6 +646,12 @@ router.patch('/register-section', async (req, res) => {
       const currentAddress = (student.address && student.address.toObject) ? student.address.toObject() : (student.address || {});
       student.address = { ...currentAddress, ...registration.address };
     }
+    if (registration.workExperience) student.workExperience = registration.workExperience;
+    if (registration.projects) student.projects = registration.projects;
+    if (registration.certificates) student.certificates = registration.certificates;
+    if (registration.extracurricular) student.extracurricular = registration.extracurricular;
+    if (registration.careerGoals) student.careerGoals = registration.careerGoals;
+    if (registration.personalDevelopmentGoals) student.personalDevelopmentGoals = registration.personalDevelopmentGoals;
 
     const reconciledKeys = ['userId', 'email', 'fullName', 'mobileNumber', 'password', 'profilePhoto', 'dob', 'gender', 'cgpa', 'batch', 'address', 'timezone', 'dateFormat', 'notificationPrefs', 'updatedAt', 'createdAt', 'status'];
     const subdoc = { ...registration };

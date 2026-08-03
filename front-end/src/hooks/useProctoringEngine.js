@@ -94,6 +94,7 @@ export const useProctoringEngine = ({
   // Timeout reference for adaptive checking
   const faceTimeoutRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
+  const cameraRetryTimeoutRef = useRef(null);
   const proctoringSessionIdRef = useRef(null);
   const registeredFaceDescriptorRef = useRef(registeredFaceDescriptor);
   const registeredAllEmbeddingsRef = useRef(registeredAllEmbeddings);

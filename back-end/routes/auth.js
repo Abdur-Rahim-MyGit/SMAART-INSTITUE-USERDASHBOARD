@@ -646,36 +646,9 @@ router.post('/login',
       }
 
       // Check if student must change password on first login
-      // BUT only if they haven't already completed the ComprehensiveSignup flow.
-      // Admin-onboarded students have isRegistered:true but NO registration subdoc —
-      // they still need to set a password and go through ComprehensiveSignup.
-      // Self-registered students who completed ComprehensiveSignup have a populated
-      // registration subdoc AND isRegistered:true — they skip this.
       if (userType === 'student' && user.mustChangePassword) {
-        // Only skip if the student actually completed the registration form
-        // (i.e. has a populated embedded registration subdoc).
-        const existingRegistration = !!(user.registration && Object.keys(
-          (user.registration.toObject ? user.registration.toObject() : user.registration)
-        ).length > 0);
-
-        if (existingRegistration) {
-          // Student already registered - skip password change, update flags, proceed normally
-          console.log(`[Auth/Login] Student ${normalizedEmail} already has registration record - skipping password change`);
-
-          // Update student record to mark as not first login and registered
-          const Student = require('../models/Student');
-          await Student.findByIdAndUpdate(user._id, {
-            mustChangePassword: false,
-            isFirstLogin: false,
-            isRegistered: true
-          });
-          user.mustChangePassword = false;
-          user.isFirstLogin = false;
-          user.isRegistered = true;
-          // Continue to normal login flow (OTP for returning users)
-        } else {
-          // === MODIFIED: First-time login now requires OTP verification first ===
-          console.log(`[Auth/Login] First-time login for ${normalizedEmail} - sending OTP before password change`);
+        // First-time login requires OTP verification followed by password change
+        console.log(`[Auth/Login] First-time login for ${normalizedEmail} - sending OTP before password change`);
 
           // Generate OTP and send
           const otp = generateOTP();
@@ -723,7 +696,6 @@ router.post('/login',
             email: loginEmail,
             fullName: user.fullName
           });
-        }
       }
 
       // Create JWT token - SECURITY: Enforce environment secret and reduce expiry

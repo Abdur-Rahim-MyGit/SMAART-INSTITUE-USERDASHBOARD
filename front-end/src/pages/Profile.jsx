@@ -417,13 +417,13 @@ const Profile = () => {
             tenthDetails: reg.tenthDetails || null,
             twelfthDetails: reg.twelfthDetails || null,
             higherEducation: reg.higherEducation || null,
-            sectorPreferences: reg.sectorPreferences || null,
-            careerGoals: reg.careerGoals || null,
-            personalDevelopmentGoals: reg.personalDevelopmentGoals || null,
-            workExperience: Array.isArray(reg.workExperience) ? reg.workExperience : [],
-            projects: Array.isArray(reg.projects) ? reg.projects : [],
-            certificates: Array.isArray(reg.certificates) ? reg.certificates : [],
-            extracurricular: Array.isArray(reg.extracurricular) ? reg.extracurricular : []
+            sectorPreferences: reg.sectorPreferences || user.sectorPreferences || null,
+            careerGoals: reg.careerGoals || user.careerGoals || user.otherDetails?.careerGoals || null,
+            personalDevelopmentGoals: reg.personalDevelopmentGoals || user.personalDevelopmentGoals || user.otherDetails?.personalDevelopmentGoals || null,
+            workExperience: Array.isArray(reg.workExperience) && reg.workExperience.length ? reg.workExperience : (Array.isArray(user.workExperience) ? user.workExperience : []),
+            projects: Array.isArray(reg.projects) && reg.projects.length ? reg.projects : (Array.isArray(user.projects) ? user.projects : []),
+            certificates: Array.isArray(reg.certificates) && reg.certificates.length ? reg.certificates : (Array.isArray(user.certificates) ? user.certificates : []),
+            extracurricular: Array.isArray(reg.extracurricular) && reg.extracurricular.length ? reg.extracurricular : (Array.isArray(user.extracurricular) ? user.extracurricular : [])
           };
 
           setFormData(newFormData);
@@ -1068,21 +1068,40 @@ const Profile = () => {
                       </div>
                       <div className="space-y-4">
                         {formData.workExperience && formData.workExperience.length > 0 ? (
-                          formData.workExperience.map((exp, idx) => (
-                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
-                              <h4 className="font-bold text-gray-900 dark:text-white">
-                                {exp.companyName || exp.organization} {exp.location && <span className="text-gray-400 font-normal text-xs ml-1">| {exp.location}</span>}
-                              </h4>
-                              <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.role || exp.title}</p>
-                              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                                <IconClock stroke={1.5} className="w-3 h-3" />
-                                <span>{exp.duration || t("profile_page.not_set")}</span>
+                          formData.workExperience.map((exp, idx) => {
+                            const company = exp.organizationName || exp.companyName || exp.organization || t("profile_page.not_set");
+                            const designation = exp.jobTitle || exp.role || exp.title || t("profile_page.not_set");
+                            const durationText = exp.duration || calculateDuration(exp.startDate, exp.endDate, exp.currentlyWorking) || (exp.startDate ? `${new Date(exp.startDate).getFullYear()} - ${exp.currentlyWorking ? 'Present' : (exp.endDate ? new Date(exp.endDate).getFullYear() : '')}` : t("profile_page.not_set"));
+                            return (
+                              <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <h4 className="font-bold text-gray-900 dark:text-white">
+                                      {company} {exp.location && <span className="text-gray-400 font-normal text-xs ml-1">| {exp.location}</span>}
+                                    </h4>
+                                    <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{designation}</p>
+                                  </div>
+                                  {exp.experienceType && (
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                                      {exp.experienceType}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-gray-500">
+                                  <div className="flex items-center gap-1.5">
+                                    <IconClock stroke={1.5} className="w-3.5 h-3.5" />
+                                    <span>{durationText}</span>
+                                  </div>
+                                  {exp.industry && (
+                                    <span className="text-gray-400">| {exp.industry}</span>
+                                  )}
+                                </div>
+                                {(exp.description || exp.keyResponsibilities) && (
+                                  <p className="text-xs text-gray-600 dark:text-slate-300 mt-2 line-clamp-2">{exp.description || exp.keyResponsibilities}</p>
+                                )}
                               </div>
-                              {exp.description && (
-                                <p className="text-xs text-gray-600 dark:text-slate-300 mt-2 line-clamp-2">{exp.description}</p>
-                              )}
-                            </div>
-                          ))
+                            );
+                          })
                         ) : (
                           <p className="text-sm text-gray-500 italic">{t("profile_page.no_work_experience")}</p>
                         )}
