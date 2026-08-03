@@ -17,8 +17,9 @@ export default function OtpVerifyScreen({ route, navigation }) {
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+  const [forceLogoutPrompt, setForceLogoutPrompt] = useState(false);
 
-  const handleVerify = async () => {
+  const handleVerify = async (forceLogout = false) => {
     if (!otp) {
       setError('Enter the OTP sent to your email.');
       return;
@@ -26,7 +27,8 @@ export default function OtpVerifyScreen({ route, navigation }) {
     setError('');
     setLoading(true);
     try {
-      const res = await verifyLoginOtp(tempToken, otp);
+      const res = await verifyLoginOtp(tempToken, otp, forceLogout);
+      setForceLogoutPrompt(false);
       if (res.requirePasswordChange) {
         // FR-AUTH-05 — first-login forced password change is a separate flow;
         // this basic scaffold surfaces it clearly rather than pretending to handle it.
@@ -40,6 +42,14 @@ export default function OtpVerifyScreen({ route, navigation }) {
         setError('Unexpected response from server.');
       }
     } catch (err) {
+      // Single-session enforcement (back-end/routes/auth.js) — mirrors the
+      // web app's LoginOtpModal force-logout confirm flow.
+      if (err.status === 409 || err.data?.requiresForceLogout) {
+        setForceLogoutPrompt(true);
+        setError(err.message);
+        return;
+      }
+      setForceLogoutPrompt(false);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -100,7 +110,26 @@ export default function OtpVerifyScreen({ route, navigation }) {
           </View>
         ) : null}
 
-        <AppButton title="Verify" icon="arrow-right" onPress={handleVerify} loading={loading} />
+        {forceLogoutPrompt ? (
+          <>
+            <AppButton
+              title="Log out other device & continue"
+              icon="log-out"
+              onPress={() => handleVerify(true)}
+              loading={loading}
+            />
+            <AppButton
+              title="Cancel"
+              variant="link"
+              onPress={() => {
+                setForceLogoutPrompt(false);
+                setError('');
+              }}
+            />
+          </>
+        ) : (
+          <AppButton title="Verify" icon="arrow-right" onPress={() => handleVerify(false)} loading={loading} />
+        )}
         <AppButton title="Resend OTP" variant="link" onPress={handleResend} loading={resending} />
       </View>
     </ScreenContainer>

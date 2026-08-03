@@ -29,6 +29,9 @@ apiClient.interceptors.response.use(
       err?.response?.data?.message ||
       err?.message ||
       'Something went wrong. Please try again.';
-    return Promise.reject(new Error(message));
+    const normalized = new Error(message);
+    normalized.status = err?.response?.status;
+    normalized.data = err?.response?.data;
+    return Promise.reject(normalized);
   }
 );
