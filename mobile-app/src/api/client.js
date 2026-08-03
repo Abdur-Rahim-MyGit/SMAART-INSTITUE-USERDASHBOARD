@@ -29,9 +29,9 @@ apiClient.interceptors.response.use(
       err?.response?.data?.message ||
       err?.message ||
       'Something went wrong. Please try again.';
-    const customErr = new Error(message);
-    customErr.status = err?.response?.status;
-    customErr.data = err?.response?.data;
-    return Promise.reject(customErr);
+    const normalized = new Error(message);
+    normalized.status = err?.response?.status;
+    normalized.data = err?.response?.data;
+    return Promise.reject(normalized);
   }
 );
