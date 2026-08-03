@@ -24,6 +24,14 @@ export const proctoringApi = {
     });
   },
 
+  // Liveness ping — the server measures the gap between pings and records a
+  // violation the candidate cannot suppress when contact lapses.
+  heartbeat: async (sessionId) => {
+    return apiCall(`/proctoring/session/${sessionId}/heartbeat`, {
+      method: 'POST'
+    });
+  },
+
   // Trigger lockout for a proctoring session
   triggerLock: async (sessionId, data) => {
     return apiCall(`/proctoring/session/${sessionId}/lock`, {

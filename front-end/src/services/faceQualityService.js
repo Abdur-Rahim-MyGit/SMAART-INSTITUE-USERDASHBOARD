@@ -200,16 +200,16 @@ export const checkHeadPose = (landmarks) => {
   let direction = 'center';
   let message = '';
 
-  if (yawDeg > 22) {
+  if (yawDeg > 28) {
     direction = 'looking_right';
     message = 'Head turned right — please face your screen.';
-  } else if (yawDeg < -22) {
+  } else if (yawDeg < -28) {
     direction = 'looking_left';
     message = 'Head turned left — please face your screen.';
-  } else if (pitchDeg > 18) {
+  } else if (pitchDeg > 24) {
     direction = 'looking_down';
     message = 'Head tilted down — please look directly at the screen.';
-  } else if (pitchDeg < -18) {
+  } else if (pitchDeg < -24) {
     direction = 'looking_up';
     message = 'Head tilted up — please look directly at the screen.';
   }
