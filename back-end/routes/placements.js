@@ -47,6 +47,50 @@ const extractRecruiterId = (job) => {
   return null;
 };
 
+/**
+ * The college that OWNS the posting. jobpostings.college is a single ObjectId.
+ * smaartjobpostings.college is an ARRAY of *targeted* colleges — that is audience,
+ * not authorship — so an array is deliberately ignored here.
+ */
+const extractOwningCollegeId = (job) => {
+  const value = job.college;
+  if (!value || Array.isArray(value)) return null;
+  if (value._id && isObjectIdLike(value._id)) return value._id.toString();
+  if (isObjectIdLike(value)) return value.toString();
+  return null;
+};
+
+/**
+ * Job-fair postings are written into `jobpostings` whichever kind of fair they
+ * came from, so the collection alone cannot tell SMAART roles from college ones.
+ * The fair's `label` is the discriminator ("smaart job fair" vs college fairs).
+ */
+const extractJobFairId = (job) => {
+  const value = job.jobFairId || job.jobFair || job.fairId;
+  if (!value || Array.isArray(value)) return null;
+  if (value._id && isObjectIdLike(value._id)) return value._id.toString();
+  if (isObjectIdLike(value)) return value.toString();
+  return null;
+};
+
+const getCollegeName = (college) => {
+  if (!college) return null;
+  return college.collegeName
+    || college.institution_name
+    || college.name
+    || college.title
+    || null;
+};
+
+const getRecruiterName = (recruiter) => {
+  if (!recruiter) return null;
+  return recruiter.fullName
+    || recruiter.name
+    || recruiter.recruiterName
+    || recruiter.contactName
+    || null;
+};
+
 const getCompanyFromRecruiter = (recruiter) => {
   if (!recruiter) return null;
   if (recruiter.company && typeof recruiter.company === 'object' && !isObjectIdLike(recruiter.company)) {
@@ -300,13 +344,22 @@ const normalizeJob = (job, sourceCollection) => {
   const salary = job.salary || job.ctc || job.package || job.compensation || job.stipend || null;
   const applyUrl = job.applyUrl || job.applicationUrl || job.link || job.jobUrl || job.url || null;
   const companyLogo = getCompanyLogo(job);
+  const compName = getCompanyText(job);
+  const compIndustry = job.__company?.industry || job.industry || 'Technology';
+  const compCountry = job.__company?.country || job.country || 'India';
+  const fallbackCompanyAbout = (compName && compName !== 'Company not listed')
+    ? `${compName} is a leading organization in the ${compIndustry} sector (${compCountry}), actively conducting placement drives to recruit fresh talent.`
+    : null;
+
   const companyAbout = job.aboutCompany
     || job.companyAbout
+    || job.about
+    || job.companyDescription
     || job.__company?.aboutCompany
     || job.__company?.about
     || job.__company?.description
     || getAboutCompanyFromRecruiter(job.__recruiter)
-    || null;
+    || fallbackCompanyAbout;
   const companyWebsite = job.companyWebsite
     || job.website
     || job.__company?.website
@@ -315,10 +368,28 @@ const normalizeJob = (job, sourceCollection) => {
     || null;
   const status = job.status || job.applicationStatus || 'active';
 
+  // Which channel this posting reached the student through. The collection alone
+  // is not sufficient: a role created inside a SMAART job fair is stored in
+  // `jobpostings` but is still a SMAART posting, so the fair's label wins.
+  const jobFairLabel = job.__jobFair?.label || '';
+  const isSmaartJobFair = /smaart/i.test(jobFairLabel);
+  const isSmaart = sourceCollection === 'smaartjobpostings' || isSmaartJobFair;
+
+  // Who actually published it. A recruiter reference wins over the college:
+  // `college` on a jobposting is the owning/HOST college, which for a role a
+  // recruiter created inside a job fair is not the publisher. Crediting the host
+  // college there reads as "SRM posted this" when Google's recruiter did.
+  const recruiterName = getRecruiterName(job.__recruiter);
+  const collegeName = getCollegeName(job.__college);
+  const postedByType = recruiterName ? 'recruiter' : 'college';
+  const postedBy = recruiterName || collegeName;
+
   return {
     ...job,
     __company: undefined,
     __recruiter: undefined,
+    __college: undefined,
+    __jobFair: undefined,
     _id: job._id?.toString?.() || job._id,
     sourceCollection,
     displayTitle: title,
@@ -333,24 +404,45 @@ const normalizeJob = (job, sourceCollection) => {
     displayCompanyAbout: companyAbout,
     displayCompanyWebsite: companyWebsite,
     displayStatus: status,
+    displayPostedBy: postedBy,
+    displayPostedByType: postedByType,
+    // The college hosting/owning the posting. Distinct from the publisher above.
+    displayHostCollege: collegeName,
+    // Channel badge: 'smaart' | 'college'. Authoritative — use this, not sourceCollection.
+    displaySource: isSmaart ? 'smaart' : 'college',
+    displayJobFairTitle: job.__jobFair?.title || null,
   };
 };
 
 const enrichJobs = async (docs, sourceCollection) => {
-  const companyMap = await findByIdsAcrossCollections(['companies'], docs.map(extractCompanyId));
-  const recruiterMap = await findByIdsAcrossCollections(
-    ['Recruiter', 'recruiters', 'recruiter'],
-    docs.map(extractRecruiterId)
-  );
+  const [companyMap, recruiterMap, collegeMap, jobFairMap] = await Promise.all([
+    findByIdsAcrossCollections(['companies'], docs.map(extractCompanyId)),
+    findByIdsAcrossCollections(
+      ['Recruiter', 'recruiters', 'recruiter'],
+      docs.map(extractRecruiterId)
+    ),
+    findByIdsAcrossCollections(
+      ['colleges', 'College', 'college'],
+      docs.map(extractOwningCollegeId)
+    ),
+    findByIdsAcrossCollections(
+      ['jobfairs', 'JobFair', 'jobfair'],
+      docs.map(extractJobFairId)
+    ),
+  ]);
 
   return docs.map((doc) => {
     const companyId = extractCompanyId(doc);
     const recruiterId = extractRecruiterId(doc);
+    const collegeId = extractOwningCollegeId(doc);
+    const jobFairId = extractJobFairId(doc);
     return normalizeJob(
       {
         ...doc,
         __company: companyId ? companyMap.get(companyId) : null,
         __recruiter: recruiterId ? recruiterMap.get(recruiterId) : null,
+        __college: collegeId ? collegeMap.get(collegeId) : null,
+        __jobFair: jobFairId ? jobFairMap.get(jobFairId) : null,
       },
       sourceCollection
     );
@@ -367,7 +459,17 @@ router.get('/jobs', protect, async (req, res) => {
     }
 
     const limit = Math.min(parseInt(req.query.limit, 10) || 100, 200);
-    const filter = buildCollectionFilter(req.user);
+
+    // Postings that belong to a job fair are surfaced inside that fair (see the
+    // /job-fairs route), not in the general feed — otherwise they appear twice.
+    // Applied at the route rather than inside buildCollectionFilter, because the
+    // job-fairs route reuses that filter and must keep these postings.
+    const filter = {
+      $and: [
+        buildCollectionFilter(req.user),
+        { $or: [{ jobFairId: { $exists: false } }, { jobFairId: null }] },
+      ],
+    };
     const collections = ['jobpostings', 'smaartjobpostings'];
 
     const results = await Promise.all(collections.map(async (collectionName) => {
@@ -402,10 +504,71 @@ router.get('/jobs', protect, async (req, res) => {
       console.warn("Could not fetch user skills/pathway for placements:", e);
     }
 
+    // ── Skill Gap Computation ──────────────────────────────────────────
+    // For each job that has structuredSkills, compare against the student's
+    // known skills (from SkillProgress) and surface which must-have skills
+    // are missing or below the required level. The student can still apply.
+    const levelTextToNumber = (l) => {
+      if (typeof l === 'number') return l;
+      if (!l) return 0;
+      const m = { beginner: 1, intermediate: 2, advanced: 3, expert: 4, master: 5 };
+      return m[String(l).toLowerCase()] || 0;
+    };
+
+    const studentSkillMap = new Map(
+      userSkills.map(name => [name.toLowerCase().trim(), 3]) // assume completed = level 3
+    );
+
+    // Fetch the actual Student document which holds verified skills
+    if (req.user && req.user.email) {
+      try {
+        const studentDoc = await mongoose.connection.db.collection('students').findOne({ email: req.user.email });
+        if (studentDoc) {
+          const rawUserSkills = studentDoc.skills || studentDoc.verifiedSkills || [];
+          rawUserSkills.forEach(s => {
+            const name = (s.skill_name || s.name || '').toLowerCase().trim();
+            if (name) studentSkillMap.set(name, s.verifiedLevel || levelTextToNumber(s.level) || 3);
+          });
+        }
+      } catch (err) {
+        console.warn("Could not fetch student doc for verified skills:", err);
+      }
+    }
+
+    const dataWithGaps = data.map(job => {
+      const required = (job.structuredSkills && job.structuredSkills.length > 0) 
+        ? job.structuredSkills 
+        : (job.eligibility?.skills || job.skills || []).map(s => ({ skill_name: s, requiredLevel: 3, isEssential: true }));
+      
+      if (!required.length) return { ...job, missedMustHaves: [], matchGapWarning: false };
+
+      const missed = [];
+      required.forEach(req => {
+        if (!req.isEssential) return;
+        const reqLevel = req.requiredLevel || 1;
+        const name = (req.skill_name || '').toLowerCase().trim();
+        const studentLevel = studentSkillMap.get(name) || 0;
+        if (studentLevel < reqLevel) {
+          missed.push({
+            name: req.skill_name || req.skill_id || 'Unknown Skill',
+            requiredLevel: reqLevel,
+            studentLevel: studentLevel
+          });
+        }
+      });
+
+      return {
+        ...job,
+        missedMustHaves: missed,
+        matchGapWarning: missed.length > 0,
+      };
+    });
+    // ──────────────────────────────────────────────────────────────────
+
     res.json({
       success: true,
-      count: data.length,
-      data,
+      count: dataWithGaps.length,
+      data: dataWithGaps,
       sources: compact(collections),
       userSkills,
       careerRoles
@@ -441,6 +604,69 @@ router.get('/jobs/:source/:id', protect, async (req, res) => {
     }
 
     const [job] = await enrichJobs([doc], source);
+
+    // ── Skill Gap Computation for Single Job ───────────────────────
+    let userSkills = [];
+    try {
+      if (req.user && req.user.email) {
+        const skills = await SkillProgressModel.find({ email: req.user.email, status: { $in: ['In Progress', 'Completed'] } });
+        userSkills = skills.map(s => s.skillName);
+      }
+    } catch (e) {
+      console.warn("Could not fetch user skills for placement detail:", e);
+    }
+
+    const levelTextToNumber = (l) => {
+      if (typeof l === 'number') return l;
+      if (!l) return 0;
+      const m = { beginner: 1, intermediate: 2, advanced: 3, expert: 4, master: 5 };
+      return m[String(l).toLowerCase()] || 0;
+    };
+
+    const studentSkillMap = new Map(
+      userSkills.map(name => [name.toLowerCase().trim(), 3])
+    );
+    
+    // Fetch the actual Student document which holds verified skills
+    if (req.user && req.user.email) {
+      try {
+        const studentDoc = await mongoose.connection.db.collection('students').findOne({ email: req.user.email });
+        if (studentDoc) {
+          const rawUserSkills = studentDoc.skills || studentDoc.verifiedSkills || [];
+          rawUserSkills.forEach(s => {
+            const name = (s.skill_name || s.name || '').toLowerCase().trim();
+            if (name) studentSkillMap.set(name, s.verifiedLevel || levelTextToNumber(s.level) || 3);
+          });
+        }
+      } catch (err) {
+        console.warn("Could not fetch student doc for verified skills:", err);
+      }
+    }
+
+    const required = (job.structuredSkills && job.structuredSkills.length > 0) 
+      ? job.structuredSkills 
+      : (job.eligibility?.skills || job.skills || []).map(s => ({ skill_name: s, requiredLevel: 3, isEssential: true }));
+    const missed = [];
+    if (required.length) {
+      required.forEach(reqSkill => {
+        if (!reqSkill.isEssential) return;
+        const reqLevel = reqSkill.requiredLevel || 1;
+        const name = (reqSkill.skill_name || '').toLowerCase().trim();
+        const studentLevel = studentSkillMap.get(name) || 0;
+        if (studentLevel < reqLevel) {
+          missed.push({
+            name: reqSkill.skill_name || reqSkill.skill_id || 'Unknown Skill',
+            requiredLevel: reqLevel,
+            studentLevel: studentLevel
+          });
+        }
+      });
+    }
+
+    job.missedMustHaves = missed;
+    job.matchGapWarning = missed.length > 0;
+    // ───────────────────────────────────────────────────────────────
+
     res.json({ success: true, data: job });
   } catch (err) {
     console.error('[Placements] job detail error:', err);
@@ -580,7 +806,69 @@ router.get('/applications', protect, async (req, res) => {
     const applicationCollection = mongoose.connection.db.collection('placementapplications');
     const docs = await applicationCollection.find(query).sort({ createdAt: -1 }).limit(200).toArray();
     if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] found docs count:', docs.length);
-    res.json({ success: true, data: docs });
+
+    // Attach the referenced posting so the client does not have to fetch each one
+    // individually. Postings do get deleted while applications live on, so anything
+    // that no longer resolves falls back to the company record for branding and is
+    // flagged with jobRemoved rather than silently rendering as a blank card.
+    const bySource = new Map();
+    docs.forEach((app) => {
+      const src = app.jobSource || 'jobpostings';
+      const jobId = getId(app.job);
+      if (!jobId || !mongoose.Types.ObjectId.isValid(jobId)) return;
+      if (!bySource.has(src)) bySource.set(src, new Set());
+      bySource.get(src).add(jobId);
+    });
+
+    const jobsBySource = new Map();
+    await Promise.all([...bySource.entries()].map(async ([src, ids]) => {
+      try {
+        const found = await mongoose.connection.db
+          .collection(src)
+          .find({ _id: { $in: [...ids].map((id) => new mongoose.Types.ObjectId(id)) } })
+          .toArray();
+        const enriched = await enrichJobs(found, src);
+        jobsBySource.set(src, new Map(enriched.map((j) => [String(j._id), j])));
+      } catch (err) {
+        if (err.codeName !== 'NamespaceNotFound') throw err;
+        jobsBySource.set(src, new Map());
+      }
+    }));
+
+    // Company logos keyed by lowercased name, for applications whose posting is gone.
+    const orphanNames = [...new Set(docs
+      .filter((app) => {
+        const src = app.jobSource || 'jobpostings';
+        return !jobsBySource.get(src)?.get(getId(app.job));
+      })
+      .map((app) => (app.companyName || '').trim().toLowerCase())
+      .filter(Boolean))];
+
+    const logoByCompany = new Map();
+    if (orphanNames.length > 0) {
+      const companies = await mongoose.connection.db.collection('companies').find({}).toArray();
+      companies.forEach((c) => {
+        const key = (c.name || c.companyName || '').trim().toLowerCase();
+        if (key && orphanNames.includes(key)) {
+          logoByCompany.set(key, c.logo || c.logoUrl || c.companyLogo || null);
+        }
+      });
+    }
+
+    const data = docs.map((app) => {
+      const src = app.jobSource || 'jobpostings';
+      const resolved = jobsBySource.get(src)?.get(getId(app.job)) || null;
+      if (resolved) return { ...app, job: resolved, jobRemoved: false };
+      const key = (app.companyName || '').trim().toLowerCase();
+      return {
+        ...app,
+        jobRemoved: true,
+        displayCompanyLogo: logoByCompany.get(key) || null,
+        displaySource: src === 'smaartjobpostings' ? 'smaart' : 'college',
+      };
+    });
+
+    res.json({ success: true, data });
   } catch (err) {
     console.error('[Placements] list applications error:', err);
     res.status(500).json({ success: false, error: 'Failed to list applications' });
@@ -675,13 +963,21 @@ router.get('/companies', protect, async (req, res) => {
     let collegePartners = [];
     if (userCollegeId && mongoose.Types.ObjectId.isValid(userCollegeId)) {
       collegePartners = await db.collection('companies')
-        .find({ college: new mongoose.Types.ObjectId(userCollegeId) })
+        .find({
+          college: new mongoose.Types.ObjectId(userCollegeId),
+          status: { $nin: ['inactive', 'Inactive', 'pending', 'Pending', 'rejected', 'Rejected', 'suspended', 'Suspended', 'in review', 'In review', 'In Review'] }
+        })
         .toArray();
     }
 
     // 2. Fetch SMAART Partners (recruiters without a specific college)
+    // Only approved and active partners should be shown to students (not pending / in review queue)
     const smaartPartners = await db.collection('recruiters')
-      .find({ role: 'recruiter', status: { $ne: 'inactive' }, $or: [{ college: null }, { college: { $exists: false } }] })
+      .find({
+        role: 'recruiter',
+        status: { $in: ['active', 'Active', 'approved', 'Approved'] },
+        $or: [{ college: null }, { college: { $exists: false } }]
+      })
       .toArray();
 
     // Map them to a common format
@@ -718,6 +1014,129 @@ router.get('/companies', protect, async (req, res) => {
 });
 
 // Get all job fairs for the student's college
+/**
+ * Postings that belong to the given fairs, normalised exactly like the Jobs tab
+ * and scoped by the same audience rules — being able to see a fair does not
+ * entitle a student to postings they are not targeted for.
+ *
+ * NOTE: The deadline/date filter from buildCollectionFilter is intentionally
+ * SKIPPED here. Job fair postings should always be visible inside the fair
+ * regardless of whether their individual application deadline has passed —
+ * the fair's own dates govern visibility, not each job's deadline.
+ * Returns a Map keyed by stringified fair id.
+ */
+const loadJobsForFairs = async (student, fairIds) => {
+  const jobsByFair = new Map();
+  if (!fairIds.length) return jobsByFair;
+
+  // Build audience filter WITHOUT the date/deadline restriction.
+  // We do this by constructing the filter ourselves instead of calling
+  // buildCollectionFilter, which bundles a dateFilter that rejects expired jobs.
+  const collegeId = getId(student.college);
+  const degreeId = getId(student.degree || student.degreeId);
+
+  // Only keep the status + audience portion — no date filter.
+  const statusFilter = {
+    $or: [
+      { status: { $exists: false } },
+      { status: { $in: ['active', 'Active', 'published', 'Published', 'open', 'Open', 'approved', 'Approved', 'draft', 'Draft', 'inactive', 'Inactive', 'closed', 'Closed'] } },
+      { isActive: true },
+      { published: true },
+      { isPublished: true },
+    ],
+  };
+
+  const audienceOrClauses = [
+    { targetType: { $exists: false } },
+    { targetType: null },
+    { targetType: { $in: ['all', 'All', 'students', 'Students'] } },
+  ];
+
+  if (collegeId && mongoose.Types.ObjectId.isValid(collegeId)) {
+    const collegeObjectId = new mongoose.Types.ObjectId(collegeId);
+    audienceOrClauses.push(
+      { college: collegeObjectId },
+      { collegeId: collegeObjectId },
+      { targetCollege: collegeObjectId },
+      { targetCollegeIds: collegeObjectId },
+      { targetColleges: collegeObjectId },
+    );
+  }
+
+  if (degreeId && mongoose.Types.ObjectId.isValid(degreeId)) {
+    const degreeObjectId = new mongoose.Types.ObjectId(degreeId);
+    audienceOrClauses.push(
+      { degree: degreeObjectId },
+      { degreeId: degreeObjectId },
+      { targetDegrees: degreeObjectId },
+    );
+  }
+
+  const fairAudienceFilter = {
+    $and: [
+      statusFilter,
+      { $or: audienceOrClauses },
+    ],
+  };
+
+  await Promise.all(['jobpostings', 'smaartjobpostings'].map(async (collectionName) => {
+    try {
+      const docs = await mongoose.connection.db
+        .collection(collectionName)
+        .find({ $and: [fairAudienceFilter, { jobFairId: { $in: fairIds } }] })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      const enriched = await enrichJobs(docs, collectionName);
+      enriched.forEach((job) => {
+        const key = String(job.jobFairId);
+        if (!jobsByFair.has(key)) jobsByFair.set(key, []);
+        jobsByFair.get(key).push(job);
+      });
+    } catch (e) {
+      if (e.codeName !== 'NamespaceNotFound') throw e;
+    }
+  }));
+
+  return jobsByFair;
+};
+
+
+// Single job fair, with its postings attached.
+router.get('/job-fairs/:id', protect, async (req, res) => {
+  try {
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({ success: false, error: 'Only student accounts can view job fairs' });
+    }
+
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid job fair id' });
+    }
+
+    const fairObjectId = new mongoose.Types.ObjectId(id);
+    const fair = await mongoose.connection.db.collection('jobfairs').findOne({ _id: fairObjectId });
+    if (!fair) {
+      return res.status(404).json({ success: false, error: 'Job fair not found' });
+    }
+
+    // Same visibility rule as the list endpoint: the student's own college, or
+    // any SMAART fair.
+    const collegeId = getId(req.user.college);
+    const visible = fair.label === 'smaart job fair'
+      || (collegeId && String(fair.college) === String(collegeId));
+    if (!visible) {
+      return res.status(403).json({ success: false, error: 'This job fair is not available to you' });
+    }
+
+    const jobsByFair = await loadJobsForFairs(req.user, [fairObjectId]);
+    res.json({ success: true, data: { ...fair, jobs: jobsByFair.get(String(fair._id)) || [] } });
+  } catch (err) {
+    console.error('[Placements] get job fair error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load job fair' });
+  }
+});
+
 router.get('/job-fairs', protect, async (req, res) => {
   try {
     if (req.user?.role !== 'student') {
@@ -744,7 +1163,15 @@ router.get('/job-fairs', protect, async (req, res) => {
       .sort({ startDate: -1 })
       .toArray();
 
-    res.json({ success: true, count: fairs.length, data: fairs });
+    // Attach each fair's postings so the card can show a role count.
+    const jobsByFair = await loadJobsForFairs(req.user, fairs.map((f) => f._id));
+
+    const data = fairs.map((fair) => ({
+      ...fair,
+      jobs: jobsByFair.get(String(fair._id)) || [],
+    }));
+
+    res.json({ success: true, count: data.length, data });
   } catch (err) {
     console.error('[Placements] get job fairs error:', err);
     res.status(500).json({ success: false, error: 'Failed to load job fairs' });
@@ -793,6 +1220,148 @@ router.post('/job-fairs/:id/register', protect, async (req, res) => {
   } catch (err) {
     console.error('[Placements] register job fair error:', err);
     res.status(500).json({ success: false, error: 'Failed to register for job fair' });
+  }
+});
+
+// @route   GET /api/placements/job-fairs/:id/pass
+// @desc    Get student's digital pass & QR payload for a job fair
+// @access  Private (Student)
+router.get('/job-fairs/:id/pass', protect, async (req, res) => {
+  try {
+    if (req.user?.role !== 'student') {
+      return res.status(403).json({ success: false, error: 'Only student accounts can access digital fair passes' });
+    }
+
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid job fair ID' });
+    }
+
+    const fairCollection = mongoose.connection.db.collection('jobfairs');
+    const fair = await fairCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    if (!fair) {
+      return res.status(404).json({ success: false, error: 'Job Fair not found' });
+    }
+
+    const registeredStudents = fair.registeredStudents || [];
+    const isRegistered = registeredStudents.some(s => s.toString() === req.user._id.toString());
+    if (!isRegistered) {
+      return res.status(400).json({ success: false, error: 'Student is not registered for this Job Fair' });
+    }
+
+    const checkIns = fair.checkIns || [];
+    const checkInRecord = checkIns.find(c => c.student && c.student.toString() === req.user._id.toString());
+
+    // Generate unique pass identifier
+    const passCode = `SJF-${String(fair._id).slice(-4).toUpperCase()}-${String(req.user._id).slice(-4).toUpperCase()}`;
+
+    // Secure QR payload
+    const qrPayload = JSON.stringify({
+      type: 'SMAART_JOB_FAIR_PASS',
+      fairId: fair._id.toString(),
+      studentId: req.user._id.toString(),
+      passCode,
+      name: req.user.fullName || req.user.name || req.user.firstName || 'Student',
+      rollNo: req.user.rollNumber || req.user.rollNo || req.user.studentId || '',
+      collegeId: getId(req.user.college),
+      issuedAt: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      data: {
+        passCode,
+        qrPayload,
+        isCheckedIn: !!checkInRecord,
+        checkedInAt: checkInRecord?.checkedInAt || null,
+        boothNumber: checkInRecord?.boothNumber || null,
+        fair: {
+          _id: fair._id,
+          title: fair.title,
+          startDate: fair.startDate,
+          endDate: fair.endDate,
+          location: fair.location,
+          mode: fair.mode,
+          label: fair.label
+        },
+        student: {
+          _id: req.user._id,
+          name: req.user.fullName || req.user.name || req.user.firstName || 'Student',
+          email: req.user.email || '',
+          phone: req.user.mobile || req.user.phone || '',
+          rollNo: req.user.rollNumber || req.user.rollNo || req.user.studentId || 'N/A',
+          degree: req.user.degree?.abbreviation || req.user.degree?.fullName || req.user.degree || 'B.Tech',
+          department: req.user.degree?.specialization || req.user.academic?.specialisation || req.user.department || req.user.branch || 'Engineering',
+          currentCGPA: req.user.cgpa ?? req.user.academic?.cgpa ?? req.user.currentCGPA ?? null,
+          profilePhoto: req.user.profilePic || req.user.profileImage || req.user.profilePhoto || req.user.avatar || null
+        }
+      }
+    });
+  } catch (err) {
+    console.error('[Placements] get fair pass error:', err);
+    res.status(500).json({ success: false, error: 'Failed to generate fair pass' });
+  }
+});
+
+// @route   POST /api/placements/applications/:id/respond-offer
+// @desc    Accept or decline an offer with e-signature
+// @access  Private (Student)
+router.post('/applications/:id/respond-offer', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'student') {
+      return res.status(403).json({ success: false, error: 'Only student accounts can respond to offers' });
+    }
+
+    const { id } = req.params;
+    const { status, eSignature, declineReason } = req.body;
+
+    if (!['Accepted', 'Declined'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid response status' });
+    }
+    
+    if (status === 'Accepted' && (!eSignature || eSignature.trim().length === 0)) {
+        return res.status(400).json({ success: false, error: 'E-Signature is required to accept the offer' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid application id' });
+    }
+
+    const applicationCollection = mongoose.connection.db.collection('placementapplications');
+    const existing = await applicationCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    if (!existing) return res.status(404).json({ success: false, error: 'Application not found' });
+
+    // Verify ownership
+    if (existing.student.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, error: 'Not authorized to modify this application' });
+    }
+
+    // Update application
+    const updateData = {
+        status: status,
+        updatedAt: new Date()
+    };
+    
+    if (status === 'Accepted') {
+        updateData.eSignature = eSignature.trim();
+        updateData.signatureDate = new Date();
+    } else if (status === 'Declined' && declineReason) {
+        updateData.declineReason = declineReason.trim();
+    }
+
+    await applicationCollection.updateOne(
+        { _id: new mongoose.Types.ObjectId(id) },
+        { $set: updateData }
+    );
+
+    res.json({
+      success: true,
+      message: `Offer successfully ${status === 'Accepted' ? 'accepted' : 'declined'}`,
+      data: { status }
+    });
+  } catch (err) {
+    console.error('[Placements] respond offer error:', err);
+    res.status(500).json({ success: false, error: 'Failed to process offer response' });
   }
 });
 

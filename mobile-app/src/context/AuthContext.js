@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import * as storage from '../utils/storage';
 import { TOKEN_KEY } from '../api/client';
 import { getMe, logout as logoutRequest } from '../api/auth';
 
@@ -15,13 +15,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     (async () => {
       try {
-        const token = await SecureStore.getItemAsync(TOKEN_KEY);
+        const token = await storage.getItem(TOKEN_KEY);
         if (token) {
           const me = await getMe();
           setUser(me.user || me);
         }
       } catch (err) {
-        await SecureStore.deleteItemAsync(TOKEN_KEY);
+        await storage.deleteItem(TOKEN_KEY);
       } finally {
         setIsBootstrapping(false);
       }
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = async (token, userData) => {
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await storage.setItem(TOKEN_KEY, token);
     setUser(userData);
   };
 

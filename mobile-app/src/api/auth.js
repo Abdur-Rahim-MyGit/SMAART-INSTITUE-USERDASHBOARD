@@ -5,8 +5,8 @@ import { apiClient } from './client';
 export const login = (email, password, collegeCode) =>
   apiClient.post('/auth/login', { email, password, collegeCode }).then((r) => r.data);
 
-export const verifyLoginOtp = (tempToken, otp) =>
-  apiClient.post('/auth/verify-login-otp', { tempToken, otp }).then((r) => r.data);
+export const verifyLoginOtp = (tempToken, otp, forceLogout = false) =>
+  apiClient.post('/auth/verify-login-otp', { tempToken, otp, forceLogout }).then((r) => r.data);
 
 export const resendLoginOtp = (tempToken) =>
   apiClient.post('/auth/resend-login-otp', { tempToken }).then((r) => r.data);

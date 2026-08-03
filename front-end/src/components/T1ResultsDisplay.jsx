@@ -246,6 +246,9 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                             <p className="text-white/80 text-sm mt-6 max-w-xl mx-auto">
                                 Average across all quotients • Stored as <span className="font-mono font-bold">S_baseline</span>
                             </p>
+                            <p className="text-white/60 text-[10px] mt-4 max-w-xl mx-auto italic">
+                                *This score reflects verified skills. It is not a prediction or guarantee of employment. Hiring decisions depend on interviews, role availability, and employer policies.
+                            </p>
                         </div>
                     </motion.div>
 
