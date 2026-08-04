@@ -411,6 +411,46 @@ const studentSchema = new mongoose.Schema({
   profileImage: String,
   idProof: String,
   certificates: [String],
+  academicRecords: [{
+    semester: Number,
+    method: {
+      type: String,
+      enum: ['slab', 'continuous', 'equal'],
+      default: 'slab'
+    },
+    totalCredits: Number,
+    earnedCredits: Number,
+    sgpa: Number,
+    cgpa: Number,
+    status: {
+      type: String,
+      enum: ['Pass', 'Result Pending', 'Fail', 'Arrear Cleared', 'Has Arrears'],
+      default: 'Pass'
+    },
+    subjects: [{
+      code: String,
+      name: String,
+      credits: Number,
+      grade: String,
+      pointsEarned: Number,
+      isArrearClearance: {
+        type: Boolean,
+        default: false
+      },
+      editedBy: String,
+      editedAt: Date
+    }],
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  activeArrears: [{
+    subjectCode: String,
+    subjectName: String,
+    credits: Number,
+    failedInSemester: Number
+  }],
   admissionDate: {
     type: Date,
     default: Date.now

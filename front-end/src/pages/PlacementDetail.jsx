@@ -358,8 +358,8 @@ const PlacementDetail = () => {
     if (e.noBacklog) list.push({ label: t("placement.label_no_backlog", "Backlogs"), value: t("placement.no_active_backlogs", "No Active Backlogs"), icon: ShieldCheck });
     if (e.hasMin12th && e.min12thPercentage > 0) list.push({ label: t("placement.label_12th_criteria", "12th Criteria"), value: `Min ${e.min12thPercentage}%`, icon: School });
     if (e.hasMin10th && e.min10thPercentage > 0) list.push({ label: t("placement.label_10th_criteria", "10th Criteria"), value: `Min ${e.min10thPercentage}%`, icon: School });
-    if (e.allowedDegrees && e.allowedDegrees.length > 0) list.push({ label: t("placement.label_qualifications", "Qualifications"), value: e.allowedDegrees.join(", "), icon: Book });
-    if (e.allowedBranches && e.allowedBranches.length > 0) list.push({ label: t("placement.label_branches", "Branches"), value: e.allowedBranches.join(", "), icon: GitBranch });
+    if (e.allowedDegrees && e.allowedDegrees.length > 0) list.push({ label: t("placement.label_qualifications", "Qualifications"), value: e.allowedDegrees.join(", "), icon: Book, fullWidth: true });
+    if (e.allowedBranches && e.allowedBranches.length > 0) list.push({ label: t("placement.label_branches", "Branches"), value: e.allowedBranches.join(", "), icon: GitBranch, fullWidth: true });
     
     return list.length > 0 ? list : null;
   }, [job, t]);
@@ -386,9 +386,19 @@ const PlacementDetail = () => {
           const mobile = mobileFromUser || mobileFromReg;
           if (mobile) updateApplicationField('mobile', mobile);
           
-          const rawBacklogs = user.academic?.activeBacklogs ?? registration.academic?.activeBacklogs ?? user.activeBacklogs;
-          if (rawBacklogs !== undefined && rawBacklogs !== null) {
-              updateApplicationField('activeBacklog', rawBacklogs);
+          let backlogsCount = null;
+          if (Array.isArray(user.activeArrears)) {
+              backlogsCount = user.activeArrears.length;
+          } else if (user.academic?.activeBacklogs !== undefined && user.academic?.activeBacklogs !== null) {
+              backlogsCount = Number(user.academic.activeBacklogs);
+          } else if (user.activeBacklogs !== undefined && user.activeBacklogs !== null) {
+              backlogsCount = Number(user.activeBacklogs);
+          } else if (registration.academic?.activeBacklogs !== undefined && registration.academic?.activeBacklogs !== null) {
+              backlogsCount = Number(registration.academic.activeBacklogs);
+          }
+
+          if (backlogsCount !== null && !isNaN(backlogsCount)) {
+              updateApplicationField('activeBacklog', backlogsCount);
               setIsBacklogReadOnly(true);
           }
         }
@@ -803,12 +813,12 @@ const PlacementDetail = () => {
                   </h2>
                   <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
                     <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-                      {eligibility.map(({ label, value, icon: Icon }) => (
-                        <div key={label} className="flex gap-3">
+                      {eligibility.map(({ label, value, icon: Icon, fullWidth }) => (
+                        <div key={label} className={`flex items-start gap-3 ${fullWidth ? 'sm:col-span-2' : ''}`}>
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-[#1a3884]/30 dark:bg-[#001630]">
                             <Icon stroke={1.7} className="h-[17px] w-[17px] text-[#1a3884] dark:text-blue-400" />
                           </div>
-                          <div className="flex min-w-0 flex-col justify-center">
+                          <div className="flex min-w-0 flex-col pt-[2px]">
                             <p className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{label}</p>
                             <p className="mt-0.5 break-words text-[13.5px] font-semibold leading-tight text-[#0d1f4e] dark:text-white">{formatValue(value, t)}</p>
                           </div>
@@ -819,21 +829,7 @@ const PlacementDetail = () => {
                 </div>
               )}
 
-              {skills.length > 0 && (
-                <div>
-                  <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
-                    <Star stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
-                    {t("placement.skills", "Skills & Technologies")}
-                  </h3>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {skills.map((skill) => (
-                      <span key={skill} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#0d1f4e] dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-slate-200">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
               {/* ── Skill Gap Section ─────────────────────────────────── */}
               {hasSkillGap && (
@@ -880,30 +876,7 @@ const PlacementDetail = () => {
               )}
               {/* ──────────────────────────────────────────────────────── */}
 
-              <div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
-                    <Building stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
-                    {t("placement.about_company", "About the Company")}
-                  </h2>
-                  {companyWebsite && (
-                    <a
-                      href={companyWebsite}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
-                    >
-                      {t("placement.website", "Website")}
-                      <ExternalLink stroke={1.8} className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                </div>
-                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
-                  <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
-                    {companyAbout || t("placement.no_company_info", "Company information has not been added yet.")}
-                  </p>
-                </div>
-              </div>
+
             </section>
 
             <aside className="space-y-6 lg:sticky lg:top-6">
@@ -924,6 +897,43 @@ const PlacementDetail = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {skills.length > 0 && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                  <h2 className="mb-4 border-b border-slate-200 pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#1a3884] dark:border-[#1a3884]/25 dark:text-blue-300">
+                    {t("placement.skills", "Skills & Technologies")}
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill) => (
+                      <span key={skill} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#0d1f4e] dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-slate-200">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                <div className="mb-4 flex items-center justify-between border-b border-slate-200 pb-3 dark:border-[#1a3884]/25">
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#1a3884] dark:text-blue-300">
+                    {t("placement.about_company", "About the Company")}
+                  </h2>
+                  {companyWebsite && (
+                    <a
+                      href={companyWebsite}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
+                    >
+                      {t("placement.website", "Website")}
+                      <ExternalLink stroke={1.8} className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+                <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+                  {companyAbout || t("placement.no_company_info", "Company information has not been added yet.")}
+                </p>
               </div>
             </aside>
           </div>

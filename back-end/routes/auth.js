@@ -1690,12 +1690,32 @@ router.get('/me', protect, async (req, res) => {
   try {
     // Registration data is embedded on the merged student document.
     const Student = require('../models/Student');
-    const studentDoc = await Student.findById(req.user._id).select('registration').lean();
+    const studentDoc = await Student.findById(req.user._id).lean();
     const registration = studentDoc ? (studentDoc.registration || null) : null;
+
+    let userObj = req.user.toObject ? req.user.toObject() : { ...req.user };
+    if (studentDoc) {
+      const activeArrears = Array.isArray(studentDoc.activeArrears) ? studentDoc.activeArrears : [];
+      const backlogsCount = activeArrears.length;
+      userObj.activeArrears = activeArrears;
+      userObj.activeBacklogs = backlogsCount;
+      if (!userObj.academic) userObj.academic = {};
+      userObj.academic.activeBacklogs = backlogsCount;
+      if (studentDoc.academicRecords && studentDoc.academicRecords.length > 0) {
+        const sorted = [...studentDoc.academicRecords].sort((a, b) => (Number(a.semester) || 0) - (Number(b.semester) || 0));
+        const latest = sorted[sorted.length - 1];
+        if (latest && (latest.cgpa || latest.sgpa)) {
+          const resolved = Number(Number(latest.cgpa || latest.sgpa).toFixed(2));
+          userObj.academic.overallCgpa = resolved;
+          userObj.cgpa = resolved;
+          userObj.academic.latestSemester = Number(latest.semester);
+        }
+      }
+    }
 
     res.status(200).json({
       success: true,
-      user: req.user,
+      user: userObj,
       registration: registration || null
     });
   } catch (err) {
