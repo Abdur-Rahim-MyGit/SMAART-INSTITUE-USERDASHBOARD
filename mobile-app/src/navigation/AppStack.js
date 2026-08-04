@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { Suspense } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainTabs from './MainTabs';
-import FaceVerificationTestScreen from '../screens/proctoring/FaceVerificationTestScreen';
 import { colors } from '../theme';
+
+// Lazy-loaded so the onnxruntime/face-pipeline native module is only touched
+// once this screen is actually opened, not at app startup.
+const FaceVerificationTestScreen = React.lazy(() =>
+  import('../screens/proctoring/FaceVerificationTestScreen')
+);
+
+function LazyFaceVerificationTestScreen(props) {
+  return (
+    <Suspense
+      fallback={
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator color={colors.navy} />
+        </View>
+      }
+    >
+      <FaceVerificationTestScreen {...props} />
+    </Suspense>
+  );
+}
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +40,7 @@ export default function AppStack() {
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen
         name="FaceVerificationTest"
-        component={FaceVerificationTestScreen}
+        component={LazyFaceVerificationTestScreen}
         options={{ title: 'Face Verification Test' }}
       />
     </Stack.Navigator>
