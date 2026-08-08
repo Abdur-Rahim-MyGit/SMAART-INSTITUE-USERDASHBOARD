@@ -356,8 +356,15 @@ const PlacementDetail = () => {
     const list = [];
     if (e.minCGPA > 0) list.push({ label: t("placement.label_min_cgpa", "Minimum CGPA"), value: e.minCGPA, icon: Certificate });
     if (e.noBacklog) list.push({ label: t("placement.label_no_backlog", "Backlogs"), value: t("placement.no_active_backlogs", "No Active Backlogs"), icon: ShieldCheck });
-    if (e.hasMin12th && e.min12thPercentage > 0) list.push({ label: t("placement.label_12th_criteria", "12th Criteria"), value: `Min ${e.min12thPercentage}%`, icon: School });
-    if (e.hasMin10th && e.min10thPercentage > 0) list.push({ label: t("placement.label_10th_criteria", "10th Criteria"), value: `Min ${e.min10thPercentage}%`, icon: School });
+    // Show the benchmark in BOTH units — "Min 75% / 7.5 CGPA". Jobs store
+    // either or both; the missing unit is derived by the ×10 convention.
+    const school = (pct, cgpa) => {
+      const p = pct > 0 ? pct : (cgpa > 0 ? Number((cgpa * 10).toFixed(1)) : null);
+      const c = cgpa > 0 ? cgpa : (pct > 0 ? Number((pct / 10).toFixed(1)) : null);
+      return `Min ${p}% / ${c} CGPA`;
+    };
+    if (e.hasMin12th && (e.min12thPercentage > 0 || e.min12thCGPA > 0)) list.push({ label: t("placement.label_12th_criteria", "12th Criteria"), value: school(e.min12thPercentage, e.min12thCGPA), icon: School });
+    if (e.hasMin10th && (e.min10thPercentage > 0 || e.min10thCGPA > 0)) list.push({ label: t("placement.label_10th_criteria", "10th Criteria"), value: school(e.min10thPercentage, e.min10thCGPA), icon: School });
     if (e.allowedDegrees && e.allowedDegrees.length > 0) list.push({ label: t("placement.label_qualifications", "Qualifications"), value: e.allowedDegrees.join(", "), icon: Book, fullWidth: true });
     if (e.allowedBranches && e.allowedBranches.length > 0) list.push({ label: t("placement.label_branches", "Branches"), value: e.allowedBranches.join(", "), icon: GitBranch, fullWidth: true });
     
