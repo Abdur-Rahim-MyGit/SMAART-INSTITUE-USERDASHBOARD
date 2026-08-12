@@ -168,7 +168,7 @@ const JobFairDigitalPassModal = ({ isOpen, onClose, fair, user }) => {
                         Roll No: <span className="font-semibold text-white">{studentRollNo}</span>
                       </div>
                       <div className="text-[10px] text-white/70 truncate">
-                        {student?.degree} • {student?.department}
+                        {typeof student?.degree === 'object' && student?.degree !== null ? (student.degree.abbreviation || student.degree.fullName) : student?.degree} • {typeof student?.department === 'object' && student?.department !== null ? (student.department.abbreviation || student.department.fullName || student.department.name) : student?.department}
                       </div>
                     </div>
                   </div>
