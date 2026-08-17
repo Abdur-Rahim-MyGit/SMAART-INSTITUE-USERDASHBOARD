@@ -2,24 +2,43 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import ScreenContainer from './ScreenContainer';
-import { colors, radius, shadow } from '../theme';
+import { radius, shadow } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
-// Shared placeholder for modules not yet built — each references the
-// requirements doc section covering that module's functional requirements.
 export default function ComingSoon({ title, description, docSection, icon = 'clock' }) {
+  const { colors: themeColors } = useTheme();
+
   return (
     <ScreenContainer contentStyle={styles.content}>
       <View style={styles.wrap}>
-        <View style={styles.iconBadge}>
-          <Feather name={icon} size={26} color={colors.primary} />
+        <View
+          style={[
+            styles.iconBadge,
+            {
+              backgroundColor: themeColors.theme === 'dark' ? '#182235' : '#FFFFFF',
+              borderColor: themeColors.border,
+            },
+          ]}
+        >
+          <Feather name={icon} size={26} color={themeColors.primaryBright} />
         </View>
-        <View style={styles.tag}>
-          <Text style={styles.tagText}>COMING SOON</Text>
+        <View
+          style={[
+            styles.tag,
+            {
+              backgroundColor: themeColors.theme === 'dark' ? 'rgba(255,255,255,0.06)' : '#E2E8F0',
+              borderColor: themeColors.border,
+            },
+          ]}
+        >
+          <Text style={[styles.tagText, { color: themeColors.textMuted }]}>COMING SOON</Text>
         </View>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={[styles.title, { color: themeColors.text }]}>{title}</Text>
+        <Text style={[styles.description, { color: themeColors.textMuted }]}>{description}</Text>
         {docSection ? (
-          <Text style={styles.hint}>See {docSection} in the requirements doc for the full spec.</Text>
+          <Text style={[styles.hint, { color: themeColors.primaryBright }]}>
+            See {docSection} in the requirements doc for the full spec.
+          </Text>
         ) : null}
       </View>
     </ScreenContainer>
@@ -33,9 +52,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -43,16 +60,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
   },
   tag: {
-    backgroundColor: colors.surfaceMuted,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.pill,
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginBottom: 12,
   },
-  tagText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8, color: colors.muted },
-  title: { fontSize: 22, fontWeight: '800', color: colors.navy, marginBottom: 8, textAlign: 'center' },
-  description: { fontSize: 14, color: colors.muted, textAlign: 'center', marginBottom: 16, lineHeight: 20 },
-  hint: { fontSize: 12, color: colors.primary, fontWeight: '600', textAlign: 'center' },
+  tagText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
+  title: { fontSize: 22, fontWeight: '800', marginBottom: 8, textAlign: 'center' },
+  description: { fontSize: 14, textAlign: 'center', marginBottom: 16, lineHeight: 20 },
+  hint: { fontSize: 12, fontWeight: '600', textAlign: 'center' },
 });

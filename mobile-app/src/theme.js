@@ -1,39 +1,39 @@
 // SMAART Institute brand palette — kept in sync with front-end/tailwind.config.ts
 // so the mobile app and web dashboard read as the same product.
 export const colors = {
-  // Navy — primary brand surface/text color
-  navyDarkest: '#00152E',
-  navyDark: '#002147',
-  navy: '#112B6B',
-  navyLight: '#002A5C',
-  primary: '#1A3884',
-  primaryBright: '#3B82F6',
+  // Slate Dark & Cyber Blue — primary brand surface/text color
+  navyDarkest: '#0A0F1D', // Obsidian slate dark
+  navyDark: '#111827',    // Premium dark grey-blue
+  navy: '#1E293B',        // Slate navy
+  navyLight: '#374151',   // Lighter slate grey
+  primary: '#2563EB',     // Royal Blue (Matches Logo)
+  primaryBright: '#3B82F6', // Cyber Blue (Matches Logo)
 
-  // Gold / silver — sparing accent use only
-  gold: '#DAA520',
-  goldLight: '#F4C430',
-  silver: '#C0C0C0',
+  // Gold / silver accents
+  gold: '#F59E0B',
+  goldLight: '#FBBF24',
+  silver: '#CBD5E1',
 
   // Neutrals
-  bg: '#F4F7FB',
+  bg: '#F8FAFC',
   surface: '#FFFFFF',
-  surfaceMuted: '#F8FAFC',
-  border: '#E5EAF2',
+  surfaceMuted: '#F3F4F6',
+  border: '#E5E7EB',
   text: '#0F172A',
   muted: '#64748B',
-  mutedLight: '#94A3B8',
+  mutedLight: '#9CA3AF',
 
-  danger: '#DC2626',
+  danger: '#EF4444',
   dangerBg: '#FEF2F2',
-  success: '#16A34A',
+  success: '#10B981', // Emerald success
 
   white: '#FFFFFF',
   black: '#000000',
 
-  // Legacy aliases kept so any not-yet-migrated screen doesn't break.
-  accent: '#1A3884',
-  light: '#DCE6F1',
-  grey: '#F2F2F2',
+  // Legacy aliases
+  accent: '#2563EB',
+  light: '#EFF6FF',
+  grey: '#F3F4F6',
 };
 
 export const radius = {

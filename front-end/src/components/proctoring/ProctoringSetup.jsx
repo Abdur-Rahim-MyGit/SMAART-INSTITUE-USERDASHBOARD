@@ -457,7 +457,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     // timer id on the first reschedule. clearInterval/clearTimeout share an id
     // space, so existing teardown calls keep working unchanged.
     faceCheckIntervalRef.current = setTimeout(scanOnce, 0);
-  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas]);
+  }, [registrationState, startFaceRegistration, drawFaceFeedback, clearCanvas, t]);
 
   // Ensure camera stream is active and playing on the video element
   const ensureCameraActive = useCallback(async () => {

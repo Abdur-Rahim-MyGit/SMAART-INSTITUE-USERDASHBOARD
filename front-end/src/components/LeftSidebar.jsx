@@ -312,8 +312,8 @@ const LeftSidebar = () => {
     return location.pathname === path || location.pathname.startsWith(path);
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const toggleTheme = (e) => {
+    setTheme(theme === 'dark' ? 'light' : 'dark', e);
   };
 
   // Prevent background scroll when mobile menu is open

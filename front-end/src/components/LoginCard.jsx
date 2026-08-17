@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -6,15 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Lock, Mail, ArrowRight, Building2, Loader2, Eye, EyeOff } from "lucide-react";
-import InstitutionSelector from "./InstitutionSelector";
+import { Lock, Mail, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import LoginOtpModal from "./auth/LoginOtpModal";
 import ForgotPasswordModal from "./auth/ForgotPasswordModal";
 import FirstLoginPasswordModal from "./auth/FirstLoginPasswordModal";
 import { resetUserIdCache } from "@/features/visionBoard/services/visionBoardProApi";
 import useUser from "@/hooks/useUser";
-import InstitutionSelectModal from "./auth/InstitutionSelectModal";
 import ContactAdminModal from "./auth/ContactAdminModal";
 
 const LoginCard = () => {
@@ -22,9 +20,6 @@ const LoginCard = () => {
   const { t } = useTranslation();
   const { login } = useUser();
   const [isLoading, setIsLoading] = useState(false);
-  const [showInstitutionSelector, setShowInstitutionSelector] = useState(true);
-  const [selectedInstitution, setSelectedInstitution] = useState(null);
-  const [isInstitutionSelectOpen, setIsInstitutionSelectOpen] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -43,30 +38,11 @@ const LoginCard = () => {
 
   const [showContactAdmin, setShowContactAdmin] = useState(false);
 
-  useEffect(() => {
-    const storedInstitution = sessionStorage.getItem("selectedInstitution");
-    if (storedInstitution) {
-      try {
-        const institution = JSON.parse(storedInstitution);
-        setSelectedInstitution(institution);
-        setShowInstitutionSelector(false);
-      } catch (error) {
-        console.error("Error parsing stored institution:", error);
-        sessionStorage.removeItem("selectedInstitution");
-      }
-    }
-  }, []);
-
   const validateEmail = (email) =>
     String(email).toLowerCase().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!selectedInstitution) {
-      toast.error(t("login.toast.select_institution_first", "Please select your institution first"));
-      return;
-    }
 
     if (!loginEmail.trim()) {
       toast.error(t("login.toast.enter_email", "Please enter your Email"));
@@ -88,7 +64,6 @@ const LoginCard = () => {
         body: JSON.stringify({
           email: normalizedEmail,
           password: loginPassword,
-          collegeCode: selectedInstitution.code,
         }),
       });
 
@@ -146,32 +121,6 @@ const LoginCard = () => {
     }
   };
 
-  const handleInstitutionSelected = (institution) => {
-    // If institution is passed (from InstitutionSelector), use it. 
-    // Otherwise fallback to sessionStorage (legacy/initial load)
-    const targetInstitution = institution || (
-      sessionStorage.getItem("selectedInstitution") ?
-        JSON.parse(sessionStorage.getItem("selectedInstitution")) :
-        null
-    );
-
-    if (targetInstitution) {
-      setSelectedInstitution(targetInstitution);
-      setShowInstitutionSelector(false);
-      setIsInstitutionSelectOpen(false);
-
-      // CRITICAL FIX: If we are on an institution-specific page or the login page, 
-      // sync the URL so the parent component (like Institution.jsx) updates its video/data
-      if (window.location.pathname.includes('/institution/') || window.location.pathname.startsWith('/login')) {
-        navigate(`/institution/${encodeURIComponent(targetInstitution.name)}`, { replace: true });
-      }
-    }
-  };
-
-  const handleChangeInstitution = () => {
-    setIsInstitutionSelectOpen(true);
-  };
-
   const handleOtpSuccess = (data) => {
     if (data.requirePasswordChange) {
       setShowOtpModal(false);
@@ -198,7 +147,7 @@ const LoginCard = () => {
     } else if (!data.user?.hasRegistration) {
       sessionStorage.setItem("signupEmail", data.user?.email || "");
       sessionStorage.setItem("signupFullName", data.user?.fullName || "");
-      navigate("/complete-registration", { replace: true });
+      navigate(data.user?.hasWatchedFirstLoginVideo === false ? "/welcome-video" : "/complete-registration", { replace: true });
     } else {
       navigate("/dashboard", { replace: true });
     }
@@ -223,7 +172,7 @@ const LoginCard = () => {
     } else {
       sessionStorage.setItem("signupEmail", data.user?.email || "");
       sessionStorage.setItem("signupFullName", data.user?.fullName || "");
-      navigate("/complete-registration", { replace: true });
+      navigate(data.user?.hasWatchedFirstLoginVideo === false ? "/welcome-video" : "/complete-registration", { replace: true });
     }
   };
 
@@ -232,124 +181,8 @@ const LoginCard = () => {
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
   };
 
-  if (showInstitutionSelector) {
-    return (
-      <>
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto"
-        >
-          {/* ── Card wrapper — matches the LoginCard Soft-UI style exactly ── */}
-          <div
-            className="overflow-hidden bg-white dark:bg-[#002A5C] rounded-3xl border border-black/5 dark:border-white/10"
-            style={{
-              boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)",
-            }}
-          >
-            {/* Navy top accent line */}
-            <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
-
-            {/* Header */}
-            <div className="bg-[#F8FAFC] dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
-              {/* Icon badge */}
-              <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden">
-                {selectedInstitution?.logo ? (
-                  <img
-                    src={selectedInstitution.logo}
-                    alt={selectedInstitution.name}
-                    className="w-full h-full object-contain p-2"
-                  />
-                ) : (
-                  <Building2 className="w-7 h-7 text-[#1a3884]" />
-                )}
-              </div>
-
-              <h2
-                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
-                style={{ letterSpacing: "-0.02em" }}
-              >
-                {t("institution_select.title", "Select Your Institution")}
-              </h2>
-              <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center max-w-[260px] leading-relaxed">
-                {t("login.select_subtitle", "Find your college to access your personalised career dashboard.")}
-              </p>
-            </div>
-
-            {/* Search area */}
-            <div className="px-6 py-7 sm:px-8 sm:py-8">
-              <InstitutionSelector onSelect={handleInstitutionSelected} />
-            </div>
-
-            {/* Contact Admin Link */}
-            <div className="px-8 pb-6 text-center">
-              <span className="text-sm font-medium text-slate-500">Need help? </span>
-              <button
-                type="button"
-                onClick={() => setShowContactAdmin(true)}
-                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
-              >
-                Contact Admin
-              </button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Contact Admin Modal — always mounted so it can open */}
-        <ContactAdminModal
-          isOpen={showContactAdmin}
-          onClose={() => setShowContactAdmin(false)}
-          selectedInstitution={selectedInstitution}
-        />
-      </>
-    );
-  }
-
-
   return (
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto flex flex-col gap-3 sm:gap-4">
-
-      {/* ── Institution Badge ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center justify-between gap-3 px-4 py-2 bg-white dark:bg-[#002A5C] border border-black/5 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl"
-      >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#00152E] border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
-            {selectedInstitution?.logo ? (
-              <img
-                src={selectedInstitution.logo}
-                alt={selectedInstitution.name}
-                className="w-full h-full object-contain p-1.5"
-              />
-            ) : (
-              <Building2 className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-bold text-gray-900 dark:text-white text-sm truncate leading-tight">
-              {selectedInstitution?.name}
-            </p>
-            {selectedInstitution?.location?.city && (
-              <p className="text-[11px] text-gray-500 dark:text-slate-300 font-medium truncate mt-0.5">
-                {selectedInstitution.location.city}
-                {selectedInstitution?.location?.state && (
-                  <span className="opacity-70">, {selectedInstitution.location.state}</span>
-                )}
-              </p>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={handleChangeInstitution}
-          className="text-[11px] font-bold uppercase tracking-widest text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300 transition-colors shrink-0 px-1"
-        >
-          {t("login.change", "Change")}
-        </button>
-      </motion.div>
 
       {/* ── Login Form Card ── */}
       <motion.div
@@ -372,15 +205,7 @@ const LoginCard = () => {
                 boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
               }}
             >
-              {selectedInstitution?.logo ? (
-                <img
-                  src={selectedInstitution.logo}
-                  alt={selectedInstitution.name}
-                  className="w-full h-full object-contain p-2"
-                />
-              ) : (
-                <Lock className="w-7 h-7 text-[#1a3884]" />
-              )}
+              <Lock className="w-7 h-7 text-[#1a3884]" />
             </motion.div>
 
             <h2
@@ -421,7 +246,7 @@ const LoginCard = () => {
                 <input
                   id="login-email"
                   type="text"
-                  placeholder={t("login.email_placeholder", "your@email.com")}
+                  placeholder={t("login.email_placeholder", "example@email.com")}
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   aria-required="true"
@@ -444,10 +269,6 @@ const LoginCard = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!selectedInstitution) {
-                      toast.error(t("login.toast.select_institution_first", "Please select your institution first"));
-                      return;
-                    }
                     if (!loginEmail.trim()) {
                       toast.error(t("login.toast.enter_registered_email", "Please enter your registered email address first"));
                       return;
@@ -574,18 +395,10 @@ const LoginCard = () => {
         onSuccess={handlePasswordChangeSuccess}
       />
 
-      {/* Institution Selection Modal */}
-      <InstitutionSelectModal
-        isOpen={isInstitutionSelectOpen}
-        onClose={() => setIsInstitutionSelectOpen(false)}
-        onInstitutionSelected={handleInstitutionSelected}
-      />
-
       {/* Contact Admin Modal */}
-      <ContactAdminModal 
+      <ContactAdminModal
         isOpen={showContactAdmin}
         onClose={() => setShowContactAdmin(false)}
-        selectedInstitution={selectedInstitution}
       />
     </div>
   );

@@ -501,3 +501,36 @@
 .dark [class*="border-slate-300"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]) {
   border-color: transparent !important;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+ * PREMIUM THEME TRANSITION ANIMATION (Ink-drop circular reveal)
+ * ───────────────────────────────────────────────────────────────── */
+html.no-transitions *,
+html.no-transitions *::before,
+html.no-transitions *::after {
+  transition: none !important;
+}
+
+html {
+  view-transition-name: root;
+}
+
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: 600ms cubic-bezier(0.4, 0, 0.2, 1) both reveal-theme;
+  mix-blend-mode: normal;
+}
+
+@keyframes reveal-theme {
+  from {
+    clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+  }
+}
+

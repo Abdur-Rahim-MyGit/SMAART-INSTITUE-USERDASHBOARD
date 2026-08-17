@@ -84,97 +84,38 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 Join SMAART Institute
               </h2>
               <p className="text-[13px] text-gray-500 mt-2 text-center px-8">
-                Create your student account to access premium educational resources.
+                Self-registration is currently disabled.
               </p>
             </div>
 
-            {/* Form */}
-            <div className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
-                  <div 
-                    className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
-                    onFocusCapture={(e) => {
-                      e.currentTarget.style.border = "1.5px solid #1a3884";
-                      e.currentTarget.style.background = "#fff";
-                      e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                    }}
-                    onBlurCapture={(e) => {
-                      e.currentTarget.style.border = "1px solid #e2e8f0";
-                      e.currentTarget.style.background = "#f8fafc";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                      <User className="w-3.5 h-3.5 text-[#1a3884]" />
-                    </div>
-                    <input
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                      className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
-                      required
-                    />
-                  </div>
-                </div>
+            {/* Support Message */}
+            <div className="p-8 flex flex-col gap-6 text-center">
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Accounts are managed by your institution administrator. To request an account, please contact us.
+              </p>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email Address</label>
-                  <div 
-                    className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
-                    onFocusCapture={(e) => {
-                      e.currentTarget.style.border = "1.5px solid #1a3884";
-                      e.currentTarget.style.background = "#fff";
-                      e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                    }}
-                    onBlurCapture={(e) => {
-                      e.currentTarget.style.border = "1px solid #e2e8f0";
-                      e.currentTarget.style.background = "#f8fafc";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                      <Mail className="w-3.5 h-3.5 text-[#1a3884]" />
-                    </div>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="your@email.com"
-                      className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-4 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
-                  disabled={isLoading}
+              <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-col items-center gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1a3884]">
+                  Contact Support
+                </span>
+                <a
+                  href="mailto:hello@smaartinstitute.org?subject=SMAART%20Institute%20Account%20Request"
+                  className="text-sm font-extrabold text-[#112b6b] hover:underline"
                 >
-                  {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      Get Started
-                      <motion.div
-                        animate={{ x: [0, 4, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </motion.div>
-                    </span>
-                  )}
-                </Button>
-              </form>
+                  hello@smaartinstitute.org
+                </a>
+              </div>
 
-              <div className="mt-8 text-center pt-6 border-t border-gray-50">
+              <a
+                href="mailto:hello@smaartinstitute.org?subject=SMAART%20Institute%20Account%20Request"
+                className="relative w-full h-12 flex items-center justify-center gap-2 font-bold text-sm text-white transition-all duration-300 hover:-translate-y-1 active:translate-y-0 overflow-hidden rounded-xl shadow-lg shadow-[#112b6b]/20"
+                style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+              >
+                <Mail className="w-4 h-4" />
+                Contact via Email
+              </a>
+
+              <div className="mt-4 text-center pt-6 border-t border-gray-50">
                 <p className="text-gray-400 text-[12px] font-medium">
                   Already have an account?{" "}
                   <button

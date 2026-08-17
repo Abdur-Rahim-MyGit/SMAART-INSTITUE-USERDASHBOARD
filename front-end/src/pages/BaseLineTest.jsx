@@ -220,7 +220,7 @@ const BaseLineTest = () => {
   const [earnedBadge, setEarnedBadge] = useState(null);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
 
-  const handleBadgesEarned = (newBadges) => {
+  const handleBadgesEarned = useCallback((newBadges) => {
     if (newBadges && newBadges.length > 0) {
       const badgeData = newBadges[0];
       const formattedBadge = {
@@ -238,7 +238,7 @@ const BaseLineTest = () => {
       setShowBadgeModal(true);
       toast.success(t("baseline_test.badge_unlocked", "Badge Unlocked: {{title}}!", { title: formattedBadge.title }));
     }
-  };
+  }, [t]);
 
   // Get current question
   const current = questions[index];
@@ -514,7 +514,7 @@ const BaseLineTest = () => {
     };
 
     initializeAssessment();
-  }, [clearTimerPersistence, navigate, stageKey, t]);
+  }, [clearTimerPersistence, navigate, stageKey, t, assessmentCode, questionLimit, stageConfig.maxAttempts, stageConfig.title, translatedTitle]);
 
   // Timer: Reset when question changes
   useEffect(() => {
@@ -643,7 +643,7 @@ const BaseLineTest = () => {
         setInteractionLocked(false);
       }
     }
-  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user, assessmentToken, t]);
+  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user, assessmentToken, t, handleBadgesEarned]);
 
   const handleRestart = async () => {
     if (!resultId) return;

@@ -119,8 +119,7 @@ export const useProctoringEngine = ({
   const heartbeatIntervalRef = useRef(null);
   const verifyInFlightRef = useRef(false);
   const faceTickRef = useRef(0); // counts verification ticks to pace identity checks
-  const objectIntervalRef = useRef(null);
-  const objectInFlightRef = useRef(false);
+
   const environmentIntervalRef = useRef(null);
   const duplicateWindowCleanupRef = useRef(null);
   // Each environment signal is reported once per session — a second monitor
@@ -1059,7 +1058,7 @@ export const useProctoringEngine = ({
     return () => {
       stopCamera();
       stopAudioMonitoring();
-      if (objectIntervalRef.current) clearInterval(objectIntervalRef.current);
+
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('blur', onBlur);
       document.removeEventListener('fullscreenchange', onFullscreenChange);

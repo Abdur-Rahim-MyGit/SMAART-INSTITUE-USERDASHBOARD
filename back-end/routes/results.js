@@ -160,34 +160,8 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             }
         });
 
-        // --- PROCTORING LOCK CHECK ---
-        const activeLock = await ProctoringSession.findOne({
-            userId,
-            assessmentId,
-            isLocked: true
-        });
-
-        if (activeLock) {
-            let isStillLocked = true;
-            if (activeLock.activeTicketId) {
-                const ticket = await SupportTicket.findById(activeLock.activeTicketId);
-                // If ticket is resolved/closed, auto-unlock the assessment
-                if (ticket && (ticket.status === 'resolved' || ticket.status === 'closed')) {
-                    activeLock.isLocked = false;
-                    activeLock.status = 'active';
-                    await activeLock.save();
-                    isStillLocked = false;
-                }
-            }
-            if (isStillLocked) {
-                console.log(`🔒 Assessment ${assessmentId} is locked for user ${userId} due to proctoring violation`);
-                return res.status(403).json({
-                    success: false,
-                    error: 'Your assessment is currently locked due to a proctoring violation. A support ticket has been raised.',
-                    locked: true
-                });
-            }
-        }
+        // --- PROCTORING LOCK CHECK (BYPASSED) ---
+        // Access suspension disabled per user directive
         // --- END PROCTORING LOCK CHECK ---
 
         // Check if user already has an in-progress attempt

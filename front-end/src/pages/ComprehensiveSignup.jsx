@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, cloneElement } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2, Home, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,10 @@ const ComprehensiveSignup = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useUser();
   const [currentStep, setCurrentStep] = useState(0);
+  // High-water mark of steps the user has validated past. The step rail lets them
+  // jump freely among these (each was already saved by `saveSection`) but never
+  // skip ahead over an unvalidated step.
+  const [maxStepReached, setMaxStepReached] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showDashboardWarning, setShowDashboardWarning] = useState(false);
@@ -40,7 +44,15 @@ const ComprehensiveSignup = () => {
 
     // SECURITY FIX #11: Redirect if no signup context and no logged-in user
     if (!email && !userData) {
-      navigate('/', { replace: true });
+      toast.error("Please enter your name and email to start the registration process.");
+      navigate('/signup-initial', { replace: true });
+      return;
+    }
+
+    // First-login students must watch the one-time constant welcome video before
+    // they can reach the registration form (prevents skipping it via direct URL).
+    if (userData?.role === 'student' && userData?.hasWatchedFirstLoginVideo === false) {
+      navigate('/welcome-video', { replace: true });
       return;
     }
 
@@ -48,6 +60,7 @@ const ComprehensiveSignup = () => {
     // If user has already completed registration, they should not access this page
     if (userData?.hasRegistration || userData?.registrationCompleted) {
       console.log("[ComprehensiveSignup] User already registered, redirecting to dashboard");
+      toast.info("You have already completed registration. Redirecting to your dashboard.");
       navigate('/dashboard', { replace: true });
       return;
     }
@@ -349,16 +362,18 @@ const ComprehensiveSignup = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // `desc` renders as the sub-heading inside each step's card, so the user gets
+  // a one-line answer to "what am I filling in here" without reading the fields.
   const steps = [
-    { title: t("comp_signup.steps.personal", "Personal"), icon: <User className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.tenth", "10th"), icon: <GraduationCap className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.twelfth", "12th"), icon: <GraduationCap className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.higher", "Higher Ed"), icon: <Award className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.activities", "Activities"), icon: <Palette className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.goals", "Goals"), icon: <Target className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.experience", "Experience"), icon: <Briefcase className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.projects", "Projects"), icon: <FolderOpen className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.certificates", "Certificates"), icon: <FileText className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.personal", "Personal"), desc: t("comp_signup.steps.personal_desc", "Photo, contact details and address"), icon: <User className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.tenth", "10th"), desc: t("comp_signup.steps.tenth_desc", "Your class 10 school, board and result"), icon: <GraduationCap className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.twelfth", "12th"), desc: t("comp_signup.steps.twelfth_desc", "Your class 12 school, stream and result"), icon: <GraduationCap className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.higher", "Higher Ed"), desc: t("comp_signup.steps.higher_desc", "Degrees, specialisations and institutions"), icon: <Award className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.activities", "Activities"), desc: t("comp_signup.steps.activities_desc", "Clubs, sports, volunteering and achievements"), icon: <Palette className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.goals", "Goals"), desc: t("comp_signup.steps.goals_desc", "Roles, sectors and where you want to be"), icon: <Target className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.experience", "Experience"), desc: t("comp_signup.steps.experience_desc", "Internships, jobs and supporting documents"), icon: <Briefcase className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.projects", "Projects"), desc: t("comp_signup.steps.projects_desc", "What you have built, alone or in a team"), icon: <FolderOpen className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.certificates", "Certificates"), desc: t("comp_signup.steps.certificates_desc", "Courses and credentials you have earned"), icon: <FileText className="w-4 h-4" /> },
   ];
 
   const validatePersonalDetails = () => {
@@ -596,11 +611,23 @@ const ComprehensiveSignup = () => {
 
       if (currentStep < steps.length - 1) {
         setCurrentStep(currentStep + 1);
+        setMaxStepReached((m) => Math.max(m, currentStep + 1));
         window.scrollTo(0, 0);
       }
     }
   };
   const handlePrevStep = () => { if (currentStep > 0) { setCurrentStep(currentStep - 1); window.scrollTo(0, 0); } };
+
+  /**
+   * Step-rail navigation. Only steps already cleared (or the current one) are
+   * reachable — jumping ahead would skip that step's validator and leave the
+   * section unsaved, so upcoming steps stay inert rather than silently failing.
+   */
+  const goToStep = (index) => {
+    if (index > maxStepReached || index === currentStep) return;
+    setCurrentStep(index);
+    window.scrollTo(0, 0);
+  };
 
   const addHigherEd = () => setHigherEducation([...higherEducation, { id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "" }]);
   const removeHigherEd = (id) => { if (higherEducation.length > 1) setHigherEducation(higherEducation.filter(h => h.id !== id)); };
@@ -729,13 +756,26 @@ const ComprehensiveSignup = () => {
             </span>
           </div>
 
-          {/* Center: Current Step Status with Modern Capsule Design (Hidden per user request) */}
-          <div className="hidden"></div>
+          {/* Center: live step capsule — the only always-visible "where am I" on
+              small screens, where the left rail collapses to the chip scroller. */}
+          <div className="hidden md:flex items-center gap-2.5 px-4 h-10 rounded-full bg-slate-100/80 dark:bg-white/5 border border-slate-200/70 dark:border-white/10">
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#1a3884] dark:bg-blue-600 text-white text-[11px] font-black tabular-nums">
+              {currentStep + 1}
+            </span>
+            <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 tracking-tight">
+              {steps[currentStep].title}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 tabular-nums">
+              / {steps.length}
+            </span>
+          </div>
 
           {/* Right: Clean Spacer & Back to Home */}
           <div className="flex items-center gap-3">
-            {/* Mobile indicator for step (Hidden per user request) */}
-            <div className="hidden"></div>
+            {/* Compact step count for screens too narrow for the capsule above */}
+            <span className="md:hidden text-[11px] font-bold text-slate-400 dark:text-slate-500 tabular-nums">
+              {currentStep + 1}/{steps.length}
+            </span>
 
             <button
               onClick={() => setShowDashboardWarning(true)}
@@ -749,14 +789,15 @@ const ComprehensiveSignup = () => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
+      <div className="max-w-6xl mx-auto py-8 px-4 relative z-10">
 
-        {/* Attractive Title & Slogan */}
-        <div className="text-center mb-8 mt-2">
+        {/* Title — left-aligned so it shares the form column's axis instead of
+            pushing the first field a screenful down the page. */}
+        <div className="mb-7 max-w-2xl">
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-extrabold text-[#1a3884] dark:text-white mb-3 tracking-tight"
+            className="text-2xl md:text-[32px] font-extrabold text-[#1a3884] dark:text-white mb-2 tracking-tight leading-tight"
           >
             {t("comp_signup.title", "Complete Your Profile")}
           </motion.h1>
@@ -764,37 +805,174 @@ const ComprehensiveSignup = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto"
+            className="text-[13px] md:text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
           >
             {t("comp_signup.subtitle", "Build a comprehensive and professional profile to unlock the best career opportunities, personalized recommendations")}
           </motion.p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-6 px-2">
-          <div className="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">
-            <span>{t("comp_signup.step_progress", "Step {{current}} of {{total}}", { current: currentStep + 1, total: steps.length })}</span>
-            <span>{t("comp_signup.pct_complete", "{{pct}}% Complete", { pct: Math.round(((currentStep + 1) / steps.length) * 100) })}</span>
-          </div>
-          <div className="h-1.5 w-full bg-slate-200/70 dark:bg-slate-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-              className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] dark:from-blue-600 dark:to-sky-500 rounded-full"
-            />
-          </div>
-        </div>
+        <div className="lg:grid lg:grid-cols-[264px_minmax(0,1fr)] lg:gap-8 lg:items-start">
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative"
-        >
-          {/* Form Container */}
-          <div className="bg-white dark:bg-[#002147] p-5 md:p-8 shadow-xl dark:shadow-none border border-slate-100 dark:border-white/10 rounded-3xl relative">
+          {/* ─── Step rail (desktop) ─────────────────────────────────────────
+              Nine steps behind a "Step 3 of 9" label gave no sense of what was
+              left or any way back to an earlier answer without clicking
+              Previous repeatedly. The rail makes the whole journey visible and
+              every cleared step directly reachable. */}
+          <aside className="hidden lg:block sticky top-28">
+            <div className="bg-white dark:bg-[#001c3d] border border-slate-100 dark:border-white/10 rounded-3xl p-5 shadow-sm">
 
-            <AnimatePresence mode="wait">
+              <div className="flex items-baseline justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                  {t("comp_signup.progress_label", "Progress")}
+                </span>
+                <span className="text-[13px] font-black text-[#1a3884] dark:text-blue-400 tabular-nums">
+                  {Math.round(((currentStep + 1) / steps.length) * 100)}%
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-200/70 dark:bg-white/10 rounded-full overflow-hidden mb-5">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                  transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                  className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] dark:from-blue-600 dark:to-sky-500 rounded-full"
+                />
+              </div>
+
+              <nav aria-label={t("comp_signup.steps_nav", "Registration steps")} className="relative">
+                {/* Rail track + filled portion. Rows are a fixed 56px tall, so
+                    the fill height is just `currentStep * 56` — no measuring. */}
+                <span aria-hidden className="absolute left-5 -translate-x-1/2 top-7 bottom-7 w-px bg-slate-200 dark:bg-white/10" />
+                <motion.span
+                  aria-hidden
+                  className="absolute left-5 -translate-x-1/2 top-7 w-px bg-[#1a3884] dark:bg-blue-500"
+                  initial={false}
+                  animate={{ height: currentStep * 56 }}
+                  transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                />
+
+                <ul className="relative">
+                  {steps.map((s, i) => {
+                    const isCurrent = i === currentStep;
+                    const isDone = !isCurrent && i <= maxStepReached;
+                    const isLocked = i > maxStepReached;
+                    return (
+                      <li key={s.title} className="h-14 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => goToStep(i)}
+                          disabled={isLocked || isCurrent}
+                          aria-current={isCurrent ? "step" : undefined}
+                          className={`group w-full h-full flex items-center gap-3 rounded-xl pr-2 text-left transition-colors ${isLocked ? "cursor-default" : isCurrent ? "cursor-default" : "cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5"
+                            }`}
+                        >
+                          <span
+                            className={`shrink-0 flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200 ${isCurrent
+                              ? "bg-[#1a3884] dark:bg-blue-600 border-[#1a3884] dark:border-blue-600 text-white shadow-lg shadow-[#1a3884]/25 dark:shadow-blue-600/25 scale-105"
+                              : isDone
+                                ? "bg-white dark:bg-[#001c3d] border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400"
+                                : "bg-white dark:bg-[#001c3d] border-slate-200 dark:border-white/10 text-slate-300 dark:text-slate-600"
+                              }`}
+                          >
+                            {isDone ? <Check className="w-4 h-4" strokeWidth={3} /> : s.icon}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span
+                              className={`block text-[13px] font-bold tracking-tight truncate transition-colors ${isCurrent
+                                ? "text-[#1a3884] dark:text-white"
+                                : isDone
+                                  ? "text-slate-700 dark:text-slate-300 group-hover:text-[#1a3884] dark:group-hover:text-blue-300"
+                                  : "text-slate-400 dark:text-slate-600"
+                                }`}
+                            >
+                              {s.title}
+                            </span>
+                            {isCurrent && (
+                              <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="block text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest"
+                              >
+                                {t("comp_signup.in_progress", "In progress")}
+                              </motion.span>
+                            )}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            </div>
+          </aside>
+
+          {/* ─── Step chips + progress (mobile / tablet) ─────────────────── */}
+          <div className="lg:hidden mb-5">
+            <div className="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">
+              <span>{t("comp_signup.step_progress", "Step {{current}} of {{total}}", { current: currentStep + 1, total: steps.length })}</span>
+              <span>{t("comp_signup.pct_complete", "{{pct}}% Complete", { pct: Math.round(((currentStep + 1) / steps.length) * 100) })}</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-200/70 dark:bg-white/10 rounded-full overflow-hidden mb-3">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] dark:from-blue-600 dark:to-sky-500 rounded-full"
+              />
+            </div>
+            <div className="-mx-4 px-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex gap-2 w-max pb-1">
+                {steps.map((s, i) => {
+                  const isCurrent = i === currentStep;
+                  const isDone = !isCurrent && i <= maxStepReached;
+                  return (
+                    <button
+                      key={s.title}
+                      type="button"
+                      onClick={() => goToStep(i)}
+                      disabled={i > maxStepReached || isCurrent}
+                      aria-current={isCurrent ? "step" : undefined}
+                      className={`flex items-center gap-1.5 h-8 px-3 rounded-full text-[12px] font-bold whitespace-nowrap border transition-all ${isCurrent
+                        ? "bg-[#1a3884] dark:bg-blue-600 border-[#1a3884] dark:border-blue-600 text-white shadow-md shadow-[#1a3884]/20"
+                        : isDone
+                          ? "bg-white dark:bg-[#001c3d] border-[#1a3884]/30 dark:border-blue-500/30 text-[#1a3884] dark:text-blue-400"
+                          : "bg-white dark:bg-[#001c3d] border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-600"
+                        }`}
+                    >
+                      {isDone && <Check className="w-3 h-3" strokeWidth={3} />}
+                      {s.title}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative min-w-0"
+          >
+            {/* Form Container */}
+            <div className="bg-white dark:bg-[#002147] p-5 md:p-8 shadow-xl dark:shadow-none border border-slate-100 dark:border-white/10 rounded-3xl relative">
+
+              {/* Per-step heading — names the section you are in and what it is
+                  for. Previously each step opened straight onto its first field. */}
+              <div className="flex items-start gap-3.5 pb-5 mb-6 border-b border-slate-100 dark:border-white/10">
+                <span className="shrink-0 flex items-center justify-center w-11 h-11 rounded-2xl bg-[#1a3884]/[0.07] dark:bg-blue-500/15 border border-[#1a3884]/10 dark:border-blue-500/20 text-[#1a3884] dark:text-blue-400">
+                  {cloneElement(steps[currentStep].icon, { className: "w-5 h-5" })}
+                </span>
+                <div className="min-w-0 pt-0.5">
+                  <h2 className="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+                    {steps[currentStep].title}
+                  </h2>
+                  <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                    {steps[currentStep].desc}
+                  </p>
+                </div>
+              </div>
+
+              <AnimatePresence mode="wait">
               {/* Step 0: Personal Details */}
               {currentStep === 0 && (
                 <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
@@ -1490,42 +1668,51 @@ const ComprehensiveSignup = () => {
               )}
             </AnimatePresence>
 
-            {/* Redesigned Footer */}
-            <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-slate-200/80 dark:border-white/10">
-              <div className="flex items-center gap-4">
-                {currentStep > 0 && (
-                  <button
-                    onClick={handlePrevStep}
-                    className="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-                  >
-                    {t("comp_signup.previous", "Previous")}
-                  </button>
-                )}
-              </div>
+              {/* Footer — pinned to the bottom of the viewport while the step
+                  scrolls beneath it. Experience/Projects/Certificates can each
+                  run several screens long, and Next used to sit at the very
+                  bottom of all of it. Negative margins bleed it to the card
+                  edges so it reads as the card's own base. */}
+              <div className="sticky bottom-0 z-20 -mx-5 md:-mx-8 -mb-5 md:-mb-8 mt-8 px-5 md:px-8 py-4 rounded-b-3xl bg-white/85 dark:bg-[#002147]/85 backdrop-blur-md border-t border-slate-200/80 dark:border-white/10 flex justify-between items-center gap-3">
+                <div className="flex items-center">
+                  {currentStep > 0 && (
+                    <button
+                      onClick={handlePrevStep}
+                      className="px-5 h-11 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001c3d] hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                    >
+                      {t("comp_signup.previous", "Previous")}
+                    </button>
+                  )}
+                </div>
 
-              <div className="flex items-center gap-4">
-                {currentStep < steps.length - 1 ? (
-                  <button
-                    onClick={handleNextStep}
-                    className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#132c6b] transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {t("comp_signup.next", "Next")}
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                    className="relative px-8 py-3 rounded-xl text-white text-sm font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-[#112b6b]/20 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
-                  >
-                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("comp_signup.complete_registration", "Complete Registration")}
-                  </button>
-                )}
+                <span className="hidden sm:block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest tabular-nums">
+                  {t("comp_signup.step_progress", "Step {{current}} of {{total}}", { current: currentStep + 1, total: steps.length })}
+                </span>
+
+                <div className="flex items-center">
+                  {currentStep < steps.length - 1 ? (
+                    <button
+                      onClick={handleNextStep}
+                      className="px-7 h-11 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#132c6b] transition-all shadow-md shadow-[#1a3884]/20 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      {t("comp_signup.next", "Next")}
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isLoading}
+                      className="relative px-7 h-11 rounded-xl text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-xl shadow-[#112b6b]/20 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0"
+                      style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+                    >
+                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("comp_signup.complete_registration", "Complete Registration")}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
       {/* Go to Dashboard Warning Modal */}
