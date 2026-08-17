@@ -333,7 +333,7 @@ const Settings = () => {
                   <button
                     key={themeOption.value}
                     type="button"
-                    onClick={() => setTheme(themeOption.value.toLowerCase())}
+                    onClick={(e) => setTheme(themeOption.value.toLowerCase(), e)}
                     className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.value.toLowerCase()
                       ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
                       : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"

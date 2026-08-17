@@ -113,7 +113,7 @@ const LandingPage = () => {
   }
 
   const openLogin = () => {
-    setIsInstitutionSelectOpen(true);
+    navigate('/login');
   };
 
   const openSignup = () => {

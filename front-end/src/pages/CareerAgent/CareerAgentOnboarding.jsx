@@ -4,21 +4,21 @@ import PageTransition from '@/components/PageTransition';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  IconUser as User, 
-  IconSchool as GraduationCap, 
-  IconTarget as Target, 
-  IconBriefcase as Briefcase, 
-  IconShieldCheck as ShieldCheck, 
-  IconCircleCheck as CheckCircle, 
-  IconMapPin as MapPin, 
-  IconCreditCard as CreditCard, 
-  IconClock as Clock, 
-  IconCompass as Compass, 
-  IconSearch as Search, 
-  IconNavigation as Navigation, 
-  IconBolt as Zap, 
-  IconTrophy as Trophy, 
+import {
+  IconUser as User,
+  IconSchool as GraduationCap,
+  IconTarget as Target,
+  IconBriefcase as Briefcase,
+  IconShieldCheck as ShieldCheck,
+  IconCircleCheck as CheckCircle,
+  IconMapPin as MapPin,
+  IconCreditCard as CreditCard,
+  IconClock as Clock,
+  IconCompass as Compass,
+  IconSearch as Search,
+  IconNavigation as Navigation,
+  IconBolt as Zap,
+  IconTrophy as Trophy,
   IconSparkles as Sparkles,
   IconLock as Lock,
   IconChevronDown as ChevronDown,
@@ -422,7 +422,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
         </select>
         {/* Dropdown arrow */}
         <div style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: selected ? 'var(--accent)' : 'var(--muted)', opacity: disabled ? 0.5 : 1 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
         </div>
       </div>
 
@@ -652,7 +652,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
                   {JOB_TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
                 </select>
                 <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--muted)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
             </div>
@@ -675,7 +675,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
                   {SALARY_OPTIONS.map(s => <option key={s}>{s}</option>)}
                 </select>
                 <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: data.salary ? 'var(--accent)' : 'var(--muted)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
             </div>
@@ -837,6 +837,15 @@ function SkillSection({ skills, onChange }) {
   );
 }
 
+const LOADING_MESSAGES = [
+  "Initializing v7 Intelligence Engine...",
+  "Correlating Educational Background...",
+  "Analyzing Technical Skill Coverage...",
+  "Simulating Industry Market Match...",
+  "Synthesizing Strategic Roadmap...",
+  "Generating Full Analysis Report..."
+];
+
 // Main Component
 const CareerAgentOnboarding = () => {
   const navigate = useNavigate();
@@ -976,7 +985,7 @@ const CareerAgentOnboarding = () => {
     };
 
     loadSavedData();
-  }, [isEditMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isEditMode]);
 
   // ─── AUTO-FILL PERSONAL DETAILS & ACADEMIC RECORD FROM PROFILE ───
   useEffect(() => {
@@ -997,10 +1006,10 @@ const CareerAgentOnboarding = () => {
             const matchedL = availableLevels.find(al => {
               const alLower = al.toLowerCase();
               return alLower === lLower ||
-                     (lLower.includes('postgrad') && alLower.includes('postgrad')) ||
-                     (lLower.includes('undergrad') && alLower.includes('undergrad')) ||
-                     (lLower.includes('diploma') && alLower.includes('diploma')) ||
-                     (lLower.includes('phd') && alLower.includes('phd'));
+                (lLower.includes('postgrad') && alLower.includes('postgrad')) ||
+                (lLower.includes('undergrad') && alLower.includes('undergrad')) ||
+                (lLower.includes('diploma') && alLower.includes('diploma')) ||
+                (lLower.includes('phd') && alLower.includes('phd'));
             });
             if (matchedL) level = matchedL;
           }
@@ -1204,11 +1213,15 @@ const CareerAgentOnboarding = () => {
   // If 2 specialisations are selected (each with 10 directions) → 20 total directions.
   // Secondary excludes the 1 picked as primary → 19 shown.
   // Tertiary excludes primary + secondary picks → 18 shown.
-  useEffect(() => {
-    const edu = formData.education[0];
-    console.log('[CareerAgentOnboarding] Education changed:', edu);
+  const eduLevel = formData.education[0]?.level;
+  const eduDomain = formData.education[0]?.domain;
+  const eduDegreeGroup = formData.education[0]?.degreeGroup;
+  const eduSpecialisationStr = JSON.stringify(formData.education[0]?.specialisation);
 
-    if (!edu?.level || !edu?.domain || !edu?.degreeGroup) {
+  useEffect(() => {
+    console.log('[CareerAgentOnboarding] Education changed:', { eduLevel, eduDomain, eduDegreeGroup, eduSpecialisationStr });
+
+    if (!eduLevel || !eduDomain || !eduDegreeGroup) {
       console.log('[CareerAgentOnboarding] Education incomplete. Clearing directions.');
       setCareerUniqueId(null);
       setCareerDirections([]);
@@ -1216,7 +1229,17 @@ const CareerAgentOnboarding = () => {
     }
 
     // Collect all specialisations to fetch for (at least one — 'General' if none selected)
-    const specs = edu.specialisation?.length > 0 ? edu.specialisation : ['General'];
+    let specs = ['General'];
+    try {
+      if (eduSpecialisationStr) {
+        const parsed = JSON.parse(eduSpecialisationStr);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          specs = parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to parse specialisations:', e);
+    }
     console.log('[CareerAgentOnboarding] Fetching directions for specs:', specs);
 
     setDirectionsLoading(true);
@@ -1225,7 +1248,7 @@ const CareerAgentOnboarding = () => {
     const fetchForSpec = async (spec) => {
       try {
         const idRes = await axios.get('/api/career-agent/unique-id', {
-          params: { level: edu.level, domain: edu.domain, degreeFullName: edu.degreeGroup, specialisation: spec }
+          params: { level: eduLevel, domain: eduDomain, degreeFullName: eduDegreeGroup, specialisation: spec }
         });
         if (!idRes.data.found || !idRes.data.uniqueId) return [];
         const dirRes = await axios.get(`/api/career-agent/directions/${idRes.data.uniqueId}`);
@@ -1254,12 +1277,7 @@ const CareerAgentOnboarding = () => {
       })
       .finally(() => setDirectionsLoading(false));
 
-  }, [
-    formData.education[0]?.level,
-    formData.education[0]?.domain,
-    formData.education[0]?.degreeGroup,
-    JSON.stringify(formData.education[0]?.specialisation)
-  ]);
+  }, [eduLevel, eduDomain, eduDegreeGroup, eduSpecialisationStr]);
 
   const updatePersonal = (field, val) => setFormData(f => ({ ...f, personalDetails: { ...f.personalDetails, [field]: val } }));
   const updateEdu = (i, field, val) => setFormData(f => {
@@ -1520,19 +1538,11 @@ const CareerAgentOnboarding = () => {
   };
 
   const [submittingStep, setSubmittingStep] = useState(0);
-  const loadingMessages = [
-    "Initializing v7 Intelligence Engine...",
-    "Correlating Educational Background...",
-    "Analyzing Technical Skill Coverage...",
-    "Simulating Industry Market Match...",
-    "Synthesizing Strategic Roadmap...",
-    "Generating Full Analysis Report..."
-  ];
 
   useEffect(() => {
     if (isSubmitting) {
       const interval = setInterval(() => {
-        setSubmittingStep(s => (s < loadingMessages.length - 1 ? s + 1 : s));
+        setSubmittingStep(s => (s < LOADING_MESSAGES.length - 1 ? s + 1 : s));
       }, 2000);
       return () => clearInterval(interval);
     }
@@ -1579,7 +1589,7 @@ const CareerAgentOnboarding = () => {
             animate={{ opacity: 1, y: 0 }}
             style={{ color: 'var(--text)', fontSize: '0.82rem', fontWeight: 700, marginTop: '1.5rem', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.05em' }}
           >
-            {t('career_agent.onboarding.loading_msg.' + submittingStep, loadingMessages[submittingStep])}
+            {t('career_agent.onboarding.loading_msg.' + submittingStep, LOADING_MESSAGES[submittingStep])}
           </motion.p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
             <p style={{ color: 'var(--accent)', fontSize: '0.7rem', fontWeight: 700, margin: 0 }}>{t('career_agent.onboarding.loading_engine_status', 'V7 ANALYSIS ENGINE ACTIVE')}</p>
@@ -1601,8 +1611,8 @@ const CareerAgentOnboarding = () => {
             Your career direction has been permanently locked. You can no longer generate new career analyses.
             Please return to your dashboard to view your locked career paths.
           </p>
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             onClick={() => navigate('/dashboard/career-agent/dashboard')}
             style={{ padding: '0.8rem 2rem', fontSize: '1rem', borderRadius: '12px' }}
           >
@@ -1695,7 +1705,7 @@ const CareerAgentOnboarding = () => {
                 </span>
               </div>
               <div className="onboard-progress-mobile-bar-wrap">
-                <div 
+                <div
                   className="onboard-progress-mobile-bar-fill"
                   style={{ width: `${(step / 6) * 100}%` }}
                 />
@@ -1750,7 +1760,7 @@ const CareerAgentOnboarding = () => {
                 {/* Email Address */}
                 <div className="fg">
                   <label className="fl">{t('career_agent.onboarding.email_address', 'Email Address')} <span className="req">*</span></label>
-                  <input className={getFieldErrorClass('personal.email')} type="email" required placeholder="your@email.com"
+                  <input className={getFieldErrorClass('personal.email')} type="email" required placeholder="example@email.com"
                     value={formData.personalDetails.email}
                     onChange={e => updatePersonal('email', e.target.value)}
                     disabled
@@ -1836,63 +1846,63 @@ const CareerAgentOnboarding = () => {
                     </div>
 
                     <div className="fgrid">
-                        {/* Level */}
-                        <div className="fg">
-                          <label className="fl">Degree Level <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)} disabled>
-                            <option value="">Select Level...</option>
-                            {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
-                          </select>
-                        </div>
+                      {/* Level */}
+                      <div className="fg">
+                        <label className="fl">Degree Level <span className="req">*</span></label>
+                        <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)} disabled>
+                          <option value="">Select Level...</option>
+                          {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
+                        </select>
+                      </div>
 
-                        {/* Domain */}
-                        <div className="fg">
-                          <label className="fl">Domain <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled>
-                            <option value="">Select Domain...</option>
-                            {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
-                          </select>
-                        </div>
+                      {/* Domain */}
+                      <div className="fg">
+                        <label className="fl">Domain <span className="req">*</span></label>
+                        <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled>
+                          <option value="">Select Domain...</option>
+                          {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
+                        </select>
+                      </div>
 
-                        {/* Degree Group */}
-                        <div className="fg">
-                          <label className="fl">Degree Group <span className="req">*</span></label>
-                          <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled>
-                            <option value="">Select Degree...</option>
-                            {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
-                          </select>
-                        </div>
+                      {/* Degree Group */}
+                      <div className="fg">
+                        <label className="fl">Degree Group <span className="req">*</span></label>
+                        <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled>
+                          <option value="">Select Degree...</option>
+                          {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
+                        </select>
+                      </div>
 
-                        {/* Graduation Year */}
-                        <div className="fg">
-                          <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
-                          <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} disabled />
-                        </div>
+                      {/* Graduation Year */}
+                      <div className="fg">
+                        <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
+                        <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} disabled />
+                      </div>
 
-                        {/* Specialisation (Multi) */}
-                        <div className="fg">
-                          <label className="fl">Specialisation(s) <span className="req">*</span></label>
-                          <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
-                            <MultiSelect
-                              options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
-                              selected={edu.specialisation || []}
-                              onChange={v => updateEdu(i, 'specialisation', v)}
-                              max={2}
-                              placeholder="Select specialisation(s)..."
-                              disabled
-                            />
-                          </div>
-                        </div>
-
-                        {/* Currently Pursuing */}
-                        <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'not-allowed', opacity: 0.8, fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
-                            <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} disabled style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'not-allowed' }} />
-                            Currently Pursuing this degree
-                          </label>
+                      {/* Specialisation (Multi) */}
+                      <div className="fg">
+                        <label className="fl">Specialisation(s) <span className="req">*</span></label>
+                        <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
+                          <MultiSelect
+                            options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
+                            selected={edu.specialisation || []}
+                            onChange={v => updateEdu(i, 'specialisation', v)}
+                            max={2}
+                            placeholder="Select specialisation(s)..."
+                            disabled
+                          />
                         </div>
                       </div>
+
+                      {/* Currently Pursuing */}
+                      <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'not-allowed', opacity: 0.8, fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
+                          <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} disabled style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'not-allowed' }} />
+                          Currently Pursuing this degree
+                        </label>
+                      </div>
                     </div>
+                  </div>
                 ))}
 
                 {formData.education.length < 3 && (
@@ -1993,20 +2003,20 @@ const CareerAgentOnboarding = () => {
                     <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Education History</span>
                   </div>
                   <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {formData.education.map((edu, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingBottom: idx < formData.education.length - 1 ? '0.75rem' : 0, borderBottom: idx < formData.education.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(37,99,235,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                        <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--accent)' }}>{idx === 0 ? 'UG' : 'PG'}</span>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '0.87rem', color: 'var(--text1)', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.2rem' }}>{edu.degreeGroup || 'Degree not set'}{edu.specialisation?.length > 0 ? ` in ${edu.specialisation.join(', ')}` : ''}</p>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                          {edu.graduationYear && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' · Currently Pursuing' : ''}</span>}
-                          {edu.university && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>· {edu.university}</span>}
+                    {formData.education.map((edu, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingBottom: idx < formData.education.length - 1 ? '0.75rem' : 0, borderBottom: idx < formData.education.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(37,99,235,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--accent)' }}>{idx === 0 ? 'UG' : 'PG'}</span>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: '0.87rem', color: 'var(--text1)', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.2rem' }}>{edu.degreeGroup || 'Degree not set'}{edu.specialisation?.length > 0 ? ` in ${edu.specialisation.join(', ')}` : ''}</p>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                            {edu.graduationYear && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' · Currently Pursuing' : ''}</span>}
+                            {edu.university && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>· {edu.university}</span>}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                   </div>
                 </div>
 
@@ -2020,9 +2030,9 @@ const CareerAgentOnboarding = () => {
                   </div>
                   <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
                     {[
-                      { label: 'Primary',   accent: 'var(--accent)',  bg: 'rgba(37,99,235,0.06)',   border: 'rgba(37,99,235,0.18)',   val: formData.preferences.primary },
-                      { label: 'Secondary', accent: 'var(--accent2)', bg: 'rgba(34,211,238,0.05)',  border: 'rgba(34,211,238,0.18)',  val: formData.preferences.secondary },
-                      { label: 'Tertiary',  accent: '#a78bfa',        bg: 'rgba(167,139,250,0.05)', border: 'rgba(167,139,250,0.18)', val: formData.preferences.tertiary }
+                      { label: 'Primary', accent: 'var(--accent)', bg: 'rgba(37,99,235,0.06)', border: 'rgba(37,99,235,0.18)', val: formData.preferences.primary },
+                      { label: 'Secondary', accent: 'var(--accent2)', bg: 'rgba(34,211,238,0.05)', border: 'rgba(34,211,238,0.18)', val: formData.preferences.secondary },
+                      { label: 'Tertiary', accent: '#a78bfa', bg: 'rgba(167,139,250,0.05)', border: 'rgba(167,139,250,0.18)', val: formData.preferences.tertiary }
                     ].map(({ label, accent, bg, border, val }) =>
                       (val?.careerDirectionName || val?.role) ? (
                         <div
@@ -2071,7 +2081,7 @@ const CareerAgentOnboarding = () => {
                 type="submit"
                 disabled={isSubmitting}
                 style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.65rem', boxShadow: '0 8px 24px rgba(var(--accent-rgb), 0.3)', transition: 'all 0.2s', fontFamily: 'var(--font)', opacity: isSubmitting ? 0.7 : 1 }}
-                onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(var(--accent-rgb), 0.4)'; }}}
+                onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(var(--accent-rgb), 0.4)'; } }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(var(--accent-rgb), 0.3)'; }}
               >
                 <Sparkles size={17} />

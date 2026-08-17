@@ -102,8 +102,8 @@ const DashboardSidebar = () => {
     return 'Good Evening';
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const toggleTheme = (e) => {
+    setTheme(theme === 'dark' ? 'light' : 'dark', e);
   };
 
   useEffect(() => {

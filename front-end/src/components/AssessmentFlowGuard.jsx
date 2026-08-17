@@ -224,15 +224,28 @@ const AssessmentFlowGuard = ({ children }) => {
         }
 
         if (parsedUser.role === 'student' && !studentIsRegistered) {
-          // Allow access ONLY to registration pages
-          const isRegistrationPage = location.pathname === '/complete-registration' ||
-            location.pathname === '/signup' ||
-            location.pathname === '/signup-initial';
+          // First-login students must watch the one-time constant welcome video
+          // before they're allowed into the registration flow.
+          const needsWelcomeVideo = parsedUser.hasWatchedFirstLoginVideo === false;
+          const isWelcomeVideoPage = location.pathname === '/welcome-video';
 
-          if (!isRegistrationPage) {
-            console.log('[AssessmentFlowGuard] Student not registered — redirecting to /complete-registration');
-            navigate('/complete-registration', { replace: true });
-            return;
+          if (needsWelcomeVideo) {
+            if (!isWelcomeVideoPage) {
+              console.log('[AssessmentFlowGuard] Student has not watched the welcome video — redirecting to /welcome-video');
+              navigate('/welcome-video', { replace: true });
+              return;
+            }
+          } else {
+            // Allow access ONLY to registration pages
+            const isRegistrationPage = location.pathname === '/complete-registration' ||
+              location.pathname === '/signup' ||
+              location.pathname === '/signup-initial';
+
+            if (!isRegistrationPage) {
+              console.log('[AssessmentFlowGuard] Student not registered — redirecting to /complete-registration');
+              navigate('/complete-registration', { replace: true });
+              return;
+            }
           }
         }
 

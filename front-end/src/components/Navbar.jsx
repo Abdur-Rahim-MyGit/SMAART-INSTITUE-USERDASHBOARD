@@ -136,7 +136,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
               <div className="flex items-center gap-4 pl-6 border-l border-gray-200 dark:border-white/10">
                 {/* Theme Toggle */}
                 <button
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onClick={(e) => setTheme(theme === 'dark' ? 'light' : 'dark', e)}
                   className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-slate-200"
                   aria-label="Toggle theme"
                 >
@@ -231,7 +231,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
           {/* Mobile Controls */}
           <div className="flex items-center gap-2 md:hidden">
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={(e) => setTheme(theme === 'dark' ? 'light' : 'dark', e)}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-slate-200"
               aria-label="Toggle theme"
             >

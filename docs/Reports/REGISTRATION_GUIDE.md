@@ -59,7 +59,7 @@ You should see:
 {
   "_id": ObjectId,
   "userId": ObjectId,
-  "email": "your@email.com",
+  "email": "example@email.com",
   "fullName": "Your Name",
   "mobileNumber": "9876543210",
   "password": "hashed_password_here",

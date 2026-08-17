@@ -11,6 +11,7 @@ const Landing = lazy(() => import('@/pages/LandingPage'));
 const Institution = lazy(() => import('@/pages/Institution'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComprehensiveSignup = lazy(() => import('@/pages/ComprehensiveSignup'));
+const WelcomeVideoPage = lazy(() => import('@/pages/WelcomeVideoPage'));
 
 // Dashboard pages
 const DashboardHome = lazy(() => import('@/pages/DashboardHome'));
@@ -119,6 +120,7 @@ const AnimatedRoutes = () => {
                     <Route path="/verify-otp" element={<VerifyOTP />} />
                     <Route path="/signup" element={<ComprehensiveSignup />} />
                     <Route path="/complete-registration" element={<ComprehensiveSignup />} />
+                    <Route path="/welcome-video" element={<WelcomeVideoPage />} />
                     <Route path="/signup-success" element={<SignupSuccess />} />
 
                     {/* Protected Dashboard Routes - Auth guard + DashboardLayout */}

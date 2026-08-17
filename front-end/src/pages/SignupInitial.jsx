@@ -121,148 +121,41 @@ const SignupInitial = () => {
               </p>
             </motion.div>
 
-            {/* Form */}
-            <form onSubmit={handleSendOTP} className="flex flex-col gap-5">
+            {/* Contact Admin View */}
+            <div className="flex flex-col gap-6 text-center py-4">
+              <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed font-medium">
+                Self-registration is currently disabled. Accounts are created and managed by the institution administrator.
+              </p>
+              
+              <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-white/5 border border-blue-100/50 dark:border-white/5 flex flex-col items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1a3884] dark:text-blue-300">
+                  Contact Support
+                </span>
+                <a
+                  href="mailto:hello@smaartinstitute.org?subject=SMAART%20Institute%20Account%20Request"
+                  className="text-base font-extrabold text-[#112b6b] dark:text-blue-400 hover:underline"
+                >
+                  hello@smaartinstitute.org
+                </a>
+              </div>
 
-              {/* Full Name */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-                className="flex flex-col gap-1.5"
+              <a
+                href="mailto:hello@smaartinstitute.org?subject=SMAART%20Institute%20Account%20Request"
+                className="relative w-full h-12 flex items-center justify-center gap-2 font-bold text-[15px] text-white transition-all duration-300 hover:-translate-y-1 active:translate-y-0 mt-2 overflow-hidden rounded-xl shadow-xl shadow-[#112b6b]/20"
+                style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
               >
-                <label
-                  htmlFor="signup-fullname"
-                  className="text-[10px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
-                >
-                  Full Name
-                </label>
-                <div
-                  className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group"
-                  style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}
-                  onFocusCapture={(e) => {
-                    e.currentTarget.style.border = "1.5px solid #1a3884";
-                    e.currentTarget.style.background = "#fff";
-                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                  }}
-                  onBlurCapture={(e) => {
-                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                    e.currentTarget.style.background = "#f8fafc";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all shrink-0">
-                    <User className="w-3.5 h-3.5 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
-                  </div>
-                  <input
-                    id="signup-fullname"
-                    type="text"
-                    placeholder="Your full name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    autoComplete="name"
-                    required
-                    className="flex-1 bg-transparent outline-none text-[13px] font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
-                  />
-                </div>
-              </motion.div>
+                <Mail className="w-4 h-4" />
+                Contact via Email
+              </a>
 
-              {/* Email */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28, duration: 0.4 }}
-                className="flex flex-col gap-1.5"
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors text-sm mt-2 underline underline-offset-4"
               >
-                <label
-                  htmlFor="signup-email"
-                  className="text-[10px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
-                >
-                  Email Address
-                </label>
-                <div
-                  className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group"
-                  style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}
-                  onFocusCapture={(e) => {
-                    e.currentTarget.style.border = "1.5px solid #1a3884";
-                    e.currentTarget.style.background = "#fff";
-                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                  }}
-                  onBlurCapture={(e) => {
-                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                    e.currentTarget.style.background = "#f8fafc";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all shrink-0">
-                    <Mail className="w-3.5 h-3.5 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
-                  </div>
-                  <input
-                    id="signup-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                    required
-                    className="flex-1 bg-transparent outline-none text-[13px] font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
-                  />
-                </div>
-              </motion.div>
-
-              {/* Submit */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.36, duration: 0.4 }}
-              >
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="relative w-full h-12 flex items-center justify-center gap-2 font-bold text-[15px] text-white transition-all duration-300 hover:-translate-y-1 active:translate-y-0 mt-2 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-xl shadow-xl shadow-[#112b6b]/20"
-                  style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) e.currentTarget.style.boxShadow = "0 12px 36px rgba(17,43,107,0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "0 10px 24px rgba(17,43,107,0.25)";
-                  }}
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Send Verification Code
-                      <motion.div
-                        animate={{ x: [0, 4, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </motion.div>
-                    </>
-                  )}
-                </button>
-              </motion.div>
-
-              {/* Already have account */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.44 }}
-                className="text-center"
-              >
-                <p className="text-gray-500 text-[13px]">
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => navigate("/login")}
-                    className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors"
-                  >
-                    Login
-                  </button>
-                </p>
-              </motion.div>
-            </form>
+                Back to Login
+              </button>
+            </div>
           </div>
 
           {/* Footer */}

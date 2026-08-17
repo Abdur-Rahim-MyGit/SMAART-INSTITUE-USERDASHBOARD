@@ -950,6 +950,11 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     const UserModel = require(`../models/${userModelName}`);
     const freshUser = await UserModel.findById(user._id);
 
+    // Keep the response in sync with the DB's welcome-video flag (students only).
+    if (userModelName === 'Student') {
+      user.hasWatchedFirstLoginVideo = freshUser?.hasWatchedFirstLoginVideo === true;
+    }
+
     // === SINGLE SESSION ENFORCEMENT ===
     // Check if user is already logged in on another device
 
@@ -1030,7 +1035,7 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // Determine next step based on user state
     let nextStep = '/dashboard';
     if (!user.isRegistered && !user.hasRegistration) {
-      nextStep = '/complete-registration';
+      nextStep = user.hasWatchedFirstLoginVideo === true ? '/complete-registration' : '/welcome-video';
     }
 
     // Delete OTP record
@@ -1575,6 +1580,7 @@ router.post('/first-login-change-password', async (req, res) => {
       isRegistered: student.isRegistered === true,
       mustChangePassword: false,   // SECURITY: Explicitly cleared so frontend guard doesn't fire
       isFirstLogin: true,          // Flag to trigger welcome/assessment flow
+      hasWatchedFirstLoginVideo: student.hasWatchedFirstLoginVideo === true,
       passwordJustChanged: true,   // Used by frontend for smart routing
       lastLogin: student.lastLogin,
       previousLogin: student.previousLogin || null
@@ -1599,6 +1605,24 @@ router.post('/first-login-change-password', async (req, res) => {
   } catch (err) {
     console.error('First login password change error:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Mark the one-time, constant first-login welcome video as watched.
+router.post('/mark-welcome-video-watched', protect, async (req, res) => {
+  try {
+    const userType = req.user.userType || req.user.role;
+    if (userType !== 'student') {
+      return res.status(403).json({ error: 'Not applicable for this account type' });
+    }
+
+    const Student = require('../models/Student');
+    await Student.findByIdAndUpdate(req.user._id, { hasWatchedFirstLoginVideo: true });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Auth] Error marking welcome video watched:', err.message);
+    res.status(500).json({ error: 'Failed to update video status' });
   }
 });
 

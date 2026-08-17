@@ -154,7 +154,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     const nextStep = data.nextStep || "/dashboard";
     console.log("[LoginModal] Navigating to:", nextStep);
     navigate(nextStep);
-  }, [formData.email, onClose, navigate, login]);
+  }, [onClose, navigate, login]);
 
   // Handle OTP verification success
   const handleOtpSuccess = (data) => {
@@ -262,7 +262,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                         autoComplete="username"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="your@email.com"
+                        placeholder="example@email.com"
                         className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                         required
                       />
@@ -337,15 +337,12 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                 <div className="mt-8 text-center pt-6 border-t border-gray-50">
                   <p className="text-gray-400 text-[12px] font-medium">
                     Don't have an account?{" "}
-                    <button
-                      onClick={() => {
-                        onClose();
-                        onSwitchToSignup();
-                      }}
+                    <a
+                      href="mailto:hello@smaartinstitute.org?subject=SMAART%20Institute%20Account%20Request"
                       className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors ml-1 underline underline-offset-4"
                     >
-                      Create Account
-                    </button>
+                      Contact Support
+                    </a>
                   </p>
                 </div>
               </div>

@@ -487,6 +487,10 @@ const studentSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  hasWatchedFirstLoginVideo: {
+    type: Boolean,
+    default: false
+  },
   passwordChangedAt: Date,
   isRegistered: {
     type: Boolean,

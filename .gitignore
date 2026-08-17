@@ -7,6 +7,7 @@ loadtest/bench-*.json
 loadtest/zap-report.html
 loadtest/e2e-results/
 loadtest/e2e/node_modules/
+back-end/logs/*.log
 
 # Environment Variables
 .env

@@ -663,8 +663,8 @@ const DashboardLayout = () => {
   }, []);
 
   // Toggle Theme
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const toggleTheme = (e) => {
+    setTheme(theme === 'dark' ? 'light' : 'dark', e);
   };
 
   const handleLogout = async () => {

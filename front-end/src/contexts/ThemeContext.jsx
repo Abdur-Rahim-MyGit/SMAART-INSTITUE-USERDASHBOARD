@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import { apiCall } from '../services/api';
 
 const ThemeContext = createContext({
@@ -46,10 +47,36 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const handleThemeChange = useCallback((newTheme) => {
-    setTheme(newTheme);
-    applyTheme(newTheme);
-    persistThemePreference(newTheme);
+  const handleThemeChange = useCallback((newTheme, event) => {
+    const isTransitionSupported =
+      document.startViewTransition &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!isTransitionSupported) {
+      setTheme(newTheme);
+      applyTheme(newTheme);
+      persistThemePreference(newTheme);
+      return;
+    }
+
+    const x = event?.clientX ?? window.innerWidth / 2;
+    const y = event?.clientY ?? window.innerHeight / 2;
+    document.documentElement.style.setProperty('--x', `${x}px`);
+    document.documentElement.style.setProperty('--y', `${y}px`);
+
+    document.documentElement.classList.add('no-transitions');
+
+    const transition = document.startViewTransition(() => {
+      flushSync(() => {
+        setTheme(newTheme);
+        applyTheme(newTheme);
+      });
+      persistThemePreference(newTheme);
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.classList.remove('no-transitions');
+    });
   }, []);
 
   useEffect(() => {

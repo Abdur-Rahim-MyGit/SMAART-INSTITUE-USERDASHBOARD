@@ -134,7 +134,7 @@ const ContactAdminModal = ({ isOpen, onClose, selectedInstitution }) => {
                     type="email"
                     value={formData.contactEmail}
                     onChange={handleChange}
-                    placeholder="your@email.com"
+                    placeholder="example@email.com"
                     style={{ width: '100%', padding: '10px 14px', border: `1px solid ${errors.contactEmail ? '#ef4444' : '#e2e8f0'}`, borderRadius: '10px', fontSize: '14px', outline: 'none', boxSizing: 'border-box', color: '#0f172a' }}
                   />
                   {errors.contactEmail && <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{errors.contactEmail}</p>}
