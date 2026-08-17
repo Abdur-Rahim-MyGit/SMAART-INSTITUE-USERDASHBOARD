@@ -8,8 +8,8 @@ import { apiCall } from "@/services/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 
-// One constant welcome video shown to every student, once, on their first login.
-// Placeholder asset — swap this single URL when the real video is ready.
+// Fallback welcome video when the student's college has no Leadership Message
+// set by the SMAART admin (Community Hub → Banners → Leadership Message).
 const WELCOME_VIDEO_URL = "https://res.cloudinary.com/dlpmrdcqp/video/upload/videoplayback_xt7in8.mp4";
 
 const WelcomeVideoPage = () => {
@@ -20,6 +20,7 @@ const WelcomeVideoPage = () => {
   const maxWatchedRef = useRef(0);
   const [hasFinished, setHasFinished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -28,6 +29,37 @@ const WelcomeVideoPage = () => {
       navigate("/", { replace: true });
     }
   }, [navigate]);
+
+  // The admin-managed Leadership Message of the student's college plays here;
+  // the constant above is only the fallback.
+  useEffect(() => {
+    const loadCollegeMedia = async () => {
+      try {
+        const user = JSON.parse(sessionStorage.getItem("user") || "null");
+        const collegeId = user?.college?._id || user?.college || user?.collegeId;
+        if (collegeId) {
+          const response = await apiCall(`/colleges/${collegeId}`);
+          if (response?.success && response.data?.chairmanVideo) {
+            setMediaUrl(response.data.chairmanVideo);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load college welcome media:", error);
+      }
+      setMediaUrl(WELCOME_VIDEO_URL);
+    };
+    loadCollegeMedia();
+  }, []);
+
+  const isImageMessage = !!mediaUrl && /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(mediaUrl);
+  // Old embed-style URLs (Cloudinary player pages) can't be tracked by a
+  // <video> element — show them in an iframe and unlock Continue right away.
+  const isEmbedMessage = !!mediaUrl && !isImageMessage && /player\.cloudinary\.com|\/embed/i.test(mediaUrl);
+
+  useEffect(() => {
+    if (isImageMessage || isEmbedMessage) setHasFinished(true);
+  }, [isImageMessage, isEmbedMessage]);
 
   const handleTimeUpdate = () => {
     const el = videoRef.current;
@@ -91,17 +123,33 @@ const WelcomeVideoPage = () => {
               </div>
 
               <div className="relative w-full rounded-2xl overflow-hidden bg-black" style={{ paddingBottom: "56.25%" }}>
-                <video
-                  ref={videoRef}
-                  src={WELCOME_VIDEO_URL}
-                  className="absolute inset-0 w-full h-full"
-                  controls
-                  controlsList="nodownload noplaybackrate"
-                  autoPlay
-                  onTimeUpdate={handleTimeUpdate}
-                  onSeeking={handleSeeking}
-                  onEnded={handleEnded}
-                />
+                {!mediaUrl ? null : isImageMessage ? (
+                  <img
+                    src={mediaUrl}
+                    alt={t("welcome_video.badge", "Welcome")}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : isEmbedMessage ? (
+                  <iframe
+                    src={mediaUrl}
+                    title={t("welcome_video.badge", "Welcome")}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="autoplay; fullscreen; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    ref={videoRef}
+                    src={mediaUrl}
+                    className="absolute inset-0 w-full h-full"
+                    controls
+                    controlsList="nodownload noplaybackrate"
+                    autoPlay
+                    onTimeUpdate={handleTimeUpdate}
+                    onSeeking={handleSeeking}
+                    onEnded={handleEnded}
+                  />
+                )}
               </div>
             </div>
 

@@ -10,7 +10,7 @@ echo  (Requires the Docker backend to be running.)
 echo  LOCAL TESTING ONLY - OTP logging is removed before launch.
 echo ============================================================
 echo --- Recent codes: ---
-docker exec smaart-institue-userdashboard-backend-1 sh -c "grep -E 'OTP email to|OTP Code|Name:' /usr/src/app/logs/combined.log | tail -9; echo '--- Waiting for new codes (leave open): ---'; tail -n 0 -f /usr/src/app/logs/combined.log | grep --line-buffered -E 'OTP email to|OTP Code|Name:'"
+docker exec smaart-institue-userdashboard-backend-1 sh -c "grep -E 'OTP email to|OTP Code|Name:' /usr/src/app/logs/combined.log | tail -9; echo '--- Waiting for new codes (leave open): ---'; tail -n 0 -f /usr/src/app/logs/combined.log | grep -E 'OTP email to|OTP Code|Name:'"
 echo.
 echo Viewer stopped (is the Docker backend running?).
 pause

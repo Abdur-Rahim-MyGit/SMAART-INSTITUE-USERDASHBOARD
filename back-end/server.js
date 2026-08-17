@@ -179,6 +179,7 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/security', require('./routes/security'));
 app.use('/api/proctoring', require('./routes/proctoring'));
 app.use('/api/colleges', require('./routes/colleges'));
+app.use('/api/login-media', require('./routes/loginMedia')); // global login-page slideshow
 app.use('/api/college-leads', require('./routes/collegeLeads')); // CRM pipeline for prospect institutions
 app.use('/api/registrations', require('./routes/registrations'));
 app.use('/api/degrees', require('./routes/degrees'));

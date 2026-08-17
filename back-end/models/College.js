@@ -97,6 +97,13 @@ const collegeSchema = new mongoose.Schema({
     required: false // Changed to optional for easier onboarding
   },
 
+  // Media slideshow beside the student login card — set by the SMAART admin
+  // (admin panel Community Hub). Images and/or videos, shown in order.
+  loginMedia: [{
+    url: String,
+    resourceType: { type: String, enum: ['image', 'video'], default: 'image' }
+  }],
+
   // Legacy/Additional Documents (Optional)
   additionalAgreement: String,
   institutionalReports: [{
