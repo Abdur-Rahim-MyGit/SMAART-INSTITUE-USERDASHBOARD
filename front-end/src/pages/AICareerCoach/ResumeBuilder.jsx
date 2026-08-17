@@ -447,6 +447,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
     }, [preloadedData]);
 
+    // Keep primary college education entry synced with verified CGPA
+    useEffect(() => {
+        if (verifiedCgpa) {
+            setResumeData(prev => {
+                if (!prev.education || prev.education.length === 0) return prev;
+                if (prev.education[0].grade === verifiedCgpa) return prev;
+                const nextEdu = [...prev.education];
+                nextEdu[0] = { ...nextEdu[0], grade: verifiedCgpa };
+                return { ...prev, education: nextEdu };
+            });
+        }
+    }, [verifiedCgpa]);
+
     useEffect(() => {
         const fingerprint = buildResumeFingerprint(resumeData);
         const nextResumePublicId = resumePublicId || createResumePublicId(fingerprint);
@@ -491,9 +504,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 const pUser = hydratedProfileRes.user || {};
                 setStudentId(pData.studentId || pReg.studentId || pStudent.studentId || '');
                 
-                const rawCgpa = pStudent.academic?.overallCgpa || pUser.academic?.overallCgpa || pData.academic?.overallCgpa;
-                if (rawCgpa) {
-                    fetchedCgpa = `${Number(rawCgpa).toFixed(2)} CGPA`;
+                fetchedCgpa = extractCgpa(pStudent, pUser, pReg, pData);
+                if (fetchedCgpa) {
                     setVerifiedCgpa(fetchedCgpa);
                 }
             }
@@ -860,6 +872,55 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         return start || end;
     };
 
+    // Robust CGPA extractor from all possible profile sources
+    const extractCgpa = (student, user, reg, richProfile) => {
+        // 1. Check latest record in academicRecords
+        const academicRecords = student?.academicRecords || user?.academicRecords;
+        if (Array.isArray(academicRecords) && academicRecords.length > 0) {
+            const sorted = [...academicRecords].sort((a, b) => (Number(a.semester) || 0) - (Number(b.semester) || 0));
+            const latest = sorted[sorted.length - 1];
+            if (latest && (latest.cgpa || latest.sgpa)) {
+                const val = Number(latest.cgpa || latest.sgpa);
+                if (!isNaN(val) && val > 0) {
+                    const sem = Number(latest.semester);
+                    return sem ? `${val.toFixed(2)} CGPA (Upto Sem ${sem})` : `${val.toFixed(2)} CGPA`;
+                }
+            }
+        }
+
+        // 2. Check if richProfile already formatted it with semester
+        if (richProfile?.cgpa && typeof richProfile.cgpa === 'string' && richProfile.cgpa.includes('CGPA')) {
+            return richProfile.cgpa;
+        }
+
+        const sem = Number(student?.academic?.latestSemester || student?.academic?.currentSemester || student?.currentSemester || richProfile?.latestSemester || richProfile?.academic?.latestSemester);
+        const semSuffix = sem ? ` (Upto Sem ${sem})` : '';
+
+        // 3. Check direct cgpa / overallCgpa fields
+        const candidates = [
+            student?.cgpa,
+            student?.academic?.overallCgpa,
+            richProfile?.overallCgpa,
+            richProfile?.academic?.overallCgpa,
+            reg?.cgpa,
+            reg?.cgpaPercentage,
+            reg?.higherEducation?.[0]?.cgpaPercentage,
+            user?.academic?.overallCgpa,
+            user?.cgpa
+        ];
+
+        for (const cand of candidates) {
+            if (cand !== undefined && cand !== null && cand !== '' && cand !== 0 && cand !== '0') {
+                const num = parseFloat(String(cand).replace(/[^0-9.]/g, ''));
+                if (!isNaN(num) && num > 0) {
+                    return `${num.toFixed(2)} CGPA${semSuffix}`;
+                }
+            }
+        }
+
+        return null;
+    };
+
     const hydrateProfileWithRegisteredDetails = async (profileRes) => {
         const data = profileRes.richProfile || {};
         const reg = profileRes.registration || {};
@@ -939,18 +1000,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
         const defaultLoc = location || firstCleanValue(reg.address?.country, student.address?.country, user.address?.country);
 
-        const calculatedCgpa = student.academic?.overallCgpa || user.academic?.overallCgpa || data.academic?.overallCgpa;
-        const formattedCgpa = calculatedCgpa ? `${Number(calculatedCgpa).toFixed(2)} CGPA` : null;
+        const formattedCgpa = extractCgpa(student, user, reg, data) || verifiedCgpa;
 
         // Education
         const eduList = [];
         if (listFrom(reg.higherEducation).length > 0) {
-            listFrom(reg.higherEducation).forEach(edu => {
+            listFrom(reg.higherEducation).forEach((edu, idx) => {
                 eduList.push({
                     degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
                     institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
                     year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
-                    grade: firstCleanValue(formattedCgpa, edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade),
+                    grade: idx === 0
+                        ? firstCleanValue(formattedCgpa, edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade)
+                        : firstCleanValue(edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade),
                     location: firstCleanValue(edu.location, defaultLoc)
                 });
             });
@@ -1102,6 +1164,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             const res = await aiCareerCoachApi.getProfile();
             if (res.success) {
                 const hydratedRes = await hydrateProfileWithRegisteredDetails(res);
+                const cgpa = extractCgpa(hydratedRes.student, hydratedRes.user, hydratedRes.registration, hydratedRes.richProfile);
+                if (cgpa) {
+                    setVerifiedCgpa(cgpa);
+                }
                 setResumeData(prev => buildResumeDataFromProfile(hydratedRes, prev));
                 if (!silent) toast.success(t('resume_builder.toast.sync_success', 'Profile data synced successfully!'));
             } else {
@@ -1163,6 +1229,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             const res = await aiCareerCoachApi.getProfile();
             if (res.success) {
                 const hydratedRes = await hydrateProfileWithRegisteredDetails(res);
+                const cgpa = extractCgpa(hydratedRes.student, hydratedRes.user, hydratedRes.registration, hydratedRes.richProfile);
+                if (cgpa) {
+                    setVerifiedCgpa(cgpa);
+                }
                 const newResumeData = buildResumeDataFromProfile(hydratedRes, null);
                 setResumeData(newResumeData);
             } else {

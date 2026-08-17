@@ -646,36 +646,9 @@ router.post('/login',
       }
 
       // Check if student must change password on first login
-      // BUT only if they haven't already completed the ComprehensiveSignup flow.
-      // Admin-onboarded students have isRegistered:true but NO registration subdoc —
-      // they still need to set a password and go through ComprehensiveSignup.
-      // Self-registered students who completed ComprehensiveSignup have a populated
-      // registration subdoc AND isRegistered:true — they skip this.
       if (userType === 'student' && user.mustChangePassword) {
-        // Only skip if the student actually completed the registration form
-        // (i.e. has a populated embedded registration subdoc).
-        const existingRegistration = !!(user.registration && Object.keys(
-          (user.registration.toObject ? user.registration.toObject() : user.registration)
-        ).length > 0);
-
-        if (existingRegistration) {
-          // Student already registered - skip password change, update flags, proceed normally
-          console.log(`[Auth/Login] Student ${normalizedEmail} already has registration record - skipping password change`);
-
-          // Update student record to mark as not first login and registered
-          const Student = require('../models/Student');
-          await Student.findByIdAndUpdate(user._id, {
-            mustChangePassword: false,
-            isFirstLogin: false,
-            isRegistered: true
-          });
-          user.mustChangePassword = false;
-          user.isFirstLogin = false;
-          user.isRegistered = true;
-          // Continue to normal login flow (OTP for returning users)
-        } else {
-          // === MODIFIED: First-time login now requires OTP verification first ===
-          console.log(`[Auth/Login] First-time login for ${normalizedEmail} - sending OTP before password change`);
+        // First-time login requires OTP verification followed by password change
+        console.log(`[Auth/Login] First-time login for ${normalizedEmail} - sending OTP before password change`);
 
           // Generate OTP and send
           const otp = generateOTP();
@@ -723,7 +696,6 @@ router.post('/login',
             email: loginEmail,
             fullName: user.fullName
           });
-        }
       }
 
       // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
@@ -1742,12 +1714,32 @@ router.get('/me', protect, async (req, res) => {
   try {
     // Registration data is embedded on the merged student document.
     const Student = require('../models/Student');
-    const studentDoc = await Student.findById(req.user._id).select('registration').lean();
+    const studentDoc = await Student.findById(req.user._id).lean();
     const registration = studentDoc ? (studentDoc.registration || null) : null;
+
+    let userObj = req.user.toObject ? req.user.toObject() : { ...req.user };
+    if (studentDoc) {
+      const activeArrears = Array.isArray(studentDoc.activeArrears) ? studentDoc.activeArrears : [];
+      const backlogsCount = activeArrears.length;
+      userObj.activeArrears = activeArrears;
+      userObj.activeBacklogs = backlogsCount;
+      if (!userObj.academic) userObj.academic = {};
+      userObj.academic.activeBacklogs = backlogsCount;
+      if (studentDoc.academicRecords && studentDoc.academicRecords.length > 0) {
+        const sorted = [...studentDoc.academicRecords].sort((a, b) => (Number(a.semester) || 0) - (Number(b.semester) || 0));
+        const latest = sorted[sorted.length - 1];
+        if (latest && (latest.cgpa || latest.sgpa)) {
+          const resolved = Number(Number(latest.cgpa || latest.sgpa).toFixed(2));
+          userObj.academic.overallCgpa = resolved;
+          userObj.cgpa = resolved;
+          userObj.academic.latestSemester = Number(latest.semester);
+        }
+      }
+    }
 
     res.status(200).json({
       success: true,
-      user: req.user,
+      user: userObj,
       registration: registration || null
     });
   } catch (err) {

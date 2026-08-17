@@ -78,11 +78,22 @@ const CollegeBanners = () => {
               transition={{ duration: 0.5 }}
               className="absolute inset-0"
             >
-              <img
-                src={banners[currentIndex].image}
-                alt="College Banner"
-                className="w-full h-full object-cover"
-              />
+              {banners[currentIndex].resourceType === "video" ? (
+                <video
+                  src={banners[currentIndex].image}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={banners[currentIndex].image}
+                  alt="College Banner"
+                  className="w-full h-full object-cover"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-4 sm:p-6 lg:p-8">
                 <motion.h2
                   initial={{ y: 20, opacity: 0 }}

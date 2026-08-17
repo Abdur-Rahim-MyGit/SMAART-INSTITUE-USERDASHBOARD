@@ -269,11 +269,11 @@ const AssessmentFlowGuard = ({ children }) => {
         ]);
 
         const completedMap = {};
-        if (baseLineRes.success && baseLineRes.data) {
+        if ((baseLineRes.success && baseLineRes.data) || parsedUser.isAssessmentCompleted || parsedUser.assessmentCompleted) {
           completedMap.baseline = {
             status: true,
-            startedAt: baseLineRes.data.createdAt ? new Date(baseLineRes.data.createdAt) : null,
-            submittedAt: baseLineRes.data.createdAt ? new Date(baseLineRes.data.createdAt) : null
+            startedAt: (baseLineRes?.data?.createdAt) ? new Date(baseLineRes.data.createdAt) : new Date(),
+            submittedAt: (baseLineRes?.data?.createdAt) ? new Date(baseLineRes.data.createdAt) : new Date()
           };
         }
 

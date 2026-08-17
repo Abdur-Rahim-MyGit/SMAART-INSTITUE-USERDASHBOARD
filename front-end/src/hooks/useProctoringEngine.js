@@ -116,6 +116,7 @@ export const useProctoringEngine = ({
   const inactivityTimerRef = useRef(null);
   const faceIntervalRef = useRef(null);
   const fullscreenTimerRef = useRef(null);
+  const cameraRetryTimeoutRef = useRef(null);
   const heartbeatIntervalRef = useRef(null);
   const verifyInFlightRef = useRef(false);
   const faceTickRef = useRef(0); // counts verification ticks to pace identity checks

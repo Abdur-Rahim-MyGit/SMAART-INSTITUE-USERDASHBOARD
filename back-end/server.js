@@ -75,9 +75,15 @@ app.use(cors({
     const isProduction = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL;
 
-    // Production: Strict Domain Check
+    // Production: Strict Domain Check — FRONTEND_URL may hold several
+    // comma-separated origins (e.g. the Docker frontend plus the Vite dev
+    // server locally, or www + apex domains in production).
     if (isProduction) {
-      if (origin === frontendUrl) {
+      const allowedOrigins = (frontendUrl || '')
+        .split(',')
+        .map((url) => url.trim())
+        .filter(Boolean);
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error('Not allowed by CORS'));

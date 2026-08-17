@@ -75,7 +75,7 @@ router.get('/by-email/:email', async (req, res) => {
         const student = await Student.findOne({
             email: { $regex: new RegExp(`^${escapedEmail}$`, 'i') }
         })
-            .select('_id fullName email studentId academic department degree college cgpa')
+            .select('_id fullName email studentId academic department degree college cgpa activeArrears activeBacklogs academicRecords')
             .populate('college', 'collegeName collegeCode')
             .populate('degree')
             .lean();
@@ -85,6 +85,13 @@ router.get('/by-email/:email', async (req, res) => {
                 success: false,
                 error: 'Student not found'
             });
+        }
+
+        if (student) {
+            const arrears = Array.isArray(student.activeArrears) ? student.activeArrears : [];
+            if (!student.academic) student.academic = {};
+            student.academic.activeBacklogs = arrears.length;
+            student.activeBacklogs = arrears.length;
         }
 
         // SECURITY (audit HIGH): non-staff may only resolve their OWN record by
@@ -115,11 +122,12 @@ router.get('/:id', async (req, res) => {
         if (!isStaff(req.user) && String(req.user && req.user._id) !== String(req.params.id)) {
             return res.status(403).json({ success: false, error: 'Not authorized' });
         }
-        const student = await Student.findById(req.params.id)
+        let student = await Student.findById(req.params.id)
             .select('-password')
             .populate('college', 'collegeName collegeCode address')
             .populate('enrolledCourses', 'title courseCode')
-            .populate('assessments.assessment', 'assessmentName assessmentCode');
+            .populate('assessments.assessment', 'assessmentName assessmentCode')
+            .lean();
 
         if (!student) {
             return res.status(404).json({
@@ -127,6 +135,11 @@ router.get('/:id', async (req, res) => {
                 error: 'Student not found'
             });
         }
+
+        const arrears = Array.isArray(student.activeArrears) ? student.activeArrears : [];
+        if (!student.academic) student.academic = {};
+        student.academic.activeBacklogs = arrears.length;
+        student.activeBacklogs = arrears.length;
 
         res.json({
             success: true,

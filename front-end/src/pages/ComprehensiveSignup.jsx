@@ -66,24 +66,67 @@ const ComprehensiveSignup = () => {
     }
 
     if (email) {
+      let initialDob = "";
+      const rawUserDob = userData?.dateOfBirth || userData?.dob;
+      if (rawUserDob) {
+        try { initialDob = new Date(rawUserDob).toISOString().split('T')[0]; } catch (e) { }
+      }
+      const initialGender = (userData?.gender || "").toLowerCase();
+      const initialBatch = typeof userData?.batch === 'object' ? (userData?.batch?.batch || "") : (userData?.batch || "");
+
       setPersonalDetails(prev => ({
         ...prev,
         email,
         fullName: fullName || prev.fullName,
-        mobileNumber: userData?.mobileNumber || "",
+        gender: initialGender || prev.gender,
+        dob: initialDob || prev.dob,
+        batch: initialBatch || prev.batch,
+        mobileNumber: userData?.mobileNumber || userData?.mobile || "",
         institution: "",
         profilePhoto: userData?.profileImage || prev.profilePhoto,
         educationLevel: userData?.academic?.degreeLevel || userData?.educationLevel || prev.educationLevel || ""
       }));
-      setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!userData?.mobileNumber }));
+      setPreFilledFields(prev => ({
+        ...prev,
+        email: true,
+        fullName: !!fullName,
+        mobileNumber: !!(userData?.mobileNumber || userData?.mobile),
+        dob: !!initialDob,
+        gender: !!initialGender
+      }));
     }
 
     if (selectedInstitution) {
       try {
         const institutionObj = JSON.parse(selectedInstitution);
-        setPersonalDetails(prev => ({ ...prev, institution: institutionObj.name || selectedInstitution }));
+        const instName = institutionObj.name || institutionObj.collegeName || selectedInstitution;
+        setPersonalDetails(prev => ({ ...prev, institution: instName }));
+        setHigherEducation(prev => {
+          const n = [...prev];
+          if (n[0] && !n[0].institutionName) n[0].institutionName = instName;
+          return n;
+        });
         setPreFilledFields(prev => ({ ...prev, institution: true }));
-      } catch { setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution })); setPreFilledFields(prev => ({ ...prev, institution: true })); }
+      } catch {
+        setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution }));
+        setHigherEducation(prev => {
+          const n = [...prev];
+          if (n[0] && !n[0].institutionName) n[0].institutionName = selectedInstitution;
+          return n;
+        });
+        setPreFilledFields(prev => ({ ...prev, institution: true }));
+      }
+    } else if (userData?.college || userData?.institution) {
+      const userInstName = typeof userData.college === 'object' ? (userData.college.collegeName || userData.college.name || "") : (userData.college || userData.institution || "");
+      if (userInstName) {
+        setPersonalDetails(prev => ({ ...prev, institution: userInstName }));
+        setHigherEducation(prev => {
+          const n = [...prev];
+          if (n[0] && !n[0].institutionName) n[0].institutionName = userInstName;
+          return n;
+        });
+        setPreFilledFields(prev => ({ ...prev, institution: true }));
+      }
     }
     if (userData?.department) {
       const deptStr = typeof userData.department === 'object' ? (userData.department.fullName || userData.department.name || "") : userData.department;
@@ -115,7 +158,8 @@ const ComprehensiveSignup = () => {
 
             // Year of passing extraction
             let expectedYear = "";
-            const batchVal = currentStudent?.batch || studentDept.batch || "";
+            const rawBatchVal = currentStudent?.batch || (typeof studentDept.batch === 'object' ? studentDept.batch?.batch : studentDept.batch) || (typeof regData.batch === 'object' ? regData.batch?.batch : regData.batch) || "";
+            const batchVal = typeof rawBatchVal === 'string' ? rawBatchVal : (rawBatchVal ? String(rawBatchVal) : "");
             if (batchVal) {
               const match = batchVal.match(/\b(20\d{2})\b/g);
               if (match && match.length > 0) {
@@ -127,7 +171,8 @@ const ComprehensiveSignup = () => {
 
             // Year of study calculation based on batch
             let yearOfStudy = "";
-            const finalBatch = regData.batch || currentStudent?.batch || studentDept.batch || "";
+            const rawFinalBatch = (typeof regData.batch === 'object' ? regData.batch?.batch : regData.batch) || currentStudent?.batch || (typeof studentDept.batch === 'object' ? studentDept.batch?.batch : studentDept.batch) || "";
+            const finalBatch = typeof rawFinalBatch === 'string' ? rawFinalBatch : (rawFinalBatch ? String(rawFinalBatch) : "");
             if (finalBatch) {
               const years = finalBatch.match(/\b(20\d{2})\b/g);
               if (years && years.length > 0) {
@@ -152,20 +197,47 @@ const ComprehensiveSignup = () => {
               else yearOfStudy = "4th Year";
             }
 
+            // Resolve Date of Birth safely
+            let resolvedDob = "";
+            const rawDob = regData.dob || regData.dateOfBirth || currentStudent?.dateOfBirth || currentStudent?.dob || userData?.dateOfBirth || userData?.dob;
+            if (rawDob) {
+              try {
+                resolvedDob = new Date(rawDob).toISOString().split('T')[0];
+              } catch (e) {
+                console.error("Error formatting DOB:", e);
+              }
+            }
+
+            // Resolve Gender safely
+            const resolvedGender = (regData.gender || currentStudent?.gender || userData?.gender || "").toLowerCase();
+
+            // Resolve Institution Name safely
+            const resolvedCollegeName = currentStudent?.college?.collegeName ||
+              (typeof regData.college === 'object' ? regData.college?.collegeName : regData.college) ||
+              regData.institution ||
+              (typeof userData?.college === 'object' ? (userData.college?.collegeName || userData.college?.name) : (userData?.college || userData?.institution)) ||
+              "";
+
+            // Resolve Department safely
+            const resolvedDept = regData.department ? (typeof regData.department === 'object' ? (regData.department.fullName || regData.department.name || "") : regData.department) : (studentDept.fullName || studentDept.abbreviation || "");
+
+            // Resolve Batch safely
+            const resolvedBatchStr = typeof regData.batch === 'object' ? (regData.batch?.batch || "") : (regData.batch || currentStudent?.batch || (typeof studentDept.batch === 'object' ? studentDept.batch?.batch : studentDept.batch) || "");
+
             setPersonalDetails(prev => ({
               ...prev,
               fullName: regData.fullName || currentStudent?.fullName || prev.fullName,
-              gender: regData.gender || currentStudent?.gender || prev.gender,
+              gender: resolvedGender || prev.gender,
               mobileNumber: regData.mobileNumber || regData.mobile || currentStudent?.mobile || prev.mobileNumber,
-              institution: regData.institution || regData.college?.collegeName || currentStudent?.college?.collegeName || prev.institution,
-              department: regData.department || (studentDept.fullName || studentDept.abbreviation) || prev.department || "",
-              dob: regData.dob ? new Date(regData.dob).toISOString().split('T')[0] : (currentStudent?.dateOfBirth ? new Date(currentStudent.dateOfBirth).toISOString().split('T')[0] : prev.dob),
+              institution: resolvedCollegeName || prev.institution,
+              department: resolvedDept || prev.department || "",
+              dob: resolvedDob || prev.dob,
               profilePhoto: regData.profilePhoto || regData.profileImage || currentStudent?.profileImage || userData?.profileImage || prev.profilePhoto,
               educationLevel: degreeLevel || prev.educationLevel || "",
               cgpa: currentStudent?.cgpa || currentStudent?.academic?.cgpa || regData.cgpa || regData.academic?.cgpa || prev.cgpa || "",
               yearOfPassing: expectedYear || regData.yearOfPassing || prev.yearOfPassing || "",
               yearOfStudy: yearOfStudy || regData.yearOfStudy || prev.yearOfStudy || "",
-              batch: regData.batch || currentStudent?.batch || studentDept.batch || prev.batch || "",
+              batch: resolvedBatchStr || prev.batch || "",
               address: {
                 street: regData.address?.street || currentStudent?.address?.street || prev.address?.street || "",
                 city: regData.address?.city || currentStudent?.address?.city || prev.address?.city || "",
@@ -181,8 +253,10 @@ const ComprehensiveSignup = () => {
               email: true,
               fullName: !!(regData.fullName || currentStudent?.fullName),
               mobileNumber: !!(regData.mobileNumber || regData.mobile || currentStudent?.mobile),
-              institution: !!(regData.institution || regData.college?.collegeName || currentStudent?.college?.collegeName),
-              department: !!studentDept
+              institution: !!resolvedCollegeName,
+              department: !!studentDept,
+              dob: !!resolvedDob,
+              gender: !!resolvedGender
             }));
 
             // Pre-populate Higher Education
@@ -190,6 +264,7 @@ const ComprehensiveSignup = () => {
             if (regData.higherEducation && Array.isArray(regData.higherEducation) && regData.higherEducation.length > 0) {
               initialHigherEdArray = regData.higherEducation.map(item => ({
                 ...item,
+                degreeStatus: (item.degreeStatus || item.status || "pursuing").toLowerCase(),
                 specialization: Array.isArray(item.specialization) ? (item.specialization[0] || "") : (item.specialization || "")
               }));
             }
@@ -209,7 +284,7 @@ const ComprehensiveSignup = () => {
                 degree: dbDomain || "",
                 degreeFullName: dbFullName || "",
                 specialization: dbSpecialization || "General",
-                institutionName: currentStudent?.college?.collegeName || regData.institution || "",
+                institutionName: resolvedCollegeName,
                 cgpaPercentage: currentStudent?.cgpa || studentAcademic.cgpa || regData.cgpa || regData.academic?.cgpa || "",
                 degreeStatus: "pursuing"
               });
@@ -220,7 +295,8 @@ const ComprehensiveSignup = () => {
                 degree: dbDomain || initialHigherEdArray[0].degree || "",
                 degreeFullName: dbFullName || initialHigherEdArray[0].degreeFullName || "",
                 specialization: dbSpecialization || initialHigherEdArray[0].specialization || "",
-                degreeStatus: "pursuing"
+                institutionName: initialHigherEdArray[0].institutionName || resolvedCollegeName,
+                degreeStatus: (initialHigherEdArray[0].degreeStatus || initialHigherEdArray[0].status || "pursuing").toLowerCase()
               };
             }
 
@@ -426,9 +502,11 @@ const ComprehensiveSignup = () => {
       if (!h.degree) { toast.error(t("comp_signup.toast.higher_domain_req", "Higher Ed {{idx}}: Domain Field is required", { idx: i + 1 })); return false; }
       if (!h.degreeFullName) { toast.error(t("comp_signup.toast.higher_name_req", "Higher Ed {{idx}}: Degree Full Name is required", { idx: i + 1 })); return false; }
       if (!h.specialization) { toast.error(t("comp_signup.toast.higher_spec_req", "Higher Ed {{idx}}: Specialization is required", { idx: i + 1 })); return false; }
-      if (!h.institutionName?.trim()) { toast.error(t("comp_signup.toast.higher_inst_req", "Higher Ed {{idx}}: Institution Name is required", { idx: i + 1 })); return false; }
-      if (!h.degreeStatus) { toast.error(t("comp_signup.toast.higher_status_req", "Higher Ed {{idx}}: Degree Status is required", { idx: i + 1 })); return false; }
-      if (h.degreeStatus !== "pursuing") {
+      const instName = h.institutionName?.trim() || (i === 0 ? personalDetails.institution?.trim() : "");
+      if (!instName) { toast.error(t("comp_signup.toast.higher_inst_req", "Higher Ed {{idx}}: Institution Name is required", { idx: i + 1 })); return false; }
+      const degStatus = h.degreeStatus || (i === 0 ? "pursuing" : "");
+      if (!degStatus) { toast.error(t("comp_signup.toast.higher_status_req", "Higher Ed {{idx}}: Degree Status is required", { idx: i + 1 })); return false; }
+      if (i > 0 && degStatus !== "pursuing") {
         if (!h.cgpaPercentage) { toast.error(t("comp_signup.toast.higher_cgpa_req", "Higher Ed {{idx}}: CGPA/Percentage is required", { idx: i + 1 })); return false; }
         const val = parseFloat(h.cgpaPercentage);
         if (isNaN(val) || val < 0 || val > 100) { toast.error(t("comp_signup.toast.higher_cgpa_range", "Higher Ed {{idx}}: CGPA/Percentage must be between 0 and 100", { idx: i + 1 })); return false; }
@@ -654,7 +732,7 @@ const ComprehensiveSignup = () => {
       formData.append("personalDetails", JSON.stringify(personalDetails));
       formData.append("tenthDetails", JSON.stringify({ ...tenthDetails, marksheet: "" }));
       formData.append("twelfthDetails", JSON.stringify({ ...twelfthDetails, marksheet: "" }));
-      const higherEducationData = higherEducation.map(h => ({ ...h, certificate: h.certificate?.publicId || h.certificate }));
+      const higherEducationData = higherEducation.map(h => ({ ...h, institutionName: h.institutionName || personalDetails.institution || '', certificate: h.certificate?.publicId || h.certificate }));
       formData.append("higherEducation", JSON.stringify(higherEducationData));
       formData.append("extracurricular", JSON.stringify(extracurricular.isApplicable ? extracurricular.items : []));
       formData.append("jobPreferences", JSON.stringify(jobPreferences.items));
@@ -990,7 +1068,13 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
                       <div className="relative">
-                        <Input type="date" value={personalDetails.dob} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
+                        <Input
+                          type="date"
+                          value={personalDetails.dob}
+                          disabled={!!personalDetails.dob}
+                          onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })}
+                          className={inputClass + (personalDetails.dob ? " opacity-60 cursor-not-allowed" : "")}
+                        />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
                           <User className="w-4 h-4 text-slate-400" />
                         </div>
@@ -999,7 +1083,12 @@ const ComprehensiveSignup = () => {
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Gender *</Label>
                       <div className="relative">
-                        <select value={personalDetails.gender} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass + " opacity-60 cursor-not-allowed"}>
+                        <select
+                          value={personalDetails.gender}
+                          disabled={!!personalDetails.gender}
+                          onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })}
+                          className={selectClass + (personalDetails.gender ? " opacity-60 cursor-not-allowed" : "")}
+                        >
                           <option value="">Select</option>
                           <option value="male">Male</option>
                           <option value="female">Female</option>
@@ -1009,7 +1098,12 @@ const ComprehensiveSignup = () => {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-sm text-slate-500 font-medium">Current Year of Study *</Label>
-                      <select value={personalDetails.yearOfStudy} disabled className={selectClass + " opacity-60 cursor-not-allowed"}>
+                      <select
+                        value={personalDetails.yearOfStudy}
+                        disabled={!!personalDetails.yearOfStudy}
+                        onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })}
+                        className={selectClass + (personalDetails.yearOfStudy ? " opacity-60 cursor-not-allowed" : "")}
+                      >
                         <option value="">Select Year</option>
                         <option value="1st Year">1st Year</option>
                         <option value="2nd Year">2nd Year</option>
@@ -1398,30 +1492,17 @@ const ComprehensiveSignup = () => {
                         <div>
                           <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.institution", "Institution *")}</Label>
                           <Input
-                            value={item.institutionName}
+                            value={index === 0 ? (item.institutionName || personalDetails.institution || "") : (item.institutionName || "")}
                             disabled={index === 0}
+                            placeholder={t("comp_signup.higher.institution_placeholder", "Enter College / Institution Name")}
                             onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }}
                             className={inputClass + (index === 0 ? " opacity-60 cursor-not-allowed" : "")}
                           />
                         </div>
-                        {item.degreeStatus !== 'pursuing' && (
-                          <div>
-                            <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                              {t("comp_signup.higher.cgpa_pct_req", "CGPA / Percentage *")}
-                            </Label>
-                            <Input
-                              type="number"
-                              max="100"
-                              value={item.cgpaPercentage || ""}
-                              onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }}
-                              className={inputClass}
-                            />
-                          </div>
-                        )}
                         <div>
                           <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.status", "Status *")}</Label>
                           <select
-                            value={item.degreeStatus}
+                            value={index === 0 ? (item.degreeStatus || "pursuing").toLowerCase() : (item.degreeStatus || "")}
                             disabled={index === 0}
                             onChange={(e) => {
                               const val = e.target.value;
@@ -1439,6 +1520,21 @@ const ComprehensiveSignup = () => {
                             <option value="completed">{t("comp_signup.higher.completed", "Completed")}</option>
                           </select>
                         </div>
+                        {index > 0 && (
+                          <div>
+                            <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                              {t("comp_signup.higher.cgpa_pct_req", "CGPA / Percentage")} {item.degreeStatus && item.degreeStatus !== 'pursuing' ? "*" : ""}
+                            </Label>
+                            <Input
+                              type="number"
+                              max="100"
+                              value={item.cgpaPercentage || ""}
+                              placeholder="e.g. 8.5 or 85"
+                              onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }}
+                              className={inputClass}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -33,12 +33,69 @@ const getRichProfile = async (userId) => {
     // Registration data is embedded on the merged student document.
     const registration = student?.registration || null;
 
+    // Academic / CGPA Extraction from all available sources
+    let resolvedCgpa = null;
+    let latestSemester = null;
+    if (Array.isArray(student?.academicRecords) && student.academicRecords.length > 0) {
+        const sorted = [...student.academicRecords].sort((a, b) => (Number(a.semester) || 0) - (Number(b.semester) || 0));
+        const latest = sorted[sorted.length - 1];
+        if (latest && (latest.cgpa || latest.sgpa)) {
+            resolvedCgpa = Number(latest.cgpa || latest.sgpa);
+            if (latest.semester) latestSemester = Number(latest.semester);
+        }
+    }
+    if (!resolvedCgpa && student?.cgpa) {
+        resolvedCgpa = parseFloat(String(student.cgpa).replace(/[^0-9.]/g, '')) || null;
+    }
+    if (!resolvedCgpa && student?.academic?.overallCgpa) {
+        resolvedCgpa = Number(student.academic.overallCgpa);
+    }
+    if (!latestSemester && student?.academic?.currentSemester) {
+        latestSemester = Number(student.academic.currentSemester);
+    }
+    if (!resolvedCgpa && registration?.cgpa) {
+        resolvedCgpa = parseFloat(String(registration.cgpa).replace(/[^0-9.]/g, '')) || null;
+    }
+    if (!resolvedCgpa && registration?.higherEducation?.[0]?.cgpaPercentage) {
+        resolvedCgpa = parseFloat(String(registration.higherEducation[0].cgpaPercentage).replace(/[^0-9.]/g, '')) || null;
+    }
+    if (!resolvedCgpa && user?.academic?.overallCgpa) {
+        resolvedCgpa = Number(user.academic.overallCgpa);
+    }
+    if (!resolvedCgpa && user?.cgpa) {
+        resolvedCgpa = parseFloat(String(user.cgpa).replace(/[^0-9.]/g, '')) || null;
+    }
+
+    if (resolvedCgpa !== null && !isNaN(resolvedCgpa)) {
+        resolvedCgpa = Number(Number(resolvedCgpa).toFixed(2));
+    }
+
+    // Active arrears and backlogs resolution
+    const activeArrearsList = Array.isArray(student?.activeArrears) ? student.activeArrears : (Array.isArray(user?.activeArrears) ? user.activeArrears : []);
+    const activeBacklogsCount = activeArrearsList.length > 0
+        ? activeArrearsList.length
+        : (student?.academic?.activeBacklogs !== undefined ? Number(student.academic.activeBacklogs) : (user?.academic?.activeBacklogs !== undefined ? Number(user.academic.activeBacklogs) : 0));
+
+    const semSuffix = latestSemester ? ` (Upto Sem ${latestSemester})` : '';
+    const formattedCgpa = resolvedCgpa ? `${resolvedCgpa.toFixed(2)} CGPA${semSuffix}` : '';
+
     // Comprehensive Student Data Capture
     const richProfile = {
         fullName: student?.fullName || registration?.fullName || user?.fullName || 'User',
         email: email || 'Not specified',
         mobile: student?.mobile || student?.mobileNumber || registration?.mobileNumber || user?.mobileNumber || user?.mobile || 'Not specified',
         studentId: student?.studentId || registration?.studentId || 'N/A',
+        cgpa: formattedCgpa,
+        overallCgpa: resolvedCgpa || 0,
+        latestSemester: latestSemester,
+        activeBacklogs: activeBacklogsCount,
+        activeArrears: activeArrearsList,
+        academic: {
+            ...(student?.academic?.toObject ? student.academic.toObject() : student?.academic || {}),
+            overallCgpa: resolvedCgpa || 0,
+            activeBacklogs: activeBacklogsCount,
+            latestSemester: latestSemester
+        },
 
         // Education - Prioritizing actual student record and registration
         education: (() => {
@@ -101,6 +158,15 @@ const getRichProfile = async (userId) => {
 
         experienceLevel: profile?.experienceLevel || 'Beginner'
     };
+
+    if (student && resolvedCgpa) {
+        if (!student.academic) student.academic = {};
+        student.academic.overallCgpa = resolvedCgpa;
+        student.academic.activeBacklogs = activeBacklogsCount;
+        student.academic.latestSemester = latestSemester;
+        student.cgpa = resolvedCgpa;
+        student.activeBacklogs = activeBacklogsCount;
+    }
 
     return { richProfile, profileDoc: profile, userDoc: user, studentDoc: student, registrationDoc: registration };
 };

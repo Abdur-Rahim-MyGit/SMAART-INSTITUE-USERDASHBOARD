@@ -20,7 +20,8 @@ import {
   IconCategory as Category,
   IconChevronRight as ChevronRight,
   IconBookmark as Bookmark,
-  IconBookmarkFilled as BookmarkFilled
+  IconBookmarkFilled as BookmarkFilled,
+  IconCircleCheck as CircleCheck
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI } from "@/services/api";
@@ -736,6 +737,14 @@ const Placement = () => {
                   const postedLabel = getPostedAgo(job.displayCreatedAt || job.createdAt, t);
                   const missedMustHaves = job.missedMustHaves || [];
                   const hasSkillGap = missedMustHaves.length > 0;
+                  // "Matched" is only claimed when the backend actually evaluated
+                  // this job (missedMustHaves present), the role has skill
+                  // requirements, and nothing is missing. Jobs with no listed
+                  // skills show neither state.
+                  const skillsMatched =
+                    Array.isArray(job.missedMustHaves) &&
+                    !hasSkillGap &&
+                    ((job.structuredSkills?.length || 0) > 0 || skills.length > 0);
                   const isSmaartPost = job.displaySource ? job.displaySource === 'smaart' : job.sourceCollection === 'smaartjobpostings';
                   const isSmaartJobFairPostFallback = job.sourceCollection === 'jobpostings' && isSmaartPost;
                   const isJobFairPost = !!(job.jobFairId || job.jobFair || isSmaartJobFairPostFallback || /job[\s-]?fair/i.test(job.postingOrigin || '') || /job[\s-]?fair/i.test(job.displayPostedBy || ''));
@@ -859,16 +868,15 @@ const Placement = () => {
                         </div>
                       )}
 
-                      {/* Skill Gap Warning — shown only when must-have skills are missing */}
-                      {hasSkillGap && (
-                        <div className="mt-3.5 rounded-lg border border-amber-200/70 bg-amber-50/70 px-3 py-2.5 dark:border-amber-500/25 dark:bg-amber-500/[0.07]">
-                          <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-amber-700 dark:text-amber-400">
-                            {t("placement.skill_gap", "Skill gap detected")}
-                          </p>
-                          <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-amber-900/80 dark:text-amber-200/80">
-                            {missedMustHaves.slice(0, 3).map(m => typeof m === 'string' ? m : m.name).join(', ')}
-                            {missedMustHaves.length > 3 ? ` +${missedMustHaves.length - 3} more` : ''}
-                          </p>
+                      {/* Skills matched — a quiet positive signal. Skill gaps are
+                          deliberately NOT flagged on the card; the detail page
+                          breaks them down for the student instead. */}
+                      {skillsMatched && (
+                        <div className="mt-3.5">
+                          <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200/70 bg-emerald-50/70 px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
+                            <CircleCheck className="h-3.5 w-3.5" stroke={2} />
+                            {t("placement.skills_matched", "Skills matched")}
+                          </span>
                         </div>
                       )}
 

@@ -12,6 +12,7 @@ import {
   IconTag as Tag,
   IconChevronRight as ChevronRight,
   IconQrcode as QrCode,
+  IconCircleCheck as CircleCheck,
 } from "@tabler/icons-react";
 import { getBackendUrl, placementsAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
@@ -401,6 +402,13 @@ const JobFairDetail = () => {
                       const statusLabel = formatStatus(job.displayStatus || job.status, t);
                       const isClosed = (job.displayStatus || job.status || "").toString().toLowerCase().includes("closed");
                       const missed = job.missedMustHaves || [];
+                      // Same rule as the Placement page: only claim a match when the
+                      // backend evaluated this job, it has skill requirements, and
+                      // nothing is missing. Gaps are explained on the detail page.
+                      const skillsMatched =
+                        Array.isArray(job.missedMustHaves) &&
+                        missed.length === 0 &&
+                        ((job.structuredSkills?.length || 0) > 0 || skills.length > 0);
                       const deadlineLabel = job.displayDeadline ? formatDate(job.displayDeadline, t) : null;
 
                       return (
@@ -487,15 +495,14 @@ const JobFairDetail = () => {
                             </div>
                           )}
 
-                          {missed.length > 0 && (
-                            <div className="mt-3.5 rounded-lg border border-amber-200/70 bg-amber-50/70 px-3 py-2.5 dark:border-amber-500/25 dark:bg-amber-500/[0.07]">
-                              <p className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-amber-700 dark:text-amber-400">
-                                {t("placement.skill_gap", "Skill gap detected")}
-                              </p>
-                              <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-amber-900/80 dark:text-amber-200/80">
-                                {missed.slice(0, 3).map((m) => (typeof m === "string" ? m : m.name)).join(", ")}
-                                {missed.length > 3 ? ` +${missed.length - 3} more` : ""}
-                              </p>
+                          {/* Skills matched — positive signal only; skill gaps are
+                              shown on the job detail page, not on the card. */}
+                          {skillsMatched && (
+                            <div className="mt-3.5">
+                              <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200/70 bg-emerald-50/70 px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
+                                <CircleCheck className="h-3.5 w-3.5" stroke={2} />
+                                {t("placement.skills_matched", "Skills matched")}
+                              </span>
                             </div>
                           )}
 
