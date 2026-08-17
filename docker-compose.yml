@@ -1,0 +1,56 @@
+# ============================================================================
+# docker-compose.yml — Full local Docker stack for the SMAART user dashboard
+# ----------------------------------------------------------------------------
+# Mirrors the admin panel's setup: backend + built frontend, talking to the
+# same MongoDB Atlas cluster as development (via back-end/.env), so all your
+# real students/colleges/jobs data is available.
+#
+#   Frontend (Nginx) : http://localhost:8081
+#   Backend API      : http://localhost:5000
+#
+# RUN:      docker compose up --build -d
+# STOP:     docker compose down
+# NOTE:     Stop the dev `node server.js` first — it and the backend container
+#           both want port 5000. The Vite dev server on :8080 can keep running.
+#
+# For the Mongo-in-a-box rehearsal variants, see docker-compose.local.yml and
+# docker-compose.prod-local.yml.
+# ============================================================================
+
+services:
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: ../aws-deployment/Dockerfile
+    ports:
+      - "5000:5000"
+    # Secrets (MONGODB_URI, JWT keys, ...) are read from the local .env at
+    # runtime — they are never baked into the image.
+    env_file:
+      - ./back-end/.env
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      # In production mode the backend's CORS only accepts these browser
+      # origins (comma-separated): the Docker frontend on :8081 and the Vite
+      # dev server on :8080 for local development.
+      - FRONTEND_URL=http://localhost:8081,http://localhost:8080
+    # User uploads live on the host disk so they survive container rebuilds.
+    volumes:
+      - ./back-end/uploads:/usr/src/app/uploads
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+      # Backend address baked into the build. Empty locally (code falls back
+      # to http://localhost:5000). For AWS, export VITE_API_URL with the real
+      # backend URL (e.g. https://api.example.com/api) before building.
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

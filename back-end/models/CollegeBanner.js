@@ -10,9 +10,14 @@ const collegeBannerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resourceType: {
+    type: String,
+    enum: ['image', 'video'],
+    default: 'image',
+  },
   message: {
     type: String,
-    required: true,
+    default: '',
   },
   isActive: {
     type: Boolean,

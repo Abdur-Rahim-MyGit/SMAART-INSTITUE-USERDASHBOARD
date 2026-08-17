@@ -65,6 +65,8 @@ const Institution = () => {
   }, [id]);
 
   const baseVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
+  // The admin may set a photo instead of a video as the leadership message
+  const isImageMessage = /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(baseVideoUrl);
   const currentVideoUrl = isPlaying
     ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`)
     : baseVideoUrl;
@@ -167,6 +169,12 @@ const Institution = () => {
                       <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#00152E] rounded-2xl">
                         <Loader2 className="w-8 h-8 text-[#002147] dark:text-white animate-spin" />
                       </div>
+                    ) : isImageMessage ? (
+                      <img
+                        src={baseVideoUrl}
+                        alt={t("login.video.iframe_title", "Founder's Message")}
+                        className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                      />
                     ) : (
                       <iframe
                         key={currentVideoUrl}
