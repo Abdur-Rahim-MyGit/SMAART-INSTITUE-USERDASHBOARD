@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { FinalCareerPathwayModel, SkillProgressModel } = require('../models/careerAgentModels');
+const { runModeration, FLAG_SEVERITY } = require('../utils/jobModerationEngine');
 
 const router = express.Router();
 
@@ -726,12 +727,49 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       resumeUrl: bodyResumeUrl
     } = req.body || {};
 
+    // Cover letter is mandatory: at least 50 words, and screened for abusive /
+    // discriminatory language before it reaches recruiters. Only hard blocks
+    // reject — style rules (caps, pronouns) don't apply to personal letters.
+    const letter = (coverLetter || '').trim();
+    const letterWords = letter ? letter.split(/\s+/).filter(Boolean).length : 0;
+    if (letterWords < 50) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please write a cover letter of at least 50 words for this job.',
+      });
+    }
+    if (letter.length > 6000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cover letter is too long (maximum 6000 characters).',
+      });
+    }
+    const moderation = runModeration('', letter);
+    if (moderation.hasHardBlock) {
+      const categories = [...new Set(
+        moderation.flags.filter(f => f.severity === FLAG_SEVERITY.HARD_BLOCK).map(f => f.category)
+      )];
+      return res.status(400).json({
+        success: false,
+        error: `Your cover letter contains language that is not allowed (${categories.join(', ')}). Please rewrite it professionally and try again.`,
+      });
+    }
+
     // If a resume file was uploaded, derive a resumeUrl from the stored file info
     let resumeUrl = bodyResumeUrl || null;
     if (req.file) {
       // For Cloudinary registration storage, multer-storage-cloudinary sets path/secure_url
       resumeUrl = req.file.path || req.file.secure_url || req.file.url || `/uploads/${req.file.filename}`;
       // If Cloudinary stored as 'raw' it may set 'secure_url' or 'path' — above covers common fields
+    }
+
+    // A SMAART-built resume is mandatory — students must complete the resume
+    // builder (Review & Save) before applying.
+    if (!resumeUrl || !String(resumeUrl).trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please build your SMAART resume before applying — it is attached automatically after Review & Save.',
+      });
     }
 
     const application = {
@@ -749,7 +787,7 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       resumeUrl: resumeUrl?.trim() || null,
       portfolioUrl: portfolioUrl?.trim() || null,
       linkedInUrl: linkedInUrl?.trim() || null,
-      coverLetter: coverLetter?.trim() || '',
+      coverLetter: letter,
       activeBacklog: activeBacklog !== undefined && activeBacklog !== '' && activeBacklog !== null ? Number(activeBacklog) : null,
       status: 'applied',
       appliedAt: new Date(),

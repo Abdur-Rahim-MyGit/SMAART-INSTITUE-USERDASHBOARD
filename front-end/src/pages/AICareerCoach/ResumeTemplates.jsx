@@ -36,7 +36,8 @@ const BulletLines = ({ text, style }) => {
 const SkillsLines = ({ skills, labelStyle, textStyle }) => {
     const rows = [
         { label: 'Technical Skills', val: clean(skills?.technical) },
-        { label: 'Soft Skills', val: clean(skills?.soft) },
+        { label: 'Domain Skills', val: clean(skills?.domain) },
+        { label: 'AI Skills', val: clean(skills?.ai) },
         { label: 'Languages', val: clean(skills?.languages) },
     ].filter(r => r.val);
     if (rows.length === 0) return null;
@@ -86,16 +87,18 @@ export const adaptData = (resumeData) => ({
         technical: Array.isArray(resumeData?.skills?.technical)
             ? resumeData.skills.technical.join(', ')
             : resumeData?.skills?.technical || '',
-        soft: Array.isArray(resumeData?.skills?.soft)
-            ? resumeData.skills.soft.join(', ')
-            : resumeData?.skills?.soft || '',
+        domain: Array.isArray(resumeData?.skills?.domain)
+            ? resumeData.skills.domain.join(', ')
+            : resumeData?.skills?.domain || '',
+        ai: Array.isArray(resumeData?.skills?.ai)
+            ? resumeData.skills.ai.join(', ')
+            : resumeData?.skills?.ai || '',
         languages: Array.isArray(resumeData?.skills?.languages)
             ? resumeData.skills.languages.join(', ')
             : resumeData?.skills?.languages || '',
     },
     awards: (resumeData?.achievements || []).map(a => ({
         achievementTitle: a.title || '',
-        link: a.link || '',
         description: a.description || '',
     })),
     extracurricular: '',
@@ -194,7 +197,6 @@ const AwardsSection = ({ awards, extracurricular, sectionHeader, bodyStyle }) =>
                 <div key={i} style={{ marginBottom: '6px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <strong style={{ fontSize: '11px' }}>{a.achievementTitle}</strong>
-                        {clean(a.link) && <span style={{ fontSize: '10px', ...bodyStyle }}>{a.link}</span>}
                     </div>
                     {clean(a.description) && <div style={{ fontSize: '10.5px', ...bodyStyle }}>{a.description}</div>}
                 </div>
@@ -262,7 +264,7 @@ export const ClassicBW = ({ data, watermark, footer }) => {
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
             {/* Skills */}
-            {(clean(skills?.technical) || clean(skills?.soft) || clean(skills?.languages)) && (
+            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />
@@ -324,7 +326,7 @@ export const NavySerif = ({ data, watermark, footer }) => {
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.soft) || clean(skills?.languages)) && (
+            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold', color: navy }} textStyle={{ fontSize: '10.5px', ...body }} />
@@ -391,7 +393,7 @@ export const CharcoalCentered = ({ data, watermark, footer }) => {
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.soft) || clean(skills?.languages)) && (
+            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />
@@ -453,7 +455,7 @@ export const ForestFormal = ({ data, watermark, footer }) => {
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.soft) || clean(skills?.languages)) && (
+            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
                 <section style={{ marginBottom: '10px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold', color: green }} textStyle={{ fontSize: '10.5px', ...body }} />
@@ -515,7 +517,7 @@ export const MinimalModern = ({ data, watermark, footer }) => {
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.soft) || clean(skills?.languages)) && (
+            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
                 <section style={{ marginBottom: '14px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />

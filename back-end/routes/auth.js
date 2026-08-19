@@ -1113,12 +1113,15 @@ router.post('/resend-login-otp', async (req, res) => {
     // Send new OTP email
     const emailResult = await sendOTPEmail(loginOtp.email, otp, loginOtp.userData?.user?.fullName);
 
-    if (!emailResult.success) {
-      return res.status(500).json({ error: 'Failed to send OTP email. Please try again.' });
-    }
-
+    // The temp token was rotated above, so the client must receive the new one
+    // even when delivery fails — otherwise it keeps a token that no longer
+    // matches and the code can never be verified, stranding the login. The
+    // login route behaves the same way when the OTP email cannot be sent.
     res.json({
-      message: 'New OTP sent to your email',
+      message: emailResult.success
+        ? 'New OTP sent to your email'
+        : 'New code generated, but the email could not be delivered.',
+      emailDelivered: !!emailResult.success,
       tempToken: newTempToken,
     });
   } catch (err) {

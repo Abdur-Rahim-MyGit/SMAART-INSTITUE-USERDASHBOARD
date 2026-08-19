@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
@@ -12,7 +13,8 @@ import {
   IconFingerprint as Brain,
   IconCpu as Bot,
   IconInfinity as Leaf,
-  IconLock as LockIcon
+  IconLock as LockIcon,
+  IconBriefcase as Briefcase
 } from "@tabler/icons-react";
 import { GraduationCap } from "lucide-react";
 import { toast } from "sonner";
@@ -219,6 +221,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               {track.id === 'PIQ' && <Brain stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
               {track.id === 'AIQ' && <Bot stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
               {track.id === 'SQ' && <Leaf stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'English for Work' && <Briefcase stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -553,7 +556,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     const hasPIQ = !isStudent ? true : (plan === 'Smaart Complete' || !!addons?.piq);
     const hasAIQ = !isStudent ? true : (addons?.aiq !== undefined ? !!addons?.aiq : true);
     const hasSQ = !isStudent ? true : (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq);
-    const hasBC = !isStudent ? true : !!addons?.britishCouncil;
+    const hasBC = true; // Always show British Council card
 
     const filterTrackList = (tracks) => {
       const filtered = [];
@@ -632,15 +635,15 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         icon: '🌱',
       },
       {
-        id: 'British Council',
-        name: t("my_courses_page.british_council_title", 'British Council English'),
-        shortName: 'BC',
-        description: t("my_courses_page.british_council_desc", 'Develop English communication skills with British Council certified courses'),
+        id: 'English for Work',
+        name: t("my_courses_page.english_for_work_title", 'English for Work'),
+        shortName: 'English for Work',
+        description: t("my_courses_page.english_for_work_desc", 'Develop professional English communication skills for the workplace'),
         color: '#EC4899',
         courses: [],
         totalCourses: 0,
         unlockAfter: 'S01',
-        icon: '🇬🇧',
+        icon: '💼',
       },
     ];
 
@@ -753,7 +756,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
 
     return {
       activeStages: templateStages.filter(s => s.courses.length > 0),
-      activeTracks: filteredTracks.filter(t => t.courses.length > 0)
+      activeTracks: filteredTracks.filter(t => t.courses.length > 0 || t.id === 'English for Work')
     };
   }, [dbCourses, t, user]);
 
@@ -862,7 +865,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                     <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    {activeTracks.map((track, i) => {
+                    {activeTracks.filter(t => t.id !== 'English for Work').map((track, i) => {
                       const unlocked = checkTrackUnlocked(track, userProgress);
                       const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
 
@@ -881,6 +884,34 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                     })}
                   </div>
                 </div>
+
+                {activeTracks.some(t => t.id === 'English for Work') && (
+                  <div className="mt-8">
+                    <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
+                      {t("my_courses_page.english_for_work_title", "English for Work")}
+                      <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                      {activeTracks.filter(t => t.id === 'English for Work').map((track, i) => {
+                        const unlocked = checkTrackUnlocked(track, userProgress);
+                        const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+
+                        return (
+                          <TrackCard
+                            key={track.id}
+                            track={track}
+                            isUnlocked={unlocked}
+                            completedCount={completed}
+                            delay={0.6 + (i * 0.1)}
+                            onClick={() => {
+                              setSelectedStageId(track.id);
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ) : (
               /* Stage/Track detail view */

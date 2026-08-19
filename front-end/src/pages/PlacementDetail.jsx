@@ -22,6 +22,7 @@ import {
   IconGitBranch as GitBranch,
   IconWand as Wand,
   IconX as X,
+  IconGift as Gift,
   IconFileDescription as FileDescription
 } from "@tabler/icons-react";
 import { getBackendUrl, placementsAPI } from "@/services/api";
@@ -69,6 +70,15 @@ const getDescription = (job, t) => {
   if (!value) return t("placement.no_description", "No detailed job description has been added yet.");
   if (Array.isArray(value)) return value.join("\n");
   return String(value);
+};
+
+// Perks the recruiter typed when posting. Absent on most older postings, so
+// the section only renders when there is something to show.
+const getBenefits = (job) => {
+  const value = job?.benefits || job?.perks;
+  if (!value) return null;
+  if (Array.isArray(value)) return value.filter(Boolean).join("\n") || null;
+  return String(value).trim() || null;
 };
 
 const getSkills = (job) => {
@@ -126,6 +136,7 @@ const PlacementDetail = () => {
   const [job, setJob] = useState(location.state?.job || null);
   const [loading, setLoading] = useState(!location.state?.job);
   const [applyOpen, setApplyOpen] = useState(false);
+  const [showCoverExample, setShowCoverExample] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [buildResumeOpen, setBuildResumeOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -347,6 +358,9 @@ const PlacementDetail = () => {
       { label: t("placement.label_package", "Package"), value: job.displaySalary || job.salaryPackage || job.ctc || job.package, icon: Tag },
       { label: t("placement.label_work_mode", "Work Mode"), value: job.workMode, icon: Briefcase },
       ...(job.experience ? [{ label: t("placement.label_experience", "Experience"), value: job.experience, icon: Star }] : []),
+      ...((job.branch || job.branchName) ? [{ label: t("placement.label_branch", "Branch"), value: job.branch || job.branchName, icon: Building }] : []),
+      ...(job.jobId ? [{ label: t("placement.label_job_id", "Job ID"), value: job.jobId, icon: Tag }] : []),
+      ...(job.postedByBranchId ? [{ label: t("placement.label_posting_branch", "Posting Branch"), value: job.postedByBranchId, icon: Building }] : []),
     ];
   }, [job, t]);
 
@@ -419,6 +433,34 @@ const PlacementDetail = () => {
     return () => { mounted = false; };
   }, [applyOpen]);
 
+  // A resume is attached PER JOB, and only after Review & Save from this job's
+  // builder — an old export never auto-attaches. Restore this job's attachment
+  // (kept until the application is submitted); reset when viewing another job.
+  useEffect(() => {
+    let url = null;
+    try {
+      const saved = localStorage.getItem(`smaartResumeAttached:${source}:${id}`);
+      if (saved) url = JSON.parse(saved)?.url || null;
+    } catch {
+      // storage unavailable — treat as not attached
+    }
+    setApplicationForm((prev) => ({ ...prev, resumeUrl: url, resumeFile: null }));
+  }, [source, id]);
+
+  // Restore any saved cover-letter draft for this job when the modal opens.
+  useEffect(() => {
+    if (!applyOpen) return;
+    try {
+      const draft = localStorage.getItem(`coverLetterDraft:${source}:${id}`);
+      if (draft) {
+        setApplicationForm((prev) => (prev.coverLetter ? prev : { ...prev, coverLetter: draft }));
+      }
+    } catch {
+      // storage unavailable — draft simply not restored
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applyOpen]);
+
   if (loading) {
     return (
       <div className="mx-auto mt-8 max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
@@ -468,8 +510,43 @@ const PlacementDetail = () => {
 
 
 
+  const coverLetterWords = (applicationForm.coverLetter || "").trim()
+    ? applicationForm.coverLetter.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+
+  const exampleCoverLetter = `Dear Hiring Team at ${job.displayCompany || "the company"},
+
+I am writing to apply for the ${job.displayTitle || "advertised"} position. Through my coursework, projects and hands-on practice I have built a strong foundation in the core skills this role expects.
+
+In my recent project work I applied [your key skills — e.g. Java, SQL, problem-solving] to deliver real, working results, and I have completed SMAART's Human Intelligence courses that strengthen the way I communicate, manage my time and think critically.
+
+What draws me to ${job.displayCompany || "your company"} is the opportunity to learn from a professional team while contributing from day one. I am disciplined, quick to learn, and serious about building my career in this field.
+
+I would welcome the opportunity to discuss how I can contribute to your team. Thank you for your time and consideration.
+
+Sincerely,
+${applicationForm.fullName || "Your Name"}`;
+
   const handleApplicationSubmit = (event) => {
     event.preventDefault();
+    if (!applicationForm.resumeUrl) {
+      toast({
+        title: t("placement.build_resume_first_title", "Build your SMAART resume first"),
+        description: t("placement.build_resume_first_desc", "Complete Review & Save — your resume will be attached to this application automatically."),
+        variant: "destructive",
+      });
+      setApplyOpen(false);
+      setBuildResumeOpen(true);
+      return;
+    }
+    if (coverLetterWords < 50) {
+      toast({
+        title: t("placement.cover_letter_required_title", "Cover letter needed"),
+        description: t("placement.cover_letter_required_desc", "Please write at least 50 words about why you fit this role before submitting."),
+        variant: "destructive",
+      });
+      return;
+    }
     setTermsOpen(true);
   };
 
@@ -478,24 +555,10 @@ const PlacementDetail = () => {
     setSubmitting(true);
     try {
       let applyResp = null;
-      // If a resume file is attached, submit as FormData so backend can receive the file
-      if (applicationForm.resumeFile instanceof File) {
-        const formData = new FormData();
-        formData.append('fullName', applicationForm.fullName || '');
-        formData.append('email', applicationForm.email || '');
-        formData.append('mobile', applicationForm.mobile || '');
-        formData.append('coverLetter', applicationForm.coverLetter || '');
-        formData.append('resume', applicationForm.resumeFile);
-        if (applicationForm.activeBacklog !== undefined && applicationForm.activeBacklog !== null && applicationForm.activeBacklog !== "") {
-          formData.append('activeBacklog', applicationForm.activeBacklog);
-        }
-        applyResp = await placementsAPI.applyJob(source, id, formData);
-      } else {
-        // Remove any file property before sending JSON
-        const payload = { ...applicationForm };
-        delete payload.resumeFile;
-        applyResp = await placementsAPI.applyJob(source, id, payload);
-      }
+      // The SMAART-built resume is always attached as a URL — no file uploads.
+      const payload = { ...applicationForm };
+      delete payload.resumeFile;
+      applyResp = await placementsAPI.applyJob(source, id, payload);
       // Try to capture application id from apply response, or poll the list endpoint as confirmation.
       try {
         let possibleId = null;
@@ -545,6 +608,10 @@ const PlacementDetail = () => {
         title: t("placement.success_submit_title", "Application submitted"),
         description: t("placement.success_submit_desc", { title: job.displayTitle, defaultValue: "Your application for {{title}} has been sent." }),
       });
+      try {
+        localStorage.removeItem(`coverLetterDraft:${source}:${id}`);
+        localStorage.removeItem(`smaartResumeAttached:${source}:${id}`);
+      } catch { /* ignore */ }
       setApplyOpen(false);
     } catch (error) {
       toast({
@@ -650,7 +717,18 @@ const PlacementDetail = () => {
                       </button>
                   )}
                   <button
-                    onClick={() => setApplyOpen(true)}
+                    onClick={() => {
+                      if (applicationForm.resumeUrl) {
+                        setApplyOpen(true);
+                      } else {
+                        // SMAART resume is mandatory — route through the builder first.
+                        toast({
+                          title: t("placement.build_resume_first_title", "Build your SMAART resume first"),
+                          description: t("placement.build_resume_first_desc", "Complete Review & Save — your resume will be attached to this application automatically."),
+                        });
+                        setBuildResumeOpen(true);
+                      }
+                    }}
                     disabled={hasApplied}
                     className={`flex h-9 w-full flex-1 items-center justify-center rounded-lg px-5 text-[13px] font-medium text-white transition-colors sm:w-auto sm:flex-initial ${hasApplied ? 'cursor-not-allowed bg-slate-300 dark:bg-slate-700' : 'bg-[#0d1f4e] hover:bg-[#1a3884] active:scale-[0.98]'}`}
                   >
@@ -812,6 +890,20 @@ const PlacementDetail = () => {
                 </div>
               </div>
 
+              {getBenefits(job) && (
+                <div>
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <Gift stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
+                    {t("placement.benefits", "Benefits & Perks")}
+                  </h2>
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                    <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+                      {getBenefits(job)}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {eligibility && (
                 <div>
                   <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
@@ -836,7 +928,55 @@ const PlacementDetail = () => {
                 </div>
               )}
 
+              {/* ── Project Domains ───────────────────────────────────── */}
+              {Array.isArray(job.projectDomains) && job.projectDomains.length > 0 && (
+                <div>
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <Briefcase stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
+                    {t("placement.project_domains", "Project Domains")}
+                  </h2>
+                  <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
+                    {t("placement.project_domains_hint", "Areas of work this role involves.")}
+                  </p>
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                    <div className="flex flex-wrap gap-2">
+                      {job.projectDomains.map((d, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center rounded-lg border border-[#1a3884]/15 bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#1a3884] dark:border-blue-400/25 dark:bg-[#001630] dark:text-blue-300"
+                        >
+                          {d}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
+              {/* ── SMAART Course Skills ──────────────────────────────── */}
+              {Array.isArray(job.courseSkills) && job.courseSkills.length > 0 && (
+                <div>
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">
+                    <Book stroke={1.7} className="h-[18px] w-[18px] text-[#1a3884] dark:text-blue-400" />
+                    {t("placement.course_skills", "Human Intelligence Courses")}
+                  </h2>
+                  <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
+                    {t("placement.course_skills_hint", "Courses from your Human Intelligence programme this role expects you to have completed.")}
+                  </p>
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#1a3884]/25 dark:bg-[#001a3d]">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {job.courseSkills.map((c, i) => (
+                        <div key={c._id || i} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5 dark:border-[#1a3884]/30 dark:bg-[#001630]">
+                          <div className="min-w-0">
+                            <p className="truncate text-[13px] font-semibold text-[#0d1f4e] dark:text-white">{c.title}</p>
+                            {c.category && <p className="text-[11px] text-slate-400">{c.category}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* ── Skill Gap Section ─────────────────────────────────── */}
               {hasSkillGap && (
@@ -1019,48 +1159,62 @@ const PlacementDetail = () => {
                 </div>
               </label>
 
-              <label className="space-y-1.5 sm:col-span-2">
+              <div className="space-y-1.5 sm:col-span-2">
                 <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.resume", "Resume")}</span>
-                <div className="flex items-center gap-3">
-                  <input
-                    id="resumeFileInput"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => {
-                      updateApplicationField('resumeFile', e.target.files && e.target.files[0] ? e.target.files[0] : null);
-                      updateApplicationField('resumeUrl', null);
-                    }}
-                    className="hidden"
-                  />
-                  {!applicationForm.resumeFile && !applicationForm.resumeUrl ? (
-                    <label
-                      htmlFor="resumeFileInput"
-                      className="inline-flex h-10 w-full cursor-pointer items-center justify-start rounded-lg border border-dashed border-slate-300 bg-white px-3.5 text-[13.5px] font-medium text-[#0d1f4e] transition-colors hover:border-[#1a3884]/50 hover:bg-[#f5f8ff] dark:border-[#1a3884]/40 dark:bg-[#001a3d] dark:text-slate-200"
-                    >
-                      <UploadIcon className="mr-2 h-4 w-4 text-slate-400" stroke={1.7} />
-                      <span>{t("placement.upload_resume", "Upload Resume")}</span>
-                    </label>
-                  ) : (
-                    <div className="inline-flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 text-[13px] font-medium text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
-                      <div className="flex items-center gap-2">
-                          <Checkbox className="h-4 w-4 text-emerald-600" stroke={1.8} />
-                          <span>{applicationForm.resumeUrl ? t("placement.smaart_resume_attached", "SMAART Resume Attached") : t("placement.uploaded", "Uploaded")}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                            updateApplicationField('resumeFile', null);
-                            updateApplicationField('resumeUrl', null);
-                        }}
-                        aria-label="Remove uploaded resume"
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-emerald-700 hover:bg-emerald-100"
-                      >
-                        <XIcon className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
+                <div className="inline-flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 text-[13px] font-medium text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
+                  <div className="flex items-center gap-2">
+                    <Checkbox className="h-4 w-4 text-emerald-600" stroke={1.8} />
+                    <span>{t("placement.smaart_resume_attached", "SMAART Resume Attached")}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setApplyOpen(false); setBuildResumeOpen(true); }}
+                    className="text-[12px] font-semibold text-emerald-700 underline-offset-2 hover:underline dark:text-emerald-400"
+                  >
+                    {t("placement.change_resume", "Change")}
+                  </button>
                 </div>
-              </label>
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">
+                    {t("placement.cover_letter", "Cover Letter")} <span className="text-red-400">*</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowCoverExample((v) => !v)}
+                    className="text-[12px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
+                  >
+                    {showCoverExample ? t("placement.hide_example", "Hide Example") : t("placement.view_example", "View Example")}
+                  </button>
+                </div>
+
+                {showCoverExample && (
+                  <div className="whitespace-pre-wrap rounded-lg border border-[#d8e6f7] bg-[#f5f8ff] p-4 text-[12.5px] leading-relaxed text-slate-600 dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-slate-300">
+                    {exampleCoverLetter}
+                  </div>
+                )}
+
+                <textarea
+                  required
+                  rows={7}
+                  value={applicationForm.coverLetter}
+                  onChange={(event) => {
+                    updateApplicationField("coverLetter", event.target.value);
+                    try { localStorage.setItem(`coverLetterDraft:${source}:${id}`, event.target.value); } catch { /* ignore */ }
+                  }}
+                  placeholder={t("placement.cover_letter_placeholder", "Explain why you are a strong fit for this role — your relevant skills, projects and what you can contribute…")}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] leading-relaxed text-slate-900 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white"
+                />
+
+                <div className="flex items-center justify-between text-[11.5px]">
+                  <span className={coverLetterWords < 50 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"}>
+                    {coverLetterWords} {t("placement.words", "words")}{coverLetterWords < 50 ? ` — ${t("placement.min_words", "minimum 50")}` : ""}
+                  </span>
+                  <span className="text-slate-400">{t("placement.cover_letter_guide", "Recommended 150 – 400 words")}</span>
+                </div>
+              </div>
             </div>
 
 
@@ -1159,9 +1313,13 @@ const PlacementDetail = () => {
                       if (builtData && builtData.url) {
                           updateApplicationField('resumeUrl', builtData.url);
                           updateApplicationField('resumeFile', null);
+                          // Remember the attachment for THIS job until the application is submitted.
+                          try {
+                              localStorage.setItem(`smaartResumeAttached:${source}:${id}`, JSON.stringify({ url: builtData.url, publicId: builtData.publicId || '', ts: Date.now() }));
+                          } catch { /* ignore */ }
                           setApplyOpen(true);
                       }
-                  }} 
+                  }}
               />
             </div>
           </div>
