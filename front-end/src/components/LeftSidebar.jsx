@@ -107,7 +107,14 @@ const menuGroups = [
   }
 ];
 
-
+// Auth headers helper (outside component so it's a stable reference)
+const getAuthHeaders = () => {
+  const token = sessionStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
 
 const LeftSidebar = () => {
   const location = useLocation();
@@ -201,14 +208,6 @@ const LeftSidebar = () => {
   const [notifLoading, setNotifLoading] = useState(false);
   const notificationRef = useRef(null);
 
-  // Auth headers helper
-  const getAuthHeaders = () => {
-    const token = sessionStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-  };
 
   // Fetch notifications
   useEffect(() => {
@@ -235,30 +234,30 @@ const LeftSidebar = () => {
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
+    const fetchNotifications = async () => {
+      setNotifLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
+          headers: getAuthHeaders()
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setNotifications(data.notifications || []);
+            setUnreadCount(data.unreadCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      } finally {
+        setNotifLoading(false);
+      }
+    };
+
     if (notificationOpen) {
       fetchNotifications();
     }
   }, [notificationOpen]);
-
-  const fetchNotifications = async () => {
-    setNotifLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setNotifications(data.notifications || []);
-          setUnreadCount(data.unreadCount || 0);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-    } finally {
-      setNotifLoading(false);
-    }
-  };
 
   const markAllRead = async () => {
     try {
@@ -383,7 +382,7 @@ const LeftSidebar = () => {
             </div>
 
             {/* Mobile Menu Items */}
-            <div className="flex-1 overflow-y-auto py-4 px-3">
+            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide">
               {displayMenuGroups.map((group, groupIndex) => (
                 <div key={group.title} className="mb-6">
                   <p className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
@@ -549,7 +548,7 @@ const LeftSidebar = () => {
         </div>
 
         {/* Menu Items */}
-        <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-hide">
           {displayMenuGroups.map((group) => (
             <div key={group.title} className="mb-3">
               {/* Group Title */}
