@@ -4,6 +4,7 @@
     "profile": "ਮੇਰਾ ਪ੍ਰੋਫ਼ਾਈਲ",
     "settings": "ਸੈਟਿੰਗਾਂ ਸੈਟਿੰਗਾਂ",
     "courses": "ਮੇਰੇ ਕੋਰਸ ਮੇਰੇ ਕੋਰਸ",
+    "british_council": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ",
     "results": "ਨਤੀਜੇ",
     "assessments": "ਮੁਲਾਂਕਣ",
     "toolkit": "ਟੂਲਕਿੱਟ",
@@ -645,8 +646,30 @@
         "name": "ਸਥਿਰਤਾ ਭਾਗ",
         "shortName": "SQ",
         "description": "ਨੈਤਿਕ ਸੋਚ ਅਤੇ ਸਥਿਰਤਾ ਜਾਗਰੂਕਤਾ ਪੈਦਾ ਕਰੋ"
+      },
+      "BC": {
+        "name": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ ਅੰਗਰੇਜ਼ੀ",
+        "shortName": "BC",
+        "description": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ ਪ੍ਰਮਾਣਿਤ ਕੋਰਸਾਂ ਨਾਲ ਅੰਗਰੇਜ਼ੀ ਸੰਚਾਰ ਹੁਨਰ ਵਿਕਸਿਤ ਕਰੋ"
       }
-    }
+    },
+    "locked_toast": "ਇਸ ਕੋਰਸ ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਪਿਛਲੇ ਪੜਾਅ ਪੂਰੇ ਕਰੋ।",
+    "course_locked_toast": "ਇਸ ਮੋਡੀਊਲ ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਪਿਛਲਾ ਕੋਰਸ ਪੂਰਾ ਕਰੋ।",
+    "complete_t1_title": "ਆਪਣਾ T1 ਬੇਸਲਾਈਨ ਮੁਲਾਂਕਣ ਪੂਰਾ ਕਰੋ",
+    "complete_t2_title": "ਆਪਣਾ T2 ਇੰਟਰਮੀਡੀਏਟ ਮੁਲਾਂਕਣ ਪੂਰਾ ਕਰੋ",
+    "complete_t3_title": "ਆਪਣਾ T3 ਐਡਵਾਂਸਡ ਮੁਲਾਂਕਣ ਪੂਰਾ ਕਰੋ",
+    "complete_t4_title": "ਆਪਣਾ T4 ਅੰਤਿਮ ਮੁਲਾਂਕਣ ਪੂਰਾ ਕਰੋ",
+    "start_assessment_for": "{{stage}} ਮੁਲਾਂਕਣ ਸ਼ੁਰੂ ਕਰੋ",
+    "start_assessment": "ਮੁਲਾਂਕਣ ਸ਼ੁਰੂ ਕਰੋ",
+    "course_closed_title": "ਕੋਰਸ ਬੰਦ ਕੀਤਾ ਗਿਆ",
+    "course_closed_desc": "ਵਾਰ-ਵਾਰ ਟੈਬ ਬਦਲਣ ਕਾਰਨ ਤੁਹਾਡਾ ਕੋਰਸ ਸੈਸ਼ਨ ਆਪਣੇ ਆਪ ਬੰਦ ਕਰ ਦਿੱਤਾ ਗਿਆ।",
+    "explore_courses": "ਕੋਰਸ ਖੋਜੋ",
+    "back_to_dashboard": "ਡੈਸ਼ਬੋਰਡ 'ਤੇ ਵਾਪਸ ਜਾਓ",
+    "next_step": "ਅਗਲਾ ਕਦਮ",
+    "continue_learning": "ਸਿੱਖਣਾ ਜਾਰੀ ਰੱਖੋ",
+    "british_council_title": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ ਅੰਗਰੇਜ਼ੀ",
+    "british_council_desc": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ ਪ੍ਰਮਾਣਿਤ ਕੋਰਸਾਂ ਨਾਲ ਅੰਗਰੇਜ਼ੀ ਸੰਚਾਰ ਹੁਨਰ ਵਿਕਸਿਤ ਕਰੋ",
+    "british_council_section_title": "ਬ੍ਰਿਟਿਸ਼ ਕੌਂਸਲ"
   },
   "course_player": {
     "stages": {
@@ -718,7 +741,17 @@
     "step_by_step_progress": "ਕਦਮ-ਦਰ-ਕਦਮ ਤਰੱਕੀ",
     "engagement_monitor": "ਰੁਝੇਵੇਂ ਦੀ ਨਿਗਰਾਨੀ",
     "live_monitor": "ਲਾਈਵ ਮਾਨੀਟਰ",
-    "secure_session_protocol": "ਸੁਰੱਖਿਅਤ ਸੈਸ਼ਨ ਪ੍ਰੋਟੋਕੋਲ ਸ਼ੁਰੂ ਹੋਇਆ।"
+    "secure_session_protocol": "ਸੁਰੱਖਿਅਤ ਸੈਸ਼ਨ ਪ੍ਰੋਟੋਕੋਲ ਸ਼ੁਰੂ ਹੋਇਆ।",
+    "locked_toast": "ਇਹ ਕੋਰਸ ਲੌਕ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਪੂਰਵ-ਸ਼ਰਤਾਂ ਪੂਰੀਆਂ ਕਰੋ।",
+    "step_why": "ਕਿਉਂ",
+    "step_story": "ਕਹਾਣੀ",
+    "notes": "ਨੋਟਸ",
+    "framework_diagram": "ਫਰੇਮਵਰਕ ਡਾਇਗ੍ਰਾਮ",
+    "micro_assessment": "ਮਾਈਕਰੋ-ਮੁਲਾਂਕਣ",
+    "self_reflection_video": "ਸਵੈ-ਪ੍ਰਤੀਬਿੰਬ ਵੀਡੀਓ",
+    "congratulations_exclaim": "ਵਧਾਈਆਂ!",
+    "badge_unlocked": "ਤੁਸੀਂ ਇਹ ਬੈਜ ਅਨਲੌਕ ਕਰ ਲਿਆ ਹੈ",
+    "sign_in_for_quiz": "ਇਹ ਮਾਈਕਰੋ-ਮੁਲਾਂਕਣ ਲੈਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ। ਜੇ ਤੁਸੀਂ ਪਹਿਲਾਂ ਹੀ ਸਾਈਨ ਇਨ ਹੋ, ਤਾਂ ਹੋ ਸਕਦਾ ਹੈ ਇਹ ਕਵਿਜ਼ ਅਜੇ ਪ੍ਰਕਾਸ਼ਿਤ ਨਾ ਹੋਇਆ ਹੋਵੇ।"
   },
   "my_assessments": {
     "page_title": "ਮੇਰੇ ਮੁਲਾਂਕਣ",

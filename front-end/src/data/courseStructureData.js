@@ -59,6 +59,14 @@ export const SQ_TRACK = [
   { id: 'SQ05', title: 'Global Citizenship', subtitle: 'Thinking beyond borders and generations' },
 ];
 
+export const BC_TRACK = [
+  { id: 'BC01', title: 'Professional English Foundations', subtitle: 'Core grammar, vocabulary, and sentence structures' },
+  { id: 'BC02', title: 'Workplace Communication & Speaking', subtitle: 'Fluent speaking, presentations, and active listening' },
+  { id: 'BC03', title: 'Business Writing & Email Etiquette', subtitle: 'Clear, concise, and professional written communication' },
+  { id: 'BC04', title: 'Advanced Conversation & Pronunciation', subtitle: 'Accent refinement, idiom usage, and nuance' },
+  { id: 'BC05', title: 'Corporate English & Global Leadership', subtitle: 'Executive communication and cross-cultural fluency' },
+];
+
 export const STAGES = [
   {
     id: 1,
@@ -125,6 +133,17 @@ export const TRACKS = [
     totalCourses: 5,
     unlockAfter: 'S21', // Unlocks after completing S21
     icon: '🌱',
+  },
+  {
+    id: 'BC',
+    name: 'English Course',
+    shortName: 'English Course',
+    description: 'Develop English communication skills with certified interactive modules',
+    color: '#0284c7', // Blue
+    courses: BC_TRACK,
+    totalCourses: 5,
+    unlockAfter: 'S01',
+    icon: '🇬🇧',
   },
 ];
 

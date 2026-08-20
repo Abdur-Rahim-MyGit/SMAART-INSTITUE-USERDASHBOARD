@@ -4,6 +4,7 @@
     "profile": "Mon profil",
     "settings": "Paramètres",
     "courses": "Mes cours",
+    "british_council": "British Council",
     "results": "Résultats",
     "assessments": "Évaluations",
     "toolkit": "Boîte à outils",
@@ -645,8 +646,30 @@
         "name": "Quotient de Durabilité",
         "shortName": "SQ",
         "description": "Développez la réflexion éthique et la sensibilisation au développement durable"
+      },
+      "BC": {
+        "name": "Anglais British Council",
+        "shortName": "BC",
+        "description": "Développez vos compétences en communication anglaise avec des cours certifiés British Council"
       }
-    }
+    },
+    "locked_toast": "Veuillez terminer les étapes précédentes pour débloquer ce cours.",
+    "course_locked_toast": "Veuillez d'abord terminer le cours précédent pour débloquer ce module.",
+    "complete_t1_title": "Complétez votre évaluation de référence T1",
+    "complete_t2_title": "Complétez votre évaluation intermédiaire T2",
+    "complete_t3_title": "Complétez votre évaluation avancée T3",
+    "complete_t4_title": "Complétez votre évaluation finale T4",
+    "start_assessment_for": "Démarrer l'évaluation {{stage}}",
+    "start_assessment": "Démarrer l'évaluation",
+    "course_closed_title": "Cours fermé",
+    "course_closed_desc": "Votre session de cours a été automatiquement fermée en raison de changements d'onglets répétés.",
+    "explore_courses": "Explorer les cours",
+    "back_to_dashboard": "Retour au tableau de bord",
+    "next_step": "Étape suivante",
+    "continue_learning": "Continuer l'apprentissage",
+    "british_council_title": "Anglais British Council",
+    "british_council_desc": "Développez vos compétences en communication anglaise avec des cours certifiés British Council",
+    "british_council_section_title": "British Council"
   },
   "course_player": {
     "stages": {
@@ -718,7 +741,17 @@
     "step_by_step_progress": "Progression étape par étape",
     "engagement_monitor": "Moniteur d'engagement",
     "live_monitor": "Moniteur en direct",
-    "secure_session_protocol": "Protocole de session sécurisé initialisé."
+    "secure_session_protocol": "Protocole de session sécurisé initialisé.",
+    "locked_toast": "Ce cours est verrouillé. Veuillez d'abord remplir les prérequis.",
+    "step_why": "Pourquoi",
+    "step_story": "Histoire",
+    "notes": "Notes",
+    "framework_diagram": "Diagramme du cadre",
+    "micro_assessment": "Micro-évaluation",
+    "self_reflection_video": "Vidéo d'auto-réflexion",
+    "congratulations_exclaim": "Félicitations !",
+    "badge_unlocked": "Vous avez débloqué ce badge",
+    "sign_in_for_quiz": "Connectez-vous pour passer cette micro-évaluation. Si vous êtes déjà connecté, ce quiz n'est peut-être pas encore publié."
   },
   "my_assessments": {
     "page_title": "MES ÉVALUATIONS",

@@ -3,6 +3,7 @@ import apiCall, { coursesAPI, courseEnrollmentAPI } from '@/services/api';
 import { assessmentApi } from '@/services/assessmentApi';
 import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from '@/data/courseStructureData';
 import { compareCourseIds } from '@/utils/courseUnlock';
+import { getCompletedCourseIds } from '@/utils/courseProgressStorage';
 
 export const useLearningPaths = (userId) => {
   const [paths, setPaths] = useState([]);
@@ -20,11 +21,6 @@ export const useLearningPaths = (userId) => {
         let resolvedPaths = [];
 
         // ── Fire independent API calls concurrently ────────────────────────────
-        const token = sessionStorage.getItem('token');
-        
-        console.log('⏱️ [useLearningPaths] Starting API calls...');
-        const startTime = Date.now();
-        
         const [
           finalPathwayRes,
           statusRes,
@@ -32,61 +28,17 @@ export const useLearningPaths = (userId) => {
           allPublishedRes
         ] = await Promise.allSettled([
           // 1. Final Pathway
-          (async () => {
-            console.time('API: final-pathway');
-            try {
-              const res = await apiCall('/career-agent/final-pathway');
-              console.timeEnd('API: final-pathway');
-              return res;
-            } catch (err) {
-              console.timeEnd('API: final-pathway');
-              throw err;
-            }
-          })(),
+          apiCall('/career-agent/final-pathway'),
 
           // 2. Assessment Status
-          (async () => {
-            if (!userId) return null;
-            console.time('API: stage-status');
-            try {
-              const res = await assessmentApi.getStageStatus(userId);
-              console.timeEnd('API: stage-status');
-              return res;
-            } catch (err) {
-              console.timeEnd('API: stage-status');
-              throw err;
-            }
-          })(),
+          userId ? assessmentApi.getStageStatus(userId) : Promise.resolve(null),
 
           // 3. Enrollments
-          (async () => {
-            if (!userId) return null;
-            console.time('API: enrollments');
-            try {
-              const res = await courseEnrollmentAPI.getByStudent(userId);
-              console.timeEnd('API: enrollments');
-              return res;
-            } catch (err) {
-              console.timeEnd('API: enrollments');
-              throw err;
-            }
-          })(),
+          userId ? courseEnrollmentAPI.getByStudent(userId) : Promise.resolve(null),
 
           // 4. Published Courses (often needed for nextCourse)
-          (async () => {
-            if (!userId) return null;
-            console.time('API: getPublished');
-            try {
-              const res = await coursesAPI.getPublished();
-              console.timeEnd('API: getPublished');
-              return res;
-            } catch (err) {
-              console.timeEnd('API: getPublished');
-              throw err;
-            }
-          })()
+          userId ? coursesAPI.getPublished() : Promise.resolve(null),
         ]);
-        console.log(`⏱️ [useLearningPaths] All API calls finished in ${Date.now() - startTime}ms`);
 
         // ── Priority 1: Career Directions from Career Agent Analysis ──────────
         if (finalPathwayRes.status === 'fulfilled' && finalPathwayRes.value?.found && finalPathwayRes.value?.output_data) {
@@ -94,7 +46,6 @@ export const useLearningPaths = (userId) => {
           const analysis = payload.output_data;
           const input_data = payload.input_data;
           const preferences = input_data?.preferences || {};
-          const isLocked = !payload.is_locked;
 
           const getDirectionName = (analysisPath, prefPref, localKey) => {
             return (
@@ -267,10 +218,10 @@ export const useLearningPaths = (userId) => {
             }
           }
         });
-        const lsCompleted = localStorage.getItem('smaart_completed_courses');
-        if (lsCompleted) {
-          try { JSON.parse(lsCompleted).forEach(id => completedIds.add(String(id).toUpperCase())); } catch { }
-        }
+        // Use the user-scoped storage helper (not the raw legacy key) so a
+        // completion marker from a different student on a shared/lab
+        // computer can't leak into this user's "next course" computation.
+        getCompletedCourseIds().forEach(id => completedIds.add(String(id).toUpperCase()));
 
         const FULL_SEQUENCE = [
           ...STAGE_1_COURSES,

@@ -31,6 +31,7 @@ import {
   IconSun as Sun,
   IconMoon as Moon,
   IconAlertTriangle as ShieldAlert,
+  IconLanguage as BritishCouncilIcon,
 } from "@tabler/icons-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -71,6 +72,7 @@ const menuGroups = [
     items: [
       { icon: LayoutDashboard, label: "sidebar.dashboard", path: "/dashboard", badge: null },
       { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
+      { icon: BritishCouncilIcon, label: "sidebar.british_council", path: "/dashboard/british-council", badge: null },
       { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
       { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
       { icon: Briefcase, label: "sidebar.placement", path: "/dashboard/placement", badge: null },

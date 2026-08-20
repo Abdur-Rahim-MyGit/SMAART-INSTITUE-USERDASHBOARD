@@ -1,11 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import {
   IconPlayerPlayFilled as RiPlayFill,
-  IconBook as RiBookOpenLine,
   IconChevronRight as RiArrowRightSLine,
-  IconClock as RiTimeLine,
-  IconCircleCheckFilled as RiCheckboxCircleLine,
 } from "@tabler/icons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,7 +14,6 @@ import { coursesAPI } from "@/services/api";
 import {
   enableCapacityDevUnlock,
   isCapacityDevUnlock,
-  hasPassedBaseline,
   resolveStaticCourseTitle,
   compareCourseIds,
 } from "@/utils/courseUnlock";
@@ -37,9 +32,9 @@ const MyCoursesHeroBanner = ({
   
   if (mode?.startsWith("assessment")) {
     if (pendingAssessment === "T1") rawTitle = t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment");
-    else if (pendingAssessment === "T2") rawTitle = "Complete your T2 Intermediate Assessment";
-    else if (pendingAssessment === "T3") rawTitle = "Complete your T3 Advanced Assessment";
-    else if (pendingAssessment === "T4") rawTitle = "Complete your T4 Final Assessment";
+    else if (pendingAssessment === "T2") rawTitle = t("my_courses_page.complete_t2_title", "Complete your T2 Intermediate Assessment");
+    else if (pendingAssessment === "T3") rawTitle = t("my_courses_page.complete_t3_title", "Complete your T3 Advanced Assessment");
+    else if (pendingAssessment === "T4") rawTitle = t("my_courses_page.complete_t4_title", "Complete your T4 Final Assessment");
   }
 
   const displayTitle = mode?.startsWith("assessment") ? rawTitle :
@@ -49,25 +44,31 @@ const MyCoursesHeroBanner = ({
     rawTitle;
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+    <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0d1f4e] dark:bg-[#071330] p-4 sm:px-5 sm:py-4 rounded-2xl border border-blue-900/40 dark:border-white/10 shadow-xl text-white">
       {(mode === "in_progress" || mode?.startsWith("assessment") || mode === "completed") && (
-          <div className="flex flex-col text-left">
-             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                {mode?.startsWith("assessment") ? "Next Step" : "Continue Learning"}
-             </span>
-             <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white truncate max-w-[200px] md:max-w-[250px]" title={displayTitle}>
+          <div className="flex-1 min-w-0 flex flex-col justify-center text-left pr-2 space-y-1">
+             <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <span className="text-[10px] font-extrabold text-blue-300 uppercase tracking-widest">
+                   {mode?.startsWith("assessment") ? t("my_courses_page.next_step", "Next Step") : t("my_courses_page.continue_learning", "Continue Learning")}
+                </span>
+             </div>
+             <h3 className="text-sm sm:text-base font-extrabold text-white leading-snug tracking-tight truncate max-w-full sm:max-w-md">
                 {displayTitle}
-             </span>
+             </h3>
           </div>
       )}
       <button
         type="button"
         onClick={onPrimaryAction}
-        className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] hover:from-[#112b6b] hover:to-[#2a50b3] dark:from-blue-600 dark:to-indigo-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+        className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-white hover:bg-slate-100 text-[#0d1f4e] font-black text-xs sm:text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 border border-white"
       >
-        {!mode?.startsWith("assessment") && <RiPlayFill size={16} className="animate-pulse" />}
-        <span>{primaryLabel || "Continue"}</span>
-        <RiArrowRightSLine size={16} stroke={2} className="group-hover:translate-x-0.5 transition-transform" />
+        {!mode?.startsWith("assessment") && <RiPlayFill size={18} className="text-[#0d1f4e] animate-pulse" />}
+        <span className="text-[#0d1f4e]">{primaryLabel || t("course_player.continue", "Continue")}</span>
+        <RiArrowRightSLine size={18} stroke={2.5} className="text-[#0d1f4e] group-hover:translate-x-1 transition-transform" />
       </button>
     </div>
   );
@@ -93,7 +94,6 @@ const MyCourses = () => {
   }, [location.state, toast, navigate, t, location.pathname]);
 
   const [publishedCourseCodes, setPublishedCourseCodes] = useState(null);
-  const [quizTestCourse, setQuizTestCourse] = useState(null);
   const userId = user?._id || user?.id;
   const { userProgress, loading: progressLoading, refresh: refreshProgress } =
     useSmaartCourseProgress(userId);
@@ -146,7 +146,6 @@ const MyCourses = () => {
   }, [progressLoading, pathsLoading, pendingAssessment, activePath]);
 
   useEffect(() => {
-    enableCapacityDevUnlock();
     refreshProgress();
   }, [refreshProgress]);
 
@@ -157,40 +156,6 @@ const MyCourses = () => {
         const list = response.data || [];
         if (Array.isArray(list) && list.length > 0) {
           setPublishedCourseCodes(new Set(list.map((c) => c.courseCode)));
-
-          if (isCapacityDevUnlock()) {
-            const courseHasQuiz = (c) =>
-              (c.modules || []).some(
-                (m) =>
-                  (m.microAssessments || []).some((ma) => (ma.questions || []).length > 0) ||
-                  (m.days || []).some((d) =>
-                    (d.steps || []).some(
-                      (s) => s.type === "quiz" && (s.content?.questions || []).length > 0
-                    )
-                  )
-              );
-
-            let withQuiz = list.find(courseHasQuiz);
-            if (!withQuiz) {
-              for (const c of list.slice(0, 5)) {
-                try {
-                  const code = c.courseCode;
-                  const detail = code
-                    ? await coursesAPI.getByCode(code)
-                    : c._id
-                      ? await coursesAPI.getById(c._id)
-                      : null;
-                  if (detail?.data && courseHasQuiz(detail.data)) {
-                    withQuiz = detail.data;
-                    break;
-                  }
-                } catch {
-                  /* try next */
-                }
-              }
-            }
-            if (withQuiz) setQuizTestCourse(withQuiz);
-          }
         }
       } catch (e) {
         console.warn("Could not load published courses:", e);
@@ -203,13 +168,9 @@ const MyCourses = () => {
     navigate(`/dashboard/courses/${courseId}/player`);
   };
 
-  const handleStartBaseline = () => {
-    navigate("/dashboard/assessments/baseline");
-  };
-
   const primaryLabel =
     heroMode?.startsWith("assessment")
-      ? `Start ${pendingAssessment} Assessment`
+      ? t("my_courses_page.start_assessment_for", "Start {{stage}} Assessment", { stage: pendingAssessment })
       : heroMode === "completed"
         ? t("my_courses_page.explore_courses", "Explore courses")
         : t("my_courses_page.resume_course");

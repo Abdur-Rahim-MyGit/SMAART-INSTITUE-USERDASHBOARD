@@ -488,7 +488,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     Review Responses
                   </button>
                   <button
-                    onClick={() => onComplete(score)}
+                    onClick={() => onComplete(score, shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0))}
                     className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
                   >
                     Continue to Next Step

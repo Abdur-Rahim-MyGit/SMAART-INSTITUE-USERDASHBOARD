@@ -37,6 +37,7 @@ export const normalizeCourseId = (courseId) => {
   if (num >= 26 && num <= 30) return `PIQ${String(num - 25).padStart(2, "0")}`;
   if (num >= 31 && num <= 35) return `AIQ${String(num - 30).padStart(2, "0")}`;
   if (num >= 36 && num <= 40) return `SQ${String(num - 35).padStart(2, "0")}`;
+  if (num >= 41 && num <= 45) return `BC${String(num - 40).padStart(2, "0")}`;
   return courseId;
 };
 
@@ -131,6 +132,20 @@ export const isCourseUnlockedInStage = (courseId, stage, userProgress) => {
   return strictCourseUnlockedInStage(courseId, stage, userProgress);
 };
 
+/**
+ * British Council courses live outside the shared STAGES/TRACKS data (they're
+ * addon content resolved entirely from the DB, with no static course list to
+ * check sequential ordering against), so they'd otherwise fall through every
+ * check below and hit the `return true` fallback — always unlocked regardless
+ * of progress. Gate them on the same single prerequisite CourseStructure.jsx
+ * uses to unlock the track card itself (`unlockAfter: 'S01'`).
+ */
+const isBritishCouncilCourse = (courseId, dbCourse) => {
+  const code = String(dbCourse?.courseCode || dbCourse?.courseNumber || courseId || '').toUpperCase();
+  const category = String(dbCourse?.category || '').toLowerCase();
+  return category === 'british council' || code.startsWith('BC');
+};
+
 /** Whether the learner may open this course (e.g. resume banner). */
 export const canAccessCourse = (courseId, userProgress, dbCourse = null) => {
   if (!courseId) return false;
@@ -141,6 +156,26 @@ export const canAccessCourse = (courseId, userProgress, dbCourse = null) => {
     if (!completed.some(comp => compareCourseIds(comp, dbCourse.unlockAfterCourseNumber))) {
       return false;
     }
+  }
+
+  if (isBritishCouncilCourse(courseId, dbCourse)) {
+    const completed = userProgress?.completedCourses || [];
+    const bcTrack = TRACKS.find(tr => tr.id === 'BC');
+    const isKnownSlot = bcTrack?.courses.some(c => compareCourseIds(c.id, courseId));
+
+    if (bcTrack && isKnownSlot) {
+      // Known BC01–05 slot: enforce the same sequential (previous-course-
+      // completed) rule every other track uses, instead of unlocking the
+      // whole track the moment S01 is done.
+      const trackCourses = bcTrack.courses.map(c =>
+        compareCourseIds(c.id, courseId) && dbCourse ? { ...c, ...dbCourse } : c
+      );
+      return strictCourseUnlockedInTrack(courseId, { ...bcTrack, courses: trackCourses }, userProgress);
+    }
+
+    // Unrecognized BC course code (e.g. a custom admin code) — we can't place
+    // it in the sequence, so fall back to the track's base prerequisite only.
+    return completed.some(comp => compareCourseIds(comp, 'S01'));
   }
 
   // Stage 1 courses can be accessed without passing T1 baseline
