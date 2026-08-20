@@ -155,9 +155,16 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       className="h-full relative"
     >
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={isUnlocked ? onClick : () => toast.error(t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage."))}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          e.preventDefault();
+          if (isUnlocked) onClick();
+          else toast.error(t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage."));
+        }}
         onMouseMove={handleMouseMove}
         className={`w-full h-full text-left p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
           ? `${cfg.cardBg || "bg-white dark:bg-[#081329]"} ${cfg.cardBorder || "border-slate-200 dark:border-white/10"} shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer`
@@ -287,7 +294,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
             )}
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Interactive Popover Modal - Shows ALL Stage Modules */}
       <AnimatePresence>
