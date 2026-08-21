@@ -73,6 +73,8 @@ const resumeSchema = new mongoose.Schema(
         skills: {
             technical: String,
             soft:      String,
+            domain:    String,
+            ai:        String,
             languages: String,
         },
         projects: [

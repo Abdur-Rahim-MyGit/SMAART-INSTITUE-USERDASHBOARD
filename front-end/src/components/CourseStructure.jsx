@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
@@ -871,7 +872,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     const hasPIQ = !isStudent ? true : (plan === 'Smaart Complete' || !!addons?.piq);
     const hasAIQ = !isStudent ? true : (addons?.aiq !== undefined ? !!addons?.aiq : true);
     const hasSQ = !isStudent ? true : (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq);
-    const hasBC = !isStudent ? true : !!addons?.britishCouncil;
+    const hasBC = true; // Always show British Council card
 
     const filterTrackList = (tracks) => {
       const filtered = [];
@@ -958,7 +959,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         courses: BC_TRACK,
         totalCourses: BC_TRACK.length,
         unlockAfter: 'S01',
-        icon: '🇬🇧',
+        icon: '💼',
       },
     ];
 

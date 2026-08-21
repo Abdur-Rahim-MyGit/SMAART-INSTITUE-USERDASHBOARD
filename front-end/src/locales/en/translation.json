@@ -380,7 +380,7 @@
     "secure_protocol": "Secure Trust Protocol",
     "verification_live": "Public Verification is Live",
     "tabs": {
-      "smart": "SMAART Courses",
+      "smart": "Human Intelligence Courses",
       "other": "Technical Skills",
       "certificates": "AI Skills",
       "projects": "Domain Skills"
@@ -631,7 +631,7 @@
     "status_passed": "Passed",
     "status_locked": "Locked",
     "learning_journey": "Learning Journey",
-    "programme": "Smaart Programme",
+    "programme": "SMAART Programme",
     "programme_desc": "Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.",
     "completion": "Completion",
     "human_intelligence_courses": "Human Intelligence Courses",

@@ -350,7 +350,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [loading, setLoading] = useState(viewOnly ? false : true);
     const [saving, setSaving] = useState(false);
     const [generating, setGenerating] = useState(false);
-    const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
 
     // ── Multi-resume list mode ───────────────────────────────────────────
@@ -375,6 +374,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [masteredSkills, setMasteredSkills] = useState([]);   // status: Completed
     const [inProgressSkills, setInProgressSkills] = useState([]); // status: In Progress
     const [suggestedSkills, setSuggestedSkills] = useState([]);  // from role API only
+    const [userSkills, setUserSkills] = useState([]); // Raw user skills from platform
     const [skillChipsLoading, setSkillChipsLoading] = useState(false);
     const [jobSkills, setJobSkills] = useState([]); // Skills from job posting
     const [verifiedCgpa, setVerifiedCgpa] = useState(null);
@@ -424,7 +424,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         education: [],
         skills: {
             technical: '',
-            soft: '',
+            domain: '',
+            ai: '',
             languages: ''
         },
         projects: [],
@@ -534,7 +535,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     summary: r.summary || '',
                     experience: r.experience || [],
                     education: loadedEdu,
-                    skills: r.skills || { technical: '', soft: '', languages: '' },
+                    skills: { technical: r.skills?.technical || '', domain: r.skills?.domain || '', ai: r.skills?.ai || '', languages: r.skills?.languages || '' },
                     projects: r.projects || [],
                     achievements: r.achievements || [],
                     personalDetails: r.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
@@ -684,17 +685,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             setMasteredSkills(mastered);
             setInProgressSkills(inProgress);
             setSuggestedSkills([...new Set([...suggested, ...softSuggested])]);
-
-            // Auto-fill mastered skills into technical field
-            if (mastered.length > 0) {
-                setResumeData(prev => {
-                    const existingTech = prev.skills.technical ? prev.skills.technical.split(',').map(s => s.trim()).filter(Boolean) : [];
-                    const toAdd = mastered.filter(m => !existingTech.some(e => e.toLowerCase() === m.toLowerCase()));
-                    if (toAdd.length === 0) return prev;
-                    const merged = [...existingTech, ...toAdd].join(', ');
-                    return { ...prev, skills: { ...prev.skills, technical: merged } };
-                });
-            }
+            // Progress records carry no category — derive it from the role's
+            // skill list so the Technical / Domain / AI groups populate.
+            const catLabel = (name) => {
+                const row = roleSkills.find(rs => (rs.skillName || '').toLowerCase().trim() === (name || '').toLowerCase().trim());
+                const c = row?.skillCategory;
+                if (c === 'Domain') return 'Domain Skill';
+                if (c === 'AI-Tool') return 'AI Skill';
+                if (c === 'Soft Skill') return 'Soft Skill';
+                return 'Technical Skill';
+            };
+            setUserSkills(userSkillsRaw
+                .map(u => ({ ...u, skillCategory: u.skillCategory || catLabel(u.skillName) }))
+                .filter(u => u.skillCategory !== 'Soft Skill'));
         } catch (e) {
             console.error('Skill chips fetch error:', e);
         } finally {
@@ -730,13 +733,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         const hasRole = !!data.personalInfo?.targetRole?.trim();
         cat2.checks.push({ label: t('resume_builder.ats.chk_target_role', 'Target Role is set'), pts: 5, pass: hasRole, step: hasRole ? null : 1 });
         const techSkillsArr = (data.skills?.technical || '').split(',').map(s => s.trim()).filter(Boolean);
+        const allSkillsArr = [data.skills?.technical, data.skills?.domain, data.skills?.ai].filter(Boolean).join(',').split(',').map(s => s.trim()).filter(Boolean);
         const hasTech3 = techSkillsArr.length >= 3;
         cat2.checks.push({ label: t('resume_builder.ats.chk_tech_3', 'Technical Skills (3+ skills)'), pts: 10, pass: hasTech3, step: hasTech3 ? null : 5 });
         // Keyword match with mastered bonus
         let kwScore = 0;
-        if (roleSkillsFromAPI.length > 0 && techSkillsArr.length > 0) {
+        if (roleSkillsFromAPI.length > 0 && allSkillsArr.length > 0) {
             let matched = 0;
-            techSkillsArr.forEach(skill => {
+            allSkillsArr.forEach(skill => {
                 const isMatch = roleSkillsFromAPI.some(rs => rs.toLowerCase() === skill.toLowerCase());
                 if (isMatch) {
                     const isMastered = mastered.some(m => m.toLowerCase() === skill.toLowerCase());
@@ -746,8 +750,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             kwScore = Math.min(10, Math.round((matched / roleSkillsFromAPI.length) * 10));
         }
         cat2.checks.push({ label: t('resume_builder.ats.chk_skills_match', 'Skills match role keywords'), pts: 10, pass: kwScore >= 5, step: 5, earned: kwScore });
-        const hasSoft = !!data.skills?.soft?.trim();
-        cat2.checks.push({ label: t('resume_builder.ats.chk_soft_filled', 'Soft Skills filled'), pts: 5, pass: hasSoft, step: hasSoft ? null : 5 });
+        const hasDomainAi = !!data.skills?.domain?.trim() || !!data.skills?.ai?.trim();
+        cat2.checks.push({ label: t('resume_builder.ats.chk_domain_ai_filled', 'Domain / AI skills filled'), pts: 5, pass: hasDomainAi, step: hasDomainAi ? null : 5 });
         cat2.score = cat2.checks.reduce((s, c) => s + (c.earned !== undefined ? c.earned : (c.pass ? c.pts : 0)), 0);
         results.push(cat2);
 
@@ -1149,7 +1153,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             experience,
             skills: {
                 technical: technicalSkills,
-                soft: base?.skills?.soft || '',
+                domain: base?.skills?.domain || '',
+                ai: base?.skills?.ai || '',
                 languages: base?.skills?.languages || ''
             },
             projects,
@@ -1242,7 +1247,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     summary: '',
                     experience: [],
                     education: [],
-                    skills: { technical: '', soft: '', languages: '' },
+                    skills: { technical: '', domain: '', ai: '', languages: '' },
                     projects: [],
                     achievements: [],
                     personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
@@ -1256,41 +1261,13 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 summary: '',
                 experience: [],
                 education: [],
-                skills: { technical: '', soft: '', languages: '' },
+                skills: { technical: '', domain: '', ai: '', languages: '' },
                 projects: [],
                 achievements: [],
                 personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
             });
         } finally {
             setIsSyncing(false);
-        }
-    };
-
-    const handleGenerateSummary = async () => {
-        // Validation: Ensure they have at least a target role or some experience/education
-        const hasExperience = resumeData.experience && resumeData.experience.length > 0;
-        const hasEducation = resumeData.education && resumeData.education.length > 0;
-        const targetRole = resumeData.personalInfo?.targetRole || selectedCareerPath?.roleName;
-
-        if (!targetRole && !hasExperience && !hasEducation) {
-            toast.error(t('resume_builder.toast.summary_needs_context', "Please fill out your Target Role, Experience, or Education first so the AI has context to write your summary."));
-            return;
-        }
-
-        setIsGeneratingSummary(true);
-        try {
-            const res = await aiCareerCoachApi.generateSummary(resumeData, targetRole);
-            if (res.success && res.summary) {
-                setResumeData(prev => ({ ...prev, summary: res.summary }));
-                toast.success(t('resume_builder.toast.summary_success', 'Professional summary generated successfully!'));
-            } else {
-                toast.error(res.message || t('resume_builder.toast.summary_failed', 'Failed to generate summary.'));
-            }
-        } catch (error) {
-            console.error('Error generating summary:', error);
-            toast.error(t('resume_builder.toast.summary_error', 'An error occurred while generating the summary.'));
-        } finally {
-            setIsGeneratingSummary(false);
         }
     };
 
@@ -1323,7 +1300,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             summary: resume.summary || '',
             experience: resume.experience || [],
             education: loadedEdu,
-            skills: resume.skills || { technical: '', soft: '', languages: '' },
+            skills: { technical: resume.skills?.technical || '', domain: resume.skills?.domain || '', ai: resume.skills?.ai || '', languages: resume.skills?.languages || '' },
             projects: resume.projects || [],
             achievements: resume.achievements || [],
             personalDetails: resume.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
@@ -1677,10 +1654,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 toast.error(t('resume_builder.validation.technical', "Please enter Technical Skills."));
                 return false;
             }
-            if (!skills.soft?.trim()) {
-                toast.error(t('resume_builder.validation.soft', "Please enter Soft Skills."));
-                return false;
-            }
             if (!skills.languages?.trim()) {
                 toast.error(t('resume_builder.validation.languages', "Please enter Languages."));
                 return false;
@@ -1696,10 +1669,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 }
                 if (!ach.description?.trim()) {
                     toast.error(t('resume_builder.validation.award_description', "Please enter Description for Award entry #{{num}}.", { num: i + 1 }));
-                    return false;
-                }
-                if (ach.link?.trim() && !isValidUrl(ach.link)) {
-                    toast.error(t('resume_builder.validation.award_link', "Please enter a valid URL for Award entry #{{num}}.", { num: i + 1 }));
                     return false;
                 }
             }
@@ -2125,44 +2094,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         </div>
 
                                         <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
-                                            <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.profile_photo', 'Profile Photo (Optional)')}</label>
-                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                                    {resumeData.personalInfo.profileImage ? (
-                                                        <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 group/photo">
-                                                            <img src={resumeData.personalInfo.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                                                            <button
-                                                                onClick={() => handleNestedChange('personalInfo', 'profileImage', '')}
-                                                                className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/photo:opacity-100 transition-opacity"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0">
-                                                            <User className="w-6 h-6 text-slate-400" />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex-1 w-full">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={(e) => {
-                                                                const file = e.target.files[0];
-                                                                if (file) {
-                                                                    const reader = new FileReader();
-                                                                    reader.onloadend = () => {
-                                                                        handleNestedChange('personalInfo', 'profileImage', reader.result);
-                                                                    };
-                                                                    reader.readAsDataURL(file);
-                                                                }
-                                                            }}
-                                                            className="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#1a3884] hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 dark:hover:file:bg-blue-900/50 cursor-pointer"
-                                                        />
-                                                        <p className="text-[10px] text-slate-400 mt-1">{t('resume_builder.photo_hint', 'Recommended for Modern Profile template. Max size 2MB.')}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.full_name', 'Full Name')}</label>
                                                 <div className="relative group/input">
@@ -2222,17 +2154,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             <div className="group">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('resume_builder.professional_summary', 'Professional Summary')}</label>
-                                                    <button
-                                                        onClick={handleGenerateSummary}
-                                                        disabled={isGeneratingSummary}
-                                                        className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-wider disabled:opacity-50"
-                                                    >
-                                                        {isGeneratingSummary ? (
-                                                            <><Loader2 className="w-3 h-3 animate-spin" /> {t('resume_builder.generating', 'Generating...')}</>
-                                                        ) : (
-                                                            <><Sparkles className="w-3 h-3" /> {t('resume_builder.generate_ai', 'Generate with AI')}</>
-                                                        )}
-                                                    </button>
+
                                                 </div>
                                                 <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
                                             </div>
@@ -2423,7 +2345,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         )}
 
                                         {/* Suggestions Card */}
-                                        {careerPaths && (
+                                        {careerPaths && userSkills.length > 0 && (
                                             <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
                                                 <div className="flex items-center gap-2 mb-4">
                                                     <Sparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
@@ -2431,43 +2353,35 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 </div>
 
                                                 <div className="space-y-4">
-                                                    {masteredSkills.length > 0 && (
-                                                        <div>
-                                                            <div className="flex items-center gap-1.5 mb-2 text-emerald-600 dark:text-emerald-400">
-                                                                <Check className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('resume_builder.mastered_auto', 'Mastered (Auto-added)')}</span>
+                                                    {[
+                                                        { label: 'Technical Skills', field: 'technical', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && s.skillCategory === 'Technical Skill').map(s => s.skillName) },
+                                                        { label: 'Domain Skills', field: 'domain', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && s.skillCategory === 'Domain Skill').map(s => s.skillName) },
+                                                        { label: 'AI Skills', field: 'ai', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && (s.skillCategory === 'AI Skill' || s.skillCategory === 'GenAI Skill')).map(s => s.skillName) }
+                                                    ].filter(g => g.items.length > 0).map((group, idx) => {
+                                                        const currentField = resumeData.skills[group.field] ? resumeData.skills[group.field].split(',').map(s => s.trim().toLowerCase()) : [];
+                                                        const available = group.items.filter(item => !currentField.includes(item.toLowerCase()));
+                                                        if (available.length === 0) return null;
+                                                        return (
+                                                            <div key={idx}>
+                                                                <div className="flex items-center gap-1.5 mb-2 text-blue-600 dark:text-blue-400">
+                                                                    <Plus className="w-3.5 h-3.5" />
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">{group.label} (Click to add)</span>
+                                                                </div>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {available.map(skill => (
+                                                                        <button key={skill} onClick={() => {
+                                                                            setResumeData(prev => ({
+                                                                                ...prev,
+                                                                                skills: { ...prev.skills, [group.field]: prev.skills[group.field] ? `${prev.skills[group.field]}, ${skill}` : skill }
+                                                                            }));
+                                                                        }} className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[11px] font-bold rounded-lg border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1 shadow-sm">
+                                                                            {skill} <Plus className="w-3 h-3" />
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {masteredSkills.map(skill => (
-                                                                    <span key={skill} className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1">
-                                                                        {skill} <Check className="w-3 h-3" />
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {inProgressSkills.length > 0 && (
-                                                        <div>
-                                                            <div className="flex items-center gap-1.5 mb-2 text-amber-600 dark:text-amber-400">
-                                                                <Plus className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('resume_builder.in_progress_click', 'In Progress (Click to add)')}</span>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {inProgressSkills.map(skill => (
-                                                                    <button key={skill} onClick={() => {
-                                                                        setResumeData(prev => ({
-                                                                            ...prev,
-                                                                            skills: { ...prev.skills, technical: prev.skills.technical ? `${prev.skills.technical}, ${skill}` : skill }
-                                                                        }));
-                                                                        setInProgressSkills(prev => prev.filter(s => s !== skill));
-                                                                    }} className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[11px] font-bold rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors flex items-center gap-1 shadow-sm">
-                                                                        {skill} <Plus className="w-3 h-3" />
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
@@ -2475,12 +2389,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.technical_skills', 'Technical Skills')}</label>
-                                                <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
+                                                <textarea value={resumeData.skills.technical || ''} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
                                             </div>
+
                                             <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.soft_skills', 'Soft Skills')}</label>
-                                                <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.soft_placeholder', 'e.g. Team Leadership, Problem Solving, Public Speaking...')}></textarea>
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.domain_skills', 'Domain Skills')}</label>
+                                                <textarea value={resumeData.skills.domain || ''} onChange={(e) => handleNestedChange('skills', 'domain', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.domain_placeholder', 'e.g. Project Management, Agile, Healthcare, Finance...')}></textarea>
                                             </div>
+
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.ai_skills', 'AI Skills')}</label>
+                                                <textarea value={resumeData.skills.ai || ''} onChange={(e) => handleNestedChange('skills', 'ai', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.ai_placeholder', 'e.g. Prompt Engineering, Midjourney, ChatGPT...')}></textarea>
+                                            </div>
+
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.languages', 'Languages')}</label>
                                                 <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
@@ -2504,14 +2425,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         </button>
                                                     </div>
                                                     <div className="p-4 sm:p-6 space-y-4">
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.achievement_title', 'Achievement Title')}</label>
                                                                 <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                            </div>
-                                                            <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.link', 'Link')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={ach.link} onChange={(e) => handleArrayChange('achievements', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
                                                         <div>
