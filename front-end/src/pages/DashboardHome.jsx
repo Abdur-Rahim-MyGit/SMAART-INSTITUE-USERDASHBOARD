@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
@@ -21,6 +22,16 @@ import { clearCareerAgentStorage } from "@/contexts/UserContextFixed";
 
 const DashboardHome = () => {
   const { t } = useTranslation();
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  useEffect(() => {
+    setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
   const location = useLocation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -174,64 +185,74 @@ const DashboardHome = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.15 }}
-          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300"
+          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300 relative overflow-hidden"
         >
+          {/* Animated Constellation Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+          </div>
 
-          {/* ── FULL WIDTH TOP: Hero & Banners ── */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="w-full space-y-4 sm:space-y-6"
-          >
+          {/* Ambient mesh glows */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/5 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/10" />
+            <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/10" />
+          </div>
 
-
-            {/* Hero */}
-            <HeroSection
-              userName={user?.firstName || user?.fullName || "User"}
-              pendingAssessment={pendingAssessment}
-              paths={(() => {
-                const incomplete = (list) => (list || []).filter(c => (c.progress || 0) < 100);
-                // 1. In-progress enrolled courses (progress > 0 and < 100) — highest priority
-                if (incomplete(inProgressCourses).length > 0) return incomplete(inProgressCourses);
-                // 2. Next unseen course from the full sequence (course not yet completed)
-                if (nextCourse) return [nextCourse];
-                // 3. Enrolled incomplete courses
-                if (incomplete(enrolledCourses).length > 0) return incomplete(enrolledCourses);
-                // 4. All done — show last completed
-                return enrolledCourses?.length > 0 ? enrolledCourses : paths;
-              })()}
-              pathsLoading={pathsLoading || progressLoading}
-            />
-
-            {/* College Banners */}
-            <CollegeBanners />
-          </motion.div>
-
-          {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
-          <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
-            {/* ── LEFT: Career Pathways ── */}
+          <div className="relative z-10 flex flex-col gap-4 sm:gap-6 w-full">
+            {/* ── FULL WIDTH TOP: Hero & Banners ── */}
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="w-full space-y-4 sm:space-y-6"
             >
-              <CareerPathsWidget paths={paths} loading={pathsLoading} />
-              <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
+              {/* Hero */}
+              <HeroSection
+                userName={user?.firstName || user?.fullName || "User"}
+                pendingAssessment={pendingAssessment}
+                paths={(() => {
+                  const incomplete = (list) => (list || []).filter(c => (c.progress || 0) < 100);
+                  // 1. In-progress enrolled courses (progress > 0 and < 100) — highest priority
+                  if (incomplete(inProgressCourses).length > 0) return incomplete(inProgressCourses);
+                  // 2. Next unseen course from the full sequence (course not yet completed)
+                  if (nextCourse) return [nextCourse];
+                  // 3. Enrolled incomplete courses
+                  if (incomplete(enrolledCourses).length > 0) return incomplete(enrolledCourses);
+                  // 4. All done — show last completed
+                  return enrolledCourses?.length > 0 ? enrolledCourses : paths;
+                })()}
+                pathsLoading={pathsLoading || progressLoading}
+              />
+
+              {/* College Banners */}
+              <CollegeBanners />
             </motion.div>
 
-            {/* ── RIGHT: Calendar + Tasks ── */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-              className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
-            >
-              <div className="xl:sticky xl:top-24">
-                <LearningProgress />
-              </div>
-            </motion.div>
+            {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
+            <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+              {/* ── LEFT: Career Pathways ── */}
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
+              >
+                <CareerPathsWidget paths={paths} loading={pathsLoading} />
+                <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
+              </motion.div>
+
+              {/* ── RIGHT: Calendar + Tasks ── */}
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+                className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
+              >
+                <div className="xl:sticky xl:top-24">
+                  <LearningProgress />
+                </div>
+              </motion.div>
+            </div>
           </div>
 
         </motion.div>

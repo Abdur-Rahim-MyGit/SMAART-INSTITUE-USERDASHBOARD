@@ -165,6 +165,7 @@ const CoursePlayer = () => {
   const [completedSteps, setCompletedSteps] = useState({});
   const [activeTab, setActiveTab] = useState('preview');
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const [currentVideoDuration, setCurrentVideoDuration] = useState(0);
   const [showCongratulation, setShowCongratulation] = useState(false);
   const [congratulationAcknowledged, setCongratulationAcknowledged] = useState(false);
   const [windowSize, setWindowSize] = useState({
@@ -470,6 +471,7 @@ const CoursePlayer = () => {
     setCongratulationAcknowledged(false);
     setVideoProgress(0);
     setCurrentVideoTime(0);
+    setCurrentVideoDuration(0);
     setVideoWatched(false);
     window.scrollTo(0, 0);
 
@@ -571,7 +573,8 @@ const CoursePlayer = () => {
 
   const handleStartCourse = () => {
     setShowIntro(false);
-    const resumeStep = stepNumbers.find(step => !completedSteps[step]) || '1';
+    const allDone = stepNumbers.every(step => completedSteps[step]);
+    const resumeStep = stepNumbers.find(step => !completedSteps[step]) || (allDone ? lastStepKey : '1');
     setActiveStep(resumeStep);
     setVideoWatched(false);
     handleStartStep(resumeStep);
@@ -658,7 +661,9 @@ const CoursePlayer = () => {
     const allCompleted = stepNumbers.every((step) => newCompletedSteps[step]);
     if (allCompleted) {
       setShowCongratulation(true);
-      setActiveStep(null);
+      // Keep activeStep on the just-finished (last) step so the content pane
+      // keeps showing it once the congrats modal is dismissed — nulling it
+      // out here used to strand users on a blank pane with no way forward.
       const userId = currentUser?._id || currentUser?.id || 'anon';
       localStorage.setItem(`${userId}_smaart_course_progress`, '100');
       markCourseCompleted(courseId);
@@ -863,7 +868,10 @@ const CoursePlayer = () => {
                   initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
                   initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
                   onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time) => setCurrentVideoTime(time)}
+                  onTimeUpdate={(time, dur) => {
+                    setCurrentVideoTime(time);
+                    if (dur) setCurrentVideoDuration(dur);
+                  }}
                   onNext={activeStep !== lastStepKey ? () => {
                     const nextStep = (parseInt(activeStep) + 1).toString();
                     handleStepComplete(activeStep);
@@ -942,7 +950,10 @@ const CoursePlayer = () => {
                   initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
                   initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
                   onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time) => setCurrentVideoTime(time)}
+                  onTimeUpdate={(time, dur) => {
+                    setCurrentVideoTime(time);
+                    if (dur) setCurrentVideoDuration(dur);
+                  }}
                   onNext={null}
                 />
               </div>
@@ -977,12 +988,16 @@ const CoursePlayer = () => {
     const completedCount = Object.keys(completedSteps).length;
     let progress = (completedCount / totalSteps) * 100;
     
-    // Add current video's fractional progress if playing a video
-    if (activeStep && !completedSteps[activeStep] && userProgressData[activeStep]) {
+    // Add current video's fractional progress if playing a video. Prefer the
+    // player's own live duration (available from the first timeupdate tick)
+    // over userProgressData[activeStep].videoDuration, which only gets set
+    // once the first background sync lands ~5s into playback — until then
+    // this bar sat frozen at 0% even though the video was visibly playing.
+    if (activeStep && !completedSteps[activeStep]) {
       const stepData = learningFlowData?.steps?.[activeStep];
       if (stepData && stepData.contentType === 'video-text') {
-        const duration = userProgressData[activeStep].videoDuration || 0;
-        const current = currentVideoTime || userProgressData[activeStep].last_timestamp || 0;
+        const duration = currentVideoDuration || userProgressData[activeStep]?.videoDuration || 0;
+        const current = currentVideoTime || userProgressData[activeStep]?.last_timestamp || 0;
         if (duration > 0 && current < duration) {
           const videoPct = (current / duration) * 100;
           progress += (videoPct / totalSteps);
@@ -991,7 +1006,7 @@ const CoursePlayer = () => {
     }
     
     return Math.min(100, Math.round(progress));
-  }, [completedSteps, totalSteps, activeStep, userProgressData, currentVideoTime, learningFlowData]);
+  }, [completedSteps, totalSteps, activeStep, userProgressData, currentVideoTime, currentVideoDuration, learningFlowData]);
 
   if (loading) {
     return (
@@ -1192,7 +1207,15 @@ const CoursePlayer = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3 }}
+                      className="p-8 text-center bg-slate-50 dark:bg-blue-950/40 rounded-2xl border border-slate-200/80 dark:border-blue-500/30"
                     >
+                      <Sparkles className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                      <h4 className="font-bold text-slate-600 dark:text-slate-300">
+                        {t("course_player.select_a_lesson", "Select a lesson to continue")}
+                      </h4>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        {t("course_player.select_a_lesson_hint", "Pick a step from the curriculum on the right to pick up where you left off.")}
+                      </p>
                     </motion.div>
                   ) : (
                     /* Active Step Content */

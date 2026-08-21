@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 import {
   IconPlayerPlayFilled as RiPlayFill,
   IconChevronRight as RiArrowRightSLine,
@@ -81,6 +82,16 @@ const MyCourses = () => {
   const { toast } = useToast();
   const { user } = useUser();
   const { t } = useTranslation();
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  useEffect(() => {
+    setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (location.state?.courseClosedByProctor) {
@@ -203,8 +214,19 @@ const MyCourses = () => {
   ) : null;
 
   return (
-    <div className="min-h-screen bg-transparent pb-8 transition-colors duration-300">
-      <main id="my-courses-programme">
+    <div className="min-h-screen bg-transparent pb-8 transition-colors duration-300 relative">
+      {/* Animated Constellation Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
+
+      {/* Subtle radial glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/5 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/10" />
+      </div>
+
+      <main id="my-courses-programme" className="relative z-10">
         <CourseStructure
           onCourseClick={handleCourseClick}
           userProgress={userProgress}

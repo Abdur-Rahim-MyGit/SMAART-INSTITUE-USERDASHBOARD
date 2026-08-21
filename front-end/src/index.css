@@ -534,3 +534,13 @@ html {
   }
 }
 
+/* Hide scrollbars globally while keeping scroll functionality intact */
+::-webkit-scrollbar {
+  display: none !important;
+}
+
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+

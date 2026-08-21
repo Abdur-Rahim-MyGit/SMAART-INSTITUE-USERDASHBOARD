@@ -69,7 +69,7 @@ export const UserProvider = ({ children }) => {
   const fetchUserDetails = useCallback(async (email) => {
     if (!email) return;
 
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (!token) {
       if (import.meta.env.DEV) console.log('[UserContext] No token found, skipping background fetch');
       return;

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Save, CheckCircle2, Loader2 } from 'lucide-react';
+import { FileText, Save, CheckCircle2, Loader2, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { notesAPI } from '@/services/api';
 
-const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, courseId = "general", isVideoCompleted = true }) => {
+const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, courseId = "general", isVideoCompleted = true, onNextLesson, showNextLesson = false }) => {
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
   const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted || false);
@@ -191,6 +191,20 @@ const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, cour
             )}
           </div>
         </motion.div>
+
+        {/* Continue to Next Lesson */}
+        {hasMarkedComplete && showNextLesson && onNextLesson && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onClick={onNextLesson}
+            className="w-full px-6 py-4 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl transform hover:scale-[1.01]"
+          >
+            Continue to Next Lesson
+            <ChevronRight className="w-4 h-4" />
+          </motion.button>
+        )}
 
         {/* Tips */}
         <motion.div

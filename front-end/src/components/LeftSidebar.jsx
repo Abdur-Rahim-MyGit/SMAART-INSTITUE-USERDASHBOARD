@@ -43,6 +43,10 @@ import { getBackendUrl } from "@/services/api";
 // Import logos for different themes
 import whiteLogo from "@/assets/white.png";
 import blueLogo from "@/assets/blue.png";
+import smaartLogoNavy from "@/assets/smaart-logo-navy.svg";
+import smaartLogoWhite from "@/assets/smaart-logo-white.svg";
+import smaartMarkNavy from "@/assets/smaart-mark-navy.svg";
+import smaartMarkWhite from "@/assets/smaart-mark-white.svg";
 
 // Import Video Assets for Avatar Card
 import ToddlerBoyIdle from "@/assets/Animations/ToddlerBoyIdle.mp4";
@@ -361,18 +365,13 @@ const LeftSidebar = () => {
           >
             {/* Mobile Header */}
             <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col items-start">
-                  <div className="flex items-center">
-                    <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                      SMAART
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
-                    Institute
-                  </span>
-                </div>
-              </div>
+              <Link to="/dashboard" className="flex items-center flex-1 pr-4">
+                <img 
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
+                  alt="SMAART Institute" 
+                  className="h-8 w-auto object-contain flex-shrink-0" 
+                />
+              </Link>
               <button
                 onClick={() => setIsMobileOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
@@ -527,21 +526,22 @@ const LeftSidebar = () => {
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
         <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-[#1a3884]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
-          <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
+          <Link to="/dashboard" className="flex flex-col items-start overflow-hidden w-full">
             {isCollapsed ? (
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
-                <span className="text-xl font-black text-white">S</span>
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center shadow-md border border-slate-200/50 dark:border-white/5 relative overflow-hidden">
+                <img 
+                  src={theme === 'dark' ? smaartMarkWhite : smaartMarkNavy} 
+                  alt="S" 
+                  className="w-7 h-7 object-contain"
+                />
               </div>
             ) : (
-              <div className="flex flex-col items-start">
-                <div className="flex items-center">
-                  <span className="text-2xl lg:text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                    SMAART
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
-                  Institute
-                </span>
+              <div className="flex items-center justify-between w-full">
+                <img 
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
+                  alt="SMAART Institute" 
+                  className="h-8 w-auto object-contain flex-shrink-0" 
+                />
               </div>
             )}
           </Link>

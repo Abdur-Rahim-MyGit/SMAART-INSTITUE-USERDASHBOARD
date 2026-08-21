@@ -41,6 +41,7 @@ import {
   isCourseUnlockedInStage,
   isCapacityDevUnlock,
   normalizeCourseId,
+  ENFORCE_PROGRESSION_GATES,
 } from "@/utils/courseUnlock";
 
 /* ─── Stage visual config ─── */
@@ -186,9 +187,9 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
           {/* Top Row: Icon & Tag */}
           <div className="flex items-center justify-between gap-3">
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md border transition-all duration-300 ${isUnlocked
-                ? "bg-gradient-to-br from-[#0d1f4e] to-[#1a3884] dark:from-[#1a3884] dark:to-blue-600 border-white/20 text-white group-hover:scale-110 group-hover:shadow-indigo-500/25"
-                : "bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400"
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
+                ? "bg-blue-50 dark:bg-blue-950/50 border-blue-100/80 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
+                : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
                 }`}
             >
               <Icon stroke={1.8} className="w-7 h-7" />
@@ -228,7 +229,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
           </div>
 
           {/* Course Preview Tags */}
-          {allCourses.length > 0 && (
+          {false && allCourses.length > 0 && (
             <div className="pt-1 space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -400,9 +401,9 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md border transition-all duration-300 ${isUnlocked
-                ? `bg-gradient-to-br ${cfg.gradient} text-white group-hover:scale-110 border-white/20 shadow-indigo-500/20`
-                : "bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-400"
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
+                ? "bg-blue-50 dark:bg-blue-950/50 border-blue-100/80 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
+                : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
                 }`}
             >
               <Icon stroke={1.8} className="w-7 h-7" />
@@ -588,8 +589,8 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
   const pct = Math.round((completedCount / totalCoursesCount) * 100);
 
   const publishedStageCourses = filterPublishedCourses(stage.courses || [], publishedCourseCodes);
-  const isAssessmentUnlocked = publishedStageCourses.length > 0 &&
-    publishedStageCourses.every(c => userProgress.completedCourses?.includes(c.id));
+  const isAssessmentUnlocked = !ENFORCE_PROGRESSION_GATES || (publishedStageCourses.length > 0 &&
+    publishedStageCourses.every(c => userProgress.completedCourses?.includes(c.id)));
 
   const isCourseUnlocked = (courseId) => isCourseUnlockedInStage(courseId, stage, userProgress);
 
@@ -1133,7 +1134,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   }, [activeStages, activeTracks, searchQuery, activeFilterTab]);
 
   return (
-    <div className="w-full relative min-h-screen bg-slate-100/70 dark:bg-[#040915] transition-colors duration-500 overflow-hidden">
+    <div className="w-full relative min-h-screen bg-transparent transition-colors duration-500 overflow-hidden">
       {/* Dynamic Moving Animated Background Mesh */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <motion.div
@@ -1294,7 +1295,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <AwardIcon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+                        <BrainIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         Human Intelligence Stages
                       </h2>
                       <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />
@@ -1327,7 +1328,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <SparklesIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                        <GlobeIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                         Readiness Tracks & English Course
                       </h2>
                       <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />

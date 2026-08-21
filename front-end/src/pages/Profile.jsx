@@ -2287,7 +2287,7 @@ const ModalSelect = ({ label, value, options, onChange }) => {
     <div className="space-y-1.5">
       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
       <select
-        value={value || ""}
+        value={value ? String(value).toLowerCase() : ""}
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
       >

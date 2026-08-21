@@ -9,7 +9,7 @@ const StageResult = require('../models/StageResult');
 const BaseLineResult = require('../models/BaseLineResult');
 const { STAGES, TRACKS } = require('../config/courseProgression');
 
-const ENFORCE_PROGRESSION_GATES = true;
+const ENFORCE_PROGRESSION_GATES = false;
 
 const classify = (course) => {
   const category = String(course.category || '').trim().toLowerCase();

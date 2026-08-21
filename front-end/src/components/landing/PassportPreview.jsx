@@ -3,7 +3,7 @@ import { FileText, Download, CheckCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
-import whiteLogo from "@/assets/white.png";
+import smaartMarkWhite from "@/assets/smaart-mark-white.svg";
 
 const PassportPreview = () => {
   const { t } = useTranslation();
@@ -63,7 +63,7 @@ const PassportPreview = () => {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white dark:bg-dark-card rounded-xl flex items-center justify-center p-1.5 border border-gray-100 dark:border-white/10 shadow-lg">
                       <div className="w-full h-full bg-gradient-to-br from-[#1a3884] to-[#132c6b] rounded-lg flex items-center justify-center">
-                        <img src={whiteLogo} alt="Logo" className="w-8 h-8 object-contain" />
+                        <img src={smaartMarkWhite} alt="Logo" className="w-8 h-8 object-contain" />
                       </div>
                     </div>
                     <div>

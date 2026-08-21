@@ -3,7 +3,7 @@ import { STAGES, TRACKS } from "@/data/courseStructureData";
 /**
  * When true, stages/courses follow T1–T4 and prerequisite rules.
  */
-export const ENFORCE_PROGRESSION_GATES = true;
+export const ENFORCE_PROGRESSION_GATES = false;
 
 /** Set via enableCapacityDevUnlock() — local to this browser only (quiz / Capacity testing). */
 export const CAPACITY_DEV_UNLOCK_KEY = "smaart_dev_unlock_capacity";
