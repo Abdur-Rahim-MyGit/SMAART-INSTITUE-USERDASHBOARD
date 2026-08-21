@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Award, Trophy, BookOpen, Layers, ChevronRight, Download,
-    Shield, Zap, Brain, Play, ArrowLeft, ChevronDown
+    Shield, Zap, ArrowLeft, ChevronDown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const TABS = [
+    { id: "overview", label: "Overview", icon: Layers },
     { id: "certificates", label: "Certificates", icon: Award },
     { id: "badges", label: "Badges", icon: Trophy },
     { id: "flashcards", label: "Flashcards", icon: Zap },
@@ -27,7 +28,7 @@ const SkillsVault = () => {
     const userId = user?.id || user?._id;
     const { userProgress } = useSmaartCourseProgress(userId);
     const completedCourses = userProgress?.completedCourses || [];
-    const [activeTab, setActiveTab] = useState("certificates");
+    const [activeTab, setActiveTab] = useState("overview");
     const [courses, setCourses] = useState([]);
     const [stageStatus, setStageStatus] = useState({});
     const [earnedBadgesCount, setEarnedBadgesCount] = useState(0);
@@ -307,6 +308,26 @@ const SkillsVault = () => {
                                         {earnedBadgesCount > 0 ? earnedBadgesCount : badges.length}
                                     </p>
                                     <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.badges", "Badges Earned")}</p>
+                                </div>
+                            </div>
+                            {/* Courses Stat */}
+                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-200/60 dark:bg-emerald-950/20 dark:border-emerald-900/20">
+                                    <BookOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{completedCourses.length}</p>
+                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.courses", "Courses")}</p>
+                                </div>
+                            </div>
+                            {/* Assessments Stat */}
+                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50 border border-violet-200/60 dark:bg-violet-950/20 dark:border-violet-900/20">
+                                    <Shield className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{completedAssessments}</p>
+                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.assessments", "Assessments")}</p>
                                 </div>
                             </div>
                         </div>

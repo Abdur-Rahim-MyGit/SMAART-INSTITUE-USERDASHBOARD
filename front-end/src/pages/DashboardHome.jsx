@@ -55,7 +55,7 @@ const DashboardHome = () => {
     if (!userProgress || progressLoading) return null;
     const completed = userProgress.completedCourses || [];
     const passed = userProgress.assessmentsPassed || [];
-    
+
     // Check baseline T1
     if (!passed.includes("T1") && !isCapacityDevUnlock()) return "T1";
     // Check Stage 1 -> T2
@@ -64,7 +64,7 @@ const DashboardHome = () => {
     if (completed.some(c => compareCourseIds(c, "S19")) && !passed.includes("T3")) return "T3";
     // Check Stage 3 -> T4
     if (completed.some(c => compareCourseIds(c, "S25")) && !passed.includes("T4")) return "T4";
-    
+
     return null;
   }, [userProgress, progressLoading]);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
@@ -155,7 +155,7 @@ const DashboardHome = () => {
               try {
                 const u = JSON.parse(sessionStorage.getItem('user') || 'null');
                 if (u) userId = u._id || u.id || 'anon';
-              } catch {}
+              } catch { }
 
               sessionStorage.clear();
               localStorage.removeItem('user');
@@ -181,11 +181,11 @@ const DashboardHome = () => {
         )}
 
         {/* Dashboard Layout */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.15 }}
-          className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 pb-10 min-h-screen bg-transparent transition-colors duration-300 relative overflow-hidden"
+          className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-5 lg:p-6 pb-10 min-h-screen bg-transparent transition-colors duration-300 relative overflow-hidden"
         >
           {/* Animated Constellation Background */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -200,7 +200,7 @@ const DashboardHome = () => {
 
           <div className="relative z-10 flex flex-col gap-4 sm:gap-6 w-full">
             {/* ── FULL WIDTH TOP: Hero & Banners ── */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -231,7 +231,7 @@ const DashboardHome = () => {
             {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
             <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
               {/* ── LEFT: Career Pathways ── */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
@@ -242,15 +242,20 @@ const DashboardHome = () => {
               </motion.div>
 
               {/* ── RIGHT: Calendar + Tasks ── */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-                className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0"
+                className="w-full xl:w-[300px] 2xl:w-[340px] shrink-0 self-start"
               >
-                <div className="xl:sticky xl:top-24">
-                  <LearningProgress />
+                {/* Section heading — same style as MY CAREER PATHS */}
+                <div className="flex items-center gap-2.5 mb-4">
+                  <span className="w-[3px] h-4 rounded-full bg-[#1a3884] dark:bg-blue-500 shrink-0" />
+                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                    My Activities
+                  </h2>
                 </div>
+                <LearningProgress />
               </motion.div>
             </div>
           </div>

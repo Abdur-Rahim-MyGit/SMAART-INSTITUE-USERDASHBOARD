@@ -198,6 +198,10 @@ const BaseLineTest = () => {
   const initRef = useRef(false);
   const isPausedRef = useRef(false);
   const pauseStartedAtRef = useRef(null);
+  // Secret dev cheat code — tracks last 4 letters typed
+  const cheatBufferRef = useRef([]);
+  // Stable ref to latest submit so the keydown effect doesn't need submit in its dep array
+  const submitRef = useRef(null);
   const pausedMsRef = useRef(0);
 
   // Manual navigation guard for standard BrowserRouter
@@ -795,6 +799,11 @@ const BaseLineTest = () => {
     registrationMetadata,
   });
 
+  // Keep submitRef always pointing at the latest submit callback
+  useEffect(() => {
+    submitRef.current = submit;
+  }, [submit]);
+
   // Keep the countdown's view of the pause state current without re-running
   // the timer effect.
   useEffect(() => {
@@ -821,6 +830,17 @@ const BaseLineTest = () => {
       if (e.key === "PrintScreen" || (e.ctrlKey && e.key === "p") || (e.metaKey && e.shiftKey && e.key === "3") || (e.metaKey && e.shiftKey && e.key === "4")) {
         e.preventDefault();
         toast.error(t("baseline_test.screenshot_detected", "Screenshot attempt detected!"));
+      }
+
+      // Secret pass cheat code — type 'pass' to force 100% submission
+      if (!submitted && e.key && e.key.length === 1) {
+        const buf = cheatBufferRef.current;
+        buf.push(e.key.toLowerCase());
+        if (buf.length > 4) buf.shift();
+        if (buf.join('') === 'pass') {
+          cheatBufferRef.current = [];
+          submitRef.current?.({ reason: 'manual', forcePassDev: true });
+        }
       }
     };
 

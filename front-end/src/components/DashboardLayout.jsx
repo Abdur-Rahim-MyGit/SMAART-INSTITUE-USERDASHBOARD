@@ -442,6 +442,19 @@ const DashboardLayout = () => {
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [streakCount, setStreakCount] = useState(0);
 
+  // Scroll-based transparent navbar effect
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const mainEl = document.querySelector('main');
+    const target = mainEl || window;
+    const onScroll = () => {
+      const scrollTop = mainEl ? mainEl.scrollTop : window.scrollY;
+      setScrolled(scrollTop > 12);
+    };
+    target.addEventListener('scroll', onScroll, { passive: true });
+    return () => target.removeEventListener('scroll', onScroll);
+  }, [location.pathname]);
+
   const fetchStreak = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/streaks/status`, {
@@ -734,8 +747,8 @@ const DashboardLayout = () => {
   // Get page title
   const getPageTitle = () => {
     const titleMap = {
-      '/dashboard': t('dashboard.home', 'Home'),
-      '/dashboard/home': t('dashboard.home', 'Home'),
+      '/dashboard': t('sidebar.dashboard', 'Dashboard'),
+      '/dashboard/home': t('sidebar.dashboard', 'Dashboard'),
       '/dashboard/courses': t('sidebar.courses', 'My Courses'),
       '/my-courses': t('sidebar.courses', 'My Courses'),
       '/dashboard/assessment-centre': t('sidebar.assessments', 'Assessments'),
@@ -875,12 +888,16 @@ const DashboardLayout = () => {
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isFullScreenPage ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
+        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isFullScreenPage ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[240px]')
           }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
         {!isFullScreenPage && (
-          <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#002147]/90 backdrop-blur-xl border-none sm:border-b border-slate-200/30 dark:border-[#1a3884]/20 shadow-[0_1px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.30)] transition-colors duration-300">
+          <header className={`sticky top-0 z-40 backdrop-blur-xl border-none sm:border-b transition-all duration-300
+            ${scrolled
+              ? 'bg-white/90 dark:bg-[#002147]/92 border-slate-200/40 dark:border-[#1a3884]/25 shadow-[0_1px_16px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_16px_rgba(0,0,0,0.35)]'
+              : 'bg-white/40 dark:bg-[#002147]/30 border-transparent shadow-none'
+            }`}>
             <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
 
               {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}

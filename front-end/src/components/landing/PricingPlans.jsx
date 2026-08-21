@@ -38,7 +38,7 @@ const PricingPlans = () => {
     ];
 
     return (
-        <section className="py-24 bg-white dark:bg-[#001835] relative overflow-hidden transition-colors duration-300">
+        <section id="pricing" className="py-24 bg-white dark:bg-[#001835] relative overflow-hidden transition-colors duration-300">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1a3884]/5 rounded-full blur-[120px] pointer-events-none" />
 
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
