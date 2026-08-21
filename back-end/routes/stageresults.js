@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const StageResult = require('../models/StageResult');
 const BaseLineResult = require('../models/BaseLineResult');
 const { protect } = require('../middleware/auth');
@@ -372,15 +373,19 @@ router.post('/restart-course', async (req, res) => {
         const courses = await Course.find({ courseCode: { $in: courseCodes } }).select('_id');
         const courseIds = courses.map(c => c._id);
 
+        const userIdFilter = mongoose.Types.ObjectId.isValid(userId)
+            ? { $in: [userId, new mongoose.Types.ObjectId(userId)] }
+            : userId;
+
         // 2. Delete enrollments for these courses for this user
         const deleteRes = await CourseEnrollment.deleteMany({
-            student: userId,
+            student: userIdFilter,
             course: { $in: courseIds }
         });
 
         // 3. Clear StageResult attempts
         const stageResultRes = await StageResult.deleteMany({
-            userId,
+            userId: userIdFilter,
             stage: stageKey
         });
 

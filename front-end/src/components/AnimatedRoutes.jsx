@@ -27,6 +27,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const AddDetails = lazy(() => import('@/pages/AddDetails'));
 const ModuleViewPage = lazy(() => import('@/pages/ModuleViewPage'));
 const CoursePlayer = lazy(() => import('@/pages/CoursePlayer'));
+const BritishCouncil = lazy(() => import('@/pages/BritishCouncil'));
 const MicroAssessmentList = lazy(() => import('@/pages/MicroAssessmentList'));
 const MicroAssessmentPlayer = lazy(() => import('@/pages/MicroAssessmentPlayer'));
 const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
@@ -136,6 +137,7 @@ const AnimatedRoutes = () => {
                         <Route path="/module/:courseId/:moduleId" element={<ModuleViewPage />} />
                         <Route path="/dashboard/courses/:courseId/modules" element={<ModuleViewPage />} />
                         <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<ModuleViewPage />} />
+                        <Route path="/dashboard/british-council" element={<BritishCouncil />} />
 
                         {/* Notes */}
                         <Route path="/dashboard/notes" element={<MyNotes />} />

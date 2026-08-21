@@ -36,6 +36,7 @@ import ProctoringSetup from "@/components/proctoring/ProctoringSetup";
 import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
 import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningModal";
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -155,6 +156,16 @@ const BaseLineTest = () => {
   const stageDurationSeconds = stageConfig.durationMinutes * 60;
 
   // State management
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  useEffect(() => {
+    setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const [user, setUser] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [resultId, setResultId] = useState(null);
@@ -522,11 +533,17 @@ const BaseLineTest = () => {
     setTimeElapsed(0);
   }, [index]);
 
-  // Timer: Update elapsed time every 100ms
+  // Timer: Update elapsed time until the 5s anti-guessing gate has passed.
+  // Ticking forever (for the rest of the question, which can be minutes)
+  // was re-rendering the whole page 10x/sec for no visible benefit.
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeElapsed(Date.now() - questionStartTime);
-    }, 100);
+      const elapsed = Date.now() - questionStartTime;
+      setTimeElapsed(elapsed);
+      if (elapsed >= 5000) {
+        clearInterval(interval);
+      }
+    }, 200);
     return () => clearInterval(interval);
   }, [questionStartTime]);
 
@@ -826,15 +843,15 @@ const BaseLineTest = () => {
   if (loading) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
-        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">{t("baseline_test.loading_test", "Loading {{title}}...", { title: translatedTitle })}</p>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] dark:border-blue-500 mx-auto mb-4"></div>
+        <p className="text-slate-655 dark:text-slate-350 text-lg font-medium">{t("baseline_test.loading_test", "Loading {{title}}...", { title: translatedTitle })}</p>
       </div>
     </div>
   );
 
   if (attemptInfo.locked) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-xl mx-auto p-8 bg-white dark:bg-[#002147] rounded-3xl shadow-2xl border border-red-200 dark:border-red-950/20 relative overflow-hidden">
+      <div className="text-center max-w-xl mx-auto p-8 bg-white dark:bg-[#002147] rounded-3xl shadow-2xl border border-red-200 dark:border-red-950/20 relative overflow-hidden text-slate-900 dark:text-white">
         {/* Decorative background blur */}
         <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-red-500/5 rounded-full blur-[50px] pointer-events-none" />
         
@@ -891,7 +908,7 @@ const BaseLineTest = () => {
 
   if (error) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
+      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30 text-slate-900 dark:text-white">
         <div className="text-red-500 text-5xl mb-4">⚠</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t("baseline_test.error", "Error")}</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
@@ -903,7 +920,7 @@ const BaseLineTest = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300 flex flex-col justify-center">
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
           onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, registrationCropUrl }) => {
@@ -922,22 +939,47 @@ const BaseLineTest = () => {
           assessmentTitle={translatedTitle}
         />
       )}
-      <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
+      <main className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)] flex flex-col justify-center relative z-10 w-full">
+        {/* Immersive mesh glow effects */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <motion.div
+            animate={{
+              x: [0, 40, -30, 0],
+              y: [0, -40, 30, 0],
+              scale: [1, 1.15, 0.9, 1],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/10 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/30"
+          />
+          <motion.div
+            animate={{
+              x: [0, -40, 30, 0],
+              y: [0, 40, -35, 0],
+              scale: [1, 0.9, 1.1, 1],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/30"
+          />
+        </div>
+
         {!submitted ? (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8 relative z-10">
             {/* Main Question Area */}
-            <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden relative">
+            <div className="flex-1 flex flex-col min-h-[540px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-2xl overflow-hidden relative text-slate-900 dark:text-white">
               {/* Background gradient effect */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="p-6 border-b border-slate-150 dark:border-white/10 bg-slate-50/50 dark:bg-[#002a5c]/30 relative z-10">
+              <div className="p-6 border-b border-slate-150 dark:border-blue-900/40 bg-slate-50/50 dark:bg-[#002a5c]/20 relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setShowExitWarning(true)}
                       disabled={submitting || interactionLocked || timeExpired}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-[#003170] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-blue-900/45 bg-white dark:bg-[#001c3d] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-[#002a5c] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       {t("baseline_test.back", "Back")}
@@ -965,29 +1007,33 @@ const BaseLineTest = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-slate-200 dark:bg-[#00152E] rounded-full overflow-hidden border border-slate-100 dark:border-blue-900/20 relative">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-500 dark:to-blue-400"
+                      className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-400 relative"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 0.5 }}
-                    />
+                    >
+                      {/* Bouncy active shimmer glow */}
+                      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.25)_50%,rgba(255,255,255,0)_100%)] w-[50%] animate-pulse" />
+                    </motion.div>
                   </div>
                   <span className="text-xs font-bold text-[#1a3884] dark:text-blue-400 min-w-[3rem] text-right">{progress}%</span>
                 </div>
               </div>
 
-              <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
-                <div className="mb-8 text-center">
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 dark:bg-blue-400/10 text-[#1a3884] dark:text-blue-300 text-xs font-bold uppercase tracking-widest mb-3">
+              <div className="p-6 md:p-10 flex-1 relative z-10 flex flex-col justify-center gap-6">
+                <div className="mb-4 text-center">
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a3884]/10 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-300 text-xs font-extrabold uppercase tracking-widest mb-2.5 border border-[#1a3884]/20 dark:border-blue-500/20 shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 animate-ping" />
                     {t("baseline_test.question_number", "Question {{current}} / {{total}}", { current: index + 1, total: questions.length })}
                   </span>
-                  <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-snug mb-2 tracking-tight">
                     {current?.questionText}
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 max-w-4xl mx-auto w-full">
+                <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-4.5 max-w-3xl mx-auto w-full mt-2">
                   {current?.options?.map((option) => {
                     const isSelected = selectedValue === option.value;
                     return (
@@ -995,19 +1041,19 @@ const BaseLineTest = () => {
                         key={option.value}
                         onClick={() => selectOption(option.value)}
                         disabled={interactionLocked || submitting || timeExpired}
-                        className={`group relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
-                          ? 'border-[#1a3884] dark:border-blue-400 bg-[#1a3884]/10 dark:bg-blue-400/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
-                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-[#1a3884]/50 dark:hover:border-blue-400/50 hover:bg-[#F8FAFC] dark:hover:bg-[#003170]'
+                        className={`group relative p-4 md:p-5 min-h-[75px] md:min-h-[85px] rounded-2xl border-2 transition-all duration-350 text-left hover:scale-[1.01] hover:shadow-md active:scale-[0.995] ${isSelected
+                          ? 'border-[#1a3884] dark:border-blue-500 bg-[#1a3884]/5 dark:bg-blue-500/10 shadow-[0_4px_20px_rgba(26,56,132,0.15)] text-[#1a3884] dark:text-white font-bold'
+                          : 'border-slate-200 dark:border-blue-900/40 bg-white dark:bg-[#001c3d] hover:border-[#1a3884]/50 dark:hover:border-blue-400/50 hover:bg-blue-50/30 dark:hover:bg-[#002a5c] text-slate-700 dark:text-slate-200'
                           }`}
                       >
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm md:text-base shrink-0 transition-colors shadow-sm ${isSelected
-                            ? 'bg-[#1a3884] dark:bg-blue-500 border-[#1a3884] dark:border-blue-500 text-white'
-                            : 'border-slate-300 dark:border-white/15 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
+                        <div className="flex items-center gap-4 md:gap-5">
+                          <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full border-2 flex items-center justify-center font-extrabold text-sm md:text-base shrink-0 transition-all duration-300 shadow-sm ${isSelected
+                            ? 'bg-gradient-to-br from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-500 border-transparent text-white shadow-md scale-105'
+                            : 'border-slate-300 dark:border-blue-800/60 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
                             }`}>
                             {option.value}
                           </div>
-                          <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-200 font-medium'}`}>
+                          <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-200 font-semibold'}`}>
                             {option.label}
                           </span>
                         </div>
@@ -1017,7 +1063,7 @@ const BaseLineTest = () => {
                 </div>
 
                 {/* Manual "Next" / "Submit" button */}
-                <div className="h-16 mt-6 md:mt-8 flex justify-center items-center">
+                <div className="h-16 mt-4 md:mt-6 flex justify-center items-center">
                   <AnimatePresence>
                     {index < questions.length - 1 ? (
                       selectedValue && (
@@ -1028,19 +1074,19 @@ const BaseLineTest = () => {
                           exit={{ opacity: 0, scale: 0.9 }}
                           onClick={nextQ}
                           disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
-                          className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2 ${timeElapsed < 5000
-                            ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 dark:text-slate-550 cursor-not-allowed'
+                          className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2.5 ${timeElapsed < 5000
+                            ? 'bg-slate-200 dark:bg-[#001c3d] text-slate-450 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-blue-900/30'
                             : 'bg-[#1a3884] dark:bg-blue-600 text-white hover:bg-[#277a84] dark:hover:bg-blue-500 hover:shadow-2xl hover:-translate-y-1'
                             }`}
                         >
                           {timeElapsed < 5000 ? (
                             <>
                               <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((5000 - timeElapsed) / 1000) })}</span>
-                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                              <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                             </>
                           ) : (
                             <>
-                              {t("baseline_test.next_question", "Next Question")} <CheckCircle2 size={18} />
+                              {t("baseline_test.next_question", "Next Question")} <CheckCircle2 size={20} />
                             </>
                           )}
                         </motion.button>
@@ -1053,8 +1099,8 @@ const BaseLineTest = () => {
                         exit={{ opacity: 0, scale: 0.9 }}
                         onClick={() => submit()}
                         disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered || !selectedValue}
-                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2 ${(!allQuestionsAnswered || !selectedValue)
-                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed'
+                        className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2.5 ${(!allQuestionsAnswered || !selectedValue)
+                          ? 'bg-slate-200 dark:bg-[#001c3d] text-slate-450 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-blue-900/30'
                           : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-2xl hover:-translate-y-1 shadow-md'
                           }`}
                       >
@@ -1082,10 +1128,10 @@ const BaseLineTest = () => {
             </div>
 
             {/* Navigation Sidebar */}
-            <div className="lg:w-80 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
+            <div className="lg:w-[320px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6 text-slate-900 dark:text-white">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Target className="text-[#1a3884] dark:text-blue-450" size={20} /> {t("baseline_test.question_map", "Question Map")}
+                  <Target className="text-[#1a3884] dark:text-blue-400" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
                   {questions.map((q, idx) => (
@@ -1094,10 +1140,10 @@ const BaseLineTest = () => {
                       onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
                         ${index === idx
-                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
+                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-400'
                           : selectedAnswers[q._id]
-                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
-                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
+                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-500/30'
+                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-blue-900/30'
                         }`}
                     >
                       {idx + 1}
@@ -1110,13 +1156,13 @@ const BaseLineTest = () => {
                 </div>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/8">
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-blue-900/40">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884] dark:bg-blue-500" /> {t("baseline_test.answered", "Answered")}</span>
+                  <span className="text-slate-550 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884] dark:bg-blue-500" /> {t("baseline_test.answered", "Answered")}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C]" /> {t("baseline_test.remaining", "Remaining")}</span>
+                  <span className="text-slate-550 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C] border border-transparent dark:border-blue-900/30" /> {t("baseline_test.remaining", "Remaining")}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
                 </div>
               </div>
@@ -1124,7 +1170,7 @@ const BaseLineTest = () => {
 
 
               {/* DEV: Auto Answer */}
-              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
+              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-blue-900/40 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
                   onClick={async () => {
@@ -1139,7 +1185,7 @@ const BaseLineTest = () => {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-[#10b981]/20 dark:bg-[#10b981]/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-[#10b981]/30 dark:hover:bg-[#10b981]/20 transition-colors"
+                  className="w-full py-2 bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors border border-emerald-200 dark:border-emerald-800/20"
                 >
                   {t("baseline_test.pass_dev", "⚡ Pass 70% (Dev)")}
                 </button>
@@ -1157,7 +1203,7 @@ const BaseLineTest = () => {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-rose-500/20 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-rose-500/30 dark:hover:bg-rose-500/20 transition-colors"
+                  className="w-full py-2 bg-rose-50 dark:bg-[#ff0000]/10 text-rose-700 dark:text-red-405 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-rose-100 dark:hover:bg-[#ff0000]/20 transition-colors border border-rose-200 dark:border-red-900/25"
                 >
                   {t("baseline_test.fail_dev", "⚡ Fail (Dev)")}
                 </button>
@@ -1172,7 +1218,7 @@ const BaseLineTest = () => {
           >
             {/* Main Results Card */}
             {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/8 rounded-2xl shadow-sm p-8 max-w-4xl mx-auto relative">
+            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-blue-900/40 rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto relative text-slate-900 dark:text-white">
               
               {/* Top Left User Info */}
               <div className="absolute top-8 left-8 hidden sm:block text-left">
@@ -1198,7 +1244,7 @@ const BaseLineTest = () => {
                     ) : (
                       <div className="space-y-2">
                         {testResults.remainingAttempts !== undefined && testResults.remainingAttempts > 0 && (
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                          <p className="text-xs text-slate-555 dark:text-slate-400 font-medium">
                             You have {testResults.remainingAttempts} attempt{testResults.remainingAttempts !== 1 ? 's' : ''} remaining. Each retry will have different questions.
                           </p>
                         )}
@@ -1224,7 +1270,7 @@ const BaseLineTest = () => {
                   </div>
                 )}
 
-                <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                <div className="flex items-center justify-center gap-2 text-slate-550 dark:text-slate-455 text-sm">
                   <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
                   <span>|</span>
                   <span>S_{stageConfig.name.toLowerCase()}</span>
@@ -1238,19 +1284,19 @@ const BaseLineTest = () => {
               </div>
 
               {/* Professional Score Display */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-white/10">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-6 border border-slate-150 dark:border-blue-900/40">
                 <div className="text-center md:text-right">
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("baseline_test.overall_score", "Overall Score")}</div>
+                  <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t("baseline_test.overall_score", "Overall Score")}</div>
                   <div className="text-5xl font-bold text-slate-900 dark:text-white">
                     {testResults?.stageScore || testResults?.baselineScore}
                     <span className="text-2xl text-slate-400 ml-1">/100</span>
                   </div>
                 </div>
 
-                <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-[#003170]" />
+                <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-blue-900/40" />
 
                 <div className="text-center md:text-left">
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("baseline_test.proficiency_level", "Proficiency Level")}</div>
+                  <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t("baseline_test.proficiency_level", "Proficiency Level")}</div>
                   {stageConfig.maxAttempts > 1 && testResults && !testResults.passed ? (
                     <div className="text-2xl font-bold px-4 py-1 rounded-full inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
                       {t("baseline_test.keep_improving", "Keep Improving")}
@@ -1266,17 +1312,17 @@ const BaseLineTest = () => {
               {/* T4 Final: Total Growth Δ + Learning Velocity (Blueprint v1.0) */}
               {stageKey === 'T4' && (testResults?.growthDelta != null || testResults?.plviBand) && (
                 <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-12">
-                  <div className="flex-1 text-center bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-5 border border-slate-100 dark:border-white/10">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{t("baseline_test.total_growth", "Total Growth (T1 → T4)")}</div>
+                  <div className="flex-1 text-center bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-5 border border-slate-150 dark:border-blue-900/40">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">{t("baseline_test.total_growth", "Total Growth (T1 → T4)")}</div>
                     <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">
                       {testResults.growthDelta == null ? '—' : `${testResults.growthDelta >= 0 ? '+' : ''}${testResults.growthDelta} pts`}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{t("baseline_test.since_baseline", "since your baseline")}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t("baseline_test.since_baseline", "since your baseline")}</div>
                   </div>
-                  <div className="flex-1 text-center bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-5 border border-slate-100 dark:border-white/10">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{t("baseline_test.learning_velocity", "Learning Velocity")}</div>
+                  <div className="flex-1 text-center bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-5 border border-slate-150 dark:border-blue-900/40">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">{t("baseline_test.learning_velocity", "Learning Velocity")}</div>
                     <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">{testResults.plviBand || '—'}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
+                    <div className="text-[11px] text-slate-550 dark:text-slate-450 mt-0.5">
                       {testResults.tDays ? `over ${testResults.tDays} ${testResults.tDaysBasis === 'active' ? 'active learning days' : 'days'}` : t("baseline_test.rate_of_growth", "rate of growth")}
                     </div>
                   </div>
@@ -1307,7 +1353,7 @@ const BaseLineTest = () => {
                         initial={{ y: 50, opacity: 0, scale: 0.9 }}
                         animate={{ y: 0, opacity: 1, scale: 1 }}
                         transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                        className="bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg p-5 hover:border-slate-300 transition-colors"
+                        className="bg-white dark:bg-[#00152E]/60 border border-slate-200 dark:border-blue-900/40 rounded-xl p-5 hover:border-slate-350 dark:hover:border-blue-500/40 transition-all duration-300 text-slate-900 dark:text-white"
                       >
                         <div className="relative z-10">
                           {/* Header */}
@@ -1321,7 +1367,7 @@ const BaseLineTest = () => {
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{qName}</h4>
                               </div>
                             </div>
-                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 dark:bg-blue-950 text-slate-600 dark:text-blue-300 border border-slate-200 dark:border-blue-900/40">
                               {t(`baseline_test.bands.${data.level}`, data.level)}
                             </span>
                           </div>
@@ -1339,14 +1385,14 @@ const BaseLineTest = () => {
                             </div>
                             <div className="text-right">
                               <div className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t("baseline_test.performance", "Performance")}</div>
-                              <div className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                              <div className="text-sm font-bold text-slate-600 dark:text-slate-350">
                                 {data.earned}/{data.possible} {t("baseline_test.correct", "correct")}
                               </div>
                             </div>
                           </div>
 
                           {/* Progress Bar */}
-                          <div className="relative h-3 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
+                          <div className="relative h-3 w-full bg-slate-105 dark:bg-[#002147] rounded-full overflow-hidden border border-slate-200 dark:border-blue-900/20">
                             {/* Threshold markers */}
                             <div className="absolute left-[20%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
                             <div className="absolute left-[40%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
@@ -1463,7 +1509,7 @@ const BaseLineTest = () => {
       {
         showExitWarning && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#002147] p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-white/10">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#002147] p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-blue-900/40 text-slate-900 dark:text-white">
               <div className="w-20 h-20 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
@@ -1472,13 +1518,13 @@ const BaseLineTest = () => {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={leaveAssessmentPage}
-                  className="w-full py-4 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-[#003170] transition-all shadow-sm"
+                  className="w-full py-4 bg-white dark:bg-[#001c3d] border border-slate-200 dark:border-blue-900/40 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-[#002a5c] transition-all shadow-sm"
                 >
                   {t("baseline_test.leave_assessment", "Leave Assessment")}
                 </button>
                 <button onClick={() => {
                   setShowExitWarning(false);
-                }} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">{t("baseline_test.continue_assessment", "Continue Assessment")}</button>
+                }} className="w-full py-4 bg-[#1a3884] dark:bg-blue-600 text-white rounded-xl font-bold hover:bg-[#277a84] dark:hover:bg-blue-500 transition-all shadow-md">{t("baseline_test.continue_assessment", "Continue Assessment")}</button>
               </div>
             </motion.div>
           </div>

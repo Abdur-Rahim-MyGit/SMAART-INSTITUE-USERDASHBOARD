@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { X, Upload, CheckCircle } from 'lucide-react';
+import { X, UploadCloud, CheckCircle2, FileText, AlertTriangle, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
     const [file, setFile] = useState(null);
@@ -19,300 +20,250 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
         }
     };
 
-    const handleVerify = () => { if (file) setVerified(true); };
+    const handleVerify = () => { 
+        if (file) {
+            setVerified(true);
+        } 
+    };
+    
     const canConfirm = verified || skipCert;
     const handleConfirm = () => { onConfirm(skillName, file); };
 
     const step = !file && !skipCert ? 1 : (file && !verified) ? 2 : 3;
-
-    const C = {
-        bg:       isDark ? '#0f1729' : '#ffffff',
-        surface:  isDark ? '#141f35' : '#f8fafc',
-        border:   isDark ? 'rgba(255,255,255,0.09)' : '#e2e8f0',
-        text1:    isDark ? '#f1f5f9' : '#0f172a',
-        text2:    isDark ? '#94a3b8' : '#475569',
-        muted:    isDark ? '#64748b' : '#94a3b8',
-        accent:   isDark ? '#3b82f6' : '#1a3884', 
-        accentBg: isDark ? 'rgba(79,142,247,0.12)' : 'rgba(26,56,132,0.08)',
-        accentBorder: isDark ? 'rgba(79,142,247,0.3)' : 'rgba(26,56,132,0.25)',
-        dropBg:   isDark ? '#111827' : '#f8fafc',
-        btnBg:    isDark ? '#1e2d48' : '#f1f5f9',
-    };
-
     const STEPS = ['Upload', 'Verify', 'Confirm'];
 
     return ReactDOM.createPortal(
-        <div
-            style={{
-                position: 'fixed', inset: 0,
-                background: 'rgba(0,0,0,0.65)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                zIndex: 99999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '1rem',
-                animation: 'fadeIn 0.18s ease',
-            }}
-            onClick={onClose}
-        >
-            <div
-                style={{
-                    background: C.bg,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: '24px',
-                    width: '100%', maxWidth: '460px',
-                    overflow: 'hidden',
-                    boxShadow: isDark
-                        ? '0 40px 80px -20px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)'
-                        : '0 24px 60px -12px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)',
-                    position: 'relative',
-                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                    animation: 'slideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)',
-                }}
-                onClick={e => e.stopPropagation()}
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/65 backdrop-blur-md overflow-y-auto">
+            {/* Modal Card */}
+            <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                transition={{ type: "spring", duration: 0.4 }}
+                className="relative w-full max-w-[460px] bg-white/95 dark:bg-[#002147]/95 backdrop-blur-2xl border border-slate-200/60 dark:border-white/10 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_24px_60px_-12px_rgba(0,0,0,0.5)] rounded-[28px] overflow-hidden font-sans my-8 text-slate-800 dark:text-slate-200"
             >
-                <div style={{
-                    height: '4px',
-                    background: isDark ? 'linear-gradient(90deg, #3b82f6, #818cf8, #06b6d4)' : '#1a3884',
-                }} />
+                {/* Top progress stripe */}
+                <div className="h-1.5 bg-[#e2e8f0] dark:bg-white/5 relative">
+                    <motion.div 
+                        className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"
+                        animate={{ width: `${(step / 3) * 100}%` }}
+                        transition={{ duration: 0.3 }}
+                    />
+                </div>
 
-                <div style={{
-                    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-                    padding: '1.4rem 1.5rem 1.1rem',
-                    borderBottom: `1px solid ${C.border}`,
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                            fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.1em',
-                            textTransform: 'uppercase', color: C.accent,
-                            background: C.accentBg,
-                            border: `1px solid ${C.accentBorder}`,
-                            padding: '0.22rem 0.6rem', borderRadius: '100px', width: 'fit-content',
-                        }}>
-                            <CheckCircle size={9} />
+                {/* Header */}
+                <div className="flex items-start justify-between p-6 pb-4 border-b border-slate-100 dark:border-white/5">
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#1a3884] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-100/30 dark:border-blue-900/20 px-2.5 py-1 rounded-full">
+                            <CheckCircle2 size={10} />
                             Mark as Completed
                         </div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: C.text1, letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+                        <h3 className="text-base font-black tracking-tight text-slate-900 dark:text-white leading-tight truncate max-w-full">
                             {skillName}
-                        </div>
+                        </h3>
                     </div>
                     <button
                         onClick={onClose}
-                        style={{
-                            background: C.surface, border: `1px solid ${C.border}`,
-                            cursor: 'pointer', color: C.text2,
-                            padding: '0.4rem', borderRadius: '9px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'all 0.15s', flexShrink: 0, marginTop: '0.1rem',
-                        }}
+                        className="p-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-xl transition-all cursor-pointer flex-shrink-0"
                     >
-                        <X size={15} />
+                        <X size={16} />
                     </button>
                 </div>
 
-                <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '1rem 1.5rem',
-                    background: C.surface,
-                    borderBottom: `1px solid ${C.border}`,
-                    gap: '0',
-                }}>
+                {/* Steps Navigator */}
+                <div className="flex items-center justify-between px-8 py-3 bg-slate-50/50 dark:bg-black/10 border-b border-slate-100 dark:border-white/5">
                     {STEPS.map((s, i) => {
                         const isActive = step === i + 1;
                         const isDone   = step > i + 1;
                         return (
                             <React.Fragment key={s}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
-                                    <div style={{
-                                        width: '28px', height: '28px', borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        transition: 'all 0.25s',
-                                        background: isDone ? '#22c55e' : isActive ? C.accent : C.btnBg,
-                                        border: isDone ? '2px solid #22c55e' : isActive ? `2px solid ${C.accent}` : `2px solid ${C.border}`,
-                                        boxShadow: isActive ? '0 0 0 4px rgba(79,142,247,0.18)' : 'none',
-                                    }}>
-                                        {isDone
-                                            ? <CheckCircle size={13} color="#fff" />
-                                            : <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isActive ? '#fff' : C.muted }}>{i + 1}</span>
-                                        }
+                                <div className="flex flex-col items-center gap-1">
+                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 text-[10px] font-black border-2 ${
+                                        isDone 
+                                            ? 'bg-emerald-500 border-emerald-500 text-white' 
+                                            : isActive 
+                                                ? 'bg-[#1a3884] dark:bg-blue-600 border-[#1a3884] dark:border-blue-600 text-white shadow-md shadow-blue-500/10' 
+                                                : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-400 dark:text-slate-500'
+                                    }`}>
+                                        {isDone ? '✓' : i + 1}
                                     </div>
-                                    <span style={{
-                                        fontSize: '0.65rem', fontWeight: 700,
-                                        color: isDone ? '#22c55e' : isActive ? C.text1 : C.muted,
-                                        transition: 'color 0.2s',
-                                    }}>
+                                    <span className={`text-[9px] font-extrabold uppercase tracking-wide transition-colors ${
+                                        isDone ? 'text-emerald-500' : isActive ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'
+                                    }`}>
                                         {s}
                                     </span>
                                 </div>
                                 {i < 2 && (
-                                    <div style={{
-                                        width: '48px', height: '2px',
-                                        margin: '0 0.4rem',
-                                        marginBottom: '1.1rem',
-                                        background: step > i + 1 ? '#22c55e' : C.border,
-                                        transition: 'background 0.3s',
-                                        borderRadius: '2px',
-                                    }} />
+                                    <div className={`flex-1 h-0.5 mx-2 rounded-full transition-colors duration-300 ${
+                                        step > i + 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-white/5'
+                                    }`} />
                                 )}
                             </React.Fragment>
                         );
                     })}
                 </div>
 
-                <div style={{ padding: '1.4rem 1.5rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div
-                        style={{
-                            border: `2px dashed ${dragOver ? C.accent : verified ? '#22c55e' : file ? 'rgba(34,197,94,0.5)' : C.border}`,
-                            borderRadius: '16px',
-                            padding: '2.2rem 1.5rem',
-                            textAlign: 'center', cursor: verified ? 'default' : 'pointer',
-                            transition: 'all 0.2s',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
-                            userSelect: 'none',
-                            background: verified
-                                ? 'rgba(34,197,94,0.06)'
-                                : dragOver
-                                    ? C.accentBg
-                                    : C.dropBg,
-                        }}
-                        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                        onDragLeave={() => setDragOver(false)}
-                        onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
-                        onClick={() => !verified && fileInputRef.current?.click()}
-                    >
-                        <input ref={fileInputRef} type="file" accept=".pdf,image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                {/* Content Body with slide animation */}
+                <div className="p-6">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={step}
+                            initial={{ opacity: 0, x: 15 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -15 }}
+                            transition={{ duration: 0.2 }}
+                            className="space-y-4"
+                        >
+                            {/* Step 1: Upload Dropzone */}
+                            {step === 1 && (
+                                <div
+                                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                                    onDragLeave={() => setDragOver(false)}
+                                    onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 flex flex-col items-center gap-3.5 ${
+                                        dragOver 
+                                            ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-500' 
+                                            : 'bg-slate-50/50 dark:bg-black/10 border-slate-200 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20'
+                                    }`}
+                                >
+                                    <input 
+                                        ref={fileInputRef} 
+                                        type="file" 
+                                        accept=".pdf,image/*" 
+                                        className="hidden" 
+                                        onChange={e => handleFile(e.target.files[0])} 
+                                    />
+                                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center text-slate-400 group-hover:scale-105 transition-transform">
+                                        <UploadCloud size={24} className="text-[#1a3884] dark:text-blue-400" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-black text-slate-900 dark:text-white">
+                                            Drop your certificate here or{' '}
+                                            <span className="text-[#1a3884] dark:text-blue-400 underline underline-offset-2">browse files</span>
+                                        </p>
+                                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                                            Supports PDF, JPG, PNG up to 10MB
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
-                        {verified ? (
-                            <>
-                                <div style={{
-                                    width: '52px', height: '52px', borderRadius: '50%',
-                                    background: 'rgba(34,197,94,0.12)',
-                                    border: '2px solid rgba(34,197,94,0.35)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                    <CheckCircle size={26} color="#22c55e" />
-                                </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#22c55e' }}>Certificate Verified ✓</div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
-                            </>
-                        ) : file ? (
-                            <>
-                                <div style={{
-                                    width: '52px', height: '52px', borderRadius: '14px',
-                                    background: 'rgba(34,197,94,0.1)',
-                                    border: '1px solid rgba(34,197,94,0.3)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '1.5rem',
-                                }}>📄</div>
-                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#22c55e' }}>{file.name}</div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
-                            </>
-                        ) : (
-                            <>
-                                <div style={{
-                                    width: '56px', height: '56px', borderRadius: '16px',
-                                    background: C.btnBg,
-                                    border: `1px solid ${C.border}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'all 0.2s',
-                                }}>
-                                    <Upload size={22} color={C.muted} />
-                                </div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.text1, lineHeight: 1.4 }}>
-                                    Drop your certificate here or{' '}
-                                    <span style={{ color: C.accent, fontWeight: 700 }}>browse files</span>
-                                </div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted }}>PDF, JPG or PNG accepted</div>
-                            </>
-                        )}
-                    </div>
+                            {/* Step 2: Uploaded & Awaiting Verification */}
+                            {step === 2 && file && (
+                                <div className="border border-slate-200/85 dark:border-white/10 bg-slate-50/40 dark:bg-black/10 rounded-2xl p-5 flex flex-col items-center gap-3 text-center">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/30 dark:border-emerald-900/20 flex items-center justify-center text-emerald-500">
+                                        <FileText size={24} />
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        <p className="text-xs font-black text-slate-800 dark:text-white truncate max-w-[320px]">
+                                            {file.name}
+                                        </p>
+                                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                                            {(file.size / 1024).toFixed(1)} KB &middot; Awaiting verification
+                                        </p>
+                                    </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
-                        {file && !verified && (
-                            <button
-                                onClick={handleVerify}
-                                style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                                    padding: '0.55rem 1.1rem',
-                                    background: C.accentBg, color: C.accent,
-                                    border: `1px solid ${C.accentBorder}`, borderRadius: '9px',
-                                    fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
-                                    transition: 'all 0.15s',
-                                }}
-                            >
-                                <CheckCircle size={13} /> Verify Certificate
-                            </button>
-                        )}
-                        {!skipCert && !verified && (
-                            <button
-                                onClick={() => setSkipCert(true)}
-                                style={{
-                                    display: 'inline-flex', alignItems: 'center',
-                                    padding: '0.55rem 1rem',
-                                    background: 'transparent', color: C.text2,
-                                    border: `1px solid ${C.border}`, borderRadius: '9px',
-                                    fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer',
-                                    transition: 'all 0.15s',
-                                }}
-                            >
-                                Skip - Mark Without Certificate
-                            </button>
-                        )}
-                        {skipCert && (
-                            <div style={{
-                                fontSize: '0.74rem', color: '#f59e0b',
-                                padding: '0.45rem 0.8rem',
-                                background: 'rgba(245,158,11,0.08)',
-                                border: '1px solid rgba(245,158,11,0.22)',
-                                borderRadius: '9px',
-                                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                            }}>
-                                ⚠️ Marking as complete without a certificate
+                                    <div className="flex gap-2 w-full pt-2">
+                                        <button
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="flex-1 py-2 px-3 border border-slate-200 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20 text-[11px] font-extrabold rounded-xl transition-all cursor-pointer"
+                                        >
+                                            Change File
+                                        </button>
+                                        <button
+                                            onClick={handleVerify}
+                                            className="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-[11px] font-extrabold rounded-xl transition-all shadow-md shadow-emerald-500/10 cursor-pointer flex items-center justify-center gap-1.5"
+                                        >
+                                            <CheckCircle2 size={13} />
+                                            Verify File
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Step 3: Verified Success or Skipped Warning */}
+                            {step === 3 && (
+                                <div className="space-y-4">
+                                    {verified ? (
+                                        <div className="border border-emerald-200/50 dark:border-emerald-900/30 bg-emerald-500/5 dark:bg-emerald-500/5 rounded-2xl p-5 flex flex-col items-center gap-3 text-center">
+                                            <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950/40 border-2 border-emerald-300 dark:border-emerald-800/40 flex items-center justify-center text-emerald-500">
+                                                <CheckCircle2 size={24} />
+                                            </div>
+                                            <div className="space-y-0.5">
+                                                <p className="text-xs font-black text-slate-900 dark:text-white">
+                                                    Verification Successful!
+                                                </p>
+                                                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                    Your certificate metadata is linked and verified.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="border border-amber-200/50 dark:border-amber-900/30 bg-amber-500/5 rounded-2xl p-5 flex flex-col items-center gap-3 text-center">
+                                            <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/30 flex items-center justify-center text-amber-500">
+                                                <AlertTriangle size={24} />
+                                            </div>
+                                            <div className="space-y-0.5">
+                                                <p className="text-xs font-black text-slate-900 dark:text-white">
+                                                    No Certificate Attached
+                                                </p>
+                                                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                                    You are completing this skill without verification docs.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Utility actions inside steps */}
+                            <div className="flex items-center justify-between text-[11px] font-bold pt-1.5">
+                                {step === 1 && !skipCert && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSkipCert(true)}
+                                        className="text-slate-400 hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors ml-auto flex items-center gap-1 cursor-pointer"
+                                    >
+                                        Skip - Complete without file <ArrowRight size={12} />
+                                    </button>
+                                )}
+                                {step === 3 && !verified && (
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSkipCert(false); setFile(null); }}
+                                        className="text-slate-400 hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                                    >
+                                        ← Back to upload
+                                    </button>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
 
-                <div style={{
-                    display: 'flex', gap: '0.65rem',
-                    padding: '1rem 1.5rem',
-                    borderTop: `1px solid ${C.border}`,
-                    justifyContent: 'flex-end',
-                    background: C.surface,
-                }}>
+                {/* Footer Controls */}
+                <div className="flex gap-2 p-5 bg-slate-50/50 dark:bg-black/10 border-t border-slate-100 dark:border-white/5 justify-end">
                     <button
                         onClick={onClose}
-                        style={{
-                            padding: '0.6rem 1.3rem',
-                            background: C.btnBg, color: C.text2,
-                            border: `1px solid ${C.border}`, borderRadius: '10px',
-                            fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
-                            transition: 'all 0.15s',
-                        }}
+                        className="py-2.5 px-4 bg-white dark:bg-[#002A5C] text-slate-600 dark:text-slate-350 border border-slate-200 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20 text-xs font-extrabold rounded-xl transition-all cursor-pointer"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirm}
                         disabled={!canConfirm}
-                        style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
-                            padding: '0.6rem 1.4rem',
-                            background: canConfirm ? C.accent : C.btnBg,
-                            color: canConfirm ? '#ffffff' : C.muted,
-                            border: canConfirm ? `1px solid ${C.accent}` : `1px solid ${C.border}`,
-                            borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700,
-                            transition: 'all 0.2s',
-                            cursor: canConfirm ? 'pointer' : 'not-allowed',
-                            boxShadow: canConfirm ? '0 4px 14px rgba(79,142,247,0.35)' : 'none',
-                        }}
+                        className={`py-2.5 px-5 text-xs font-black rounded-xl transition-all flex items-center gap-1.5 ${
+                            canConfirm 
+                                ? 'bg-gradient-to-r from-[#1a3884] to-[#112b6b] dark:from-blue-600 dark:to-blue-500 text-white shadow-md shadow-blue-500/10 cursor-pointer' 
+                                : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                        }`}
                     >
-                        <CheckCircle size={14} />
-                        {verified ? 'Complete with Certificate' : 'Mark as Completed'}
+                        <CheckCircle2 size={14} />
+                        {verified ? 'Complete & Link Cert' : 'Mark as Completed'}
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </div>,
         document.body
     );

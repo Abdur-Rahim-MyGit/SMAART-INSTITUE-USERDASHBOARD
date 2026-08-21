@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { assessmentApi } from "@/services/assessmentApi";
 import { toast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 // Lucide Icons
 import {
@@ -64,8 +65,6 @@ const SkillAssessmentPlayer = () => {
   // Timer states
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
-  const [timeElapsed, setTimeElapsed] = useState(0);
   const [interactionLocked, setInteractionLocked] = useState(false);
   
   const initRef = useRef(false);
@@ -75,6 +74,46 @@ const SkillAssessmentPlayer = () => {
   const pauseStartedAtRef = useRef(null);
   const isPausedRef = useRef(false);
   const [user, setUser] = useState(null);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  useEffect(() => {
+    setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const submit = useCallback(async ({ reason = "manual", forcePassDev = false, forceFailDev = false } = {}) => {
+    if (!resultId || submitting || submitted) return;
+
+    try {
+      setSubmitting(true);
+      setInteractionLocked(true);
+
+      const response = await assessmentApi.submitAssessment(resultId, assessmentToken, {
+        submissionReason: reason,
+        completeMissingAnswers: reason === "timeout" || reason === "violation" || forcePassDev || forceFailDev,
+        forcePassDev,
+        forceFailDev
+      });
+
+      if (response.success) {
+        setSubmitted(true);
+        setTestResults(response.data);
+        toast.success("Assessment submitted successfully!");
+      } else {
+        throw new Error(response.error || "Failed to submit assessment");
+      }
+    } catch (err) {
+      console.error("Error submitting assessment:", err);
+      toast.error(err.message || "Failed to submit assessment.");
+    } finally {
+      setSubmitting(false);
+      setInteractionLocked(false);
+    }
+  }, [resultId, assessmentToken, submitted, submitting]);
 
   // Synced user details
   useEffect(() => {
@@ -179,19 +218,6 @@ const SkillAssessmentPlayer = () => {
     initializeAssessment();
   }, [decodedSkillName]);
 
-  // Timer trackers
-  useEffect(() => {
-    setQuestionStartTime(Date.now());
-    setTimeElapsed(0);
-  }, [index]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeElapsed(Date.now() - questionStartTime);
-    }, 100);
-    return () => clearInterval(interval);
-  }, [questionStartTime]);
-
   // Countdown timer
   useEffect(() => {
     if (loading || submitted || !resultId || !setupCompleted) return;
@@ -228,7 +254,10 @@ const SkillAssessmentPlayer = () => {
       }
     };
 
-    const timer = setInterval(updateCountdown, 250);
+    // Only whole seconds are ever displayed (see minutes/seconds below), so a
+    // 1s tick is all the UI needs — a faster interval just re-renders for no
+    // visible change.
+    const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
   }, [loading, resultId, setupCompleted, submitted, assessment, submit]);
 
@@ -339,36 +368,6 @@ const SkillAssessmentPlayer = () => {
       setIndex(i => i + 1);
     }
   };
-
-  const submit = useCallback(async ({ reason = "manual", forcePassDev = false, forceFailDev = false } = {}) => {
-    if (!resultId || submitting || submitted) return;
-
-    try {
-      setSubmitting(true);
-      setInteractionLocked(true);
-
-      const response = await assessmentApi.submitAssessment(resultId, assessmentToken, {
-        submissionReason: reason,
-        completeMissingAnswers: reason === "timeout" || reason === "violation" || forcePassDev || forceFailDev,
-        forcePassDev,
-        forceFailDev
-      });
-
-      if (response.success) {
-        setSubmitted(true);
-        setTestResults(response.data);
-        toast.success("Assessment submitted successfully!");
-      } else {
-        throw new Error(response.error || "Failed to submit assessment");
-      }
-    } catch (err) {
-      console.error("Error submitting assessment:", err);
-      toast.error(err.message || "Failed to submit assessment.");
-    } finally {
-      setSubmitting(false);
-      setInteractionLocked(false);
-    }
-  }, [resultId, assessmentToken, submitted, submitting]);
 
   const handleRetry = () => {
     // Reset core states and reload
@@ -553,12 +552,38 @@ const SkillAssessmentPlayer = () => {
   const timeFormatted = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
-      <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300 relative overflow-x-hidden">
+      {/* Animated Constellation Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
+
+      <main className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto relative z-10 min-h-[calc(100vh-4rem)] flex flex-col justify-center w-full">
+        {/* Immersive mesh glow effects */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <motion.div
+            animate={{
+              x: [0, 40, -30, 0],
+              y: [0, -40, 30, 0],
+              scale: [1, 1.15, 0.9, 1],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/10 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/30"
+          />
+          <motion.div
+            animate={{
+              x: [0, -40, 30, 0],
+              y: [0, 40, -35, 0],
+              scale: [1, 0.9, 1.1, 1],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/30"
+          />
+        </div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
           
           {/* Question Area */}
-          <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden relative">
+          <div className="flex-1 flex flex-col min-h-[540px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-2xl overflow-hidden relative text-slate-900 dark:text-white">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#1a3884]/5 rounded-full blur-[80px] pointer-events-none" />
 
             {/* Header info */}
@@ -600,30 +625,34 @@ const SkillAssessmentPlayer = () => {
 
               {/* Progress bar */}
               <div className="flex items-center gap-4">
-                <div className="flex-1 h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-slate-200 dark:bg-[#00152E] rounded-full overflow-hidden border border-slate-100 dark:border-blue-900/20 relative">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-500 dark:to-blue-400"
+                    className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-400 relative"
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
-                  />
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.25)_50%,rgba(255,255,255,0)_100%)] w-[50%] animate-pulse" />
+                  </motion.div>
                 </div>
                 <span className="text-xs font-bold text-[#1a3884] dark:text-blue-400 min-w-[2.5rem] text-right">{progressPercent}%</span>
               </div>
             </div>
 
             {/* Question Display */}
-            <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
-              <div className="mb-8 text-center">
-                <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 dark:bg-blue-400/10 text-[#1a3884] dark:text-blue-300 text-xs font-bold uppercase tracking-widest mb-3">
+            <div className="p-6 md:p-10 flex-1 relative z-10 flex flex-col justify-center gap-6">
+              <div className="mb-4 text-center">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a3884]/10 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-300 text-xs font-extrabold uppercase tracking-widest mb-2.5 border border-[#1a3884]/20 dark:border-blue-500/20 shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 animate-ping" />
                   Question {index + 1} of {questions.length}
                 </span>
-                <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight max-w-3xl mx-auto">
+                <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-snug mb-2 tracking-tight">
                   {currentQuestion?.questionText}
                 </h3>
               </div>
 
               {/* Options Grid */}
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 max-w-3xl mx-auto w-full">
+              <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-4.5 max-w-3xl mx-auto w-full mt-2">
                 {currentQuestion?.options?.map((option) => {
                   const isSelected = selectedAnswers[currentQuestion._id] === option.value;
                   return (
@@ -631,19 +660,19 @@ const SkillAssessmentPlayer = () => {
                       key={option.value}
                       onClick={() => selectOption(option.value)}
                       disabled={interactionLocked || submitting || timeExpired}
-                      className={`group relative p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
-                        ? 'border-[#1a3884] dark:border-blue-450 bg-[#1a3884]/5 dark:bg-blue-400/10 shadow-md'
-                        : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-[#1a3884]/50 dark:hover:border-blue-450/50 hover:bg-slate-50 dark:hover:bg-[#003170]'
+                      className={`group relative p-4 md:p-5 min-h-[75px] md:min-h-[85px] rounded-2xl border-2 transition-all duration-355 text-left hover:scale-[1.01] hover:shadow-md active:scale-[0.995] ${isSelected
+                        ? 'border-[#1a3884] dark:border-blue-500 bg-[#1a3884]/5 dark:bg-blue-500/10 shadow-[0_4px_20px_rgba(26,56,132,0.15)] text-[#1a3884] dark:text-white font-bold'
+                        : 'border-slate-200 dark:border-blue-900/40 bg-white dark:bg-[#001c3d] hover:border-[#1a3884]/50 dark:hover:border-blue-400/50 hover:bg-blue-50/30 dark:hover:bg-[#002a5c] text-slate-700 dark:text-slate-200'
                         }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm shrink-0 transition-colors ${isSelected
-                          ? 'bg-[#1a3884] dark:bg-blue-500 border-[#1a3884] dark:border-blue-500 text-white'
-                          : 'border-slate-300 dark:border-white/15 text-slate-450 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
+                      <div className="flex items-center gap-4 md:gap-5">
+                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full border-2 flex items-center justify-center font-extrabold text-sm md:text-base shrink-0 transition-all duration-300 shadow-sm ${isSelected
+                          ? 'bg-gradient-to-br from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-500 border-transparent text-white shadow-md scale-105'
+                          : 'border-slate-300 dark:border-blue-800/60 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
                           }`}>
                           {option.value}
                         </div>
-                        <span className={`text-sm md:text-base font-semibold ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-255'}`}>
+                        <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-200 font-semibold'}`}>
                           {option.label}
                         </span>
                       </div>
@@ -661,7 +690,7 @@ const SkillAssessmentPlayer = () => {
               )}
 
               {/* Navigation button */}
-              <div className="h-16 mt-8 flex justify-center items-center">
+              <div className="h-16 mt-4 md:mt-6 flex justify-center items-center">
                 {index < questions.length - 1 ? (
                   selectedAnswers[currentQuestion?._id] && (
                     <motion.button
@@ -693,7 +722,7 @@ const SkillAssessmentPlayer = () => {
           </div>
 
           {/* Question Navigator Side panel */}
-          <div className="lg:w-72 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl p-6 h-fit shrink-0">
+          <div className="lg:w-[320px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6 text-slate-900 dark:text-white">
             <h4 className="text-base font-bold text-slate-905 dark:text-white mb-4 flex items-center gap-2">
               <BookOpen className="text-[#1a3884] dark:text-blue-400" size={18} /> Question Map
             </h4>

@@ -152,10 +152,10 @@ const FloatingDictionary = () => {
             <motion.div
                 layout
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-4 sm:right-8 z-50 w-14 h-14 rounded-full bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 group"
+                className="fixed bottom-6 right-4 sm:right-8 z-50 w-14 h-14 rounded-full bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-lg hover:shadow-[0_0_20px_rgba(26,56,132,0.35)] flex items-center justify-center cursor-pointer transition-all duration-300 group border border-white/10"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
             >
                 <AnimatePresence mode="wait">
@@ -165,7 +165,7 @@ const FloatingDictionary = () => {
                         </motion.div>
                     ) : (
                         <motion.div key="book" className="relative flex items-center justify-center" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                            <IconBook2 stroke={1.5} className="w-6 h-6 text-white" />
+                            <IconBook2 stroke={2} className="w-6 h-6 text-white" />
                         </motion.div>
                     )}
                 </AnimatePresence>

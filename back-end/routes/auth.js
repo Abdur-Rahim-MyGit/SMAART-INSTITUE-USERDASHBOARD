@@ -1130,6 +1130,52 @@ router.post('/resend-login-otp', async (req, res) => {
   }
 });
 
+// Lookup college by email (autofill during forgot password)
+router.get('/lookup-college-by-email', async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const Student = require('../models/Student');
+    const User = require('../models/User');
+    const Teacher = require('../models/Teacher');
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // 1. Search in Student
+    let user = await Student.findOne({ email: normalizedEmail }).populate('college');
+
+    // 2. Search in User
+    if (!user) {
+      user = await User.findOne({ email: normalizedEmail }).populate('college');
+    }
+
+    // 3. Search in Teacher
+    if (!user) {
+      user = await Teacher.findOne({ email: normalizedEmail }).populate('college');
+    }
+
+    if (!user || !user.college) {
+      return res.json({ success: false, message: 'User or institution not found for this email' });
+    }
+
+    res.json({
+      success: true,
+      college: {
+        _id: user.college._id,
+        name: user.college.collegeName,
+        code: user.college.collegeCode,
+        logo: user.college.logo,
+      }
+    });
+  } catch (err) {
+    console.error('Lookup college by email error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Forgot Password - Request Reset - PROTECTED with rate limiting
 router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
   try {

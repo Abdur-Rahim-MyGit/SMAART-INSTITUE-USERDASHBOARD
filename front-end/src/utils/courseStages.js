@@ -21,10 +21,7 @@ export const getVideoUrlFromDay = (day) => {
     day?.steps?.[0]?.content?.videoUrl ||
     null;
 
-  if (!url || url.trim() === '') {
-    return TEMP_VIDEO_URL;
-  }
-  return url;
+  return url && url.trim() !== '' ? url : null;
 };
 
 export const mapCourseDaysToFlowSteps = (days = [], module = {}) => {
@@ -39,7 +36,6 @@ export const mapCourseDaysToFlowSteps = (days = [], module = {}) => {
     const isNotes = index === 6;
     const videoUrl = isNotes ? null : getVideoUrlFromDay(day);
     const assessmentData = getQuizAssessmentForDay(module, day, index);
-    const hasVideo = Boolean(videoUrl && !isNotes);
 
     let contentType = isNotes ? 'notes' : 'video-text';
     // Admin quiz on this day replaces demo MCQ (e.g. Practice / day 4)

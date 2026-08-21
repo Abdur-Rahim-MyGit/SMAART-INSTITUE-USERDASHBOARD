@@ -57,6 +57,30 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
         return () => clearInterval(timer);
     }, [resendCooldown]);
 
+    // Autofill institution when email is typed
+    useEffect(() => {
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail || !trimmedEmail.includes("@") || trimmedEmail.length < 5) {
+            return;
+        }
+
+        const lookupCollege = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/lookup-college-by-email?email=${encodeURIComponent(trimmedEmail)}`);
+                const data = await response.json();
+                if (data.success && data.college) {
+                    setSelectedCollege(data.college);
+                    setCollegeSearch(data.college.name);
+                }
+            } catch (err) {
+                console.error("Autofill college error:", err);
+            }
+        };
+
+        const debounceTimer = setTimeout(lookupCollege, 400);
+        return () => clearTimeout(debounceTimer);
+    }, [email]);
+
 
 
     useEffect(() => {
@@ -345,17 +369,17 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
                                         {/* Account Email */}
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest ml-1">Account Email</label>
-                                            <div className="relative flex items-center gap-2.5 px-3.5 rounded-xl h-11 bg-gray-100/60 dark:bg-[#001D3D]/60 border border-gray-200 dark:border-white/5 cursor-not-allowed">
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10">
+                                            <div className="relative flex items-center gap-2.5 px-3.5 rounded-xl h-11 bg-white dark:bg-[#001D3D]/30 border border-gray-200 dark:border-white/10 focus-within:border-[#1a3884] dark:focus-within:border-blue-400">
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
                                                     <Mail className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
                                                 </div>
                                                 <input
                                                     type="email"
-                                                    readOnly
                                                     value={email}
-                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold text-gray-500 dark:text-slate-300 cursor-not-allowed"
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold text-slate-800 dark:text-slate-205"
+                                                    placeholder="example@email.com"
                                                 />
-                                                <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500 shrink-0" />
                                             </div>
                                         </div>
                                     </div>

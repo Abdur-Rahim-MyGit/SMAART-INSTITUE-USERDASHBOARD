@@ -4,8 +4,9 @@ const CourseEnrollment = require('../models/CourseEnrollment');
 const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
 const { notifyCourseCompleted } = require('../services/notificationService');
-const { isSessionCompleted, isModuleCompleted } = require('../utils/progressUtils');
+const { isModuleCompleted } = require('../utils/progressUtils');
 const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils');
+const { canStudentAccessCourse } = require('../utils/courseProgressionGate');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
@@ -22,6 +23,14 @@ router.use(protect);
 const STAFF_ROLES = ['admin', 'teacher', 'moderator'];
 const isStaff = (u) => STAFF_ROLES.includes(u?.role) || (Array.isArray(u?.roles) && u.roles.some((r) => STAFF_ROLES.includes(r)));
 const ownStudentId = (req, provided) => (isStaff(req.user) ? provided : String(req.user._id));
+
+// Maps Mongoose error types to the correct HTTP status instead of always 500,
+// so clients can distinguish bad input (400) from a real server failure (500).
+const statusForError = (err) => {
+    if (err.name === 'ValidationError' || err.name === 'CastError') return 400;
+    if (err.code === 11000) return 409;
+    return 500;
+};
 
 // Get all course enrollments with filters
 router.get('/', async (req, res) => {
@@ -53,7 +62,7 @@ router.get('/', async (req, res) => {
             data: enrollments
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course enrollments',
             message: err.message
@@ -87,7 +96,7 @@ router.get('/:id', async (req, res) => {
             data: enrollment
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course enrollment',
             message: err.message
@@ -122,7 +131,7 @@ router.post('/', async (req, res) => {
             data: enrollment
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to create course enrollment',
             message: err.message
@@ -159,7 +168,7 @@ router.put('/:id', async (req, res) => {
             data: enrollment
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to update course enrollment',
             message: err.message
@@ -188,7 +197,7 @@ router.delete('/:id', async (req, res) => {
             message: 'Course enrollment deleted successfully'
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to delete course enrollment',
             message: err.message
@@ -214,7 +223,7 @@ router.get('/student/:studentId', async (req, res) => {
             data: enrollments
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch student enrollments',
             message: err.message
@@ -226,10 +235,8 @@ router.get('/student/:studentId', async (req, res) => {
 
 router.post('/task-progress', async (req, res) => {
     try {
-        console.log('Received task-progress request:', req.body);
         const { courseCode, moduleId, dayId, taskId, completed } = req.body;
         const studentId = ownStudentId(req, req.body.studentId);
-
 
         // Find course by code
         const course = await Course.findOne({
@@ -239,10 +246,11 @@ router.post('/task-progress', async (req, res) => {
             ]
         });
         if (!course) {
-            console.error('Course not found for code:', courseCode);
             return res.status(404).json({ success: false, error: 'Course not found' });
         }
-        console.log('Found course:', course._id);
+        if (!isStaff(req.user) && !(await canStudentAccessCourse(course, studentId))) {
+            return res.status(403).json({ success: false, error: 'This course is locked. Complete the prerequisites first.' });
+        }
 
         // Find enrollment
         let enrollment = await CourseEnrollment.findOne({
@@ -251,7 +259,6 @@ router.post('/task-progress', async (req, res) => {
         });
 
         if (!enrollment) {
-            console.log('Enrollment not found. Creating new enrollment for student:', studentId);
             // Create new enrollment
             enrollment = new CourseEnrollment({
                 student: studentId,
@@ -262,7 +269,6 @@ router.post('/task-progress', async (req, res) => {
                 moduleProgress: []
             });
         }
-        console.log('Using enrollment:', enrollment._id);
 
         // Find the module ObjectId from the Course document using the numeric moduleId (index)
         // moduleId from frontend is 1-based index
@@ -270,16 +276,13 @@ router.post('/task-progress', async (req, res) => {
         const moduleDoc = course.modules[moduleIndex];
 
         if (!moduleDoc) {
-            console.error('Module not found at index:', moduleIndex);
             return res.status(404).json({ success: false, error: 'Module not found' });
         }
-        console.log('Found module doc:', moduleDoc._id);
 
         // Find or create module progress entry
         let modProgress = enrollment.moduleProgress.find(mp => mp.module.toString() === moduleDoc._id.toString());
 
         if (!modProgress) {
-            console.log('Creating new module progress entry');
             enrollment.moduleProgress.push({
                 module: moduleDoc._id,
                 completedTasks: []
@@ -298,33 +301,22 @@ router.post('/task-progress', async (req, res) => {
             t => t.dayId === parseInt(dayId) && t.taskId === parseInt(taskId)
         );
 
-        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
         if (completed) {
             if (taskIndex === -1) {
-                console.log('Adding completed task:', { dayId, taskId });
                 modProgress.completedTasks.push({
                     dayId: parseInt(dayId),
                     taskId: parseInt(taskId),
                     completedAt: new Date()
                 });
-            } else {
-                console.log('Task already completed');
             }
         } else {
             if (taskIndex > -1) {
-                console.log('Removing completed task');
                 modProgress.completedTasks.splice(taskIndex, 1);
             }
         }
 
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
-        console.log('Enrollment saved successfully');
-
-        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
-
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -354,7 +346,7 @@ router.post('/task-progress', async (req, res) => {
 
     } catch (err) {
         console.error('Error updating task progress:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 
@@ -372,6 +364,9 @@ router.post('/video-progress', async (req, res) => {
             ]
         });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        if (!isStaff(req.user) && !(await canStudentAccessCourse(course, studentId))) {
+            return res.status(403).json({ success: false, error: 'This course is locked. Complete the prerequisites first.' });
+        }
 
         // Find or create enrollment
         let enrollment = await CourseEnrollment.findOne({
@@ -411,10 +406,7 @@ router.post('/video-progress', async (req, res) => {
             (vp.stepId === parseInt(stepId) || (!vp.stepId && parseInt(stepId) === 1))
         );
 
-        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
         if (!vidProgress) {
-            console.log(`Adding new video progress for S${dayId} Step ${stepId}`);
             modProgress.videoProgress.push({
                 dayId: parseInt(dayId),
                 stepId: parseInt(stepId || 1),
@@ -424,7 +416,6 @@ router.post('/video-progress', async (req, res) => {
                 lastUpdated: new Date()
             });
         } else {
-            console.log(`Updating existing video progress for S${dayId} Step ${stepId}`);
             // Update stepId if it was missing (legacy migration)
             if (!vidProgress.stepId) vidProgress.stepId = parseInt(stepId || 1);
 
@@ -447,10 +438,6 @@ router.post('/video-progress', async (req, res) => {
 
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
-
-        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
-
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -480,7 +467,7 @@ router.post('/video-progress', async (req, res) => {
 
     } catch (err) {
         console.error('Error updating video progress:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 
@@ -499,6 +486,9 @@ router.post('/quiz-progress', async (req, res) => {
             ]
         });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        if (!isStaff(req.user) && !(await canStudentAccessCourse(course, studentId))) {
+            return res.status(403).json({ success: false, error: 'This course is locked. Complete the prerequisites first.' });
+        }
 
         // Find or create enrollment
         let enrollment = await CourseEnrollment.findOne({
@@ -537,8 +527,6 @@ router.post('/quiz-progress', async (req, res) => {
         // so we can generate a consistent pseudo-ID or use the one provided by frontend.
         const existingQuiz = modProgress.quizzesTaken.find(q => q.quizId && q.quizId.toString() === quizId);
 
-        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
         if (existingQuiz) {
             // Update existing attempt (keep highest score or just last attempt? Usually highest)
             if (score > existingQuiz.score) {
@@ -559,12 +547,22 @@ router.post('/quiz-progress', async (req, res) => {
             });
         }
 
+        // Also update completedTasks so this day counts toward the enrollment's
+        // progress %, not just badge eligibility — keeps quizzesTaken in sync
+        // with completedTasks the same way /task-result does.
+        if (!modProgress.completedTasks) modProgress.completedTasks = [];
+        const dayIdNum = parseInt(dayId);
+        const existingCompletion = modProgress.completedTasks.find(t => t.dayId === dayIdNum && t.taskId === dayIdNum);
+        if (!existingCompletion) {
+            modProgress.completedTasks.push({
+                dayId: dayIdNum,
+                taskId: dayIdNum,
+                completedAt: new Date()
+            });
+        }
+
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
-
-        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
-
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -594,7 +592,7 @@ router.post('/quiz-progress', async (req, res) => {
 
     } catch (err) {
         console.error('Error updating quiz progress:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 
@@ -612,6 +610,9 @@ router.post('/task-result', async (req, res) => {
             ]
         });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+        if (!isStaff(req.user) && !(await canStudentAccessCourse(course, studentId))) {
+            return res.status(403).json({ success: false, error: 'This course is locked. Complete the prerequisites first.' });
+        }
 
         // Find or create enrollment
         let enrollment = await CourseEnrollment.findOne({
@@ -681,14 +682,8 @@ router.post('/task-result', async (req, res) => {
             });
         }
 
-        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
-
-        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
-
-
 
         // Check for badge eligibility
         const badgesEarned = [];
@@ -717,7 +712,7 @@ router.post('/task-result', async (req, res) => {
         res.json({ success: true, data: enrollment, badgesEarned });
     } catch (err) {
         console.error('Error updating task result:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 
@@ -733,7 +728,7 @@ router.get('/user-progress/:courseCode', async (req, res) => {
         });
         res.json({ success: true, data: progressList });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 
@@ -783,7 +778,7 @@ router.post('/user-progress/save', async (req, res) => {
 
         res.json({ success: true, data: progress });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        res.status(statusForError(err)).json({ success: false, error: err.message });
     }
 });
 

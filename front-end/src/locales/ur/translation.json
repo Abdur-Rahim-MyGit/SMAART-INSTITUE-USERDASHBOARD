@@ -4,6 +4,7 @@
     "profile": "میری پروفائل",
     "settings": "ترتیبات",
     "courses": "میرے کورسز",
+    "british_council": "برٹش کونسل",
     "results": "نتائج",
     "assessments": "جائزے",
     "toolkit": "ٹول کٹ",
@@ -643,8 +644,30 @@
         "name": "پائیداری کا تناسب",
         "shortName": "SQ",
         "description": "اخلاقی سوچ اور پائیداری کے بارے میں آگاہی پیدا کریں"
+      },
+      "BC": {
+        "name": "برٹش کونسل انگلش",
+        "shortName": "BC",
+        "description": "برٹش کونسل سے تصدیق شدہ کورسز کے ساتھ انگریزی مواصلاتی مہارتیں فروغ دیں"
       }
-    }
+    },
+    "locked_toast": "اس کورس کو ان لاک کرنے کے لیے براہ کرم پچھلے مراحل مکمل کریں۔",
+    "course_locked_toast": "اس ماڈیول کو ان لاک کرنے کے لیے براہ کرم پہلے پچھلا کورس مکمل کریں۔",
+    "complete_t1_title": "اپنا T1 بیس لائن اسیسمنٹ مکمل کریں",
+    "complete_t2_title": "اپنا T2 انٹرمیڈیٹ اسیسمنٹ مکمل کریں",
+    "complete_t3_title": "اپنا T3 ایڈوانسڈ اسیسمنٹ مکمل کریں",
+    "complete_t4_title": "اپنا T4 حتمی اسیسمنٹ مکمل کریں",
+    "start_assessment_for": "{{stage}} اسیسمنٹ شروع کریں",
+    "start_assessment": "اسیسمنٹ شروع کریں",
+    "course_closed_title": "کورس بند کر دیا گیا",
+    "course_closed_desc": "بار بار ٹیب تبدیل کرنے کی وجہ سے آپ کا کورس سیشن خودکار طور پر بند کر دیا گیا۔",
+    "explore_courses": "کورسز دریافت کریں",
+    "back_to_dashboard": "ڈیش بورڈ پر واپس جائیں",
+    "next_step": "اگلا مرحلہ",
+    "continue_learning": "سیکھنا جاری رکھیں",
+    "british_council_title": "برٹش کونسل انگلش",
+    "british_council_desc": "برٹش کونسل سے تصدیق شدہ کورسز کے ساتھ انگریزی مواصلاتی مہارتیں فروغ دیں",
+    "british_council_section_title": "برٹش کونسل"
   },
   "course_player": {
     "stages": {
@@ -716,7 +739,17 @@
     "step_by_step_progress": "قدم بہ قدم پیش رفت",
     "engagement_monitor": "مشغولیت کی نگرانی",
     "live_monitor": "لائیو مانیٹر",
-    "secure_session_protocol": "محفوظ سیشن پروٹوکول شروع ہوا۔"
+    "secure_session_protocol": "محفوظ سیشن پروٹوکول شروع ہوا۔",
+    "locked_toast": "یہ کورس مقفل ہے۔ براہ کرم پہلے شرائط پوری کریں۔",
+    "step_why": "کیوں",
+    "step_story": "کہانی",
+    "notes": "نوٹس",
+    "framework_diagram": "فریم ورک ڈایاگرام",
+    "micro_assessment": "مائیکرو اسیسمنٹ",
+    "self_reflection_video": "سیلف ریفلیکشن ویڈیو",
+    "congratulations_exclaim": "مبارک ہو!",
+    "badge_unlocked": "آپ نے یہ بیج ان لاک کر لیا ہے",
+    "sign_in_for_quiz": "یہ مائیکرو اسیسمنٹ لینے کے لیے سائن ان کریں۔ اگر آپ پہلے ہی سائن ان ہیں، تو ہو سکتا ہے یہ کوئز ابھی شائع نہ ہوا ہو۔"
   },
   "my_assessments": {
     "page_title": "میرے جائزے",

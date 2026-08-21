@@ -31,6 +31,7 @@ import {
   IconSun as Sun,
   IconMoon as Moon,
   IconAlertTriangle as ShieldAlert,
+  IconLanguage as BritishCouncilIcon,
 } from "@tabler/icons-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -42,6 +43,10 @@ import { getBackendUrl } from "@/services/api";
 // Import logos for different themes
 import whiteLogo from "@/assets/white.png";
 import blueLogo from "@/assets/blue.png";
+import smaartLogoNavy from "@/assets/smaart-logo-navy.svg";
+import smaartLogoWhite from "@/assets/smaart-logo-white.svg";
+import smaartMarkNavy from "@/assets/smaart-mark-navy.svg";
+import smaartMarkWhite from "@/assets/smaart-mark-white.svg";
 
 // Import Video Assets for Avatar Card
 import ToddlerBoyIdle from "@/assets/Animations/ToddlerBoyIdle.mp4";
@@ -71,6 +76,7 @@ const menuGroups = [
     items: [
       { icon: LayoutDashboard, label: "sidebar.dashboard", path: "/dashboard", badge: null },
       { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
+      { icon: BritishCouncilIcon, label: "sidebar.british_council", path: "/dashboard/british-council", badge: null },
       { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
       { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
       { icon: Briefcase, label: "sidebar.placement", path: "/dashboard/placement", badge: null },
@@ -105,7 +111,14 @@ const menuGroups = [
   }
 ];
 
-
+// Auth headers helper (outside component so it's a stable reference)
+const getAuthHeaders = () => {
+  const token = sessionStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
 
 const LeftSidebar = () => {
   const location = useLocation();
@@ -199,14 +212,6 @@ const LeftSidebar = () => {
   const [notifLoading, setNotifLoading] = useState(false);
   const notificationRef = useRef(null);
 
-  // Auth headers helper
-  const getAuthHeaders = () => {
-    const token = sessionStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-  };
 
   // Fetch notifications
   useEffect(() => {
@@ -233,30 +238,30 @@ const LeftSidebar = () => {
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
+    const fetchNotifications = async () => {
+      setNotifLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
+          headers: getAuthHeaders()
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setNotifications(data.notifications || []);
+            setUnreadCount(data.unreadCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      } finally {
+        setNotifLoading(false);
+      }
+    };
+
     if (notificationOpen) {
       fetchNotifications();
     }
   }, [notificationOpen]);
-
-  const fetchNotifications = async () => {
-    setNotifLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setNotifications(data.notifications || []);
-          setUnreadCount(data.unreadCount || 0);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-    } finally {
-      setNotifLoading(false);
-    }
-  };
 
   const markAllRead = async () => {
     try {
@@ -360,18 +365,13 @@ const LeftSidebar = () => {
           >
             {/* Mobile Header */}
             <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col items-start">
-                  <div className="flex items-center">
-                    <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                      SMAART
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
-                    Institute
-                  </span>
-                </div>
-              </div>
+              <Link to="/dashboard" className="flex items-center flex-1 pr-4">
+                <img 
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
+                  alt="SMAART Institute" 
+                  className="h-8 w-auto object-contain flex-shrink-0" 
+                />
+              </Link>
               <button
                 onClick={() => setIsMobileOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
@@ -381,7 +381,7 @@ const LeftSidebar = () => {
             </div>
 
             {/* Mobile Menu Items */}
-            <div className="flex-1 overflow-y-auto py-4 px-3">
+            <div className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide">
               {displayMenuGroups.map((group, groupIndex) => (
                 <div key={group.title} className="mb-6">
                   <p className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
@@ -526,28 +526,29 @@ const LeftSidebar = () => {
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
         <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-[#1a3884]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
-          <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
+          <Link to="/dashboard" className="flex flex-col items-start overflow-hidden w-full">
             {isCollapsed ? (
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
-                <span className="text-xl font-black text-white">S</span>
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center shadow-md border border-slate-200/50 dark:border-white/5 relative overflow-hidden">
+                <img 
+                  src={theme === 'dark' ? smaartMarkWhite : smaartMarkNavy} 
+                  alt="S" 
+                  className="w-7 h-7 object-contain"
+                />
               </div>
             ) : (
-              <div className="flex flex-col items-start">
-                <div className="flex items-center">
-                  <span className="text-2xl lg:text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                    SMAART
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
-                  Institute
-                </span>
+              <div className="flex items-center justify-between w-full">
+                <img 
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
+                  alt="SMAART Institute" 
+                  className="h-8 w-auto object-contain flex-shrink-0" 
+                />
               </div>
             )}
           </Link>
         </div>
 
         {/* Menu Items */}
-        <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto py-4 px-2 scrollbar-hide">
           {displayMenuGroups.map((group) => (
             <div key={group.title} className="mb-3">
               {/* Group Title */}

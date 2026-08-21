@@ -4,6 +4,7 @@
     "profile": "मेरी प्रोफ़ाइल",
     "settings": "सेटिंग्स",
     "courses": "मेरे पाठ्यक्रम",
+    "british_council": "ब्रिटिश काउंसिल",
     "results": "परिणाम",
     "assessments": "आकलन",
     "toolkit": "टूलकिट",
@@ -643,8 +644,30 @@
         "name": "सस्टेनेबिलिटी भागफल",
         "shortName": "SQ",
         "description": "नैतिक सोच और स्थिरता जागरूकता का निर्माण करें"
+      },
+      "BC": {
+        "name": "ब्रिटिश काउंसिल अंग्रेज़ी",
+        "shortName": "BC",
+        "description": "ब्रिटिश काउंसिल प्रमाणित पाठ्यक्रमों के साथ अंग्रेज़ी संचार कौशल विकसित करें"
       }
-    }
+    },
+    "locked_toast": "इस पाठ्यक्रम को अनलॉक करने के लिए कृपया पिछले चरण पूरे करें।",
+    "course_locked_toast": "इस मॉड्यूल को अनलॉक करने के लिए कृपया पहले पिछला पाठ्यक्रम पूरा करें।",
+    "complete_t1_title": "अपना T1 बेसलाइन आकलन पूरा करें",
+    "complete_t2_title": "अपना T2 इंटरमीडिएट आकलन पूरा करें",
+    "complete_t3_title": "अपना T3 एडवांस्ड आकलन पूरा करें",
+    "complete_t4_title": "अपना T4 फाइनल आकलन पूरा करें",
+    "start_assessment_for": "{{stage}} आकलन शुरू करें",
+    "start_assessment": "आकलन शुरू करें",
+    "course_closed_title": "पाठ्यक्रम बंद कर दिया गया",
+    "course_closed_desc": "बार-बार टैब बदलने के कारण आपका पाठ्यक्रम सत्र स्वतः बंद कर दिया गया।",
+    "explore_courses": "पाठ्यक्रम देखें",
+    "back_to_dashboard": "डैशबोर्ड पर वापस जाएं",
+    "next_step": "अगला कदम",
+    "continue_learning": "सीखना जारी रखें",
+    "british_council_title": "ब्रिटिश काउंसिल अंग्रेज़ी",
+    "british_council_desc": "ब्रिटिश काउंसिल प्रमाणित पाठ्यक्रमों के साथ अंग्रेज़ी संचार कौशल विकसित करें",
+    "british_council_section_title": "ब्रिटिश काउंसिल"
   },
   "course_player": {
     "stages": {
@@ -716,7 +739,17 @@
     "step_by_step_progress": "चरण-दर-चरण प्रगति",
     "engagement_monitor": "सक्रियता मॉनिटर",
     "live_monitor": "लाइव मॉनिटर",
-    "secure_session_protocol": "सुरक्षित सत्र प्रोटोकॉल प्रारंभ हो गया।"
+    "secure_session_protocol": "सुरक्षित सत्र प्रोटोकॉल प्रारंभ हो गया।",
+    "locked_toast": "यह पाठ्यक्रम लॉक है। कृपया पहले पूर्वापेक्षाएँ पूरी करें।",
+    "step_why": "क्यों",
+    "step_story": "कहानी",
+    "notes": "नोट्स",
+    "framework_diagram": "फ्रेमवर्क डायग्राम",
+    "micro_assessment": "माइक्रो-असेसमेंट",
+    "self_reflection_video": "आत्म-चिंतन वीडियो",
+    "congratulations_exclaim": "बधाई हो!",
+    "badge_unlocked": "आपने यह बैज अनलॉक कर लिया है",
+    "sign_in_for_quiz": "यह माइक्रो-असेसमेंट लेने के लिए साइन इन करें। अगर आप पहले से साइन इन हैं, तो हो सकता है यह क्विज़ अभी प्रकाशित न हुआ हो।"
   },
   "my_assessments": {
     "page_title": "मेरे मूल्यांकन",

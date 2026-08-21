@@ -12,7 +12,14 @@ import NeuralBackground from "@/components/ui/NeuralBackground";
 // the selected college (admin panel → Community Hub → Banners → Leadership
 // Media). Managed media comes from college.loginMedia.
 const FALLBACK_EMBED =
-  "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
+  "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8&autoplay=true&muted=true";
+
+const getAutoplayUrl = (url) => {
+  if (!url) return "";
+  if (url.includes("autoplay=")) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}autoplay=true&muted=true`;
+};
 
 const Institution = () => {
   const navigate = useNavigate();
@@ -46,7 +53,13 @@ const Institution = () => {
     loadLoginMedia();
   }, []);
 
-  const items = media.length > 0 ? media : [{ url: FALLBACK_EMBED, resourceType: "embed" }];
+  const items = media.length > 0
+    ? [...media].sort((a, b) => {
+        const typeA = a.resourceType === "video" || a.resourceType === "embed" ? 0 : 1;
+        const typeB = b.resourceType === "video" || b.resourceType === "embed" ? 0 : 1;
+        return typeA - typeB;
+      })
+    : [{ url: FALLBACK_EMBED, resourceType: "embed" }];
   const current = items[Math.min(index, items.length - 1)];
 
   // Images advance automatically; videos advance when they finish (onEnded).
@@ -74,9 +87,25 @@ const Institution = () => {
             filter: "grayscale(1) brightness(1.2)",
           }}
         />
-        {/* Soft radial glows for light mode */}
-        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 opacity-50 blur-[100px]" />
+        {/* Soft radial glows that float dynamically */}
+        <motion.div
+          animate={{
+            x: [0, 30, -20, 0],
+            y: [0, -30, 20, 0],
+            scale: [1, 1.15, 0.9, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 dark:bg-blue-900/10 opacity-40 blur-[120px] pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            x: [0, -30, 20, 0],
+            y: [0, 30, -20, 0],
+            scale: [1, 0.9, 1.1, 1],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 dark:bg-indigo-900/10 opacity-50 blur-[100px] pointer-events-none"
+        />
       </div>
 
       <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-10">
@@ -130,7 +159,7 @@ const Institution = () => {
                     ) : (
                       <iframe
                         key={current.url}
-                        src={current.url}
+                        src={getAutoplayUrl(current.url)}
                         className="absolute inset-0 w-full h-full border-0 rounded-2xl"
                         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                         allowFullScreen

@@ -26,30 +26,20 @@ router.use(generalLimiter);
 // (every course's flashcards/modules) to any anonymous caller. It was a debug
 // aid with no production use.
 
-router.get('/debug-videos', async (req, res) => {
-    try {
-        const courses = await Course.find({}, 'courseCode title modules learningFlow');
-        const urls = courses.map(c => {
-            const days = c.modules?.[0]?.days || [];
-            const day1 = days[0] || {};
-            const dayUrl = day1.videoContent?.videoUrl || day1.video_url || day1.videoUrl || day1.VideoContent?.[0]?.videoUrl || 'NONE';
-            
-            const lf = c.learningFlow || {};
-            const lfUrls = {
-                stepA_Why: lf.stepA_Why?.videoUrl || 'NONE',
-                stepB_Story: lf.stepB_Story?.videoUrl || 'NONE',
-                stepC_Framework: lf.stepC_Framework?.videoUrl || 'NONE',
-            };
-            return { code: c.courseCode, title: c.title, dayUrl, lfUrls };
-        });
-        res.json(urls);
-    } catch (e) {
-        res.status(500).json({error: e.message});
-    }
-});
+// SECURITY: GET /debug-videos was removed for the same reason as above — it
+// was registered before router.use(protect) and dumped every course's title
+// and video URLs to any anonymous caller, bypassing subscription gating.
 
 // Apply protection to all course routes
 router.use(protect);
+
+// Maps Mongoose error types to the correct HTTP status instead of always 500,
+// so clients can distinguish bad input (400) from a real server failure (500).
+const statusForError = (err) => {
+    if (err.name === 'ValidationError' || err.name === 'CastError') return 400;
+    if (err.code === 11000) return 409;
+    return 500;
+};
 
 const getAllowedCategories = async (user) => {
     let allowed = ['Capacity', 'Capability', 'Leadership'];
@@ -208,7 +198,7 @@ router.get('/', async (req, res) => {
             data: courses
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch courses',
             message: err.message
@@ -240,7 +230,7 @@ router.post('/sync-defaults', authorize('admin', 'teacher'), async (req, res) =>
             data: synced
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to sync default courses',
             message: err.message
@@ -279,7 +269,7 @@ router.patch('/:id/publish', authorize('admin', 'teacher'), async (req, res) => 
             data: course
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to publish course',
             message: err.message
@@ -338,7 +328,7 @@ router.get('/:id/stages', async (req, res) => {
             data: stages
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course stages',
             message: err.message
@@ -396,7 +386,7 @@ router.get('/catalog/:catalogId', async (req, res) => {
             hasQuizContent: courseHasQuizContent(enrichCourseForPlayer(course)),
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course',
             message: err.message,
@@ -410,7 +400,7 @@ router.get('/code/:code', async (req, res) => {
         const code = req.params.code.toUpperCase();
         const candidates = await Course.find({
             $or: [{ courseCode: code }, { courseNumber: code }, { tags: code }],
-        }).sort({ updatedAt: -1 });
+        }).sort({ updatedAt: -1 }).limit(20);
 
         const course = pickBestCatalogCourse(candidates);
 
@@ -435,7 +425,7 @@ router.get('/code/:code', async (req, res) => {
             data: enrichCourseForPlayer(course),
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course',
             message: err.message
@@ -471,7 +461,7 @@ router.get('/:id', async (req, res) => {
             data: enrichCourseForPlayer(course)
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch course',
             message: err.message
@@ -500,7 +490,7 @@ router.post('/', authorize('admin', 'teacher'), async (req, res) => {
             data: course
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to create course',
             message: err.message
@@ -537,7 +527,7 @@ router.put('/:id', authorize('admin', 'teacher'), async (req, res) => {
             data: existing
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to update course',
             message: err.message
@@ -562,7 +552,7 @@ router.delete('/:id', authorize('admin'), async (req, res) => {
             message: 'Course deleted successfully'
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to delete course',
             message: err.message
@@ -573,12 +563,21 @@ router.delete('/:id', authorize('admin'), async (req, res) => {
 // Get all modules for a course
 router.get('/:id/modules', async (req, res) => {
     try {
-        const course = await Course.findById(req.params.id).select('modules title courseCode');
+        const course = await Course.findById(req.params.id).select('modules title courseCode category courseNumber');
 
         if (!course) {
             return res.status(404).json({
                 success: false,
                 error: 'Course not found'
+            });
+        }
+
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (!checkCourseAccess(course, allowedCategories)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access Denied',
+                message: 'Your institution subscription does not include access to this course.'
             });
         }
 
@@ -588,7 +587,7 @@ router.get('/:id/modules', async (req, res) => {
             data: course.modules
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to fetch modules',
             message: err.message
@@ -617,7 +616,7 @@ router.post('/:id/modules', authorize('admin', 'teacher'), async (req, res) => {
             data: course
         });
     } catch (err) {
-        res.status(500).json({
+        res.status(statusForError(err)).json({
             success: false,
             error: 'Failed to add module',
             message: err.message
