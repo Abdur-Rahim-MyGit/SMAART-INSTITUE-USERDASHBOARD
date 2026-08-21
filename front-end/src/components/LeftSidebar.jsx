@@ -334,7 +334,7 @@ const LeftSidebar = () => {
   }, [isMobileOpen]);
 
   // Sidebar width classes
-  const sidebarWidth = isCollapsed ? 'w-[70px]' : 'w-[260px]';
+  const sidebarWidth = isCollapsed ? 'w-[70px]' : 'w-[240px]';
 
   return (
     <>
@@ -520,7 +520,7 @@ const LeftSidebar = () => {
       {/* Desktop Left Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ width: isCollapsed ? 70 : 260 }}
+        animate={{ width: isCollapsed ? 70 : 240 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#00152E] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}

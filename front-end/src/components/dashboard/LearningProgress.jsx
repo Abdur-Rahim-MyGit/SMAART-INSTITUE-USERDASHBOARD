@@ -58,7 +58,7 @@ const LearningProgress = memo(() => {
     fetchTodos();
   }, [fetchTodos]);
 
-  // ── calendar helpers ──────────────────────────────
+  // â”€â”€ calendar helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const monthLabel = viewDate.toLocaleDateString(i18n.language || "en-US", { month: "long", year: "numeric" });
@@ -103,7 +103,7 @@ const LearningProgress = memo(() => {
   const isSelected = (d) =>
     d === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
 
-  // ── todo actions ──────────────────────────────────
+  // â”€â”€ todo actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const addTodo = async () => {
     if (!newTask.trim()) return;
     setAdding(true);
@@ -154,247 +154,244 @@ const LearningProgress = memo(() => {
   const doneCount = selectedTodos.filter(t => t.completed).length;
 
   return (
-    <div className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200/80 dark:border-[#1a3884]/25 shadow-sm overflow-hidden">
+    <div className="font-sans bg-white dark:bg-[#001b3d] rounded-2xl border border-slate-200/60 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] overflow-hidden">
 
-      {/* ── Calendar Header ──────────────────────── */}
-      <div className="px-4 pt-4 pb-3 border-b border-slate-100 dark:border-[#1a3884]/20">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold text-slate-800 dark:text-white tracking-tight">{monthLabel}</span>
-          </div>
+      {/* ── Calendar Section ────────────────────────── */}
+      <div className="px-4 pt-4 pb-3">
+
+        {/* Month Header */}
+        <div className="flex items-center justify-between mb-3.5">
+          <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+            {monthLabel}
+          </span>
           <div className="flex items-center gap-0.5">
             <button
               onClick={() => setViewDate(new Date(year, month - 1, 1))}
-              className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] hover:text-slate-700 dark:hover:text-white transition-colors"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-150 active:scale-90"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewDate(new Date(year, month + 1, 1))}
-              className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] hover:text-slate-700 dark:hover:text-white transition-colors"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-150 active:scale-90"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Day-of-week headers */}
-        <div className="grid grid-cols-7 mb-1">
+        {/* Unified Grid: Day Headers + Day Cells */}
+        <div className="grid grid-cols-7">
+          {/* Day Name Headers */}
           {DAY_NAMES.map(d => (
-            <div key={d} className="text-center text-[9px] font-bold text-slate-400 dark:text-slate-500 py-0.5 select-none">
+            <div key={d} className="text-center text-[10px] font-medium text-slate-400 dark:text-slate-600 uppercase tracking-[0.05em] pb-2 select-none">
               {d}
             </div>
           ))}
-        </div>
 
-        {/* Day cells */}
-        <div className="grid grid-cols-7 gap-y-0.5">
+          {/* Empty offset cells */}
           {Array(firstDay).fill(null).map((_, i) => <div key={`e${i}`} />)}
+
+          {/* Day cells */}
           {Array(daysInMonth).fill(null).map((_, i) => {
             const d = i + 1;
             const sel = isSelected(d);
             const tod = isToday(d);
             const dotColor = getPriorityColorForDay(d);
             return (
-              <motion.button
-                key={d}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setSelectedDate(new Date(year, month, d))}
-                className={`relative mx-auto w-7 h-7 rounded-lg text-[11px] font-semibold transition-all duration-150 flex items-center justify-center select-none
-                  ${sel
-                    ? "bg-[#1a3884] text-white font-bold shadow-sm"
-                    : tod
-                      ? "bg-blue-50 dark:bg-[#1a3884]/25 text-[#1a3884] dark:text-blue-300 font-bold"
-                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]"
-                  }`}
-              >
-                {d}
-                {dotColor && !sel && (
-                  <motion.span 
-                    layoutId={`dot-${d}`}
-                    className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${dotColor}`} 
-                  />
-                )}
-              </motion.button>
+              <div key={d} className="flex items-center justify-center py-[2px]">
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => setSelectedDate(new Date(year, month, d))}
+                  className={`relative w-7 h-7 rounded-full text-xs transition-all duration-150 flex items-center justify-center select-none
+                    ${sel
+                      ? "bg-[#1a3884] dark:bg-blue-500 text-white font-bold shadow-sm"
+                      : tod
+                        ? "text-[#1a3884] dark:text-blue-400 font-semibold ring-[1.5px] ring-[#1a3884]/35 dark:ring-blue-500/35 bg-blue-50/60 dark:bg-blue-500/10"
+                        : "text-slate-500 dark:text-slate-400 font-normal hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-700 dark:hover:text-slate-200"
+                    }`}
+                >
+                  {d}
+                  {dotColor && !sel && (
+                    <span className={`absolute bottom-[2px] left-1/2 -translate-x-1/2 w-[3px] h-[3px] rounded-full ${dotColor}`} />
+                  )}
+                </motion.button>
+              </div>
             );
           })}
         </div>
-
-        {/* Legend */}
-        {/* <div className="flex items-center justify-center gap-4 mt-3 pt-2 border-t border-slate-50 dark:border-[#1a3884]/10 text-[9px] font-extrabold tracking-wider text-slate-400 dark:text-slate-500 uppercase select-none">
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-            High
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            Medium
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            Low
-          </div>
-        </div> */}
       </div>
 
-      {/* ── Tasks Section ─────────────────────────── */}
+      {/* ── Divider ──────────────────────────────────── */}
+      <div className="h-px bg-slate-100 dark:bg-white/[0.05] mx-4" />
+
+      {/* ── Tasks Section ────────────────────────── */}
       <div className="px-4 py-3">
-        {/* Task header */}
+
+        {/* Task Row Header */}
         <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-1.5">
-            <ClipboardList className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#1a3884]/8 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-[14px] h-[14px] text-[#1a3884] dark:text-blue-400" />
+            </div>
             <div>
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none">
-                {selectedDate.toLocaleDateString(i18n.language || "en-US", { weekday: "short", month: "short", day: "numeric" })}
+              {/* text-sm = 14px, font-semibold matches section-label hierarchy */}
+              <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
+                {selectedDate.toLocaleDateString(i18n.language || "en-US", {
+                  weekday: "short", month: "short", day: "numeric"
+                })}
               </p>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
+              {/* text-xs secondary muted label */}
+              <p className="text-xs font-normal text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">
                 {selectedTodos.length === 0
-                  ? t('calendar.no_tasks', 'No tasks')
-                  : `${doneCount} ${t('calendar.of', 'of')} ${selectedTodos.length} ${t('calendar.completed', 'completed')}`}
+                  ? t('calendar.no_tasks', 'No tasks scheduled')
+                  : `${doneCount} of ${selectedTodos.length} completed`}
               </p>
             </div>
           </div>
+          {/* + Add: text-xs (12px) font-semibold — standard button label size */}
           <button
             onClick={() => setShowInput(v => !v)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#1a3884] hover:bg-[#132c6b] text-white text-[11px] font-bold transition-colors shadow-sm"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95
+              ${showInput
+                ? "bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300"
+                : "bg-[#1a3884] dark:bg-blue-600 text-white shadow-sm hover:bg-[#132c6b] dark:hover:bg-blue-700"
+              }`}
           >
-            <Plus className="w-3 h-3" />
+            <Plus className="w-3.5 h-3.5" />
             {t('dashboard.add', 'Add')}
           </button>
         </div>
 
-        {/* Add-task input */}
+        {/* Add-task Input Drawer */}
         <AnimatePresence>
           {showInput && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden mb-2.5 space-y-2 bg-slate-50/55 dark:bg-[#002A5C]/40 p-2.5 rounded-xl border border-slate-100 dark:border-white/5"
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="overflow-hidden"
             >
-              <input
-                autoFocus
-                value={newTask}
-                onChange={e => setNewTask(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addTodo()}
-                placeholder={t('calendar.task_name_placeholder', 'Task name…')}
-                className="w-full text-xs px-2.5 py-2 rounded-lg bg-white dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/30 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a3884]/25 transition-all"
-              />
-              <div className="flex items-center justify-between gap-2">
-                {/* Priority Selector */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider">{t('calendar.priority', 'Priority')}:</span>
-                  <div className="flex bg-white dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/20 rounded-md p-0.5">
+              <div className="mb-2.5 space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-xl border border-slate-200/60 dark:border-white/[0.06]">
+                {/* text-sm input for readable typing */}
+                <input
+                  autoFocus
+                  value={newTask}
+                  onChange={e => setNewTask(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && addTodo()}
+                  placeholder={t('calendar.task_name_placeholder', 'Task name…')}
+                  className="w-full text-sm px-3 py-2 rounded-lg bg-white dark:bg-[#001b3d] border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 dark:focus:ring-blue-500/20 transition-all"
+                />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
                     {["low", "medium", "high"].map((p) => {
                       const active = newPriority === p;
-                      const activeColors = {
-                        low: "bg-emerald-500 text-white",
-                        medium: "bg-amber-500 text-white",
-                        high: "bg-rose-500 text-white",
+                      const colors = {
+                        low: active ? "bg-emerald-500 text-white" : "text-slate-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600",
+                        medium: active ? "bg-amber-500 text-white" : "text-slate-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-600",
+                        high: active ? "bg-rose-500 text-white" : "text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600",
                       };
                       return (
                         <button
                           key={p}
                           onClick={() => setNewPriority(p)}
-                          className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded transition-all ${active ? activeColors[p] : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            }`}
+                          className={`text-[11px] capitalize font-semibold px-2 py-1 rounded-md transition-all ${colors[p]}`}
                         >
                           {t(`calendar.priority_${p}`, p)}
                         </button>
                       );
                     })}
                   </div>
+                  {/* Save button: text-xs font-semibold */}
+                  <button
+                    onClick={addTodo}
+                    disabled={adding || !newTask.trim()}
+                    className="px-3 py-1.5 bg-[#1a3884] dark:bg-blue-600 hover:bg-[#132c6b] text-white rounded-lg text-xs font-semibold disabled:opacity-40 transition-colors"
+                  >
+                    {adding ? "…" : t('calendar.save', 'Save')}
+                  </button>
                 </div>
-                <button
-                  onClick={addTodo}
-                  disabled={adding || !newTask.trim()}
-                  className="px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-lg text-[10px] font-bold disabled:opacity-40 transition-colors"
-                >
-                  {adding ? "…" : t('calendar.save', 'Save')}
-                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Task list */}
-        <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-0.5 custom-scrollbar">
-          {loadingTodos ? (
-            <>
-              {[1, 2].map(i => (
-                <div key={i} className="h-9 rounded-xl bg-slate-100 dark:bg-[#002A5C] animate-pulse" />
-              ))}
-            </>
-          ) : selectedTodos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-5 text-center">
-              <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/20 flex items-center justify-center mb-2">
-                <Calendar className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">{t('calendar.no_tasks_day', 'No tasks for this day')}</p>
+        {/* Task List */}
+        {loadingTodos ? (
+          <div className="space-y-2">
+            {[1, 2].map(i => (
+              <div key={i} className="h-10 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse" />
+            ))}
+          </div>
+        ) : selectedTodos.length === 0 ? (
+          <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.05]">
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/[0.06] flex items-center justify-center shrink-0">
+              <Calendar className="w-[14px] h-[14px] text-slate-400 dark:text-slate-500" />
             </div>
-          ) : (
+            <div>
+              {/* text-xs (12px) font-medium — clear primary empty state label */}
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{t('calendar.no_tasks_day', 'No tasks for this day')}</p>
+              {/* text-[11px] — softer hint */}
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Free day — tap Add to create one</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-0.5 custom-scrollbar">
             <AnimatePresence mode="popLayout">
-            {selectedTodos.map(todo => {
-              const priorityColors = {
-                high: "border-l-rose-500 bg-rose-500/5 dark:bg-rose-500/10",
-                medium: "border-l-amber-500 bg-amber-500/5 dark:bg-amber-500/10",
-                low: "border-l-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/10"
-              };
-              return (
-                <motion.div
-                  key={todo._id}
-                  layout
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -15, scale: 0.95 }}
-                  className={`flex items-center gap-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-[#002A5C]/60 border border-slate-100 dark:border-[#1a3884]/15 border-l-3 ${priorityColors[todo.priority || "medium"]
-                    } group hover:border-[#1a3884]/25 transition-all`}
-                >
-                  <button
-                    onClick={() => !todo.isGlobalEvent && toggleTodo(todo._id, todo.completed)}
-                    className={`shrink-0 transition-transform ${!todo.isGlobalEvent ? 'hover:scale-110' : 'cursor-default'}`}
+              {selectedTodos.map(todo => {
+                const priorityDot = {
+                  high: "bg-rose-500",
+                  medium: "bg-amber-500",
+                  low: "bg-emerald-500"
+                };
+                return (
+                  <motion.div
+                    key={todo._id}
+                    layout
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -12, scale: 0.96 }}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-white/[0.04] border border-slate-200/50 dark:border-white/[0.06] group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-200"
                   >
-                    {todo.completed
-                      ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      : <Circle className={`w-4 h-4 ${todo.isGlobalEvent ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-300 dark:text-slate-600 hover:text-[#1a3884] transition-colors'}`} />
-                    }
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <span className={`block text-xs leading-snug font-medium truncate ${todo.completed ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-700 dark:text-slate-200"}`}>
-                      {todo.title}
-                    </span>
-                    {todo.isGlobalEvent && (
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[9px] font-bold text-[#1a3884]/70 dark:text-blue-400/70 uppercase tracking-wider">
-                          {todo.type === 'assessment' ? t('calendar.type_assessment', 'Assessment') : todo.type === 'session' ? t('calendar.type_session', 'Session') : t('calendar.type_event', 'Event')}
-                        </span>
-                        {(todo.creatorRole === 'admin' || todo.creatorRole === 'superadmin') && (
-                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-[8px] font-bold uppercase tracking-wider">
-                            {t('calendar.smaart_admin', 'SMAART Admin')}
-                          </span>
-                        )}
-                        {todo.creatorRole === 'college_admin' && (
-                          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-[8px] font-bold uppercase tracking-wider">
-                            {t('calendar.college_admin', 'College Admin')}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {!todo.isGlobalEvent && (
                     <button
-                      onClick={() => deleteTodo(todo._id)}
-                      className="opacity-0 group-hover:opacity-100 shrink-0 text-slate-300 hover:text-red-400 dark:text-slate-600 dark:hover:text-red-400 transition-all"
+                      onClick={() => !todo.isGlobalEvent && toggleTodo(todo._id, todo.completed)}
+                      className={`shrink-0 ${!todo.isGlobalEvent ? 'hover:scale-110' : 'cursor-default'} transition-transform`}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      {todo.completed
+                        ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        : <Circle className={`w-4 h-4 ${todo.isGlobalEvent ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                      }
                     </button>
-                  )}
-                </motion.div>
-              );
-            })}
+                    <div className="flex-1 min-w-0">
+                      {/* text-xs (12px) font-medium — task title, clear and readable */}
+                      <span className={`block text-xs font-medium leading-snug truncate ${todo.completed ? "line-through text-slate-400 dark:text-slate-600" : "text-slate-700 dark:text-slate-200"}`}>
+                        {todo.title}
+                      </span>
+                      {todo.isGlobalEvent && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${priorityDot[todo.priority || 'medium']}`} />
+                          {/* text-[10px] badge label */}
+                          <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                            {todo.type === 'assessment' ? t('calendar.type_assessment', 'Assessment') : todo.type === 'session' ? t('calendar.type_session', 'Session') : t('calendar.type_event', 'Event')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {!todo.isGlobalEvent && (
+                      <button
+                        onClick={() => deleteTodo(todo._id)}
+                        className="opacity-0 group-hover:opacity-100 shrink-0 p-1 rounded-md text-slate-300 dark:text-slate-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-150"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -402,3 +399,4 @@ const LearningProgress = memo(() => {
 
 LearningProgress.displayName = "LearningProgress";
 export default LearningProgress;
+

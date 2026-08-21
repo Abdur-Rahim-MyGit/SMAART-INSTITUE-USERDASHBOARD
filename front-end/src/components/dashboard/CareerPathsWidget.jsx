@@ -26,8 +26,9 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
   return (
     <div className="w-full">
       {/* Section heading */}
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-xs uppercase font-extrabold text-slate-800 dark:text-white tracking-tight">
+      <div className="flex items-center gap-2.5 mb-4">
+        <span className="w-[3px] h-4 rounded-full bg-[#1a3884] dark:bg-blue-500 shrink-0" />
+        <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
           {t("dashboard.my_career_paths", "My Career Paths")}
         </h2>
       </div>

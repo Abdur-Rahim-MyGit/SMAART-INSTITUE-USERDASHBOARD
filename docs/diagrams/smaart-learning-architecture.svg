@@ -1,0 +1,43 @@
+<svg class="arch" viewBox="0 0 1500 218" role="img" aria-label="The learning architecture as a chain: a tier bought by the college flows down through programme, stages, courses, tracks and assessments into quotients, the SRI score and the Skills Passport." xmlns="http://www.w3.org/2000/svg" width="1500" height="218"><style>@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap');:root,svg{
+  --bg:#F4F6FB; --surface:#FFFFFF; --ink:#0F1B33; --muted:#5A6782; --line:#CBD3E3;
+  --admin:#1A3884; --admin-tint:#E7ECF8; --student:#0B7A80; --student-tint:#DFF2F2;
+  --db:#46557A; --db-tint:#ECEFF6; --hand:#B97A00; --code:#23325A;}
+svg.flow, svg.arch { color: var(--ink); font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.lanebg { opacity: .55; }
+.lanebg.admin { fill: var(--admin-tint); } .lanebg.student { fill: var(--student-tint); } .lanebg.db { fill: var(--db-tint); }
+.lanehead rect { fill: var(--surface); stroke-width: 1.5; }
+.lanehead.admin rect { stroke: var(--admin); } .lanehead.student rect { stroke: var(--student); } .lanehead.db rect { stroke: var(--db); stroke-dasharray: 5 4; }
+.lanehead .lt { font-family: Outfit, Inter, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .14em; text-anchor: middle; }
+.lanehead.admin .lt { fill: var(--admin); } .lanehead.student .lt { fill: var(--student); } .lanehead.db .lt { fill: var(--db); }
+.lanehead .ls { font-size: 11px; fill: var(--muted); text-anchor: middle; }
+.row line { stroke: var(--line); stroke-width: 1; }
+.row circle { fill: var(--ink); }
+.row .rn { font-family: Outfit, Inter, sans-serif; font-weight: 700; font-size: 11px; fill: var(--bg); text-anchor: middle; }
+.row .rt { font-family: Outfit, Inter, sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; fill: var(--ink); }
+.box rect { fill: var(--surface); stroke-width: 1.5; }
+.box.admin rect { stroke: var(--admin); } .box.student rect { stroke: var(--student); }
+.box .bt { font-family: Outfit, Inter, sans-serif; font-weight: 600; font-size: 13px; fill: var(--ink); }
+.box.admin .bt { fill: var(--admin); } .box.student .bt { fill: var(--student); }
+.box .bs { font-size: 11px; fill: var(--muted); }
+.box.ghost rect { fill: none; stroke: var(--muted); stroke-dasharray: 4 4; stroke-width: 1; }
+.box.ghost .bt { fill: var(--muted); font-weight: 500; }
+.pill rect { fill: var(--db-tint); stroke: var(--db); stroke-width: 1.2; }
+.pill text { font-family: ui-monospace, Consolas, 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; font-weight: 500; fill: var(--code); text-anchor: middle; }
+.arrow line { stroke: currentColor; stroke-width: 1.3; }
+.arrow text { font-size: 10.5px; fill: var(--muted); text-anchor: middle; }
+.arrow.hand line { stroke: var(--hand); stroke-width: 1.9; }
+.arrow.hand text { fill: var(--hand); font-weight: 600; }
+.arrow.dash line { stroke: var(--muted); stroke-dasharray: 5 4; }
+.mh { fill: var(--hand); } .mm { fill: var(--muted); }
+.legend line.hand { stroke: var(--hand); stroke-width: 1.9; } .legend line.dash { stroke: var(--muted); stroke-dasharray: 5 4; stroke-width: 1.3; }
+.legend text { font-size: 11px; fill: var(--muted); } .legend text.r { text-anchor: end; }
+.node rect { fill: var(--surface); stroke-width: 1.5; }
+.node.inst rect { stroke: var(--admin); } .node.earn rect { stroke: var(--student); fill: var(--student-tint); }
+.node .nt { font-family: Outfit, Inter, sans-serif; font-weight: 600; font-size: 13px; text-anchor: middle; fill: var(--ink); }
+.node.inst .nt { fill: var(--admin); } .node.earn .nt { fill: var(--student); }
+.node .ns { font-size: 10.5px; fill: var(--muted); text-anchor: middle; }
+.chain { stroke: currentColor; stroke-width: 1.3; }
+.legend2 rect.inst { fill: var(--surface); stroke: var(--admin); stroke-width: 1.5; }
+.legend2 rect.earn { fill: var(--student-tint); stroke: var(--student); stroke-width: 1.5; }
+.legend2 text { font-size: 11px; fill: var(--muted); }
+</style><rect width="100%" height="100%" fill="#FFFFFF"/><defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs><g class="node inst"><rect x="40" y="40" width="136" height="58" rx="8"/><text class="nt" x="108" y="74">Tier</text><text class="ns" x="108" y="120">what the college buys</text><text class="ns" x="108" y="134">Core · Standard · Complete</text></g><line class="chain" x1="178" y1="69" x2="197.5" y2="69" marker-end="url(#arr2)"/><g class="node inst"><rect x="200.5" y="40" width="136" height="58" rx="8"/><text class="nt" x="268.5" y="74">Programme</text><text class="ns" x="268.5" y="120">Human Intelligence</text><text class="ns" x="268.5" y="134">25 core courses</text></g><line class="chain" x1="338.5" y1="69" x2="358" y2="69" marker-end="url(#arr2)"/><g class="node inst"><rect x="361" y="40" width="136" height="58" rx="8"/><text class="nt" x="429" y="74">Stages</text><text class="ns" x="429" y="120">Capacity →</text><text class="ns" x="429" y="134">Capability →</text><text class="ns" x="429" y="148">Leadership</text></g><line class="chain" x1="499" y1="69" x2="518.5" y2="69" marker-end="url(#arr2)"/><g class="node inst"><rect x="521.5" y="40" width="136" height="58" rx="8"/><text class="nt" x="589.5" y="74">Courses</text><text class="ns" x="589.5" y="120">S01 – S25</text><text class="ns" x="589.5" y="134">day-by-day steps</text></g><line class="chain" x1="659.5" y1="69" x2="679" y2="69" marker-end="url(#arr2)"/><g class="node inst"><rect x="682" y="40" width="136" height="58" rx="8"/><text class="nt" x="750" y="74">Tracks</text><text class="ns" x="750" y="120">PIQ · AIQ · SQ</text><text class="ns" x="750" y="134">which ones: set by tier</text></g><line class="chain" x1="820" y1="69" x2="839.5" y2="69" marker-end="url(#arr2)"/><g class="node inst"><rect x="842.5" y="40" width="136" height="58" rx="8"/><text class="nt" x="910.5" y="74">Assessments</text><text class="ns" x="910.5" y="120">T1 – T4</text><text class="ns" x="910.5" y="134">MCQ · FIB · SJT</text></g><line class="chain" x1="980.5" y1="69" x2="1000" y2="69" marker-end="url(#arr2)"/><g class="node earn"><rect x="1003" y="40" width="136" height="58" rx="8"/><text class="nt" x="1071" y="74">Quotients</text><text class="ns" x="1071" y="120">CRQ · SRQ · LQ · SIQ</text><text class="ns" x="1071" y="134">PEQ · DAQ · SEQ</text></g><line class="chain" x1="1141" y1="69" x2="1160.5" y2="69" marker-end="url(#arr2)"/><g class="node earn"><rect x="1163.5" y="40" width="136" height="58" rx="8"/><text class="nt" x="1231.5" y="74">SRI score</text><text class="ns" x="1231.5" y="120">readiness index</text><text class="ns" x="1231.5" y="134">rolled up from quotients</text></g><line class="chain" x1="1301.5" y1="69" x2="1321" y2="69" marker-end="url(#arr2)"/><g class="node earn"><rect x="1324" y="40" width="136" height="58" rx="8"/><text class="nt" x="1392" y="74">Skills Passport</text><text class="ns" x="1392" y="120">shareable record</text><text class="ns" x="1392" y="134">scores · skills · certificates</text></g><g class="legend2"><rect x="40" y="188" width="14" height="14" rx="3" class="inst"/><text x="62" y="199">decided by the institution and the admin side</text><rect x="360" y="188" width="14" height="14" rx="3" class="earn"/><text x="382" y="199">earned by the student, and what the passport carries</text></g></svg>

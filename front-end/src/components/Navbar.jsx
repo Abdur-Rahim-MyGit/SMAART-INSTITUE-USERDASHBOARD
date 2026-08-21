@@ -52,12 +52,12 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
   };
 
   const navItems = [
-    { key: "Services", label: t("landing.navbar.services") },
-    { key: "How It Works", label: t("landing.navbar.how_it_works") },
-    { key: "Testimonials", label: t("landing.navbar.testimonials") },
-    { key: "FAQ", label: t("landing.navbar.faq") },
-    { key: "Verify Certificate", label: t("landing.navbar.verify_certificate") },
-    { key: "Contact", label: t("landing.navbar.contact") }
+    { key: "Services", label: t("landing.navbar.services", "Services") },
+    { key: "How It Works", label: t("landing.navbar.how_it_works", "How It Works") },
+    { key: "Pricing", label: t("landing.navbar.pricing", "Pricing") },
+    { key: "Verify Certificate", label: t("landing.navbar.verify_certificate", "Verify Certificate") },
+    { key: "FAQ", label: t("landing.navbar.faq", "FAQ") },
+    { key: "Contact", label: t("landing.navbar.contact", "Contact") }
   ];
 
   // Use simple scroll listener for state
