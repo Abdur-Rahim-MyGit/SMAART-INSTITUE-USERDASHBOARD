@@ -43,7 +43,7 @@ volumes:
 services:
   # ── User dashboard backend (Express + Socket.IO) ─────────────────────────
   user-backend:
-    image: ghcr.io/abdur-rahim-mygit/smaart-user-backend:${USER_TAG:-latest}
+    image: ${UB_IMAGE:-ghcr.io/abdur-rahim-mygit/smaart-user-backend:latest}
     build:
       context: ../../back-end
       dockerfile: ../aws-deployment/Dockerfile
@@ -69,7 +69,7 @@ services:
   # Keeps its own nginx.conf, which carries the ONNX/WASM MIME rules the AI
   # proctoring needs. The edge just proxies to it — do not bypass it.
   user-frontend:
-    image: ghcr.io/abdur-rahim-mygit/smaart-user-frontend:${USER_TAG:-latest}
+    image: ${UF_IMAGE:-ghcr.io/abdur-rahim-mygit/smaart-user-frontend:latest}
     build:
       context: ../../front-end
       dockerfile: Dockerfile
@@ -84,7 +84,7 @@ services:
 
   # ── Admin backend (Express) ──────────────────────────────────────────────
   admin-backend:
-    image: ghcr.io/abdur-rahim-mygit/smaart-admin-backend:${ADMIN_TAG:-latest}
+    image: ${AB_IMAGE:-ghcr.io/abdur-rahim-mygit/smaart-admin-backend:latest}
     build:
       context: ../../../SMAART-INSTITUTE-ADMIN/Backend
       dockerfile: Dockerfile
@@ -106,7 +106,7 @@ services:
 
   # ── Admin frontend (CRA/React → nginx) ───────────────────────────────────
   admin-frontend:
-    image: ghcr.io/abdur-rahim-mygit/smaart-admin-frontend:${ADMIN_TAG:-latest}
+    image: ${AF_IMAGE:-ghcr.io/abdur-rahim-mygit/smaart-admin-frontend:latest}
     build:
       context: ../../../SMAART-INSTITUTE-ADMIN/Frontend
       dockerfile: Dockerfile

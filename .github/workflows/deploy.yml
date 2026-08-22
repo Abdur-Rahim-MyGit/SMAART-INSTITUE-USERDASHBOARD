@@ -69,14 +69,30 @@ jobs:
             COMPOSE="docker compose -f docker-compose.prod.yml"
 
             echo "==> Recording what is currently running (for rollback)"
-            prev_tag () {
-              docker inspect --format='{{.Config.Image}}' "$1" 2>/dev/null \
-                | grep '^ghcr.io/' | sed 's/.*://' || true
+            # Record an IMMUTABLE reference to what is running, never a tag.
+            # `latest` is a moving pointer: if a bad build overwrote it, rolling
+            # back "to latest" redeploys the same broken image and the safety net
+            # does nothing at all.
+            #
+            # Prefer the registry digest (ghcr.io/...@sha256:...). Fall back to
+            # the local image ID, which is what a locally-built or now-dangling
+            # image has - it has no RepoDigests, but the ID still names that
+            # exact image and Docker can start it. Note RepoDigests lives on the
+            # IMAGE, not the container, hence the two-step lookup.
+            ref_of () {
+              img=$(docker inspect --format '{{.Image}}' "$1" 2>/dev/null) || return 0
+              [ -n "$img" ] || return 0
+              d=$(docker image inspect --format '{{if .RepoDigests}}{{index .RepoDigests 0}}{{end}}' "$img" 2>/dev/null || true)
+              if [ -n "$d" ]; then echo "$d"; else echo "$img"; fi
             }
-            PREV_USER=$(prev_tag smaart-prod-user-backend-1)
-            PREV_ADMIN=$(prev_tag smaart-prod-admin-backend-1)
-            echo "previous user tag : ${PREV_USER:-<none - built locally, no rollback target>}"
-            echo "previous admin tag: ${PREV_ADMIN:-<none - built locally, no rollback target>}"
+            PREV_UB=$(ref_of smaart-prod-user-backend-1)
+            PREV_UF=$(ref_of smaart-prod-user-frontend-1)
+            PREV_AB=$(ref_of smaart-prod-admin-backend-1)
+            PREV_AF=$(ref_of smaart-prod-admin-frontend-1)
+            echo "previous user-backend  : ${PREV_UB:-<none - no rollback target>}"
+            echo "previous user-frontend : ${PREV_UF:-<none - no rollback target>}"
+            echo "previous admin-backend : ${PREV_AB:-<none - no rollback target>}"
+            echo "previous admin-frontend: ${PREV_AF:-<none - no rollback target>}"
 
             echo "==> Refreshing compose/edge config from git"
             # Pulls docker-compose.prod.yml and edge.conf changes. The deploy key
@@ -87,7 +103,11 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 
             echo "==> Pulling images  user=$USER_TAG  admin=$ADMIN_TAG"
-            export USER_TAG ADMIN_TAG
+            REG=ghcr.io/abdur-rahim-mygit
+            export UB_IMAGE="$REG/smaart-user-backend:$USER_TAG"
+            export UF_IMAGE="$REG/smaart-user-frontend:$USER_TAG"
+            export AB_IMAGE="$REG/smaart-admin-backend:$ADMIN_TAG"
+            export AF_IMAGE="$REG/smaart-admin-frontend:$ADMIN_TAG"
             $COMPOSE pull user-backend user-frontend admin-backend admin-frontend
 
             echo "==> Starting"
@@ -115,12 +135,19 @@ jobs:
             fi
 
             echo "==> UNHEALTHY after ~100s."
-            if [ -n "$PREV_USER" ] && [ -n "$PREV_ADMIN" ]; then
-              echo "==> Rolling back to user=$PREV_USER admin=$PREV_ADMIN"
-              USER_TAG="$PREV_USER" ADMIN_TAG="$PREV_ADMIN" $COMPOSE up -d --no-build
+            if [ -n "$PREV_UB" ] && [ -n "$PREV_UF" ] && [ -n "$PREV_AB" ] && [ -n "$PREV_AF" ]; then
+              echo "==> Rolling back to the exact images that were running before:"
+              echo "    $PREV_UB"
+              echo "    $PREV_UF"
+              echo "    $PREV_AB"
+              echo "    $PREV_AF"
+              # No pull needed — these images are still on the disk locally.
+              UB_IMAGE="$PREV_UB" UF_IMAGE="$PREV_UF" \
+              AB_IMAGE="$PREV_AB" AF_IMAGE="$PREV_AF" \
+                $COMPOSE up -d --no-build
               echo "==> Rolled back. The deploy FAILED - investigate before retrying."
             else
-              echo "==> No previous registry tag recorded, so NO automatic rollback."
+              echo "==> No previous image digests recorded, so NO automatic rollback."
               echo "==> The new version is still running and is unhealthy."
               echo "==> Check: docker compose -f docker-compose.prod.yml logs --tail=50"
             fi
