@@ -49,8 +49,16 @@ jobs:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          # Host and user are NOT secrets and are deliberately literal here.
+          # The IP is published in public DNS (smaartinstitute.com resolves to
+          # it) and `ubuntu` is the stock user on every Ubuntu AMI — putting
+          # them in secrets bought no security, but did add two invisible
+          # failure modes: a stray space in either one produces the same
+          # "unable to authenticate ... [none publickey]" error as a bad key,
+          # sending you hunting the wrong problem. Secrets you cannot read back
+          # are a poor place for values that are not secret.
+          host: 13.207.12.89
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           command_timeout: 15m
           envs: USER_TAG,ADMIN_TAG,GHCR_TOKEN,GHCR_USER
