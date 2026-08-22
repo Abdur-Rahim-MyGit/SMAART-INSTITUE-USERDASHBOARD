@@ -4,8 +4,12 @@
 # Runs the user dashboard and the admin panel side by side as two separate
 # nginx virtual hosts behind a single edge proxy:
 #
-#   https://app.<domain>    → user-frontend   ; /api,/socket.io,/ws → user-backend :5000
-#   https://admin.<domain>  → admin-frontend  ; /api,/uploads       → admin-backend :5001
+#   https://smaartinstitute.com        → user-frontend  ; /api,/socket.io,/ws → user-backend :5000
+#   https://admin.smaartinstitute.com  → admin-frontend ; /api,/uploads       → admin-backend :5001
+#
+# Each app service names BOTH an `image:` (GHCR) and a `build:`. That is
+# deliberate: `up --build` still builds locally (bootstrap / emergencies),
+# while `pull` + `up` fetches images CI already built. See .github/workflows/.
 #
 # NOTHING but the edge publishes a host port. That is the whole point: both
 # repos' own compose files assume they own the machine (the admin one grabs
@@ -39,6 +43,7 @@ volumes:
 services:
   # ── User dashboard backend (Express + Socket.IO) ─────────────────────────
   user-backend:
+    image: ghcr.io/abdur-rahim-mygit/smaart-user-backend:${USER_TAG:-latest}
     build:
       context: ../../back-end
       dockerfile: ../aws-deployment/Dockerfile
@@ -64,6 +69,7 @@ services:
   # Keeps its own nginx.conf, which carries the ONNX/WASM MIME rules the AI
   # proctoring needs. The edge just proxies to it — do not bypass it.
   user-frontend:
+    image: ghcr.io/abdur-rahim-mygit/smaart-user-frontend:${USER_TAG:-latest}
     build:
       context: ../../front-end
       dockerfile: Dockerfile
@@ -78,6 +84,7 @@ services:
 
   # ── Admin backend (Express) ──────────────────────────────────────────────
   admin-backend:
+    image: ghcr.io/abdur-rahim-mygit/smaart-admin-backend:${ADMIN_TAG:-latest}
     build:
       context: ../../../SMAART-INSTITUTE-ADMIN/Backend
       dockerfile: Dockerfile
@@ -99,6 +106,7 @@ services:
 
   # ── Admin frontend (CRA/React → nginx) ───────────────────────────────────
   admin-frontend:
+    image: ghcr.io/abdur-rahim-mygit/smaart-admin-frontend:${ADMIN_TAG:-latest}
     build:
       context: ../../../SMAART-INSTITUTE-ADMIN/Frontend
       dockerfile: Dockerfile

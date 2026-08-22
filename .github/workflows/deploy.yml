@@ -1,0 +1,124 @@
+# ============================================================================
+# Deploy to production — MANUAL ONLY.
+# ----------------------------------------------------------------------------
+# Deploys BOTH apps (user dashboard + admin panel) to smaart-prod, because a
+# single docker-compose.prod.yml in this repo runs both.
+#
+# It does NOT build. It pulls images that build-images.yml already pushed to
+# GHCR, so a deploy is ~30 seconds and puts no build load on the live server.
+#
+# Nothing here runs automatically. You choose when students get new code.
+#
+# ---------------------------------------------------------------------------
+# REQUIRED REPO SECRETS (Settings -> Secrets and variables -> Actions):
+#   EC2_HOST         13.207.12.89
+#   EC2_USER         ubuntu
+#   EC2_SSH_KEY      private key contents for a deploy key on the server
+#                    (generate a DEDICATED one — do not reuse smaart-prod.pem)
+#   GHCR_PULL_TOKEN  a GitHub PAT with `read:packages`, so the server can pull
+#                    private images from BOTH repos' packages
+# ---------------------------------------------------------------------------
+# ROLLBACK: run this workflow again with the previous commit SHA as the tag.
+# Every build is tagged by SHA, so old images stay pullable.
+# ============================================================================
+
+name: Deploy to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      user_tag:
+        description: 'User dashboard image tag (commit SHA, or "latest")'
+        required: true
+        default: 'latest'
+      admin_tag:
+        description: 'Admin panel image tag (commit SHA, or "latest")'
+        required: true
+        default: 'latest'
+
+# Never let two deploys touch the server at once.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 15m
+          envs: USER_TAG,ADMIN_TAG,GHCR_TOKEN,GHCR_USER
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /opt/smaart/SMAART-INSTITUE-USERDASHBOARD/aws-deployment/single-instance
+            COMPOSE="docker compose -f docker-compose.prod.yml"
+
+            echo "==> Recording what is currently running (for rollback)"
+            prev_tag () {
+              docker inspect --format='{{.Config.Image}}' "$1" 2>/dev/null \
+                | grep '^ghcr.io/' | sed 's/.*://' || true
+            }
+            PREV_USER=$(prev_tag smaart-prod-user-backend-1)
+            PREV_ADMIN=$(prev_tag smaart-prod-admin-backend-1)
+            echo "previous user tag : ${PREV_USER:-<none - built locally, no rollback target>}"
+            echo "previous admin tag: ${PREV_ADMIN:-<none - built locally, no rollback target>}"
+
+            echo "==> Refreshing compose/edge config from git"
+            # Pulls docker-compose.prod.yml and edge.conf changes. The deploy key
+            # on this server is read-only, so this can never push anything back.
+            git -C /opt/smaart/SMAART-INSTITUE-USERDASHBOARD pull --ff-only
+
+            echo "==> Logging in to GHCR"
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+            echo "==> Pulling images  user=$USER_TAG  admin=$ADMIN_TAG"
+            export USER_TAG ADMIN_TAG
+            $COMPOSE pull user-backend user-frontend admin-backend admin-frontend
+
+            echo "==> Starting"
+            # --no-build guarantees the server never compiles anything: if an
+            # image is missing this fails loudly instead of silently starting a
+            # 10-minute build on the box that is serving students.
+            $COMPOSE up -d --no-build
+
+            echo "==> Health check"
+            ok=0
+            for i in $(seq 1 20); do
+              sleep 5
+              health=$(curl -fsS --max-time 10 https://smaartinstitute.com/api/health || true)
+              site=$(curl -o /dev/null -sw '%{http_code}' --max-time 10 https://smaartinstitute.com || true)
+              admin=$(curl -o /dev/null -sw '%{http_code}' --max-time 10 https://admin.smaartinstitute.com || true)
+              echo "  attempt $i: api=$health site=$site admin=$admin"
+              case "$health" in *'"db":"connected"'*) db_ok=1 ;; *) db_ok=0 ;; esac
+              if [ "$db_ok" = 1 ] && [ "$site" = "200" ] && [ "$admin" = "200" ]; then ok=1; break; fi
+            done
+
+            if [ "$ok" = 1 ]; then
+              echo "==> HEALTHY. Deploy complete."
+              docker image prune -f >/dev/null 2>&1 || true
+              exit 0
+            fi
+
+            echo "==> UNHEALTHY after ~100s."
+            if [ -n "$PREV_USER" ] && [ -n "$PREV_ADMIN" ]; then
+              echo "==> Rolling back to user=$PREV_USER admin=$PREV_ADMIN"
+              USER_TAG="$PREV_USER" ADMIN_TAG="$PREV_ADMIN" $COMPOSE up -d --no-build
+              echo "==> Rolled back. The deploy FAILED - investigate before retrying."
+            else
+              echo "==> No previous registry tag recorded, so NO automatic rollback."
+              echo "==> The new version is still running and is unhealthy."
+              echo "==> Check: docker compose -f docker-compose.prod.yml logs --tail=50"
+            fi
+            exit 1
+        env:
+          USER_TAG: ${{ inputs.user_tag }}
+          ADMIN_TAG: ${{ inputs.admin_tag }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
