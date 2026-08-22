@@ -150,6 +150,34 @@ chmod 600 /opt/smaart/SMAART-INSTITUE-USERDASHBOARD/back-end/.env
 chmod 600 /opt/smaart/SMAART-INSTITUTE-ADMIN/Backend/.env
 ```
 
+### Create the uploads directories BEFORE the first start
+
+`back-end/uploads/` is gitignored, so a fresh clone does not contain it. Docker
+then creates the bind-mount source itself — owned by **root**. The user backend
+runs as the non-root `node` user (uid 1000), so it cannot write there and dies
+on boot with:
+
+```
+Error: EACCES: permission denied, mkdir '/usr/src/app/uploads/proctoring'
+```
+
+The container restart-loops while every other service looks healthy, which makes
+it read like an application bug. Pre-create the directories with the right owner
+instead:
+
+```bash
+mkdir -p /opt/smaart/SMAART-INSTITUE-USERDASHBOARD/back-end/uploads
+mkdir -p /opt/smaart/SMAART-INSTITUTE-ADMIN/Backend/uploads
+sudo chown -R 1000:1000 /opt/smaart/SMAART-INSTITUE-USERDASHBOARD/back-end/uploads
+```
+
+The admin backend does not hit this — its Dockerfile sets no `USER`, so it runs
+as root and can write into a root-owned mount. That difference is why only one
+of the two backends fails.
+
+If you have already hit it, the fix is the same `chown` followed by
+`docker compose -f docker-compose.prod.yml restart user-backend`.
+
 Then the deploy config:
 
 ```bash

@@ -1,8 +1,28 @@
-name: Deploy to EC2 (Live Site)
+name: Deploy to EC2 (LEGACY - pm2/system-nginx - manual only)
+
+# ============================================================================
+# DISABLED on 2026-08-22. Was `on: push: branches: [main]`.
+# ----------------------------------------------------------------------------
+# This workflow targets the OLD, pre-Docker deployment: it copies the frontend
+# build into /var/www/html, restarts the HOST's nginx via systemctl, and runs
+# the backend under pm2.
+#
+# Production no longer works that way. Since 2026-08-22 the live site runs
+# entirely in Docker on smaart-prod (13.207.12.89): nginx is the `edge`
+# CONTAINER holding ports 80/443, and both backends are containers, not pm2
+# processes. See aws-deployment/single-instance/README.md.
+#
+# If this ran against the live server it would `rm -rf /var/www/html/*`,
+# fight the edge container for port 80 via `systemctl restart nginx`, and
+# start a SECOND copy of the backend under pm2 alongside the container.
+#
+# Left in place as a record of the old deployment. To deploy now:
+#   ssh in, git pull both repos, then from
+#   aws-deployment/single-instance:  docker compose -f docker-compose.prod.yml up -d --build
+# ============================================================================
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:        # manual only — never auto-runs
 
 jobs:
   deploy-frontend:
