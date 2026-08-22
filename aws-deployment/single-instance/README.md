@@ -4,8 +4,8 @@ Runs both SMAART apps on one machine as two separate nginx virtual hosts:
 
 | Hostname | Serves | Backend |
 |---|---|---|
-| `app.smaartminds.com` | User dashboard (Vite/React) | user-backend `:5000` |
-| `admin.smaartminds.com` | Admin panel (CRA/React) | admin-backend `:5001` |
+| `smaartinstitute.com` | User dashboard (Vite/React) | user-backend `:5000` |
+| `admin.smaartinstitute.com` | Admin panel (CRA/React) | admin-backend `:5001` |
 
 Only the `edge` container publishes host ports (80/443). Every app container is
 internal-only on a shared Docker network. This is what makes co-hosting work:
@@ -19,7 +19,7 @@ so they cannot both run unmodified.
 | Setting | Value |
 |---|---|
 | Region | ap-south-1 (Mumbai) |
-| AMI | Ubuntu Server 24.04 LTS |
+| AMI | Ubuntu Server **26.04 LTS** (Resolute) — 24.04 LTS also fine, just supported 2 years less. Docker publishes packages for both, and the install commands below detect the release automatically. |
 | Instance type | **t3.medium (4 GiB) minimum**, t3.large (8 GiB) if building both frontends on the box |
 | Storage | **40 GiB gp3** |
 | Security group | 22 from **your IP only**; 80 and 443 from `0.0.0.0/0`. Nothing else. |
@@ -166,8 +166,8 @@ debug the wrong file.
 Point both A records at the Elastic IP and wait for propagation:
 
 ```bash
-dig +short app.smaartminds.com
-dig +short admin.smaartminds.com
+dig +short smaartinstitute.com
+dig +short admin.smaartinstitute.com
 ```
 
 Also add the Elastic IP to **MongoDB Atlas → Network Access**, or both backends
@@ -194,15 +194,15 @@ dashboard alone carries 218 MB of face-api model assets.
 ## 7. Verify
 
 ```bash
-curl -I https://app.smaartminds.com                     # 200, SPA
-curl -s https://app.smaartminds.com/api/health          # backend healthy
-curl -I https://admin.smaartminds.com                   # 200, admin SPA
-curl -I http://app.smaartminds.com                      # 301 -> https
+curl -I https://smaartinstitute.com                     # 200, SPA
+curl -s https://smaartinstitute.com/api/health          # backend healthy
+curl -I https://admin.smaartinstitute.com                   # 200, admin SPA
+curl -I http://smaartinstitute.com                      # 301 -> https
 ```
 
 In the browser, confirm on the admin panel that a page reading student data
 loads without CORS errors in the console — that path crosses from
-`admin.smaartminds.com` to `app.smaartminds.com`.
+`admin.smaartinstitute.com` to `smaartinstitute.com`.
 
 ---
 
@@ -285,4 +285,10 @@ console.
 | t3.medium | ~$33 |
 | t3.large | ~$67 |
 | 40 GiB gp3 | ~$3.20 |
-| Elastic IP (while attached) | $0 |
+| Elastic IP | ~$3.60 |
+
+Since Feb 2024 AWS bills **every** public IPv4 address at $0.005/hour, including
+Elastic IPs attached to a running instance. The auto-assigned public IP the
+instance launched with was already costing this, so attaching an Elastic IP is
+not an extra charge — it just makes the address permanent. Releasing an Elastic
+IP you are not using does save the ~$3.60/month.

@@ -90,7 +90,7 @@ cat <<DONE
 Done. The certificate lives in the '$CONF_VOL' volume and the certbot
 service in docker-compose.prod.yml renews it automatically.
 
-If APP_DOMAIN is not app.smaartminds.com, edit the server_name and
+If APP_DOMAIN is not smaartinstitute.com, edit the server_name and
 ssl_certificate paths in edge.conf to match before starting the stack.
 
 Next:
