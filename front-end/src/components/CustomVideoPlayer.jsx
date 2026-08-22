@@ -580,17 +580,17 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Play/Pause */}
                 <button
                   onClick={togglePlay}
-                  className="text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title={isPlaying ? "Pause (Space)" : "Play (Space)"}
                 >
-                  {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-indigo-600 dark:text-cyan-400" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-indigo-600 dark:text-cyan-400" />}
+                  {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-[#1a3884] dark:text-cyan-400" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-[#1a3884] dark:text-cyan-400" />}
                 </button>
 
                 {/* Volume Control */}
                 <div className="flex items-center gap-1 group/volume">
                   <button
                     onClick={toggleMute}
-                    className="text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                     title={isMuted ? "Unmute (M)" : "Mute (M)"}
                   >
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600 dark:text-slate-200" />}
@@ -603,14 +603,14 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       step="0.05"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-full accent-indigo-600 dark:accent-cyan-400 h-1 cursor-pointer bg-slate-200 dark:bg-white/20 rounded-lg"
+                      className="w-full accent-[#1a3884] dark:accent-cyan-400 h-1 cursor-pointer bg-slate-200 dark:bg-white/20 rounded-lg"
                     />
                   </div>
                 </div>
 
                 {/* Time Display */}
                 <div className="text-[11px] sm:text-xs font-bold tabular-nums border-l border-slate-200 dark:border-white/15 pl-3 h-5 flex items-center text-slate-500 dark:text-slate-300">
-                  <span className="text-indigo-600 dark:text-cyan-300">{formatTime(currentTime)}</span>
+                  <span className="text-[#1a3884] dark:text-cyan-300">{formatTime(currentTime)}</span>
                   <span className="mx-1 opacity-40">/</span>
                   <span className="opacity-70">{formatTime(videoDuration)}</span>
                 </div>
@@ -620,8 +620,8 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Title / Info - Only shown when wide enough */}
                 {title && (
                   <div className="hidden lg:flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1 backdrop-blur-md">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.5)] dark:shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-cyan-400">NOW PLAYING</span>
+                    <span className="w-2 h-2 rounded-full bg-[#1a3884] dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(26,56,132,0.5)] dark:shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#1a3884] dark:text-cyan-400">NOW PLAYING</span>
                     <span className="text-xs font-bold truncate max-w-[180px] text-slate-800 dark:text-white">{title}</span>
                   </div>
                 )}
@@ -637,12 +637,12 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }}
                     className={`transition-all duration-200 p-1.5 sm:px-2.5 sm:py-1 rounded-xl flex items-center gap-1 border border-slate-200 dark:border-white/10 ${
                       isCompleted 
-                        ? 'hover:text-indigo-600 dark:hover:text-cyan-300 hover:border-indigo-400/40 dark:hover:border-cyan-400/40 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer text-slate-600 dark:text-slate-200' 
+                        ? 'hover:text-[#1a3884] dark:hover:text-cyan-300 hover:border-[#1a3884]/40 dark:hover:border-cyan-400/40 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer text-slate-600 dark:text-slate-200' 
                         : 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/50'
                     }`}
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
-                    <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-indigo-600 dark:text-cyan-400" />
+                    <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-[#1a3884] dark:text-cyan-400" />
                     <span className="text-xs font-extrabold">{playbackSpeed}x</span>
                   </button>
 
@@ -662,7 +662,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                             onClick={() => handleSpeedChange(speed)}
                             className={`w-full px-3 py-1.5 text-xs text-left rounded-xl transition-all flex items-center justify-between font-bold ${
                               playbackSpeed === speed 
-                                ? 'bg-indigo-50 dark:bg-cyan-500/20 text-indigo-600 dark:text-cyan-300 border border-indigo-200 dark:border-cyan-500/30' 
+                                ? 'bg-[#1a3884]/10 dark:bg-cyan-500/20 text-[#1a3884] dark:text-cyan-300 border border-[#1a3884]/25 dark:border-cyan-500/30' 
                                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white'
                             }`}
                           >
@@ -686,7 +686,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }}
                     className={`transition-all duration-200 p-2 rounded-xl ${
                       isCompleted 
-                        ? 'text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer' 
+                        ? 'text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer' 
                         : 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/50'
                     }`}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
@@ -698,7 +698,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Fullscreen */}
                 <button
                   onClick={toggleFullscreen}
-                  className="text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title="Toggle Fullscreen (F)"
                 >
                   {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { CheckCircle2, PlayCircle } from "lucide-react";
+import { CheckCircle2, PlayCircle, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { apiCall } from "@/services/api";
 import { useTheme } from "@/contexts/ThemeContext";
 import NeuralBackground from "@/components/ui/NeuralBackground";
@@ -21,6 +21,9 @@ const WelcomeVideoPage = () => {
   const [hasFinished, setHasFinished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mediaUrl, setMediaUrl] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, duration: 0 });
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -67,6 +70,25 @@ const WelcomeVideoPage = () => {
     if (el.currentTime > maxWatchedRef.current) {
       maxWatchedRef.current = el.currentTime;
     }
+    setProgress({ current: el.currentTime, duration: el.duration || 0 });
+  };
+
+  const togglePlay = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.paused) el.play(); else el.pause();
+  };
+
+  const toggleMute = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = !el.muted;
+    setIsMuted(el.muted);
+  };
+
+  const fmt = (s) => {
+    if (!Number.isFinite(s) || s < 0) return "0:00";
+    return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   };
 
   const handleSeeking = () => {
@@ -138,17 +160,54 @@ const WelcomeVideoPage = () => {
                     allowFullScreen
                   />
                 ) : (
-                  <video
-                    ref={videoRef}
-                    src={mediaUrl}
-                    className="absolute inset-0 w-full h-full"
-                    controls
-                    controlsList="nodownload noplaybackrate"
-                    autoPlay
-                    onTimeUpdate={handleTimeUpdate}
-                    onSeeking={handleSeeking}
-                    onEnded={handleEnded}
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={mediaUrl}
+                      className="absolute inset-0 w-full h-full cursor-pointer"
+                      autoPlay
+                      playsInline
+                      onClick={togglePlay}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onTimeUpdate={handleTimeUpdate}
+                      onSeeking={handleSeeking}
+                      onEnded={handleEnded}
+                      onLoadedMetadata={handleTimeUpdate}
+                    />
+                    {/* Custom controls — deliberately NO seek bar interaction:
+                        students must watch the full video without skipping. */}
+                    <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-10">
+                      <div className="h-1 w-full rounded-full bg-white/25 overflow-hidden mb-2.5">
+                        <div
+                          className="h-full rounded-full bg-white transition-[width] duration-200"
+                          style={{ width: `${progress.duration ? (progress.current / progress.duration) * 100 : 0}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={togglePlay}
+                          aria-label={isPlaying ? "Pause" : "Play"}
+                          className="text-white transition-colors hover:text-white/75"
+                        >
+                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                        </button>
+                        <span className="text-[12px] font-semibold tabular-nums text-white/90">
+                          {fmt(progress.current)} / {fmt(progress.duration)}
+                        </span>
+                        <span className="flex-1" />
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          aria-label={isMuted ? "Unmute" : "Mute"}
+                          className="text-white transition-colors hover:text-white/75"
+                        >
+                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>

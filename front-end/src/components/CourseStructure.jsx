@@ -20,7 +20,6 @@ import {
   IconFilter as FilterIcon,
   IconSparkles as SparklesIcon,
   IconTrophy as TrophyIcon,
-  IconFlame as FlameIcon,
   IconChevronRight as ChevronRightIcon,
   IconArrowUpRight as ArrowUpRightIcon,
   IconWorld as GlobeIcon,
@@ -48,74 +47,74 @@ import {
 /* ─── Stage visual config ─── */
 const STAGE_CONFIG = {
   1: {
-    gradient: "from-[#0f172a] via-[#1e1b4b] to-[#312e81]",
-    cardBg: "bg-gradient-to-b from-indigo-50/80 via-white to-white dark:from-[#0d1633] dark:via-[#081329] dark:to-[#081329]",
-    cardBorder: "border-indigo-200 dark:border-indigo-500/20 hover:border-indigo-400 dark:hover:border-indigo-500/40",
-    badgeBg: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30",
-    accentColor: "#6366f1",
-    lightAccent: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700/50",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBg: "bg-white dark:bg-[#071330]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
+    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
     tag: "Stage 1 • Foundations",
     estimatedTime: "~8.5 Hours",
     Icon: CapacityIcon,
-    color: "#6366f1",
-    accentGlow: "rgba(99, 102, 241, 0.15)",
+    color: "#1a3884",
+    accentGlow: "rgba(26, 56, 132, 0.12)",
   },
   2: {
-    gradient: "from-[#042f2e] via-[#115e59] to-[#0d9488]",
-    cardBg: "bg-gradient-to-b from-teal-50/80 via-white to-white dark:from-[#072422] dark:via-[#081329] dark:to-[#081329]",
-    cardBorder: "border-teal-200 dark:border-teal-500/20 hover:border-teal-400 dark:hover:border-teal-500/40",
-    badgeBg: "bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-500/30",
-    accentColor: "#14b8a6",
-    lightAccent: "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-700/50",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBg: "bg-white dark:bg-[#071330]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
+    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
     tag: "Stage 2 • Intermediate",
     estimatedTime: "~7.0 Hours",
     Icon: CapabilityIcon,
-    color: "#14b8a6",
-    accentGlow: "rgba(20, 184, 166, 0.15)",
+    color: "#1a3884",
+    accentGlow: "rgba(26, 56, 132, 0.12)",
   },
   3: {
-    gradient: "from-[#2e1065] via-[#581c87] to-[#7e22ce]",
-    cardBg: "bg-gradient-to-b from-purple-50/80 via-white to-white dark:from-[#1b0d33] dark:via-[#081329] dark:to-[#081329]",
-    cardBorder: "border-purple-200 dark:border-purple-500/20 hover:border-purple-400 dark:hover:border-purple-500/40",
-    badgeBg: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30",
-    accentColor: "#a855f7",
-    lightAccent: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700/50",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBg: "bg-white dark:bg-[#071330]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
+    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
     tag: "Stage 3 • Advanced",
     estimatedTime: "~5.5 Hours",
     Icon: LeadershipIcon,
-    color: "#a855f7",
-    accentGlow: "rgba(168, 85, 247, 0.15)",
+    color: "#1a3884",
+    accentGlow: "rgba(26, 56, 132, 0.12)",
   },
 };
 
 /* ─── Track visual config ─── */
 const TRACK_CONFIG = {
   PIQ: {
-    gradient: "from-[#31103f] via-[#581c87] to-[#7c3aed]",
-    cardBorder: "border-violet-500/20 hover:border-violet-500/50",
-    badgeBg: "bg-violet-500/10 text-violet-400 border-violet-500/30",
-    accentColor: "#8b5cf6",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
     Icon: PIQIcon,
   },
   AIQ: {
-    gradient: "from-[#0c2a4a] via-[#1e3a8a] to-[#2563eb]",
-    cardBorder: "border-blue-500/20 hover:border-blue-500/50",
-    badgeBg: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-    accentColor: "#3b82f6",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
     Icon: AIQIcon,
   },
   SQ: {
-    gradient: "from-[#064e3b] via-[#047857] to-[#10b981]",
-    cardBorder: "border-emerald-500/20 hover:border-emerald-500/50",
-    badgeBg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-    accentColor: "#10b981",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
     Icon: SQIcon,
   },
   BC: {
-    gradient: "from-[#0284c7] via-[#2563eb] to-[#1d4ed8]",
-    cardBorder: "border-sky-200 dark:border-sky-500/20 hover:border-sky-400 dark:hover:border-sky-500/40",
-    badgeBg: "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200 dark:border-sky-800/40",
-    accentColor: "#0284c7",
+    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
+    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
+    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
+    accentColor: "#1a3884",
     Icon: BCIcon,
   },
 };
@@ -135,7 +134,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
   const spotlightBackground = useMotionTemplate`
     radial-gradient(
       600px circle at ${mouseX}px ${mouseY}px,
-      ${cfg.accentGlow || "rgba(59, 130, 246, 0.15)"},
+      ${cfg.accentGlow || "rgba(26, 56, 132, 0.10)"},
       transparent 80%
     )
   `;
@@ -168,7 +167,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
           else toast.error(t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage."));
         }}
         onMouseMove={handleMouseMove}
-        className={`w-full h-full text-left p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
+        className={`w-full h-full text-left p-4 rounded-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
           ? `${cfg.cardBg || "bg-white dark:bg-[#081329]"} ${cfg.cardBorder || "border-slate-200 dark:border-white/10"} shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer`
           : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-pointer"
           }`}
@@ -182,52 +181,45 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
         )}
 
         {/* Dynamic Decorative Accent Gradient Pill */}
-        <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-transparent rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-125" />
 
-        <div className="relative z-10 space-y-4">
-          {/* Top Row: Icon & Tag */}
-          <div className="flex items-center justify-between gap-3">
-            <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                ? "bg-blue-50 dark:bg-blue-950/50 border-blue-100/80 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
-                : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
-                }`}
-            >
-              <Icon stroke={1.8} className="w-7 h-7" />
+        <div className="relative z-10 space-y-2">
+          {/* Icon + title share one row; the stage tag sits at the right */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
+                  ? "bg-[#1a3884]/[0.07] dark:bg-blue-950/50 border-[#1a3884]/15 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
+                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
+                  }`}
+              >
+                <Icon stroke={1.8} className="w-5 h-5" />
+              </div>
+              <h3
+                className={`text-[15px] font-bold tracking-tight transition-colors truncate group-hover:text-[#1a3884] dark:group-hover:text-blue-400 ${isUnlocked ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
+                  }`}
+              >
+                {t(`my_courses_page.stages.${stage.id}.name`, stage.name)}
+              </h3>
             </div>
 
-            <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-col items-end gap-0.5 shrink-0">
               <span
-                className={`text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm ${isUnlocked
+                className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${isUnlocked
                   ? cfg.lightAccent || "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300"
                   : "bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-500"
                   }`}
               >
                 {t(`my_courses_page.stage_n`, { n: stage.id })}
               </span>
-              <div className="flex items-center gap-2 text-[10px] font-extrabold text-slate-400 dark:text-slate-500">
-                <span className="flex items-center gap-1">
-                  <ClockIcon className="w-3 h-3 text-slate-400" />
-                  {cfg.estimatedTime || "~6 Hrs"}
-                </span>
-                <span>•</span>
-                <span>{total} Modules</span>
+              <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                {total} Modules
               </div>
             </div>
           </div>
 
-          {/* Title & Description */}
-          <div>
-            <h3
-              className={`text-lg font-black tracking-tight mb-1.5 transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400 ${isUnlocked ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
-                }`}
-            >
-              {t(`my_courses_page.stages.${stage.id}.name`, stage.name)}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
-              {t(`my_courses_page.stages.${stage.id}.description`, stage.description)}
-            </p>
-          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
+            {t(`my_courses_page.stages.${stage.id}.description`, stage.description)}
+          </p>
 
           {/* Course Preview Tags */}
           {false && allCourses.length > 0 && (
@@ -265,27 +257,27 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, on
         </div>
 
         {/* Progress Bar & CTA */}
-        <div className="relative z-10 pt-5 mt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
+        <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 dark:border-white/5 space-y-2">
           <div className="flex items-center justify-between text-xs font-bold">
             <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
               {t("my_courses_page.progression", "Progression")}
             </span>
-            <span className="text-blue-600 dark:text-blue-400 font-extrabold">
+            <span className="text-[#1a3884] dark:text-blue-400 font-extrabold">
               {completedCount} / {total} Completed ({pct}%)
             </span>
           </div>
 
-          <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
               transition={{ duration: 1, delay: delay + 0.2, ease: "easeOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500"
+              className="h-full rounded-full bg-gradient-to-r from-[#1a3884] to-[#2b52b8]"
             />
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex items-center gap-1">
+            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors flex items-center gap-1">
               Explore Stage
               <ArrowUpRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </span>
@@ -362,7 +354,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
   const spotlightBackground = useMotionTemplate`
     radial-gradient(
       600px circle at ${mouseX}px ${mouseY}px,
-      rgba(59, 130, 246, 0.15),
+      rgba(26, 56, 132, 0.10),
       transparent 80%
     )
   `;
@@ -386,8 +378,8 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         type="button"
         onClick={isUnlocked ? onClick : () => toast.error(t("my_courses_page.locked_toast", "Please complete required stages first."))}
         onMouseMove={handleMouseMove}
-        className={`w-full h-full text-left p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
-          ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer"
+        className={`w-full h-full text-left p-4 rounded-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
+          ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer"
           : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-pointer"
           }`}
       >
@@ -399,63 +391,40 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
           />
         )}
 
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                ? "bg-blue-50 dark:bg-blue-950/50 border-blue-100/80 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
-                : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
-                }`}
-            >
-              <Icon stroke={1.8} className="w-7 h-7" />
+        <div className="relative z-10 space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
+                  ? "bg-[#1a3884]/[0.07] dark:bg-blue-950/50 border-[#1a3884]/15 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
+                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
+                  }`}
+              >
+                <Icon stroke={1.8} className="w-5 h-5" />
+              </div>
+              <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight truncate transition-colors group-hover:text-[#1a3884] dark:group-hover:text-[#4f7dff]">
+                {track.id === 'BC' ? 'British Council' : t(`my_courses_page.tracks.${track.id}.shortName`, track.shortName || track.name)}
+              </h3>
             </div>
 
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end gap-0.5 shrink-0">
               <span
-                className={`text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm ${cfg.badgeBg}`}
+                className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${cfg.badgeBg}`}
               >
                 Specialization Track
-
               </span>
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mt-1">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
                 {total} {total === 1 ? "Course" : "Courses"}
               </span>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight mb-1.5 transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-              {track.id === 'BC' ? 'British Council' : t(`my_courses_page.tracks.${track.id}.shortName`, track.shortName || track.name)}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
-              {t(`my_courses_page.tracks.${track.id}.description`, track.description)}
-            </p>
-          </div>
-
-          {previewCourses.length > 0 && (
-            <div className="pt-1 space-y-1.5">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Featured Modules:
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {previewCourses.map((c) => (
-                  <span
-                    key={c.id}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 truncate max-w-[200px]"
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full shrink-0"
-                      style={{ backgroundColor: cfg.accentColor }}
-                    />
-                    {c.title || c.id}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
+            {t(`my_courses_page.tracks.${track.id}.description`, track.description)}
+          </p>
         </div>
 
-        <div className="relative z-10 pt-5 mt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
+        <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 dark:border-white/5 space-y-2">
           <div className="flex items-center justify-between text-xs font-bold">
             <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
               {t("my_courses_page.progression", "Progression")}
@@ -465,7 +434,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
             </span>
           </div>
 
-          <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
@@ -475,7 +444,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center gap-1">
+            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-[#1a3884] dark:group-hover:text-[#4f7dff] transition-colors flex items-center gap-1">
               Start Learning Track
               <ArrowUpRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </span>
@@ -508,7 +477,7 @@ const CourseTimelineNode = ({ course, index, isCompleted, isCurrent, isUnlocked,
           className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 border-2 transition-all duration-300 shadow-lg ${isCompleted
             ? "bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-300 text-white shadow-emerald-500/25 ring-4 ring-emerald-500/10"
             : isCurrent
-              ? "bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 border-blue-300 text-white shadow-blue-500/35 ring-4 ring-blue-500/25 animate-pulse"
+              ? "bg-[#1a3884] border-[#2b52b8] text-white shadow-[#1a3884]/35 ring-4 ring-[#1a3884]/20 animate-pulse"
               : isUnlocked
                 ? "bg-white dark:bg-[#0d1b3e] border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 cursor-pointer shadow-md"
                 : "bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/60 text-slate-400 cursor-not-allowed"
@@ -616,50 +585,46 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
         <button
           type="button"
           onClick={onBack}
-          className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-[#081329] border border-slate-200/90 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm hover:shadow-md cursor-pointer"
+          className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-[#081329] border border-slate-200/90 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-[#1a3884] hover:text-[#1a3884] transition-all shadow-sm hover:shadow-md cursor-pointer"
         >
-          <ArrowLeft stroke={2.5} className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-blue-600 dark:text-blue-400" />
+          <ArrowLeft stroke={2.5} className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-[#1a3884] dark:text-blue-400" />
           {t("my_courses_page.back_to_overview", "Back to Overview")}
         </button>
       </div>
 
       {/* ── Pristine White Stage Header Banner ── */}
-      <section className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#081329] p-6 sm:p-8 text-slate-900 dark:text-white shadow-xl border border-slate-200/90 dark:border-white/10">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-transparent rounded-bl-full pointer-events-none" />
+      <section className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#081329] p-4 sm:p-5 text-slate-900 dark:text-white shadow-xl border border-slate-200/90 dark:border-white/10">
 
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           {/* Left Side: Title & Info */}
-          <div className="space-y-3 max-w-xl">
+          <div className="space-y-1.5 max-w-xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 shadow-sm">
-                <SparklesIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" /> STAGE DETAIL VIEW
-              </span>
               {typeof stage.id === 'number' && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
                   Stage {stage.id}
                 </span>
               )}
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#00152E] dark:text-white">
               {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.name`, stage.name) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
             </h1>
             
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+            <p className="text-[13px] text-slate-500 dark:text-slate-300 leading-relaxed font-medium">
               {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.description`, stage.description) : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
             </p>
           </div>
 
           {/* Right Side: Overall Progress Card + Assessment Card Side-by-Side */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
             {/* Radial Progress Card */}
-            <div className="flex items-center gap-4 bg-slate-50 dark:bg-white/5 px-5 py-4 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm shrink-0 w-full sm:w-auto">
-              <div className="relative w-14 h-14 flex-shrink-0">
+            <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shrink-0 w-full sm:w-auto">
+              <div className="relative w-11 h-11 flex-shrink-0">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="10" fill="none" />
                   <motion.circle
                     cx="50" cy="50" r="40"
-                    className="stroke-blue-600 dark:stroke-blue-400"
+                    className="stroke-[#1a3884] dark:stroke-blue-400"
                     strokeWidth="10" strokeLinecap="round" fill="none"
                     initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
                     animate={{ strokeDashoffset: 251.2 - (251.2 * (pct || 0)) / 100 }}
@@ -671,7 +636,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                 </div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Overall Progress</div>
+                <div className="text-[10px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">Overall Progress</div>
                 <div className="text-base font-black text-slate-900 dark:text-white">{completedCount} / {totalCoursesCount} <span className="text-xs font-bold text-slate-400 dark:text-slate-500">Modules</span></div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{totalCoursesCount - completedCount} modules remaining</div>
               </div>
@@ -689,22 +654,22 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                     toast.error(`You have to complete all ${publishedStageCourses.length || 10} modules below first!`);
                   }
                 }}
-                className={`flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all duration-300 cursor-pointer shadow-sm shrink-0 w-full sm:w-auto ${
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all duration-300 cursor-pointer shrink-0 w-full sm:w-auto ${
                   userProgress.assessmentsPassed?.includes(stage.assessmentGate)
                     ? "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/40 hover:shadow-md"
                     : isAssessmentUnlocked
-                      ? "bg-blue-50/80 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800/40 hover:shadow-md hover:-translate-y-0.5"
+                      ? "bg-[#1a3884]/[0.05] dark:bg-blue-950/30 border-[#1a3884]/20 dark:border-blue-800/40 hover:shadow-md hover:-translate-y-0.5"
                       : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-700/50"
                 }`}
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
                   userProgress.assessmentsPassed?.includes(stage.assessmentGate)
                     ? "bg-emerald-500 text-white border-emerald-400"
                     : isAssessmentUnlocked
-                      ? "bg-blue-600 text-white border-blue-400"
+                      ? "bg-[#1a3884] text-white border-[#1a3884]"
                       : "bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/40"
                 }`}>
-                  <TrophyIcon className="w-6 h-6" />
+                  <TrophyIcon className="w-4.5 h-4.5" />
                 </div>
 
                 <div className="space-y-0.5 text-left">
@@ -715,7 +680,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                     {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
                       <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">✓ Passed & Certified</span>
                     ) : isAssessmentUnlocked ? (
-                      <span className="text-blue-600 dark:text-blue-400 font-extrabold flex items-center gap-1">Start Assessment →</span>
+                      <span className="text-[#1a3884] dark:text-blue-400 font-extrabold flex items-center gap-1">Start Assessment →</span>
                     ) : (
                       <span className="text-amber-600 dark:text-amber-400 font-extrabold flex items-center gap-1">🔒 Locked Assessment</span>
                     )}
@@ -735,8 +700,8 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
       {/* ── Modules List Directory Grid ── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
             Module Directory ({publishedStageCourses.length})
           </h3>
           <span className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:inline">
@@ -745,12 +710,19 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {publishedStageCourses.map((course, idx) => {
+          {(() => {
+            // Only ONE module may be "Current": the tracked one, else the first
+            // uncompleted unlocked module. (Previously every open module was
+            // badged Current, drowning the completed/green states.)
+            const firstOpenId = publishedStageCourses.find(
+              (c) => !userProgress.completedCourses?.includes(c.id) && isCourseUnlocked(c.id)
+            )?.id;
+            return publishedStageCourses.map((course, idx) => {
             const isCompleted = userProgress.completedCourses?.includes(course.id);
             const isUnlocked = isCourseUnlocked(course.id);
-            const isCurrent =
+            const isCurrent = !isCompleted && (
               userProgress.currentCourse === course.id ||
-              (!isCompleted && isUnlocked && !userProgress.currentCourse);
+              (!userProgress.currentCourse && course.id === firstOpenId));
 
             return (
               <motion.div
@@ -762,9 +734,9 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                 className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 cursor-pointer group ${isCompleted
                   ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/30 hover:shadow-lg hover:-translate-y-0.5"
                   : isCurrent
-                    ? "bg-blue-50/50 dark:bg-blue-950/30 border-blue-300 dark:border-blue-700/50 shadow-md ring-1 ring-blue-500/20 hover:shadow-xl hover:-translate-y-0.5"
+                    ? "bg-[#1a3884]/[0.04] dark:bg-blue-950/30 border-[#1a3884]/30 dark:border-blue-700/50 shadow-md ring-1 ring-[#1a3884]/15 hover:shadow-xl hover:-translate-y-0.5"
                     : isUnlocked
-                      ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-500/40 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
+                      ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-blue-500/40 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
                       : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-not-allowed"
                   }`}
               >
@@ -774,7 +746,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                       className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border ${isCompleted
                         ? "bg-emerald-500 text-white border-emerald-400 shadow-md"
                         : isCurrent
-                          ? "bg-blue-600 text-white border-blue-400 shadow-md"
+                          ? "bg-[#1a3884] text-white border-[#1a3884] shadow-md"
                           : isUnlocked
                             ? "bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-white/10"
                             : "bg-slate-200 dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700"
@@ -793,12 +765,12 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                           Module {idx + 1}
                         </span>
                         {isCurrent && (
-                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#1a3884]/10 dark:bg-blue-900/60 text-[#1a3884] dark:text-blue-300">
                             Current
                           </span>
                         )}
                       </div>
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                      <h4 className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                         {course.title || t(`my_courses_page.courses.${course.id}.title`)}
                       </h4>
                     </div>
@@ -820,7 +792,8 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
                 )}
               </motion.div>
             );
-          })}
+            });
+          })()}
         </div>
       </div>
     </motion.div>
@@ -1136,34 +1109,19 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
 
   return (
     <div className="w-full relative min-h-screen bg-transparent transition-colors duration-500 overflow-hidden">
-      {/* Dynamic Moving Animated Background Mesh */}
+      {/* Ambient navy wash — two slow, small drifts. The previous version used
+          three 550-650px multi-hue orbs that dominated the page behind the
+          content; these stay subtle and on-theme. */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <motion.div
-          animate={{
-            x: [0, 60, -40, 0],
-            y: [0, -50, 40, 0],
-            scale: [1, 1.25, 0.9, 1],
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-32 -left-32 w-[550px] h-[550px] bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-purple-500/10 rounded-full blur-[130px]"
+          animate={{ x: [0, 25, -15, 0], y: [0, -20, 15, 0] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#1a3884]/[0.07] dark:bg-[#1a3884]/20 blur-[110px]"
         />
         <motion.div
-          animate={{
-            x: [0, -60, 50, 0],
-            y: [0, 50, -60, 0],
-            scale: [1, 0.9, 1.2, 1],
-          }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/3 -right-32 w-[600px] h-[600px] bg-gradient-to-br from-indigo-500/20 via-blue-600/15 to-cyan-400/10 rounded-full blur-[140px]"
-        />
-        <motion.div
-          animate={{
-            x: [0, 40, -50, 0],
-            y: [0, 60, -30, 0],
-            scale: [1, 1.15, 0.85, 1],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-32 left-1/3 w-[650px] h-[650px] bg-gradient-to-tr from-cyan-500/15 via-blue-500/15 to-purple-600/15 rounded-full blur-[150px]"
+          animate={{ x: [0, -25, 20, 0], y: [0, 20, -15, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 -right-24 w-80 h-80 rounded-full bg-[#0d1f4e]/[0.06] dark:bg-[#0d1f4e]/25 blur-[120px]"
         />
       </div>
 
@@ -1175,16 +1133,15 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
               initial={{ opacity: 0, y: -15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#071330] p-5 sm:p-6 lg:p-7 shadow-[0_8px_30px_rgba(26,56,132,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-slate-200/80 dark:border-white/10"
+              className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#071330] p-4 sm:p-5 shadow-[0_4px_20px_rgba(26,56,132,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-slate-200/80 dark:border-white/10"
             >
               {/* Soft Ambient Radial Wash Backgrounds */}
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-600/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-56 h-56 bg-[#1a3884]/[0.06] rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                 {/* Left Side: Title & Subtitle */}
                 <div className="space-y-2 max-w-2xl">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[#0d1f4e] dark:text-white leading-tight">
+                  <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#0d1f4e] dark:text-white leading-snug">
                     Human Intelligence & Readiness Pathways
                   </h1>
 
@@ -1192,17 +1149,6 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                     Experience a structured, multi-tier curriculum designed to build core capability, technical readiness, and vision.
                   </p>
 
-                  {/* Stat Badges Row */}
-                  <div className="pt-1 flex flex-wrap items-center gap-3 text-xs font-extrabold text-slate-700 dark:text-slate-200">
-                    <div className="flex items-center gap-2 bg-slate-100/90 dark:bg-white/5 px-3 py-1 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
-                      <TrophyIcon className="w-3.5 h-3.5 text-amber-500" />
-                      <span>{totalCompleted} / {totalCoursesCount} Modules Completed</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-100/90 dark:bg-white/5 px-3 py-1 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
-                      <FlameIcon className="w-3.5 h-3.5 text-rose-500" />
-                      <span>{overallPct}% Overall Completion</span>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Right Side: Hero Action (Continue Learning Element) */}
@@ -1296,7 +1242,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <BrainIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        <BrainIcon className="w-6 h-6 text-[#1a3884] dark:text-[#4f7dff]" />
                         Human Intelligence Stages
                       </h2>
                       <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />
@@ -1329,7 +1275,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <GlobeIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                        <GlobeIcon className="w-6 h-6 text-[#1a3884] dark:text-[#4f7dff]" />
                         Readiness Tracks & English Course
                       </h2>
                       <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />

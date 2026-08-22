@@ -1,0 +1,145 @@
+# ============================================================================
+# docker-compose.prod.yml — BOTH SMAART apps on ONE EC2 instance.
+# ----------------------------------------------------------------------------
+# Runs the user dashboard and the admin panel side by side as two separate
+# nginx virtual hosts behind a single edge proxy:
+#
+#   https://app.<domain>    → user-frontend   ; /api,/socket.io,/ws → user-backend :5000
+#   https://admin.<domain>  → admin-frontend  ; /api,/uploads       → admin-backend :5001
+#
+# NOTHING but the edge publishes a host port. That is the whole point: both
+# repos' own compose files assume they own the machine (the admin one grabs
+# host :80), so they cannot both run as-is. Here every app container is
+# internal-only and the edge routes by Host header.
+#
+# REQUIRED DIRECTORY LAYOUT (the build contexts below depend on it):
+#   /opt/smaart/
+#     ├── SMAART-INSTITUE-USERDASHBOARD/   ← this file lives in aws-deployment/single-instance/
+#     └── SMAART-INSTITUTE-ADMIN/
+#
+# SETUP:
+#   cp deploy.env.example .env     # then edit APP_DOMAIN / ADMIN_DOMAIN
+#   ./bootstrap.sh                 # issues the TLS certificate (run once)
+#
+# RUN:    docker compose -f docker-compose.prod.yml up -d --build
+# LOGS:   docker compose -f docker-compose.prod.yml logs -f
+# STOP:   docker compose -f docker-compose.prod.yml down
+# ============================================================================
+
+name: smaart-prod
+
+networks:
+  smaart:
+    driver: bridge
+
+volumes:
+  certbot-conf:   # /etc/letsencrypt — issued certificates
+  certbot-www:    # ACME http-01 challenge webroot
+
+services:
+  # ── User dashboard backend (Express + Socket.IO) ─────────────────────────
+  user-backend:
+    build:
+      context: ../../back-end
+      dockerfile: ../aws-deployment/Dockerfile
+    env_file:
+      - ../../back-end/.env
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      # CORS. BOTH origins are required: the admin React app calls the student
+      # API directly from the browser (REACT_APP_STUDENT_API_URL), so the admin
+      # origin must be allowed here too or every admin page that reads student
+      # data fails on CORS.
+      - FRONTEND_URL=https://${APP_DOMAIN},https://${ADMIN_DOMAIN}
+      # NOTE: LOG_OTP is deliberately absent. See README "Before you go live".
+    volumes:
+      - ../../back-end/uploads:/usr/src/app/uploads
+    expose:
+      - "5000"
+    networks: [smaart]
+    restart: unless-stopped
+
+  # ── User dashboard frontend (Vite/React → nginx) ─────────────────────────
+  # Keeps its own nginx.conf, which carries the ONNX/WASM MIME rules the AI
+  # proctoring needs. The edge just proxies to it — do not bypass it.
+  user-frontend:
+    build:
+      context: ../../front-end
+      dockerfile: Dockerfile
+      args:
+        # Convention for THIS app: the value INCLUDES the /api suffix.
+        VITE_API_URL: https://${APP_DOMAIN}/api
+    expose:
+      - "80"
+    depends_on: [user-backend]
+    networks: [smaart]
+    restart: unless-stopped
+
+  # ── Admin backend (Express) ──────────────────────────────────────────────
+  admin-backend:
+    build:
+      context: ../../../SMAART-INSTITUTE-ADMIN/Backend
+      dockerfile: Dockerfile
+    env_file:
+      - ../../../SMAART-INSTITUTE-ADMIN/Backend/.env
+    environment:
+      - PORT=5001
+      - NODE_ENV=production
+      # This backend's CORS takes a SINGLE origin (unlike the user backend).
+      - FRONTEND_URL=https://${ADMIN_DOMAIN}
+      # NOTE: LOG_OTP is deliberately NOT set here. The local compose sets
+      # LOG_OTP=true, which prints login OTPs with name+email to the log.
+    volumes:
+      - ../../../SMAART-INSTITUTE-ADMIN/Backend/uploads:/app/uploads
+    expose:
+      - "5001"
+    networks: [smaart]
+    restart: unless-stopped
+
+  # ── Admin frontend (CRA/React → nginx) ───────────────────────────────────
+  admin-frontend:
+    build:
+      context: ../../../SMAART-INSTITUTE-ADMIN/Frontend
+      dockerfile: Dockerfile
+      args:
+        # Convention for THIS app: BARE ORIGIN, no /api suffix — the code
+        # appends it (Frontend/src/utils/api.js: baseURL = `${API_URL}/api`).
+        REACT_APP_API_URL: https://${ADMIN_DOMAIN}
+        REACT_APP_STUDENT_API_URL: https://${APP_DOMAIN}
+    expose:
+      - "80"
+    depends_on: [admin-backend]
+    networks: [smaart]
+    restart: unless-stopped
+
+  # ── Edge proxy: the ONLY container with published host ports ─────────────
+  edge:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./edge.conf:/etc/nginx/nginx.conf:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    depends_on: [user-frontend, admin-frontend]
+    networks: [smaart]
+    restart: unless-stopped
+    # Certbot rewrites the certificate files in the shared volume, but a running
+    # nginx keeps serving the copy it loaded at startup — so a renewed cert would
+    # not take effect until something restarted this container, i.e. the site
+    # would start serving an EXPIRED certificate ~90 days in. Reloading every 6h
+    # picks up any renewal well within the 30-day window certbot renews in.
+    command: >-
+      /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
+
+  # ── Certificate renewal (runs forever, wakes twice a day) ────────────────
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+    networks: [smaart]
+    restart: unless-stopped

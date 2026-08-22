@@ -84,7 +84,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
     accentGlow: "from-indigo-500 to-cyan-400",
-    btnClass: "bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-500 dark:hover:bg-indigo-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   capability: {
     gradient: "from-teal-50/70 via-[#e6f4f1]/60 to-emerald-50/70 dark:from-[#042f2e] dark:via-[#115e59] dark:to-[#0d9488]",
@@ -92,7 +92,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
     accentGlow: "from-teal-500 to-emerald-400",
-    btnClass: "bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   leadership: {
     gradient: "from-purple-50/70 via-[#f3e8ff]/60 to-[#faf5ff]/70 dark:from-[#2e1065] dark:via-[#581c87] dark:to-[#7e22ce]",
@@ -100,7 +100,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
     accentGlow: "from-purple-600 to-violet-400",
-    btnClass: "bg-purple-600 hover:bg-purple-700 text-white dark:bg-purple-500 dark:hover:bg-purple-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   piq: {
     gradient: "from-violet-50/70 via-fuchsia-50/60 to-slate-50/70 dark:from-[#31103f] dark:via-[#581c87] dark:to-[#7c3aed]",
@@ -108,7 +108,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     accentGlow: "from-violet-600 to-fuchsia-400",
-    btnClass: "bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-500 dark:hover:bg-violet-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   aiq: {
     gradient: "from-blue-50/70 via-cyan-50/60 to-slate-50/70 dark:from-[#0c2a4a] dark:via-[#1e3a8a] dark:to-[#2563eb]",
@@ -116,7 +116,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-blue-500/10 text-blue-600 dark:text-cyan-400",
     accentGlow: "from-blue-600 to-cyan-400",
-    btnClass: "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   siq: {
     gradient: "from-emerald-50/70 via-green-50/60 to-slate-50/70 dark:from-[#064e3b] dark:via-[#047857] dark:to-[#10b981]",
@@ -124,7 +124,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     accentGlow: "from-emerald-600 to-teal-400",
-    btnClass: "bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-500 dark:hover:bg-emerald-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   },
   unknown: {
     gradient: "from-blue-50/70 via-indigo-50/60 to-slate-50/70 dark:from-[#0d1f4e] dark:via-[#1a3884] dark:to-[#0f2d6b]",
@@ -132,7 +132,7 @@ const STAGE_THEME = {
     activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
     iconBg: "bg-blue-500/10 text-blue-600 dark:text-cyan-400",
     accentGlow: "from-blue-600 to-cyan-400",
-    btnClass: "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600",
+    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
   }
 };
 

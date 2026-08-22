@@ -410,7 +410,10 @@ const studentSchema = new mongoose.Schema({
   },
   profileImage: String,
   idProof: String,
-  certificates: [String],
+  // NOTE: `certificates` is defined ONCE above as rich objects. A duplicate
+  // `certificates: [String]` used to sit here and, being later in the object
+  // literal, silently overrode the rich definition — every registration
+  // submit then failed with "Cast to [string] failed". Do not re-add it.
   academicRecords: [{
     semester: Number,
     method: {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, cloneElement } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2, Home, AlertCircle } from "lucide-react";
+import { Upload, X, ChevronDown, ChevronsUpDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2, Home, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,11 +8,60 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import FileUpload from "@/components/FileUpload";
-import logoWhite from "@/assets/white.png";
-import logoGold from "@/assets/blue.png"; // Using blue.png as proxy for logo if needed, but the ref has white/blue theme
+import smaartLogoNavy from "@/assets/smaart-logo-navy.svg";
+import smaartLogoWhite from "@/assets/smaart-logo-white.svg";
 import { useUser } from "@/contexts/UserContextFixed";
 import { useTranslation } from "react-i18next";
 import { getStates, getDistricts, getCities, getPincodeForCity } from "@/services/indiaLocationService";
+import { PROJECT_DOMAINS } from "@/data/projectDomains";
+
+// Custom year picker — a styled dropdown with its own scroll area, so long
+// year lists stay compact instead of overflowing the screen like the native
+// <select> popup did. Years render newest first.
+const YearSelect = ({ value, onChange, years, placeholder = "Select Year" }) => {
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
+
+  useEffect(() => {
+    const close = (e) => { if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  return (
+    <div ref={boxRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full bg-slate-50 dark:bg-[#001630] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-left transition-all duration-200 focus:bg-white dark:focus:bg-[#001c3d] focus:border-[#1a3884] dark:focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-blue-500/20 flex items-center justify-between gap-2"
+      >
+        <span className={value ? "text-slate-800 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}>{value || placeholder}</span>
+        <ChevronsUpDown className="w-4 h-4 text-slate-400 shrink-0" />
+      </button>
+      {open && (
+        <div
+          className="absolute z-40 mt-1.5 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001c3d] shadow-xl py-1"
+          style={{ maxHeight: "232px", overflowY: "auto", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch", scrollbarWidth: "thin" }}
+        >
+          {years.length === 0 ? (
+            <div className="px-3.5 py-2 text-[13px] font-medium text-slate-400">No valid years</div>
+          ) : years.map((y) => (
+            <button
+              key={y}
+              type="button"
+              onClick={() => { onChange(String(y)); setOpen(false); }}
+              className={`w-full text-left px-3.5 py-2 text-[13px] font-semibold transition-colors ${String(y) === String(value)
+                ? "bg-[#1a3884]/10 text-[#1a3884] dark:bg-blue-500/15 dark:text-blue-300"
+                : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"}`}
+            >
+              {y}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ComprehensiveSignup = () => {
   const { t } = useTranslation();
@@ -414,8 +463,8 @@ const ComprehensiveSignup = () => {
   }, []);
 
   const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null, address: { street: "", city: "", state: "", country: "India", district: "", pincode: "" }, cgpa: "", batch: "" });
-  const [tenthDetails, setTenthDetails] = useState({ schoolName: "", board: "", yearOfPassing: "", percentage: "" });
-  const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", board: "", yearOfPassing: "", percentage: "" });
+  const [tenthDetails, setTenthDetails] = useState({ schoolName: "", board: "", yearOfPassing: "", scoreType: "", percentage: "" });
+  const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", board: "", yearOfPassing: "", scoreType: "", percentage: "" });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", cgpaPercentage: "", degreeStatus: "pursuing" }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
   const [jobPreferences, setJobPreferences] = useState({ items: [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation1: "", preferredLocation2: "", preferredLocation3: "", willingToRelocate: "", expectedSalary: "" }] });
@@ -442,9 +491,9 @@ const ComprehensiveSignup = () => {
   // a one-line answer to "what am I filling in here" without reading the fields.
   const steps = [
     { title: t("comp_signup.steps.personal", "Personal"), desc: t("comp_signup.steps.personal_desc", "Photo, contact details and address"), icon: <User className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.tenth", "10th"), desc: t("comp_signup.steps.tenth_desc", "Your class 10 school, board and result"), icon: <GraduationCap className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.twelfth", "12th"), desc: t("comp_signup.steps.twelfth_desc", "Your class 12 school, stream and result"), icon: <GraduationCap className="w-4 h-4" /> },
-    { title: t("comp_signup.steps.higher", "Higher Ed"), desc: t("comp_signup.steps.higher_desc", "Degrees, specialisations and institutions"), icon: <Award className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.tenth", "Class 10th"), desc: t("comp_signup.steps.tenth_desc", "Your class 10 school, board and result"), icon: <GraduationCap className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.twelfth", "Class 12th"), desc: t("comp_signup.steps.twelfth_desc", "Your class 12 school, stream and result"), icon: <GraduationCap className="w-4 h-4" /> },
+    { title: t("comp_signup.steps.higher", "Higher Education"), desc: t("comp_signup.steps.higher_desc", "Degrees, specialisations and institutions"), icon: <Award className="w-4 h-4" /> },
     { title: t("comp_signup.steps.activities", "Activities"), desc: t("comp_signup.steps.activities_desc", "Clubs, sports, volunteering and achievements"), icon: <Palette className="w-4 h-4" /> },
     { title: t("comp_signup.steps.goals", "Goals"), desc: t("comp_signup.steps.goals_desc", "Roles, sectors and where you want to be"), icon: <Target className="w-4 h-4" /> },
     { title: t("comp_signup.steps.experience", "Experience"), desc: t("comp_signup.steps.experience_desc", "Internships, jobs and supporting documents"), icon: <Briefcase className="w-4 h-4" /> },
@@ -462,7 +511,6 @@ const ComprehensiveSignup = () => {
     if (age < 16 || (age === 16 && m < 0)) { toast.error(t("comp_signup.toast.underage", "You must be at least 16 years old.")); return false; }
     if (dobDate > today) { toast.error(t("comp_signup.toast.future_dob", "Date of Birth cannot be in the future")); return false; }
     if (!personalDetails.gender) { toast.error(t("comp_signup.toast.gender_req", "Gender is required")); return false; }
-    if (!personalDetails.yearOfStudy) { toast.error(t("comp_signup.toast.study_year_req", "Year of Study is required")); return false; }
     if (!personalDetails.address?.country?.trim()) { toast.error(t("comp_signup.toast.country_req", "Country is required")); return false; }
     if (!personalDetails.address?.state?.trim()) { toast.error(t("comp_signup.toast.state_req", "State/Province is required")); return false; }
     if (!personalDetails.address?.district?.trim()) { toast.error(t("comp_signup.toast.district_req", "District/Region is required")); return false; }
@@ -477,9 +525,11 @@ const ComprehensiveSignup = () => {
     if (!tenthDetails.board) { toast.error(t("comp_signup.toast.tenth_board_req", "10th Board is required")); return false; }
     if (!tenthDetails.yearOfPassing) { toast.error(t("comp_signup.toast.tenth_passing_req", "10th Year of Passing is required")); return false; }
     if (!tenthDetails.percentage) { toast.error(t("comp_signup.toast.tenth_pct_req", "10th Percentage/CGPA is required")); return false; }
+    if (!tenthDetails.scoreType) { toast.error(t("comp_signup.toast.10th_score_type_req", "10th: Select Percentage or CGPA first")); return false; }
     const pct = parseFloat(tenthDetails.percentage);
-    if (isNaN(pct) || pct < 0 || pct > 100) { toast.error(t("comp_signup.toast.pct_range", "Percentage/CGPA must be between 0 and 100")); return false; }
-    if (pct > 10 && pct < 30) { toast.error(t("comp_signup.toast.pct_invalid_range", "Please enter a valid Percentage (30-100) or CGPA (0-10).")); return false; }
+    if (isNaN(pct) || pct < 0) { toast.error(t("comp_signup.toast.score_invalid", "10th score must be a valid, non-negative number")); return false; }
+    if (tenthDetails.scoreType === "Percentage" && pct > 100) { toast.error(t("comp_signup.toast.pct_max", "10th Percentage cannot be more than 100")); return false; }
+    if (tenthDetails.scoreType === "CGPA" && pct > 10) { toast.error(t("comp_signup.toast.cgpa_max", "10th CGPA cannot be more than 10")); return false; }
     return true;
   };
 
@@ -488,14 +538,23 @@ const ComprehensiveSignup = () => {
     if (!twelfthDetails.board) { toast.error(t("comp_signup.toast.twelfth_board_req", "12th Board is required")); return false; }
     if (!twelfthDetails.stream) { toast.error(t("comp_signup.toast.twelfth_stream_req", "12th Stream is required")); return false; }
     if (!twelfthDetails.yearOfPassing) { toast.error(t("comp_signup.toast.twelfth_passing_req", "12th Year of Passing is required")); return false; }
+    const tenthYr = parseInt(tenthDetails.yearOfPassing, 10);
+    const twelfthYr = parseInt(twelfthDetails.yearOfPassing, 10);
+    if (Number.isFinite(tenthYr) && Number.isFinite(twelfthYr) && twelfthYr !== tenthYr + 2 && twelfthYr !== tenthYr + 3) {
+      toast.error(t("comp_signup.toast.twelfth_year_rule", "12th Year of Passing must be 2 years after 10th ({{y2}}), or {{y3}} if a year was repeated. Please check your years.", { y2: tenthYr + 2, y3: tenthYr + 3 }));
+      return false;
+    }
     if (!twelfthDetails.percentage) { toast.error(t("comp_signup.toast.twelfth_pct_req", "12th Percentage/CGPA is required")); return false; }
+    if (!twelfthDetails.scoreType) { toast.error(t("comp_signup.toast.12th_score_type_req", "12th: Select Percentage or CGPA first")); return false; }
     const pct = parseFloat(twelfthDetails.percentage);
-    if (isNaN(pct) || pct < 0 || pct > 100) { toast.error(t("comp_signup.toast.pct_range", "Percentage/CGPA must be between 0 and 100")); return false; }
-    if (pct > 10 && pct < 30) { toast.error(t("comp_signup.toast.pct_invalid_range", "Please enter a valid Percentage (30-100) or CGPA (0-10).")); return false; }
+    if (isNaN(pct) || pct < 0) { toast.error(t("comp_signup.toast.score_invalid", "12th score must be a valid, non-negative number")); return false; }
+    if (twelfthDetails.scoreType === "Percentage" && pct > 100) { toast.error(t("comp_signup.toast.pct_max", "12th Percentage cannot be more than 100")); return false; }
+    if (twelfthDetails.scoreType === "CGPA" && pct > 10) { toast.error(t("comp_signup.toast.cgpa_max", "12th CGPA cannot be more than 10")); return false; }
     return true;
   };
 
   const validateHigherEducation = () => {
+    if (!personalDetails.yearOfStudy) { toast.error(t("comp_signup.toast.study_year_req", "Current Year of Study is required")); return false; }
     for (let i = 0; i < higherEducation.length; i++) {
       const h = higherEducation[i];
       if (!h.qualificationLevel) { toast.error(t("comp_signup.toast.higher_level_req", "Higher Ed {{idx}}: Degree Level is required", { idx: i + 1 })); return false; }
@@ -556,16 +615,9 @@ const ComprehensiveSignup = () => {
     if (!workExperience.isApplicable) return true;
     for (let i = 0; i < workExperience.items.length; i++) {
       const w = workExperience.items[i];
-      if (w.currentlyWorking) {
-        if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate) {
-          toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 }));
-          return false;
-        }
-      } else {
-        if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate || !w.keyResponsibilities?.trim() || !w.significantAccomplishments?.trim()) {
-          toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 }));
-          return false;
-        }
+      if (!w.experienceType || !w.organizationName?.trim() || !w.jobTitle?.trim() || !w.industry?.trim() || !w.startDate || !w.keyResponsibilities?.trim() || !w.significantAccomplishments?.trim()) {
+        toast.error(t("comp_signup.toast.exp_req", "Experience {{idx}}: All fields marked * are required", { idx: i + 1 }));
+        return false;
       }
       if (new Date(w.startDate) > new Date()) { toast.error(t("comp_signup.toast.exp_future_start", "Experience {{idx}}: Start Date cannot be in the future", { idx: i + 1 })); return false; }
       if (!w.currentlyWorking && !w.endDate) { toast.error(t("comp_signup.toast.exp_end_req", "Experience {{idx}}: End Date is required", { idx: i + 1 })); return false; }
@@ -577,16 +629,9 @@ const ComprehensiveSignup = () => {
     if (!projects.isApplicable) return true;
     for (let i = 0; i < projects.items.length; i++) {
       const p = projects.items[i];
-      if (p.currentlyWorking) {
-        if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate) {
-          toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 }));
-          return false;
-        }
-      } else {
-        if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim() || !p.significantAchievements?.trim()) {
-          toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 }));
-          return false;
-        }
+      if (!p.title?.trim() || !p.domain || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim() || !p.significantAchievements?.trim()) {
+        toast.error(t("comp_signup.toast.proj_req", "Project {{idx}}: All fields marked * are required", { idx: i + 1 }));
+        return false;
       }
       if (p.projectUrl?.trim()) {
         const url = p.projectUrl.toLowerCase();
@@ -715,7 +760,7 @@ const ComprehensiveSignup = () => {
   const removeJobPref = (id) => setJobPreferences(prev => ({ ...prev, items: prev.items.filter(j => j.id !== id) }));
   const addWorkExperience = () => setWorkExperience(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, keyResponsibilities: "", significantAccomplishments: "", documents: { offerLetter: null, appointmentLetter: null, appreciationLetter: null, experienceLetter: null }, selectedDocs: [], githubLink: "" }] }));
   const removeWorkExperience = (id) => setWorkExperience(prev => ({ ...prev, items: prev.items.filter(w => w.id !== id) }));
-  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", significantAchievements: "", projectUrl: "" }] }));
+  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", domain: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", significantAchievements: "", projectUrl: "" }] }));
   const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
   const addCertificate = () => setCertificates(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }));
   const removeCertificate = (id) => setCertificates(prev => ({ ...prev, items: prev.items.filter(c => c.id !== id) }));
@@ -789,7 +834,13 @@ const ComprehensiveSignup = () => {
   const inputClass = "w-full bg-slate-50 dark:bg-[#001630] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal transition-all duration-200 focus:bg-white dark:focus:bg-[#001c3d] focus:border-[#1a3884] dark:focus:border-blue-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 dark:focus-visible:ring-blue-500/20 focus-visible:ring-offset-0";
   const selectClass = "w-full bg-slate-50 dark:bg-[#001630] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 dark:text-slate-200 transition-all duration-200 focus:bg-white dark:focus:bg-[#001c3d] focus:border-[#1a3884] dark:focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-blue-500/20 appearance-none";
   const textareaClass = "w-full bg-slate-50 dark:bg-[#001630] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal transition-all duration-200 focus:bg-white dark:focus:bg-[#001c3d] focus:border-[#1a3884] dark:focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-blue-500/20 resize-none";
-  const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
+  // Full range, newest first — a few years into the future down to 1980, in
+  // one scrollable dropdown. 12th options respect the two-year rule: a 12th
+  // pass can only be 2+ years after the 10th pass.
+  const currentYear = new Date().getFullYear();
+  const maxYear = currentYear + 5;
+  const yearOptions = Array.from({ length: maxYear - 1980 + 1 }, (_, i) => maxYear - i);
+
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
   const sectorOptions = excelData.sectors.length > 0
@@ -821,17 +872,10 @@ const ComprehensiveSignup = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
-          {/* Left: Brand Typography Matching Navbar */}
-          <div onClick={() => navigate("/")} className="flex flex-col items-start cursor-pointer group transition-all duration-300 transform hover:scale-105">
-            <div className="flex items-center gap-1">
-              <span className="text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none transition-colors duration-300 group-hover:text-[#132c6b] dark:group-hover:text-blue-200">
-                SMAART
-              </span>
-              <div className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse" />
-            </div>
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mt-0.5">
-              {t("comp_signup.institute", "Institute")}
-            </span>
+          {/* Left: same SMAART logo as the dashboard sidebar */}
+          <div onClick={() => navigate("/")} className="flex items-center cursor-pointer transition-all duration-300 transform hover:scale-105">
+            <img src={smaartLogoNavy} alt="SMAART Institute" className="h-8 w-auto object-contain dark:hidden" />
+            <img src={smaartLogoWhite} alt="SMAART Institute" className="hidden h-8 w-auto object-contain dark:block" />
           </div>
 
           {/* Center: live step capsule — the only always-visible "where am I" on
@@ -843,8 +887,8 @@ const ComprehensiveSignup = () => {
             <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200 tracking-tight">
               {steps[currentStep].title}
             </span>
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 tabular-nums">
-              / {steps.length}
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 tabular-nums">
+              {t("comp_signup.step_of", "of {{total}}", { total: steps.length })}
             </span>
           </div>
 
@@ -860,7 +904,7 @@ const ComprehensiveSignup = () => {
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 text-slate-600 dark:text-slate-300 hover:text-[#1a3884] dark:hover:text-white bg-white dark:bg-[#001c3d] hover:bg-blue-50/20 dark:hover:bg-blue-950/20 shadow-sm hover:shadow transition-all duration-200 text-xs font-bold uppercase tracking-wider group"
             >
               <Briefcase className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors" />
-              <span className="hidden sm:inline">{t("comp_signup.go_to_dashboard", "Go into Dashboard")}</span>
+              <span className="hidden sm:inline">{t("comp_signup.go_to_dashboard", "Go to Dashboard")}</span>
             </button>
           </div>
 
@@ -1055,18 +1099,18 @@ const ComprehensiveSignup = () => {
               {currentStep === 0 && (
                 <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <div className="flex flex-col justify-start mb-8">
-                    <Label className="text-sm text-slate-500 font-medium mb-2">Profile Photo *</Label>
+                    <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Profile Photo *</Label>
                     <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo" accept=".jpg,.png,.jpeg" />
                   </div>
                   <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Full Name</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Full Name</Label>
                       <div className="relative group">
                         <Input value={personalDetails.fullName} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Date of Birth *</Label>
                       <div className="relative">
                         <Input
                           type="date"
@@ -1081,7 +1125,7 @@ const ComprehensiveSignup = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Gender *</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Gender *</Label>
                       <div className="relative">
                         <select
                           value={personalDetails.gender}
@@ -1097,23 +1141,7 @@ const ComprehensiveSignup = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Current Year of Study *</Label>
-                      <select
-                        value={personalDetails.yearOfStudy}
-                        disabled={!!personalDetails.yearOfStudy}
-                        onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })}
-                        className={selectClass + (personalDetails.yearOfStudy ? " opacity-60 cursor-not-allowed" : "")}
-                      >
-                        <option value="">Select Year</option>
-                        <option value="1st Year">1st Year</option>
-                        <option value="2nd Year">2nd Year</option>
-                        <option value="3rd Year">3rd Year</option>
-                        <option value="4th Year">4th Year</option>
-                        <option value="Graduated">Graduated</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Mobile Number</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Mobile Number</Label>
                       <div className="relative">
                         <Input value={personalDetails.mobileNumber} disabled onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass + " opacity-60 cursor-not-allowed"} />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -1122,12 +1150,8 @@ const ComprehensiveSignup = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Email</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Email</Label>
                       <Input value={personalDetails.email} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-sm text-slate-500 font-medium">Batch</Label>
-                      <Input value={personalDetails.batch || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} placeholder="e.g. 2023-2027" />
                     </div>
                   </div>
 
@@ -1135,13 +1159,13 @@ const ComprehensiveSignup = () => {
                   <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
                     <div className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400">
                       <Home className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                      <h3 className="text-lg font-bold tracking-tight">{t("comp_signup.personal.address", "Address")}</h3>
+                      <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">{t("comp_signup.personal.address", "Address")}</h3>
                     </div>
 
                     {/* Row 1: COUNTRY and STATE/PROVINCE */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">COUNTRY *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">COUNTRY *</Label>
                         <select
                           value={personalDetails.address?.country || "India"}
                           onChange={(e) => {
@@ -1175,7 +1199,7 @@ const ComprehensiveSignup = () => {
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">STATE/PROVINCE *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">STATE/PROVINCE *</Label>
                         {personalDetails.address?.country === "India" ? (
                           <select
                             value={personalDetails.address?.state || ""}
@@ -1216,7 +1240,7 @@ const ComprehensiveSignup = () => {
                     {/* Row 2: DISTRICT/REGION and CITY / TOWN */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">DISTRICT/REGION *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">DISTRICT/REGION *</Label>
                         {personalDetails.address?.country === "India" ? (
                           <select
                             value={personalDetails.address?.district || ""}
@@ -1254,7 +1278,7 @@ const ComprehensiveSignup = () => {
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">CITY / TOWN *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">CITY / TOWN *</Label>
                         {personalDetails.address?.country === "India" ? (
                           <select
                             value={personalDetails.address?.city || ""}
@@ -1301,7 +1325,7 @@ const ComprehensiveSignup = () => {
                     {/* Row 3: ADDRESS LINE and PINCODE / ZIPCODE */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">ADDRESS LINE *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">ADDRESS LINE *</Label>
                         <Input
                           placeholder="Enter floor, building, street address"
                           value={personalDetails.address?.street || ""}
@@ -1314,7 +1338,7 @@ const ComprehensiveSignup = () => {
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">PINCODE / ZIPCODE *</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">PINCODE / ZIPCODE *</Label>
                         <Input
                           placeholder="Enter postal code"
                           value={personalDetails.address?.pincode || ""}
@@ -1333,11 +1357,11 @@ const ComprehensiveSignup = () => {
               {/* Step 1: 10th Details */}
               {currentStep === 1 && (
                 <motion.div key="tenth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">{t("comp_signup.tenth.title", "Secondary School Level (Grade 10)")}</h2>
+                  <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight mb-5">{t("comp_signup.tenth.title", "Secondary School Level (Grade 10)")}</h2>
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.school_name", "School Name *")}</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
+                    <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.tenth.school_name", "School Name *")}</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
                     <div>
-                      <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">Board *</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Board *</Label>
                       <select value={tenthDetails.board || ""} onChange={(e) => setTenthDetails({ ...tenthDetails, board: e.target.value })} className={selectClass}>
                         <option value="">Select Board</option>
                         <option value="State Board">State Board</option>
@@ -1347,14 +1371,23 @@ const ComprehensiveSignup = () => {
                         <option value="Others">Others</option>
                       </select>
                     </div>
-                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.year_of_passing", "Year of Passing *")}</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">{t("comp_signup.tenth.select_year", "Select Year")}</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                    <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.tenth.percentage", "Percentage / CGPA *")}</Label><Input type="number" min="0" max="100" step="0.01" value={tenthDetails.percentage} onChange={(e) => {
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.tenth.year_of_passing", "Year of Passing *")}</Label><YearSelect value={tenthDetails.yearOfPassing} years={yearOptions} placeholder={t("comp_signup.tenth.select_year", "Select Year")} onChange={(v) => {
+                      setTenthDetails({ ...tenthDetails, yearOfPassing: v });
+                      const t12 = parseInt(twelfthDetails.yearOfPassing, 10);
+                      const t10 = parseInt(v, 10);
+                      if (Number.isFinite(t12) && t12 !== t10 + 2 && t12 !== t10 + 3) {
+                        setTwelfthDetails({ ...twelfthDetails, yearOfPassing: "" });
+                      }
+                    }} /></div>
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.tenth.score_type", "Score Type *")}</Label><select value={tenthDetails.scoreType} onChange={(e) => setTenthDetails({ ...tenthDetails, scoreType: e.target.value, percentage: "" })} className={selectClass + (tenthDetails.scoreType ? "" : " text-slate-400")}><option value="" disabled>{t("comp_signup.tenth.select_score_type", "Select Percentage or CGPA...")}</option><option value="Percentage">Percentage</option><option value="CGPA">CGPA</option></select></div>
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{tenthDetails.scoreType === "CGPA" ? t("comp_signup.tenth.cgpa", "CGPA *") : t("comp_signup.tenth.percentage_only", "Percentage *")}</Label><Input type="number" min="0" max={tenthDetails.scoreType === "CGPA" ? 10 : 100} step="0.01" disabled={!tenthDetails.scoreType} value={tenthDetails.percentage} onChange={(e) => {
                       const val = e.target.value;
+                      if (val.startsWith("-")) return;
                       const parts = val.split('.');
                       if (parts[0] && parts[0].length > 3) return;
                       if (parts[1] && parts[1].length > 2) return;
                       setTenthDetails({ ...tenthDetails, percentage: val });
-                    }} className={inputClass} placeholder="e.g. 95.5 or 9.8" /></div>
+                    }} className={inputClass + (!tenthDetails.scoreType ? " opacity-60 cursor-not-allowed" : "")} placeholder={tenthDetails.scoreType === "CGPA" ? "e.g. 8.5 (0 - 10)" : "e.g. 85.5 (0 - 100)"} /></div>
                   </div>
                 </motion.div>
               )}
@@ -1362,11 +1395,11 @@ const ComprehensiveSignup = () => {
               {/* Step 2: 12th Details */}
               {currentStep === 2 && (
                 <motion.div key="twelfth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">{t("comp_signup.twelfth.title", "Higher Secondary Level (Grade 12)")}</h2>
+                  <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight mb-5">{t("comp_signup.twelfth.title", "Higher Secondary Level (Grade 12)")}</h2>
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.school_name", "School/College Name *")}</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
+                    <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.twelfth.school_name", "School/College Name *")}</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
                     <div>
-                      <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">Board *</Label>
+                      <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Board *</Label>
                       <select value={twelfthDetails.board || ""} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, board: e.target.value })} className={selectClass}>
                         <option value="">Select Board</option>
                         <option value="State Board">State Board</option>
@@ -1376,18 +1409,39 @@ const ComprehensiveSignup = () => {
                         <option value="Others">Others</option>
                       </select>
                     </div>
-                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.group", "Group *")}</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value, customStream: '' })} className={selectClass}><option value="">{t("comp_signup.twelfth.select", "Select")}</option><option value="Science">{t("comp_signup.twelfth.science", "Science")}</option><option value="Commerce">{t("comp_signup.twelfth.commerce", "Commerce")}</option><option value="Arts">{t("comp_signup.twelfth.arts", "Arts")}</option><option value="Others">{t("comp_signup.twelfth.others", "Others")}</option></select></div>
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.twelfth.group", "Group *")}</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value, customStream: '' })} className={selectClass}><option value="">{t("comp_signup.twelfth.select", "Select")}</option>{[
+                      'Science — Maths, Physics, Chemistry (PCM)',
+                      'Science — Biology, Physics, Chemistry (PCB)',
+                      'Science — Maths & Biology (PCMB)',
+                      'Science — Computer Science',
+                      'Commerce — Accountancy & Economics',
+                      'Commerce — Computer Applications',
+                      'Commerce — Business Maths',
+                      'Arts / Humanities',
+                      'Vocational',
+                      'Others'
+                    ].map((g) => <option key={g} value={g}>{g}</option>)}</select></div>
                     {twelfthDetails.stream === "Others" && (
-                      <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.specify_group", "Specify your group *")}</Label><Input value={twelfthDetails.customStream || ''} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, customStream: e.target.value })} className={inputClass} placeholder={t("comp_signup.twelfth.specify_group_placeholder", "Enter your group")} /></div>
+                      <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.twelfth.specify_group", "Specify your group *")}</Label><Input value={twelfthDetails.customStream || ''} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, customStream: e.target.value })} className={inputClass} placeholder={t("comp_signup.twelfth.specify_group_placeholder", "Enter your group")} /></div>
                     )}
-                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.year_of_passing", "Year of Passing *")}</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">{t("comp_signup.twelfth.select_year", "Select Year")}</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                    <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.twelfth.percentage", "Percentage / CGPA *")}</Label><Input type="number" min="0" max="100" step="0.01" value={twelfthDetails.percentage} onChange={(e) => {
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.twelfth.year_of_passing", "Year of Passing *")}</Label><YearSelect value={twelfthDetails.yearOfPassing} years={yearOptions} placeholder={t("comp_signup.twelfth.select_year", "Select Year")} onChange={(v) => {
+                      const t10 = parseInt(tenthDetails.yearOfPassing, 10);
+                      const t12 = parseInt(v, 10);
+                      if (Number.isFinite(t10) && t12 !== t10 + 2 && t12 !== t10 + 3) {
+                        toast.error(t("comp_signup.toast.twelfth_year_rule", "12th Year of Passing must be 2 years after 10th ({{y2}}), or {{y3}} if a year was repeated. Please check your years.", { y2: t10 + 2, y3: t10 + 3 }));
+                        return;
+                      }
+                      setTwelfthDetails({ ...twelfthDetails, yearOfPassing: v });
+                    }} /></div>
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.twelfth.score_type", "Score Type *")}</Label><select value={twelfthDetails.scoreType} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, scoreType: e.target.value, percentage: "" })} className={selectClass + (twelfthDetails.scoreType ? "" : " text-slate-400")}><option value="" disabled>{t("comp_signup.twelfth.select_score_type", "Select Percentage or CGPA...")}</option><option value="Percentage">Percentage</option><option value="CGPA">CGPA</option></select></div>
+                    <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{twelfthDetails.scoreType === "CGPA" ? t("comp_signup.twelfth.cgpa", "CGPA *") : t("comp_signup.twelfth.percentage_only", "Percentage *")}</Label><Input type="number" min="0" max={twelfthDetails.scoreType === "CGPA" ? 10 : 100} step="0.01" disabled={!twelfthDetails.scoreType} value={twelfthDetails.percentage} onChange={(e) => {
                       const val = e.target.value;
+                      if (val.startsWith("-")) return;
                       const parts = val.split('.');
                       if (parts[0] && parts[0].length > 3) return;
                       if (parts[1] && parts[1].length > 2) return;
                       setTwelfthDetails({ ...twelfthDetails, percentage: val });
-                    }} className={inputClass} placeholder="e.g. 95.5 or 9.8" /></div>
+                    }} className={inputClass + (!twelfthDetails.scoreType ? " opacity-60 cursor-not-allowed" : "")} placeholder={twelfthDetails.scoreType === "CGPA" ? "e.g. 8.5 (0 - 10)" : "e.g. 85.5 (0 - 100)"} /></div>
                   </div>
                 </motion.div>
               )}
@@ -1396,17 +1450,46 @@ const ComprehensiveSignup = () => {
               {currentStep === 3 && (
                 <motion.div key="higher" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.higher.title", "Higher Education")}</h2>
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">{t("comp_signup.higher.title", "Higher Education")}</h2>
                     <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> {t("comp_signup.higher.add_degree", "Add Degree")}</Button>
                   </div>
+
+                  {/* Study status — moved here from Personal: it belongs with
+                      the degree details. Backed by the same personalDetails
+                      state, so saving/sync stays unchanged. */}
+                  <div className="p-6 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.year_of_study", "Current Year of Study *")}</Label>
+                        <select
+                          value={personalDetails.yearOfStudy}
+                          disabled={!!personalDetails.yearOfStudy}
+                          onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })}
+                          className={selectClass + (personalDetails.yearOfStudy ? " opacity-60 cursor-not-allowed" : "")}
+                        >
+                          <option value="">Select Year</option>
+                          <option value="1st Year">1st Year</option>
+                          <option value="2nd Year">2nd Year</option>
+                          <option value="3rd Year">3rd Year</option>
+                          <option value="4th Year">4th Year</option>
+                          <option value="Graduated">Graduated</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.batch", "Batch")}</Label>
+                        <Input value={personalDetails.batch || ""} disabled className={inputClass + " opacity-60 cursor-not-allowed"} placeholder="e.g. 2023-2027" />
+                      </div>
+                    </div>
+                  </div>
+
                   {higherEducation.map((item, index) => (
                     <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative group">
                       {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
-                      <h3 className="font-semibold mb-4 text-slate-900 dark:text-white">{t("comp_signup.higher.degree_num", "Degree #{{num}}", { num: index + 1 })}</h3>
+                      <h3 className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-wider mb-4">{t("comp_signup.higher.degree_num", "Degree #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
                         {/* Degree Level */}
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.degree_level", "Degree Level *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.degree_level", "Degree Level *")}</Label>
                           <select
                             value={item.qualificationLevel}
                             disabled={index === 0}
@@ -1429,7 +1512,7 @@ const ComprehensiveSignup = () => {
 
                         {/* Degree (Domain) */}
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.domain_field", "Domain Field *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.domain_field", "Domain Field *")}</Label>
                           <select
                             value={item.degree}
                             disabled={index === 0 || !item.qualificationLevel}
@@ -1451,7 +1534,7 @@ const ComprehensiveSignup = () => {
 
                         {/* Degree Full Name */}
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.degree_full_name", "Degree Full Name *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.degree_full_name", "Degree Full Name *")}</Label>
                           <select
                             value={item.degreeFullName}
                             disabled={index === 0 || !item.degree}
@@ -1472,7 +1555,7 @@ const ComprehensiveSignup = () => {
 
                         {/* Specialization */}
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.specialization", "Specialization *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.specialization", "Specialization *")}</Label>
                           <select
                             value={item.specialization}
                             disabled={index === 0 || !item.degreeFullName}
@@ -1490,7 +1573,7 @@ const ComprehensiveSignup = () => {
                         </div>
 
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.institution", "Institution *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.institution", "Institution *")}</Label>
                           <Input
                             value={index === 0 ? (item.institutionName || personalDetails.institution || "") : (item.institutionName || "")}
                             disabled={index === 0}
@@ -1500,7 +1583,7 @@ const ComprehensiveSignup = () => {
                           />
                         </div>
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.higher.status", "Status *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.higher.status", "Status *")}</Label>
                           <select
                             value={index === 0 ? (item.degreeStatus || "pursuing").toLowerCase() : (item.degreeStatus || "")}
                             disabled={index === 0}
@@ -1522,7 +1605,7 @@ const ComprehensiveSignup = () => {
                         </div>
                         {index > 0 && (
                           <div>
-                            <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                               {t("comp_signup.higher.cgpa_pct_req", "CGPA / Percentage")} {item.degreeStatus && item.degreeStatus !== 'pursuing' ? "*" : ""}
                             </Label>
                             <Input
@@ -1544,25 +1627,25 @@ const ComprehensiveSignup = () => {
               {/* Step 4: Activities */}
               {currentStep === 4 && (
                 <motion.div key="activities" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.activities.title", "Significant Accomplishments & Extracurricular Activities")}</h2>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} /><span className="text-sm dark:text-slate-300">{t("comp_signup.not_applicable", "Not Applicable")}</span></label>
-                      {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> {t("comp_signup.add", "Add")}</Button>}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug">{t("comp_signup.activities.title", "Significant Accomplishments & Extracurricular Activities")}</h2>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <label className={`flex items-center gap-2 cursor-pointer select-none px-3.5 h-9 rounded-xl border text-[12px] font-bold uppercase tracking-wider transition-all ${!extracurricular.isApplicable ? "border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-500 dark:bg-blue-500/10 dark:text-blue-300" : "border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20"}`}><input type="checkbox" className="h-3.5 w-3.5 accent-[#1a3884]" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} />{t("comp_signup.not_applicable", "Not Applicable")}</label>
+                      {extracurricular.isApplicable && <Button onClick={addExtracurricular} size="sm" className="h-9 px-4 rounded-xl bg-[#1a3884] text-white text-[12px] font-bold uppercase tracking-wider hover:bg-[#112b6b] transition-all shadow-sm shadow-[#1a3884]/20"><Plus size={15} /> {t("comp_signup.add", "Add")}</Button>}
                     </div>
                   </div>
                   {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
                     <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative group">
                       {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
-                      <h3 className="font-semibold mb-4 text-slate-900 dark:text-white">{t("comp_signup.activities.activity_num", "Activity #{{num}}", { num: index + 1 })}</h3>
+                      <h3 className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-wider mb-4">{t("comp_signup.activities.activity_num", "Activity #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.activities.type", "Type *")}</Label><select value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; n.items[index].customActivityType = ''; setExtracurricular(n); }} className={selectClass}><option value="">{t("comp_signup.activities.select_type", "Select")}</option><option value="Sports">{t("comp_signup.activities.sports", "Sports")}</option><option value="Arts">{t("comp_signup.activities.arts", "Arts")}</option><option value="Volunteering">{t("comp_signup.activities.volunteering", "Volunteering")}</option><option value="Leadership roles">{t("comp_signup.activities.leadership", "Leadership roles")}</option><option value="Others">{t("comp_signup.activities.others", "Others")}</option></select></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.activities.type", "Type *")}</Label><select value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; n.items[index].customActivityType = ''; setExtracurricular(n); }} className={selectClass}><option value="">{t("comp_signup.activities.select_type", "Select")}</option><option value="Sports">{t("comp_signup.activities.sports", "Sports")}</option><option value="Arts">{t("comp_signup.activities.arts", "Arts")}</option><option value="Volunteering">{t("comp_signup.activities.volunteering", "Volunteering")}</option><option value="Leadership roles">{t("comp_signup.activities.leadership", "Leadership roles")}</option><option value="Others">{t("comp_signup.activities.others", "Others")}</option></select></div>
                         {item.activityType === "Others" && (
-                          <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.activities.specify_type", "Specify Activity Type *")}</Label><Input value={item.customActivityType || ''} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].customActivityType = e.target.value; setExtracurricular(n); }} className={inputClass} placeholder={t("comp_signup.activities.specify_type_placeholder", "Enter your activity type")} /></div>
+                          <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.activities.specify_type", "Specify Activity Type *")}</Label><Input value={item.customActivityType || ''} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].customActivityType = e.target.value; setExtracurricular(n); }} className={inputClass} placeholder={t("comp_signup.activities.specify_type_placeholder", "Enter your activity type")} /></div>
                         )}
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.activities.level", "Level *")}</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">{t("comp_signup.activities.select_level", "Select")}</option><option value="School">{t("comp_signup.activities.level_school", "School")}</option><option value="College">{t("comp_signup.activities.level_college", "College")}</option><option value="District">{t("comp_signup.activities.level_district", "District")}</option><option value="State">{t("comp_signup.activities.level_state", "State")}</option><option value="National">{t("comp_signup.activities.level_national", "National")}</option><option value="International">{t("comp_signup.activities.level_international", "International")}</option></select></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.activities.achievements", "Achievements *")}</Label><Input value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
-                        <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.activities.description", "Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} className={textareaClass} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.activities.level", "Level *")}</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">{t("comp_signup.activities.select_level", "Select")}</option><option value="School">{t("comp_signup.activities.level_school", "School")}</option><option value="College">{t("comp_signup.activities.level_college", "College")}</option><option value="District">{t("comp_signup.activities.level_district", "District")}</option><option value="State">{t("comp_signup.activities.level_state", "State")}</option><option value="National">{t("comp_signup.activities.level_national", "National")}</option><option value="International">{t("comp_signup.activities.level_international", "International")}</option></select></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.activities.achievements", "Achievements *")}</Label><Input value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.activities.description", "Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} className={textareaClass} /></div>
                       </div>
                     </div>
                   )) : <div className="p-10 text-center text-slate-500 dark:text-slate-400">{t("comp_signup.activities.no_items", "No activities to add.")}</div>}
@@ -1572,28 +1655,28 @@ const ComprehensiveSignup = () => {
               {/* Step 5: Goals - Refined Placeholders */}
               {currentStep === 5 && (
                 <motion.div key="goals" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.goals.career_title", "Career Goals")}</h2>
+                  <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">{t("comp_signup.goals.career_title", "Career Goals")}</h2>
                   <div>
-                    <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.short_term", "Short-term Goal (0-1 year) *")}</Label>
+                    <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.short_term", "Short-term Goal (0-1 year) *")}</Label>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-2">{t("comp_signup.goals.short_term_desc", "Goals that can be achieved in the near future and focus on building basic skills, habits, or immediate improvements.")}</p>
                     <textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder={t("comp_signup.goals.short_term_placeholder", "e.g. Gain hands-on experience through projects or internships, and secure an entry-level role.")} />
                   </div>
                   <div>
-                    <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.medium_term", "Medium-term Goal (1-5 years) *")}</Label>
+                    <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.medium_term", "Medium-term Goal (1-5 years) *")}</Label>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-2">{t("comp_signup.goals.medium_term_desc", "Goals planned for the next phase of growth that focus on strengthening abilities, gaining experience, and progressing toward bigger responsibilities.")}</p>
                     <textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder={t("comp_signup.goals.medium_term_placeholder", "e.g. Build advanced role-specific skills, take ownership of key work responsibilities, and progress to a higher position or better organization.")} />
                   </div>
                   <div>
-                    <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.long_term", "Long-term Goal (5+ years) *")}</Label>
+                    <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.long_term", "Long-term Goal (5+ years) *")}</Label>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-2">{t("comp_signup.goals.long_term_desc", "Goals set for the future that focus on overall direction, long-lasting impact, leadership, and sustained personal and professional growth.")}</p>
                     <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder={t("comp_signup.goals.long_term_placeholder", "e.g. Move into leadership or specialist roles, continuously reskill with new technologies, and contribute to organizational and industry growth.")} />
                   </div>
 
                   <div className="pt-6 border-t border-slate-200 dark:border-white/10">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.goals.personal_title", "Personal Development Goals")}</h2>
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">{t("comp_signup.goals.personal_title", "Personal Development Goals")}</h2>
                     <div className="space-y-6 mt-6">
                       <div>
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.personal_short_term", "Short term (0–1 year) *")}</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.personal_short_term", "Short term (0–1 year) *")}</Label>
                         <textarea
                           value={personalDevelopmentGoals.shortTerm}
                           onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, shortTerm: e.target.value })}
@@ -1602,7 +1685,7 @@ const ComprehensiveSignup = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.personal_medium_term", "Medium term (1–5 years) *")}</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.personal_medium_term", "Medium term (1–5 years) *")}</Label>
                         <textarea
                           value={personalDevelopmentGoals.mediumTerm}
                           onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, mediumTerm: e.target.value })}
@@ -1611,7 +1694,7 @@ const ComprehensiveSignup = () => {
                         />
                       </div>
                       <div>
-                        <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.goals.personal_long_term", "Long term (5+ years) *")}</Label>
+                        <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.goals.personal_long_term", "Long term (5+ years) *")}</Label>
                         <textarea
                           value={personalDevelopmentGoals.longTerm}
                           onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, longTerm: e.target.value })}
@@ -1627,31 +1710,27 @@ const ComprehensiveSignup = () => {
               {/* Step 6: Work */}
               {currentStep === 6 && (
                 <motion.div key="work" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.work.title", "Work Experience")}</h2>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} /><span className="text-sm dark:text-slate-300">{t("comp_signup.not_applicable", "Not Applicable")}</span></label>
-                      {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> {t("comp_signup.add", "Add")}</Button>}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug">{t("comp_signup.work.title", "Work Experience")}</h2>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <label className={`flex items-center gap-2 cursor-pointer select-none px-3.5 h-9 rounded-xl border text-[12px] font-bold uppercase tracking-wider transition-all ${!workExperience.isApplicable ? "border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-500 dark:bg-blue-500/10 dark:text-blue-300" : "border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20"}`}><input type="checkbox" className="h-3.5 w-3.5 accent-[#1a3884]" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} />{t("comp_signup.not_applicable", "Not Applicable")}</label>
+                      {workExperience.isApplicable && <Button onClick={addWorkExperience} size="sm" className="h-9 px-4 rounded-xl bg-[#1a3884] text-white text-[12px] font-bold uppercase tracking-wider hover:bg-[#112b6b] transition-all shadow-sm shadow-[#1a3884]/20"><Plus size={15} /> {t("comp_signup.add", "Add")}</Button>}
                     </div>
                   </div>
                   {workExperience.isApplicable ? workExperience.items.map((item, index) => (
                     <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative group">
                       {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
-                      <h3 className="font-semibold mb-4 text-slate-900 dark:text-white">{t("comp_signup.work.exp_num", "Exp #{{num}}", { num: index + 1 })}</h3>
+                      <h3 className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-wider mb-4">{t("comp_signup.work.exp_num", "Exp #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.experience_type", "Experience Type *")}</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">{t("comp_signup.work.select", "Select")}</option><option value="full-time">{t("comp_signup.work.full_time", "Full-Time")}</option><option value="part-time">{t("comp_signup.work.part_time", "Part-Time")}</option><option value="internship">{t("comp_signup.work.internship", "Internship")}</option><option value="freelance">{t("comp_signup.work.freelance", "Freelance")}</option><option value="volunteering">{t("comp_signup.work.volunteering", "Volunteering")}</option></select></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.organization", "Organization Name *")}</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.organization_placeholder", "e.g. Google, Startup Inc")} /></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.job_title", "Designation / Role *")}</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.job_title_placeholder", "e.g. Software Engineer")} /></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.industry", "Industry / Sector *")}</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.industry_placeholder", "e.g. IT, Healthcare")} /></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
-                        {!item.currentlyWorking && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
-                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; n.items[index].keyResponsibilities = ""; n.items[index].significantAccomplishments = ""; } setWorkExperience(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.work.currently_working", "Currently working")}</Label></div>
-                        {!item.currentlyWorking && (
-                          <>
-                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.responsibilities", "Key Responsibilities *")}</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.responsibilities_placeholder", "Outline your primary duties and the scope of your work in this role.")} /></div>
-                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.work.accomplishments", "Significant Accomplishments *")}</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.accomplishments_placeholder", "Highlight major achievements, contributions, or impacts you made during your tenure.")} /></div>
-                          </>
-                        )}
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.experience_type", "Experience Type *")}</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">{t("comp_signup.work.select", "Select")}</option><option value="full-time">{t("comp_signup.work.full_time", "Full-Time")}</option><option value="part-time">{t("comp_signup.work.part_time", "Part-Time")}</option><option value="internship">{t("comp_signup.work.internship", "Internship")}</option><option value="freelance">{t("comp_signup.work.freelance", "Freelance")}</option><option value="volunteering">{t("comp_signup.work.volunteering", "Volunteering")}</option></select></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.organization", "Organization Name *")}</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.organization_placeholder", "e.g. Google, Startup Inc")} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.job_title", "Designation / Role *")}</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.job_title_placeholder", "e.g. Software Engineer")} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.industry", "Industry / Sector *")}</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder={t("comp_signup.work.industry_placeholder", "e.g. IT, Healthcare")} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
+                        {!item.currentlyWorking && <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; } setWorkExperience(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.work.currently_working", "Currently working")}</Label></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.responsibilities", "Key Responsibilities *")}</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.responsibilities_placeholder", "Outline your primary duties and the scope of your work in this role.")} /></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.work.accomplishments", "Significant Accomplishments *")}</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder={t("comp_signup.work.accomplishments_placeholder", "Highlight major achievements, contributions, or impacts you made during your tenure.")} /></div>
                         
                       </div>
                     </div>
@@ -1662,33 +1741,30 @@ const ComprehensiveSignup = () => {
               {/* Step 7: Projects */}
               {currentStep === 7 && (
                 <motion.div key="proj" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.projects.title", "Projects")}</h2>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} /><span className="text-sm dark:text-slate-300">{t("comp_signup.not_applicable", "Not Applicable")}</span></label>
-                      {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> {t("comp_signup.add", "Add")}</Button>}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight leading-snug">{t("comp_signup.projects.title", "Projects")}</h2>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <label className={`flex items-center gap-2 cursor-pointer select-none px-3.5 h-9 rounded-xl border text-[12px] font-bold uppercase tracking-wider transition-all ${!projects.isApplicable ? "border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-500 dark:bg-blue-500/10 dark:text-blue-300" : "border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20"}`}><input type="checkbox" className="h-3.5 w-3.5 accent-[#1a3884]" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} />{t("comp_signup.not_applicable", "Not Applicable")}</label>
+                      {projects.isApplicable && <Button onClick={addProject} size="sm" className="h-9 px-4 rounded-xl bg-[#1a3884] text-white text-[12px] font-bold uppercase tracking-wider hover:bg-[#112b6b] transition-all shadow-sm shadow-[#1a3884]/20"><Plus size={15} /> {t("comp_signup.add", "Add")}</Button>}
                     </div>
                   </div>
                   {projects.isApplicable ? projects.items.map((item, index) => (
                     <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative group">
                       {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
-                      <h3 className="font-semibold mb-4 text-slate-900 dark:text-white">{t("comp_signup.projects.project_num", "Project #{{num}}", { num: index + 1 })}</h3>
+                      <h3 className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-wider mb-4">{t("comp_signup.projects.project_num", "Project #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.project_title", "Project Title *")}</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_title_placeholder", "e.g. E-commerce Website")} /></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.done_in", "Project developed in *")}</Label><select value={item.doneIn} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].doneIn = e.target.value; setProjects(n); }} className={selectClass}><option value="">{t("comp_signup.projects.select", "Select")}</option><option value="Institution">{t("comp_signup.projects.institution_opt", "Institution")}</option><option value="Organization">{t("comp_signup.projects.organization_opt", "Organization")}</option><option value="Others">{t("comp_signup.projects.others_opt", "Others")}</option></select></div>
-                        {item.doneIn === 'Institution' && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.institution_name", "College / University Name *")}</Label><Input value={item.institution} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].institution = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.institution_name_placeholder", "e.g. Stanford University")} /></div>}
-                        {item.doneIn === 'Organization' && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.company_name", "Company / Organization Name *")}</Label><Input value={item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].companyName = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.company_name_placeholder", "e.g. Acme Corp")} /></div>}
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.team_type", "Team Type *")}</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">{t("comp_signup.projects.select", "Select")}</option><option value="Individual">{t("comp_signup.projects.individual", "Individual")}</option><option value="Team">{t("comp_signup.projects.team", "Team")}</option></select></div>
-                        <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
-                        {!item.currentlyWorking && <div><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`proj-current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; n.items[index].description = ""; n.items[index].significantAchievements = ""; n.items[index].projectUrl = ""; } setProjects(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`proj-current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.projects.currently_working", "Currently working on project")}</Label></div>
-                        {!item.currentlyWorking && (
-                          <>
-                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.description", "Project Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.description_placeholder", "Describe your role and the technologies used...")} /></div>
-                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.achievements", "Significant Achievements *")}</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.achievements_placeholder", "Highlight key results, performance wins, or unique contributions...")} /></div>
-                            <div className="md:col-span-2"><Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.projects.project_url", "Professional Project Link (GitHub / Google Docs Link Only)")}</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_url_placeholder", "e.g. github.com/username/repo or docs.google.com/...")} /></div>
-                          </>
-                        )}
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.project_title", "Project Title *")}</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_title_placeholder", "e.g. E-commerce Website")} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.project_domain", "Project Domain *")}</Label><YearSelect value={item.domain} years={PROJECT_DOMAINS} placeholder={t("comp_signup.projects.select_domain", "Select Domain")} onChange={(v) => { const n = { ...projects, items: [...projects.items] }; n.items[index].domain = v; setProjects(n); }} /></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.done_in", "Project developed in *")}</Label><select value={item.doneIn} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].doneIn = e.target.value; setProjects(n); }} className={selectClass}><option value="">{t("comp_signup.projects.select", "Select")}</option><option value="Institution">{t("comp_signup.projects.institution_opt", "Institution")}</option><option value="Organization">{t("comp_signup.projects.organization_opt", "Organization")}</option><option value="Others">{t("comp_signup.projects.others_opt", "Others")}</option></select></div>
+                        {item.doneIn === 'Institution' && <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.institution_name", "College / University Name *")}</Label><Input value={item.institution} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].institution = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.institution_name_placeholder", "e.g. Stanford University")} /></div>}
+                        {item.doneIn === 'Organization' && <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.company_name", "Company / Organization Name *")}</Label><Input value={item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].companyName = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.company_name_placeholder", "e.g. Acme Corp")} /></div>}
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.team_type", "Team Type *")}</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">{t("comp_signup.projects.select", "Select")}</option><option value="Individual">{t("comp_signup.projects.individual", "Individual")}</option><option value="Team">{t("comp_signup.projects.team", "Team")}</option></select></div>
+                        <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.start_date", "Start Date *")}</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
+                        {!item.currentlyWorking && <div><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.end_date", "End Date *")}</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`proj-current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) { n.items[index].endDate = ""; } setProjects(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`proj-current-${item.id}`} className="cursor-pointer dark:text-slate-300">{t("comp_signup.projects.currently_working", "Currently working on project")}</Label></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.description", "Project Description *")}</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.description_placeholder", "Describe your role and the technologies used...")} /></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.achievements", "Significant Achievements *")}</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder={t("comp_signup.projects.achievements_placeholder", "Highlight key results, performance wins, or unique contributions...")} /></div>
+                        <div className="md:col-span-2"><Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.projects.project_url", "Professional Project Link (GitHub / Google Docs Link Only)")}</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder={t("comp_signup.projects.project_url_placeholder", "e.g. github.com/username/repo or docs.google.com/...")} /></div>
                       </div>
                     </div>
                   )) : <div className="p-10 text-center text-slate-500 dark:text-slate-400">{t("comp_signup.projects.no_items", "No projects to add.")}</div>}
@@ -1698,21 +1774,10 @@ const ComprehensiveSignup = () => {
               {currentStep === 8 && (
                 <motion.div key="certs" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("comp_signup.certificates.title", "Certificates")}</h2>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={!certificates.isApplicable}
-                          onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })}
-                        />
-                        <span className="text-sm dark:text-slate-300">{t("comp_signup.not_applicable", "Not Applicable")}</span>
-                      </label>
-                      {certificates.isApplicable && (
-                        <Button onClick={addCertificate} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all">
-                          <Plus size={16} /> {t("comp_signup.add", "Add")}
-                        </Button>
-                      )}
+                    <h2 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">{t("comp_signup.certificates.title", "Certificates")}</h2>
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <label className={`flex items-center gap-2 cursor-pointer select-none px-3.5 h-9 rounded-xl border text-[12px] font-bold uppercase tracking-wider transition-all ${!certificates.isApplicable ? "border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-500 dark:bg-blue-500/10 dark:text-blue-300" : "border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20"}`}><input type="checkbox" className="h-3.5 w-3.5 accent-[#1a3884]" checked={!certificates.isApplicable} onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })} />{t("comp_signup.not_applicable", "Not Applicable")}</label>
+                      {certificates.isApplicable && <Button onClick={addCertificate} size="sm" className="h-9 px-4 rounded-xl bg-[#1a3884] text-white text-[12px] font-bold uppercase tracking-wider hover:bg-[#112b6b] transition-all shadow-sm shadow-[#1a3884]/20"><Plus size={15} /> {t("comp_signup.add", "Add")}</Button>}
                     </div>
                   </div>
                   {certificates.isApplicable ? certificates.items.map((item, index) => (
@@ -1722,36 +1787,32 @@ const ComprehensiveSignup = () => {
                           <Trash2 size={18} />
                         </button>
                       )}
-                      <h3 className="font-semibold mb-4 text-[#1a3884] dark:text-blue-400">{t("comp_signup.certificates.cert_num", "Certificate #{{num}}", { num: index + 1 })}</h3>
+                      <h3 className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-wider mb-4">{t("comp_signup.certificates.cert_num", "Certificate #{{num}}", { num: index + 1 })}</h3>
                       <div className="grid md:grid-cols-2 gap-6">
                         <div className="md:col-span-2">
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.cert_title", "Certificate Name / Title *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.certificates.cert_title", "Certificate Name / Title *")}</Label>
                           <Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} placeholder={t("comp_signup.certificates.cert_title_placeholder", "e.g. AWS Certified Solutions Architect")} />
                         </div>
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.issuing_org", "Issuing Organization *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.certificates.issuing_org", "Issuing Organization *")}</Label>
                           <Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} className={inputClass} placeholder={t("comp_signup.certificates.issuing_org_placeholder", "e.g. Amazon Web Services, Coursera")} />
                         </div>
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.completion_year", "Year of Completion *")}</Label>
-                          <select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}>
-                            <option value="">{t("comp_signup.certificates.select_year", "Select Year")}</option>
-                            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-                          </select>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.certificates.completion_year", "Year of Completion *")}</Label>
+                          <YearSelect value={item.yearOfCompletion} years={yearOptions} placeholder={t("comp_signup.certificates.select_year", "Select Year")} onChange={(v) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = v; setCertificates(n); }} />
                         </div>
                         <div>
-                          <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.verification_mode", "Verification Mode *")}</Label>
+                          <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.certificates.verification_mode", "Verification Mode *")}</Label>
                           <select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}>
                             <option value="">{t("comp_signup.certificates.select", "Select")}</option>
                             <option value="url">{t("comp_signup.certificates.verify_url", "Link / URL")}</option>
-                            <option value="qr">{t("comp_signup.certificates.verify_qr", "QR Code")}</option>
-                            <option value="none">{t("comp_signup.certificates.verify_none", "None")}</option>
+                                                        <option value="none">{t("comp_signup.certificates.verify_none", "None")}</option>
                           </select>
                         </div>
 
                         {item.verificationType === "url" && (
                           <div className="md:col-span-1">
-                            <Label className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t("comp_signup.certificates.verification_link", "Verification Link / URL *")}</Label>
+                            <Label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">{t("comp_signup.certificates.verification_link", "Verification Link / URL *")}</Label>
                             <Input value={item.verificationUrl} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationUrl = e.target.value; setCertificates(n); }} className={inputClass} placeholder="https://..." />
                           </div>
                         )}
@@ -1832,14 +1893,17 @@ const ComprehensiveSignup = () => {
                 <AlertCircle className="w-8 h-8 text-amber-600 animate-pulse" />
               </div>
 
-              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+              <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight mb-2">
                 {t("comp_signup.warning.title", "Incomplete Profile Registration")}
               </h3>
 
               <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 px-2">
-                {t("comp_signup.warning.desc", "You have not completed your profile registration. We highly recommend completing it now to unlock your personalized courses, assessments, and full dashboard features.")}
+                {t("comp_signup.warning.desc_required", "Your profile registration must be completed at least once before you can enter the dashboard. It unlocks your personalized courses, assessments, and full dashboard features.")}
               </p>
 
+              {/* First-time students have no escape hatch — the profile must be
+                  completed once before the dashboard opens. (Students who have
+                  already registered never see this page; they are redirected.) */}
               <div className="w-full flex flex-col gap-2.5">
                 <Button
                   onClick={() => setShowDashboardWarning(false)}
@@ -1848,17 +1912,6 @@ const ComprehensiveSignup = () => {
                 >
                   {t("comp_signup.warning.continue", "Continue Registration")}
                 </Button>
-
-                <button
-                  onClick={() => {
-                    setShowDashboardWarning(false);
-                    sessionStorage.setItem('bypassRegistrationGuard', 'true');
-                    navigate("/dashboard", { replace: true });
-                  }}
-                  className="w-full h-11 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white bg-white hover:bg-slate-50 dark:bg-transparent dark:hover:bg-white/5 border border-slate-200 dark:border-white/10 transition-all shadow-sm flex items-center justify-center"
-                >
-                  {t("comp_signup.warning.skip", "Go to Dashboard Anyway")}
-                </button>
               </div>
             </motion.div>
           </motion.div>
