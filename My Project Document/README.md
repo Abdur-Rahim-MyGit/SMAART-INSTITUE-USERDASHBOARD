@@ -8,6 +8,8 @@ Everything here is written to be read on its own, without needing the codebase o
 | **SMAART Institute - Overview Presentation.pptx** | A 16-slide deck explaining what SMAART Institute is, who uses it, how it works and where it stands today. | Presenting the platform to a college, a partner or a stakeholder. |
 | **System Document.docx** | The complete platform reference — every feature, every role, the assessment and learning models, the technical architecture, security and integrations. 25 sections. | You need the full picture, or the detail behind one specific part of the system. |
 | **Hosting.docx** | The production environment, the build pipeline, the deployment procedure, troubleshooting and the server setup runbook. 18 sections. | You are deploying, verifying, fixing or rebuilding the production environment. |
+| **Costing.docx** | What the platform costs to run at 10, 500, 1,000, 2,500 and 5,000 users — line by line, with the full rate card, the MongoDB and Docker breakdown, twelve savings levers and the annual budget. 16 sections. | You are setting a budget, answering "what does this cost", or deciding when to scale up. |
+| **SMAART Institute - Cost Overview.pptx** | A 9-slide version of the costing for a budget conversation. | Presenting the numbers rather than reading them. |
 | `assets/` | The SMAART Institute logo in the two variants used across these documents. | Producing further material in the same style. |
 
 ## The short version
@@ -20,6 +22,8 @@ Everything here is written to be read on its own, without needing the codebase o
   and the resulting verified profile carries into placement.
 - **Hosted** in Docker on one AWS instance in Mumbai, behind HTTPS, with an automated build and a
   health-checked, self-rolling-back deployment.
+- **Costs** about $115–156 a month today (one college, 500 students) and about $1,136–1,406 a month
+  at 5,000 students — roughly $0.28 per registered student per month. Docker itself is free.
 
 ## Brand
 
