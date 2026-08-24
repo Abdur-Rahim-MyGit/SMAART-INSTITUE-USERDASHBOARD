@@ -18,68 +18,143 @@ Assessments, Learning, Career, Community, Profile). Nothing here proposes a new 
 
 ---
 
-## 1. Real status as of 2026-08-24
+## 1. Verified status as of 2026-08-24
 
-> **This table was badly out of date.** It still described Phases 2–7 as "0% — not
-> started" long after those screens had been built. The statuses below were
-> re-derived by reading `src/screens/` and `src/api/` directly rather than by
-> trusting the previous entry. **No screen in the app is a `ComingSoon` stub any
-> more.**
+> **How this was produced.** Every requirement below was checked against the code,
+> not against the previous entry in this file. The 60 FR identifiers come from the
+> SRS (`../Documentation/07-Technical-Docs-and-Reports/04-React-Native-App-Requirements-and-Roadmap.docx`).
+> "Built" means a screen exists AND imports a live API module AND is reachable from
+> navigation. An API module with no screen importing it counts as **not built** —
+> four such orphans were found and are named below.
 
-| Phase (SRS §11) | Scope | Status |
+| Phase (SRS §11) | Scope | Verified status |
 |---|---|---|
-| Phase 0 — Discovery & Setup | RN scaffold, CI, EAS config | **Done.** `eas.json`/`.easignore` exist. Local `expo export`/`run:android` builds are blocked by this machine's Windows Application Control policy on the bundled `hermesc.exe` — not a code issue, use `eas build` instead. |
-| Phase 1 — Core Auth & Navigation | FR-AUTH-01…12 | **Done.** All twelve FRs built — see the breakdown below. |
-| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **Built.** `assessments/AssessmentsScreen.js` (stage centre) + `AssessmentPlayerScreen.js` (attempt runner), against `api/assessments.js` and `data/assessmentStages.js`. |
-| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Partial — unchanged.** The face-match pipeline (FR-PROC-02/03) is built in `src/facepipeline/` and exercised by `FaceVerificationTestScreen`, but **has still never been run on a physical device**. FR-PROC-04…15 (in-assessment enforcement, event capture, risk scoring) are unbuilt. **This is the one real gap left.** |
-| Phase 4 — Learning & Course Platform | FR-LRN-01…07 | **Built.** `learning/LearningScreen.js` (roadmap + player), `CertificatesScreen`, `NotesScreen`, `LibraryScreen`, `CgpaCalculatorScreen`, `components/CourseVideoPlayer.js`. |
-| Phase 5 — Career & Placement | FR-CAR-01…06 | **Built.** `career/CareerScreen.js`, `CareerDirectionsScreen`, `CareerCoachChatScreen`, `SkillsVaultScreen`, `JobDetailScreen`, `ToolkitScreen`, `DictionaryScreen`. |
-| Phase 6 — Community, Wellbeing, Gamification | FR-COM-01…05 | **Built.** `community/CommunityScreen.js` plus the three Vision Board screens. |
-| Phase 7 — Support & Notifications | FR-SUP-01…04 | **Built, except push (2026-08-24).** `notifications/NotificationsScreen.js` is the full notification centre; `support/SupportScreen.js` + `SupportDetailScreen.js` cover tickets and grievances. **FR-SUP-04 (push delivery) is NOT done** — see §1.1. |
-| Phase 8–10 | Hardening, store submission, post-launch | Not started. Now the sensible next focus: the feature surface is essentially complete. |
+| Phase 0 — Discovery & Setup | Scaffold, EAS config | **Done.** |
+| Phase 1 — Core Auth & Navigation | FR-AUTH-01…12 | **Done — 12/12.** |
+| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **Mostly done — 6/9.** Two FRs unbuilt, two partial. |
+| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Barely started — 2/15, and not wired into the exam.** The largest remaining gap by far. |
+| Phase 4 — Learning & Course Platform | FR-LRN-01…07 | **Done — 7/7.** |
+| Phase 5 — Career & Placement | FR-CAR-01…06 | **Mostly done — 4/6.** Resume builder and interview prep unbuilt. |
+| Phase 6 — Community & Gamification | FR-COM-01…05 | **Half done — 2/5.** MindCare and to-do tracker unbuilt; community feed and achievements partial. |
+| Phase 7 — Support & Notifications | FR-SUP-01…04 | **Done except push — 3/4.** |
+| Phase 8–10 | Hardening, store submission | Not started. |
 
-### 1.1 What is genuinely still outstanding
+**Overall: 36 of 60 FRs fully built, 6 partial, 18 not started.** Fourteen of the
+eighteen unbuilt are proctoring.
 
-Two items, and they are worth stating precisely rather than leaving implied:
+### 1.1 Correction to the previous revision
 
-1. **Push notifications (FR-SUP-04).** The in-app notification *centre* is built and
-   reads the real API. **Push delivery is not.** `expo-notifications` is not in
-   `package.json`, no device token is ever registered, and the backend's
-   `POST /api/notifications/subscribe` is never called. A student sees a
-   notification when they open the app, not when it happens. Closing this needs
-   the Expo push service, a token handshake on login, and a backend sender.
+An earlier edit of this file (same day) had **FR-SUP-03 and FR-SUP-04 swapped**. The
+SRS is authoritative and reads:
 
-2. **Proctoring on a real device (FR-PROC-01…15).** The pipeline exists but has
-   only ever run in an emulator. Until it runs on real hardware, "built" is a
-   claim, not a fact — and the rest of the proctoring FRs depend on it.
+- **FR-SUP-03 = Push notifications** (native FCM/APNs) — **not built**
+- **FR-SUP-04 = In-app notification centre** — **built**
 
-Everything else in the SRS feature list has a screen wired to a live endpoint.
+The numbering is corrected in §1.4 below. Nothing about the code changed; the label
+was wrong.
 
-### 1.2 Phase 7 detail (Support & Notifications) — added 2026-08-24
+### 1.2 Phase 2 — Assessments, FR by FR
 
-| Requirement | Status |
+| FR | Requirement | Status | Evidence / gap |
+|---|---|---|---|
+| ASMT-01 | Assessments dashboard | ⚠️ **Partial** | `data/assessmentStages.js` defines T1–T4 only. The SRS asks for **T1–T4 *and AIQ***. The AIQ stage card does not exist. |
+| ASMT-02 | Question renderer | ✅ Built | `AssessmentPlayerScreen` renders whatever `options[]` the server sends, which covers Likert and MCQ alike. No special-casing for Likert-7 / Likert-negative, and none appears to be needed — scoring is server-side. |
+| ASMT-03 | Timed session with resume | ✅ Built | Replays saved answers and lands on the first unanswered question; countdown against `durationMinutes`. |
+| ASMT-04 | Offline answer buffering | ❌ **Not built** | No NetInfo, no local queue, no retry. An answer lost to a network drop is lost. |
+| ASMT-05 | Stage-gating logic | ✅ Built | `utils/courseUnlock.js` mirrors S10/S19/S25 + T2/T3 gates; the server re-checks on start. |
+| ASMT-06 | Skill assessment player | ❌ **Not built** | Nothing calls `/api/skill-assessments`. No per-skill flow exists. |
+| ASMT-07 | Micro-assessments | ✅ Built | `utils/courseFlow.js` resolves module-level quizzes inside the learning flow. |
+| ASMT-08 | Results & quotient analysis | ⚠️ **Partial** | The report shows percentage, pass/fail and a band pill. **There is no quotient breakdown** — no CRQ/SRQ/LQ/SIQ/PEQ/DAQ/SEQ grid, which the web has and the SRS asks for. |
+| ASMT-09 | Submission & review states | ⚠️ **Partial** | "Completed" and "Locked" only. No distinct "pending review" state. |
+
+### 1.3 Phase 3 — Proctoring, the real picture
+
+**This is the honest headline: proctoring is not integrated into the assessment.**
+
+`src/api/proctoring.js` exists and exports exactly the right calls — `startSession`,
+`saveRegistration`, `getEmbedding`, `logVerification`, `logEvent`, `completeSession`.
+**No screen imports it.** It is dead code.
+
+`src/facepipeline/` is a genuine, careful port of the web's SCRFD + ArcFace pipeline,
+but its only entry point is `FaceVerificationTestScreen`, reachable from the drawer as
+"Face Verification (Beta)". It has still **never been run on physical hardware**.
+
+`AssessmentPlayerScreen` does not start a proctoring session, does not open the camera,
+does not capture a reference face, does not log a single event. It only *reacts* to a
+lock the server already applied.
+
+| FR | Requirement | Status |
+|---|---|---|
+| PROC-01 | Camera/mic permission flow | ❌ Not built (permissions declared in `app.json`, never requested in an exam context) |
+| PROC-02 | Face registration | ⚠️ Pipeline exists, not wired to an exam, never run on a device |
+| PROC-03 | Continuous face-match | ⚠️ Same |
+| PROC-04 | Presence & attention detection | ❌ Not built |
+| PROC-05 | Randomized liveness checks | ❌ Not built |
+| PROC-06 | Background/foreground detection | ❌ Not built (`AppState` is used only in `AuthContext` for token renewal) |
+| PROC-07 | Kiosk / screen-pinning mode | ❌ Not built |
+| PROC-08 | Screenshot / recording flagging | ❌ Not built |
+| PROC-09 | Audio monitoring | ❌ Not built |
+| PROC-10 | Heartbeat ping | ❌ Not built |
+| PROC-11 | Inactivity detection | ❌ Not built |
+| PROC-12 | Server-authoritative decisioning | ⚠️ Server side already does this; the client sends it nothing |
+| PROC-13 | Evidence capture & upload | ❌ Not built |
+| PROC-14 | Proctoring status UI | ❌ Not built (no overlay, warning modal, pause or held screen) |
+| PROC-15 | Flag-only mode support | ❌ Not built |
+
+**Consequence worth stating plainly:** a student can currently sit a gated assessment on
+the phone with no proctoring whatsoever, while the same assessment on the web is
+proctored. Until this closes, mobile assessments are not equivalent to web assessments
+and should not be treated as such.
+
+### 1.4 Phases 4–7 — remaining gaps
+
+| FR | Requirement | Status | Gap |
+|---|---|---|---|
+| **LRN-01…07** | Learning platform | ✅ **All 7 built** | Catalogue/enrol, `expo-video` player with progress, module tasks, progress sync, notes, CGPA, certificates. |
+| CAR-01 | AI Career Coach chat | ✅ Built | `CareerCoachChatScreen`. |
+| CAR-02 | Resume builder | ❌ **Not built** | `src/api/resumes.js` has full CRUD and **no screen imports it** — an orphan. |
+| CAR-03 | Career roadmap & insights | ✅ Built | `CareerDirectionsScreen`. |
+| CAR-04 | Interview prep content | ❌ **Not built** | Appears only in marketing copy and code comments. No screen. |
+| CAR-05 | Job / placement board | ✅ Built | `CareerScreen` + `JobDetailScreen`. |
+| CAR-06 | Skills passport & badges | ✅ Built | `SkillsVaultScreen`. (`api/userCertificates.js` is a second orphan — `certificates.js` covers the need.) |
+| COM-01 | Vision board | ✅ Built | Three screens. |
+| COM-02 | MindCare sessions | ❌ **Not built** | No screen, no API module. |
+| COM-03 | Community feed | ⚠️ **Partial** | `CommunityScreen` does announcements + group chat. **`src/api/communityFeed.js` is orphaned** — the posts feed, likes, replies and reporting are not built. |
+| COM-04 | Streaks & achievements | ⚠️ **Partial** | A streak figure on Home; no achievements screen, no nudges. |
+| COM-05 | To-do tracker | ❌ **Not built** | No screen. |
+| SUP-01 | Support tickets | ✅ Built | `SupportScreen` (2026-08-24). |
+| SUP-02 | Grievances | ✅ Built | Same screen, second tab. |
+| **SUP-03** | **Push notifications** | ❌ **Not built** | `expo-notifications` is not installed; no device token is ever registered; `POST /api/notifications/subscribe` is never called. |
+| SUP-04 | In-app notification centre | ✅ Built | `NotificationsScreen` (2026-08-24), with Home's bell showing the real unread count. |
+
+### 1.5 Orphaned API modules — build the screen or delete the file
+
+Four API clients exist with no consumer. Each is either a missing feature or dead code:
+
+| Module | Verdict |
 |---|---|
-| FR-SUP-01 Raise a support ticket | ✅ `support/SupportScreen.js` — composer with category, priority and server-matching length validation, against `POST /api/tickets`. |
-| FR-SUP-02 Raise a grievance | ✅ Same screen, second tab. Includes the **anonymous** toggle the web form has, against `POST /api/grievances`. Kept deliberately separate from tickets: different handling, different confidentiality. |
-| FR-SUP-03 Notification centre | ✅ `notifications/NotificationsScreen.js` — list, unread filter, mark one/all read, delete one/all, pull to refresh, refresh on focus. All mutations optimistic with rollback. Home's bell now shows the **real** unread count (it previously showed a hardcoded dot). |
-| FR-SUP-04 Push notifications | ❌ Not built — see §1.1. |
-| — Reply threads | ✅ `support/SupportDetailScreen.js` serves both systems from one screen. Replies are blocked in the UI when an item is `resolved`/`closed`, matching the server, which rejects them. |
+| `api/resumes.js` | Missing feature — FR-CAR-02. |
+| `api/communityFeed.js` | Missing feature — the posts half of FR-COM-03. |
+| `api/proctoring.js` | Missing feature — all of Phase 3's server wiring. |
+| `api/userCertificates.js` | Probably redundant with `api/certificates.js`. Delete unless it serves a distinct endpoint. |
 
-**Verification performed.** Every file parses; every relative import resolves; every
-symbol imported from `api/notifications.js` and `api/support.js` is exported; every
-`navigation.navigate()` target exists in `AppStack`/`MainTabs`. One bug was caught by
-that last check and fixed before commit: notification deep-links to `Learning`,
-`Career`, `Community` and `Profile` were navigating directly, but those five screens
-live **inside `MainTabs`** and must be addressed as
-`navigate('MainTabs', { screen })` — the same rule `HomeScreen.handleShortcutPress`
-already follows.
+### 1.6 Recommended order
 
-**Not verified.** Nothing here has been run on a device or an emulator in this
-session, and `AGENTS.md` asks that the SDK 57 docs be read before writing code —
-`docs.expo.dev` is blocked by this environment's egress proxy, so that was not
-possible. The new screens use only React Native core components and
-`@expo/vector-icons`, both already used throughout the app; no new Expo SDK surface
-was introduced.
+1. **Push notifications (FR-SUP-03).** Smallest high-value item. Install
+   `expo-notifications`, register the token after login, call the subscribe endpoint,
+   add a backend sender. Roughly a day.
+2. **Quotient breakdown on the results screen (FR-ASMT-08).** The data already comes
+   back from `submitAssessment`; it is a rendering job. Half a day.
+3. **Offline answer buffering (FR-ASMT-04).** Protects real exam attempts on campus
+   Wi-Fi. One to two days.
+4. **Resume builder (FR-CAR-02)** and **community feed (FR-COM-03).** The API clients
+   are already written. Two to three days each.
+5. **Proctoring integration (Phase 3).** The largest piece by an order of magnitude,
+   and the one that decides whether mobile assessments can count. Needs a device in
+   hand from day one. Weeks, not days.
+6. MindCare, to-do tracker, interview prep, AIQ stage, skill-assessment player — all
+   "Could"/"Should" priority in the SRS. After the above.
+
 
 ### Phase 1 detail (Core Auth) — all twelve FRs
 

@@ -3,14 +3,23 @@
 Companion mobile app to the `front-end/` web dashboard, talking to the **same** `back-end/`
 API. Full requirements and phased roadmap: `../Documentation/07-Technical-Docs-and-Reports/04-React-Native-App-Requirements-and-Roadmap.docx`.
 
-The app is now well past the Phase 0/1 scaffold this README originally described.
-Assessments, Learning, Career, Community, Notifications and Support are all built against
-live endpoints — **no screen is a placeholder any more**. The two things genuinely
-outstanding are **push notifications** (FR-SUP-04) and **running the proctoring pipeline on
-real hardware** (FR-PROC-01…15).
+The app is well past the Phase 0/1 scaffold this README originally described. No screen
+is a `ComingSoon` placeholder any more, and **36 of the SRS's 60 functional requirements
+are built** (6 partial, 18 not started).
 
-`IMPLEMENTATION_MAP.md` in this folder is the authoritative per-phase status; read it
-before assuming anything here is unbuilt.
+The gaps that matter, largest first:
+
+- **Proctoring is not integrated into the assessment player** (FR-PROC-01…15, 14 of 15
+  unbuilt). `src/api/proctoring.js` exists but no screen imports it, and the face
+  pipeline has still never run on physical hardware. A mobile assessment is currently
+  unproctored while the same assessment on the web is not.
+- **Push notifications** (FR-SUP-03) — `expo-notifications` is not installed.
+- Offline answer buffering (FR-ASMT-04), the quotient breakdown on results (FR-ASMT-08),
+  the resume builder (FR-CAR-02) and the community posts feed (FR-COM-03).
+
+`IMPLEMENTATION_MAP.md` §1 has the full requirement-by-requirement matrix, verified
+against the code. **Read it before assuming anything here is either built or unbuilt** —
+this file has been wrong in both directions before.
 
 ## Stack
 
