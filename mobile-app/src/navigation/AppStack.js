@@ -5,6 +5,7 @@ import MainTabs from './MainTabs';
 import NotificationsScreen from '../screens/notifications/NotificationsScreen';
 import SettingsScreen from '../screens/profile/SettingsScreen';
 import SupportScreen from '../screens/support/SupportScreen';
+import SupportDetailScreen from '../screens/support/SupportDetailScreen';
 import AssessmentsScreen from '../screens/assessments/AssessmentsScreen';
 import AssessmentPlayerScreen from '../screens/assessments/AssessmentPlayerScreen';
 import CertificatesScreen from '../screens/learning/CertificatesScreen';
@@ -103,7 +104,7 @@ function AppNavigator() {
         <Stack.Screen
           name="Notifications"
           component={NotificationsScreen}
-          options={{ title: 'Notifications' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Settings"
@@ -113,7 +114,12 @@ function AppNavigator() {
         <Stack.Screen
           name="Support"
           component={SupportScreen}
-          options={{ title: 'Support & Grievances' }}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SupportDetail"
+          component={SupportDetailScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
 

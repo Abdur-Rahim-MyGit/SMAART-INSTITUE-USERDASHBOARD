@@ -88,3 +88,6 @@ back-end/logs/
 # Documentation tooling dependencies (reinstall with: npm install in that folder)
 Documentation/**/node_modules/
 docs/**/node_modules/
+
+# Word/Office lock files
+~$*

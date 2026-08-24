@@ -1,12 +1,12 @@
 # Mobile App — Web Feature → Mobile Placement Map & Current Status
 
-_Last updated: 2026-08-06_
+_Last updated: 2026-08-24_
 
 This document answers one question: **for every feature that already exists on the web
 dashboard, where does it go in `mobile-app/`, and how far along is it?** It sits alongside
 two other docs — don't duplicate them, read them together:
 
-- `../docs/04-React-Native-App-Requirements-and-Roadmap.docx` — the **contract**: full FR/NFR
+- `../Documentation/07-Technical-Docs-and-Reports/04-React-Native-App-Requirements-and-Roadmap.docx` — the **contract**: full FR/NFR
   list, phase numbering (Phase 0–10), architecture recommendations. Treat its phase numbers as
   canonical.
 - `README.md` (this folder) — the **quickstart**: how to run it, what works today, face-pipeline
@@ -18,19 +18,68 @@ Assessments, Learning, Career, Community, Profile). Nothing here proposes a new 
 
 ---
 
-## 1. Real status as of 2026-08-06
+## 1. Real status as of 2026-08-24
+
+> **This table was badly out of date.** It still described Phases 2–7 as "0% — not
+> started" long after those screens had been built. The statuses below were
+> re-derived by reading `src/screens/` and `src/api/` directly rather than by
+> trusting the previous entry. **No screen in the app is a `ComingSoon` stub any
+> more.**
 
 | Phase (SRS §11) | Scope | Status |
 |---|---|---|
 | Phase 0 — Discovery & Setup | RN scaffold, CI, EAS config | **Done.** `eas.json`/`.easignore` exist. Local `expo export`/`run:android` builds are blocked by this machine's Windows Application Control policy on the bundled `hermesc.exe` — not a code issue, use `eas build` instead. |
-| Phase 1 — Core Auth & Navigation | FR-AUTH-01…12 | **Done (2026-08-06).** All twelve FRs built. See breakdown below. **Not yet run on a physical device** — biometrics in particular cannot be exercised in Expo Go or on web. |
-| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **0% — not started.** `AssessmentsScreen` is a `ComingSoon` stub. |
-| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Partial.** Face-match model (FR-PROC-02/03) is built but never run on a real device. Everything else (FR-PROC-04…15) unbuilt. |
-| Phase 4 — Learning & Course Platform | FR-LRN-01…07 | **0% — not started.** `LearningScreen` is a stub. |
-| Phase 5 — Career & Placement | FR-CAR-01…06 | **0% — not started.** `CareerScreen` is a stub. |
-| Phase 6 — Community, Wellbeing, Gamification | FR-COM-01…05 | **0% — not started.** `CommunityScreen` is a stub. |
-| Phase 7 — Support & Notifications | FR-SUP-01…04 | **0% — not started.** No notifications/support screens exist at all. |
-| Phase 8–10 | Hardening, store submission, post-launch | Not started (expected — nothing to harden yet). |
+| Phase 1 — Core Auth & Navigation | FR-AUTH-01…12 | **Done.** All twelve FRs built — see the breakdown below. |
+| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **Built.** `assessments/AssessmentsScreen.js` (stage centre) + `AssessmentPlayerScreen.js` (attempt runner), against `api/assessments.js` and `data/assessmentStages.js`. |
+| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Partial — unchanged.** The face-match pipeline (FR-PROC-02/03) is built in `src/facepipeline/` and exercised by `FaceVerificationTestScreen`, but **has still never been run on a physical device**. FR-PROC-04…15 (in-assessment enforcement, event capture, risk scoring) are unbuilt. **This is the one real gap left.** |
+| Phase 4 — Learning & Course Platform | FR-LRN-01…07 | **Built.** `learning/LearningScreen.js` (roadmap + player), `CertificatesScreen`, `NotesScreen`, `LibraryScreen`, `CgpaCalculatorScreen`, `components/CourseVideoPlayer.js`. |
+| Phase 5 — Career & Placement | FR-CAR-01…06 | **Built.** `career/CareerScreen.js`, `CareerDirectionsScreen`, `CareerCoachChatScreen`, `SkillsVaultScreen`, `JobDetailScreen`, `ToolkitScreen`, `DictionaryScreen`. |
+| Phase 6 — Community, Wellbeing, Gamification | FR-COM-01…05 | **Built.** `community/CommunityScreen.js` plus the three Vision Board screens. |
+| Phase 7 — Support & Notifications | FR-SUP-01…04 | **Built, except push (2026-08-24).** `notifications/NotificationsScreen.js` is the full notification centre; `support/SupportScreen.js` + `SupportDetailScreen.js` cover tickets and grievances. **FR-SUP-04 (push delivery) is NOT done** — see §1.1. |
+| Phase 8–10 | Hardening, store submission, post-launch | Not started. Now the sensible next focus: the feature surface is essentially complete. |
+
+### 1.1 What is genuinely still outstanding
+
+Two items, and they are worth stating precisely rather than leaving implied:
+
+1. **Push notifications (FR-SUP-04).** The in-app notification *centre* is built and
+   reads the real API. **Push delivery is not.** `expo-notifications` is not in
+   `package.json`, no device token is ever registered, and the backend's
+   `POST /api/notifications/subscribe` is never called. A student sees a
+   notification when they open the app, not when it happens. Closing this needs
+   the Expo push service, a token handshake on login, and a backend sender.
+
+2. **Proctoring on a real device (FR-PROC-01…15).** The pipeline exists but has
+   only ever run in an emulator. Until it runs on real hardware, "built" is a
+   claim, not a fact — and the rest of the proctoring FRs depend on it.
+
+Everything else in the SRS feature list has a screen wired to a live endpoint.
+
+### 1.2 Phase 7 detail (Support & Notifications) — added 2026-08-24
+
+| Requirement | Status |
+|---|---|
+| FR-SUP-01 Raise a support ticket | ✅ `support/SupportScreen.js` — composer with category, priority and server-matching length validation, against `POST /api/tickets`. |
+| FR-SUP-02 Raise a grievance | ✅ Same screen, second tab. Includes the **anonymous** toggle the web form has, against `POST /api/grievances`. Kept deliberately separate from tickets: different handling, different confidentiality. |
+| FR-SUP-03 Notification centre | ✅ `notifications/NotificationsScreen.js` — list, unread filter, mark one/all read, delete one/all, pull to refresh, refresh on focus. All mutations optimistic with rollback. Home's bell now shows the **real** unread count (it previously showed a hardcoded dot). |
+| FR-SUP-04 Push notifications | ❌ Not built — see §1.1. |
+| — Reply threads | ✅ `support/SupportDetailScreen.js` serves both systems from one screen. Replies are blocked in the UI when an item is `resolved`/`closed`, matching the server, which rejects them. |
+
+**Verification performed.** Every file parses; every relative import resolves; every
+symbol imported from `api/notifications.js` and `api/support.js` is exported; every
+`navigation.navigate()` target exists in `AppStack`/`MainTabs`. One bug was caught by
+that last check and fixed before commit: notification deep-links to `Learning`,
+`Career`, `Community` and `Profile` were navigating directly, but those five screens
+live **inside `MainTabs`** and must be addressed as
+`navigate('MainTabs', { screen })` — the same rule `HomeScreen.handleShortcutPress`
+already follows.
+
+**Not verified.** Nothing here has been run on a device or an emulator in this
+session, and `AGENTS.md` asks that the SDK 57 docs be read before writing code —
+`docs.expo.dev` is blocked by this environment's egress proxy, so that was not
+possible. The new screens use only React Native core components and
+`@expo/vector-icons`, both already used throughout the app; no new Expo SDK surface
+was introduced.
 
 ### Phase 1 detail (Core Auth) — all twelve FRs
 

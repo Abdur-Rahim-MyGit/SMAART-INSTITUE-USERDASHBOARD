@@ -1,12 +1,16 @@
 # SMAART Institute — Mobile App (React Native / Expo)
 
 Companion mobile app to the `front-end/` web dashboard, talking to the **same** `back-end/`
-API. Full requirements and phased roadmap: `../docs/04-React-Native-App-Requirements-and-Roadmap.docx`.
+API. Full requirements and phased roadmap: `../Documentation/07-Technical-Docs-and-Reports/04-React-Native-App-Requirements-and-Roadmap.docx`.
 
-This is the **Phase 0/1 scaffold** from that roadmap — project setup, navigation shell, and a
-real (not mocked) authentication flow — plus a working first cut of **Phase 3's core risk
-item: on-device face verification**. Assessments/Learning/Career/Community tabs are still
-placeholder screens ready to be built out phase-by-phase.
+The app is now well past the Phase 0/1 scaffold this README originally described.
+Assessments, Learning, Career, Community, Notifications and Support are all built against
+live endpoints — **no screen is a placeholder any more**. The two things genuinely
+outstanding are **push notifications** (FR-SUP-04) and **running the proctoring pipeline on
+real hardware** (FR-PROC-01…15).
+
+`IMPLEMENTATION_MAP.md` in this folder is the authoritative per-phase status; read it
+before assuming anything here is unbuilt.
 
 ## Stack
 

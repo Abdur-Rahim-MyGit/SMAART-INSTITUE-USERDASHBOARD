@@ -39,6 +39,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { getEnrollments } from '../../api/courses';
 import { getStageStatus } from '../../api/assessments';
 import { getCollegeBanners } from '../../api/colleges';
+import { getUnreadCount } from '../../api/notifications';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_ROTATE_MS = 6000;
@@ -251,6 +252,7 @@ export default function HomeScreen({ navigation }) {
   const [stageStatus, setStageStatus] = useState(null);
   const [banners, setBanners] = useState([]);
   const [enrolledCount, setEnrolledCount] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -311,10 +313,11 @@ export default function HomeScreen({ navigation }) {
   const collegeId = user?.college?._id || user?.college?.id || user?.college || user?.collegeId;
 
   const fetchData = useCallback(async () => {
-    const [enrollRes, stageRes, bannerRes] = await Promise.allSettled([
+    const [enrollRes, stageRes, bannerRes, unreadRes] = await Promise.allSettled([
       userId ? getEnrollments(userId) : Promise.resolve(null),
       userId ? getStageStatus(userId) : Promise.resolve(null),
       collegeId ? getCollegeBanners(collegeId) : Promise.resolve(null),
+      getUnreadCount(),
     ]);
 
     if (enrollRes.status === 'fulfilled' && enrollRes.value?.data) {
@@ -327,6 +330,11 @@ export default function HomeScreen({ navigation }) {
     }
     if (bannerRes.status === 'fulfilled' && bannerRes.value?.data) {
       setBanners(bannerRes.value.data);
+    }
+    // The bell used to show a dot unconditionally, which taught students to
+    // ignore it. Now it only appears when something is genuinely unread.
+    if (unreadRes.status === 'fulfilled') {
+      setUnreadNotifications(Number(unreadRes.value?.unreadCount) || 0);
     }
   }, [userId, collegeId]);
 
@@ -624,7 +632,13 @@ export default function HomeScreen({ navigation }) {
                 ]}
               >
                 <Feather name="bell" size={18} color={colors.text} />
-                <View style={styles.notifBadgeDot} />
+                {unreadNotifications > 0 && (
+                  <View style={styles.notifBadge}>
+                    <Text style={styles.notifBadgeText}>
+                      {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                    </Text>
+                  </View>
+                )}
               </Pressable>
 
               <Pressable
@@ -1117,14 +1131,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  notifBadgeDot: {
+  notifBadge: {
     position: 'absolute',
-    top: 11,
-    right: 11,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: '#3B82F6',
+    top: 5,
+    right: 4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EF4444',
+  },
+  notifBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9.5,
+    fontWeight: '800',
   },
   avatarRingWrap: {
     width: 42,
