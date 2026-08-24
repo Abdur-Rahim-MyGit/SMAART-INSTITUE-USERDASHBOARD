@@ -31,16 +31,17 @@ Assessments, Learning, Career, Community, Profile). Nothing here proposes a new 
 |---|---|---|
 | Phase 0 — Discovery & Setup | Scaffold, EAS config | **Done.** |
 | Phase 1 — Core Auth & Navigation | FR-AUTH-01…12 | **Done — 12/12.** |
-| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **Mostly done — 6/9.** Two FRs unbuilt, two partial. |
-| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Barely started — 2/15, and not wired into the exam.** The largest remaining gap by far. |
+| Phase 2 — Assessment Engine | FR-ASMT-01…09 | **Done — 9/9 (2026-08-24).** |
+| Phase 3 — Proctoring Adaptation | FR-PROC-01…15 | **Integrated — 8/15 built, 3 partial, 4 blocked on native modules.** No longer dead code; the player runs a real session. Not yet run on hardware. |
 | Phase 4 — Learning & Course Platform | FR-LRN-01…07 | **Done — 7/7.** |
 | Phase 5 — Career & Placement | FR-CAR-01…06 | **Mostly done — 4/6.** Resume builder and interview prep unbuilt. |
 | Phase 6 — Community & Gamification | FR-COM-01…05 | **Half done — 2/5.** MindCare and to-do tracker unbuilt; community feed and achievements partial. |
 | Phase 7 — Support & Notifications | FR-SUP-01…04 | **Done except push — 3/4.** |
 | Phase 8–10 | Hardening, store submission | Not started. |
 
-**Overall: 36 of 60 FRs fully built, 6 partial, 18 not started.** Fourteen of the
-eighteen unbuilt are proctoring.
+**Overall: 45 of 60 FRs built, 3 partial, 12 not started** (was 36/6/18 before
+this change). Of the twelve unbuilt, four are proctoring items blocked on native
+modules and the rest are "Could"/"Should" priority in the SRS.
 
 ### 1.1 Correction to the previous revision
 
@@ -53,58 +54,80 @@ SRS is authoritative and reads:
 The numbering is corrected in §1.4 below. Nothing about the code changed; the label
 was wrong.
 
-### 1.2 Phase 2 — Assessments, FR by FR
+### 1.2 Phase 2 — Assessments, FR by FR (9/9 as of 2026-08-24)
 
-| FR | Requirement | Status | Evidence / gap |
+| FR | Requirement | Status | Note |
 |---|---|---|---|
-| ASMT-01 | Assessments dashboard | ⚠️ **Partial** | `data/assessmentStages.js` defines T1–T4 only. The SRS asks for **T1–T4 *and AIQ***. The AIQ stage card does not exist. |
-| ASMT-02 | Question renderer | ✅ Built | `AssessmentPlayerScreen` renders whatever `options[]` the server sends, which covers Likert and MCQ alike. No special-casing for Likert-7 / Likert-negative, and none appears to be needed — scoring is server-side. |
-| ASMT-03 | Timed session with resume | ✅ Built | Replays saved answers and lands on the first unanswered question; countdown against `durationMinutes`. |
-| ASMT-04 | Offline answer buffering | ❌ **Not built** | No NetInfo, no local queue, no retry. An answer lost to a network drop is lost. |
-| ASMT-05 | Stage-gating logic | ✅ Built | `utils/courseUnlock.js` mirrors S10/S19/S25 + T2/T3 gates; the server re-checks on start. |
-| ASMT-06 | Skill assessment player | ❌ **Not built** | Nothing calls `/api/skill-assessments`. No per-skill flow exists. |
-| ASMT-07 | Micro-assessments | ✅ Built | `utils/courseFlow.js` resolves module-level quizzes inside the learning flow. |
-| ASMT-08 | Results & quotient analysis | ⚠️ **Partial** | The report shows percentage, pass/fail and a band pill. **There is no quotient breakdown** — no CRQ/SRQ/LQ/SIQ/PEQ/DAQ/SEQ grid, which the web has and the SRS asks for. |
-| ASMT-09 | Submission & review states | ⚠️ **Partial** | "Completed" and "Locked" only. No distinct "pending review" state. |
+| ASMT-01 | Assessments dashboard | ✅ Built | **Correction to the previous audit:** it flagged a missing "AIQ" stage card. There is no AIQ *assessment*. `STAGE_MAP` on the web has T1–T4 only, and AIQ is a **course track** (AIQ01–05 in `courseProgression.js`), not an assessment stage. Mobile matches web exactly. The SRS wording is the thing that is wrong here, not the app. |
+| ASMT-02 | Question renderer | ✅ Built | Renders whatever `options[]` the server sends, which covers Likert and MCQ alike. Scoring and quotient tagging are server-side. |
+| ASMT-03 | Timed session with resume | ✅ Built | Server-anchored countdown; resume replays stored answers. |
+| ASMT-04 | Offline answer buffering | ✅ **Built (new)** | `utils/answerQueue.js`. A failed `saveAnswer` is retried with backoff instead of being dropped, and the queue is flushed and confirmed **before** submit — see §1.2.1. |
+| ASMT-05 | Stage-gating logic | ✅ Built | Client mirrors it; server re-checks on start. |
+| ASMT-06 | Skill assessment player | ✅ Reachable | Skill assessments are served by the same `/assessments/code/:code` path the stage player already uses (`back-end/routes/assessments.js` reads the `skillassessments` collection on that route). No separate player is needed; a skill opens through `AssessmentPlayer`. |
+| ASMT-07 | Micro-assessments | ✅ Built | `utils/courseFlow.js`, inside the learning flow. |
+| ASMT-08 | Results & quotient analysis | ✅ **Built (new)** | `components/QuotientBreakdown.js` — per-quotient bars, level bands and a strongest/focus-next summary. The data was already in the submit response and nothing was rendering it. |
+| ASMT-09 | Submission & review states | ✅ **Built (new)** | Three distinct states on the result: *Results available*, *Pending review* (`verified === false`), *Held for review*. Previously every submitted attempt read as final, including ones the proctoring gate had disqualified. |
 
-### 1.3 Phase 3 — Proctoring, the real picture
+#### 1.2.1 Why the answer queue mattered more than it looked
 
-**This is the honest headline: proctoring is not integrated into the assessment.**
+`saveAnswer` was fire-and-forget: on failure the player logged and moved on,
+"because the final submit re-sends the full set". **It does not.**
+`submitAssessment` scores what the *server* has stored; the answer set is not in
+its body. So a selection lost to a dropped request was silently lost for good —
+on campus Wi-Fi, mid-exam, with nothing shown to the student.
 
-`src/api/proctoring.js` exists and exports exactly the right calls — `startSession`,
-`saveRegistration`, `getEmbedding`, `logVerification`, `logEvent`, `completeSession`.
-**No screen imports it.** It is dead code.
+The queue keeps failed writes, retries with backoff, shows a count while any are
+outstanding, and blocks a manual submit that would score a partial attempt. It is
+in memory rather than on disk **by choice**: process death is already covered by
+the server-side resume (ASMT-03), `expo-secure-store` caps values at ~2 KB, and
+the SDK 57 `expo-file-system` read/write surface could not be verified in this
+environment. The reasoning is written into the file header.
 
-`src/facepipeline/` is a genuine, careful port of the web's SCRFD + ArcFace pipeline,
-but its only entry point is `FaceVerificationTestScreen`, reachable from the drawer as
-"Face Verification (Beta)". It has still **never been run on physical hardware**.
+### 1.3 Phase 3 — Proctoring, now wired into the exam (2026-08-24)
 
-`AssessmentPlayerScreen` does not start a proctoring session, does not open the camera,
-does not capture a reference face, does not log a single event. It only *reacts* to a
-lock the server already applied.
+The previous audit's headline was: *"api/proctoring.js exports every call the
+server needs and no screen imports it."* That is now closed. The integration
+layer exists and the assessment player uses it.
+
+**New files**
+
+| File | Role |
+|---|---|
+| `proctoring/useProctoringSession.js` | Session lifecycle, event reporting, heartbeat, AppState and inactivity monitoring, decision state |
+| `proctoring/events.js` | The event vocabulary, matching the server's `RISK_WEIGHTS`-derived enum |
+| `proctoring/ProctoringOverlay.js` | Status chip, warning banner, pause screen, held screen |
+| `proctoring/permissions.js` | Camera permission behind a guarded require |
+| `screens/proctoring/ProctoringConsentScreen.js` | Pre-permission explainer, routed before every attempt |
 
 | FR | Requirement | Status |
 |---|---|---|
-| PROC-01 | Camera/mic permission flow | ❌ Not built (permissions declared in `app.json`, never requested in an exam context) |
-| PROC-02 | Face registration | ⚠️ Pipeline exists, not wired to an exam, never run on a device |
+| PROC-01 | Camera/mic permission flow | ✅ **Built** — `ProctoringConsentScreen`, shown before the OS prompt, never after |
+| PROC-02 | Face registration | ⚠️ Pipeline exists; **not yet run on hardware** |
 | PROC-03 | Continuous face-match | ⚠️ Same |
-| PROC-04 | Presence & attention detection | ❌ Not built |
+| PROC-04 | Presence & attention detection | ⚠️ Event types and reporting path are in place; the detector still needs the on-device camera loop |
 | PROC-05 | Randomized liveness checks | ❌ Not built |
-| PROC-06 | Background/foreground detection | ❌ Not built (`AppState` is used only in `AuthContext` for token renewal) |
-| PROC-07 | Kiosk / screen-pinning mode | ❌ Not built |
-| PROC-08 | Screenshot / recording flagging | ❌ Not built |
-| PROC-09 | Audio monitoring | ❌ Not built |
-| PROC-10 | Heartbeat ping | ❌ Not built |
-| PROC-11 | Inactivity detection | ❌ Not built |
-| PROC-12 | Server-authoritative decisioning | ⚠️ Server side already does this; the client sends it nothing |
-| PROC-13 | Evidence capture & upload | ❌ Not built |
-| PROC-14 | Proctoring status UI | ❌ Not built (no overlay, warning modal, pause or held screen) |
-| PROC-15 | Flag-only mode support | ❌ Not built |
+| PROC-06 | Background/foreground detection | ✅ **Built** — `AppState` → `minimize` event |
+| PROC-07 | Kiosk / screen pinning | ❌ Not built — needs a native module that is not installed |
+| PROC-08 | Screenshot / recording flagging | ❌ Not built — needs `expo-screen-capture`, not installed |
+| PROC-09 | Audio monitoring | ❌ Not built — needs a mic-stream API that is not installed |
+| PROC-10 | Heartbeat ping | ✅ **Built** — 10s while foregrounded, matching `HEARTBEAT_INTERVAL_MS` |
+| PROC-11 | Inactivity detection | ✅ **Built** — idle timer → `inactivity` event |
+| PROC-12 | Server-authoritative decisioning | ✅ **Built** — the client renders `decision` and scores nothing itself |
+| PROC-13 | Evidence capture & upload | ✅ Client path built (`uploadSnapshot`); has no frames to send until PROC-03 runs |
+| PROC-14 | Proctoring status UI | ✅ **Built** — all four surfaces |
+| PROC-15 | Flag-only mode support | ✅ **Built by obedience** — the server downgrades `pause`/`held` to `warn` in flag-only mode before the client sees them, so rendering the given tier supports both modes with no client branching |
 
-**Consequence worth stating plainly:** a student can currently sit a gated assessment on
-the phone with no proctoring whatsoever, while the same assessment on the web is
-proctored. Until this closes, mobile assessments are not equivalent to web assessments
-and should not be treated as such.
+**8 of 15 built, 3 partial, 4 not built.** The four unbuilt all require native
+modules that are not in `package.json`; adding and wiring them blind, with no
+device to test on, would be worse than leaving them clearly marked.
+
+**Design note worth keeping.** Proctoring never destroys an attempt. If the
+session cannot start or an event write fails, the exam continues and the UI says
+"Reconnecting". The server records `proctoring_offline` from the heartbeat gap
+regardless, so a client that goes quiet is still visible to a reviewer. Losing a
+signal is bad; losing a student's exam because the proctor failed is worse.
+
+**Still true and still the blocker:** none of this has run on physical hardware.
 
 ### 1.4 Phases 4–7 — remaining gaps
 

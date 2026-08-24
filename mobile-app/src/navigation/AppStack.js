@@ -8,6 +8,7 @@ import SupportScreen from '../screens/support/SupportScreen';
 import SupportDetailScreen from '../screens/support/SupportDetailScreen';
 import AssessmentsScreen from '../screens/assessments/AssessmentsScreen';
 import AssessmentPlayerScreen from '../screens/assessments/AssessmentPlayerScreen';
+import ProctoringConsentScreen from '../screens/proctoring/ProctoringConsentScreen';
 import CertificatesScreen from '../screens/learning/CertificatesScreen';
 import NotesScreen from '../screens/learning/NotesScreen';
 import LibraryScreen from '../screens/learning/LibraryScreen';
@@ -67,6 +68,11 @@ function AppNavigator() {
         <Stack.Screen name="Assessments" component={AssessmentsScreen} options={{ headerShown: false }} />
         {/* The player owns its own chrome (timer, progress, exit guard) and must
             not be dismissable by a stack back button mid-attempt. */}
+        <Stack.Screen
+          name="ProctoringConsent"
+          component={ProctoringConsentScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="AssessmentPlayer"
           component={AssessmentPlayerScreen}

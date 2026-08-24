@@ -25,6 +25,19 @@
  *     disables `prevQ` outright and blocks `nextQ` for 5 seconds per question;
  *     both are reproduced here rather than "improved", because they are
  *     assessment-integrity rules, not UI preferences.
+ *
+ * Two things were added on 2026-08-24:
+ *
+ *  4. **Answers go through a retrying queue** (`utils/answerQueue.js`,
+ *     FR-ASMT-04). A dropped `saveAnswer` used to be lost for good: submit
+ *     scores what the server stored, it does not re-send the answer set. The
+ *     queue is flushed and confirmed before submit.
+ *
+ *  5. **The attempt is proctored** (`proctoring/useProctoringSession.js`,
+ *     Phase 3). Previously this screen started an attempt with no proctoring
+ *     session at all and only reacted to a lock applied for some other reason.
+ *     It now opens a session, reports what a phone can honestly observe, and
+ *     renders the server's tier. It never decides a tier itself.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -44,6 +57,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { assessmentApi } from '../../api/assessments';
 import { getStageConfig, STAGE_ACCENT } from '../../data/assessmentStages';
+import { createAnswerQueue } from '../../utils/answerQueue';
+import { useProctoringSession } from '../../proctoring/useProctoringSession';
+import {
+  ProctoringStatusChip,
+  ProctoringWarningBanner,
+  ProctoringBlockModal,
+} from '../../proctoring/ProctoringOverlay';
+import { QuotientBreakdown } from '../../components/QuotientBreakdown';
 
 /** Web blocks Next for this long on each question. Integrity rule, not UI. */
 const MIN_QUESTION_DWELL_MS = 5000;
@@ -70,15 +91,24 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   const [error, setError] = useState(null);
 
   const [resultId, setResultId] = useState(null);
+  const [assessmentId, setAssessmentId] = useState(null);
   const [assessmentToken, setAssessmentToken] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [savingAnswer, setSavingAnswer] = useState(false);
 
   const [remaining, setRemaining] = useState(config.durationMinutes * 60);
   const [submitting, setSubmitting] = useState(false);
   const [report, setReport] = useState(null);
+  const [pendingAnswers, setPendingAnswers] = useState(0);
+  const [warningDismissedAt, setWarningDismissedAt] = useState(0);
+  // Acknowledged at this warning count. `held` is never acknowledgeable.
+  const [pauseAckedAt, setPauseAckedAt] = useState(-1);
+
+  // Whether the student consented on the way in. `undefined` (screen opened
+  // directly, e.g. from an old deep link) is treated as proctored — the safe
+  // default is to monitor, not to skip.
+  const proctored = route?.params?.proctored !== false;
 
   // Server's attempt start, in epoch ms. The single source of truth for the
   // countdown — see note 1 in the header.
@@ -104,6 +134,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         if (!assessmentRes?.success || !assessmentRes?.data?._id) {
           throw new Error(assessmentRes?.error || `Could not load ${config.title}.`);
         }
+        setAssessmentId(assessmentRes.data._id);
 
         const startRes = await assessmentApi.startAssessment(assessmentRes.data._id);
         if (!startRes?.success) {
@@ -162,6 +193,35 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     };
   }, [config.code, config.durationMinutes, config.questionLimit, config.title, navigation]);
 
+  // ── Proctoring (Phase 3) ────────────────────────────────────────────────
+  // The hook owns the session; this screen only reports activity and renders
+  // the server's verdict. See proctoring/useProctoringSession.js.
+  const proctoring = useProctoringSession({
+    resultId,
+    assessmentId,
+    enabled: proctored && !!resultId && !loading,
+    finished: !!report,
+  });
+
+  // ── Answer queue (FR-ASMT-04) ───────────────────────────────────────────
+  // Created once per attempt. `send` closes over the token via a ref-free
+  // dependency list on purpose: the queue outlives individual renders.
+  const queueRef = useRef(null);
+  if (!queueRef.current) {
+    queueRef.current = createAnswerQueue({
+      send: (payload) =>
+        assessmentApi.saveAnswer(
+          payload.resultId,
+          payload.questionId,
+          payload.value,
+          payload.questionText,
+          payload.token
+        ),
+      onPendingChange: setPendingAnswers,
+    });
+  }
+  useEffect(() => () => queueRef.current?.dispose(), []);
+
   // ── Submit ──────────────────────────────────────────────────────────────
   const submit = useCallback(
     async ({ reason = 'manual' } = {}) => {
@@ -173,6 +233,20 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
       setSubmitting(true);
       try {
+        // Never score an attempt against a partial answer set. On a manual
+        // submit an unflushable answer is worth stopping for; on a timeout the
+        // deadline wins and the server fills the blanks.
+        const flushed = await queueRef.current.flush();
+        if (!flushed.ok && reason === 'manual') {
+          setSubmitting(false);
+          Alert.alert(
+            'Some answers have not saved',
+            `${flushed.unsent} answer${flushed.unsent === 1 ? '' : 's'} could not reach the server. ` +
+              'Check your connection and submit again — nothing has been lost.'
+          );
+          return;
+        }
+
         const res = await assessmentApi.submitAssessment(resultId, assessmentToken, {
           submissionReason: reason,
           // On timeout the server fills the blanks; on a manual submit
@@ -255,24 +329,29 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
   // ── Answering ───────────────────────────────────────────────────────────
   const selectOption = useCallback(
-    async (value) => {
+    (value) => {
       if (!current || submitting || report) return;
       const qid = current._id;
 
       setAnswers((prev) => ({ ...prev, [qid]: value }));
+      proctoring.noteActivity();
 
-      try {
-        setSavingAnswer(true);
-        await assessmentApi.saveAnswer(resultId, qid, value, current.questionText || '', assessmentToken);
-      } catch {
-        // Web logs and continues — the answer stays selected locally and the
-        // final submit re-sends the full set, so one dropped write is not fatal.
-      } finally {
-        setSavingAnswer(false);
-      }
+      // Queued rather than awaited: the student should never wait on the
+      // network to pick an option, and a failed write must not be discarded.
+      queueRef.current.enqueue(qid, {
+        resultId,
+        questionId: qid,
+        value,
+        questionText: current.questionText || '',
+        token: assessmentToken,
+      });
     },
-    [current, resultId, assessmentToken, submitting, report]
+    [current, resultId, assessmentToken, submitting, report, proctoring.noteActivity]
   );
+
+  // `held` is terminal and always blocks; `pause` blocks until acknowledged.
+  const pauseAcknowledged =
+    proctoring.decision.tier === 'pause' && pauseAckedAt >= proctoring.decision.warnings;
 
   const canAdvance = !!current && !!answers[current._id] && dwellElapsed >= MIN_QUESTION_DWELL_MS;
   const dwellLeft = Math.ceil((MIN_QUESTION_DWELL_MS - dwellElapsed) / 1000);
@@ -322,6 +401,31 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   if (report) {
     const pct = Math.round(report.percentage ?? report.score ?? 0);
     const passed = report.passed ?? pct >= config.passingPercentage;
+
+    // Three distinct outcomes, not one. `verified === false` is the server's
+    // way of saying "submitted, scored, but the proctoring record disqualifies
+    // it pending review" — see back-end/services/proctoringGate.js.
+    const unverified = report.verified === false || report.proctoringStatus === 'unverified';
+    const reviewState = proctoring.isHeld
+      ? {
+          icon: 'lock',
+          tint: themeColors.danger,
+          title: 'Held for review',
+          body: 'Your answers were submitted and saved. The result is withheld until a reviewer has looked at the proctoring record.',
+        }
+      : unverified
+        ? {
+            icon: 'alert-triangle',
+            tint: themeColors.warning,
+            title: 'Pending review',
+            body: 'This attempt was flagged during proctoring. The score below is provisional until a reviewer confirms it.',
+          }
+        : {
+            icon: 'check-circle',
+            tint: themeColors.success,
+            title: 'Results available',
+            body: 'This attempt was submitted and verified. The score below is final.',
+          };
     return shell(
       <ScrollView contentContainerStyle={styles.reportScroll}>
         <View style={[styles.reportBadge, { backgroundColor: passed ? '#10B98122' : '#EF444422' }]}>
@@ -339,6 +443,33 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
             <Text style={[styles.bandText, { color: accent }]}>{report.bandLabel}</Text>
           </View>
         )}
+
+        {/* FR-ASMT-09 — say which of the three states this attempt is in, rather
+            than implying every submitted attempt is a final result. An attempt
+            held by proctoring is submitted but NOT scored yet, and a student
+            reading a score that may later be withdrawn is worse than waiting. */}
+        {reviewState && (
+          <View
+            style={[
+              styles.reviewBox,
+              { backgroundColor: `${reviewState.tint}14`, borderColor: `${reviewState.tint}44` },
+            ]}
+          >
+            <Feather name={reviewState.icon} size={15} color={reviewState.tint} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.reviewTitle, { color: themeColors.text }]}>
+                {reviewState.title}
+              </Text>
+              <Text style={[styles.reviewBody, { color: themeColors.textMuted }]}>
+                {reviewState.body}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* FR-ASMT-08 — the per-quotient breakdown. Renders nothing when the
+            result carries no quotient data. */}
+        <QuotientBreakdown report={report} />
 
         <Pressable
           style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 26 }]}
@@ -360,9 +491,18 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           <Text style={[styles.headerTitle, { color: themeColors.text }]} numberOfLines={1}>
             {config.title}
           </Text>
-          <Text style={[styles.headerMeta, { color: themeColors.textMuted }]}>
-            Question {index + 1} of {questions.length}
-          </Text>
+          <View style={styles.headerMetaRow}>
+            <Text style={[styles.headerMeta, { color: themeColors.textMuted }]}>
+              Question {index + 1} of {questions.length}
+            </Text>
+            {proctored && (
+              <ProctoringStatusChip
+                decision={proctoring.decision}
+                degraded={proctoring.degraded}
+                sessionId={proctoring.sessionId}
+              />
+            )}
+          </View>
         </View>
 
         <View style={[styles.clock, { backgroundColor: low ? '#EF444418' : themeColors.pillBg }]}>
@@ -376,6 +516,13 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+        {proctored && proctoring.decision.warnings > warningDismissedAt && (
+          <ProctoringWarningBanner
+            decision={proctoring.decision}
+            onDismiss={() => setWarningDismissedAt(proctoring.decision.warnings)}
+          />
+        )}
+
         <Text style={[styles.question, { color: themeColors.text }]}>
           {current?.questionText || current?.question || ''}
         </Text>
@@ -407,8 +554,11 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           })}
         </View>
 
-        {savingAnswer && (
-          <Text style={[styles.savingHint, { color: themeColors.textMuted }]}>Saving…</Text>
+        {pendingAnswers > 0 && (
+          <Text style={[styles.savingHint, { color: themeColors.warning }]}>
+            {pendingAnswers} answer{pendingAnswers === 1 ? '' : 's'} waiting to sync — they are kept
+            and retried automatically.
+          </Text>
         )}
       </ScrollView>
 
@@ -416,7 +566,10 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         {index < questions.length - 1 ? (
           <Pressable
             disabled={!canAdvance}
-            onPress={() => setIndex((i) => i + 1)}
+            onPress={() => {
+              proctoring.noteActivity();
+              setIndex((i) => i + 1);
+            }}
             style={[styles.primaryBtn, { backgroundColor: accent, opacity: canAdvance ? 1 : 0.45, flex: 1 }]}
           >
             <Text style={styles.primaryBtnText}>
@@ -439,11 +592,35 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           </Pressable>
         )}
       </View>
+
+      {/* FR-PROC-14 — blocking surfaces. The tier is the server's; this only
+          renders it. In FLAG_ONLY_MODE the server never sends `pause`/`held`,
+          so these never appear without this file knowing the mode exists. */}
+      {proctored && !pauseAcknowledged && (
+        <ProctoringBlockModal
+          decision={proctoring.decision}
+          onResume={() => {
+            proctoring.noteActivity();
+            // Acknowledge THIS warning count. A further violation raises the
+            // count, so the block returns — but the student is never trapped
+            // behind a tier the server has not actually locked them out of.
+            setPauseAckedAt(proctoring.decision.warnings);
+          }}
+          onExit={() => navigation.goBack()}
+        />
+      )}
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  headerMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
+  reviewBox: {
+    alignSelf: 'stretch', flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    borderWidth: 1, borderRadius: 14, padding: 13, marginTop: 20,
+  },
+  reviewTitle: { fontSize: 13.5, fontWeight: '800' },
+  reviewBody: { fontSize: 12, lineHeight: 17.5, marginTop: 3 },
   screen: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
   centeredTitle: { fontSize: 17, fontWeight: '800' },

@@ -100,7 +100,9 @@ export default function AssessmentsScreen({ navigation }) {
       Alert.alert('No attempts left', 'You have used every attempt for this stage. Contact your administrator.');
       return;
     }
-    navigation.navigate('AssessmentPlayer', { stage: key });
+    // Consent first (FR-PROC-01). It `replace`s itself with the player, so the
+    // student cannot swipe back into the explainer once the attempt is running.
+    navigation.navigate('ProctoringConsent', { stage: key });
   };
 
   return (
