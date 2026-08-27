@@ -20,6 +20,8 @@ describe('Middleware Unit Tests', () => {
     let req, res, next;
 
     beforeEach(() => {
+        process.env.NODE_ENV = 'test';
+        process.env.ADMIN_SYSTEM_SECRET = 'admin-secret-xyz';
         req = {
             headers: {},
             body: {},
@@ -254,6 +256,15 @@ describe('Middleware Unit Tests', () => {
 
             delete process.env.ADMIN_SYSTEM_SECRET;
             req.headers['x-admin-secret'] = 'admin-secret-123';
+            mw(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(401);
+        });
+
+        it('disallows admin bypass in production mode for requireRole', () => {
+            process.env.NODE_ENV = 'production';
+            req.headers['x-admin-bypass'] = 'true';
+            req.headers['x-admin-secret'] = 'admin-secret-xyz';
+            const mw = requireRole('admin');
             mw(req, res, next);
             expect(res.status).toHaveBeenCalledWith(401);
         });
