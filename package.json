@@ -1,4 +1,14 @@
 {
+  "name": "smaart-institute-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix front-end",
+    "dev:frontend": "npm run dev --prefix front-end",
+    "dev:backend": "npm run dev --prefix back-end",
+    "start": "npm start --prefix back-end",
+    "start:backend": "npm start --prefix back-end",
+    "start:frontend": "npm run dev --prefix front-end"
+  },
   "dependencies": {
     "uuid": "^13.0.0"
   },

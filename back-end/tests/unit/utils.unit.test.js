@@ -29,7 +29,12 @@ jest.mock('../../utils/logger', () => ({
 }));
 
 const escapeRegex = require('../../utils/escapeRegex');
-const { shuffleArrayDeterministic, selectQuestionsForUser } = require('../../utils/questionShuffler');
+const {
+    shuffleArrayDeterministic,
+    selectQuestionsForUser,
+    selectStratifiedQuestions,
+    selectStratifiedQuestionsForStage
+} = require('../../utils/questionShuffler');
 const { withRetry } = require('../../utils/retry');
 const { successResponse, errorResponse, paginatedResponse } = require('../../utils/response');
 
@@ -84,7 +89,7 @@ describe('shuffleArrayDeterministic', () => {
     });
 });
 
-describe('selectQuestionsForUser', () => {
+describe('selectQuestionsForUser and stratified selection', () => {
     const pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     it('returns the first `limit` items of the deterministic shuffle for that user', () => {
@@ -93,6 +98,20 @@ describe('selectQuestionsForUser', () => {
         expect(selected).toEqual(shuffleArrayDeterministic(pool, 'user-123').slice(0, 4));
         // Default limit is 36; a smaller pool is returned whole.
         expect(selectQuestionsForUser(pool, 'user-123')).toHaveLength(10);
+    });
+
+    it('selectStratifiedQuestions and selectStratifiedQuestionsForStage fallback cleanly when pool is provided', () => {
+        const qPool = [
+            { _id: '1', quotient: 'CRQ', difficultyLevel: 'L1' },
+            { _id: '2', quotient: 'CRQ', difficultyLevel: 'L2' },
+            { _id: '3', quotient: 'CRQ', difficultyLevel: 'L3' }
+        ];
+
+        const selected = selectStratifiedQuestions(qPool, 'user-456');
+        expect(Array.isArray(selected)).toBe(true);
+
+        const selectedStage = selectStratifiedQuestionsForStage(qPool, 'user-456', 'UNKNOWN_STAGE');
+        expect(Array.isArray(selectedStage)).toBe(true);
     });
 });
 

@@ -4,8 +4,8 @@
  */
 const deviceFingerprint = (req, res, next) => {
     req.deviceInfo = {
-        userAgent: req.headers['user-agent'] || 'unknown',
-        ip: req.ip || req.connection.remoteAddress || 'unknown'
+        userAgent: req.headers?.['user-agent'] || 'unknown',
+        ip: req.ip || (req.connection && req.connection.remoteAddress) || 'unknown'
     };
     next();
 };
