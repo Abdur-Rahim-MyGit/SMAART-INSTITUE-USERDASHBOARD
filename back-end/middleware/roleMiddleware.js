@@ -17,7 +17,14 @@ const requireRole = (...allowedRoles) => {
     // Bypass for the trusted admin system (the User<->Admin service interlink).
     // NOTE: this path is only as safe as ADMIN_SYSTEM_SECRET — it MUST be a
     // strong, rotated value that is never committed to the repo.
-    if (req.headers['x-admin-bypass'] === 'true') {
+    //
+    // SECURITY: disabled in production, matching `protect` and `protectOrBypass`
+    // in middleware/auth.js, which both wrap the same bypass in this check.
+    // Without the gate, any caller who learns ADMIN_SYSTEM_SECRET escalates to
+    // admin on every requireRole-guarded route on the LIVE site — including
+    // DELETE /api/students/:id. Nothing in the admin backend sends these
+    // headers, so gating it costs production no functionality.
+    if (process.env.NODE_ENV !== 'production' && req.headers['x-admin-bypass'] === 'true') {
       const adminSecret = process.env.ADMIN_SYSTEM_SECRET;
       // SECURITY: never allow the bypass when the secret is unset/empty,
       // otherwise `undefined === undefined` would grant admin to anyone.

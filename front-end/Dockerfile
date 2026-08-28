@@ -13,6 +13,10 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
+# The AI proctoring loads the ONNX Runtime from /onnx-wasm/. Those files are
+# gitignored (large binaries) but ship inside the onnxruntime-web package, so
+# stage them into the build output here instead of relying on public/.
+RUN mkdir -p dist/onnx-wasm && cp node_modules/onnxruntime-web/dist/* dist/onnx-wasm/
 
 # Stage 2: Serve the static build with Nginx
 FROM nginx:alpine

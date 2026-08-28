@@ -970,7 +970,7 @@ const Profile = () => {
                                 <p className="text-sm text-gray-500 dark:text-slate-300">{formData.twelfthDetails.schoolName}</p>
                                  <p className="text-xs text-gray-400 mt-1">
                                     {formData.twelfthDetails.stream && <span>{formData.twelfthDetails.stream} • </span>}
-                                    {formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}
+                                    {formData.twelfthDetails.percentage}{formData.twelfthDetails.scoreType === "CGPA" ? " CGPA" : "%"} • {formData.twelfthDetails.yearOfPassing}
                                  </p>
                               </div>
                               <button
@@ -987,7 +987,7 @@ const Profile = () => {
                                 <h4 className="font-bold text-gray-900 dark:text-white">{t("profile_page.tenth_standard")}</h4>
                                 <hr className="w-full my-3 border-gray-200 dark:border-white/10" />
                                 <p className="text-sm text-gray-500 dark:text-slate-300">{formData.tenthDetails.schoolName}</p>
-                                <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
+                                <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}{formData.tenthDetails.scoreType === "CGPA" ? " CGPA" : "%"} • {formData.tenthDetails.yearOfPassing}</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('tenthDetails', formData.tenthDetails)}
@@ -1129,6 +1129,11 @@ const Profile = () => {
                           formData.projects.map((project, idx) => (
                             <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
                               <h4 className="font-bold text-gray-900 dark:text-white">{project.title}</h4>
+                              {project.domain && (
+                                <span className="mt-1 inline-flex items-center rounded-md bg-[#1a3884]/8 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1a3884] dark:bg-blue-500/15 dark:text-blue-300">
+                                  {project.domain}
+                                </span>
+                              )}
                               {project.link && (
                                 <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
                                   {t("profile_page.view_project")} <Plus className="w-2 h-2" />

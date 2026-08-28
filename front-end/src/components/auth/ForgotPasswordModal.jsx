@@ -24,6 +24,13 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
     const [isSearchingColleges, setIsSearchingColleges] = useState(false);
     const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0); // seconds remaining before can resend
+    // The institution field is locked and filled from the email, so when the
+    // lookup finds nothing the user needs to be told why it stayed empty.
+    const [collegeLookup, setCollegeLookup] = useState('idle'); // idle | searching | found | notfound
+    // Students who have never logged in still hold the institution-issued
+    // default password, so the server refuses to reset it. Remember that
+    // refusal to keep the guidance on screen instead of in a passing toast.
+    const [firstTimeBlocked, setFirstTimeBlocked] = useState(false);
     const inputRefs = useRef([]);
 
     useEffect(() => {
@@ -37,6 +44,8 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
             setResendCooldown(0);
             
             // Try to pre-fill from session if available
+            setCollegeLookup('idle');
+            setFirstTimeBlocked(false);
             const stored = sessionStorage.getItem("selectedInstitution");
             if (stored) {
                 try {
@@ -61,8 +70,11 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
     useEffect(() => {
         const trimmedEmail = email.trim();
         if (!trimmedEmail || !trimmedEmail.includes("@") || trimmedEmail.length < 5) {
+            setCollegeLookup('idle');
             return;
         }
+        setCollegeLookup('searching');
+        setFirstTimeBlocked(false);
 
         const lookupCollege = async () => {
             try {
@@ -71,9 +83,20 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
                 if (data.success && data.college) {
                     setSelectedCollege(data.college);
                     setCollegeSearch(data.college.name);
+                    setCollegeLookup('found');
+                } else {
+                    // Clear whatever was pre-filled. Keeping a stale institution
+                    // here showed a confidently WRONG college for an unknown
+                    // email, which is worse than showing nothing.
+                    setSelectedCollege(null);
+                    setCollegeSearch("");
+                    setCollegeLookup('notfound');
                 }
             } catch (err) {
                 console.error("Autofill college error:", err);
+                setSelectedCollege(null);
+                setCollegeSearch("");
+                setCollegeLookup('notfound');
             }
         };
 
@@ -155,7 +178,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
             console.error("Forgot password detail error:", error);
             // Check if the error response has the isFirstTimeUser flag
             if (error.data?.isFirstTimeUser) {
-                toast.error("You haven't set up your account yet. Please log in with the default password provided by your institution first.", { duration: 6000 });
+                setFirstTimeBlocked(true);
             } else {
                 toast.error(error.message || "An error occurred");
             }
@@ -364,6 +387,17 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
                                                 />
                                                 <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500 shrink-0" />
                                             </div>
+                                            {collegeLookup === 'searching' && !selectedCollege && (
+                                                <p className="text-[11px] text-gray-400 dark:text-slate-500 ml-1">Looking up your institution...</p>
+                                            )}
+                                            {collegeLookup === 'notfound' && !selectedCollege && (
+                                                <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400 ml-1">
+                                                    We couldn't find an account with this email. Check the address, or contact your institution if it looks right.
+                                                </p>
+                                            )}
+                                            {collegeLookup === 'idle' && !selectedCollege && (
+                                                <p className="text-[11px] text-gray-400 dark:text-slate-500 ml-1">Fills in automatically once you enter your account email.</p>
+                                            )}
                                         </div>
 
                                         {/* Account Email */}
@@ -384,9 +418,27 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail }) => {
                                         </div>
                                     </div>
 
+                                    {firstTimeBlocked && (
+                                        <div className="mt-5 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4">
+                                            <p className="text-[12.5px] font-bold text-amber-800 dark:text-amber-300">First login not completed</p>
+                                            <p className="mt-1 text-[12px] leading-relaxed text-amber-700 dark:text-amber-200/90">
+                                                This account still uses the password your institution issued (usually your date of birth).
+                                                Sign in with that first and you will be asked to set your own password &mdash; password
+                                                reset becomes available after that.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={onClose}
+                                                className="mt-3 text-[12px] font-bold text-amber-800 dark:text-amber-300 underline underline-offset-2"
+                                            >
+                                                Go back to login
+                                            </button>
+                                        </div>
+                                    )}
+
                                     <Button
                                         onClick={handleRequestReset}
-                                        disabled={isLoading || !email || !selectedCollege}
+                                        disabled={isLoading || !email || !selectedCollege || firstTimeBlocked}
                                         className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-black/10 mt-6 disabled:opacity-50 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
                                         style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                                     >

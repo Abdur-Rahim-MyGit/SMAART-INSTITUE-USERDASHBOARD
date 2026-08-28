@@ -1,0 +1,90 @@
+# ============================================================================
+# Build & push the USER DASHBOARD images to GitHub Container Registry.
+# ----------------------------------------------------------------------------
+# This workflow only BUILDS. It never touches the server — deploying is a
+# separate, manual step (see deploy.yml), so merging to main is always safe.
+#
+# Why build here instead of on the server: the frontend build is memory-hungry
+# (it needed 4 GB of swap on an idle t3.medium). Running it on the live server
+# would make the site crawl for minutes on every deploy and risk an OOM while
+# students are using it. GitHub's runners are free and disposable.
+#
+# Images are tagged with the commit SHA (immutable, rollback-able) and `latest`.
+# ============================================================================
+
+name: Build & Push Images (user dashboard)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: abdur-rahim-mygit          # MUST be lowercase — GHCR rejects capitals
+  # Public hostname baked into the frontend bundle at BUILD time. Changing the
+  # domain means rebuilding, not just restarting.
+  APP_DOMAIN: smaartinstitute.com
+
+permissions:
+  contents: read
+  packages: write                   # lets GITHUB_TOKEN push to GHCR
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- Backend -------------------------------------------------------
+      # NOTE: `file:` is relative to the repo root, NOT to `context:`. The
+      # production Dockerfile deliberately lives outside the build context.
+      - name: Build & push user-backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end
+          file: ./aws-deployment/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/smaart-user-backend:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/smaart-user-backend:latest
+          cache-from: type=gha,scope=user-backend
+          cache-to: type=gha,mode=max,scope=user-backend
+
+      # --- Frontend ------------------------------------------------------
+      # VITE_API_URL is baked in here and cannot be changed at runtime. It
+      # INCLUDES the /api suffix — that is this app's convention (the admin
+      # app uses bare origins instead; do not "harmonise" them).
+      - name: Build & push user-frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./front-end
+          file: ./front-end/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_URL=https://${{ env.APP_DOMAIN }}/api
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/smaart-user-frontend:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/smaart-user-frontend:latest
+          cache-from: type=gha,scope=user-frontend
+          cache-to: type=gha,mode=max,scope=user-frontend
+
+      - name: Summary
+        run: |
+          echo "### Images pushed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Tag: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- smaart-user-backend" >> $GITHUB_STEP_SUMMARY
+          echo "- smaart-user-frontend" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Nothing is live yet. Run the **Deploy to production** workflow to ship it." >> $GITHUB_STEP_SUMMARY

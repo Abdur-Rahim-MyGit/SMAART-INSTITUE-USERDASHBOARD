@@ -215,8 +215,9 @@ const MyCourses = () => {
 
   return (
     <div className="min-h-screen bg-transparent pb-8 transition-colors duration-300 relative">
-      {/* Animated Constellation Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Constellation background — faded right down so it reads as a quiet
+          texture instead of competing with the cards. */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-25">
         <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
       </div>
 

@@ -26,11 +26,19 @@ const generateOTP = () => {
 
 // Send OTP email
 const sendOTPEmail = async (email, otp, fullName = '', subject = '') => {
-  console.log(`📨 Attempting to send OTP email to ${email}...`);
-  console.log(`🔢 OTP Code: ${otp}`);
-  console.log(`👤 Name: ${fullName || 'N/A'}`);
-  console.log(`📋 Subject: ${subject || 'Login Verification'}`);
-  console.log('-'.repeat(50));
+  // SECURITY: the OTP code, the recipient's address and their name are printed
+  // ONLY when explicitly enabled for local testing. Left unconditional, every
+  // login would write a WORKING login code into logs/combined.log, so anyone
+  // able to read the server's log files could sign in as that user.
+  // The gate matches the admin backend (Backend/controllers/authController.js).
+  // NEVER set LOG_OTP in production.
+  if (process.env.NODE_ENV === 'development' || process.env.LOG_OTP === 'true') {
+    console.log(`📨 Attempting to send OTP email to ${email}...`);
+    console.log(`🔢 OTP Code: ${otp}`);
+    console.log(`👤 Name: ${fullName || 'N/A'}`);
+    console.log(`📋 Subject: ${subject || 'Login Verification'}`);
+    console.log('-'.repeat(50));
+  }
 
   try {
     if (process.env.NODE_ENV === 'development' && otp === '123456') {

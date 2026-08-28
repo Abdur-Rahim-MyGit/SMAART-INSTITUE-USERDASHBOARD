@@ -50,6 +50,7 @@ const registrationSchema = new mongoose.Schema({
     schoolName: String,
     board: String,
     yearOfPassing: String,
+    scoreType: String, // 'Percentage' | 'CGPA'
     percentage: String,
     marksheet: String, // file path
   },
@@ -60,6 +61,7 @@ const registrationSchema = new mongoose.Schema({
     stream: String,
     board: String,
     yearOfPassing: String,
+    scoreType: String, // 'Percentage' | 'CGPA'
     percentage: String,
     marksheet: String, // file path
   },
@@ -146,6 +148,7 @@ const registrationSchema = new mongoose.Schema({
     _id: false,
     id: String,
     title: String,
+    domain: String,
     qualificationLevel: String,
     institution: String,
     teamType: String,

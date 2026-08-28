@@ -215,14 +215,9 @@ const AssessmentFlowGuard = ({ children }) => {
           parsedUser.isRegistered === true ||
           parsedUser.userType === 'registration';
 
-        const isBypassed = sessionStorage.getItem('bypassRegistrationGuard') === 'true';
-
-        if (isBypassed) {
-          setAssessmentData({ skipped: true });
-          setLoading(false);
-          return;
-        }
-
+        // Registration is mandatory at least once — the old
+        // 'bypassRegistrationGuard' escape (Go to Dashboard Anyway) is removed,
+        // so unregistered students always route back to the flow below.
         if (parsedUser.role === 'student' && !studentIsRegistered) {
           // First-login students must watch the one-time constant welcome video
           // before they're allowed into the registration flow.

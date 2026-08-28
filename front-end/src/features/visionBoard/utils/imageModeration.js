@@ -11,8 +11,13 @@ import * as nsfwjs from 'nsfwjs';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import { moderateText } from './contentModeration';
 
-// Backend API URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Backend API URL.
+// NOTE: VITE_API_URL ALREADY ENDS IN /api — that is the convention every other
+// call site in this app follows (see visionBoardApi.js, DashboardSidebar.jsx,
+// ...). This file used to default to a bare origin and then append '/api/...',
+// which produced '/api/api/ocr/extract' — a 404 — as soon as VITE_API_URL was
+// set to a real value at build time. Keep the default in step with the others.
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MODEL SINGLETONS - Lazy loaded
@@ -148,7 +153,7 @@ const extractTextFromImage = async (base64Image) => {
   try {
     // Send the session JWT — the backend /api/ocr/extract route now requires auth.
     const token = sessionStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/api/ocr/extract`, {
+    const response = await fetch(`${API_BASE_URL}/ocr/extract`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -201,7 +206,7 @@ const checkImageServerSide = async (base64Image) => {
   try {
     // Send the session JWT — the backend /api/nsfw/check route now requires auth.
     const token = sessionStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/api/nsfw/check`, {
+    const response = await fetch(`${API_BASE_URL}/nsfw/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
