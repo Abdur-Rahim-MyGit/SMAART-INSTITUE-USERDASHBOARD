@@ -22,6 +22,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -44,6 +45,48 @@ const STARTERS = [
   'How do I prepare for a product role?',
   'Review my strengths and gaps',
 ];
+
+/**
+ * Fades a message bubble in once, the moment it first mounts. Because React
+ * keeps the same component instance for a stable `key` (the message's id),
+ * this only fires for genuinely new messages — re-renders of the thread
+ * (e.g. a sibling message's status flipping from 'sending' to 'sent') never
+ * replay it for bubbles that are already on screen.
+ */
+function FadeInMessage({ children, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 260,
+      useNativeDriver: true,
+    }).start();
+  }, [anim]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [6, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function CareerCoachChatScreen({ navigation }) {
   const { colors: themeColors, theme } = useTheme();
@@ -228,21 +271,20 @@ export default function CareerCoachChatScreen({ navigation }) {
 
               <View style={styles.starters}>
                 {STARTERS.map((s) => (
-                  <Pressable
+                  <PressCard
                     key={s}
                     onPress={() => send(s)}
-                    style={({ pressed }) => [
+                    style={[
                       styles.starter,
                       {
                         backgroundColor: themeColors.card,
                         borderColor: themeColors.border,
-                        opacity: pressed ? 0.8 : 1,
                       },
                     ]}
                   >
                     <Text style={[styles.starterText, { color: themeColors.text }]}>{s}</Text>
                     <Feather name="arrow-up-right" size={13} color={themeColors.iconMuted} />
-                  </Pressable>
+                  </PressCard>
                 ))}
               </View>
             </View>
@@ -250,7 +292,7 @@ export default function CareerCoachChatScreen({ navigation }) {
             messages.map((m) => {
               const mine = m.role === 'user';
               return (
-                <View key={m.id} style={[styles.row, mine ? styles.rowMine : styles.rowTheirs]}>
+                <FadeInMessage key={m.id} style={[styles.row, mine ? styles.rowMine : styles.rowTheirs]}>
                   {!mine && (
                     <View style={[styles.avatar, { backgroundColor: themeColors.pillBg }]}>
                       <Feather name="compass" size={13} color={themeColors.primaryBright} />
@@ -287,13 +329,13 @@ export default function CareerCoachChatScreen({ navigation }) {
                       </Pressable>
                     )}
                   </View>
-                </View>
+                </FadeInMessage>
               );
             })
           )}
 
           {sending && (
-            <View style={[styles.row, styles.rowTheirs]}>
+            <FadeInMessage style={[styles.row, styles.rowTheirs]}>
               <View style={[styles.avatar, { backgroundColor: themeColors.pillBg }]}>
                 <Feather name="compass" size={13} color={themeColors.primaryBright} />
               </View>
@@ -305,7 +347,7 @@ export default function CareerCoachChatScreen({ navigation }) {
               >
                 <ActivityIndicator size="small" color={themeColors.primaryBright} />
               </View>
-            </View>
+            </FadeInMessage>
           )}
         </ScrollView>
 
@@ -325,7 +367,7 @@ export default function CareerCoachChatScreen({ navigation }) {
               },
             ]}
           />
-          <Pressable
+          <PressCard
             disabled={!draft.trim() || sending}
             onPress={() => send()}
             style={[
@@ -337,7 +379,7 @@ export default function CareerCoachChatScreen({ navigation }) {
             ]}
           >
             <Feather name="send" size={17} color="#FFFFFF" />
-          </Pressable>
+          </PressCard>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

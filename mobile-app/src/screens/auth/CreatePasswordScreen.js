@@ -17,6 +17,7 @@ import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import PasswordRules from '../../components/PasswordRules';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { register } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { formatServerPasswordError, validatePassword } from '../../utils/password';
@@ -83,6 +84,7 @@ export default function CreatePasswordScreen({ route, navigation }) {
       subtitle={`Almost there, ${String(fullName).split(' ')[0]} — choose a password for ${email}`}
       onBack={() => navigation.goBack()}
     >
+      <FadeSlideIn duration={400}>
       <PillInput
         label="Password"
         icon="lock"
@@ -133,6 +135,7 @@ export default function CreatePasswordScreen({ route, navigation }) {
       <Text style={styles.legal}>
         By creating an account you agree to your institution's acceptable-use policy.
       </Text>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }

@@ -19,21 +19,45 @@ export default function PillInput({
   ...inputProps
 }) {
   const [reveal, setReveal] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   return (
     <View style={containerStyle}>
       {label ? <Text style={styles.inputLabel}>{label}</Text> : null}
-      <View style={[styles.inputRow, error && styles.inputRowError]}>
-        {icon ? <Feather name={icon} size={18} color="#64748B" style={styles.inputIcon} /> : null}
+      <View style={[
+        styles.inputRow,
+        focused && styles.inputRowFocused,
+        error && styles.inputRowError
+      ]}>
+        {icon ? (
+          <Feather
+            name={icon}
+            size={18}
+            color={focused ? colors.primaryBright : '#94A3B8'}
+            style={styles.inputIcon}
+          />
+        ) : null}
         <TextInput
           style={styles.textInput}
-          placeholderTextColor={colors.mutedLight}
+          placeholderTextColor="rgba(248, 250, 252, 0.4)"
           secureTextEntry={secure && !reveal}
+          onFocus={(e) => {
+            setFocused(true);
+            if (inputProps.onFocus) inputProps.onFocus(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            if (inputProps.onBlur) inputProps.onBlur(e);
+          }}
           {...inputProps}
         />
         {secure ? (
           <Pressable onPress={() => setReveal((v) => !v)} hitSlop={10}>
-            <Feather name={reveal ? 'eye-off' : 'eye'} size={18} color={colors.mutedLight} />
+            <Feather
+              name={reveal ? 'eye-off' : 'eye'}
+              size={18}
+              color={focused ? colors.primaryBright : '#94A3B8'}
+            />
           </Pressable>
         ) : null}
       </View>
@@ -58,10 +82,14 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
+    borderColor: '#334155',
+    backgroundColor: '#0F172A',
     paddingHorizontal: 18,
     marginBottom: 18,
+  },
+  inputRowFocused: {
+    borderColor: colors.primaryBright,
+    backgroundColor: '#1E293B',
   },
   inputRowError: {
     borderColor: colors.danger,
@@ -72,7 +100,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14.5,
     fontWeight: '600',
-    color: colors.text,
+    color: '#F8FAFC',
     paddingVertical: 0,
   },
   fieldError: {

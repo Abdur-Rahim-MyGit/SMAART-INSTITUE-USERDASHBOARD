@@ -106,7 +106,7 @@ export const TRACKS = [
     name: 'AI Readiness Quotient',
     shortName: 'AIQ',
     description: 'Master AI tools and work effectively with artificial intelligence',
-    color: '#3B82F6',
+    color: '#1478B8',
     courses: AIQ_TRACK,
     totalCourses: 5,
     unlockAfter: 'S15',

@@ -13,8 +13,9 @@
  * module (expo-av / expo-audio) that isn't installed, and adding one is out
  * of scope for this pass — the phonetic spelling still renders as text.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Pressable,
   ScrollView,
   StatusBar as RNStatusBar,
@@ -27,6 +28,42 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 const DAILY_WORDS = ['serendipity', 'ephemeral', 'resilience', 'eloquent', 'mellifluous', 'pragmatic', 'innovate'];
 const TRENDING_WORDS = ['Resilience', 'Empathy', 'Agile', 'Cognitive', 'Paradigm'];
@@ -136,37 +173,39 @@ export default function DictionaryScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <Feather name="search" size={16} color={themeColors.iconMuted} />
-          <TextInput
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-            onSubmitEditing={onSubmit}
-            placeholder="Search for a word…"
-            placeholderTextColor={themeColors.textMuted}
-            style={[styles.searchInput, { color: themeColors.text }]}
-            autoCorrect={false}
-            autoCapitalize="none"
-            returnKeyType="search"
-          />
-          {searchTerm.length > 0 && (
-            <Pressable onPress={() => setSearchTerm('')} hitSlop={10}>
-              <Feather name="x-circle" size={16} color={themeColors.iconMuted} />
-            </Pressable>
-          )}
-        </View>
+        <AnimatedSection delay={0}>
+          <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Feather name="search" size={16} color={themeColors.iconMuted} />
+            <TextInput
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              onSubmitEditing={onSubmit}
+              placeholder="Search for a word…"
+              placeholderTextColor={themeColors.textMuted}
+              style={[styles.searchInput, { color: themeColors.text }]}
+              autoCorrect={false}
+              autoCapitalize="none"
+              returnKeyType="search"
+            />
+            {searchTerm.length > 0 && (
+              <Pressable onPress={() => setSearchTerm('')} hitSlop={10}>
+                <Feather name="x-circle" size={16} color={themeColors.iconMuted} />
+              </Pressable>
+            )}
+          </View>
 
-        <Pressable
-          onPress={onSubmit}
-          disabled={loading || !searchTerm.trim()}
-          style={[
-            styles.searchBtn,
-            { backgroundColor: themeColors.primaryBright, opacity: loading || !searchTerm.trim() ? 0.5 : 1 },
-          ]}
-        >
-          <Feather name="search" size={15} color="#FFFFFF" />
-          <Text style={styles.searchBtnText}>{loading ? 'Searching…' : 'Search'}</Text>
-        </Pressable>
+          <PressCard
+            onPress={onSubmit}
+            disabled={loading || !searchTerm.trim()}
+            style={[
+              styles.searchBtn,
+              { backgroundColor: themeColors.primaryBright, opacity: loading || !searchTerm.trim() ? 0.5 : 1 },
+            ]}
+          >
+            <Feather name="search" size={15} color="#FFFFFF" />
+            <Text style={styles.searchBtnText}>{loading ? 'Searching…' : 'Search'}</Text>
+          </PressCard>
+        </AnimatedSection>
 
         {loading ? (
           <View style={{ marginTop: 16, gap: 10 }}>
@@ -177,15 +216,15 @@ export default function DictionaryScreen({ navigation }) {
             <SkeletonBox width="70%" height={14} borderRadius={6} />
           </View>
         ) : error ? (
-          <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, alignItems: 'center', marginTop: 16 }]}>
+          <AnimatedSection delay={0} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, alignItems: 'center', marginTop: 16 }]}>
             <Feather name="alert-triangle" size={26} color={themeColors.danger} />
             <Text style={[styles.emptyTitle, { color: themeColors.text, marginTop: 10 }]}>{error}</Text>
             <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>
               Couldn't find "{searchTerm}". Check spelling or try another word.
             </Text>
-          </View>
+          </AnimatedSection>
         ) : definition ? (
-          <View style={{ marginTop: 16, gap: 14 }}>
+          <AnimatedSection delay={0} style={{ marginTop: 16, gap: 14 }}>
             <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
               <Text style={[styles.word, { color: themeColors.text }]}>{definition.word}</Text>
               {!!definition.phonetic && (
@@ -227,30 +266,30 @@ export default function DictionaryScreen({ navigation }) {
                 </View>
                 <View style={styles.chipWrap}>
                   {definition.synonyms.map((syn) => (
-                    <Pressable
+                    <PressCard
                       key={syn}
                       onPress={() => onWordTap(syn)}
                       style={[styles.chip, { borderColor: themeColors.border, backgroundColor: themeColors.pillBg }]}
                     >
                       <Text style={[styles.chipText, { color: themeColors.text }]}>{syn}</Text>
-                    </Pressable>
+                    </PressCard>
                   ))}
                 </View>
               </View>
             )}
-          </View>
+          </AnimatedSection>
         ) : (
-          <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, borderStyle: 'dashed', alignItems: 'center', marginTop: 16 }]}>
+          <AnimatedSection delay={0} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, borderStyle: 'dashed', alignItems: 'center', marginTop: 16 }]}>
             <View style={[styles.emptyIconWrap, { backgroundColor: themeColors.pillBg }]}>
               <Feather name="book" size={22} color={themeColors.primaryBright} />
             </View>
             <Text style={[styles.emptyText, { color: themeColors.textMuted, textAlign: 'center', marginTop: 10 }]}>
               Type a word above and tap Search to see its definition.
             </Text>
-          </View>
+          </AnimatedSection>
         )}
 
-        <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, marginTop: 14 }]}>
+        <AnimatedSection delay={60} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, marginTop: 14 }]}>
           <View style={styles.sectionHeadRow}>
             <Feather name="star" size={14} color={themeColors.warning} />
             <Text style={[styles.sectionHead, { color: themeColors.text }]}>Word of the Day</Text>
@@ -272,9 +311,9 @@ export default function DictionaryScreen({ navigation }) {
               </Pressable>
             </View>
           ) : null}
-        </View>
+        </AnimatedSection>
 
-        <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, marginTop: 14 }]}>
+        <AnimatedSection delay={120} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border, marginTop: 14 }]}>
           <View style={styles.sectionHeadRow}>
             <Feather name="book" size={14} color={themeColors.primaryBright} />
             <Text style={[styles.sectionHead, { color: themeColors.text }]}>Trending Words</Text>
@@ -285,7 +324,7 @@ export default function DictionaryScreen({ navigation }) {
               <Feather name="arrow-right" size={14} color={themeColors.iconMuted} />
             </Pressable>
           ))}
-        </View>
+        </AnimatedSection>
       </ScrollView>
     </SafeAreaView>
   );

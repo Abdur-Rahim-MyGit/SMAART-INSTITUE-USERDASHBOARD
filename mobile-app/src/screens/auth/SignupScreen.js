@@ -17,6 +17,7 @@ import AuthScreenLayout from '../../components/AuthScreenLayout';
 import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { sendSignupOtp } from '../../api/auth';
 import { colors, radius } from '../../theme';
 
@@ -63,6 +64,7 @@ export default function SignupScreen({ navigation }) {
       subtitle="We'll email you a code to confirm it's really you"
       onBack={() => navigation.goBack()}
     >
+      <FadeSlideIn duration={400}>
       <PillInput
         label="Full Name"
         icon="user"
@@ -110,15 +112,16 @@ export default function SignupScreen({ navigation }) {
           Already have an account? <Text style={styles.footerLink}>Sign In</Text>
         </Text>
       </Pressable>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
   noticeCard: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: 'rgba(59, 130, 246, 0.2)',
     borderRadius: radius.lg,
     padding: 14,
     marginBottom: 18,
@@ -128,11 +131,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
-    color: colors.primary,
+    color: colors.primaryBright,
     marginBottom: 6,
   },
-  noticeBody: { fontSize: 12.5, lineHeight: 18, fontWeight: '500', color: '#1E3A8A' },
-  noticeStrong: { fontWeight: '800' },
+  noticeBody: { fontSize: 12.5, lineHeight: 18, fontWeight: '500', color: '#94A3B8' },
+  noticeStrong: { fontWeight: '800', color: colors.primaryBright },
   footerBtn: { paddingVertical: 8 },
   footerNote: {
     textAlign: 'center',
@@ -140,5 +143,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.muted,
   },
-  footerLink: { color: colors.navy, fontWeight: '800' },
+  footerLink: { color: colors.primaryBright, fontWeight: '800' },
 });

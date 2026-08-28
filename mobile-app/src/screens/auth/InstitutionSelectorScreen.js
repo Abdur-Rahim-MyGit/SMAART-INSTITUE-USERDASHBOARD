@@ -27,6 +27,7 @@ import { Feather } from '@expo/vector-icons';
 import { getColleges } from '../../api/colleges';
 import { useAuth } from '../../context/AuthContext';
 import { colors, radius, shadow } from '../../theme';
+import { FadeSlideIn, PressScale } from '../../components/Motion';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
 
@@ -71,18 +72,20 @@ export default function InstitutionSelectorScreen({ navigation }) {
       <RNStatusBar barStyle="light-content" backgroundColor={colors.navyDark} />
 
       {/* Dark Top Header */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={12}
-          style={styles.backBtn}
-        >
-          <Feather name="arrow-left" size={20} color="#FFFFFF" />
-        </Pressable>
+      <FadeSlideIn duration={380}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            hitSlop={12}
+            style={styles.backBtn}
+          >
+            <Feather name="arrow-left" size={20} color="#FFFFFF" />
+          </Pressable>
 
-        <Text style={styles.title}>Select Your College</Text>
-        <Text style={styles.subtitle}>Find your institution to continue to Sign In</Text>
-      </View>
+          <Text style={styles.title}>Select Your College</Text>
+          <Text style={styles.subtitle}>Find your institution to continue to Sign In</Text>
+        </View>
+      </FadeSlideIn>
 
       {/* White Curved Sheet Container with Keyboard Avoiding View */}
       <KeyboardAvoidingView
@@ -90,6 +93,7 @@ export default function InstitutionSelectorScreen({ navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
+        <FadeSlideIn duration={420} delay={90} style={{ flex: 1 }}>
         <View style={styles.sheetContent}>
           {/* Custom Pill Search Input */}
           <View style={styles.searchBarWrap}>
@@ -159,8 +163,10 @@ export default function InstitutionSelectorScreen({ navigation }) {
               ) : null
             }
             renderItem={({ item }) => (
-              <Pressable
-                style={({ pressed }) => [styles.collegeCard, pressed && styles.collegeCardPressed]}
+              <PressScale
+                style={styles.collegeCard}
+                pressedStyle={styles.collegeCardPressed}
+                scaleTo={0.98}
                 onPress={() => selectCollege(item)}
               >
                 <View style={styles.collegeIconWrap}>
@@ -182,10 +188,11 @@ export default function InstitutionSelectorScreen({ navigation }) {
                   <Text style={styles.selectText}>Select</Text>
                   <Feather name="chevron-right" size={16} color={colors.primaryBright} />
                 </View>
-              </Pressable>
+              </PressScale>
             )}
           />
         </View>
+        </FadeSlideIn>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -309,15 +316,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
   },
   collegeCardPressed: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#EAF7FD',
     borderColor: colors.primaryBright,
-    transform: [{ scale: 0.99 }],
   },
   collegeIconWrap: {
     width: 42,
     height: 42,
     borderRadius: radius.md,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EAF7FD',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -342,7 +348,7 @@ const styles = StyleSheet.create({
   selectAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EAF7FD',
     borderRadius: radius.pill,
     paddingHorizontal: 10,
     paddingVertical: 5,

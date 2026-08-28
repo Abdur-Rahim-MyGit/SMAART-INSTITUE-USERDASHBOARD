@@ -13,9 +13,10 @@
  * vs host-college vs job-fair distinction, eligibility criteria, and the
  * server-computed skill-gap warning (missedMustHaves / matchGapWarning).
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Image,
   Linking,
   Pressable,
@@ -29,6 +30,42 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { normalizeJobType } from './CareerScreen';
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 function CompanyLogo({ uri, letter, tint, size = 56, radius = 18 }) {
   const [failed, setFailed] = useState(false);
@@ -151,7 +188,7 @@ export default function JobDetailScreen({ navigation, route }) {
 
       {/* Aurora Background */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <View style={[styles.auroraBlob, { backgroundColor: '#3B82F6', top: -90, right: -80, width: 300, height: 300, borderRadius: 150, opacity: isDark ? 0.1 : 0.05 }]} />
+        <View style={[styles.auroraBlob, { backgroundColor: '#1478B8', top: -90, right: -80, width: 300, height: 300, borderRadius: 150, opacity: isDark ? 0.1 : 0.05 }]} />
         <View style={[styles.auroraBlob, { backgroundColor: '#8B5CF6', bottom: 40, left: -120, width: 280, height: 280, borderRadius: 140, opacity: isDark ? 0.08 : 0.04 }]} />
       </View>
 
@@ -171,14 +208,14 @@ export default function JobDetailScreen({ navigation, route }) {
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Company Hero */}
-        <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+        <AnimatedSection delay={0} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
           <View style={styles.heroTop}>
             <CompanyLogo uri={job?.displayCompanyLogo} letter={companyInit} tint={themeColors.primaryBright} />
             <View style={{ flex: 1, marginLeft: 14 }}>
               <Text style={[styles.jobTitle, { color: themeColors.text }]} numberOfLines={2}>{title}</Text>
               <Text style={[styles.companyName, { color: themeColors.textMuted }]} numberOfLines={1}>{company}</Text>
               <View style={styles.tagRow}>
-                <View style={[styles.sourceTag, { backgroundColor: isSmaart ? '#1E293B' : 'rgba(59, 130, 246, 0.12)' }]}>
+                <View style={[styles.sourceTag, { backgroundColor: isSmaart ? '#1E293B' : 'rgba(20, 120, 184, 0.12)' }]}>
                   <Text style={[styles.sourceTagText, { color: isSmaart ? '#FFFFFF' : themeColors.primaryBright }]}>
                     {isSmaart ? 'SMAART' : 'COLLEGE'}
                   </Text>
@@ -209,11 +246,11 @@ export default function JobDetailScreen({ navigation, route }) {
               ) : null}
             </View>
           )}
-        </View>
+        </AnimatedSection>
 
         {/* Skill Gap Warning */}
         {hasSkillGap && (
-          <View style={[styles.card, styles.warningCard, { backgroundColor: isDark ? 'rgba(245, 158, 11, 0.08)' : '#FFFBEB', borderColor: 'rgba(245, 158, 11, 0.35)' }]}>
+          <AnimatedSection delay={60} style={[styles.card, styles.warningCard, { backgroundColor: isDark ? 'rgba(245, 158, 11, 0.08)' : '#FFFBEB', borderColor: 'rgba(245, 158, 11, 0.35)' }]}>
             <View style={styles.warningHeader}>
               <Feather name="alert-triangle" size={15} color="#F59E0B" />
               <Text style={styles.warningTitle}>Skill Gap Detected</Text>
@@ -235,19 +272,19 @@ export default function JobDetailScreen({ navigation, route }) {
                 ))}
               </View>
             )}
-          </View>
+          </AnimatedSection>
         )}
 
         {/* Description */}
-        <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+        <AnimatedSection delay={120} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
           <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Job Description</Text>
           <Text style={[styles.bodyText, { color: themeColors.textMuted, lineHeight: 20 }]}>
             {job?.description || job?.jobDescription || 'Role details and requirements will be shared by the recruiter.'}
           </Text>
-        </View>
+        </AnimatedSection>
 
         {/* Meta Grid */}
-        <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+        <AnimatedSection delay={160} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
           <Text style={[styles.sectionLabel, { color: themeColors.textMuted, marginBottom: 12 }]}>Role Details</Text>
           <View style={styles.metaGrid}>
             {metaItems.map((item) => (
@@ -260,11 +297,11 @@ export default function JobDetailScreen({ navigation, route }) {
               </View>
             ))}
           </View>
-        </View>
+        </AnimatedSection>
 
         {/* Eligibility Criteria */}
         {hasEligibilitySection && (
-          <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+          <AnimatedSection delay={200} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
             <Text style={[styles.sectionLabel, { color: themeColors.textMuted, marginBottom: 10 }]}>Eligibility Criteria</Text>
             {eligibilityRows.map((row) => (
               <View key={row.label} style={styles.eligRow}>
@@ -299,12 +336,12 @@ export default function JobDetailScreen({ navigation, route }) {
                 </View>
               </View>
             )}
-          </View>
+          </AnimatedSection>
         )}
 
         {/* Required Skills */}
         {skills.length > 0 && (
-          <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+          <AnimatedSection delay={240} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
             <Text style={[styles.sectionLabel, { color: themeColors.textMuted, marginBottom: 10 }]}>Required Skills</Text>
             <View style={styles.skillsRow}>
               {skills.map((skill, index) => (
@@ -313,7 +350,7 @@ export default function JobDetailScreen({ navigation, route }) {
                 </View>
               ))}
             </View>
-          </View>
+          </AnimatedSection>
         )}
 
         <View style={{ height: 12 }} />
@@ -321,7 +358,7 @@ export default function JobDetailScreen({ navigation, route }) {
 
       {/* Sticky Apply CTA */}
       <View style={[styles.footer, { backgroundColor: themeColors.bg, borderTopColor: themeColors.border }]}>
-        <Pressable
+        <PressCard
           disabled={alreadyApplied || localApplying}
           onPress={handleApplyPress}
           style={[
@@ -340,7 +377,7 @@ export default function JobDetailScreen({ navigation, route }) {
           ) : (
             <Text style={styles.applyBtnText}>Apply for this Job</Text>
           )}
-        </Pressable>
+        </PressCard>
       </View>
     </SafeAreaView>
   );

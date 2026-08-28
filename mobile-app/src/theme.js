@@ -1,30 +1,31 @@
-// SMAART Institute brand palette — kept in sync with front-end/tailwind.config.ts
-// so the mobile app and web dashboard read as the same product.
+// SMAART Institute brand palette — Obsidian Navy & Cyber Blue.
 export const colors = {
-  // Slate Dark & Cyber Blue — primary brand surface/text color
-  navyDarkest: '#0A0F1D', // Obsidian slate dark
-  navyDark: '#111827',    // Premium dark grey-blue
-  navy: '#1E293B',        // Slate navy
-  navyLight: '#374151',   // Lighter slate grey
-  primary: '#2563EB',     // Royal Blue (Matches Logo)
-  primaryBright: '#3B82F6', // Cyber Blue (Matches Logo)
+  // Navy/Slate family — deep obsidian header/surface tones
+  navyDarkest: '#0A0F1D', // Deepest obsidian space-dark color
+  navyDark: '#0D1527',    // Brand slate-dark navy — auth background/header
+  navy: '#1E293B',        // Slate-800 surface color
+  navyLight: '#334155',   // Slate-700 borders/dividers
 
-  // Gold / silver accents
+  primary: '#2563EB',      // Modern vibrant cyber blue
+  primaryBright: '#3B82F6', // Lighter neon cyber blue highlight state
+
+  // Gold / cream / silver accents
   gold: '#F59E0B',
   goldLight: '#FBBF24',
+  cream: '#FFF0C7',   // Warm accent — premium highlight touches
   silver: '#CBD5E1',
 
-  // Neutrals
-  bg: '#F8FAFC',
-  surface: '#FFFFFF',
-  surfaceMuted: '#F3F4F6',
-  border: '#E5E7EB',
-  text: '#0F172A',
-  muted: '#64748B',
-  mutedLight: '#9CA3AF',
+  // Neutrals — icy slate-blue tinted
+  bg: '#0A0F1D',
+  surface: '#1E293B',
+  surfaceMuted: '#1E293B',
+  border: '#334155',
+  text: '#F8FAFC',
+  muted: '#94A3B8',
+  mutedLight: '#64748B',
 
   danger: '#EF4444',
-  dangerBg: '#FEF2F2',
+  dangerBg: '#7A1C1C',
   success: '#10B981', // Emerald success
 
   white: '#FFFFFF',
@@ -32,8 +33,9 @@ export const colors = {
 
   // Legacy aliases
   accent: '#2563EB',
-  light: '#EFF6FF',
-  grey: '#F3F4F6',
+  light: '#0A0F1D',
+  grey: '#1E293B',
+  lightBlue: '#3B82F6',
 };
 
 export const radius = {

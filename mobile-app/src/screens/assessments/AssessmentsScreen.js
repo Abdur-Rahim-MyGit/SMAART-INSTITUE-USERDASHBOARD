@@ -9,9 +9,10 @@
  * Gating shown here is presentation only — `results.js` re-checks it when an
  * attempt actually starts, so a stale client cannot open a locked stage.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -33,6 +34,42 @@ import {
   STAGE_MAP,
   deriveStageLocks,
 } from '../../data/assessmentStages';
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function StagePressCard({ onPress, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} style={{ flex: 1 }}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function AssessmentsScreen({ navigation }) {
   const { user } = useAuth();
@@ -139,24 +176,26 @@ export default function AssessmentsScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={[styles.summary, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <Text style={[styles.summaryValue, { color: themeColors.text }]}>
-            {completedCount}
-            <Text style={[styles.summaryTotal, { color: themeColors.textMuted }]}> / {STAGE_KEYS.length}</Text>
-          </Text>
-          <Text style={[styles.summaryLabel, { color: themeColors.textMuted }]}>stages completed</Text>
-          <View style={[styles.summaryTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#EEF2F7' }]}>
-            <View
-              style={[
-                styles.summaryFill,
-                {
-                  width: `${(completedCount / STAGE_KEYS.length) * 100}%`,
-                  backgroundColor: themeColors.primaryBright,
-                },
-              ]}
-            />
+        <AnimatedSection delay={0}>
+          <View style={[styles.summary, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Text style={[styles.summaryValue, { color: themeColors.text }]}>
+              {completedCount}
+              <Text style={[styles.summaryTotal, { color: themeColors.textMuted }]}> / {STAGE_KEYS.length}</Text>
+            </Text>
+            <Text style={[styles.summaryLabel, { color: themeColors.textMuted }]}>stages completed</Text>
+            <View style={[styles.summaryTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#EEF2F7' }]}>
+              <View
+                style={[
+                  styles.summaryFill,
+                  {
+                    width: `${(completedCount / STAGE_KEYS.length) * 100}%`,
+                    backgroundColor: themeColors.primaryBright,
+                  },
+                ]}
+              />
+            </View>
           </View>
-        </View>
+        </AnimatedSection>
 
         {loading ? (
           <View style={{ gap: 12 }}>
@@ -185,81 +224,83 @@ export default function AssessmentsScreen({ navigation }) {
                       : { label: 'Ready', color: accent, icon: 'circle' };
 
               return (
-                <View key={key} style={styles.row}>
-                  <View style={styles.rail}>
-                    <View
-                      style={[
-                        styles.node,
-                        {
-                          backgroundColor: lock.completed ? '#10B981' : lock.unlocked ? accent : themeColors.card,
-                          borderColor: lock.completed ? '#10B981' : lock.unlocked ? accent : themeColors.border,
-                        },
-                      ]}
-                    >
-                      {lock.completed ? (
-                        <Feather name="check" size={14} color="#FFFFFF" />
-                      ) : (
-                        <Feather
-                          name={STAGE_ICON[key]}
-                          size={14}
-                          color={lock.unlocked ? '#FFFFFF' : themeColors.textMuted}
+                <AnimatedSection key={key} delay={100 + idx * 90}>
+                  <View style={styles.row}>
+                    <View style={styles.rail}>
+                      <View
+                        style={[
+                          styles.node,
+                          {
+                            backgroundColor: lock.completed ? '#10B981' : lock.unlocked ? accent : themeColors.card,
+                            borderColor: lock.completed ? '#10B981' : lock.unlocked ? accent : themeColors.border,
+                          },
+                        ]}
+                      >
+                        {lock.completed ? (
+                          <Feather name="check" size={14} color="#FFFFFF" />
+                        ) : (
+                          <Feather
+                            name={STAGE_ICON[key]}
+                            size={14}
+                            color={lock.unlocked ? '#FFFFFF' : themeColors.textMuted}
+                          />
+                        )}
+                      </View>
+                      {!isLast && (
+                        <View
+                          style={[
+                            styles.connector,
+                            { backgroundColor: lock.completed ? '#10B981' : themeColors.border },
+                          ]}
                         />
                       )}
                     </View>
-                    {!isLast && (
-                      <View
-                        style={[
-                          styles.connector,
-                          { backgroundColor: lock.completed ? '#10B981' : themeColors.border },
-                        ]}
-                      />
-                    )}
+
+                    <StagePressCard
+                      onPress={() => openStage(key)}
+                      style={[
+                        styles.card,
+                        {
+                          backgroundColor: themeColors.card,
+                          borderColor: lock.unlocked && !lock.completed ? accent : themeColors.border,
+                          borderWidth: lock.unlocked && !lock.completed ? 1.5 : 1,
+                          opacity: lock.unlocked ? 1 : 0.6,
+                        },
+                      ]}
+                    >
+                      <View style={styles.cardTop}>
+                        <Text style={[styles.stageKey, { color: accent }]}>{key} · {cfg.name}</Text>
+                        <View style={styles.stateWrap}>
+                          <Feather name={state.icon} size={11} color={state.color} />
+                          <Text style={[styles.stateText, { color: state.color }]}>{state.label}</Text>
+                        </View>
+                      </View>
+
+                      <Text style={[styles.cardTitle, { color: themeColors.text }]}>{cfg.title}</Text>
+
+                      <View style={[styles.metaRow, { borderTopColor: themeColors.border }]}>
+                        <View style={styles.metaItem}>
+                          <Feather name="help-circle" size={11} color={themeColors.textMuted} />
+                          <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
+                            {cfg.questionLimit} questions
+                          </Text>
+                        </View>
+                        <View style={styles.metaItem}>
+                          <Feather name="clock" size={11} color={themeColors.textMuted} />
+                          <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
+                            {cfg.durationMinutes} min
+                          </Text>
+                        </View>
+                        <View style={styles.metaItem}>
+                          <Feather name="repeat" size={11} color={themeColors.textMuted} />
+                          <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
+                            {used}/{cfg.maxAttempts}
+                          </Text>
+                        </View>
+                      </View>
+                    </StagePressCard>
                   </View>
-
-                  <Pressable
-                    onPress={() => openStage(key)}
-                    style={({ pressed }) => [
-                      styles.card,
-                      {
-                        backgroundColor: themeColors.card,
-                        borderColor: lock.unlocked && !lock.completed ? accent : themeColors.border,
-                        borderWidth: lock.unlocked && !lock.completed ? 1.5 : 1,
-                        opacity: pressed ? 0.85 : lock.unlocked ? 1 : 0.6,
-                      },
-                    ]}
-                  >
-                    <View style={styles.cardTop}>
-                      <Text style={[styles.stageKey, { color: accent }]}>{key} · {cfg.name}</Text>
-                      <View style={styles.stateWrap}>
-                        <Feather name={state.icon} size={11} color={state.color} />
-                        <Text style={[styles.stateText, { color: state.color }]}>{state.label}</Text>
-                      </View>
-                    </View>
-
-                    <Text style={[styles.cardTitle, { color: themeColors.text }]}>{cfg.title}</Text>
-
-                    <View style={[styles.metaRow, { borderTopColor: themeColors.border }]}>
-                      <View style={styles.metaItem}>
-                        <Feather name="help-circle" size={11} color={themeColors.textMuted} />
-                        <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
-                          {cfg.questionLimit} questions
-                        </Text>
-                      </View>
-                      <View style={styles.metaItem}>
-                        <Feather name="clock" size={11} color={themeColors.textMuted} />
-                        <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
-                          {cfg.durationMinutes} min
-                        </Text>
-                      </View>
-                      <View style={styles.metaItem}>
-                        <Feather name="repeat" size={11} color={themeColors.textMuted} />
-                        <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
-                          {used}/{cfg.maxAttempts}
-                        </Text>
-                      </View>
-                    </View>
-                  </Pressable>
-                </View>
+                </AnimatedSection>
               );
             })}
           </View>

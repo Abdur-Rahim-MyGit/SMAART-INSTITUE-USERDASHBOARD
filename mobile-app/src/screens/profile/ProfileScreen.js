@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,9 +10,11 @@ import {
   Modal,
   Alert,
   Dimensions,
+  Animated,
+  Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import ScreenContainer from '../../components/ScreenContainer';
 import AppButton from '../../components/AppButton';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -30,6 +32,42 @@ const ALL_BADGES = [
   { id: 'AIQ', label: 'AI Ready Quotient', desc: 'Cleared AI Quotient module', icon: '🤖' },
   { id: 'SQ', label: 'Sustainability Quotient', desc: 'Cleared SQ Quotient module', icon: '🌱' },
 ];
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, disabled, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.98, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function ProfileScreen({ navigation }) {
   const { user, signOut, refreshUser } = useAuth();
@@ -245,44 +283,48 @@ export default function ProfileScreen({ navigation }) {
   const initials = (user?.fullName || 'ST').split(' ').map((n) => n[0]).join('').toUpperCase().substring(0, 2);
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.bg }]} edges={['top']}>
       {/* Aurora mesh gradient */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <View style={[styles.auroraBlob, { backgroundColor: '#EC4899', top: -100, left: -60, width: 280, height: 280, borderRadius: 140, opacity: theme === 'dark' ? 0.12 : 0.05 }]} />
-        <View style={[styles.auroraBlob, { backgroundColor: '#3B82F6', bottom: 120, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.1 : 0.04 }]} />
+        <View style={[styles.auroraBlob, { backgroundColor: '#1478B8', bottom: 120, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.1 : 0.04 }]} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         {/* Profile Card Header */}
-        <View style={[styles.profileHeaderCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <View style={[styles.avatarCircle, { backgroundColor: themeColors.primaryBright }]}>
-            <Text style={styles.avatarInitials}>{initials}</Text>
+        <AnimatedSection delay={0}>
+          <View style={[styles.profileHeaderCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <View style={[styles.avatarCircle, { backgroundColor: themeColors.primaryBright }]}>
+              <Text style={styles.avatarInitials}>{initials}</Text>
+            </View>
+            <Text style={[styles.fullName, { color: themeColors.text }]}>{user?.fullName || 'Student Learner'}</Text>
+            <Text style={[styles.userEmail, { color: themeColors.textMuted }]}>{user?.email}</Text>
+            <View style={styles.badgeBanner}>
+              <Feather name="award" size={13} color="#D97706" />
+              <Text style={[styles.badgeBannerText, { color: themeColors.text }]}>
+                {earnedBadges.length} Milestone Badges Earned
+              </Text>
+            </View>
           </View>
-          <Text style={[styles.fullName, { color: themeColors.text }]}>{user?.fullName || 'Student Learner'}</Text>
-          <Text style={[styles.userEmail, { color: themeColors.textMuted }]}>{user?.email}</Text>
-          <View style={styles.badgeBanner}>
-            <Feather name="award" size={13} color="#D97706" />
-            <Text style={[styles.badgeBannerText, { color: themeColors.text }]}>
-              {earnedBadges.length} Milestone Badges Earned
-            </Text>
-          </View>
-        </View>
+        </AnimatedSection>
 
         {/* Tab selector */}
-        <View style={[styles.selectorBar, { backgroundColor: theme === 'dark' ? '#1E293B' : '#EFF6FF' }]}>
-          <TouchableOpacity
-            style={[styles.selectorBtn, activeTab === 'info' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
-            onPress={() => setActiveTab('info')}
-          >
-            <Text style={[styles.selectorText, { color: activeTab === 'info' ? '#FFFFFF' : themeColors.textMuted }]}>Details</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.selectorBtn, activeTab === 'badges' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
-            onPress={() => setActiveTab('badges')}
-          >
-            <Text style={[styles.selectorText, { color: activeTab === 'badges' ? '#FFFFFF' : themeColors.textMuted }]}>Badges</Text>
-          </TouchableOpacity>
-        </View>
+        <AnimatedSection delay={60}>
+          <View style={[styles.selectorBar, { backgroundColor: theme === 'dark' ? '#0E3555' : '#EAF7FD' }]}>
+            <TouchableOpacity
+              style={[styles.selectorBtn, activeTab === 'info' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+              onPress={() => setActiveTab('info')}
+            >
+              <Text style={[styles.selectorText, { color: activeTab === 'info' ? '#FFFFFF' : themeColors.textMuted }]}>Details</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.selectorBtn, activeTab === 'badges' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+              onPress={() => setActiveTab('badges')}
+            >
+              <Text style={[styles.selectorText, { color: activeTab === 'badges' ? '#FFFFFF' : themeColors.textMuted }]}>Badges</Text>
+            </TouchableOpacity>
+          </View>
+        </AnimatedSection>
 
         {loading ? (
           <View style={styles.loaderContainer}>
@@ -294,6 +336,7 @@ export default function ProfileScreen({ navigation }) {
             {activeTab === 'info' && (
               <View style={styles.sectionsWrap}>
                 {/* Personal Section */}
+                <AnimatedSection delay={0}>
                 <View style={[styles.detailSection, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                   <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Personal Details</Text>
                   <View style={styles.detailRow}>
@@ -309,8 +352,10 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={[styles.detailVal, { color: themeColors.text }]}>{user?.mobileNumber || 'Not provided'}</Text>
                   </View>
                 </View>
+                </AnimatedSection>
 
                 {/* Address Section */}
+                <AnimatedSection delay={60}>
                 <View style={[styles.detailSection, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                   <View style={styles.sectionHeaderRow}>
                     <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Contact Address</Text>
@@ -331,8 +376,10 @@ export default function ProfileScreen({ navigation }) {
                     </Text>
                   </View>
                 </View>
+                </AnimatedSection>
 
                 {/* Education Section */}
+                <AnimatedSection delay={120}>
                 <View style={[styles.detailSection, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                   <View style={styles.sectionHeaderRow}>
                     <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Education History</Text>
@@ -351,9 +398,11 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={[styles.detailVal, { color: themeColors.text }]}>{domain || 'Not completed'}</Text>
                   </View>
                 </View>
+                </AnimatedSection>
 
                 {/* Institution Row */}
                 {user?.collegeDetails && (
+                  <AnimatedSection delay={180}>
                   <View style={[styles.detailSection, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                     <Text style={[styles.sectionHeading, { color: themeColors.text }]}>College Details</Text>
                     <View style={styles.detailRow}>
@@ -365,9 +414,11 @@ export default function ProfileScreen({ navigation }) {
                       <Text style={[styles.detailVal, { color: themeColors.text }]} numberOfLines={1}>{user.collegeDetails.address}</Text>
                     </View>
                   </View>
+                  </AnimatedSection>
                 )}
 
                 {/* Certificates Section */}
+                <AnimatedSection delay={240}>
                 <View style={[styles.detailSection, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                   <View style={styles.sectionHeaderRow}>
                     <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Certifications</Text>
@@ -401,38 +452,40 @@ export default function ProfileScreen({ navigation }) {
                     ))
                   )}
                 </View>
+                </AnimatedSection>
               </View>
             )}
 
             {/* BADGES TAB */}
             {activeTab === 'badges' && (
               <View style={styles.badgesGrid}>
-                {ALL_BADGES.map((bd) => {
+                {ALL_BADGES.map((bd, idx) => {
                   const isEarned = earnedBadges.includes(bd.id);
 
                   return (
-                    <View
-                      key={bd.id}
-                      style={[
-                        styles.badgeCard,
-                        { backgroundColor: themeColors.card, borderColor: themeColors.border },
-                        !isEarned && { opacity: 0.4 },
-                      ]}
-                    >
-                      <Text style={styles.badgeIcon}>{bd.icon}</Text>
-                      <Text style={[styles.badgeName, { color: themeColors.text }]} numberOfLines={1}>
-                        {bd.label || bd.title}
-                      </Text>
-                      <Text style={[styles.badgeDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
-                        {bd.desc}
-                      </Text>
-                      {isEarned && (
-                        <View style={styles.earnedTag}>
-                          <Feather name="check" size={8} color="#FFFFFF" />
-                          <Text style={styles.earnedTagText}>EARNED</Text>
-                        </View>
-                      )}
-                    </View>
+                    <AnimatedSection key={bd.id} delay={idx * 40}>
+                      <View
+                        style={[
+                          styles.badgeCard,
+                          { backgroundColor: themeColors.card, borderColor: themeColors.border },
+                          !isEarned && { opacity: 0.4 },
+                        ]}
+                      >
+                        <Text style={styles.badgeIcon}>{bd.icon}</Text>
+                        <Text style={[styles.badgeName, { color: themeColors.text }]} numberOfLines={1}>
+                          {bd.label || bd.title}
+                        </Text>
+                        <Text style={[styles.badgeDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
+                          {bd.desc}
+                        </Text>
+                        {isEarned && (
+                          <View style={styles.earnedTag}>
+                            <Feather name="check" size={8} color="#FFFFFF" />
+                            <Text style={styles.earnedTagText}>EARNED</Text>
+                          </View>
+                        )}
+                      </View>
+                    </AnimatedSection>
                   );
                 })}
               </View>
@@ -602,7 +655,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 

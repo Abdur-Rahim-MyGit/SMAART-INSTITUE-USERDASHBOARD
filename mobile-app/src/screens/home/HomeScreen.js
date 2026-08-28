@@ -32,6 +32,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Feather, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useDrawer } from '../../context/DrawerContext';
@@ -39,6 +40,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { getEnrollments } from '../../api/courses';
 import { getStageStatus } from '../../api/assessments';
 import { getCollegeBanners } from '../../api/colleges';
+import { notificationsAPI } from '../../api/notifications';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_ROTATE_MS = 6000;
@@ -56,7 +58,7 @@ const SHORTCUTS = [
     title: 'My Courses',
     description: 'Access active learning tracks',
     icon: 'book-open',
-    color: '#3B82F6',
+    color: '#1478B8',
     category: 'academic',
     screen: 'Learning',
     isTab: true,
@@ -253,6 +255,7 @@ export default function HomeScreen({ navigation }) {
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Carousel & Scroll animations
   const carouselRef = useRef(null);
@@ -345,6 +348,18 @@ export default function HomeScreen({ navigation }) {
     await fetchData();
     setRefreshing(false);
   }, [fetchData]);
+
+  // Cheap, on its own — refreshed every time Home regains focus (e.g. coming
+  // back from the Notifications screen after reading something) without
+  // re-running the full dashboard fetch above.
+  useFocusEffect(
+    useCallback(() => {
+      notificationsAPI
+        .getUnreadCount()
+        .then((res) => setUnreadCount(res?.unreadCount || 0))
+        .catch(() => {});
+    }, [])
+  );
 
   const completedCount = countCompletedStages(stageStatus);
   const pendingAssessment = derivePendingAssessment(stageStatus);
@@ -452,7 +467,7 @@ export default function HomeScreen({ navigation }) {
             style={[
               styles.minimalHeroCard,
               {
-                backgroundColor: isDark ? colors.card : '#0F2942',
+                backgroundColor: isDark ? colors.card : '#072036',
               },
             ]}
           >
@@ -491,7 +506,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
 
                 <TouchableOpacity
-                  style={[styles.minimalCtaButton, { backgroundColor: '#2563EB' }]}
+                  style={[styles.minimalCtaButton, { backgroundColor: '#045C9A' }]}
                   onPress={() => {
                     if (pendingAssessment) {
                       navigation.navigate('Assessments');
@@ -552,7 +567,7 @@ export default function HomeScreen({ navigation }) {
                 </Text>
                 <View style={styles.announcementCtaRow}>
                   <Text style={styles.announcementCtaText}>View Details</Text>
-                  <Feather name="chevron-right" size={12} color="#60A5FA" style={{ marginLeft: 3 }} />
+                  <Feather name="chevron-right" size={12} color="#6EC6EA" style={{ marginLeft: 3 }} />
                 </View>
               </View>
             </View>
@@ -624,7 +639,7 @@ export default function HomeScreen({ navigation }) {
                 ]}
               >
                 <Feather name="bell" size={18} color={colors.text} />
-                <View style={styles.notifBadgeDot} />
+                {unreadCount > 0 && <View style={styles.notifBadgeDot} />}
               </Pressable>
 
               <Pressable
@@ -664,7 +679,7 @@ export default function HomeScreen({ navigation }) {
                 styles.institutionBadgePill,
                 {
                   backgroundColor: colors.pillBg,
-                  borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(37,99,235,0.05)',
+                  borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(4,92,154,0.05)',
                 },
               ]}
             >
@@ -726,13 +741,13 @@ export default function HomeScreen({ navigation }) {
               style={[
                 styles.searchInner,
                 {
-                  backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                  backgroundColor: isDark ? '#0E3555' : '#DDEFF8',
                 },
               ]}
             >
-              <Feather name="search" size={19} color={isDark ? '#94A3B8' : '#3B82F6'} style={{ marginRight: 10 }} />
+              <Feather name="search" size={19} color={isDark ? '#94A3B8' : '#1478B8'} style={{ marginRight: 10 }} />
               <TextInput
-                style={[styles.searchInput, { color: isDark ? '#FFFFFF' : '#0F172A' }]}
+                style={[styles.searchInput, { color: isDark ? '#FFFFFF' : '#072036' }]}
                 placeholder="Search modules, courses, skills..."
                 placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
                 value={searchQuery}
@@ -746,7 +761,7 @@ export default function HomeScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={[styles.filterActionBtn, { backgroundColor: '#2563EB' }]}
+              style={[styles.filterActionBtn, { backgroundColor: '#045C9A' }]}
               onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
             >
               <Feather name="sliders" size={19} color="#FFFFFF" />
@@ -808,11 +823,11 @@ export default function HomeScreen({ navigation }) {
         {/* ── Recommended Section ── */}
         <AnimatedSection delay={240}>
           <View style={styles.sectionHeaderRow}>
-            <Text style={[styles.sectionTitle, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>
+            <Text style={[styles.sectionTitle, { color: isDark ? '#FFFFFF' : '#072036' }]}>
               Recommended for you
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}>
-              <Text style={[styles.seeAllText, { color: '#2563EB' }]}>See all →</Text>
+              <Text style={[styles.seeAllText, { color: '#045C9A' }]}>See all →</Text>
             </TouchableOpacity>
           </View>
 
@@ -823,7 +838,7 @@ export default function HomeScreen({ navigation }) {
               style={[
                 styles.recCard,
                 {
-                  backgroundColor: isDark ? '#1E293B' : '#E0F2FE',
+                  backgroundColor: isDark ? '#0E3555' : '#E0F2FE',
                 },
               ]}
             >
@@ -851,9 +866,9 @@ export default function HomeScreen({ navigation }) {
               </View>
 
               <View style={styles.recCardFooterRow}>
-                <Text style={[styles.recPriceBadge, { color: isDark ? '#38BDF8' : '#0369A1' }]}>Included in Tier</Text>
+                <Text style={[styles.recPriceBadge, { color: isDark ? '#2B8FCC' : '#0369A1' }]}>Included in Tier</Text>
                 <TouchableOpacity
-                  style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#38BDF8' : '#0F172A' }]}
+                  style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#2B8FCC' : '#072036' }]}
                   onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
                 >
                   <Text style={styles.recDetailsBtnText}>See details</Text>
@@ -867,7 +882,7 @@ export default function HomeScreen({ navigation }) {
               style={[
                 styles.recCard,
                 {
-                  backgroundColor: isDark ? '#1E293B' : '#F3E8FF',
+                  backgroundColor: isDark ? '#0E3555' : '#F3E8FF',
                 },
               ]}
             >
@@ -892,7 +907,7 @@ export default function HomeScreen({ navigation }) {
               <View style={styles.recCardFooterRow}>
                 <Text style={[styles.recPriceBadge, { color: isDark ? '#C084FC' : '#6B21A8' }]}>⭐ 4.9 (1.3k reviews)</Text>
                 <TouchableOpacity
-                  style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#A855F7' : '#0F172A' }]}
+                  style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#A855F7' : '#072036' }]}
                   onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
                 >
                   <Text style={styles.recDetailsBtnText}>See details</Text>
@@ -909,18 +924,18 @@ export default function HomeScreen({ navigation }) {
             style={[
               styles.journeyCardContainer,
               {
-                backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                backgroundColor: isDark ? '#0E3555' : '#FFFFFF',
               },
             ]}
           >
             <View style={styles.journeyTopRow}>
               {/* Left: Progress score ring */}
-              <View style={[styles.ringContainer, { borderColor: isDark ? 'rgba(59,130,246,0.2)' : '#EFF6FF' }]}>
-                <Text style={[styles.ringPctText, { color: '#2563EB' }]}>{completedCount * 25}%</Text>
+              <View style={[styles.ringContainer, { borderColor: isDark ? 'rgba(20,120,184,0.2)' : '#EAF7FD' }]}>
+                <Text style={[styles.ringPctText, { color: '#045C9A' }]}>{completedCount * 25}%</Text>
               </View>
 
               <View style={styles.journeyTextWrap}>
-                <Text style={[styles.journeyMainHeading, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>
+                <Text style={[styles.journeyMainHeading, { color: isDark ? '#FFFFFF' : '#072036' }]}>
                   Assessment Journey
                 </Text>
                 <Text style={[styles.journeySubHeading, { color: isDark ? '#94A3B8' : '#64748B' }]}>
@@ -946,11 +961,11 @@ export default function HomeScreen({ navigation }) {
                       style={[
                         styles.nodeCircle,
                         {
-                          backgroundColor: isDark ? '#0F172A' : '#F8FAFC',
+                          backgroundColor: isDark ? '#072036' : '#EAF7FD',
                           borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#CBD5E1',
                         },
                         isDone && { backgroundColor: '#10B981', borderColor: '#10B981' },
-                        isCurrent && { borderColor: '#2563EB', borderWidth: 2.5 },
+                        isCurrent && { borderColor: '#045C9A', borderWidth: 2.5 },
                       ]}
                     >
                       {isDone ? (
@@ -958,14 +973,14 @@ export default function HomeScreen({ navigation }) {
                       ) : !isDone && !isCurrent ? (
                         <Feather name="lock" size={9} color={isDark ? '#64748B' : '#94A3B8'} />
                       ) : (
-                        <Text style={[styles.nodeNumText, { color: '#2563EB' }]}>{idx + 1}</Text>
+                        <Text style={[styles.nodeNumText, { color: '#045C9A' }]}>{idx + 1}</Text>
                       )}
                     </View>
                     <Text
                       style={[
                         styles.nodeLabelText,
                         {
-                          color: isCurrent || isDone ? (isDark ? '#FFFFFF' : '#0F172A') : (isDark ? '#64748B' : '#94A3B8'),
+                          color: isCurrent || isDone ? (isDark ? '#FFFFFF' : '#072036') : (isDark ? '#64748B' : '#94A3B8'),
                           fontWeight: isCurrent || isDone ? '800' : '600',
                         },
                       ]}
@@ -979,7 +994,7 @@ export default function HomeScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={[styles.journeyCtaButton, { backgroundColor: '#2563EB' }]}
+              style={[styles.journeyCtaButton, { backgroundColor: '#045C9A' }]}
               onPress={() => navigation.navigate('Assessments')}
             >
               <Text style={styles.journeyCtaText}>Continue Assessment Stage</Text>
@@ -990,7 +1005,7 @@ export default function HomeScreen({ navigation }) {
 
         {/* ── Explore Modules Category Filters & 2-Column Grid ── */}
         <AnimatedSection delay={360}>
-          <Text style={[styles.sectionTitle, { color: isDark ? '#FFFFFF' : '#0F172A' }, styles.gridSectionHeader]}>
+          <Text style={[styles.sectionTitle, { color: isDark ? '#FFFFFF' : '#072036' }, styles.gridSectionHeader]}>
             Explore Modules
           </Text>
 
@@ -1006,15 +1021,15 @@ export default function HomeScreen({ navigation }) {
                     styles.chipPill,
                     active
                       ? {
-                          backgroundColor: '#2563EB',
-                          shadowColor: '#2563EB',
+                          backgroundColor: '#045C9A',
+                          shadowColor: '#045C9A',
                           shadowOffset: { width: 0, height: 4 },
                           shadowOpacity: 0.2,
                           shadowRadius: 8,
                           elevation: 3,
                         }
                       : {
-                          backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                          backgroundColor: isDark ? '#0E3555' : '#DDEFF8',
                           borderWidth: 0,
                         },
                   ]}
@@ -1037,7 +1052,7 @@ export default function HomeScreen({ navigation }) {
                     style={[
                       styles.moduleGridCard,
                       {
-                        backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
+                        backgroundColor: isDark ? '#0E3555' : '#FFFFFF',
                       },
                     ]}
                   >
@@ -1045,11 +1060,11 @@ export default function HomeScreen({ navigation }) {
                       <View style={[styles.iconContainer, { backgroundColor: `${item.color}15` }]}>
                         <Feather name={item.icon} size={20} color={item.color} />
                       </View>
-                      <View style={[styles.arrowCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9' }]}>
+                      <View style={[styles.arrowCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#DDEFF8' }]}>
                         <Feather name="arrow-right" size={13} color={item.color} />
                       </View>
                     </View>
-                    <Text style={[styles.moduleCardTitle, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>{item.title}</Text>
+                    <Text style={[styles.moduleCardTitle, { color: isDark ? '#FFFFFF' : '#072036' }]}>{item.title}</Text>
                     <Text style={[styles.moduleCardSub, { color: isDark ? '#94A3B8' : '#64748B' }]} numberOfLines={2}>
                       {item.description}
                     </Text>
@@ -1124,7 +1139,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1478B8',
   },
   avatarRingWrap: {
     width: 42,
@@ -1189,7 +1204,7 @@ const styles = StyleSheet.create({
     padding: 18,
     position: 'relative',
     overflow: 'hidden',
-    shadowColor: '#002147',
+    shadowColor: '#072036',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -1259,7 +1274,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   minimalPctText: {
-    color: '#60A5FA',
+    color: '#6EC6EA',
     fontSize: 12.5,
     fontWeight: '900',
   },
@@ -1272,17 +1287,17 @@ const styles = StyleSheet.create({
   minimalProgressFill: {
     height: '100%',
     borderRadius: 2.5,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1478B8',
   },
   minimalCtaButton: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#045C9A',
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 8,
-    shadowColor: '#2563EB',
+    shadowColor: '#045C9A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
@@ -1325,7 +1340,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     overflow: 'hidden',
     position: 'relative',
-    backgroundColor: '#0F172A',
+    backgroundColor: '#072036',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.15,
@@ -1339,7 +1354,7 @@ const styles = StyleSheet.create({
   announcementFallback: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#002147',
+    backgroundColor: '#072036',
   },
   announcementOverlay: {
     position: 'absolute',
@@ -1360,7 +1375,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#045C9A',
     borderRadius: 10,
     paddingHorizontal: 9,
     paddingVertical: 4,
@@ -1384,7 +1399,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   announcementCtaText: {
-    color: '#60A5FA',
+    color: '#6EC6EA',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -1427,7 +1442,7 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2563EB',
+    shadowColor: '#045C9A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
@@ -1444,7 +1459,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginHorizontal: 20,
     marginBottom: 24,
-    shadowColor: '#0F172A',
+    shadowColor: '#072036',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 18,

@@ -64,6 +64,18 @@ export const firstLoginChangePassword = (tempToken, newPassword, confirmPassword
     .post('/auth/first-login-change-password', { tempToken, newPassword, confirmPassword })
     .then((r) => r.data);
 
+// ── Self-service password change ────────────────────────────────────────────
+// For an already-signed-in student changing their password voluntarily from
+// Settings — distinct from `firstLoginChangePassword` (server-forced, tempToken
+// flow, no current password known) and `resetPassword` (forgot-password OTP
+// flow). Requires the current password.
+
+/** @returns {Promise<{ success, message }>} */
+export const changePassword = (currentPassword, newPassword, confirmPassword) =>
+  apiClient
+    .post('/auth/change-password', { currentPassword, newPassword, confirmPassword })
+    .then((r) => r.data);
+
 // ── FR-AUTH-08 · Silent token renewal ───────────────────────────────────────
 // Server-side sessions last 3h (`sessionExpiresAt`); this both re-issues the JWT
 // and pushes that wall back. Requires a still-valid token.

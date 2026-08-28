@@ -4,21 +4,57 @@
  * The web hub is a purely navigational card grid — no data fetching of its
  * own, just a curated list of tool cards that route to sub-pages. This is a
  * faithful mobile port of that grid, using the exact same copy (title / meta /
- * description / CTA) for the three tools that already have a real mobile
- * destination:
+ * description / CTA) for each tool that has a real mobile destination:
  *   - My Notes           → existing `Notes` stack screen (api/notes.js)
  *   - CGPA Calculator     → new `CgpaCalculator` stack screen (api/cgpa.js)
  *   - General Dictionary  → new `Dictionary` stack screen (public dictionary APIs)
+ *   - Resume Builder       → `ResumeBuilder` stack screen (api/resumes.js)
  *
- * Resume Builder and Interview Preparation are intentionally left off this
- * grid rather than linking to screens that don't exist yet — same approach
- * the web hub already takes with its commented-out Library / To-Do cards.
+ * Interview Preparation is still intentionally left off this grid rather than
+ * linking to a screen that doesn't exist yet — same approach the web hub
+ * already takes with its commented-out Library / To-Do cards.
  */
-import React from 'react';
-import { Pressable, ScrollView, StatusBar as RNStatusBar, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable, ScrollView, StatusBar as RNStatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 const TOOLS = [
   {
@@ -47,6 +83,15 @@ const TOOLS = [
     description:
       'Calculate your CGPA effortlessly. Enter your subjects and instantly compute Slab-Based, Continuous, and Equal-Credit results.',
     cta: 'Open Calculator',
+  },
+  {
+    key: 'ResumeBuilder',
+    icon: 'file-text',
+    meta: 'ATS-FRIENDLY',
+    title: 'Resume Builder',
+    description:
+      'Build and manage multiple resume versions with your experience, education, projects, and skills.',
+    cta: 'Open Resume Builder',
   },
 ];
 
@@ -79,50 +124,46 @@ export default function ToolkitScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.subtitle, { color: themeColors.textMuted }]}>
-          Explore our curated repository of career intelligence, wellness resources, and learning tools.
-        </Text>
+        <AnimatedSection delay={0}>
+          <Text style={[styles.subtitle, { color: themeColors.textMuted }]}>
+            Explore our curated repository of career intelligence, wellness resources, and learning tools.
+          </Text>
 
-        <View style={styles.sectionLabelRow}>
-          <Feather name="tool" size={13} color={themeColors.primaryBright} />
-          <Text style={[styles.sectionLabel, { color: themeColors.primaryBright }]}>YOUR TOOLS</Text>
-          <View style={[styles.sectionRule, { backgroundColor: themeColors.border }]} />
-        </View>
+          <View style={styles.sectionLabelRow}>
+            <Feather name="tool" size={13} color={themeColors.primaryBright} />
+            <Text style={[styles.sectionLabel, { color: themeColors.primaryBright }]}>YOUR TOOLS</Text>
+            <View style={[styles.sectionRule, { backgroundColor: themeColors.border }]} />
+          </View>
+        </AnimatedSection>
 
         <View style={{ gap: 14 }}>
-          {TOOLS.map((tool) => (
-            <Pressable
-              key={tool.key}
-              onPress={() => navigation.navigate(tool.key)}
-              style={({ pressed }) => [
-                styles.card,
-                {
-                  backgroundColor: themeColors.card,
-                  borderColor: themeColors.border,
-                  opacity: pressed ? 0.9 : 1,
-                },
-              ]}
-            >
-              <View style={styles.cardTop}>
-                <View style={[styles.iconWrap, { backgroundColor: themeColors.primaryBright }]}>
-                  <Feather name={tool.icon} size={18} color="#FFFFFF" />
+          {TOOLS.map((tool, idx) => (
+            <AnimatedSection key={tool.key} delay={70 + idx * 70}>
+              <PressCard
+                onPress={() => navigation.navigate(tool.key)}
+                style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+              >
+                <View style={styles.cardTop}>
+                  <View style={[styles.iconWrap, { backgroundColor: themeColors.primaryBright }]}>
+                    <Feather name={tool.icon} size={18} color="#FFFFFF" />
+                  </View>
                 </View>
-              </View>
 
-              <Text style={[styles.meta, { color: themeColors.primaryBright }]}>{tool.meta}</Text>
-              <Text style={[styles.cardTitle, { color: themeColors.text }]}>{tool.title}</Text>
-              <Text style={[styles.cardDesc, { color: themeColors.textMuted }]}>{tool.description}</Text>
+                <Text style={[styles.meta, { color: themeColors.primaryBright }]}>{tool.meta}</Text>
+                <Text style={[styles.cardTitle, { color: themeColors.text }]}>{tool.title}</Text>
+                <Text style={[styles.cardDesc, { color: themeColors.textMuted }]}>{tool.description}</Text>
 
-              <View style={[styles.ctaDivider, { backgroundColor: themeColors.border }]} />
+                <View style={[styles.ctaDivider, { backgroundColor: themeColors.border }]} />
 
-              <View style={[styles.ctaRow, { backgroundColor: isDark ? 'rgba(59,130,246,0.1)' : themeColors.pillBg }]}>
-                <View>
-                  <Text style={[styles.ctaText, { color: themeColors.text }]}>{tool.cta}</Text>
-                  <Text style={[styles.ctaSub, { color: themeColors.textMuted }]}>Launch from your toolkit</Text>
+                <View style={[styles.ctaRow, { backgroundColor: isDark ? 'rgba(43,143,204,0.1)' : themeColors.pillBg }]}>
+                  <View>
+                    <Text style={[styles.ctaText, { color: themeColors.text }]}>{tool.cta}</Text>
+                    <Text style={[styles.ctaSub, { color: themeColors.textMuted }]}>Launch from your toolkit</Text>
+                  </View>
+                  <Feather name="arrow-right" size={16} color={themeColors.primaryBright} />
                 </View>
-                <Feather name="arrow-right" size={16} color={themeColors.primaryBright} />
-              </View>
-            </Pressable>
+              </PressCard>
+            </AnimatedSection>
           ))}
         </View>
       </ScrollView>
