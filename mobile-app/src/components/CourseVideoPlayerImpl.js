@@ -26,7 +26,7 @@
  * screen owns the API contract and this component stays a pure player.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useEvent, useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -49,9 +49,18 @@ export default function CourseVideoPlayer({
   alreadyCompleted = false,
   onProgress,
   onComplete,
-  accent = '#2563EB',
+  accent = '#045C9A',
 }) {
   const viewRef = useRef(null);
+  const fadeIn = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeIn]);
 
   const player = useVideoPlayer(source || null, (p) => {
     // Without this the `timeUpdate` event never fires — see the header note.
@@ -180,15 +189,15 @@ export default function CourseVideoPlayer({
 
   if (!source) {
     return (
-      <View style={[styles.shell, styles.centered]}>
+      <Animated.View style={[styles.shell, styles.centered, { opacity: fadeIn }]}>
         <Feather name="video-off" size={26} color="rgba(255,255,255,0.5)" />
         <Text style={styles.stateText}>No video attached to this module yet</Text>
-      </View>
+      </Animated.View>
     );
   }
 
   return (
-    <View style={styles.shell}>
+    <Animated.View style={[styles.shell, { opacity: fadeIn }]}>
       <VideoView
         ref={viewRef}
         player={player}
@@ -287,7 +296,7 @@ export default function CourseVideoPlayer({
           </View>
         </>
       )}
-    </View>
+    </Animated.View>
   );
 }
 

@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#EAF7FD",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -40,7 +40,16 @@
           "faceIDPermission": "SMAART Institute uses Face ID to unlock your session without re-entering your password."
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A0F1D",
+          "image": "./assets/smaart-logo.png",
+          "imageWidth": 260,
+          "resizeMode": "contain"
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -8,8 +8,9 @@
  * makes sense inside the drag-and-drop editor's coordinate system and is
  * deliberately NOT rendered here — no canvas, no drag, read-only goals only.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Image,
   Pressable,
   RefreshControl,
@@ -30,6 +31,27 @@ function formatDate(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return 'Unknown date';
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
 }
 
 function GoalList({ label, icon, goals, themeColors }) {
@@ -160,50 +182,58 @@ export default function VisionBoardDetailScreen({ navigation, route }) {
           </View>
         ) : (
           <View style={{ gap: 22 }}>
-            <View
-              style={[
-                styles.hero,
-                { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', borderColor: themeColors.border },
-              ]}
-            >
-              {board.collageImage ? (
-                <Image source={{ uri: board.collageImage }} style={styles.heroImg} resizeMode="cover" />
-              ) : (
-                <View style={styles.heroEmpty}>
-                  <Feather name="image" size={30} color={themeColors.iconMuted} />
-                  <Text style={[styles.heroEmptyText, { color: themeColors.iconMuted }]}>
-                    This vision board is empty
+            <AnimatedSection delay={0}>
+              <View
+                style={[
+                  styles.hero,
+                  { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#DDEFF8', borderColor: themeColors.border },
+                ]}
+              >
+                {board.collageImage ? (
+                  <Image source={{ uri: board.collageImage }} style={styles.heroImg} resizeMode="cover" />
+                ) : (
+                  <View style={styles.heroEmpty}>
+                    <Feather name="image" size={30} color={themeColors.iconMuted} />
+                    <Text style={[styles.heroEmptyText, { color: themeColors.iconMuted }]}>
+                      This vision board is empty
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </AnimatedSection>
+
+            <AnimatedSection delay={80}>
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.boardTitle, { color: themeColors.text }]}>{board.title}</Text>
+                <View style={styles.metaRow}>
+                  <Feather name="calendar" size={12} color={themeColors.iconMuted} />
+                  <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
+                    Created {formatDate(board.createdAt)}
                   </Text>
                 </View>
-              )}
-            </View>
-
-            <View style={{ gap: 8 }}>
-              <Text style={[styles.boardTitle, { color: themeColors.text }]}>{board.title}</Text>
-              <View style={styles.metaRow}>
-                <Feather name="calendar" size={12} color={themeColors.iconMuted} />
-                <Text style={[styles.metaText, { color: themeColors.textMuted }]}>
-                  Created {formatDate(board.createdAt)}
-                </Text>
+                {!!board.description && (
+                  <Text style={[styles.boardDesc, { color: themeColors.textMuted }]}>{board.description}</Text>
+                )}
               </View>
-              {!!board.description && (
-                <Text style={[styles.boardDesc, { color: themeColors.textMuted }]}>{board.description}</Text>
-              )}
-            </View>
+            </AnimatedSection>
 
-            <GoalList
-              label="Short-Term Goals"
-              icon="zap"
-              goals={Array.isArray(board.shortTermGoals) ? board.shortTermGoals : []}
-              themeColors={themeColors}
-            />
+            <AnimatedSection delay={140}>
+              <GoalList
+                label="Short-Term Goals"
+                icon="zap"
+                goals={Array.isArray(board.shortTermGoals) ? board.shortTermGoals : []}
+                themeColors={themeColors}
+              />
+            </AnimatedSection>
 
-            <GoalList
-              label="Long-Term Goals"
-              icon="flag"
-              goals={Array.isArray(board.longTermGoals) ? board.longTermGoals : []}
-              themeColors={themeColors}
-            />
+            <AnimatedSection delay={200}>
+              <GoalList
+                label="Long-Term Goals"
+                icon="flag"
+                goals={Array.isArray(board.longTermGoals) ? board.longTermGoals : []}
+                themeColors={themeColors}
+              />
+            </AnimatedSection>
           </View>
         )}
       </ScrollView>

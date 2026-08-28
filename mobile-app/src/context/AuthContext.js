@@ -49,7 +49,11 @@ export function AuthProvider({ children }) {
         const token = await storage.getItem(TOKEN_KEY);
         if (token) {
           const me = await getMe();
-          setUser(me.user || me);
+          const userData = me.user || me;
+          setUser(userData);
+          if (userData && userData.college) {
+            setCollege(userData.college);
+          }
           // Gate the restored session behind biometrics if the student opted in.
           if (enabled) setIsLocked(true);
         }
@@ -115,6 +119,9 @@ export function AuthProvider({ children }) {
   const signIn = async (token, userData) => {
     await storage.setItem(TOKEN_KEY, token);
     setUser(userData);
+    if (userData && userData.college) {
+      setCollege(userData.college);
+    }
     setIsLocked(false);
   };
 

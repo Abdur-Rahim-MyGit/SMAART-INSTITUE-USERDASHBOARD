@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import AuthStack from './AuthStack';
@@ -25,9 +25,17 @@ export default function RootNavigator() {
   const { user, isBootstrapping, isLocked, needsProfileCompletion } = useAuth();
 
   if (isBootstrapping) {
+    // Same navy background + logo as the native splash (app.json's
+    // expo-splash-screen config) and AuthStack's SplashScreen — kept static
+    // and un-animated here so hiding the native splash never flashes to an
+    // unbranded screen while the session check is still in flight.
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color={colors.navy} />
+        <Image
+          source={require('../../assets/smaart-logo.png')}
+          style={styles.loadingLogo}
+          resizeMode="contain"
+        />
       </View>
     );
   }
@@ -44,5 +52,6 @@ export default function RootNavigator() {
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.navyDarkest },
+  loadingLogo: { width: 260, height: 88 },
 });

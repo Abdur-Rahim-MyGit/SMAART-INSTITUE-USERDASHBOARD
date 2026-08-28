@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,7 +11,9 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -21,7 +23,43 @@ import { groupsAPI } from '../../api/groups';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const GROUP_ICONS = ['users', 'book-open', 'coffee', 'award', 'zap', 'hash'];
-const GROUP_COLORS = ['#3B82F6', '#10B981', '#8B5CF6', '#EC4899', '#F59E0B', '#14B8A6'];
+const GROUP_COLORS = ['#1478B8', '#10B981', '#8B5CF6', '#EC4899', '#F59E0B', '#14B8A6'];
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
@@ -51,7 +89,7 @@ export default function CommunityScreen({ navigation }) {
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupDesc, setNewGroupDesc] = useState('');
   const [newGroupIcon, setNewGroupIcon] = useState('users');
-  const [newGroupColor, setNewGroupColor] = useState('#3B82F6');
+  const [newGroupColor, setNewGroupColor] = useState('#1478B8');
   const [creatingGroup, setCreatingGroup] = useState(false);
 
   const fetchNotices = async () => {
@@ -177,6 +215,22 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
+  // Group chat has no realtime layer (web doesn't either — see IMPLEMENTATION_MAP.md,
+  // it polls every 3s rather than standing up Socket.io for this one feature).
+  // Mirrors that exact approach: refetch while the chat overlay is open.
+  useEffect(() => {
+    if (!chatModalVisible || !selectedGroup) return undefined;
+    const id = setInterval(async () => {
+      try {
+        const res = await groupsAPI.getGroup(selectedGroup._id);
+        if (res?.success) setChatMessages(res.data?.messages || []);
+      } catch {
+        // A missed poll just means the next tick catches up.
+      }
+    }, 3000);
+    return () => clearInterval(id);
+  }, [chatModalVisible, selectedGroup]);
+
   // Filter Notices
   const filteredNotices = useMemo(() => {
     return announcements.filter((ann) => {
@@ -195,35 +249,48 @@ export default function CommunityScreen({ navigation }) {
   }, [announcements, roleFilter, searchQuery]);
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.bg }]} edges={['top']}>
       {/* Aurora mesh background */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <View style={[styles.auroraBlob, { backgroundColor: '#8B5CF6', top: -100, left: -60, width: 280, height: 280, borderRadius: 140, opacity: theme === 'dark' ? 0.12 : 0.05 }]} />
         <View style={[styles.auroraBlob, { backgroundColor: '#EC4899', top: 320, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.08 : 0.04 }]} />
       </View>
 
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: themeColors.text }]}>University Hub</Text>
-        <Text style={[styles.headerSubtitle, { color: themeColors.textMuted }]}>
-          Stay updated with college bulletins and participate in student groups.
-        </Text>
-      </View>
+      <AnimatedSection delay={0}>
+        <View style={styles.header}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.headerTitle, { color: themeColors.text }]}>University Hub</Text>
+            <Text style={[styles.headerSubtitle, { color: themeColors.textMuted }]}>
+              Stay updated with college bulletins and participate in student groups.
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => navigation.navigate('VisionBoard')}
+            style={[styles.visionBoardBtn, { backgroundColor: theme === 'dark' ? 'rgba(139,92,246,0.16)' : 'rgba(139,92,246,0.1)' }]}
+          >
+            <Feather name="eye" size={14} color="#8B5CF6" />
+            <Text style={styles.visionBoardBtnText}>Vision Board</Text>
+          </Pressable>
+        </View>
+      </AnimatedSection>
 
       {/* Segment Tab Selector */}
-      <View style={[styles.selectorBar, { backgroundColor: theme === 'dark' ? '#1E293B' : '#EFF6FF' }]}>
-        <TouchableOpacity
-          style={[styles.selectorBtn, activeTab === 'notices' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
-          onPress={() => setActiveTab('notices')}
-        >
-          <Text style={[styles.selectorText, { color: activeTab === 'notices' ? '#FFFFFF' : themeColors.textMuted }]}>Notice Board</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.selectorBtn, activeTab === 'groups' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
-          onPress={() => setActiveTab('groups')}
-        >
-          <Text style={[styles.selectorText, { color: activeTab === 'groups' ? '#FFFFFF' : themeColors.textMuted }]}>Study Groups</Text>
-        </TouchableOpacity>
-      </View>
+      <AnimatedSection delay={60}>
+        <View style={[styles.selectorBar, { backgroundColor: theme === 'dark' ? '#0E3555' : '#EAF7FD' }]}>
+          <TouchableOpacity
+            style={[styles.selectorBtn, activeTab === 'notices' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+            onPress={() => setActiveTab('notices')}
+          >
+            <Text style={[styles.selectorText, { color: activeTab === 'notices' ? '#FFFFFF' : themeColors.textMuted }]}>Notice Board</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.selectorBtn, activeTab === 'groups' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+            onPress={() => setActiveTab('groups')}
+          >
+            <Text style={[styles.selectorText, { color: activeTab === 'groups' ? '#FFFFFF' : themeColors.textMuted }]}>Study Groups</Text>
+          </TouchableOpacity>
+        </View>
+      </AnimatedSection>
 
       {loading ? (
         <View style={styles.loaderContainer}>
@@ -233,6 +300,7 @@ export default function CommunityScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           {/* NOTICE BOARD TAB */}
           {activeTab === 'notices' && (
+            <AnimatedSection delay={80}>
             <View style={styles.tabContent}>
               {/* Search notices */}
               <View style={[styles.searchBar, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
@@ -286,7 +354,7 @@ export default function CommunityScreen({ navigation }) {
                   return (
                     <View key={ann._id} style={[styles.noticeCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                       <View style={styles.noticeHeader}>
-                        <View style={[styles.noticeIconWrap, { backgroundColor: ann.isPinned ? '#FEF3C7' : 'rgba(37, 99, 235, 0.08)' }]}>
+                        <View style={[styles.noticeIconWrap, { backgroundColor: ann.isPinned ? '#FEF3C7' : 'rgba(4, 92, 154, 0.08)' }]}>
                           <Feather name={ann.isPinned ? 'pin' : 'volume-2'} size={15} color={ann.isPinned ? '#D97706' : themeColors.primaryBright} />
                         </View>
                         <View style={styles.noticeMeta}>
@@ -330,10 +398,12 @@ export default function CommunityScreen({ navigation }) {
                 })
               )}
             </View>
+            </AnimatedSection>
           )}
 
           {/* STUDY GROUPS TAB */}
           {activeTab === 'groups' && (
+            <AnimatedSection delay={80}>
             <View style={styles.tabContent}>
               <View style={styles.groupsHeaderRow}>
                 <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Collaborate with Peers</Text>
@@ -355,11 +425,11 @@ export default function CommunityScreen({ navigation }) {
                 </View>
               ) : (
                 groups.map((group) => {
-                  const grpColor = group.color || '#3B82F6';
+                  const grpColor = group.color || '#1478B8';
                   const grpIcon = group.icon && GROUP_ICONS.includes(group.icon) ? group.icon : 'users';
 
                   return (
-                    <Pressable
+                    <PressCard
                       key={group._id}
                       style={[styles.noticeCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
                       onPress={() => handleOpenGroupChat(group)}
@@ -379,11 +449,12 @@ export default function CommunityScreen({ navigation }) {
                       <Text style={[styles.noticeDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
                         {group.description || 'No description provided.'}
                       </Text>
-                    </Pressable>
+                    </PressCard>
                   );
                 })
               )}
             </View>
+            </AnimatedSection>
           )}
         </ScrollView>
       )}
@@ -541,7 +612,7 @@ export default function CommunityScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -554,9 +625,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
     paddingHorizontal: 20,
     marginBottom: 16,
   },
+  visionBoardBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 2,
+  },
+  visionBoardBtnText: { fontSize: 11.5, fontWeight: '800', color: '#8B5CF6' },
   headerTitle: {
     fontSize: 24,
     fontWeight: '800',

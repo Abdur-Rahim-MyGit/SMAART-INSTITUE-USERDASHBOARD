@@ -13,7 +13,15 @@
  * takes a `capturePhoto` callback and loops it, mirroring the web version's
  * frame-sampling loop but with discrete captures instead of a video stream.
  */
-import { InferenceSession, Tensor } from 'onnxruntime-react-native';
+let InferenceSession = null;
+let Tensor = null;
+try {
+  const ort = require('onnxruntime-react-native');
+  InferenceSession = ort.InferenceSession;
+  Tensor = ort.Tensor;
+} catch (e) {
+  console.warn('onnxruntime-react-native is not available in this environment:', e.message);
+}
 import { Platform } from 'react-native';
 import { ensureAllModelsDownloaded } from './modelDownloader';
 import { decodePhoto, photoToDetectorTensor, alignFaceAsArcFaceTensor, photoToQualityBuffer } from './skiaImage';
@@ -51,6 +59,9 @@ let initializing = null;
  * depend on which EP wins — only speed does — so this fallback is safe.
  */
 async function createSession(modelPath) {
+  if (!InferenceSession) {
+    throw new Error('ONNX InferenceSession is not available (native onnxruntime-react-native module missing).');
+  }
   const accelerated = Platform.select({ ios: ['coreml'], android: ['nnapi'], default: null });
   if (accelerated) {
     try {
@@ -93,6 +104,9 @@ export const isReady = () => initialized;
  */
 export async function detectAndEmbed(fileUri) {
   if (!initialized) throw new Error('[OnnxFacePipeline] Not initialized — call initPipeline() first.');
+  if (!Tensor) {
+    throw new Error('ONNX Tensor is not available in this environment.');
+  }
 
   const image = await decodePhoto(fileUri);
   const origWidth = image.width();

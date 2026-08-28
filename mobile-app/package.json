@@ -15,6 +15,7 @@
     "expo-file-system": "~57.0.1",
     "expo-local-authentication": "~57.0.2",
     "expo-secure-store": "~57.0.1",
+    "expo-splash-screen": "~57.0.8",
     "expo-status-bar": "~57.0.1",
     "expo-video": "~57.0.2",
     "onnxruntime-react-native": "^1.24.3",

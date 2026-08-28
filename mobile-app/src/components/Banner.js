@@ -13,7 +13,7 @@ import { colors, radius } from '../theme';
 const VARIANTS = {
   error: { bg: colors.dangerBg, fg: colors.danger, icon: 'alert-circle' },
   success: { bg: '#F0FDF4', fg: colors.success, icon: 'check-circle' },
-  info: { bg: '#EFF6FF', fg: colors.primary, icon: 'info' },
+  info: { bg: '#EAF7FD', fg: colors.primary, icon: 'info' },
   warning: { bg: '#FFFBEB', fg: '#92400E', icon: 'alert-triangle' },
 };
 

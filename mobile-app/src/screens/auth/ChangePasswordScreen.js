@@ -25,6 +25,7 @@ import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import PasswordRules from '../../components/PasswordRules';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { firstLoginChangePassword } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { formatServerPasswordError, validatePassword } from '../../utils/password';
@@ -85,6 +86,7 @@ export default function ChangePasswordScreen({ route, navigation }) {
       title={firstName ? `Welcome, ${firstName}` : 'Set your password'}
       subtitle="Your institution issued a temporary password. Choose your own to continue."
     >
+      <FadeSlideIn duration={400}>
       <View style={styles.noticeCard}>
         <Feather name="shield" size={16} color={colors.primary} />
         <Text style={styles.noticeText}>
@@ -131,6 +133,7 @@ export default function ChangePasswordScreen({ route, navigation }) {
       <Text style={styles.hint}>
         Your new password must be different from the temporary one you were given.
       </Text>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
   noticeCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EAF7FD',
     borderWidth: 1,
     borderColor: '#BFDBFE',
     borderRadius: radius.lg,

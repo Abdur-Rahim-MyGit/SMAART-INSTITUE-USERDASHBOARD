@@ -53,15 +53,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
  * accents over the dark surface muddied into near-identical greys.
  */
 const STAGE_THEME = {
-  1: { accent: '#2563EB', tintLight: '#EFF6FF', tintDark: '#111E2F', icon: 'layers', numeral: 'I' },
-  2: { accent: '#3B82F6', tintLight: '#EFF6FF', tintDark: '#13253A', icon: 'zap', numeral: 'II' },
-  3: { accent: '#1D4ED8', tintLight: '#EFF6FF', tintDark: '#1E2B3E', icon: 'award', numeral: 'III' },
+  1: { accent: '#045C9A', tintLight: '#EAF7FD', tintDark: '#111E2F', icon: 'layers', numeral: 'I' },
+  2: { accent: '#1478B8', tintLight: '#EAF7FD', tintDark: '#13253A', icon: 'zap', numeral: 'II' },
+  3: { accent: '#1D4ED8', tintLight: '#EAF7FD', tintDark: '#1E2B3E', icon: 'award', numeral: 'III' },
 };
 
 const TRACK_THEME = {
-  PIQ: { accent: '#2563EB', tintLight: '#EFF6FF', tintDark: '#111E2F', icon: 'user-check', numeral: '🧍' },
-  AIQ: { accent: '#3B82F6', tintLight: '#EFF6FF', tintDark: '#13253A', icon: 'cpu', numeral: '🤖' },
-  SQ: { accent: '#1D4ED8', tintLight: '#EFF6FF', tintDark: '#1E2B3E', icon: 'globe', numeral: '🌱' },
+  PIQ: { accent: '#045C9A', tintLight: '#EAF7FD', tintDark: '#111E2F', icon: 'user-check', numeral: '🧍' },
+  AIQ: { accent: '#1478B8', tintLight: '#EAF7FD', tintDark: '#13253A', icon: 'cpu', numeral: '🤖' },
+  SQ: { accent: '#1D4ED8', tintLight: '#EAF7FD', tintDark: '#1E2B3E', icon: 'globe', numeral: '🌱' },
 };
 
 const stageVisual = (id) => STAGE_THEME[id] || STAGE_THEME[1];
@@ -107,6 +107,35 @@ function AnimatedSection({ children, delay = 0 }) {
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
 
   return <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>{children}</Animated.View>;
+}
+
+/**
+ * Matches HomeScreen's PressCard feel, adapted for this screen's cards and
+ * rows whose style is computed from Pressable's own `pressed` state (locked/
+ * unlocked/active tints etc). The conditional style function is passed
+ * straight through unchanged and now runs against the wrapping Animated.View
+ * instead of the Pressable, so none of that logic moves — only a spring scale
+ * rides on top of it.
+ */
+function PressCard({ onPress, disabled, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      {(state) => (
+        <Animated.View
+          style={[{ transform: [{ scale }] }, typeof style === 'function' ? style(state) : style]}
+        >
+          {children}
+        </Animated.View>
+      )}
+    </Pressable>
+  );
 }
 
 export default function LearningScreen({ navigation }) {
@@ -636,7 +665,7 @@ export default function LearningScreen({ navigation }) {
       {/* Decorative Pastel Background Blobs */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <View style={[styles.auroraBlob, { backgroundColor: '#DBEAFE', top: -100, left: -60, width: 280, height: 280, borderRadius: 140, opacity: theme === 'dark' ? 0.03 : 0.15 }]} />
-        <View style={[styles.auroraBlob, { backgroundColor: '#EFF6FF', top: 320, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.02 : 0.12 }]} />
+        <View style={[styles.auroraBlob, { backgroundColor: '#EAF7FD', top: 320, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.02 : 0.12 }]} />
       </View>
 
       <RNStatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={themeColors.bg} />
@@ -782,7 +811,7 @@ export default function LearningScreen({ navigation }) {
               const unlocked = isCourseUnlockedInStage(course.courseCode, group, userProgress);
               const done = userProgress.completedCourses.includes(course.courseCode);
               return (
-                <Pressable
+                <PressCard
                   key={course._id || course.courseCode}
                   onPress={() => {
                     setSelectedStageId(group.id);
@@ -819,7 +848,7 @@ export default function LearningScreen({ navigation }) {
                     </Text>
                   </View>
                   <Feather name="chevron-right" size={16} color={themeColors.iconMuted} />
-                </Pressable>
+                </PressCard>
               );
             })}
           </View>
@@ -918,7 +947,7 @@ export default function LearningScreen({ navigation }) {
 
                 <View style={styles.journeyStatsRow}>
                   {[
-                    { icon: 'book-open', tint: '#3B82F6', value: learningStats.enrolled, label: 'Enrolled' },
+                    { icon: 'book-open', tint: '#1478B8', value: learningStats.enrolled, label: 'Enrolled' },
                     { icon: 'clock', tint: '#F59E0B', value: learningStats.active, label: 'In Progress' },
                     { icon: 'check-circle', tint: '#10B981', value: learningStats.completed, label: 'Completed' },
                   ].map((s, idx) => (
@@ -1048,7 +1077,7 @@ export default function LearningScreen({ navigation }) {
                 const isLast = idx === arr.length - 1;
 
                 return (
-                  <Pressable
+                  <PressCard
                     key={node.id}
                     onPress={() => handleStageSelect(node)}
                     style={({ pressed }) => [
@@ -1066,7 +1095,7 @@ export default function LearningScreen({ navigation }) {
                             elevation: 4,
                           }
                         : {
-                            backgroundColor: isDark ? '#121824' : '#F8FAFC',
+                            backgroundColor: isDark ? '#121824' : '#EAF7FD',
                             borderColor: themeColors.border,
                             borderLeftColor: themeColors.border,
                             borderLeftWidth: 4.5,
@@ -1173,7 +1202,7 @@ export default function LearningScreen({ navigation }) {
                           styles.stageCta,
                           unlocked
                             ? { backgroundColor: vis.accent }
-                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#F1F5F9' },
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#DDEFF8' },
                         ]}
                       >
                         <Text style={[styles.stageCtaText, { color: unlocked ? '#FFFFFF' : mutedText }]}>
@@ -1187,7 +1216,7 @@ export default function LearningScreen({ navigation }) {
                         />
                       </View>
                     </View>
-                  </Pressable>
+                  </PressCard>
                 );
               })}
             </View>
@@ -1195,6 +1224,7 @@ export default function LearningScreen({ navigation }) {
         ) : (
           /* STAGE / DETAIL TIMELINE VIEW */
           <View style={styles.detailContainer}>
+            <AnimatedSection delay={60}>
             {/* Back Button */}
             <TouchableOpacity style={styles.backBtn} onPress={() => setSelectedStageId(null)}>
               <Feather name="arrow-left" size={16} color={themeColors.text} />
@@ -1287,7 +1317,9 @@ export default function LearningScreen({ navigation }) {
                 </View>
               );
             })()}
+            </AnimatedSection>
 
+            <AnimatedSection delay={120}>
             {/* ── Course list — a continuation of the same rail used on the
                 overview, carrying this stage's accent so Capacity, Capability
                 and Leadership stay visually distinct all the way down. Each row
@@ -1322,7 +1354,7 @@ export default function LearningScreen({ navigation }) {
                           : { label: 'Not started', color: themeColors.textMuted, icon: 'circle' };
 
                     return (
-                      <Pressable
+                      <PressCard
                         key={course._id || course.id || idx}
                         onPress={() => handleCoursePress(course, selectedStage)}
                         style={({ pressed }) => [
@@ -1345,7 +1377,7 @@ export default function LearningScreen({ navigation }) {
                                   borderWidth: 1,
                                 }
                               : {
-                                  backgroundColor: isDark ? '#121824' : '#F8FAFC',
+                                  backgroundColor: isDark ? '#121824' : '#EAF7FD',
                                   borderColor: themeColors.border,
                                   borderWidth: 1,
                                   opacity: 0.6,
@@ -1422,16 +1454,18 @@ export default function LearningScreen({ navigation }) {
                             />
                           </View>
                         </View>
-                      </Pressable>
+                      </PressCard>
                     );
                   })}
                 </View>
               );
             })()}
+            </AnimatedSection>
 
             {/* Stage Gate Assessment */}
             {selectedStage.assessmentGate && (
-              <View style={[styles.assessmentGateBox, { 
+              <AnimatedSection delay={180}>
+              <View style={[styles.assessmentGateBox, {
                 backgroundColor: themeColors.card, 
                 borderColor: themeColors.border,
                 borderLeftWidth: 5,
@@ -1472,6 +1506,7 @@ export default function LearningScreen({ navigation }) {
                   </TouchableOpacity>
                 )}
               </View>
+              </AnimatedSection>
             )}
           </View>
         )}
@@ -1782,7 +1817,7 @@ export default function LearningScreen({ navigation }) {
                     const done = saved?.videoCompleted || saved?.testCompleted;
                     const active = idx === activeStepIdx;
                     return (
-                      <Pressable
+                      <PressCard
                         key={item.stepId}
                         onPress={() => setActiveStepIdx(idx)}
                         style={({ pressed }) => [
@@ -1839,7 +1874,7 @@ export default function LearningScreen({ navigation }) {
                           color={active ? stageAccent : themeColors.textMuted}
                           style={{ marginLeft: 'auto' }}
                         />
-                      </Pressable>
+                      </PressCard>
                     );
                   })}
                 </View>

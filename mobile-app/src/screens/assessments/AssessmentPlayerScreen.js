@@ -44,6 +44,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { assessmentApi } from '../../api/assessments';
 import { getStageConfig, STAGE_ACCENT } from '../../data/assessmentStages';
+import { useProctoringSession } from '../../facepipeline/useProctoringSession';
+import ProctoringGate from './ProctoringGate';
 
 /** Web blocks Next for this long on each question. Integrity rule, not UI. */
 const MIN_QUESTION_DWELL_MS = 5000;
@@ -59,7 +61,7 @@ function formatClock(totalSeconds) {
 export default function AssessmentPlayerScreen({ route, navigation }) {
   const stageKey = route?.params?.stage || 'T1';
   const config = getStageConfig(stageKey);
-  const accent = STAGE_ACCENT[stageKey] || '#2563EB';
+  const accent = STAGE_ACCENT[stageKey] || '#045C9A';
 
   const { user } = useAuth();
   const { colors: themeColors, theme } = useTheme();
@@ -70,6 +72,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   const [error, setError] = useState(null);
 
   const [resultId, setResultId] = useState(null);
+  const [assessmentId, setAssessmentId] = useState(null);
   const [assessmentToken, setAssessmentToken] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -87,6 +90,22 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   const [dwellElapsed, setDwellElapsed] = useState(0);
   const warnedRef = useRef(false);
   const submitRef = useRef(null);
+  const heldSubmitRef = useRef(false);
+
+  // Answers whose saveAnswer() call failed — keyed by questionId so a later
+  // successful write for the same question simply clears the earlier one.
+  // Retried on an interval and, non-negotiably, drained before every submit —
+  // this is what actually makes "one dropped write is not fatal" true; before
+  // this it was a comment, not a mechanism (submitAssessment never resends
+  // answers, it only scores whatever the server already has on file).
+  const pendingRef = useRef(new Map());
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // Proctoring: identity gate before the first question, then heartbeat +
+  // app-backgrounding detection for the rest of the attempt. See
+  // facepipeline/useProctoringSession.js for exactly what this does and does
+  // not cover yet.
+  const proctoring = useProctoringSession({ resultId, assessmentId });
 
   const current = questions[index];
   const answeredCount = Object.keys(answers).length;
@@ -113,6 +132,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
         const data = startRes.data;
         setResultId(data.resultId);
+        setAssessmentId(assessmentRes.data._id);
         setAssessmentToken(data.assessmentToken);
 
         // Server order wins, then truncate to this stage's question count —
@@ -162,6 +182,36 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     };
   }, [config.code, config.durationMinutes, config.questionLimit, config.title, navigation]);
 
+  // Retries every locally-queued failed write. Returns the number still
+  // pending after the attempt (0 means fully caught up).
+  const flushPending = useCallback(async () => {
+    if (!resultId || pendingRef.current.size === 0) return 0;
+
+    const entries = Array.from(pendingRef.current.entries());
+    await Promise.all(
+      entries.map(async ([qid, answer]) => {
+        try {
+          await assessmentApi.saveAnswer(resultId, qid, answer.selectedValue, answer.questionText, assessmentToken);
+          pendingRef.current.delete(qid);
+        } catch {
+          // Still unreachable — stays queued for the next flush.
+        }
+      })
+    );
+    setPendingCount(pendingRef.current.size);
+    return pendingRef.current.size;
+  }, [resultId, assessmentToken]);
+
+  // Retry queued writes in the background so a brief network drop resolves
+  // itself before the student ever reaches submit.
+  useEffect(() => {
+    if (loading || report || proctoring.heldInfo) return undefined;
+    const id = setInterval(() => {
+      if (pendingRef.current.size > 0) flushPending();
+    }, 8000);
+    return () => clearInterval(id);
+  }, [loading, report, proctoring.heldInfo, flushPending]);
+
   // ── Submit ──────────────────────────────────────────────────────────────
   const submit = useCallback(
     async ({ reason = 'manual' } = {}) => {
@@ -169,6 +219,21 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
       if (reason === 'manual' && !allAnswered) {
         Alert.alert('Not finished', 'Answer every question before submitting.');
         return;
+      }
+
+      // The server only ever scores what it actually received — drain every
+      // queued write first so a dropped answer doesn't silently score as blank.
+      if (pendingRef.current.size > 0) {
+        const stillPending = await flushPending();
+        if (stillPending > 0 && reason === 'manual') {
+          Alert.alert(
+            'Some answers are unsent',
+            `${stillPending} answer${stillPending === 1 ? '' : 's'} couldn't reach the server yet. Check your connection and try again in a moment.`
+          );
+          return;
+        }
+        // Timeout/violation submits can't wait on connectivity — proceed and
+        // let completeMissingAnswers fill the gaps, same as any other unanswered question.
       }
 
       setSubmitting(true);
@@ -181,6 +246,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         });
         if (res?.success) {
           setReport(res.data);
+          proctoring.complete();
         } else {
           throw new Error(res?.error || 'Submission failed.');
         }
@@ -193,25 +259,41 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
             const existing = await assessmentApi.getStageResult(userId, stageKey);
             if (existing?.success && existing?.data) {
               setReport(existing.data);
+              proctoring.complete();
               return;
             }
           } catch {
             /* fall through to the alert below */
           }
         }
-        Alert.alert('Submission failed', err?.data?.error || err?.message || 'Please try again.');
+        // A held attempt has nowhere to land a normal "submission failed"
+        // alert — the held screen already tells the student what happened.
+        if (reason !== 'violation') {
+          Alert.alert('Submission failed', err?.data?.error || err?.message || 'Please try again.');
+        }
       } finally {
         setSubmitting(false);
       }
     },
-    [resultId, assessmentToken, submitting, report, allAnswered, userId, stageKey]
+    [resultId, assessmentToken, submitting, report, allAnswered, userId, stageKey, proctoring, flushPending]
   );
 
   submitRef.current = submit;
 
+  // Held for review — the server has already decided; this only submits what
+  // was answered so far (the score itself is withheld pending admin review)
+  // and stops the clock. Never derived locally, same rule the web engine
+  // documents for its own `enterHeldState`.
+  useEffect(() => {
+    if (proctoring.heldInfo && !heldSubmitRef.current) {
+      heldSubmitRef.current = true;
+      submitRef.current?.({ reason: 'violation' });
+    }
+  }, [proctoring.heldInfo]);
+
   // ── Countdown ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (loading || report || !startedAtRef.current) return;
+    if (loading || report || proctoring.heldInfo || !startedAtRef.current) return;
 
     const tick = setInterval(() => {
       const elapsed = (Date.now() - startedAtRef.current) / 1000;
@@ -229,7 +311,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     }, 1000);
 
     return () => clearInterval(tick);
-  }, [loading, report, config.durationMinutes]);
+  }, [loading, report, proctoring.heldInfo, config.durationMinutes]);
 
   // Minimum dwell per question.
   useEffect(() => {
@@ -260,13 +342,18 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
       const qid = current._id;
 
       setAnswers((prev) => ({ ...prev, [qid]: value }));
+      const questionText = current.questionText || '';
 
       try {
         setSavingAnswer(true);
-        await assessmentApi.saveAnswer(resultId, qid, value, current.questionText || '', assessmentToken);
+        await assessmentApi.saveAnswer(resultId, qid, value, questionText, assessmentToken);
+        // A retry may have queued this question earlier — this write supersedes it.
+        if (pendingRef.current.delete(qid)) setPendingCount(pendingRef.current.size);
       } catch {
-        // Web logs and continues — the answer stays selected locally and the
-        // final submit re-sends the full set, so one dropped write is not fatal.
+        // Queued for the background retry loop and for the mandatory
+        // pre-submit flush — see flushPending().
+        pendingRef.current.set(qid, { selectedValue: value, questionText });
+        setPendingCount(pendingRef.current.size);
       } finally {
         setSavingAnswer(false);
       }
@@ -317,6 +404,35 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         </Pressable>
       </View>
     );
+  }
+
+  if (proctoring.heldInfo) {
+    const info = proctoring.heldInfo;
+    return shell(
+      <ScrollView contentContainerStyle={styles.reportScroll}>
+        <View style={[styles.reportBadge, { backgroundColor: '#F59E0B22' }]}>
+          <Feather name="shield-off" size={38} color="#F59E0B" />
+        </View>
+        <Text style={[styles.reportTitle, { color: themeColors.text }]}>Held for review</Text>
+        <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+          {info.reason}
+        </Text>
+        <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+          Your answers were saved. A support ticket has been raised and your score will be released once
+          it's reviewed.
+        </Text>
+        <Pressable
+          style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 26 }]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.primaryBtnText}>Back to assessments</Text>
+        </Pressable>
+      </ScrollView>
+    );
+  }
+
+  if (proctoring.phase !== 'monitoring' && !report) {
+    return shell(<ProctoringGate session={proctoring} accent={accent} onCancel={() => navigation.goBack()} />);
   }
 
   if (report) {
@@ -409,6 +525,11 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
         {savingAnswer && (
           <Text style={[styles.savingHint, { color: themeColors.textMuted }]}>Saving…</Text>
+        )}
+        {!savingAnswer && pendingCount > 0 && (
+          <Text style={[styles.savingHint, { color: themeColors.warning }]}>
+            {pendingCount} answer{pendingCount === 1 ? '' : 's'} unsent — retrying…
+          </Text>
         )}
       </ScrollView>
 

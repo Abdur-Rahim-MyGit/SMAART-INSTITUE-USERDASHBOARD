@@ -13,7 +13,7 @@ import { PASSWORD_RULES, passwordStrength, validatePassword } from '../utils/pas
 import { colors, radius } from '../theme';
 
 const STRENGTH_LABELS = ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'];
-const STRENGTH_COLORS = ['#E5E7EB', colors.danger, colors.gold, '#3B82F6', colors.success];
+const STRENGTH_COLORS = ['#E5E7EB', colors.danger, colors.gold, '#1478B8', colors.success];
 
 export default function PasswordRules({ password, style }) {
   const { passed } = validatePassword(password);

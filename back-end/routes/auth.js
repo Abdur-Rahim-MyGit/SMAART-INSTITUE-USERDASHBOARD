@@ -1658,6 +1658,63 @@ router.post('/first-login-change-password', async (req, res) => {
 });
 
 // Mark the one-time, constant first-login welcome video as watched.
+// ── Self-service password change (already-authenticated user) ──────────────
+// Distinct from '/first-login-change-password' (a one-time tempToken flow for
+// a server-forced change, no current password known) and '/reset-password' (a
+// forgot-password OTP flow). This one is the ordinary "I'm logged in and want
+// to change my password" path — requires the current password, and did not
+// exist anywhere in this product (web or mobile) before this route.
+router.post('/change-password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    const policyCheck = validatePasswordPolicy(newPassword);
+    if (!policyCheck.isValid) {
+      return res.status(400).json({
+        error: 'Password does not meet requirements',
+        requirements: policyCheck.errors
+      });
+    }
+
+    const Student = require('../models/Student');
+    const student = await Student.findById(req.user._id || req.user.id).select('+password');
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, student.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, student.password);
+    if (isSamePassword) {
+      return res.status(400).json({ error: 'New password must be different from your current password' });
+    }
+
+    student.password = newPassword; // hashed by the pre-save hook
+    student.passwordChangedAt = new Date();
+    await student.save();
+
+    sendPasswordChangedEmail({
+      to: student.email,
+      fullName: student.fullName,
+    }).catch(() => { });
+
+    res.json({ success: true, message: 'Password changed successfully.' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
 router.post('/mark-welcome-video-watched', protect, async (req, res) => {
   try {
     const userType = req.user.userType || req.user.role;

@@ -7,8 +7,9 @@
  * redrawing the certificate natively — one canonical verification surface,
  * and no html2canvas equivalent to maintain on mobile.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Linking,
   Pressable,
   RefreshControl,
@@ -24,6 +25,38 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import { getMyCertificates } from '../../api/certificates';
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>{children}</Animated.View>;
+}
+
+function PressScale({ onPress, style, children, hitSlop }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} hitSlop={hitSlop}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 function formatDate(value) {
   if (!value) return '';
@@ -120,9 +153,9 @@ export default function CertificatesScreen({ navigation }) {
           </View>
         ) : (
           <View style={{ gap: 14 }}>
-            {certs.map((c) => (
+            {certs.map((c, idx) => (
+              <AnimatedSection key={c.certificateId} delay={Math.min(idx * 60, 300)}>
               <View
-                key={c.certificateId}
                 style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
               >
                 <View style={styles.cardTop}>
@@ -167,7 +200,7 @@ export default function CertificatesScreen({ navigation }) {
                   </Text>
 
                   <View style={styles.actions}>
-                    <Pressable
+                    <PressScale
                       hitSlop={8}
                       onPress={() =>
                         Share.share({
@@ -177,18 +210,19 @@ export default function CertificatesScreen({ navigation }) {
                       style={[styles.iconBtn, { borderColor: themeColors.border }]}
                     >
                       <Feather name="share-2" size={14} color={themeColors.text} />
-                    </Pressable>
+                    </PressScale>
 
-                    <Pressable
+                    <PressScale
                       onPress={() => c.verificationUrl && Linking.openURL(c.verificationUrl).catch(() => {})}
                       style={[styles.verifyBtn, { backgroundColor: themeColors.primaryBright }]}
                     >
                       <Text style={styles.verifyText}>Verify</Text>
                       <Feather name="external-link" size={12} color="#FFFFFF" />
-                    </Pressable>
+                    </PressScale>
                   </View>
                 </View>
               </View>
+              </AnimatedSection>
             ))}
           </View>
         )}

@@ -7,8 +7,9 @@
  * canvas layout (slotImages/textOverlays/assetOverlays) is intentionally out of
  * scope for mobile; see VisionBoardCreateScreen/VisionBoardDetailScreen.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Image,
   Pressable,
   RefreshControl,
@@ -30,6 +31,42 @@ function formatDate(value) {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, disabled, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
 }
 
 export default function VisionBoardScreen({ navigation }) {
@@ -118,7 +155,7 @@ export default function VisionBoardScreen({ navigation }) {
           />
         }
       >
-        <Pressable
+        <PressCard
           onPress={goCreate}
           disabled={!canCreateMore}
           style={[
@@ -134,7 +171,7 @@ export default function VisionBoardScreen({ navigation }) {
           <Text style={[styles.newBtnText, { color: canCreateMore ? '#FFFFFF' : themeColors.textMuted }]}>
             {canCreateMore ? 'New Vision Board' : `Limit reached (${maxAllowed} max)`}
           </Text>
-        </Pressable>
+        </PressCard>
 
         {loading ? (
           <View style={{ gap: 14, marginTop: 16 }}>
@@ -164,48 +201,49 @@ export default function VisionBoardScreen({ navigation }) {
           </View>
         ) : (
           <View style={{ gap: 14, marginTop: 16 }}>
-            {boards.map((board) => {
+            {boards.map((board, index) => {
               const goalCount =
                 (board.shortTermGoals?.length || 0) + (board.longTermGoals?.length || 0);
               return (
-                <Pressable
-                  key={board._id}
-                  onPress={() => navigation.navigate('VisionBoardDetail', { id: board._id })}
-                  style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
-                >
-                  <View style={[styles.cover, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }]}>
-                    {board.collageImage ? (
-                      <Image source={{ uri: board.collageImage }} style={styles.coverImg} resizeMode="cover" />
-                    ) : (
-                      <Feather name="image" size={34} color={themeColors.iconMuted} />
-                    )}
-                  </View>
-
-                  <View style={styles.cardBody}>
-                    <View style={styles.cardRow}>
-                      <Text style={[styles.cardTitle, { color: themeColors.text }]} numberOfLines={1}>
-                        {board.title || 'Untitled Vision Board'}
-                      </Text>
-                      {goalCount > 0 && (
-                        <View style={[styles.goalPill, { backgroundColor: themeColors.pillBg }]}>
-                          <Text style={[styles.goalPillText, { color: themeColors.primaryBright }]}>
-                            {goalCount} goal{goalCount === 1 ? '' : 's'}
-                          </Text>
-                        </View>
+                <AnimatedSection key={board._id} delay={index * 60}>
+                  <PressCard
+                    onPress={() => navigation.navigate('VisionBoardDetail', { id: board._id })}
+                    style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                  >
+                    <View style={[styles.cover, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#DDEFF8' }]}>
+                      {board.collageImage ? (
+                        <Image source={{ uri: board.collageImage }} style={styles.coverImg} resizeMode="cover" />
+                      ) : (
+                        <Feather name="image" size={34} color={themeColors.iconMuted} />
                       )}
                     </View>
 
-                    {!!board.description && (
-                      <Text style={[styles.cardDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
-                        {board.description}
-                      </Text>
-                    )}
+                    <View style={styles.cardBody}>
+                      <View style={styles.cardRow}>
+                        <Text style={[styles.cardTitle, { color: themeColors.text }]} numberOfLines={1}>
+                          {board.title || 'Untitled Vision Board'}
+                        </Text>
+                        {goalCount > 0 && (
+                          <View style={[styles.goalPill, { backgroundColor: themeColors.pillBg }]}>
+                            <Text style={[styles.goalPillText, { color: themeColors.primaryBright }]}>
+                              {goalCount} goal{goalCount === 1 ? '' : 's'}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
 
-                    <Text style={[styles.cardDate, { color: themeColors.iconMuted }]}>
-                      Created {formatDate(board.createdAt)}
-                    </Text>
-                  </View>
-                </Pressable>
+                      {!!board.description && (
+                        <Text style={[styles.cardDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
+                          {board.description}
+                        </Text>
+                      )}
+
+                      <Text style={[styles.cardDate, { color: themeColors.iconMuted }]}>
+                        Created {formatDate(board.createdAt)}
+                      </Text>
+                    </View>
+                  </PressCard>
+                </AnimatedSection>
               );
             })}
           </View>
