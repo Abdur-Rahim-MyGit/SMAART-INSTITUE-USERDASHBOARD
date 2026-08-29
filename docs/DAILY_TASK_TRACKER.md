@@ -10,12 +10,14 @@ in the admin panel repo**, not here:
 
 A nightly job checks this repo out alongside the admin panel and scans
 `origin/dharshh` and `origin/main` for commits by `dharsinismaart@gmail.com`,
-turning each day's work into rows in a monthly Excel sheet.
+appending each day's work to `Task_Tracker_Dharsini.xlsx`.
 
-Commits are grouped into one task row per (day, work area). Areas come from
-file paths — `front-end/`, `back-end/`, `mobile-app/`, `docs/`,
-`aws-deployment/`, `nginx/`, `loadtest/`. Generated paths (`dist/`, lockfiles,
-`node_modules/`) are excluded so they don't inflate the numbers.
+All of a day's commits — from this repo and the admin panel together — become
+one colour-banded block: a leading row with the date, project and task title,
+then one row per description bullet. File paths decide the Project Title, via
+`front-end/`, `back-end/`, `mobile-app/`, `docs/`, `aws-deployment/`, `nginx/`
+and `loadtest/`. Generated paths (`dist/`, lockfiles, `node_modules/`) are
+excluded so they don't inflate the day.
 
 ## Two things that make your rows read better
 
