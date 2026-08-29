@@ -25,6 +25,9 @@ These are counted, not estimated. Commands are in §8 so anyone can re-run them.
 | Files using haptics | **0** | every commit, every error |
 | Files honouring `useSafeAreaInsets` | **0** (29 use `SafeAreaView`) | the floating tab bar needs insets |
 | Theme choice persisted across launches | **No** — `useState` in `ThemeContext.js` | persisted |
+| Competing token sources | **2** (`theme.js` and `ThemeContext.js`), disagreeing | 1 |
+| Screens with no dark mode at all | **27** (all auth, onboarding, Settings) | 0 |
+| Component files with zero importers | **3** (`AppTextInput`, `ComingSoon`, `QuickStatsBar`) | 0 |
 
 The largest screens are `LearningScreen.js` at **3,113 lines**, `HomeScreen.js` at
 **1,768**, `CareerScreen.js` at **1,120**. A 3,000-line screen is not a styling
@@ -54,27 +57,96 @@ replace them.
 
 ## 2. The design system to build
 
-One new folder, `src/design/`, and nothing else moves on day one.
+**Correction to the first draft of this plan: this is not greenfield.** The app
+already has *two* design systems, and they disagree with each other. Phase 1 is a
+**merge**, not a new folder from nothing.
 
+### 2.1 The split, measured
+
+Of the 57 screen and component files:
+
+| Token source | Files | Covers | Dark mode |
+|---|---|---|---|
+| `src/theme.js` — `colors` / `radius` / `spacing` / `shadow` / `typography` | **27** | all 12 auth screens, onboarding, proctoring test, Settings, 4 components | **None. Light-only.** |
+| `src/context/ThemeContext.js` — `useTheme()` | **31** | Home, Learning, Career, Community, Profile, assessments, support, notifications | Yes |
+| Both, in the same file | 2 | `SettingsScreen.js`, `ComingSoon.js` | mixed |
+| Neither | 2 | the two video-player files | n/a |
+
+The two disagree on values that matter:
+
+| | `theme.js` | `ThemeContext.js` | Used in screens |
+|---|---|---|---|
+| Large radius | `radius.lg = 18` | — | `borderRadius: 16` **43 times** |
+| Muted text | `muted: #64748B` | `textMuted: #475569` | 16 vs 5 literal uses |
+| Medium spacing | `spacing.md = 16` | — | — |
+| Card shadow | offset y=12, radius 24, opacity .08 | — | most screens hand-roll their own |
+
+That is the real cause of the 90 hardcoded colours. A developer on a main-app
+screen cannot use `theme.js` (no dark palette), and `ThemeContext` offers colour
+but no radius, spacing or type scale — so they type the hex.
+
+### 2.2 The consequence nobody has reported yet
+
+**Dark mode does not work on 27 screens.** `theme.js` has no dark palette, and
+`LoginScreen.js` contains zero references to `useTheme`, `isDark` or `darkColors` —
+the same is true of every auth screen. Turn the app to dark and login, signup, OTP,
+password reset, institution select, onboarding and Settings stay white.
+
+This is a real bug, not a polish item, and Phase 1 fixes it as a side effect.
+
+### 2.3 What Phase 1 actually does
+
+1. **Promote `ThemeContext.js` to the single source.** Add `radius`, `space`,
+   `type`, `elevation` to it, and a full dark palette for the auth surfaces.
+2. **Keep `theme.js` as a thin re-export** that maps its old key names onto the new
+   tokens, so all 27 files keep working on day one and get dark mode for free. Then
+   delete it in Phase 2 as screens migrate.
+3. **Resolve the conflicts** in favour of what the screens actually do:
+   `radius.lg = 16` (43 uses beat the file's 18), `textMuted = #475569` for main
+   app, `space.md = 12`.
+4. **Persist the theme choice**, plus a `system` option.
+5. **Add only the primitives that are genuinely missing** (see 2.5).
+
+### 2.4 Persistence — correction
+
+The first draft said `AsyncStorage`. **It is not installed.** `expo-secure-store`
+is (`~57.0.1`), and it is already used for auth tokens. Use that — one existing
+dependency, no new install, no Expo SDK surface to verify against docs I cannot
+reach from this environment.
+
+```js
+const KEY = 'smaart.theme';           // 'light' | 'dark' | 'system'
+// mount:  SecureStore.getItemAsync(KEY)  -> fall back to useColorScheme()
+// toggle: SecureStore.setItemAsync(KEY, next)
 ```
-src/design/
-  tokens.js        colour, spacing, radius, type, elevation, motion
-  Text.js          <Text variant="title|section|cardTitle|body|meta|number">
-  Card.js          surface, radius 16, 1px border, soft shadow, pressable variant
-  Button.js        primary | secondary | ghost | destructive · 48px · haptic on press
-  Chip.js          filter | status | value · 999 radius · 44px hit target
-  Row.js           label + value preview + chevron — the detail-row primitive
-  Stat.js          the 4-up tile used on Home, Profile, Career
-  Progress.js      Bar and Ring, one implementation
-  Sheet.js         bottom sheet with a drag handle and keyboard avoidance
-  Banner.js        info | warning | offline | error-with-retry
-  EmptyState.js    icon + sentence + one action
-  Skeleton.js      promote the existing SkeletonBox here
-```
 
-### 2.1 Tokens — extend `ThemeContext.js`, keep the existing keys
+### 2.5 Primitives — what exists, what is new
 
-The current colour keys stay exactly as they are so no screen breaks. Add:
+`src/components/` already has 16 files. Adoption counted by importer:
+
+| Existing | Importers | Verdict |
+|---|---|---|
+| `SkeletonBox.js` | 14 | **Keep** — promote to the system as-is |
+| `Banner.js` | 8 | **Keep** — extend with offline + error-retry variants |
+| `PillButton.js` | 8 | **Merge** into `Button` as a variant |
+| `PillInput.js` | 7 | **Merge** into `Input` |
+| `AuthScreenLayout.js` | 7 | **Keep** — it is the auth screen shell |
+| `PasswordRules.js` | 3 | Keep, auth-specific |
+| `ScreenContainer.js` | 3 | **Keep and make mandatory** — this is where the 96px tab-bar clearance belongs |
+| `AppButton.js` | 2 | **Merge** into `Button`, then delete |
+| `ChipSelect.js` | 1 | **Merge** into `Chip` |
+| `QuotientBreakdown.js` | 1 | Feature component, not a primitive |
+| `SideDrawer.js` | 1 | Keep |
+| `CourseVideoPlayer(Impl).js` | — | Keep, out of scope |
+| `AppTextInput.js` | **0** | **Dead — delete** |
+| `ComingSoon.js` | **0** | **Dead — delete** |
+| `QuickStatsBar.js` | **0** | **Dead — delete** |
+
+So Phase 1 writes **six genuinely new pieces** — `Text`, `Card`, `Row`, `Stat`,
+`Progress`, `Sheet`, `EmptyState` — consolidates four pairs into `Button`, `Chip`
+and `Input`, keeps five, and deletes three dead files. Not twelve from scratch.
+
+### 2.6 Tokens — extend `ThemeContext.js`, keep every existing colour key
 
 ```js
 export const radius  = { sm: 8, md: 12, lg: 16, pill: 999 };
@@ -89,37 +161,27 @@ export const type = {
 };
 export const elevation = { card: { shadowColor: '#0F1B2E', shadowOpacity: 0.05,
   shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 } };
-export const TAB_BAR_CLEARANCE = 96; // every scroll needs this as bottom padding
+export const TAB_BAR_CLEARANCE = 96;
 ```
 
 Seven type steps replace twenty. The half-pixel sizes (8.5, 9.5, 10.5, 13.5, 14.5)
-all collapse into the nearest step — none of them was a decision, they were drift.
+collapse into the nearest step — none was a decision, they were drift.
 
-### 2.2 Two fixes to the theme itself
-
-- **Persist it.** `AsyncStorage` read on mount, write on toggle, fall back to
-  `useColorScheme()`. Three lines, and it stops the app forgetting the user.
-- **Add a `system` option** so "follow my phone" is a real choice, not the default
-  the user cannot get back to.
-
-### 2.3 The rules the system enforces
+### 2.7 The rules the system enforces
 
 1. **One primary filled button per screen.** Everything else is a row, chip or
    outlined control. If two things are filled blue, neither is primary.
-2. **Rows show values, not labels.** `Chennai, Tamil Nadu · 600042`, never
-   `City / State → Not completed`. Recognition over recall.
-3. **Quantify the gap.** `+12% profile strength`, `2 lessons to unlock Stage 2`. A
-   vague chore becomes a ninety-second decision.
-4. **Colour carries meaning only.** Status, progress, one action. Decorative
+2. **Rows show values, not labels.** `Chennai, Tamil Nadu - 600042`, never
+   `City / State -> Not completed`. Recognition over recall.
+3. **Quantify the gap.** `+12% profile strength`, `2 lessons to unlock Stage 2`.
+4. **Colour carries meaning only.** Status, progress, one action. The decorative
    gradient blobs (`#EC4899` at 5% opacity on Profile) come out.
 5. **44px minimum hit target**, measured, not eyeballed.
 6. **Loading is a skeleton, never a spinner on a blank screen.** Errors are inline
    with a retry. Offline shows cached content plus a banner.
 7. **Destructive looks destructive and confirms.**
 8. **Every interactive element gets `accessibilityRole` and `accessibilityLabel`.**
-   This is a lint rule, not a good intention.
-
----
+   A lint rule, not a good intention.
 
 ## 3. Screen-by-screen
 
@@ -175,14 +237,14 @@ Six phases. Each ships independently and leaves the app releasable.
 
 | Phase | Work | Size |
 |---|---|---|
-| **1 · Foundation** | `src/design/` tokens + 12 primitives, theme persistence, `system` theme option, Storybook-style gallery screen behind a dev flag | 3 days |
+| **1 · Foundation** | Merge the two token systems into `ThemeContext.js` (radius, space, type, elevation + a dark palette for auth), leave `theme.js` as a compatibility re-export, persist the theme via `expo-secure-store`, add a `system` option, write 7 new primitives, consolidate 4 pairs, delete 3 dead components, gallery screen behind a dev flag | 4 days |
 | **2 · Migrate P0** | Home, Learning (split into 6 files), pre-flight, player — onto the primitives. Delete the dead hexes as they are replaced | 5 days |
 | **3 · Profile rebuild** | Build the already-designed Profile screen, edit sheets, strength calculation, optimistic save with revert | 2 days |
 | **4 · Result loop** | Score hero + next-action lines on the quotient breakdown, deep links back into Learning | 1 day |
 | **5 · Accessibility & feel** | Roles and labels everywhere, dynamic-type support, haptics on commit and error, reduce-motion respect, `useSafeAreaInsets` for the floating tab bar | 3 days |
 | **6 · Guardrails** | ESLint rule banning raw hex in `screens/`, a token-drift test, a 44px hit-target check | 1 day |
 
-Fifteen working days. Phase 6 is what stops the 90 hexes coming back.
+Sixteen working days. Phase 6 is what stops the 90 hexes coming back.
 
 ---
 
@@ -206,7 +268,7 @@ A screen is migrated when all of these hold:
 - **No new navigation model.** Five tabs, floating capsule — it works, and changing
   it would relearn every student's muscle memory for nothing.
 - **No brand change.** Blue and white stay.
-- **No component library dependency.** Twelve primitives are cheaper to own than a
+- **No component library dependency.** A dozen owned primitives are cheaper than a
   library that fights Expo on upgrade.
 - **No animation framework.** The six `Animated.timing` uses are enough; motion
   should be almost invisible.
@@ -234,6 +296,10 @@ grep -roh "borderRadius: [0-9]*" screens components | sort -u | wc -l       # di
 grep -roh "fontSize: [0-9.]*"  screens components | sort -u | wc -l         # distinct sizes
 grep -rl accessibilityRole screens components | wc -l                       # a11y coverage
 wc -l screens/*/*.js components/*.js | sort -rn | head                      # screen sizes
+grep -rl "from '.*theme'" screens components | wc -l                        # on theme.js
+grep -rl useTheme screens components | wc -l                                # on ThemeContext
+for c in components/*.js; do n=$(grep -rl "components/$(basename $c .js)" \
+  screens components navigation | wc -l); echo "$n $c"; done | sort -n      # dead components
 ```
 
 Every number in §1 came from those five lines. They are also the phase-6 regression
