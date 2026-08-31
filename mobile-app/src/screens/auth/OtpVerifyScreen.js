@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Platform,
   Pressable,
   StatusBar as RNStatusBar,
@@ -13,7 +14,7 @@ import { Feather } from '@expo/vector-icons';
 import { resendLoginOtp, verifyLoginOtp } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { colors, radius, shadow } from '../../theme';
-import { FadeSlideIn } from '../../components/Motion';
+import { FadeSlideIn, PressScale, useShake } from '../../components/Motion';
 import PillInput from '../../components/PillInput';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
@@ -28,6 +29,7 @@ export default function OtpVerifyScreen({ route, navigation }) {
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [forceLogoutPrompt, setForceLogoutPrompt] = useState(false);
+  const shakeStyle = useShake(error);
 
   const handleVerify = async (forceLogout = false) => {
     if (!otp) {
@@ -132,17 +134,19 @@ export default function OtpVerifyScreen({ route, navigation }) {
 
           {/* Error Banner */}
           {error ? (
-            <View style={styles.errorBanner}>
+            <Animated.View style={[styles.errorBanner, shakeStyle]}>
               <Feather name="alert-circle" size={16} color={colors.danger} />
               <Text style={styles.errorText}>{error}</Text>
-            </View>
+            </Animated.View>
           ) : null}
 
           {/* Action Buttons */}
           {forceLogoutPrompt ? (
             <>
-              <Pressable
-                style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
+              <PressScale
+                style={styles.loginBtn}
+                pressedStyle={styles.loginBtnPressed}
+                scaleTo={0.98}
                 onPress={() => handleVerify(true)}
                 disabled={loading}
               >
@@ -154,7 +158,7 @@ export default function OtpVerifyScreen({ route, navigation }) {
                     <Feather name="log-out" size={16} color="#FFFFFF" style={styles.btnIcon} />
                   </>
                 )}
-              </Pressable>
+              </PressScale>
 
               <Pressable
                 style={({ pressed }) => [styles.cancelBtn, pressed && styles.cancelBtnPressed]}
@@ -167,8 +171,10 @@ export default function OtpVerifyScreen({ route, navigation }) {
               </Pressable>
             </>
           ) : (
-            <Pressable
-              style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
+            <PressScale
+              style={styles.loginBtn}
+              pressedStyle={styles.loginBtnPressed}
+              scaleTo={0.98}
               onPress={() => handleVerify(false)}
               disabled={loading}
             >
@@ -180,7 +186,7 @@ export default function OtpVerifyScreen({ route, navigation }) {
                   <Feather name="arrow-right" size={16} color="#FFFFFF" style={styles.btnIcon} />
                 </>
               )}
-            </Pressable>
+            </PressScale>
           )}
 
           <Pressable
