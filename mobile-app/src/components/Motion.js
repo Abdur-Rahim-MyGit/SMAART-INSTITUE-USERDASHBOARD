@@ -29,6 +29,31 @@ export function FadeSlideIn({ children, delay = 0, duration = 400, distance = 16
   );
 }
 
+/**
+ * Shake feedback for form errors (wrong password/OTP, validation failures).
+ * Re-triggers whenever `trigger` changes to a new truthy value — pass the
+ * error message/state itself so the same message re-shakes on a repeat wrong
+ * attempt (e.g. via a bump counter) if the caller needs that.
+ */
+export function useShake(trigger) {
+  const shake = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!trigger) return;
+    shake.setValue(0);
+    Animated.sequence([
+      Animated.timing(shake, { toValue: 1, duration: 60, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: -1, duration: 60, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 1, duration: 60, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: -0.6, duration: 60, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 0, duration: 60, useNativeDriver: true }),
+    ]).start();
+  }, [trigger]);
+
+  const translateX = shake.interpolate({ inputRange: [-1, 1], outputRange: [-8, 8] });
+  return { transform: [{ translateX }] };
+}
+
 export function PressScale({
   onPress,
   onLongPress,

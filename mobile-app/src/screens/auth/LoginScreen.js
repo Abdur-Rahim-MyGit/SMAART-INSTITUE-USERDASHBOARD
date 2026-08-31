@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Linking,
   Platform,
   Pressable,
@@ -15,7 +16,7 @@ import { Feather } from '@expo/vector-icons';
 import { login } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { colors, radius, shadow } from '../../theme';
-import { FadeSlideIn } from '../../components/Motion';
+import { FadeSlideIn, PressScale, useShake } from '../../components/Motion';
 import PillInput from '../../components/PillInput';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
@@ -25,6 +26,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const shakeStyle = useShake(error);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -108,15 +110,17 @@ export default function LoginScreen({ navigation }) {
 
           {/* Error Banner */}
           {error ? (
-            <View style={styles.errorBanner}>
+            <Animated.View style={[styles.errorBanner, shakeStyle]}>
               <Feather name="alert-circle" size={16} color={colors.danger} />
               <Text style={styles.errorText}>{error}</Text>
-            </View>
+            </Animated.View>
           ) : null}
 
           {/* Primary Login Button */}
-          <Pressable
-            style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
+          <PressScale
+            style={styles.loginBtn}
+            pressedStyle={styles.loginBtnPressed}
+            scaleTo={0.98}
             onPress={handleLogin}
             disabled={loading}
           >
@@ -125,7 +129,7 @@ export default function LoginScreen({ navigation }) {
             ) : (
               <Text style={styles.loginBtnText}>Login</Text>
             )}
-          </Pressable>
+          </PressScale>
 
           <Text style={styles.footerNote}>
             Trouble signing in? Contact your institution administrator.
