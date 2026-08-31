@@ -41,6 +41,8 @@ import { getEnrollments } from '../../api/courses';
 import { getStageStatus } from '../../api/assessments';
 import { getCollegeBanners } from '../../api/colleges';
 import { notificationsAPI } from '../../api/notifications';
+import { getStreakStatus } from '../../api/streaks';
+import { getBadgeStats } from '../../api/badges';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_ROTATE_MS = 6000;
@@ -256,6 +258,9 @@ export default function HomeScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
+  // Real quick-stats data (previously hardcoded placeholders).
+  const [streakDays, setStreakDays] = useState(0);
+  const [badgeStats, setBadgeStats] = useState(null);
 
   // Carousel & Scroll animations
   const carouselRef = useRef(null);
@@ -314,10 +319,12 @@ export default function HomeScreen({ navigation }) {
   const collegeId = user?.college?._id || user?.college?.id || user?.college || user?.collegeId;
 
   const fetchData = useCallback(async () => {
-    const [enrollRes, stageRes, bannerRes] = await Promise.allSettled([
+    const [enrollRes, stageRes, bannerRes, streakRes, badgeRes] = await Promise.allSettled([
       userId ? getEnrollments(userId) : Promise.resolve(null),
       userId ? getStageStatus(userId) : Promise.resolve(null),
       collegeId ? getCollegeBanners(collegeId) : Promise.resolve(null),
+      getStreakStatus(),
+      userId ? getBadgeStats(userId) : Promise.resolve(null),
     ]);
 
     if (enrollRes.status === 'fulfilled' && enrollRes.value?.data) {
@@ -330,6 +337,12 @@ export default function HomeScreen({ navigation }) {
     }
     if (bannerRes.status === 'fulfilled' && bannerRes.value?.data) {
       setBanners(bannerRes.value.data);
+    }
+    if (streakRes.status === 'fulfilled' && streakRes.value?.data) {
+      setStreakDays(streakRes.value.data.currentStreak ?? 0);
+    }
+    if (badgeRes.status === 'fulfilled' && badgeRes.value?.data) {
+      setBadgeStats(badgeRes.value.data);
     }
   }, [userId, collegeId]);
 
@@ -787,7 +800,7 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="fire" size={22} color="#F97316" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                {user?.streak || 7} Days
+                {streakDays} Day{streakDays === 1 ? '' : 's'}
               </Text>
               <Text style={[styles.statLabel, { color: colors.textMuted }]}>Daily Streak</Text>
             </View>
@@ -800,9 +813,9 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="star-circle" size={22} color="#EAB308" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                Level {user?.level || 2}
+                {badgeStats?.totalXP ?? 0} XP
               </Text>
-              <Text style={[styles.statLabel, { color: colors.textMuted }]}>XP Rank</Text>
+              <Text style={[styles.statLabel, { color: colors.textMuted }]}>Experience</Text>
             </View>
 
             <View style={[styles.statDividerVertical, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]} />
@@ -813,7 +826,7 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="trophy" size={21} color="#6366F1" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                12 Badges
+                {badgeStats?.totalEarned ?? 0} Badge{(badgeStats?.totalEarned ?? 0) === 1 ? '' : 's'}
               </Text>
               <Text style={[styles.statLabel, { color: colors.textMuted }]}>Achievements</Text>
             </View>
@@ -831,8 +844,10 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
+          {/* Driven by the student's real enrolment + stage data (the old
+              cards here were hardcoded marketing filler). */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recommendedScroll}>
-            {/* Card 1: Biomedical & AI Sciences */}
+            {/* Card 1: continue (or start) learning */}
             <PressCard
               onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
               style={[
@@ -844,10 +859,16 @@ export default function HomeScreen({ navigation }) {
             >
               <View style={styles.recCardHeader}>
                 <View style={styles.recCardTitleWrap}>
-                  <Text style={[styles.recCardCategory, { color: isDark ? '#93C5FD' : '#0369A1' }]}>AI & SCIENCE</Text>
-                  <Text style={[styles.recCardTitle, { color: isDark ? '#FFFFFF' : '#0C4A6E' }]}>Biomedical & AI</Text>
+                  <Text style={[styles.recCardCategory, { color: isDark ? '#93C5FD' : '#0369A1' }]}>
+                    {activeEnrollment ? 'CONTINUE LEARNING' : 'GET STARTED'}
+                  </Text>
+                  <Text style={[styles.recCardTitle, { color: isDark ? '#FFFFFF' : '#0C4A6E' }]} numberOfLines={2}>
+                    {activeEnrollment?.course?.title || 'Explore the catalogue'}
+                  </Text>
                   <Text style={[styles.recCardSub, { color: isDark ? '#94A3B8' : '#0284C7' }]}>
-                    46 classes • 388 Applicants
+                    {activeEnrollment
+                      ? `${Math.round(activeEnrollment.progress || 0)}% complete`
+                      : 'Pick your first course'}
                   </Text>
                 </View>
                 <Image source={require('../../../assets/course_brain.png')} style={styles.recCardImg} resizeMode="contain" />
@@ -855,14 +876,15 @@ export default function HomeScreen({ navigation }) {
 
               <View style={styles.recPillTagsRow}>
                 <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
-                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#0369A1' }]}>Online class</Text>
+                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#0369A1' }]}>Self-paced</Text>
                 </View>
-                <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
-                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#0369A1' }]}>56 Class</Text>
-                </View>
-                <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
-                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#0369A1' }]}>+5</Text>
-                </View>
+                {enrolledCount > 0 && (
+                  <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
+                    <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#0369A1' }]}>
+                      {enrolledCount} enrolled
+                    </Text>
+                  </View>
+                )}
               </View>
 
               <View style={styles.recCardFooterRow}>
@@ -871,14 +893,16 @@ export default function HomeScreen({ navigation }) {
                   style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#2B8FCC' : '#072036' }]}
                   onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
                 >
-                  <Text style={styles.recDetailsBtnText}>See details</Text>
+                  <Text style={styles.recDetailsBtnText}>
+                    {activeEnrollment ? 'Continue' : 'Browse'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </PressCard>
 
-            {/* Card 2: Advanced Mathematics & Physics */}
+            {/* Card 2: next assessment stage */}
             <PressCard
-              onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
+              onPress={() => navigation.navigate('Assessments')}
               style={[
                 styles.recCard,
                 {
@@ -888,29 +912,35 @@ export default function HomeScreen({ navigation }) {
             >
               <View style={styles.recCardHeader}>
                 <View style={styles.recCardTitleWrap}>
-                  <Text style={[styles.recCardCategory, { color: isDark ? '#C084FC' : '#7E22CE' }]}>CORE ACADEMICS</Text>
-                  <Text style={[styles.recCardTitle, { color: isDark ? '#FFFFFF' : '#581C87' }]}>Advanced Physics</Text>
-                  <Text style={[styles.recCardSub, { color: isDark ? '#94A3B8' : '#7E22CE' }]}>41 Lessons • 6 Mentors</Text>
+                  <Text style={[styles.recCardCategory, { color: isDark ? '#C084FC' : '#7E22CE' }]}>ASSESSMENTS</Text>
+                  <Text style={[styles.recCardTitle, { color: isDark ? '#FFFFFF' : '#581C87' }]}>
+                    {pendingAssessment ? `${pendingAssessment} Test up next` : 'All stages cleared'}
+                  </Text>
+                  <Text style={[styles.recCardSub, { color: isDark ? '#94A3B8' : '#7E22CE' }]}>
+                    {completedCount} of 4 stages cleared
+                  </Text>
                 </View>
                 <Image source={require('../../../assets/home_hero.png')} style={styles.recCardImg} resizeMode="contain" />
               </View>
 
               <View style={styles.recPillTagsRow}>
                 <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
-                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#7E22CE' }]}>Live Session</Text>
+                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#7E22CE' }]}>Proctored</Text>
                 </View>
                 <View style={[styles.recPillTag, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF' }]}>
-                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#7E22CE' }]}>28 Class</Text>
+                  <Text style={[styles.recPillTagText, { color: isDark ? '#E2E8F0' : '#7E22CE' }]}>T1–T4 journey</Text>
                 </View>
               </View>
 
               <View style={styles.recCardFooterRow}>
-                <Text style={[styles.recPriceBadge, { color: isDark ? '#C084FC' : '#6B21A8' }]}>⭐ 4.9 (1.3k reviews)</Text>
+                <Text style={[styles.recPriceBadge, { color: isDark ? '#C084FC' : '#6B21A8' }]}>
+                  {pendingAssessment ? 'Ready when you are' : 'Great work! 🎉'}
+                </Text>
                 <TouchableOpacity
                   style={[styles.recDetailsBtn, { backgroundColor: isDark ? '#A855F7' : '#072036' }]}
-                  onPress={() => navigation.navigate('MainTabs', { screen: 'Learning' })}
+                  onPress={() => navigation.navigate('Assessments')}
                 >
-                  <Text style={styles.recDetailsBtnText}>See details</Text>
+                  <Text style={styles.recDetailsBtnText}>{pendingAssessment ? 'Start' : 'View results'}</Text>
                 </TouchableOpacity>
               </View>
             </PressCard>

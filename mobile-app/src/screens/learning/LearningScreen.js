@@ -31,6 +31,7 @@ import {
   getUserProgress,
   saveUserProgress,
   saveQuizProgress,
+  saveVideoProgress,
 } from '../../api/courses';
 import { getCourseNote, saveCourseNote } from '../../api/notes';
 import { resolveLearningFlow, indexProgressByStep } from '../../utils/courseFlow';
@@ -536,8 +537,9 @@ export default function LearningScreen({ navigation }) {
    * server upserts on (user, courseCode, moduleId, dayId, stepId), so matching
    * them means mobile updates the same row rather than creating a parallel one.
    *
-   * Note the sibling POST /video-progress endpoint expects `maxWatchedTime` /
-   * `isCompleted` instead; the web does not use it, so neither do we.
+   * The sibling POST /video-progress endpoint (called below on completion
+   * only) is what finds-or-creates the CourseEnrollment and awards badges —
+   * `user-progress/save` alone never touches the enrolment.
    */
   const handleVideoProgress = useCallback(
     async ({ maxWatchedTime, duration, completed }) => {
@@ -572,6 +574,25 @@ export default function LearningScreen({ navigation }) {
         // A dropped checkpoint must never interrupt playback — the next tick
         // resends the same high-water mark, so nothing is lost.
         console.warn('[Learning] video progress save failed:', err?.message);
+      }
+
+      // On completion, also write the enrolment-backed record: POST
+      // /video-progress finds-or-creates the CourseEnrollment and runs the
+      // module/course badge checks. Without this, video-only activity never
+      // moved enrolment progress — completed-course counts and Performance
+      // only updated via quiz steps or the web.
+      if (completed) {
+        saveVideoProgress({
+          courseCode,
+          moduleId: '1',
+          dayId: 1,
+          stepId: step.stepId,
+          maxWatchedTime,
+          videoDuration: duration,
+          isCompleted: true,
+        }).catch((err) => {
+          console.warn('[Learning] enrolment video-progress save failed:', err?.message);
+        });
       }
     },
     [flow, activeStepIdx, selectedCourse]
