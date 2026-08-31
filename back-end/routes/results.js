@@ -315,7 +315,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
                     assessmentToken,
-                    mcqConfig: publicMcqConfig(assessment)
+                    mcqConfig: publicMcqConfig(assessment),
+                    startedAt: existingResult.startedAt,
+                    durationMinutes,
+                    remainingSeconds
                 }
             });
         }
@@ -448,7 +451,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 questions: orderedQuestions,
                 totalQuestions: totalQuestions,
                 assessmentToken,
-                mcqConfig: publicMcqConfig(assessment)
+                mcqConfig: publicMcqConfig(assessment),
+                startedAt: result.startedAt,
+                durationMinutes,
+                remainingSeconds: durationMinutes * 60
             }
         });
     } catch (err) {

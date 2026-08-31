@@ -24,6 +24,7 @@ import {
   StatusBar as RNStatusBar,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -115,6 +116,13 @@ export default function JobDetailScreen({ navigation, route }) {
   const { job, alreadyApplied = false, onApply } = route?.params || {};
 
   const [localApplying, setLocalApplying] = useState(false);
+  // The server requires a cover letter of at least 50 words (max 6000 chars).
+  const [coverLetter, setCoverLetter] = useState('');
+  const coverLetterWords = useMemo(
+    () => (coverLetter.trim() ? coverLetter.trim().split(/\s+/).filter(Boolean).length : 0),
+    [coverLetter]
+  );
+  const coverLetterReady = coverLetterWords >= 50 && coverLetter.trim().length <= 6000;
 
   const title = job?.displayTitle || job?.title || 'Placement Role';
   const company = job?.displayCompany || job?.company || 'Hiring Partner';
@@ -173,10 +181,10 @@ export default function JobDetailScreen({ navigation, route }) {
   };
 
   const handleApplyPress = async () => {
-    if (!onApply || !job || alreadyApplied || localApplying) return;
+    if (!onApply || !job || alreadyApplied || localApplying || !coverLetterReady) return;
     setLocalApplying(true);
     try {
-      await onApply(job);
+      await onApply(job, coverLetter);
     } finally {
       setLocalApplying(false);
     }
@@ -353,18 +361,49 @@ export default function JobDetailScreen({ navigation, route }) {
           </AnimatedSection>
         )}
 
+        {/* Cover Letter */}
+        {!alreadyApplied && (
+          <AnimatedSection delay={280} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Cover Letter</Text>
+            <Text style={[styles.bodyText, { color: themeColors.textMuted, marginBottom: 10 }]}>
+              Tell the employer why you're a great fit. A minimum of 50 words is required.
+            </Text>
+            <TextInput
+              value={coverLetter}
+              onChangeText={setCoverLetter}
+              multiline
+              textAlignVertical="top"
+              placeholder="Write your cover letter here…"
+              placeholderTextColor={themeColors.textMuted}
+              maxLength={6000}
+              style={[
+                styles.coverInput,
+                { color: themeColors.text, borderColor: themeColors.border, backgroundColor: themeColors.bg },
+              ]}
+            />
+            <Text
+              style={[
+                styles.coverCounter,
+                { color: coverLetterReady ? '#16A34A' : themeColors.textMuted },
+              ]}
+            >
+              {coverLetterWords} / 50 words minimum
+            </Text>
+          </AnimatedSection>
+        )}
+
         <View style={{ height: 12 }} />
       </ScrollView>
 
       {/* Sticky Apply CTA */}
       <View style={[styles.footer, { backgroundColor: themeColors.bg, borderTopColor: themeColors.border }]}>
         <PressCard
-          disabled={alreadyApplied || localApplying}
+          disabled={alreadyApplied || localApplying || !coverLetterReady}
           onPress={handleApplyPress}
           style={[
             styles.applyBtn,
             { backgroundColor: alreadyApplied ? themeColors.border : themeColors.primaryBright },
-            (localApplying) && { opacity: 0.7 },
+            (localApplying || (!alreadyApplied && !coverLetterReady)) && { opacity: 0.7 },
           ]}
         >
           {localApplying ? (
@@ -375,7 +414,9 @@ export default function JobDetailScreen({ navigation, route }) {
               <Text style={[styles.applyBtnText, { color: themeColors.textMuted }]}>Already Applied</Text>
             </>
           ) : (
-            <Text style={styles.applyBtnText}>Apply for this Job</Text>
+            <Text style={styles.applyBtnText}>
+              {coverLetterReady ? 'Apply for this Job' : `Cover letter: ${coverLetterWords}/50 words`}
+            </Text>
           )}
         </PressCard>
       </View>
@@ -442,6 +483,17 @@ const styles = StyleSheet.create({
   eligIconWrap: { width: 26, height: 26, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   eligLabel: { fontSize: 12, fontWeight: '600', flex: 1 },
   eligValue: { fontSize: 12.5, fontWeight: '800' },
+
+  coverInput: {
+    minHeight: 140,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    padding: 12,
+    fontSize: 13,
+    fontWeight: '500',
+    lineHeight: 19,
+  },
+  coverCounter: { fontSize: 11, fontWeight: '700', marginTop: 8, textAlign: 'right' },
 
   skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   skillTag: { paddingVertical: 5, paddingHorizontal: 11, borderRadius: 9 },

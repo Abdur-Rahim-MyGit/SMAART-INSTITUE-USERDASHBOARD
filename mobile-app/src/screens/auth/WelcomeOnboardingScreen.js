@@ -331,7 +331,7 @@ const pStyles = StyleSheet.create({
 });
 
 // â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-export default function WelcomeOnboardingScreen({ navigation }) {
+export default function WelcomeOnboardingScreen({ navigation, route }) {
   const { biometricEnabled, setBiometricPreference } = useAuth();
   const { theme, toggleTheme, colors: themeColors } = useTheme();
 
@@ -366,11 +366,14 @@ export default function WelcomeOnboardingScreen({ navigation }) {
         const completed = await storage.getItem('smaart_onboarding_completed');
         const savedLang = await storage.getItem('smaart_pref_language');
         if (savedLang) setLangCode(savedLang);
-        if (completed === 'true') { navigation.replace('Login'); }
+        // Auto-skip only on the cold-start pass. When the student navigates
+        // here deliberately (Login's back arrow), replacing back to a *fresh*
+        // Login would both lose what they'd typed and stack Login entries.
+        if (completed === 'true' && !route?.params?.review) { navigation.replace('Login'); }
         else { setCheckingOnboarding(false); }
       } catch { setCheckingOnboarding(false); }
     })();
-  }, [navigation]);
+  }, [navigation, route?.params?.review]);
 
   useEffect(() => {
     if (checkingOnboarding) return;

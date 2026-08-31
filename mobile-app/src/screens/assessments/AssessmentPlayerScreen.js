@@ -82,6 +82,11 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   const [remaining, setRemaining] = useState(config.durationMinutes * 60);
   const [submitting, setSubmitting] = useState(false);
   const [report, setReport] = useState(null);
+  // A submit can come back { success: true, held: true } without the client
+  // ever having seen a live "held" decision (missed heartbeats / risk score
+  // evaluated at submit time). It carries no report data, so it needs its own
+  // terminal state rather than falling through setReport(undefined).
+  const [heldAtSubmit, setHeldAtSubmit] = useState(null);
 
   // Server's attempt start, in epoch ms. The single source of truth for the
   // countdown — see note 1 in the header.
@@ -182,6 +187,27 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     };
   }, [config.code, config.durationMinutes, config.questionLimit, config.title, navigation]);
 
+  // A 4xx (other than timeout/rate-limit) will fail identically on every
+  // retry — an expired assessment token, a rejected value, a completed
+  // attempt. Queueing it would block submit forever behind a write that can
+  // never land.
+  const isPermanentSaveFailure = (err) =>
+    typeof err?.status === 'number' && err.status >= 400 && err.status < 500 && err.status !== 408 && err.status !== 429;
+
+  // A permanently-rejected answer is dropped from the queue AND from the local
+  // answers map, so the question shows as unanswered again instead of counting
+  // toward a submit the server would refuse.
+  const dropRejectedAnswer = useCallback((qid, err) => {
+    pendingRef.current.delete(qid);
+    setPendingCount(pendingRef.current.size);
+    setAnswers((prev) => {
+      const next = { ...prev };
+      delete next[qid];
+      return next;
+    });
+    Alert.alert('Answer not accepted', err?.data?.error || err?.message || 'Please select your answer again.');
+  }, []);
+
   // Retries every locally-queued failed write. Returns the number still
   // pending after the attempt (0 means fully caught up).
   const flushPending = useCallback(async () => {
@@ -193,29 +219,32 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         try {
           await assessmentApi.saveAnswer(resultId, qid, answer.selectedValue, answer.questionText, assessmentToken);
           pendingRef.current.delete(qid);
-        } catch {
-          // Still unreachable — stays queued for the next flush.
+        } catch (err) {
+          if (isPermanentSaveFailure(err)) {
+            dropRejectedAnswer(qid, err);
+          }
+          // Otherwise still unreachable — stays queued for the next flush.
         }
       })
     );
     setPendingCount(pendingRef.current.size);
     return pendingRef.current.size;
-  }, [resultId, assessmentToken]);
+  }, [resultId, assessmentToken, dropRejectedAnswer]);
 
   // Retry queued writes in the background so a brief network drop resolves
   // itself before the student ever reaches submit.
   useEffect(() => {
-    if (loading || report || proctoring.heldInfo) return undefined;
+    if (loading || report || proctoring.heldInfo || heldAtSubmit) return undefined;
     const id = setInterval(() => {
       if (pendingRef.current.size > 0) flushPending();
     }, 8000);
     return () => clearInterval(id);
-  }, [loading, report, proctoring.heldInfo, flushPending]);
+  }, [loading, report, proctoring.heldInfo, heldAtSubmit, flushPending]);
 
   // ── Submit ──────────────────────────────────────────────────────────────
   const submit = useCallback(
     async ({ reason = 'manual' } = {}) => {
-      if (!resultId || submitting || report) return;
+      if (!resultId || submitting || report || heldAtSubmit) return;
       if (reason === 'manual' && !allAnswered) {
         Alert.alert('Not finished', 'Answer every question before submitting.');
         return;
@@ -244,7 +273,10 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           // everything is already answered.
           completeMissingAnswers: reason === 'timeout' || reason === 'violation',
         });
-        if (res?.success) {
+        if (res?.success && res.held) {
+          setHeldAtSubmit(res);
+          proctoring.complete();
+        } else if (res?.success) {
           setReport(res.data);
           proctoring.complete();
         } else {
@@ -258,7 +290,8 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           try {
             const existing = await assessmentApi.getStageResult(userId, stageKey);
             if (existing?.success && existing?.data) {
-              setReport(existing.data);
+              // Stage results carry the score as `stageScore`, not `percentage`.
+              setReport({ ...existing.data, percentage: existing.data.stageScore });
               proctoring.complete();
               return;
             }
@@ -275,7 +308,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         setSubmitting(false);
       }
     },
-    [resultId, assessmentToken, submitting, report, allAnswered, userId, stageKey, proctoring, flushPending]
+    [resultId, assessmentToken, submitting, report, heldAtSubmit, allAnswered, userId, stageKey, proctoring, flushPending]
   );
 
   submitRef.current = submit;
@@ -293,7 +326,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
   // ── Countdown ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (loading || report || proctoring.heldInfo || !startedAtRef.current) return;
+    if (loading || report || proctoring.heldInfo || heldAtSubmit || !startedAtRef.current) return;
 
     const tick = setInterval(() => {
       const elapsed = (Date.now() - startedAtRef.current) / 1000;
@@ -311,7 +344,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     }, 1000);
 
     return () => clearInterval(tick);
-  }, [loading, report, proctoring.heldInfo, config.durationMinutes]);
+  }, [loading, report, proctoring.heldInfo, heldAtSubmit, config.durationMinutes]);
 
   // Minimum dwell per question.
   useEffect(() => {
@@ -349,16 +382,20 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         await assessmentApi.saveAnswer(resultId, qid, value, questionText, assessmentToken);
         // A retry may have queued this question earlier — this write supersedes it.
         if (pendingRef.current.delete(qid)) setPendingCount(pendingRef.current.size);
-      } catch {
-        // Queued for the background retry loop and for the mandatory
-        // pre-submit flush — see flushPending().
-        pendingRef.current.set(qid, { selectedValue: value, questionText });
-        setPendingCount(pendingRef.current.size);
+      } catch (err) {
+        if (isPermanentSaveFailure(err)) {
+          dropRejectedAnswer(qid, err);
+        } else {
+          // Queued for the background retry loop and for the mandatory
+          // pre-submit flush — see flushPending().
+          pendingRef.current.set(qid, { selectedValue: value, questionText });
+          setPendingCount(pendingRef.current.size);
+        }
       } finally {
         setSavingAnswer(false);
       }
     },
-    [current, resultId, assessmentToken, submitting, report]
+    [current, resultId, assessmentToken, submitting, report, dropRejectedAnswer]
   );
 
   const canAdvance = !!current && !!answers[current._id] && dwellElapsed >= MIN_QUESTION_DWELL_MS;
@@ -406,8 +443,8 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     );
   }
 
-  if (proctoring.heldInfo) {
-    const info = proctoring.heldInfo;
+  if (proctoring.heldInfo || heldAtSubmit) {
+    const info = proctoring.heldInfo || heldAtSubmit;
     return shell(
       <ScrollView contentContainerStyle={styles.reportScroll}>
         <View style={[styles.reportBadge, { backgroundColor: '#F59E0B22' }]}>
@@ -415,12 +452,17 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         </View>
         <Text style={[styles.reportTitle, { color: themeColors.text }]}>Held for review</Text>
         <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
-          {info.reason}
+          {info.reason || info.message}
         </Text>
         <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
           Your answers were saved. A support ticket has been raised and your score will be released once
           it's reviewed.
         </Text>
+        {!!info.reference && (
+          <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+            Reference: {info.reference}
+          </Text>
+        )}
         <Pressable
           style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 26 }]}
           onPress={() => navigation.goBack()}
@@ -436,7 +478,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   }
 
   if (report) {
-    const pct = Math.round(report.percentage ?? report.score ?? 0);
+    const pct = Math.round(report.percentage ?? report.stageScore ?? report.score ?? 0);
     const passed = report.passed ?? pct >= config.passingPercentage;
     return shell(
       <ScrollView contentContainerStyle={styles.reportScroll}>
@@ -450,9 +492,9 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           {config.passingPercentage > 0 ? ` · pass mark ${config.passingPercentage}%` : ''}
         </Text>
 
-        {!!report.bandLabel && (
+        {!!(report.stageBand || report.bandLabel) && (
           <View style={[styles.bandPill, { backgroundColor: themeColors.pillBg }]}>
-            <Text style={[styles.bandText, { color: accent }]}>{report.bandLabel}</Text>
+            <Text style={[styles.bandText, { color: accent }]}>{report.stageBand || report.bandLabel}</Text>
           </View>
         )}
 

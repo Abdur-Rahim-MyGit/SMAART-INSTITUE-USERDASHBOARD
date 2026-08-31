@@ -451,8 +451,11 @@ const submitAssessment = async (req, res) => {
             responseData.stage = stageInfo.stage;
             responseData.assessmentType = `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`;
 
-            // Set percentage for badge checking
+            // Set percentage for badge checking — and keep the response's
+            // displayed percentage in sync with the weighted stage score, so
+            // the score the student sees is the one pass/fail was decided on.
             percentage = stageScore;
+            responseData.percentage = stageScore;
 
             // Save to StageResult collection (always — both pass and fail)
             try {

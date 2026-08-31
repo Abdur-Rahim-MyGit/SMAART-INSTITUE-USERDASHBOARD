@@ -25,6 +25,26 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const GROUP_ICONS = ['users', 'book-open', 'coffee', 'award', 'zap', 'hash'];
 const GROUP_COLORS = ['#1478B8', '#10B981', '#8B5CF6', '#EC4899', '#F59E0B', '#14B8A6'];
 
+// Groups created on the web store Tailwind classes ('bg-blue-500') as their
+// color; RN needs a real color value, and `grpColor + '15'` on a class string
+// produces an invalid color. Map the classes the web uses, else fall back.
+const TAILWIND_GROUP_COLORS = {
+  'bg-blue-500': '#3B82F6',
+  'bg-green-500': '#22C55E',
+  'bg-purple-500': '#A855F7',
+  'bg-pink-500': '#EC4899',
+  'bg-amber-500': '#F59E0B',
+  'bg-orange-500': '#F97316',
+  'bg-red-500': '#EF4444',
+  'bg-teal-500': '#14B8A6',
+  'bg-indigo-500': '#6366F1',
+  'bg-cyan-500': '#06B6D4',
+};
+const normalizeGroupColor = (color) => {
+  if (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color)) return color;
+  return TAILWIND_GROUP_COLORS[color] || '#1478B8';
+};
+
 function AnimatedSection({ children, delay = 0 }) {
   const anim = useRef(new Animated.Value(0)).current;
 
@@ -374,8 +394,13 @@ export default function CommunityScreen({ navigation }) {
                           { emoji: '❤️', label: 'Love' },
                           { emoji: '🎉', label: 'Celebrate' },
                         ].map((rx) => {
-                          const count = ann.reactions?.[rx.emoji]?.length || 0;
-                          const hasReacted = ann.reactions?.[rx.emoji]?.includes(user?.email);
+                          // Reactions are stored as an array of { userId, emoji }.
+                          const rxList = Array.isArray(ann.reactions) ? ann.reactions : [];
+                          const count = rxList.filter((r) => r.emoji === rx.emoji).length;
+                          const myId = String(user?._id || user?.id || '');
+                          const hasReacted = rxList.some(
+                            (r) => r.emoji === rx.emoji && String(r.userId?._id || r.userId) === myId
+                          );
 
                           return (
                             <TouchableOpacity
@@ -425,7 +450,7 @@ export default function CommunityScreen({ navigation }) {
                 </View>
               ) : (
                 groups.map((group) => {
-                  const grpColor = group.color || '#1478B8';
+                  const grpColor = normalizeGroupColor(group.color);
                   const grpIcon = group.icon && GROUP_ICONS.includes(group.icon) ? group.icon : 'users';
 
                   return (
@@ -560,7 +585,9 @@ export default function CommunityScreen({ navigation }) {
                 </Text>
               ) : (
                 chatMessages.map((msg, idx) => {
-                  const isMine = msg.senderEmail === user?.email;
+                  // Messages carry `sender` (the user's id), not an email.
+                  const isMine =
+                    String(msg.sender?._id || msg.sender || '') === String(user?._id || user?.id || '');
                   return (
                     <View
                       key={msg._id || idx}

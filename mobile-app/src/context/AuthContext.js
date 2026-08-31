@@ -58,7 +58,13 @@ export function AuthProvider({ children }) {
           if (enabled) setIsLocked(true);
         }
       } catch (err) {
-        await storage.deleteItem(TOKEN_KEY);
+        // Only an actual rejection invalidates the stored session. A network
+        // failure (offline launch, server down, timeout) has no status — the
+        // token may be perfectly valid, so keep it for the next launch instead
+        // of forcing a full password + email-OTP re-login from a dead zone.
+        if (err?.status === 401 || err?.status === 403) {
+          await storage.deleteItem(TOKEN_KEY);
+        }
       } finally {
         setIsBootstrapping(false);
       }

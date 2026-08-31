@@ -35,6 +35,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import { ticketsAPI } from '../../api/tickets';
 import { grievancesAPI } from '../../api/grievances';
@@ -130,6 +131,7 @@ function TextField({ themeColors, isDark, ...props }) {
 
 export default function SupportScreen({ navigation }) {
   const { colors: themeColors, theme } = useTheme();
+  const { user } = useAuth();
   const isDark = theme === 'dark';
 
   const [section, setSection] = useState('tickets'); // 'tickets' | 'grievances'
@@ -152,7 +154,9 @@ export default function SupportScreen({ navigation }) {
   const loadTickets = useCallback(async () => {
     setTicketsLoading(true);
     try {
-      const res = await ticketsAPI.getMyTickets();
+      // The server defaults to limit=10 with pagination this screen doesn't
+      // render — request enough to show the full history.
+      const res = await ticketsAPI.getMyTickets({ limit: 100 });
       setTickets(res.data || []);
     } catch {
       setTickets([]);
@@ -535,7 +539,13 @@ export default function SupportScreen({ navigation }) {
                   </Text>
                   <View style={{ gap: 10, marginTop: 8 }}>
                     {(detail.item.responses || []).map((resp, idx) => {
-                      const isYou = resp.respondedBy?.role === 'student';
+                      // `respondedBy` is populated on list/reply responses; if
+                      // it ever arrives as a raw id, fall back to comparing it
+                      // against the signed-in user's id.
+                      const isYou =
+                        resp.respondedBy?.role === 'student' ||
+                        String(resp.respondedBy?._id || resp.respondedBy || '') ===
+                          String(user?._id || user?.id || '');
                       return (
                         <View
                           key={idx}
