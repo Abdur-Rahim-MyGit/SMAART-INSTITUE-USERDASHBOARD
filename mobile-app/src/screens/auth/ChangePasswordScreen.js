@@ -17,8 +17,8 @@
  * web, the endpoint refuses the change and returns `alreadyRegistered: true`
  * WITH a valid token — so we sign them in instead of showing an error.
  */
-import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, BackHandler, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import AuthScreenLayout from '../../components/AuthScreenLayout';
 import PillInput from '../../components/PillInput';
@@ -39,6 +39,30 @@ export default function ChangePasswordScreen({ route, navigation }) {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // The OTP screen behind this one is dead — the server consumed its login-OTP
+  // record when it issued this tempToken. Android's hardware back would pop
+  // into it and any re-verify there fails confusingly, so back restarts login
+  // instead (mirrors `gestureEnabled: false` on iOS).
+  useEffect(() => {
+    const onBack = () => {
+      Alert.alert(
+        'Set your new password',
+        'You need to choose a new password before signing in. Going back will restart the login.',
+        [
+          { text: 'Stay', style: 'cancel' },
+          {
+            text: 'Restart login',
+            style: 'destructive',
+            onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }),
+          },
+        ]
+      );
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => sub.remove();
+  }, [navigation]);
 
   const policy = useMemo(() => validatePassword(password), [password]);
   const mismatch = confirm.length > 0 && confirm !== password;

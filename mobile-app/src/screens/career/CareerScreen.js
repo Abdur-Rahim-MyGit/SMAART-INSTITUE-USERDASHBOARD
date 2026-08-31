@@ -132,9 +132,10 @@ export default function CareerScreen({ navigation }) {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    await fetchJobs();
-    if (activeTab === 'applied') await fetchApplications();
-    else if (activeTab === 'fairs') await fetchJobFairs();
+    // Applications are always loaded so "Already Applied" is accurate on the
+    // job board itself, not only after visiting the My Applications tab.
+    await Promise.all([fetchJobs(), fetchApplications()]);
+    if (activeTab === 'fairs') await fetchJobFairs();
     else if (activeTab === 'partners') await fetchPartners();
     setLoading(false);
   }, [activeTab]);
@@ -165,17 +166,30 @@ export default function CareerScreen({ navigation }) {
   }, [jobs, typeFilter, sourceFilter, searchQuery]);
 
   // Handle Job Application
-  const handleApply = async (job) => {
+  const handleApply = async (job, coverLetter) => {
     const alreadyApplied = applications.some((app) => (app.job?._id || app.job) === job._id);
     if (alreadyApplied) {
       Alert.alert('Already Applied', 'You have already submitted an application for this role.');
       return;
     }
 
+    // Server rejects letters under 50 words / over 6000 chars — mirror it here
+    // so the student gets immediate feedback instead of a round-trip error.
+    const letter = (coverLetter || '').trim();
+    const wordCount = letter ? letter.split(/\s+/).filter(Boolean).length : 0;
+    if (wordCount < 50) {
+      Alert.alert('Cover Letter Required', 'Please write a cover letter of at least 50 words for this job.');
+      return;
+    }
+    if (letter.length > 6000) {
+      Alert.alert('Cover Letter Too Long', 'Cover letter is too long (maximum 6000 characters).');
+      return;
+    }
+
     try {
       const source = job.sourceCollection || 'jobpostings';
       await placementsAPI.applyJob(source, job._id, {
-        coverLetter: 'Applied via SMAART Mobile App.',
+        coverLetter: letter,
       });
       Alert.alert('Application Submitted! 🎉', 'Your profile details have been sent to the employer.');
       navigation.goBack();

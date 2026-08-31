@@ -63,7 +63,7 @@ export default function LoginScreen({ navigation }) {
       <FadeSlideIn duration={380}>
         <View style={styles.topHeader}>
           <Pressable
-            onPress={() => navigation.navigate('WelcomeOnboarding')}
+            onPress={() => navigation.navigate('WelcomeOnboarding', { review: true })}
             hitSlop={12}
             style={styles.backBtn}
           >
