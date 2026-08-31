@@ -12,6 +12,9 @@ import {
   Alert,
   Dimensions,
   Animated,
+  RefreshControl,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -19,6 +22,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { announcementsAPI } from '../../api/announcements';
 import { groupsAPI } from '../../api/groups';
+import { communityFeedAPI } from '../../api/communityFeed';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -44,6 +48,44 @@ const normalizeGroupColor = (color) => {
   if (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color)) return color;
   return TAILWIND_GROUP_COLORS[color] || '#1478B8';
 };
+
+// Matches back-end/models/CommunityPost.js `category` enum exactly — the server
+// rejects anything else with a Mongoose validation error.
+const FEED_CATEGORIES = ['general', 'career', 'study', 'exams', 'skills', 'motivation', 'other'];
+
+// The 5 reaction types accepted by POST /community/discussions/:id/react —
+// any other `type` gets a 400 "Invalid reaction type".
+const FEED_REACTIONS = [
+  { type: 'like', emoji: '👍' },
+  { type: 'heart', emoji: '❤️' },
+  { type: 'insightful', emoji: '💡' },
+  { type: 'support', emoji: '🤝' },
+  { type: 'smile', emoji: '😄' },
+];
+
+const FEED_PAGE_SIZE = 10;
+
+const timeAgo = (dateStr) => {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return '';
+  const secs = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (secs < 60) return 'Just now';
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString();
+};
+
+// Feed authors are hydrated server-side (hydrateAuthors) into
+// { _id, fullName, email, profileImage } — but legacy posts can still carry a
+// bare ObjectId string, so guard both shapes.
+const authorName = (author) =>
+  (author && typeof author === 'object' && (author.fullName || author.email)) || 'Community Member';
+
+const authorIdOf = (author) => String(author?._id || author || '');
 
 function AnimatedSection({ children, delay = 0 }) {
   const anim = useRef(new Animated.Value(0)).current;
@@ -85,7 +127,7 @@ export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
   const { colors: themeColors, theme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState('notices'); // 'notices' or 'groups'
+  const [activeTab, setActiveTab] = useState('notices'); // 'notices', 'feed' or 'groups'
   const [loading, setLoading] = useState(true);
 
   // Data States
@@ -103,6 +145,27 @@ export default function CommunityScreen({ navigation }) {
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
+
+  // Discussion Feed States
+  const [feedPosts, setFeedPosts] = useState([]);
+  const [feedPagination, setFeedPagination] = useState(null);
+  const [feedCategory, setFeedCategory] = useState('all');
+  const [feedRefreshing, setFeedRefreshing] = useState(false);
+  const [feedLoadingMore, setFeedLoadingMore] = useState(false);
+
+  // Create Post Modal States
+  const [createPostModalVisible, setCreatePostModalVisible] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [newPostCategory, setNewPostCategory] = useState('general');
+  const [creatingPost, setCreatingPost] = useState(false);
+
+  // Post Detail (replies) Modal States
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [postModalVisible, setPostModalVisible] = useState(false);
+  const [postDetailLoading, setPostDetailLoading] = useState(false);
+  const [replyInput, setReplyInput] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   // Create Group Modal States
   const [createGroupModalVisible, setCreateGroupModalVisible] = useState(false);
@@ -141,15 +204,32 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
+  const fetchFeed = async (page = 1, { append = false } = {}) => {
+    try {
+      const params = { page, limit: FEED_PAGE_SIZE, sortBy: 'createdAt' };
+      if (feedCategory !== 'all') params.category = feedCategory;
+      const res = await communityFeedAPI.getDiscussions(params);
+      if (res?.success) {
+        const incoming = res.data || [];
+        setFeedPosts((prev) => (append ? [...prev, ...incoming] : incoming));
+        setFeedPagination(res.pagination || null);
+      }
+    } catch (err) {
+      console.warn('Failed to load community feed:', err);
+    }
+  };
+
   const loadData = useCallback(async () => {
     setLoading(true);
     if (activeTab === 'notices') {
       await fetchNotices();
+    } else if (activeTab === 'feed') {
+      await fetchFeed(1);
     } else {
       await fetchGroups();
     }
     setLoading(false);
-  }, [activeTab, dateFilter]);
+  }, [activeTab, dateFilter, feedCategory]);
 
   useEffect(() => {
     loadData();
@@ -168,6 +248,132 @@ export default function CommunityScreen({ navigation }) {
       }
     } catch (err) {
       console.warn('React error:', err);
+    }
+  };
+
+  // ── Discussion Feed handlers ────────────────────────────────────────────
+
+  const myId = String(user?._id || user?.id || '');
+
+  // Keep the list and the open detail modal in sync after any mutation.
+  const applyPostUpdate = (postId, updater) => {
+    setFeedPosts((prev) => prev.map((p) => (p._id === postId ? updater(p) : p)));
+    setSelectedPost((prev) => (prev && prev._id === postId ? updater(prev) : prev));
+  };
+
+  const handleFeedRefresh = async () => {
+    setFeedRefreshing(true);
+    await fetchFeed(1);
+    setFeedRefreshing(false);
+  };
+
+  const handleFeedLoadMore = async () => {
+    if (feedLoadingMore || !feedPagination) return;
+    if (feedPagination.page >= feedPagination.pages) return;
+    setFeedLoadingMore(true);
+    await fetchFeed(feedPagination.page + 1, { append: true });
+    setFeedLoadingMore(false);
+  };
+
+  const handleCreatePost = async () => {
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
+      Alert.alert('Required', 'Please enter both a title and some content.');
+      return;
+    }
+
+    setCreatingPost(true);
+    try {
+      // POST /community/discussions expects multipart (uploadCommunity.any());
+      // FormData without a file gives the same req.body fields, no attachment.
+      const formData = new FormData();
+      formData.append('title', newPostTitle.trim());
+      formData.append('content', newPostContent.trim());
+      formData.append('category', newPostCategory);
+
+      const res = await communityFeedAPI.createDiscussion(formData);
+      if (res?.success) {
+        setCreatePostModalVisible(false);
+        setNewPostTitle('');
+        setNewPostContent('');
+        setNewPostCategory('general');
+        if (res.data && (feedCategory === 'all' || feedCategory === res.data.category)) {
+          setFeedPosts((prev) => [res.data, ...prev]);
+        }
+      }
+    } catch (err) {
+      // Moderation rejections (profanity in title/content) come back as 400s
+      // with a human-readable `error` the interceptor puts on err.message.
+      Alert.alert('Could not post', err.message || 'Please try again.');
+    } finally {
+      setCreatingPost(false);
+    }
+  };
+
+  const handleToggleReaction = async (post, type) => {
+    if (!myId) return;
+    try {
+      const res = await communityFeedAPI.reactToDiscussion(post._id, myId, type);
+      if (res?.success) {
+        applyPostUpdate(post._id, (p) => ({ ...p, reactions: res.data.reactions || [] }));
+      }
+    } catch (err) {
+      // e.g. 403 "You cannot react to your own post" for students.
+      Alert.alert('Reaction failed', err.message || 'Please try again.');
+    }
+  };
+
+  const handleToggleBookmark = async (post) => {
+    if (!myId) return;
+    try {
+      const res = await communityFeedAPI.toggleBookmark(post._id, myId);
+      if (res?.success) {
+        const bookmarked = res.data?.isBookmarked;
+        applyPostUpdate(post._id, (p) => {
+          const list = (p.isBookmarkedBy || []).filter((id) => String(id) !== myId);
+          return { ...p, isBookmarkedBy: bookmarked ? [...list, myId] : list };
+        });
+      }
+    } catch (err) {
+      Alert.alert('Bookmark failed', err.message || 'Please try again.');
+    }
+  };
+
+  const handleOpenPost = async (post) => {
+    setSelectedPost(post);
+    setPostModalVisible(true);
+    setReplyInput('');
+    setPostDetailLoading(true);
+    try {
+      // Also increments the server-side view counter — no separate view ping.
+      const res = await communityFeedAPI.getDiscussion(post._id);
+      if (res?.success && res.data) {
+        setSelectedPost(res.data);
+        setFeedPosts((prev) => prev.map((p) => (p._id === res.data._id ? res.data : p)));
+      }
+    } catch (err) {
+      console.warn('Failed to load discussion:', err);
+    } finally {
+      setPostDetailLoading(false);
+    }
+  };
+
+  const handleSendReply = async () => {
+    if (!replyInput.trim() || !selectedPost || sendingReply) return;
+
+    setSendingReply(true);
+    try {
+      // Server derives the author from the session; authorId is parity-only.
+      const res = await communityFeedAPI.addReply(selectedPost._id, replyInput.trim(), myId);
+      if (res?.success && res.data) {
+        setReplyInput('');
+        setSelectedPost(res.data);
+        setFeedPosts((prev) => prev.map((p) => (p._id === res.data._id ? res.data : p)));
+      }
+    } catch (err) {
+      // Moderation 400s ("inappropriate language") and same-college 403s.
+      Alert.alert('Could not reply', err.message || 'Please try again.');
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -304,6 +510,12 @@ export default function CommunityScreen({ navigation }) {
             <Text style={[styles.selectorText, { color: activeTab === 'notices' ? '#FFFFFF' : themeColors.textMuted }]}>Notice Board</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={[styles.selectorBtn, activeTab === 'feed' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+            onPress={() => setActiveTab('feed')}
+          >
+            <Text style={[styles.selectorText, { color: activeTab === 'feed' ? '#FFFFFF' : themeColors.textMuted }]}>Feed</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.selectorBtn, activeTab === 'groups' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
             onPress={() => setActiveTab('groups')}
           >
@@ -317,7 +529,20 @@ export default function CommunityScreen({ navigation }) {
           <ActivityIndicator size="large" color={themeColors.primaryBright} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            activeTab === 'feed' ? (
+              <RefreshControl
+                refreshing={feedRefreshing}
+                onRefresh={handleFeedRefresh}
+                tintColor={themeColors.primaryBright}
+                colors={[themeColors.primaryBright]}
+              />
+            ) : undefined
+          }
+        >
           {/* NOTICE BOARD TAB */}
           {activeTab === 'notices' && (
             <AnimatedSection delay={80}>
@@ -426,6 +651,146 @@ export default function CommunityScreen({ navigation }) {
             </AnimatedSection>
           )}
 
+          {/* DISCUSSION FEED TAB */}
+          {activeTab === 'feed' && (
+            <AnimatedSection delay={80}>
+            <View style={styles.tabContent}>
+              <View style={styles.groupsHeaderRow}>
+                <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Peer Discussions</Text>
+                <TouchableOpacity
+                  style={[styles.createGroupBtn, { backgroundColor: themeColors.primaryBright }]}
+                  onPress={() => setCreatePostModalVisible(true)}
+                >
+                  <Feather name="edit-3" size={14} color="#FFFFFF" />
+                  <Text style={styles.createGroupText}>New Post</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Category filter pills */}
+              <View style={styles.pillsRow}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 6 }}>
+                  {['all', ...FEED_CATEGORIES].map((cat) => (
+                    <TouchableOpacity
+                      key={cat}
+                      style={[
+                        styles.filterPill,
+                        { backgroundColor: themeColors.card, borderColor: themeColors.border },
+                        feedCategory === cat && { backgroundColor: themeColors.primaryBright, borderColor: themeColors.primaryBright },
+                      ]}
+                      onPress={() => setFeedCategory(cat)}
+                    >
+                      <Text style={[styles.filterPillText, { color: feedCategory === cat ? '#FFFFFF' : themeColors.text }]}>
+                        {cat === 'all' ? 'All Topics' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {feedPosts.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Feather name="message-square" size={32} color={themeColors.textMuted} />
+                  <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>
+                    No discussions yet. Start the first one!
+                  </Text>
+                </View>
+              ) : (
+                feedPosts.map((post) => {
+                  const reactions = Array.isArray(post.reactions) ? post.reactions : [];
+                  const myReaction = reactions.find((r) => String(r.user?._id || r.user) === myId)?.type || null;
+                  const isBookmarked = (post.isBookmarkedBy || []).some((id) => String(id?._id || id) === myId);
+                  const replyCount = (post.replies || []).length;
+
+                  return (
+                    <PressCard
+                      key={post._id}
+                      style={[styles.noticeCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                      onPress={() => handleOpenPost(post)}
+                    >
+                      <View style={styles.noticeHeader}>
+                        <View style={[styles.noticeIconWrap, { backgroundColor: post.isPinned ? '#FEF3C7' : 'rgba(4, 92, 154, 0.08)' }]}>
+                          <Feather
+                            name={post.isPinned ? 'pin' : 'message-square'}
+                            size={15}
+                            color={post.isPinned ? '#D97706' : themeColors.primaryBright}
+                          />
+                        </View>
+                        <View style={styles.noticeMeta}>
+                          <Text style={[styles.noticeTitle, { color: themeColors.text }]} numberOfLines={2}>
+                            {post.title}
+                          </Text>
+                          <Text style={[styles.noticeIssuer, { color: themeColors.textMuted }]}>
+                            {authorName(post.author)} • {timeAgo(post.createdAt)}
+                            {post.category ? ` • ${post.category}` : ''}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.bookmarkBtn}
+                          onPress={() => handleToggleBookmark(post)}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        >
+                          <Feather
+                            name="bookmark"
+                            size={16}
+                            color={isBookmarked ? '#F59E0B' : themeColors.textMuted}
+                          />
+                        </TouchableOpacity>
+                      </View>
+
+                      <Text style={[styles.noticeDesc, { color: themeColors.textMuted }]} numberOfLines={3}>
+                        {post.content}
+                      </Text>
+
+                      {/* Reactions + reply count */}
+                      <View style={styles.reactionRow}>
+                        {FEED_REACTIONS.map((rx) => {
+                          const count = reactions.filter((r) => r.type === rx.type).length;
+                          const active = myReaction === rx.type;
+                          return (
+                            <TouchableOpacity
+                              key={rx.type}
+                              style={[
+                                styles.reactBtn,
+                                { backgroundColor: themeColors.border },
+                                active && { backgroundColor: themeColors.primaryBright + '20', borderColor: themeColors.primaryBright },
+                              ]}
+                              onPress={() => handleToggleReaction(post, rx.type)}
+                            >
+                              <Text style={{ fontSize: 11 }}>{rx.emoji}</Text>
+                              {count > 0 && (
+                                <Text style={[styles.reactCount, { color: themeColors.text }]}>{count}</Text>
+                              )}
+                            </TouchableOpacity>
+                          );
+                        })}
+                        <View style={styles.replyCountWrap}>
+                          <Feather name="message-circle" size={12} color={themeColors.textMuted} />
+                          <Text style={[styles.reactCount, { color: themeColors.textMuted }]}>{replyCount}</Text>
+                        </View>
+                      </View>
+                    </PressCard>
+                  );
+                })
+              )}
+
+              {/* Pagination */}
+              {feedPagination && feedPagination.page < feedPagination.pages && (
+                <TouchableOpacity
+                  style={[styles.loadMoreBtn, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                  onPress={handleFeedLoadMore}
+                  disabled={feedLoadingMore}
+                >
+                  {feedLoadingMore ? (
+                    <ActivityIndicator size="small" color={themeColors.primaryBright} />
+                  ) : (
+                    <Text style={[styles.loadMoreText, { color: themeColors.primaryBright }]}>Load more discussions</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+            </AnimatedSection>
+          )}
+
           {/* STUDY GROUPS TAB */}
           {activeTab === 'groups' && (
             <AnimatedSection delay={80}>
@@ -483,6 +848,181 @@ export default function CommunityScreen({ navigation }) {
           )}
         </ScrollView>
       )}
+
+      {/* CREATE POST MODAL */}
+      <Modal visible={createPostModalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: themeColors.bg }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
+              <Text style={[styles.modalHeaderTitle, { color: themeColors.text }]}>Start a Discussion</Text>
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setCreatePostModalVisible(false)}>
+                <Feather name="x" size={20} color={themeColors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Title</Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="What do you want to discuss?"
+                placeholderTextColor={themeColors.textMuted}
+                value={newPostTitle}
+                onChangeText={setNewPostTitle}
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Content</Text>
+              <TextInput
+                style={[
+                  styles.modalTextInput,
+                  { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text, minHeight: 96, textAlignVertical: 'top' },
+                ]}
+                placeholder="Share your question, tip or thought with peers..."
+                placeholderTextColor={themeColors.textMuted}
+                value={newPostContent}
+                onChangeText={setNewPostContent}
+                multiline
+                numberOfLines={4}
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Category</Text>
+              <View style={[styles.choicesRow, { flexWrap: 'wrap' }]}>
+                {FEED_CATEGORIES.map((cat) => (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[
+                      styles.filterPill,
+                      { backgroundColor: themeColors.card, borderColor: themeColors.border, marginRight: 0 },
+                      newPostCategory === cat && { backgroundColor: themeColors.primaryBright, borderColor: themeColors.primaryBright },
+                    ]}
+                    onPress={() => setNewPostCategory(cat)}
+                  >
+                    <Text style={[styles.filterPillText, { color: newPostCategory === cat ? '#FFFFFF' : themeColors.text }]}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={[styles.submitGroupBtn, { backgroundColor: themeColors.primaryBright }, creatingPost && { opacity: 0.6 }]}
+                disabled={creatingPost}
+                onPress={handleCreatePost}
+              >
+                {creatingPost ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitGroupText}>Post to Community</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* POST DETAIL + REPLIES MODAL */}
+      <Modal visible={postModalVisible} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={[styles.modalContent, { backgroundColor: themeColors.bg, height: '90%' }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
+              <Text style={[styles.modalHeaderTitle, { color: themeColors.text }]} numberOfLines={1}>
+                {selectedPost?.title || 'Discussion'}
+              </Text>
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setPostModalVisible(false)}>
+                <Feather name="x" size={20} color={themeColors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
+              {selectedPost && (
+                <>
+                  <Text style={[styles.noticeIssuer, { color: themeColors.textMuted }]}>
+                    {authorName(selectedPost.author)} • {timeAgo(selectedPost.createdAt)}
+                    {selectedPost.category ? ` • ${selectedPost.category}` : ''}
+                  </Text>
+                  <Text style={[styles.postDetailContent, { color: themeColors.text }]}>
+                    {selectedPost.content}
+                  </Text>
+
+                  {/* Reactions on the open post */}
+                  <View style={[styles.reactionRow, { marginTop: 10 }]}>
+                    {FEED_REACTIONS.map((rx) => {
+                      const reactions = Array.isArray(selectedPost.reactions) ? selectedPost.reactions : [];
+                      const count = reactions.filter((r) => r.type === rx.type).length;
+                      const active =
+                        reactions.find((r) => String(r.user?._id || r.user) === myId)?.type === rx.type;
+                      return (
+                        <TouchableOpacity
+                          key={rx.type}
+                          style={[
+                            styles.reactBtn,
+                            { backgroundColor: themeColors.border },
+                            active && { backgroundColor: themeColors.primaryBright + '20', borderColor: themeColors.primaryBright },
+                          ]}
+                          onPress={() => handleToggleReaction(selectedPost, rx.type)}
+                        >
+                          <Text style={{ fontSize: 11 }}>{rx.emoji}</Text>
+                          {count > 0 && (
+                            <Text style={[styles.reactCount, { color: themeColors.text }]}>{count}</Text>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  {/* Replies */}
+                  <Text style={[styles.sectionHeading, { color: themeColors.text, marginTop: 18, marginBottom: 8 }]}>
+                    Replies ({(selectedPost.replies || []).length})
+                  </Text>
+
+                  {postDetailLoading ? (
+                    <ActivityIndicator size="small" color={themeColors.primaryBright} style={{ marginTop: 16 }} />
+                  ) : (selectedPost.replies || []).length === 0 ? (
+                    <Text style={[styles.noChatText, { color: themeColors.textMuted, marginTop: 12 }]}>
+                      No replies yet. Be the first to respond!
+                    </Text>
+                  ) : (
+                    (selectedPost.replies || []).map((reply, idx) => {
+                      const mine = authorIdOf(reply.author) === myId;
+                      return (
+                        <View
+                          key={reply._id || idx}
+                          style={[styles.replyCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                        >
+                          <Text style={[styles.replyAuthor, { color: mine ? themeColors.primaryBright : themeColors.textMuted }]}>
+                            {mine ? 'You' : authorName(reply.author)} • {timeAgo(reply.createdAt)}
+                          </Text>
+                          <Text style={[styles.replyContent, { color: themeColors.text }]}>{reply.content}</Text>
+                        </View>
+                      );
+                    })
+                  )}
+                </>
+              )}
+            </ScrollView>
+
+            {/* Reply input */}
+            <View style={[styles.chatInputRow, { borderTopColor: themeColors.border }]}>
+              <TextInput
+                style={[styles.chatTextInput, { backgroundColor: themeColors.card, color: themeColors.text, borderColor: themeColors.border }]}
+                placeholder="Write a reply..."
+                placeholderTextColor={themeColors.textMuted}
+                value={replyInput}
+                onChangeText={setReplyInput}
+              />
+              <TouchableOpacity
+                style={[styles.sendBtn, { backgroundColor: themeColors.primaryBright }, sendingReply && { opacity: 0.6 }]}
+                disabled={sendingReply}
+                onPress={handleSendReply}
+              >
+                <Feather name="send" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       {/* CREATE STUDY GROUP MODAL */}
       <Modal visible={createGroupModalVisible} animationType="slide" transparent>
@@ -835,6 +1375,51 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '800',
+  },
+
+  /* DISCUSSION FEED */
+  bookmarkBtn: {
+    marginLeft: 'auto',
+    padding: 4,
+  },
+  replyCountWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 'auto',
+    paddingVertical: 5,
+  },
+  loadMoreBtn: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  loadMoreText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  postDetailContent: {
+    fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '500',
+    marginTop: 10,
+  },
+  replyCard: {
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: 12,
+    marginBottom: 10,
+  },
+  replyAuthor: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  replyContent: {
+    fontSize: 12.5,
+    lineHeight: 18,
+    fontWeight: '500',
   },
 
   /* MODAL OVERLAY STYLES */

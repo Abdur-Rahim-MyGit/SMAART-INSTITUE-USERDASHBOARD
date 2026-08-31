@@ -4,6 +4,11 @@ import * as storage from '../utils/storage';
 import { TOKEN_KEY, renewAuthToken, setSessionExpiredHandler } from '../api/client';
 import { getMe, logout as logoutRequest } from '../api/auth';
 import { isBiometricEnabled, setBiometricEnabled as persistBiometricEnabled } from '../utils/biometrics';
+import {
+  registerForPushNotifications,
+  unregisterPushNotifications,
+  subscribeToNotificationTaps,
+} from '../utils/pushNotifications';
 
 const AuthContext = createContext(null);
 
@@ -71,6 +76,21 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
+  // Push notifications — register this device whenever a session exists
+  // (fresh sign-in AND restored session on app start). Keyed on the user id so
+  // refreshUser() churn doesn't re-register; pushNotifications also no-ops on
+  // an unchanged token. Push failures must never break auth flows.
+  const userId = user?._id || user?.id || null;
+  useEffect(() => {
+    if (!userId) return;
+    registerForPushNotifications().catch((err) =>
+      console.warn('[Auth] Push registration failed:', err?.message || err)
+    );
+  }, [userId]);
+
+  // Notification taps → Notifications screen. Mounted once for the app's life.
+  useEffect(() => subscribeToNotificationTaps(), []);
+
   // Let the axios interceptor sign us out when renewal is no longer possible.
   useEffect(() => {
     setSessionExpiredHandler(clearSession);
@@ -132,6 +152,13 @@ export function AuthProvider({ children }) {
   };
 
   const signOut = async () => {
+    // Deregister the device's push token while we still have an auth token —
+    // the DELETE is authenticated. Best-effort: never blocks sign-out.
+    try {
+      await unregisterPushNotifications();
+    } catch (err) {
+      console.warn('[Auth] Push unregister failed:', err?.message || err);
+    }
     try {
       await logoutRequest();
     } catch {

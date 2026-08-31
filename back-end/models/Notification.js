@@ -141,6 +141,14 @@ notificationSchema.statics.createNotification = async function(data) {
   await notification.save();
   // Fire real-time event for WebSocket layer
   notificationEmitter.emit('new_notification', notification.toJSON());
+  // Mirror as an Expo push notification — fire-and-forget, never blocks or
+  // fails the request that created the notification. Lazy require avoids any
+  // module load-order coupling between model and service layers.
+  try {
+    require('../services/expoPush').sendPushForNotification(notification);
+  } catch (err) {
+    console.error('[Notification] Push mirror error:', err.message);
+  }
   return notification;
 };
 

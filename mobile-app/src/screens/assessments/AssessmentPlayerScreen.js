@@ -508,6 +508,24 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     );
   }
 
+  // Server-decided pause: block answering until a later heartbeat clears the
+  // tier. The clock keeps running (server-anchored), same as the web.
+  if (proctoring.decision.tier === 'pause') {
+    return shell(
+      <View style={styles.centered}>
+        <Feather name="pause-circle" size={38} color="#F59E0B" />
+        <Text style={[styles.centeredTitle, { color: themeColors.text }]}>Assessment paused</Text>
+        <Text style={[styles.centeredText, { color: themeColors.textMuted }]}>
+          {proctoring.decision.reason || 'Proctoring flagged an issue with this attempt.'}
+        </Text>
+        <Text style={[styles.centeredText, { color: themeColors.textMuted }]}>
+          Stay on this screen — it resumes automatically once the check clears. The timer keeps running.
+        </Text>
+        <ActivityIndicator size="small" color="#F59E0B" style={{ marginTop: 10 }} />
+      </View>
+    );
+  }
+
   const progress = questions.length ? (index + 1) / questions.length : 0;
   const low = remaining <= WARN_AT_SECONDS;
 
@@ -532,6 +550,17 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
       <View style={[styles.progressTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#EEF2F7' }]}>
         <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
       </View>
+
+      {/* Server-issued proctoring warning — previously received but never shown. */}
+      {proctoring.decision.tier === 'warn' && (
+        <View style={styles.proctorWarnBanner}>
+          <Feather name="alert-triangle" size={14} color="#B45309" />
+          <Text style={styles.proctorWarnText} numberOfLines={2}>
+            Proctoring warning {proctoring.decision.warnings}/{proctoring.decision.maxWarnings}
+            {proctoring.decision.reason ? ` — ${proctoring.decision.reason}` : ''}
+          </Text>
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <Text style={[styles.question, { color: themeColors.text }]}>
@@ -634,6 +663,16 @@ const styles = StyleSheet.create({
 
   progressTrack: { height: 3, width: '100%' },
   progressFill: { height: '100%' },
+
+  proctorWarnBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(245, 158, 11, 0.14)',
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+  },
+  proctorWarnText: { flex: 1, fontSize: 12, fontWeight: '700', color: '#B45309' },
 
   body: { padding: 20, paddingBottom: 32 },
   question: { fontSize: 18, fontWeight: '700', lineHeight: 26, marginBottom: 22 },

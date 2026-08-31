@@ -1,5 +1,15 @@
 const Notification = require('../models/Notification');
 const emailService = require('./emailService');
+const { sendPushToUsers } = require('./expoPush');
+
+/**
+ * Fire-and-forget push mirror for bulk (insertMany) notification paths, which
+ * bypass Notification.createNotification and therefore its built-in push hook.
+ */
+const _sendBulkPush = (userIds, title, message, data = {}) => {
+  sendPushToUsers(userIds, { title, body: message, data })
+    .catch(err => console.error('[NotificationService] Push dispatch error:', err.message));
+};
 
 // Icon and color mappings for notification types
 const NOTIFICATION_CONFIG = {
@@ -258,7 +268,9 @@ const notifySystemAnnouncement = async (userIds, title, message, link = null) =>
     color: '#64748B'
   }));
 
-  return Notification.insertMany(notifications);
+  const created = await Notification.insertMany(notifications);
+  _sendBulkPush(userIds, title, message, { type: 'system' });
+  return created;
 };
 
 /**
@@ -295,7 +307,14 @@ const notifyNewCourse = async (userIds, course) => {
     metadata: { courseId: course._id }
   }));
 
-  return Notification.insertMany(notifications);
+  const created = await Notification.insertMany(notifications);
+  _sendBulkPush(
+    userIds,
+    '📚 New Course Available!',
+    `"${course.title}" is now available. Enroll now to start learning!`,
+    { type: 'course' }
+  );
+  return created;
 };
 
 /**

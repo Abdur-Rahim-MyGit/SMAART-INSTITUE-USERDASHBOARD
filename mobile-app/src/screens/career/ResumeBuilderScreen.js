@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -33,7 +34,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
-import { listResumes, createResume, updateResume, deleteResume } from '../../api/resumes';
+import { listResumes, createResume, updateResume, deleteResume, exportResumePdf } from '../../api/resumes';
 
 function blankResume(user) {
   return {
@@ -154,6 +155,27 @@ export default function ResumeBuilderScreen({ navigation }) {
   const [mode, setMode] = useState('list'); // 'list' | 'edit'
   const [current, setCurrent] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  // Server-side render (GET /resumes/:id/pdf) → open the returned public URL
+  // in the browser. Only saved resumes can export — the server renders what's
+  // stored, not what's typed.
+  const handleExportPdf = async () => {
+    if (!current?._id || exporting) return;
+    setExporting(true);
+    try {
+      const res = await exportResumePdf(current._id);
+      if (res?.url) {
+        await Linking.openURL(res.url);
+      } else {
+        throw new Error(res?.message || 'The server did not return a file.');
+      }
+    } catch (err) {
+      Alert.alert("Couldn't export", err?.data?.message || err?.message || 'Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const load = useCallback(async () => {
     try {
@@ -304,9 +326,28 @@ export default function ResumeBuilderScreen({ navigation }) {
             {saving ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Text style={styles.saveBtnText}>Save Resume</Text>}
           </Pressable>
 
+          {current._id ? (
+            <Pressable
+              onPress={handleExportPdf}
+              disabled={exporting}
+              style={[styles.exportBtn, { borderColor: themeColors.primaryBright, opacity: exporting ? 0.6 : 1 }]}
+            >
+              {exporting ? (
+                <ActivityIndicator color={themeColors.primaryBright} size="small" />
+              ) : (
+                <>
+                  <Feather name="download" size={15} color={themeColors.primaryBright} />
+                  <Text style={[styles.exportBtnText, { color: themeColors.primaryBright }]}>Export PDF</Text>
+                </>
+              )}
+            </Pressable>
+          ) : (
+            <Text style={[styles.exportNote, { color: themeColors.textMuted }]}>
+              Save this resume first — then you can export it as a PDF.
+            </Text>
+          )}
           <Text style={[styles.exportNote, { color: themeColors.textMuted }]}>
-            PDF export isn't available from the app yet — the web dashboard renders the printable
-            version. Your resume is saved either way and reachable from both.
+            The PDF is rendered from your last saved version.
           </Text>
         </ScrollView>
       </SafeAreaView>
@@ -432,4 +473,15 @@ const styles = StyleSheet.create({
   saveBtn: { marginTop: 26, borderRadius: 14, paddingVertical: 15, alignItems: 'center', justifyContent: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 14.5, fontWeight: '800' },
   exportNote: { fontSize: 11.5, lineHeight: 17, textAlign: 'center', marginTop: 14, paddingHorizontal: 10 },
+  exportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    marginTop: 12,
+  },
+  exportBtnText: { fontSize: 14, fontWeight: '800' },
 });
