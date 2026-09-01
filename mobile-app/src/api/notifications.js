@@ -7,4 +7,8 @@ export const notificationsAPI = {
   markAllRead: () => apiClient.patch('/notifications/read-all').then((r) => r.data),
   deleteNotification: (id) => apiClient.delete(`/notifications/${id}`).then((r) => r.data),
   clearAll: () => apiClient.delete('/notifications/clear-all').then((r) => r.data),
+  registerPushToken: (token, platform) =>
+    apiClient.post('/notifications/push-token', { token, platform }).then((r) => r.data),
+  unregisterPushToken: (token) =>
+    apiClient.delete('/notifications/push-token', { data: { token } }).then((r) => r.data),
 };

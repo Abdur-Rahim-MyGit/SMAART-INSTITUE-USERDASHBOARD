@@ -131,6 +131,14 @@ export default function LoginScreen({ navigation }) {
             )}
           </PressScale>
 
+          {/* FR-AUTH-02 — entry point to the self-service signup flow. */}
+          <View style={styles.signupRow}>
+            <Text style={styles.signupPrompt}>New to SMAART? </Text>
+            <Pressable onPress={() => navigation.navigate('Signup')} hitSlop={8}>
+              <Text style={styles.signupLink}>Create an account</Text>
+            </Pressable>
+          </View>
+
           <Text style={styles.footerNote}>
             Trouble signing in? Contact your institution administrator.
           </Text>
@@ -247,5 +255,21 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.muted,
     marginTop: 14,
+  },
+  signupRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 18,
+  },
+  signupPrompt: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.muted,
+  },
+  signupLink: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.primaryBright || colors.primary,
   },
 });

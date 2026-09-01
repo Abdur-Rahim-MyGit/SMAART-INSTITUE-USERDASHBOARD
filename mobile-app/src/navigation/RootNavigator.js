@@ -1,6 +1,8 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from './navigationRef';
+import { handleInitialNotificationResponse } from '../utils/pushNotifications';
 import { useAuth } from '../context/AuthContext';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
@@ -48,7 +50,19 @@ export default function RootNavigator() {
     return <ProfileCompletionScreen />;
   }
 
-  return <NavigationContainer>{user ? <AppStack /> : <AuthStack />}</NavigationContainer>;
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        // If a push notification tap launched the app from a killed state,
+        // route to the Notifications screen once navigation can handle it.
+        // Only meaningful with a session — AuthStack has no such screen.
+        if (user) handleInitialNotificationResponse();
+      }}
+    >
+      {user ? <AppStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({

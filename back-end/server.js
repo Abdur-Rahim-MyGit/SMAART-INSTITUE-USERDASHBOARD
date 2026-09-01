@@ -67,10 +67,30 @@ if (process.env.NODE_ENV === 'development') {
 app.set('trust proxy', 1);
 
 // Middleware - Allow CORS from any origin for development (mobile access)
-app.use(cors({
-  origin: function (origin, callback) {
+// Delegate form (receives req) so same-origin requests can be recognized:
+// browsers send an Origin header on every POST — same-origin included — and
+// behind the Nginx LB that origin is the public hostname (e.g. http://nginx
+// in the e2e stack, the site domain in prod), which matched neither the dev
+// IP patterns nor FRONTEND_URL and got every same-origin browser POST
+// rejected while header-less clients (curl, tests, mobile) passed.
+app.use(cors(function (req, callback) {
+  const applyOrigin = (err, allow) =>
+    callback(err, { origin: allow === true, credentials: true });
+  const origin = req.headers.origin;
+
+  {
     // Allow requests with no origin (like mobile apps, curl, etc)
-    if (!origin) return callback(null, true);
+    if (!origin) return applyOrigin(null, true);
+
+    // Same-origin through the proxy: the Origin's host equals the Host the
+    // browser addressed (Nginx forwards it verbatim). Not cross-origin at all.
+    try {
+      if (new URL(origin).host === req.headers.host) {
+        return applyOrigin(null, true);
+      }
+    } catch {
+      /* malformed Origin — fall through to the explicit checks */
+    }
 
     const isProduction = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL;
@@ -84,9 +104,9 @@ app.use(cors({
         .map((url) => url.trim())
         .filter(Boolean);
       if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+        return applyOrigin(null, true);
       }
-      return callback(new Error('Not allowed by CORS'));
+      return applyOrigin(new Error('Not allowed by CORS'));
     }
 
     // Development: Allow Localhost & Local Network IPs (Mobile Testing)
@@ -99,14 +119,13 @@ app.use(cors({
     ];
 
     if (allowedDevPatterns.some(pattern => pattern.test(origin))) {
-      return callback(null, true);
+      return applyOrigin(null, true);
     }
 
     // Block unknown origins in Dev too (to be cleaner, or allow all?)
     // User complaint was "server talks to any IP". So we restrict to local networks.
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true
+    applyOrigin(new Error('Not allowed by CORS'));
+  }
 }));
 // Increase payload size limit for base64 images (50MB)
 // SECURITY (audit HIGH): lowered from 50mb. 50mb of JSON parsed concurrently on

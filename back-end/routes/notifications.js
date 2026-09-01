@@ -144,6 +144,57 @@ router.get('/unread-count', protect, async (req, res) => {
   }
 });
 
+// ── Expo push token registration ────────────────────────────────────────────
+// NOTE: these are registered BEFORE the parameterized `/:id` delete route so
+// that DELETE /notifications/push-token is not swallowed by `/:id`.
+
+router.post('/push-token', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const { token, platform } = req.body || {};
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ success: false, message: 'A push token is required' });
+    }
+
+    const allowedPlatforms = ['ios', 'android', 'web'];
+    const normalizedPlatform = allowedPlatforms.includes(platform) ? platform : 'unknown';
+
+    const PushToken = require('../models/PushToken');
+    // Upsert keyed on token: refreshes updatedAt, and re-points the token to
+    // the current user when a different account signs in on the same device.
+    const pushToken = await PushToken.findOneAndUpdate(
+      { token },
+      { $set: { user: userId, platform: normalizedPlatform } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+
+    res.status(201).json({ success: true, pushToken: { token: pushToken.token, platform: pushToken.platform } });
+  } catch (error) {
+    console.error('Error registering push token:', error);
+    res.status(500).json({ success: false, message: 'Failed to register push token' });
+  }
+});
+
+router.delete('/push-token', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const { token } = req.body || {};
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ success: false, message: 'A push token is required' });
+    }
+
+    const PushToken = require('../models/PushToken');
+    const result = await PushToken.deleteOne({ token, user: userId });
+
+    res.json({ success: true, deleted: result.deletedCount > 0 });
+  } catch (error) {
+    console.error('Error removing push token:', error);
+    res.status(500).json({ success: false, message: 'Failed to remove push token' });
+  }
+});
+
 router.patch('/:id/read', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
@@ -349,6 +400,19 @@ router.post('/broadcast', protect, async (req, res) => {
       message: `Broadcast sent to ${students.length} students`,
       recipientCount: students.length,
     });
+
+    // Mirror the broadcast as Expo push notifications — fire-and-forget
+    // (insertMany bypasses Notification.createNotification's push hook).
+    try {
+      const { sendPushToUsers } = require('../services/expoPush');
+      sendPushToUsers(students.map((s) => s._id), {
+        title,
+        body: message,
+        data: { type: 'system' },
+      }).catch((pushErr) => console.error('[Broadcast] Push error:', pushErr.message));
+    } catch (pushErr) {
+      console.error('[Broadcast] Push setup error:', pushErr.message);
+    }
 
     setImmediate(async () => {
       try {
