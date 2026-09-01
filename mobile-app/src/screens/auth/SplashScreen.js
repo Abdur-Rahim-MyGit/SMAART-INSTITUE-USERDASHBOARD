@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SplashScreen — enhanced JS splash with particle burst + logo scale entrance.
  *
  * Native splash (app.json expo-splash-screen) already shows navy bg + logo
@@ -134,7 +134,7 @@ export default function SplashScreen({ navigation }) {
 
     const timer = setTimeout(() => {
       navigation.replace('WelcomeOnboarding');
-    }, 2400);
+    }, 3800);
 
     return () => {
       clearTimeout(timer);
