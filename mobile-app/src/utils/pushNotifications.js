@@ -119,10 +119,32 @@ export async function unregisterPushNotifications() {
   }
 }
 
-function openNotificationsScreen() {
-  // Every push mirrors an in-app notification, so the Notifications screen is
-  // the right landing spot regardless of payload type.
-  navigate('Notifications');
+/**
+ * Where a tapped push lands, by the Notification model's `type` (the server
+ * sends it in the push data payload as { notificationId, type }). Values are
+ * either a stack route name or [tab-container, nested tab]. Anything unmapped
+ * (system, info, warning, task, …) falls back to the Notifications list,
+ * which every push mirrors into.
+ */
+const TAP_ROUTES = {
+  assessment: 'Assessments',
+  certificate: 'Certificates',
+  support: 'Support',
+  course: ['MainTabs', 'Learning'],
+  community: ['MainTabs', 'Community'],
+  coaching: ['MainTabs', 'Career'],
+  badge: ['MainTabs', 'Profile'],
+  achievement: ['MainTabs', 'Profile'],
+};
+
+function openForNotification(response) {
+  const type = response?.notification?.request?.content?.data?.type;
+  const route = TAP_ROUTES[type];
+  if (Array.isArray(route)) {
+    navigate(route[0], { screen: route[1] });
+  } else {
+    navigate(route || 'Notifications');
+  }
 }
 
 /**
@@ -131,8 +153,8 @@ function openNotificationsScreen() {
  */
 export function subscribeToNotificationTaps() {
   try {
-    const subscription = Notifications.addNotificationResponseReceivedListener(() => {
-      openNotificationsScreen();
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      openForNotification(response);
     });
     return () => subscription.remove();
   } catch (err) {
@@ -150,7 +172,7 @@ export function handleInitialNotificationResponse() {
     const response = Notifications.getLastNotificationResponse();
     if (response) {
       Notifications.clearLastNotificationResponse();
-      openNotificationsScreen();
+      openForNotification(response);
     }
   } catch (err) {
     console.warn('[Push] Cold-start notification handling failed:', err?.message || err);
