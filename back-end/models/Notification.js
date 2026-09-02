@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
+const { sendExpoPushToUser } = require('../services/expoPushService');
 
 // Singleton emitter – keeps the model free of WS dependencies
 const notificationEmitter = new EventEmitter();
@@ -141,6 +142,16 @@ notificationSchema.statics.createNotification = async function(data) {
   await notification.save();
   // Fire real-time event for WebSocket layer
   notificationEmitter.emit('new_notification', notification.toJSON());
+
+  // Mirror to any registered mobile devices. Fire-and-forget: a push
+  // failure (or no FCM credentials configured yet) must never block the
+  // in-app notification that was just saved above.
+  sendExpoPushToUser(notification.userId, {
+    title: notification.title,
+    body: notification.message,
+    data: { notificationId: notification._id.toString(), link: notification.link },
+  }).catch(() => {});
+
   return notification;
 };
 

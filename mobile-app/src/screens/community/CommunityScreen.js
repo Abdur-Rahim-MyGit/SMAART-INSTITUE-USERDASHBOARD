@@ -19,6 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { announcementsAPI } from '../../api/announcements';
 import { groupsAPI } from '../../api/groups';
+import { communityFeedAPI } from '../../api/communityFeed';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -65,12 +66,20 @@ export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
   const { colors: themeColors, theme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState('notices'); // 'notices' or 'groups'
+  const [activeTab, setActiveTab] = useState('notices'); // 'notices' | 'groups' | 'discussions'
   const [loading, setLoading] = useState(true);
 
   // Data States
   const [announcements, setAnnouncements] = useState([]);
   const [groups, setGroups] = useState([]);
+
+  // Discussions feed state
+  const [discussions, setDiscussions] = useState([]);
+  const [discussionSearch, setDiscussionSearch] = useState('');
+  const [createPostModalVisible, setCreatePostModalVisible] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [creatingPost, setCreatingPost] = useState(false);
 
   // Notices Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -121,12 +130,25 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
+  const fetchDiscussions = async () => {
+    try {
+      const res = await communityFeedAPI.getDiscussions({ limit: 30 });
+      if (res?.success) {
+        setDiscussions(res.data || []);
+      }
+    } catch (err) {
+      console.warn('Failed to load discussions:', err);
+    }
+  };
+
   const loadData = useCallback(async () => {
     setLoading(true);
     if (activeTab === 'notices') {
       await fetchNotices();
-    } else {
+    } else if (activeTab === 'groups') {
       await fetchGroups();
+    } else {
+      await fetchDiscussions();
     }
     setLoading(false);
   }, [activeTab, dateFilter]);
@@ -231,6 +253,32 @@ export default function CommunityScreen({ navigation }) {
     return () => clearInterval(id);
   }, [chatModalVisible, selectedGroup]);
 
+  const handleCreatePost = async () => {
+    if (!newPostTitle.trim() || !newPostContent.trim()) {
+      Alert.alert('Required', 'Please enter both a title and some content.');
+      return;
+    }
+
+    setCreatingPost(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', newPostTitle.trim());
+      formData.append('content', newPostContent.trim());
+      formData.append('channelType', 'discussion');
+      const res = await communityFeedAPI.createDiscussion(formData);
+      if (res?.success) {
+        setCreatePostModalVisible(false);
+        setNewPostTitle('');
+        setNewPostContent('');
+        fetchDiscussions();
+      }
+    } catch (err) {
+      Alert.alert('Failed', err.message || 'Please try again.');
+    } finally {
+      setCreatingPost(false);
+    }
+  };
+
   // Filter Notices
   const filteredNotices = useMemo(() => {
     return announcements.filter((ann) => {
@@ -247,6 +295,16 @@ export default function CommunityScreen({ navigation }) {
       return matchRole && matchSearch;
     });
   }, [announcements, roleFilter, searchQuery]);
+
+  const filteredDiscussions = useMemo(() => {
+    const query = discussionSearch.trim().toLowerCase();
+    if (!query) return discussions;
+    return discussions.filter((d) => {
+      const title = (d.title || '').toLowerCase();
+      const content = (d.content || '').toLowerCase();
+      return title.includes(query) || content.includes(query);
+    });
+  }, [discussions, discussionSearch]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeColors.bg }]} edges={['top']}>
@@ -288,6 +346,12 @@ export default function CommunityScreen({ navigation }) {
             onPress={() => setActiveTab('groups')}
           >
             <Text style={[styles.selectorText, { color: activeTab === 'groups' ? '#FFFFFF' : themeColors.textMuted }]}>Study Groups</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.selectorBtn, activeTab === 'discussions' && [styles.selectorBtnActive, { backgroundColor: themeColors.primaryBright }]]}
+            onPress={() => setActiveTab('discussions')}
+          >
+            <Text style={[styles.selectorText, { color: activeTab === 'discussions' ? '#FFFFFF' : themeColors.textMuted }]}>Discussions</Text>
           </TouchableOpacity>
         </View>
       </AnimatedSection>
@@ -456,8 +520,139 @@ export default function CommunityScreen({ navigation }) {
             </View>
             </AnimatedSection>
           )}
+
+          {/* DISCUSSIONS TAB */}
+          {activeTab === 'discussions' && (
+            <AnimatedSection delay={80}>
+            <View style={styles.tabContent}>
+              <View style={styles.groupsHeaderRow}>
+                <Text style={[styles.sectionHeading, { color: themeColors.text }]}>Ask, share, discuss</Text>
+                <TouchableOpacity
+                  style={[styles.createGroupBtn, { backgroundColor: themeColors.primaryBright }]}
+                  onPress={() => setCreatePostModalVisible(true)}
+                >
+                  <Feather name="plus" size={14} color="#FFFFFF" />
+                  <Text style={styles.createGroupText}>New Post</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={[styles.searchBar, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+                <Feather name="search" size={16} color={themeColors.textMuted} style={{ marginRight: 8 }} />
+                <TextInput
+                  style={[styles.searchInput, { color: themeColors.text }]}
+                  placeholder="Search discussions..."
+                  placeholderTextColor={themeColors.textMuted}
+                  value={discussionSearch}
+                  onChangeText={setDiscussionSearch}
+                />
+              </View>
+
+              {filteredDiscussions.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Feather name="message-circle" size={32} color={themeColors.textMuted} />
+                  <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>
+                    No discussions yet. Start the conversation.
+                  </Text>
+                </View>
+              ) : (
+                filteredDiscussions.map((post) => {
+                  const authorName = post.author?.fullName || post.author?.email || 'Student';
+                  const replyCount = post.replies?.length || 0;
+                  const reactionCount = (post.reactions?.length || 0) + (post.likes?.length || 0);
+
+                  return (
+                    <PressCard
+                      key={post._id}
+                      style={[styles.noticeCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                      onPress={() => navigation.navigate('DiscussionDetail', { discussionId: post._id })}
+                    >
+                      <View style={styles.noticeHeader}>
+                        <View style={[styles.noticeIconWrap, { backgroundColor: 'rgba(20,120,184,0.12)' }]}>
+                          <Feather name="message-circle" size={15} color="#1478B8" />
+                        </View>
+                        <View style={styles.noticeMeta}>
+                          <Text style={[styles.noticeTitle, { color: themeColors.text }]} numberOfLines={1}>{post.title}</Text>
+                          <Text style={[styles.noticeIssuer, { color: themeColors.textMuted }]}>
+                            {authorName} • {new Date(post.createdAt).toLocaleDateString()}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <Text style={[styles.noticeDesc, { color: themeColors.textMuted }]} numberOfLines={2}>
+                        {post.content}
+                      </Text>
+
+                      <View style={styles.reactionRow}>
+                        <View style={styles.discussionStat}>
+                          <Feather name="heart" size={12} color={themeColors.textMuted} />
+                          <Text style={[styles.reactCount, { color: themeColors.textMuted }]}>{reactionCount}</Text>
+                        </View>
+                        <View style={styles.discussionStat}>
+                          <Feather name="message-square" size={12} color={themeColors.textMuted} />
+                          <Text style={[styles.reactCount, { color: themeColors.textMuted }]}>{replyCount}</Text>
+                        </View>
+                        <View style={styles.discussionStat}>
+                          <Feather name="eye" size={12} color={themeColors.textMuted} />
+                          <Text style={[styles.reactCount, { color: themeColors.textMuted }]}>{post.views || 0}</Text>
+                        </View>
+                      </View>
+                    </PressCard>
+                  );
+                })
+              )}
+            </View>
+            </AnimatedSection>
+          )}
         </ScrollView>
       )}
+
+      {/* CREATE DISCUSSION POST MODAL */}
+      <Modal visible={createPostModalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: themeColors.bg }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
+              <Text style={[styles.modalHeaderTitle, { color: themeColors.text }]}>New Discussion</Text>
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setCreatePostModalVisible(false)}>
+                <Feather name="x" size={20} color={themeColors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Title</Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="What's your question or topic?"
+                placeholderTextColor={themeColors.textMuted}
+                value={newPostTitle}
+                onChangeText={setNewPostTitle}
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Content</Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text, height: 110, textAlignVertical: 'top' }]}
+                placeholder="Share the details..."
+                placeholderTextColor={themeColors.textMuted}
+                value={newPostContent}
+                onChangeText={setNewPostContent}
+                multiline
+                numberOfLines={5}
+              />
+
+              <TouchableOpacity
+                style={[styles.submitGroupBtn, { backgroundColor: themeColors.primaryBright }, creatingPost && { opacity: 0.6 }]}
+                disabled={creatingPost}
+                onPress={handleCreatePost}
+              >
+                {creatingPost ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.submitGroupText}>Post Discussion</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* CREATE STUDY GROUP MODAL */}
       <Modal visible={createGroupModalVisible} animationType="slide" transparent>
@@ -785,6 +980,11 @@ const styles = StyleSheet.create({
   reactCount: {
     fontSize: 10,
     fontWeight: '800',
+  },
+  discussionStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   groupsHeaderRow: {
     flexDirection: 'row',

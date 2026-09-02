@@ -4,6 +4,7 @@ import * as storage from '../utils/storage';
 import { TOKEN_KEY, renewAuthToken, setSessionExpiredHandler } from '../api/client';
 import { getMe, logout as logoutRequest } from '../api/auth';
 import { isBiometricEnabled, setBiometricEnabled as persistBiometricEnabled } from '../utils/biometrics';
+import { registerForPushNotifications, unregisterPushNotifications } from '../utils/pushNotifications';
 
 const AuthContext = createContext(null);
 
@@ -56,6 +57,7 @@ export function AuthProvider({ children }) {
           }
           // Gate the restored session behind biometrics if the student opted in.
           if (enabled) setIsLocked(true);
+          registerForPushNotifications().catch(() => {});
         }
       } catch (err) {
         await storage.deleteItem(TOKEN_KEY);
@@ -123,9 +125,11 @@ export function AuthProvider({ children }) {
       setCollege(userData.college);
     }
     setIsLocked(false);
+    registerForPushNotifications().catch(() => {});
   };
 
   const signOut = async () => {
+    await unregisterPushNotifications();
     try {
       await logoutRequest();
     } catch {

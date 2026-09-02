@@ -554,6 +554,10 @@ const studentSchema = new mongoose.Schema({
       auth: String
     }
   }],
+  // Expo push tokens (mobile) — separate from pushSubscriptions above, which
+  // is the web dashboard's Web Push subscription shape. One student can have
+  // several (multiple devices), so this stays a plain deduped string array.
+  expoPushTokens: [{ type: String }],
 
   // Streak data - Sunday-based weekly cycle (formerly Registration.streakData)
   streakData: {

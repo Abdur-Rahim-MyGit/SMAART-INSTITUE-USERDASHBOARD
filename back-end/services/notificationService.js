@@ -1,5 +1,6 @@
 const Notification = require('../models/Notification');
 const emailService = require('./emailService');
+const { sendExpoPushToUsers } = require('./expoPushService');
 
 // Icon and color mappings for notification types
 const NOTIFICATION_CONFIG = {
@@ -258,7 +259,9 @@ const notifySystemAnnouncement = async (userIds, title, message, link = null) =>
     color: '#64748B'
   }));
 
-  return Notification.insertMany(notifications);
+  const saved = await Notification.insertMany(notifications);
+  sendExpoPushToUsers(userIds, { title, body: message, data: { link } }).catch(() => {});
+  return saved;
 };
 
 /**
@@ -284,18 +287,23 @@ const notifyWelcome = async (userId, fullName) => {
  * Notify user about new course available
  */
 const notifyNewCourse = async (userIds, course) => {
+  const title = '📚 New Course Available!';
+  const message = `"${course.title}" is now available. Enroll now to start learning!`;
+
   const notifications = userIds.map(userId => ({
     userId,
     type: 'course',
-    title: '📚 New Course Available!',
-    message: `"${course.title}" is now available. Enroll now to start learning!`,
+    title,
+    message,
     link: `/courses/${course._id}`,
     icon: 'book-open',
     color: '#4F46E5',
     metadata: { courseId: course._id }
   }));
 
-  return Notification.insertMany(notifications);
+  const saved = await Notification.insertMany(notifications);
+  sendExpoPushToUsers(userIds, { title, body: message, data: { courseId: course._id?.toString() } }).catch(() => {});
+  return saved;
 };
 
 /**

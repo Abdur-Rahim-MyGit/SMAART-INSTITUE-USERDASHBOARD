@@ -128,7 +128,10 @@ bio: {
       p256dh: String,
       auth: String
     }
-  }]
+  }],
+  // Expo push tokens (mobile) — see Student.js for why this is separate
+  // from pushSubscriptions.
+  expoPushTokens: [{ type: String }]
 }, {
   timestamps: true
 });

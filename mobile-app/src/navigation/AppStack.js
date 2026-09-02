@@ -17,6 +17,7 @@ import PerformanceScreen from '../screens/performance/PerformanceScreen';
 import VisionBoardScreen from '../screens/community/VisionBoardScreen';
 import VisionBoardDetailScreen from '../screens/community/VisionBoardDetailScreen';
 import VisionBoardCreateScreen from '../screens/community/VisionBoardCreateScreen';
+import DiscussionDetailScreen from '../screens/community/DiscussionDetailScreen';
 import CareerDirectionsScreen from '../screens/career/CareerDirectionsScreen';
 import ToolkitScreen from '../screens/career/ToolkitScreen';
 import CgpaCalculatorScreen from '../screens/learning/CgpaCalculatorScreen';
@@ -122,6 +123,7 @@ function AppNavigator() {
         <Stack.Screen name="VisionBoard" component={VisionBoardScreen} options={{ headerShown: false }} />
         <Stack.Screen name="VisionBoardDetail" component={VisionBoardDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="VisionBoardCreate" component={VisionBoardCreateScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="DiscussionDetail" component={DiscussionDetailScreen} options={{ headerShown: false }} />
 
         <Stack.Screen
           name="FaceVerificationTest"

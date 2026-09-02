@@ -12,6 +12,7 @@ const {
   emitNotificationsClearedToUser,
 } = require('../services/websocketService');
 const { sendSystemAnnouncementEmail } = require('../services/emailService');
+const { sendExpoPushToUsers } = require('../services/expoPushService');
 
 const getAuthenticatedUserId = (req) => (req.user?._id || req.user?.id || '').toString();
 
@@ -332,6 +333,7 @@ router.post('/broadcast', protect, async (req, res) => {
     }));
 
     await Notification.insertMany(notifications);
+    sendExpoPushToUsers(students.map((s) => s._id), { title, body: message }).catch(() => {});
 
     broadcastToAll({
       type: 'system',
@@ -407,6 +409,66 @@ router.post('/subscribe', protect, async (req, res) => {
   } catch (error) {
     console.error('Error saving push subscription:', error);
     res.status(500).json({ success: false, message: 'Failed to save push subscription' });
+  }
+});
+
+// Register this device's Expo push token (mobile app). Separate from
+// POST /subscribe above, which stores a Web Push subscription object — an
+// Expo push token is just a string (`ExponentPushToken[...]`), not that shape.
+router.post('/register-device', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const { expoPushToken } = req.body;
+    const { isExpoPushToken } = require('../services/expoPushService');
+
+    if (!isExpoPushToken(expoPushToken)) {
+      return res.status(400).json({ success: false, message: 'Invalid Expo push token' });
+    }
+
+    const Student = require('../models/Student');
+    const User = require('../models/User');
+
+    let owner = await Student.findById(userId);
+    if (!owner) owner = await User.findById(userId);
+    if (!owner) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!owner.expoPushTokens?.includes(expoPushToken)) {
+      owner.expoPushTokens = [...(owner.expoPushTokens || []), expoPushToken];
+      await owner.save();
+    }
+
+    res.json({ success: true, message: 'Device registered for push notifications' });
+  } catch (error) {
+    console.error('Error registering push token:', error);
+    res.status(500).json({ success: false, message: 'Failed to register device' });
+  }
+});
+
+// Unregister this device's Expo push token — call on logout so a signed-out
+// device stops receiving pushes for the account.
+router.delete('/register-device', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const { expoPushToken } = req.body;
+
+    const Student = require('../models/Student');
+    const User = require('../models/User');
+
+    let owner = await Student.findById(userId);
+    if (!owner) owner = await User.findById(userId);
+    if (!owner) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    owner.expoPushTokens = (owner.expoPushTokens || []).filter((t) => t !== expoPushToken);
+    await owner.save();
+
+    res.json({ success: true, message: 'Device unregistered' });
+  } catch (error) {
+    console.error('Error unregistering push token:', error);
+    res.status(500).json({ success: false, message: 'Failed to unregister device' });
   }
 });
 
