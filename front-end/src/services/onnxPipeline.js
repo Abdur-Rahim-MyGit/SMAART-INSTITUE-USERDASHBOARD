@@ -49,7 +49,7 @@ let lastObjectNearMisses = [];
 export const getLastObjectNearMisses = () => lastObjectNearMisses;
 const YOLO_PAD_VALUE = 114 / 255;
 // Detections between this and the acting threshold are logged, never acted on.
-const YOLO_NEAR_MISS_SCORE = 0.18;
+const YOLO_NEAR_MISS_SCORE = 0.12;
 const YOLO_NMS_THRESHOLD = 0.45;
 // COCO class id → violation label. Only these classes are reported.
 const YOLO_CLASSES_OF_INTEREST = { 67: 'phone', 73: 'book', 63: 'laptop' };
@@ -749,14 +749,17 @@ if (typeof window !== 'undefined') {
   };
 }
 
-// Preprocess a frame for YOLO: letterbox into 640×640 (aspect ratio kept, grey
-// padding, as the model was trained), RGB, normalised 0–1, NCHW.
+// Preprocess a region of the frame for YOLO: letterbox into 640×640 (aspect
+// ratio kept, grey padding, as the model was trained), RGB, 0–1, NCHW.
 //
 // This used to stretch the 4:3 camera frame straight into the square, which
 // squashed everything by 25% along one axis. Shape is most of what separates a
 // phone from a book or a remote at webcam distance, so the distortion produced
 // exactly the confusions candidates reported.
-const videoToYoloTensor = (videoEl) => {
+//
+// `region` is {sx, sy, sw, sh} in video pixels. The full frame is the default;
+// a tighter region is a zoom, which is how small objects get enough pixels.
+const videoToYoloTensor = (videoEl, region) => {
   if (!_yoloCanvas) {
     _yoloCanvas = document.createElement('canvas');
     _yoloCtx = _yoloCanvas.getContext('2d', { willReadFrequently: true });
@@ -765,15 +768,16 @@ const videoToYoloTensor = (videoEl) => {
   }
   const vw = videoEl.videoWidth || YOLO_INPUT_SIZE;
   const vh = videoEl.videoHeight || YOLO_INPUT_SIZE;
-  const scale = Math.min(YOLO_INPUT_SIZE / vw, YOLO_INPUT_SIZE / vh);
-  const dw = Math.round(vw * scale);
-  const dh = Math.round(vh * scale);
+  const { sx, sy, sw, sh } = region || { sx: 0, sy: 0, sw: vw, sh: vh };
+  const scale = Math.min(YOLO_INPUT_SIZE / sw, YOLO_INPUT_SIZE / sh);
+  const dw = Math.round(sw * scale);
+  const dh = Math.round(sh * scale);
   const padX = Math.floor((YOLO_INPUT_SIZE - dw) / 2);
   const padY = Math.floor((YOLO_INPUT_SIZE - dh) / 2);
 
   _yoloCtx.fillStyle = 'rgb(114,114,114)';
   _yoloCtx.fillRect(0, 0, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE);
-  _yoloCtx.drawImage(videoEl, padX, padY, dw, dh);
+  _yoloCtx.drawImage(videoEl, sx, sy, sw, sh, padX, padY, dw, dh);
 
   const { data } = _yoloCtx.getImageData(0, 0, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE);
   const pixels = YOLO_INPUT_SIZE * YOLO_INPUT_SIZE;
@@ -783,90 +787,112 @@ const videoToYoloTensor = (videoEl) => {
     t[pixels + i] = data[i * 4 + 1] / 255;    // G
     t[2 * pixels + i] = data[i * 4 + 2] / 255; // B
   }
-  return { tensor: t, scale, padX, padY, vw, vh };
+  return { tensor: t, scale, padX, padY, sx, sy, sw, sh, vw, vh };
+};
+
+/**
+ * One YOLO pass over a region. Returns candidate boxes in VIDEO pixels, before
+ * non-maximum suppression, so passes over different regions can be merged.
+ */
+const runYoloPass = async (videoEl, region, nearMisses) => {
+  const ort = getOrt();
+  const { tensor: input, scale, padX, padY, sx, sy, vw, vh } = videoToYoloTensor(videoEl, region);
+  const tensor = new ort.Tensor('float32', input, [1, 3, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE]);
+  const outputs = await yoloSession.run({ [yoloSession.inputNames[0]]: tensor });
+  const out = outputs[yoloSession.outputNames[0]];
+  const dims = out.dims;
+  const dataArr = out.data;
+
+  // Handle both export layouts: [1, attrs, anchors] and [1, anchors, attrs].
+  // attrs = 4 (box) + numClasses; it is the SMALLER of the two trailing dims.
+  const d1 = dims[1], d2 = dims[2];
+  const attrsFirst = d1 <= d2;
+  const numAttrs = attrsFirst ? d1 : d2;
+  const numAnchors = attrsFirst ? d2 : d1;
+  const at = (attr, a) => (attrsFirst ? dataArr[attr * numAnchors + a] : dataArr[a * numAttrs + attr]);
+
+  const numClasses = Math.min(YOLO_NUM_CLASSES, numAttrs - 4);
+  const minArea = YOLO_MIN_AREA_RATIO * YOLO_INPUT_SIZE * YOLO_INPUT_SIZE;
+  const found = [];
+  for (let a = 0; a < numAnchors; a++) {
+    // Best watched class for this anchor, and the best of every OTHER class
+    // except "person". A watched object must beat the other objects (so a
+    // remote or a bottle is not reported as a phone) but is allowed to lose
+    // to "person": a phone held up beside the face sits on anchors that also
+    // score the person highly, and requiring it to out-score the person
+    // silently dropped phones in exactly the pose that matters most.
+    let bestScore = 0, bestCls = -1, bestOther = 0;
+    for (let c = 0; c < numClasses; c++) {
+      const sc = at(4 + c, a);
+      if (c in YOLO_CLASSES_OF_INTEREST) {
+        if (sc > bestScore) { bestScore = sc; bestCls = c; }
+      } else if (c !== YOLO_PERSON_CLASS && sc > bestOther) {
+        bestOther = sc;
+      }
+    }
+    if (bestCls < 0 || bestScore < YOLO_NEAR_MISS_SCORE) continue;
+    if (bestOther > bestScore) continue; // the model thinks it is something else
+
+    const threshold = YOLO_CLASS_THRESHOLDS[bestCls] ?? YOLO_SCORE_THRESHOLD;
+    if (bestScore < threshold) {
+      // Seen, but not confidently enough to act on. Logged because "the model
+      // never saw the phone" and "the model saw it at 0.31 against a 0.35 bar"
+      // are completely different problems with completely different fixes.
+      nearMisses.push(`${YOLO_CLASSES_OF_INTEREST[bestCls]} ${bestScore.toFixed(2)}`);
+      continue;
+    }
+
+    const cx = at(0, a), cy = at(1, a), w = at(2, a), h = at(3, a);
+    if (w * h < minArea) continue;
+    // Letterboxed 640-space → video pixels.
+    const x1 = Math.max(0, sx + (cx - w / 2 - padX) / scale);
+    const y1 = Math.max(0, sy + (cy - h / 2 - padY) / scale);
+    const x2 = Math.min(vw, sx + (cx + w / 2 - padX) / scale);
+    const y2 = Math.min(vh, sy + (cy + h / 2 - padY) / scale);
+    found.push({ cls: bestCls, score: bestScore, box: [x1, y1, x2, y2] });
+  }
+  return found;
 };
 
 /**
  * Detect prohibited objects (phone/book/laptop) in the current frame.
  * No-ops (returns []) when the YOLO model isn't loaded.
+ *
+ * Two passes. The full frame first; if that finds nothing, a zoomed pass over
+ * the centre of the frame — where a phone is held when photographing the
+ * screen, in front of the face and chest. At webcam resolution a phone shown
+ * from the back is a small featureless rectangle of maybe 60 pixels; doubled,
+ * the model has something to work with. The second pass only runs when the
+ * first is empty, so the cost is paid exactly when it can help.
+ *
  * @returns {Promise<Array<{cls:number, label:string, score:number, box:number[]}>>}
  */
 export const detectObjects = async (videoEl) => {
   if (!yoloSession || !videoEl || videoEl.readyState < 2) return [];
   try {
-    const ort = getOrt();
-    const { tensor: input, scale, padX, padY, vw, vh } = videoToYoloTensor(videoEl);
-    const tensor = new ort.Tensor('float32', input, [1, 3, YOLO_INPUT_SIZE, YOLO_INPUT_SIZE]);
-    const outputs = await yoloSession.run({ [yoloSession.inputNames[0]]: tensor });
-    const out = outputs[yoloSession.outputNames[0]];
-    const dims = out.dims;
-    const dataArr = out.data;
-
-    // Handle both export layouts: [1, attrs, anchors] and [1, anchors, attrs].
-    // attrs = 4 (box) + numClasses; it is the SMALLER of the two trailing dims.
-    const d1 = dims[1], d2 = dims[2];
-    const attrsFirst = d1 <= d2;
-    const numAttrs = attrsFirst ? d1 : d2;
-    const numAnchors = attrsFirst ? d2 : d1;
-    const at = (attr, a) => (attrsFirst ? dataArr[attr * numAnchors + a] : dataArr[a * numAttrs + attr]);
-
-    const numClasses = Math.min(YOLO_NUM_CLASSES, numAttrs - 4);
-    const minArea = YOLO_MIN_AREA_RATIO * YOLO_INPUT_SIZE * YOLO_INPUT_SIZE;
-    const boxes = [], scores = [], classes = [];
+    const vw = videoEl.videoWidth || YOLO_INPUT_SIZE;
+    const vh = videoEl.videoHeight || YOLO_INPUT_SIZE;
     const nearMisses = [];
-    for (let a = 0; a < numAnchors; a++) {
-      // Best watched class for this anchor, and the best of every OTHER class
-      // except "person". A watched object must beat the other objects (so a
-      // remote or a bottle is not reported as a phone) but is allowed to lose
-      // to "person": a phone held up beside the face sits on anchors that also
-      // score the person highly, and requiring it to out-score the person
-      // silently dropped phones in exactly the pose that matters most.
-      let bestScore = 0, bestCls = -1, bestOther = 0;
-      for (let c = 0; c < numClasses; c++) {
-        const s = at(4 + c, a);
-        if (c in YOLO_CLASSES_OF_INTEREST) {
-          if (s > bestScore) { bestScore = s; bestCls = c; }
-        } else if (c !== YOLO_PERSON_CLASS && s > bestOther) {
-          bestOther = s;
-        }
-      }
-      if (bestCls < 0 || bestScore < YOLO_NEAR_MISS_SCORE) continue;
-      if (bestOther > bestScore) continue; // the model thinks it is something else
 
-      const threshold = YOLO_CLASS_THRESHOLDS[bestCls] ?? YOLO_SCORE_THRESHOLD;
-      if (bestScore >= YOLO_NEAR_MISS_SCORE && bestScore < threshold) {
-        // Seen, but not confidently enough to act on. Logged because "the model
-        // never saw the phone" and "the model saw it at 0.31 against a 0.45 bar"
-        // are completely different problems with completely different fixes.
-        nearMisses.push(`${YOLO_CLASSES_OF_INTEREST[bestCls]} ${bestScore.toFixed(2)}`);
-      }
-      if (bestScore < threshold) continue;
+    let found = await runYoloPass(videoEl, null, nearMisses);
 
-      const cx = at(0, a), cy = at(1, a), w = at(2, a), h = at(3, a);
-      if (w * h < minArea) continue;
-      boxes.push([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]);
-      scores.push(bestScore);
-      classes.push(bestCls);
+    if (found.length === 0) {
+      const zoom = { sx: Math.round(vw * 0.2), sy: 0, sw: Math.round(vw * 0.6), sh: Math.round(vh * 0.8) };
+      found = await runYoloPass(videoEl, zoom, nearMisses);
     }
+
     lastObjectNearMisses = [...new Set(nearMisses)];
     if (nearMisses.length) {
       console.log(`[OnnxPipeline] YOLO near-miss (below class threshold): ${lastObjectNearMisses.join(', ')}`);
     }
 
-    if (!boxes.length) return [];
-    const keep = nms(boxes, scores, YOLO_NMS_THRESHOLD);
-    // Boxes come back in the letterboxed 640-space; map them to video pixels.
-    const toVideo = ([x1, y1, x2, y2]) => [
-      Math.max(0, (x1 - padX) / scale),
-      Math.max(0, (y1 - padY) / scale),
-      Math.min(vw, (x2 - padX) / scale),
-      Math.min(vh, (y2 - padY) / scale),
-    ];
+    if (!found.length) return [];
+    const keep = nms(found.map(f => f.box), found.map(f => f.score), YOLO_NMS_THRESHOLD);
     return keep.map(i => ({
-      cls: classes[i],
-      label: YOLO_CLASSES_OF_INTEREST[classes[i]],
-      score: scores[i],
-      box: toVideo(boxes[i])
+      cls: found[i].cls,
+      label: YOLO_CLASSES_OF_INTEREST[found[i].cls],
+      score: found[i].score,
+      box: found[i].box
     }));
   } catch (err) {
     console.warn('[OnnxPipeline] detectObjects failed:', err.message);
