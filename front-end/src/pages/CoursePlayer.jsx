@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -191,6 +191,18 @@ const CoursePlayer = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
   const [isTheater, setIsTheater] = useState(readTheaterPreference);
+  // This page is its own scroll container (h-screen overflow-y-auto), so
+  // window.scrollTo has no effect here; scroll the root element instead.
+  const pageRef = useRef(null);
+  const scrollPageToTop = (behavior = "smooth") => {
+    const el = pageRef.current;
+    if (el && typeof el.scrollTo === "function") {
+      el.scrollTo({ top: 0, left: 0, behavior });
+    } else if (el) {
+      el.scrollTop = 0;
+    }
+    window.scrollTo({ top: 0, left: 0, behavior });
+  };
   const toggleTheater = () =>
     setIsTheater((prev) => {
       const next = !prev;
@@ -355,14 +367,15 @@ const CoursePlayer = () => {
 
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
-  // Theater only reshapes the page for steps that actually have a video;
-  // quizzes and practice keep the default two-column view so the setting can
-  // always be changed from the header.
+  // Theater widens every step to a single column with the curriculum below.
+  // Only steps with a video also get the YouTube-style black band; quizzes,
+  // flash cards and practice keep their card and simply use the full width.
   const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
   const activeStepHasVideo =
     activeStepData?.contentType === 'video-text' ||
     (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
-  const theaterLayout = isTheater && activeStepHasVideo;
+  const theaterLayout = isTheater;
+  const theaterBand = isTheater && activeStepHasVideo;
 
   const isCompleted = useMemo(() => {
     if (!totalSteps) return false;
@@ -540,7 +553,7 @@ const CoursePlayer = () => {
     setCurrentVideoTime(0);
     setCurrentVideoDuration(0);
     setVideoWatched(false);
-    window.scrollTo(0, 0);
+    scrollPageToTop("auto");
 
     if (courseId) {
       const userId = currentUser?._id || currentUser?.id || 'anon';
@@ -649,7 +662,8 @@ const CoursePlayer = () => {
     setActiveStep(resumeStep);
     setVideoWatched(false);
     handleStartStep(resumeStep);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+    // Wait one frame so the lesson view has replaced the intro before scrolling.
+    requestAnimationFrame(() => scrollPageToTop("auto"));
   };
 
   const handleStepClick = (stepNumber) => {
@@ -659,7 +673,7 @@ const CoursePlayer = () => {
       setVideoWatched(false);
       if (isActivating) {
         handleStartStep(stepNumber);
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+        requestAnimationFrame(() => scrollPageToTop("smooth"));
       }
     } else {
       toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
@@ -1129,7 +1143,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-28">
+    <div ref={pageRef} className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-28">
       {/* Ambient layer, matching the dashboard and courses pages. Fixed rather
           than absolute because this page's own root is the scroll container --
           an absolute layer would scroll away with the lesson content. */}
@@ -1192,11 +1206,11 @@ const CoursePlayer = () => {
         </div>
 
         {/* Main Content */}
-        <main className={theaterLayout ? "space-y-6" : "pt-2 sm:pt-4 space-y-6"}>
+        <main className={theaterBand ? "space-y-6" : "pt-2 sm:pt-4 space-y-6"}>
           {/* Course Info Header */}
           {!showIntro && (
             <AnimatePresence initial={false}>
-              {!theaterLayout && (
+              {!theaterBand && (
                 <motion.div
                   key="course-title-full"
                   initial={{ opacity: 0, y: 6 }}
@@ -1414,12 +1428,12 @@ const CoursePlayer = () => {
                         exit={{ opacity: 0, y: -10 }}
                         transition={LAYOUT_TRANSITION}
                         className={
-                          theaterLayout
+                          theaterBand
                             ? "flex flex-col mb-6 text-left text-[#072036] dark:text-white"
                             : "p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left"
                         }
                       >
-                        {!theaterLayout && (
+                        {!theaterBand && (
                           <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
                         )}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
@@ -1429,7 +1443,7 @@ const CoursePlayer = () => {
                             </div>
                             <div className="min-w-0">
                               <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                {theaterLayout && (
+                                {theaterBand && (
                                   <>
                                     <span>{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</span>
                                     <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
