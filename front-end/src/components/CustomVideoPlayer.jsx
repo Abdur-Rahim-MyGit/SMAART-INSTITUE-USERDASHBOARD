@@ -12,12 +12,14 @@ import {
   RotateCcw,
   Settings,
   Sparkles,
+  TheaterNormal,
+  TheaterWide,
   Volume2,
   VolumeX,
 } from "@/components/icons";
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onTimeUpdate, onNext, nextLabel = "Next Lesson" }, ref) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onTimeUpdate, onNext, nextLabel = "Next Lesson", isTheater = false, onToggleTheater, className = "" }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -41,6 +43,9 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   const controlsTimeoutRef = useRef(null);
   const lastSyncTimeRef = useRef(0);
   const lastUrlRef = useRef(videoUrl);
+  // Latest theater toggle, read from the keyboard handler without re-binding it.
+  const onToggleTheaterRef = useRef(onToggleTheater);
+  useEffect(() => { onToggleTheaterRef.current = onToggleTheater; }, [onToggleTheater]);
 
   useImperativeHandle(ref, () => ({
     seekTo: (time) => {
@@ -279,6 +284,18 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!videoRef.current) return;
+      // Never hijack typing: the notes editor and quiz inputs share this page.
+      const target = e.target;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       switch (e.key.toLowerCase()) {
         case ' ':
@@ -301,6 +318,12 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
         case 'f':
           e.preventDefault();
           toggleFullscreen();
+          break;
+        case 't':
+          if (onToggleTheaterRef.current) {
+            e.preventDefault();
+            onToggleTheaterRef.current();
+          }
           break;
         default:
           break;
@@ -441,7 +464,11 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   return (
     <div
       ref={containerRef}
-      className="group relative aspect-video rounded-2xl overflow-hidden shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30 cursor-pointer select-none transform-gpu bg-slate-950"
+      className={`group relative aspect-video overflow-hidden cursor-pointer select-none transform-gpu bg-slate-950 ${
+        isTheater
+          ? 'rounded-none border-0 shadow-none'
+          : 'rounded-2xl shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30'
+      } ${className}`}
       style={{ transform: 'translateZ(0)' }}
       onMouseEnter={() => setShowControls(true)}
       onMouseMove={handleMouseMove}
@@ -692,6 +719,21 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
                   >
                     <Tv className="w-5 h-5" />
+                  </button>
+                )}
+
+                {/* Theater mode (page-level layout, YouTube style) */}
+                {onToggleTheater && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleTheater();
+                    }}
+                    className="hidden lg:inline-flex text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    title={isTheater ? 'Default view (T)' : 'Theater mode (T)'}
+                    aria-pressed={isTheater}
+                  >
+                    {isTheater ? <TheaterNormal className="w-5 h-5" /> : <TheaterWide className="w-5 h-5" />}
                   </button>
                 )}
 

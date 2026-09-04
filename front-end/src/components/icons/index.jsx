@@ -136,6 +136,8 @@ export const ICON_NAMES = Object.freeze([
   "volume_up",
   "wand_stars",
   "warning",
+  "width_normal",
+  "width_wide",
   "work",
   "workspace_premium",
   "zoom_in",
@@ -323,6 +325,8 @@ export const Trophy = /*#__PURE__*/ icon("Trophy", "trophy");
 export const Upload = /*#__PURE__*/ icon("Upload", "upload");
 export const User = /*#__PURE__*/ icon("User", "person");
 export const Users = /*#__PURE__*/ icon("Users", "groups");
+export const TheaterNormal = /*#__PURE__*/ icon("TheaterNormal", "width_normal");
+export const TheaterWide = /*#__PURE__*/ icon("TheaterWide", "width_wide");
 export const Volume2 = /*#__PURE__*/ icon("Volume2", "volume_up");
 export const VolumeX = /*#__PURE__*/ icon("VolumeX", "volume_off");
 export const Wrench = /*#__PURE__*/ icon("Wrench", "handyman");

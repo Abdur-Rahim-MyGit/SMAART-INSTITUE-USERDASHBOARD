@@ -148,6 +148,17 @@ const COURSE_GUIDELINES = [
   },
 ];
 
+/* Theater mode (YouTube style): the video takes the full content width and the
+   curriculum drops below it. Remembered per browser. */
+const THEATER_STORAGE_KEY = "smaart_course_player_theater";
+const readTheaterPreference = () => {
+  try {
+    return localStorage.getItem(THEATER_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -174,6 +185,17 @@ const CoursePlayer = () => {
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
+  const [isTheater, setIsTheater] = useState(readTheaterPreference);
+  const toggleTheater = () =>
+    setIsTheater((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(THEATER_STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        /* preference is a convenience; ignore storage failures */
+      }
+      return next;
+    });
   const acknowledgedCount = COURSE_GUIDELINES.filter((g) => acknowledgedGuidelines[g.id]).length;
   const allGuidelinesAcknowledged = acknowledgedCount === COURSE_GUIDELINES.length;
   const toggleGuideline = (id) =>
@@ -888,33 +910,49 @@ const CoursePlayer = () => {
       case 'video-text': {
         const isPlaceholderVideo = !stepData.videoUrl;
         const playbackUrl = stepData.videoUrl || TEMP_VIDEO_URL;
+        // In theater mode the lesson card becomes a flex column and this wrapper
+        // dissolves (display: contents) so the video can be ordered above the
+        // card header as a full-bleed dark band, without remounting the player.
         return (
-          <div className="space-y-4">
+          <div className={isTheater ? "contents" : "space-y-4"}>
             {playbackUrl && (
-              <div className="rounded-2xl overflow-hidden relative">
+              <div
+                className={
+                  isTheater
+                    ? "order-first relative -mx-5 -mt-5 mb-6 overflow-hidden bg-[#061a2e] sm:-mx-7 sm:-mt-7"
+                    : "rounded-2xl overflow-hidden relative"
+                }
+              >
                 {isPlaceholderVideo && (
-                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/95 text-white text-[11px] font-bold shadow-lg backdrop-blur-sm">
+                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/95 text-white text-xs font-bold shadow-lg backdrop-blur-sm">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                <CustomVideoPlayer
-                  videoUrl={playbackUrl}
-                  title={stepData.title}
-                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
-                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
-                  onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time, dur) => {
-                    setCurrentVideoTime(time);
-                    if (dur) setCurrentVideoDuration(dur);
-                  }}
-                  onNext={activeStep !== lastStepKey ? () => {
-                    const nextStep = (parseInt(activeStep) + 1).toString();
-                    handleStepComplete(activeStep);
-                    setActiveStep(nextStep);
-                    setVideoWatched(false);
-                  } : null}
-                />
+                <div
+                  className={isTheater ? "mx-auto w-full" : undefined}
+                  style={isTheater ? { maxWidth: "calc(76vh * 16 / 9)" } : undefined}
+                >
+                  <CustomVideoPlayer
+                    videoUrl={playbackUrl}
+                    title={stepData.title}
+                    initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                    initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
+                    onProgressUpdate={handleVideoProgressUpdate}
+                    onTimeUpdate={(time, dur) => {
+                      setCurrentVideoTime(time);
+                      if (dur) setCurrentVideoDuration(dur);
+                    }}
+                    onNext={activeStep !== lastStepKey ? () => {
+                      const nextStep = (parseInt(activeStep) + 1).toString();
+                      handleStepComplete(activeStep);
+                      setActiveStep(nextStep);
+                      setVideoWatched(false);
+                    } : null}
+                    isTheater={isTheater}
+                    onToggleTheater={toggleTheater}
+                  />
+                </div>
               </div>
             )}
 
@@ -979,8 +1017,10 @@ const CoursePlayer = () => {
         return (
           <div className="space-y-6 h-full overflow-y-auto pb-8">
             {playbackUrl && (
-              <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto">
+              <div className={`rounded-2xl overflow-hidden mx-auto ${isTheater ? "max-w-none" : "max-w-4xl"}`}>
                 <CustomVideoPlayer
+                  isTheater={isTheater}
+                  onToggleTheater={toggleTheater}
                   videoUrl={playbackUrl}
                   title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
                   initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
@@ -1092,7 +1132,7 @@ const CoursePlayer = () => {
               <div className="flex flex-wrap items-center gap-3 sm:gap-5">
                 <button
                   onClick={handleBack}
-                  className="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] transition-all duration-300 font-bold text-xs cursor-pointer"
+                  className="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] transition-all duration-300 font-bold text-sm cursor-pointer"
                 >
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-[#d7ebf5] dark:border-[#045C9A]/30 bg-white dark:bg-[#0d3a5f] group-hover:border-[#045C9A]/50 group-hover:bg-[#EAF7FD] dark:group-hover:bg-[#045C9A]/20 transition-all shadow-sm">
                     <ArrowLeft className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8] group-hover:-translate-x-0.5 transition-transform" />
@@ -1101,10 +1141,10 @@ const CoursePlayer = () => {
                 </button>
                 <div className="hidden sm:block h-5 w-px bg-[#d7ebf5] dark:bg-[#045C9A]/30" />
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest shadow-none`}>
+                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest shadow-none`}>
                     {t(stageKey)}
                   </Badge>
-                  <span className="text-[15px] font-bold tracking-tight text-[#072036] dark:text-white">
+                  <span className="text-base font-bold tracking-tight text-[#072036] dark:text-white">
                     {t(stageNameKey)}
                   </span>
                 </div>
@@ -1121,22 +1161,22 @@ const CoursePlayer = () => {
         <main className="pt-2 sm:pt-4 space-y-6">
           {/* Course Info Header */}
           {!showIntro && (
-            <div className="text-left mb-6 mt-2 space-y-1">
-              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
+            <div className="text-left mb-4 mt-1 space-y-1">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
                 {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
                 {course.title}
               </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
+              <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
                 {course.subtitle}
               </p>
             </div>
           )}
 
-          <div className={showIntro ? "flex justify-center" : "grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"}>
+          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${isTheater ? "" : "lg:grid-cols-3"}`}>
             {/* Left Column - Video and Content */}
-            <div className={showIntro ? "max-w-5xl w-full mx-auto" : "lg:col-span-2"}>
+            <div className={showIntro ? "max-w-5xl w-full mx-auto" : (isTheater ? "w-full" : "lg:col-span-2")}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1154,15 +1194,15 @@ const CoursePlayer = () => {
                       {/* Top Meta Bar */}
                       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-[#045C9A]/25">
                         <div className="flex items-center gap-2">
-                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[10px] font-bold uppercase tracking-widest`}>
+                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-bold uppercase tracking-widest`}>
                             {t(stageKey)}
                           </span>
-                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
+                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
                             {t(stageNameKey)}
                           </span>
                         </div>
                         
-                        <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
                           <span className="flex items-center gap-1.5">
                             <Fingerprint className="w-3.5 h-3.5 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />
                             {t("course_player.course_id", "Course ID")}
@@ -1186,7 +1226,7 @@ const CoursePlayer = () => {
                         >
                           {course.title}
                         </h1>
-                        <p className="max-w-2xl text-[13px] font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
+                        <p className="max-w-2xl text-[15px] font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
                           {course.subtitle}
                         </p>
                       </div>
@@ -1210,10 +1250,10 @@ const CoursePlayer = () => {
                               <ClipboardCheck className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#072036] dark:text-white">
+                              <p className="text-[11px] font-bold uppercase tracking-widest text-[#072036] dark:text-white">
                                 {t("course_player.important_guidelines", "Important Disclaimers & Guidelines")}
                               </p>
-                              <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                              <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
                                 {t("course_player.guidelines_hint", "Please read and acknowledge each point before you begin.")}
                               </p>
                             </div>
@@ -1260,7 +1300,7 @@ const CoursePlayer = () => {
                                 >
                                   {checked && <Check className="w-3 h-3" />}
                                 </span>
-                                <span className="min-w-0 text-[13px] leading-relaxed">
+                                <span className="min-w-0 text-sm leading-relaxed">
                                   <span className="block font-bold text-[#072036] dark:text-white">
                                     {t(guideline.titleKey, guideline.titleDefault)}
                                   </span>
@@ -1276,7 +1316,7 @@ const CoursePlayer = () => {
 
                       {/* Primary CTA & Footer */}
                       <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-600 dark:text-slate-400">
                           <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                           <span>{t("course_player.secure_session", "Secure session protocol initialized")}</span>
                         </div>
@@ -1288,7 +1328,7 @@ const CoursePlayer = () => {
                           onClick={handleStartCourse}
                           disabled={!allGuidelinesAcknowledged}
                           title={allGuidelinesAcknowledged ? undefined : t("course_player.acknowledge_all_guidelines", "Please acknowledge all guidelines to continue.")}
-                          className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold transition-all sm:w-auto ${currentTheme.btnClass} ${
+                          className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all sm:w-auto ${currentTheme.btnClass} ${
                             allGuidelinesAcknowledged ? "cursor-pointer" : "cursor-not-allowed opacity-50 shadow-none"
                           }`}
                         >
@@ -1326,7 +1366,7 @@ const CoursePlayer = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left"
+                        className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${isTheater ? "flex flex-col" : ""}`}
                       >
                         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
@@ -1340,13 +1380,13 @@ const CoursePlayer = () => {
                               </h3>
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="w-2 h-2 rounded-full bg-[#045C9A] animate-pulse" />
-                                <p className="text-[10px] font-bold text-[#045C9A] uppercase tracking-widest">{t("course_player.active_session", "ACTIVE SESSION")}</p>
+                                <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">{t("course_player.active_session", "ACTIVE SESSION")}</p>
                               </div>
                             </div>
                           </div>
                           {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
                             !learningFlowData?.steps?.[activeStep]?.assessmentData && (
-                              <div className="px-4 py-2 bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl text-xs font-bold text-slate-600 dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-white/[0.05] shadow-xs shrink-0 flex items-center gap-1.5">
+                              <div className="px-4 py-2 bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl text-sm font-bold text-slate-600 dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-white/[0.05] shadow-xs shrink-0 flex items-center gap-1.5">
                                 <Clock className="w-3.5 h-3.5 text-[#045C9A]" />
                                 <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}</span>
                               </div>
@@ -1362,7 +1402,7 @@ const CoursePlayer = () => {
                             <p className="text-sm text-slate-500 dark:text-slate-400">{t("course_player.step_preparing", { step: activeStep })}</p>
                             <button
                               onClick={() => handleStepComplete(activeStep)}
-                              className={`mt-6 rounded-xl px-5 py-2.5 text-[13px] font-semibold transition-colors ${currentTheme.btnClass}`}
+                              className={`mt-6 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors ${currentTheme.btnClass}`}
                             >
                               {t("course_player.complete_step")}
                             </button>
@@ -1373,7 +1413,7 @@ const CoursePlayer = () => {
                           learningFlowData?.steps?.[activeStep]?.contentType !== 'notes' && (
                           <button
                             onClick={handleNextLesson}
-                            className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold transition-colors ${currentTheme.btnClass}`}
+                            className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-colors ${currentTheme.btnClass}`}
                           >
                             {t("course_player.unlock_next_course")}
                             <ChevronRight className="w-4 h-4" />
@@ -1388,7 +1428,7 @@ const CoursePlayer = () => {
                           <div className="flex flex-wrap items-center gap-3">
                             <button
                               onClick={() => setActiveTab('preview')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold transition-colors cursor-pointer border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'preview'
                                   ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
                                   : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
@@ -1400,7 +1440,7 @@ const CoursePlayer = () => {
 
                             <button
                               onClick={() => setActiveTab('transcription')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold transition-colors cursor-pointer border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'transcription'
                                   ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
                                   : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
@@ -1412,7 +1452,7 @@ const CoursePlayer = () => {
 
                             <button
                               onClick={() => setActiveTab('notes')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold transition-colors cursor-pointer border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'notes'
                                   ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
                                   : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
@@ -1434,7 +1474,7 @@ const CoursePlayer = () => {
                                   transition={{ duration: 0.2 }}
                                 >
                                   <div className="bg-[#F1F5F9] dark:bg-[#0d3a5f]/90 border border-[#d7ebf5] dark:border-[#045C9A]/30 rounded-2xl p-6 transition-colors duration-300 text-[#072036] dark:text-white">
-                                    <h4 className="mb-3 text-[15px] font-bold text-[#072036] dark:text-white">{t("course_player.lesson_preview")}</h4>
+                                    <h4 className="mb-3 text-base font-bold text-[#072036] dark:text-white">{t("course_player.lesson_preview")}</h4>
                                     {(activeStep === '1' || activeStep === '2' || activeStep === '3') && learningFlowData?.steps?.[activeStep]?.title ? (
                                       <div className="space-y-2 mb-3">
                                         <h5 className="font-bold text-sm sm:text-base text-[#045C9A] dark:text-[#A6D7E8]">
@@ -1445,16 +1485,16 @@ const CoursePlayer = () => {
                                             <img src={learningFlowData.steps[activeStep].diagramUrl} alt={t("course_player.framework_diagram", "Framework Diagram")} className="w-full h-auto object-contain max-h-64" />
                                           </div>
                                         )}
-                                        <p className="text-slate-600 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-line">
+                                        <p className="text-slate-600 dark:text-slate-200 text-[15px] leading-relaxed whitespace-pre-line">
                                           {learningFlowData.steps[activeStep].content || t("course_player.lesson_preview_desc")}
                                         </p>
                                       </div>
                                     ) : (
-                                      <p className="text-slate-600 dark:text-slate-200 leading-relaxed mb-3">
+                                      <p className="text-slate-600 dark:text-slate-200 text-[15px] leading-relaxed mb-3">
                                         {learningFlowData?.steps?.[activeStep]?.content || t("course_player.lesson_preview_desc")}
                                       </p>
                                     )}
-                                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500 dark:text-slate-300">
+                                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm text-slate-500 dark:text-slate-300">
                                       <div className="flex items-center gap-2">
                                         <Clock className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                                         <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min")}</span>
@@ -1507,122 +1547,136 @@ const CoursePlayer = () => {
             </div>
 
             {!showIntro && (
-              <div className="lg:col-span-1">
+              <div className={isTheater ? "w-full" : "lg:col-span-1"}>
                 <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: isTheater ? 0 : 20, y: isTheater ? 20 : 0 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="space-y-6 text-left"
+                  className="text-left"
                 >
-                  {/* Progress Card */}
-                  <div className="relative overflow-hidden bg-white dark:bg-[#0d3a5f] rounded-2xl p-5 sm:p-6 border border-[#d7ebf5] dark:border-white/[0.03] shadow-sm text-[#072036] dark:text-white">
+                  {/* Progress + Curriculum in one card so the step list stays above the fold */}
+                  <div className="relative overflow-hidden bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/[0.03] shadow-sm text-[#072036] dark:text-white">
                     <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs">
-                        <Target className="w-5 h-5" />
+
+                    {/* Progress strip */}
+                    <div className="p-5 sm:p-6 border-b border-[#d7ebf5] dark:border-white/10">
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs shrink-0">
+                            <Target className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-base font-bold text-[#072036] dark:text-white leading-tight">
+                              {t("course_player.progress", "Progress")}
+                            </h3>
+                            <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400 tabular-nums">
+                              {t("course_player.steps_completed_of", "{{done}} of {{total}} steps completed", {
+                                done: Object.keys(completedSteps).length,
+                                total: totalSteps,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-2xl font-extrabold tabular-nums tracking-tight text-[#045C9A] dark:text-[#A6D7E8] shrink-0">
+                          {overallContentProgress}%
+                        </span>
                       </div>
-                      <h3 className="text-base font-bold text-[#072036] dark:text-white">
-                        {t("course_player.progress", "Progress")}
-                      </h3>
+
+                      <div className={`grid grid-cols-1 gap-4 ${isTheater ? "sm:grid-cols-2" : ""}`}>
+                        {/* Content Progress */}
+                        <div className="space-y-1.5 text-left">
+                          <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
+                            <span>{t("course_player.content_progress", "Content Progress")}</span>
+                            <span className="text-[#045C9A] dark:text-[#A6D7E8] tabular-nums">{overallContentProgress}%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${overallContentProgress}%` }}
+                              className="h-full bg-gradient-to-r from-[#034a7d] to-[#045C9A] rounded-full"
+                              transition={{ type: "spring", bounce: 0, duration: 1 }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Steps Completed */}
+                        <div className="space-y-1.5 text-left">
+                          <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
+                            <span>{t("course_player.steps_completed", "Steps Completed")}</span>
+                            <span className="text-[#045C9A] dark:text-[#A6D7E8] tabular-nums">
+                              {Object.keys(completedSteps).length}/{totalSteps}
+                            </span>
+                          </div>
+                          <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(Object.keys(completedSteps).length / totalSteps) * 100}%` }}
+                              className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
+                              transition={{ type: "spring", bounce: 0, duration: 1 }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-4">
-                      {/* Content Progress */}
-                      <div className="space-y-1.5 text-left">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                          <span>{t("course_player.content_progress", "Content Progress")}</span>
-                          <span className="text-[#045C9A] dark:text-[#A6D7E8]">{overallContentProgress}%</span>
-                        </div>
-                        <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${overallContentProgress}%` }}
-                            className="h-full bg-gradient-to-r from-[#034a7d] to-[#045C9A] rounded-full"
-                            transition={{ type: "spring", bounce: 0, duration: 1 }}
-                          />
-                        </div>
+                    {/* Curriculum */}
+                    <div className="p-5 sm:p-6">
+                      <div className="flex items-center justify-between gap-3 mb-4">
+                        <h3 className="text-base font-bold text-[#072036] dark:text-white flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs">
+                            <PlayCircle className="w-5 h-5" />
+                          </div>
+                          {t("course_player.curriculum", "Curriculum")}
+                        </h3>
+                        <span className="px-3 py-1 bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/25 rounded-full text-sm font-bold tabular-nums">
+                          {Object.keys(completedSteps).length}/{totalSteps}
+                        </span>
                       </div>
 
-                      {/* Steps Completed */}
-                      <div className="space-y-1.5 text-left">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
-                          <span>{t("course_player.steps_completed", "Steps Completed")}</span>
-                          <span className="text-[#045C9A] dark:text-[#A6D7E8]">
-                            {Object.keys(completedSteps).length}/{totalSteps}
-                          </span>
-                        </div>
-                        <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(Object.keys(completedSteps).length / totalSteps) * 100}%` }}
-                            className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
-                            transition={{ type: "spring", bounce: 0, duration: 1 }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      <div className={isTheater ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
+                        {stepNumbers.map((step) => {
+                          const status = getStepStatus(step);
+                          const stepData = learningFlowData?.steps?.[step];
+                          const isActive = activeStep === step;
 
-                  {/* Curriculum Flow Card */}
-                  <div className="relative overflow-hidden bg-white dark:bg-[#0d3a5f] rounded-2xl p-5 sm:p-6 border border-[#d7ebf5] dark:border-white/[0.03] shadow-sm text-[#072036] dark:text-white">
-                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-base font-bold text-[#072036] dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs">
-                          <PlayCircle className="w-5 h-5" />
-                        </div>
-                        {t("course_player.curriculum", "Curriculum")}
-                      </h3>
-                      <span className="px-3 py-1 bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/25 rounded-full text-xs font-bold">
-                        {Object.keys(completedSteps).length}/{totalSteps}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2.5">
-                      {stepNumbers.map((step) => {
-                        const status = getStepStatus(step);
-                        const stepData = learningFlowData?.steps?.[step];
-                        const isActive = activeStep === step;
-
-                        return (
-                          <button
-                            key={step}
-                            disabled={status === 'locked'}
-                            onClick={() => handleStepClick(step)}
-                            className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 border text-left cursor-pointer hover:-translate-y-0.5 hover:shadow-md ${isActive
-                              ? 'bg-[#045C9A] dark:bg-[#045C9A] border-[#045C9A] dark:border-[#045C9A] text-white shadow-md shadow-[#072036]/15'
-                              : status === 'completed'
-                                ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/70 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300'
-                                : status === 'locked'
-                                  ? 'opacity-40 cursor-not-allowed border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-[#072036]/60 text-slate-400'
-                                  : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-white/[0.03] text-slate-800 dark:text-slate-200 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/40'
-                              }`}
-                          >
-                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-xs transition-colors ${isActive ? 'bg-white/20 text-white' :
-                              status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30' :
-                                status === 'locked' ? 'bg-[#F1F5F9] dark:bg-white/5 text-slate-400 border border-[#d7ebf5] dark:border-white/10' : 'bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/30 shadow-xs'
-                              }`}>
-                              {getStepIcon(step, stepData, status, isActive)}
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-xs truncate ${isActive ? 'text-white' : 'text-[#072036] dark:text-slate-100'}`}>
-                                {step === '1' ? t("course_player.step_why", "Why") : step === '2' ? t("course_player.step_story", "Story") : (stepData?.title || `${t("course_player.curriculum")} ${step}`)}
-                              </h4>
-                              <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 mt-0.5">
-                                <Clock size={11} className={isActive ? 'text-white/80' : 'text-slate-400'} />
-                                <span className={isActive ? 'text-white/90' : ''}>
-                                  {stepData?.duration || t("course_player.five_ten_min", "5 min")}
-                                </span>
+                          return (
+                            <button
+                              key={step}
+                              disabled={status === 'locked'}
+                              onClick={() => handleStepClick(step)}
+                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 border text-left cursor-pointer hover:-translate-y-0.5 hover:shadow-md ${isActive
+                                ? 'bg-[#045C9A] dark:bg-[#045C9A] border-[#045C9A] dark:border-[#045C9A] text-white shadow-md shadow-[#072036]/15'
+                                : status === 'completed'
+                                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/70 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300'
+                                  : status === 'locked'
+                                    ? 'opacity-40 cursor-not-allowed border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-[#072036]/60 text-slate-400'
+                                    : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-white/[0.03] text-slate-800 dark:text-slate-200 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/40'
+                                }`}
+                            >
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-sm transition-colors ${isActive ? 'bg-white/20 text-white' :
+                                status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30' :
+                                  status === 'locked' ? 'bg-[#F1F5F9] dark:bg-white/5 text-slate-400 border border-[#d7ebf5] dark:border-white/10' : 'bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/30 shadow-xs'
+                                }`}>
+                                {getStepIcon(step, stepData, status, isActive)}
                               </div>
-                            </div>
 
-                            {status !== 'locked' && !isActive && (
-                              <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`font-bold text-[15px] leading-tight truncate ${isActive ? 'text-white' : 'text-[#072036] dark:text-slate-100'}`}>
+                                  {step === '1' ? t("course_player.step_why", "Why") : step === '2' ? t("course_player.step_story", "Story") : (stepData?.title || `${t("course_player.curriculum")} ${step}`)}
+                                </h4>
+                                <div className={`flex items-center gap-1.5 text-[13px] font-semibold mt-1 ${isActive ? 'text-white/90' : 'text-slate-500 dark:text-slate-400'}`}>
+                                  <Clock size={13} className={isActive ? 'text-white/80' : 'text-slate-400'} />
+                                  <span>{stepData?.duration || t("course_player.five_ten_min", "5 min")}</span>
+                                </div>
+                              </div>
+
+                              {status !== 'locked' && !isActive && (
+                                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

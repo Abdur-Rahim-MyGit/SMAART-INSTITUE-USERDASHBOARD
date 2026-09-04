@@ -746,6 +746,7 @@
     "progress": "Progress",
     "content_progress": "Content Progress",
     "steps_completed": "Steps Completed",
+    "steps_completed_of": "{{done}} of {{total}} steps completed",
     "course_completed": "Course Completed",
     "all_steps_validated": "All steps validated",
     "curriculum": "Curriculum",
