@@ -1639,9 +1639,6 @@ const CoursePlayer = () => {
                             </p>
                           </div>
                         </div>
-                        <span className="text-2xl font-bold tabular-nums tracking-tight text-[#045C9A] dark:text-[#A6D7E8] shrink-0">
-                          {overallContentProgress}%
-                        </span>
                       </div>
 
                       <motion.div layout transition={LAYOUT_TRANSITION} className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
