@@ -167,18 +167,49 @@ const focusFromFace = (face, vw, vh) => {
   return { sx, sy, sw: Math.round(w), sh: Math.round(h) };
 };
 
+// Every call used to chain up to THREE sequential inferences (full frame,
+// then face-focus, then a band zoom) before answering. That is fine for
+// coverage but terrible for latency: a held phone is rarely centred and
+// filling the full frame, so the common case burned two or three full model
+// passes -- upward of a second on WASM -- before every single result, and
+// while that was running the next scheduled tick found the worker still
+// busy and was simply skipped. The tick rate collapsed to however long the
+// worst-case chain took, not the configured interval.
+//
+// One inference per call fixes that: each tick is now a single pass, so it
+// finishes inside the interval and the NEXT tick is never skipped. Coverage
+// across space comes from CHOOSING the right single region rather than
+// trying every region every time:
+//   - a face box is available on almost every tick (the exam is proctoring
+//     a face), and a held object is beside or below it, so that is the
+//     region picked by default -- exactly where the thing we are looking
+//     for actually is;
+//   - every third call instead scans the full frame, so an object away
+//     from the face (a laptop left running on the desk, a book off to the
+//     side) is still found within a couple of seconds, just not every tick.
+let callCount = 0;
+const FULL_FRAME_EVERY_N = 3;
+
 const detect = async (bitmap, face) => {
   const vw = bitmap.width, vh = bitmap.height;
   const nearMisses = [];
-  let found = await runPass(bitmap, null, nearMisses);
-  if (found.length === 0) {
-    const focus = focusFromFace(face, vw, vh);
-    if (focus) {
-      // Aim at the hands beside the face first; it is where a held object is.
-      found = await runPass(bitmap, focus, nearMisses);
-    }
+  callCount++;
+
+  const focus = focusFromFace(face, vw, vh);
+  const useFullFrame = !focus || callCount % FULL_FRAME_EVERY_N === 0;
+
+  let region;
+  if (useFullFrame) {
+    region = null;
+  } else {
+    region = focus;
   }
-  if (found.length === 0) {
+  let found = await runPass(bitmap, region, nearMisses);
+
+  // A face-focus miss is worth one fallback look at the wider band -- a
+  // held object can sit just outside the tight face crop -- but still only
+  // ONE extra pass, never a third.
+  if (found.length === 0 && !useFullFrame) {
     const bandX = Math.round(vw * 0.15), bandW = Math.round(vw * 0.70);
     const zoom = zoomLower
       ? { sx: bandX, sy: Math.round(vh * 0.40), sw: bandW, sh: Math.round(vh * 0.60) }
@@ -186,6 +217,7 @@ const detect = async (bitmap, face) => {
     zoomLower = !zoomLower;
     found = await runPass(bitmap, zoom, nearMisses);
   }
+
   const unique = [...new Set(nearMisses)];
   if (!found.length) return { found: [], nearMisses: unique };
   const keep = nms(found.map((f) => f.box), found.map((f) => f.score), NMS_THRESHOLD);
