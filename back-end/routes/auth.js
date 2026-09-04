@@ -1783,6 +1783,17 @@ router.get('/me', protect, async (req, res) => {
           userObj.cgpa = resolved;
           userObj.academic.latestSemester = Number(latest.semester);
         }
+        // Forward the per-semester rows, not just the derived summary. The
+        // profile page renders an SGPA/CGPA table from these; with only the
+        // latest figure it could never show a trend.
+        userObj.academic.semesterPerformances = sorted.map((r) => ({
+          semesterNumber: Number(r.semester),
+          sgpa: r.sgpa == null ? null : Number(r.sgpa),
+          cgpa: r.cgpa == null ? null : Number(r.cgpa),
+          creditsEarned: r.earnedCredits == null ? 0 : Number(r.earnedCredits),
+          totalCredits: r.totalCredits == null ? 0 : Number(r.totalCredits),
+          status: r.status || '',
+        }));
       }
     }
 

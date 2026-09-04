@@ -18,9 +18,11 @@
  * The 68-point face-api landmark model continues to be loaded for gaze only.
  */
 
-import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError } from './onnxPipeline';
+import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError, detectObjects as detectObjectsRaw, isObjectDetectorReady as isObjectDetectorReadyRaw } from './onnxPipeline';
 import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
-import { evaluateLiveness } from './livenessService';
+// NOTE: livenessService.evaluateLiveness is deliberately NOT wired. It was
+// imported here but never called, which read as spoof protection that does not
+// exist. Presentation-attack detection is still an open gap — see the audit.
 import { calculateGazeAndPose } from './gazeTrackingService';
 
 // Eye gaze service reset export kept for signature compatibility
@@ -45,8 +47,27 @@ export const resetTrackingState = () => {
 // ~0.38. 0.40 accepts the real person while different people (ArcFace cosine
 // typically < 0.25) are still cleanly rejected. Verify also best-matches against
 // ALL registered embeddings, which further separates genuine vs impostor.
-const VERIFICATION_COSINE_THRESHOLD = 0.40;  // 512-d ArcFace cosine; same person >= 0.40
+// 512-d ArcFace (w600k_r50) cosine.
+//
+// Lowered from 0.40 on direct evidence from this deployment: the genuinely
+// registered candidate was being flagged as a mismatch on her own camera. A
+// false accusation of impersonation is the worst failure this system has, and
+// it was happening to the honest case.
+//
+// The two distributions are far apart for this model — impostor pairs sit well
+// under 0.30, while the same person across separate captures normally lands
+// between 0.45 and 0.75. 0.40 sat close under the bottom of the genuine range,
+// so ordinary pose and lighting drift crossed it. 0.32 keeps clear water above
+// the impostor range while giving the real candidate room to move.
+//
+// This is a reasoned starting point, NOT a measured one. Confirm it against
+// your own candidates and cameras with __proctorCalibration — the number that
+// belongs here comes from that run, not from this comment.
+const VERIFICATION_COSINE_THRESHOLD = 0.32;
 const REGISTRATION_COSINE_THRESHOLD = 0.48;  // consistency check across frames
+// Composite frame-quality score below which a failed match is attributed to an
+// obscured/unusable frame rather than to a different person.
+const COVERED_QUALITY_SCORE = 55;
 const ANTISPOOF_MIN_SCORE = 0.50;   // real person liveness threshold
 const REGISTRATION_FRAMES = 5;
 const REGISTRATION_MAX_ATTEMPTS = 14;     // Allow up to 14 tries to get 5 good frames
@@ -87,9 +108,135 @@ export const isReady = () => isOnnxReady();
 // instead of hanging on "Detecting your face…".
 export const getModelLoadError = () => getOnnxInitError();
 
+/**
+ * Prohibited-item detection (YOLOv8n, COCO classes).
+ *
+ * The pipeline has loaded and implemented this since the ONNX migration, but
+ * nothing ever called it: the engine's object path was written against the
+ * worker, and the worker is deliberately disabled (its ArcFace embeddings did
+ * not match the main-thread registration embeddings). So the detector was
+ * downloaded on every assessment and never asked a single question.
+ */
+export const detectObjects = (videoEl) => detectObjectsRaw(videoEl);
+export const isObjectDetectorReady = () => isObjectDetectorReadyRaw();
+
 export const getLoadError = () => null;
 export const getBackendInfo = () => ({ backend: 'onnx-wasm+webgl', isWebGL: true, isCPU: false });
 export const getMatchThreshold = () => VERIFICATION_COSINE_THRESHOLD;
+
+// ─── Threshold calibration recorder ──────────────────────────────────────────
+/**
+ * VERIFICATION_COSINE_THRESHOLD is currently an ARGUED number, not a measured
+ * one. The only honest way to set it is to look at where genuine and impostor
+ * scores actually separate on the hardware, lighting and camera your candidates
+ * really use — that separation moves with all three.
+ *
+ * This records every live verification score so that curve can be plotted.
+ * It is inert until explicitly started, and it stores nothing but a label, a
+ * timestamp and a number — no frames, no embeddings, no identities.
+ *
+ * How to use it, from the browser console during a normal assessment:
+ *
+ *   __proctorCalibration.start('genuine')   // the enrolled candidate sits
+ *   ... let it run a minute, vary pose and lighting ...
+ *   __proctorCalibration.start('impostor')  // someone else sits in their place
+ *   ... another minute ...
+ *   __proctorCalibration.export()           // downloads calibration.csv
+ *
+ * Repeat across ~10 people, then pick the threshold from the gap between the
+ * two score distributions. `summary()` prints that gap without leaving the
+ * console if you just want a quick read.
+ */
+let calibrationLabel = null;
+let calibrationRows = [];
+
+const recordCalibrationScore = (similarity, refCount) => {
+  if (!calibrationLabel) return;
+  calibrationRows.push({
+    label: calibrationLabel,
+    similarity,
+    refCount,
+    at: new Date().toISOString(),
+  });
+};
+
+export const calibration = {
+  /** Begin tagging subsequent scores with `label` (e.g. 'genuine'/'impostor'). */
+  start(label = 'sample') {
+    calibrationLabel = String(label);
+    console.log(`[Calibration] Recording as "${calibrationLabel}". ${calibrationRows.length} row(s) so far.`);
+  },
+  /** Stop recording; rows already collected are kept. */
+  stop() {
+    calibrationLabel = null;
+    console.log(`[Calibration] Stopped. ${calibrationRows.length} row(s) held.`);
+  },
+  /** Discard everything collected. */
+  clear() {
+    calibrationRows = [];
+    console.log('[Calibration] Cleared.');
+  },
+  rows: () => [...calibrationRows],
+  /** Per-label count / min / mean / max, and the genuine-vs-impostor gap. */
+  summary() {
+    const byLabel = {};
+    for (const r of calibrationRows) {
+      if (!byLabel[r.label]) byLabel[r.label] = [];
+      byLabel[r.label].push(r.similarity);
+    }
+
+    const stats = {};
+    for (const [label, vals] of Object.entries(byLabel)) {
+      const sorted = [...vals].sort((a, b) => a - b);
+      stats[label] = {
+        n: vals.length,
+        min: +sorted[0].toFixed(4),
+        mean: +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(4),
+        max: +sorted[sorted.length - 1].toFixed(4),
+      };
+    }
+    console.table(stats);
+
+    // The number that matters: the worst genuine score against the best
+    // impostor score. If the first is comfortably above the second, any
+    // threshold between them works. If they overlap, no threshold does and the
+    // problem is enrolment or camera quality, not the number.
+    if (stats.genuine && stats.impostor) {
+      const gap = stats.genuine.min - stats.impostor.max;
+      console.log(
+        `[Calibration] Worst genuine=${stats.genuine.min}, best impostor=${stats.impostor.max}, ` +
+        `gap=${gap.toFixed(4)}. ` +
+        (gap > 0
+          ? `Any threshold strictly between them separates every sample; the midpoint is ${((stats.genuine.min + stats.impostor.max) / 2).toFixed(4)}.`
+          : `OVERLAP — no threshold separates these samples. Fix enrolment/lighting before tuning the number.`)
+      );
+    }
+    return stats;
+  },
+  /** Download every recorded row as calibration.csv. */
+  export() {
+    if (!calibrationRows.length) {
+      console.warn('[Calibration] Nothing recorded yet.');
+      return;
+    }
+    const csv = ['label,similarity,ref_count,timestamp']
+      .concat(calibrationRows.map(r => `${r.label},${r.similarity},${r.refCount},${r.at}`))
+      .join('\n');
+
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'calibration.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    console.log(`[Calibration] Exported ${calibrationRows.length} row(s).`);
+  },
+};
+
+if (typeof window !== 'undefined') {
+  window.__proctorCalibration = calibration;
+}
+
 export const distanceToSimilarity = (d) => Math.exp(-d * 3); // keep for legacy callers
 
 // ─── detectFaces ─────────────────────────────────────────────────────────────
@@ -99,6 +246,57 @@ export const distanceToSimilarity = (d) => Math.exp(-d * 3); // keep for legacy 
  *
  * Returns: { faceCount, faces, isFacePresent, error?, timings? }
  */
+
+// ─── Counting people, not detections ─────────────────────────────────────────
+/**
+ * A detector box is not the same thing as a person in the room.
+ *
+ * SCRFD will happily return a low-confidence box for a framed photograph on the
+ * wall, a face on a poster, a reflection in a cupboard door, or a pattern in a
+ * curtain. At the 0.35 floor used for presence, those artefacts are frequent
+ * enough to raise "Multiple Faces Detected" against a candidate sitting alone —
+ * which is both wrong and alarming, and it burns their warning budget.
+ *
+ * The candidate's own face is large, centred and confidently detected. Anyone
+ * genuinely in the room with them is also a real face at real size. So the
+ * primary detection keeps the sensitive threshold (missing the candidate is
+ * worse than a stray box), while every ADDITIONAL detection has to clear a
+ * higher confidence bar and be a meaningful fraction of the primary's size.
+ */
+const SECONDARY_FACE_MIN_SCORE = 0.62;   // vs 0.35 for the primary
+const SECONDARY_FACE_MIN_AREA_RATIO = 0.22; // relative to the largest face
+
+const boxArea = (box) => {
+  if (!box) return 0;
+  const w = box.width ?? ((box.x2 ?? 0) - (box.x1 ?? 0));
+  const h = box.height ?? ((box.y2 ?? 0) - (box.y1 ?? 0));
+  return Math.max(0, w) * Math.max(0, h);
+};
+
+/**
+ * Filter raw detections down to the ones that plausibly represent people.
+ * The largest detection is always kept; the rest must earn their place.
+ */
+export const filterToPeople = (faces) => {
+  if (!faces || faces.length <= 1) return faces || [];
+
+  const sorted = [...faces].sort((a, b) => boxArea(b.box) - boxArea(a.box));
+  const primary = sorted[0];
+  const primaryArea = boxArea(primary.box) || 1;
+
+  const others = sorted.slice(1).filter((f) => {
+    const confident = f.score >= SECONDARY_FACE_MIN_SCORE;
+    const bigEnough = boxArea(f.box) / primaryArea >= SECONDARY_FACE_MIN_AREA_RATIO;
+    if (!confident || !bigEnough) {
+      console.log(`[FaceVerification] Ignoring extra detection (score ${f.score.toFixed(2)}, ${(boxArea(f.box) / primaryArea * 100).toFixed(0)}% of primary) — background artefact, not a person.`);
+      return false;
+    }
+    return true;
+  });
+
+  return [primary, ...others];
+};
+
 export const detectFaces = async (videoEl, _disableOpts = false) => {
   if (!videoEl) return { faceCount: 0, faces: [], isFacePresent: false, error: 'No input' };
   if (videoEl.readyState < 2) return { faceCount: 0, faces: [], isFacePresent: false, error: 'Video not ready' };
@@ -107,7 +305,7 @@ export const detectFaces = async (videoEl, _disableOpts = false) => {
   try {
     let raw = [];
     if (isOnnxReady()) {
-      raw = (await detectOnly(videoEl)).filter(f => f.score >= 0.35);
+      raw = filterToPeople((await detectOnly(videoEl)).filter(f => f.score >= 0.35));
     }
 
     const elapsed = performance.now() - t0;
@@ -355,7 +553,12 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
 
     // Single-pass detect and embed with 0.45 score threshold for multi-face detection
     // Single-pass detect and embed with 0.45 score threshold for multi-face detection
-    const faces = await detectAndEmbedWithFallback(videoEl, 0.45);
+    // Same people-vs-detections filter as the presence path, so the two agree.
+    // They previously used different thresholds (0.35 vs 0.45) with no filter,
+    // so a borderline artefact could make one path see two faces and the other
+    // one — the exam flipping between "mismatch" and "multiple faces" for a
+    // candidate sitting perfectly still.
+    const faces = filterToPeople(await detectAndEmbedWithFallback(videoEl, 0.45));
     const elapsed = performance.now() - t0;
 
     if (faces.length === 0) {
@@ -374,24 +577,79 @@ export const verifyFace = async (videoEl, referenceDescriptor) => {
       return { status: VerificationStatus.COVERED, similarity: 0, distance: 1, faceCount: 1, timings: { total: elapsed } };
     }
 
-    // Best-match cosine against ALL registered embeddings — a live frame need
-    // only match the CLOSEST registered pose, which absorbs pose/lighting drift
-    // and prevents false "mismatch" for the genuine candidate.
-    let similarity = 0;
-    for (const ref of referenceEmbeddings) {
-      const s = cosineSimilarity(face.embedding, Array.from(ref));
-      if (s > similarity) similarity = s;
-    }
+    // ── Score against the registered references ──────────────────────────
+    // This used to take the MAXIMUM cosine over every registered frame, on the
+    // theory that matching the closest pose "further separates genuine from
+    // impostor". It does the opposite. The maximum of N draws rises with N for
+    // ANY face, impostor included, so adding reference frames made the check
+    // progressively easier to pass — the single loosest thing the verifier did.
+    //
+    // Mean of the top two keeps most of the pose tolerance (a live frame still
+    // does not have to match every enrolled angle) while requiring agreement
+    // from more than one reference, which is exactly what an impostor's lucky
+    // single-frame outlier cannot produce.
+    const scores = referenceEmbeddings
+      .map((ref) => cosineSimilarity(face.embedding, Array.from(ref)))
+      .sort((a, b) => b - a);
+
+    // Best match across the enrolled frames.
+    //
+    // This briefly used the mean of the top two instead, on the argument that
+    // the maximum of N comparisons rises with N for any face and so flatters an
+    // impostor. That reasoning is sound in general and wrong here, for two
+    // reasons. The references are five frames of ONE person, so this is a
+    // best-match against a gallery of a single identity — the standard way to
+    // absorb pose and lighting variation. And the mean of the top two is always
+    // at or below the maximum, so swapping the rule without moving the
+    // threshold silently tightened the check and started rejecting the genuine
+    // candidate.
+    //
+    // Reverting does NOT reopen the impostor hole. A different person passed
+    // because presence-only ticks stamped 'verified' without running the
+    // recognition model at all; that is fixed independently in
+    // useProctoringEngine, and it was never about the scoring rule.
+    const similarity = scores[0] ?? 0;
     const distance = 1 - similarity;
 
-    console.log(`[FaceVerification] Verify: bestCosine=${similarity.toFixed(4)} over ${referenceEmbeddings.length} ref(s), threshold=${VERIFICATION_COSINE_THRESHOLD}`);
+    recordCalibrationScore(similarity, scores.length);
+
+    // Both figures are printed so the calibration run can compare the two
+    // rules on real data rather than on argument.
+    const topTwoMean = scores.length >= 2 ? (scores[0] + scores[1]) / 2 : similarity;
+    console.log(
+      `[FaceVerification] Verify: score=${similarity.toFixed(4)} ` +
+      `${similarity >= VERIFICATION_COSINE_THRESHOLD ? 'PASS' : 'FAIL'} ` +
+      `threshold=${VERIFICATION_COSINE_THRESHOLD} | ` +
+      `all ${scores.length} refs: ${scores.map(v => v.toFixed(3)).join(', ')} | ` +
+      `top2mean=${topTwoMean.toFixed(4)}`
+    );
 
     const gazeInfo = (face && face.landmarks?.length >= 5) ? calculateGazeAndPose(face.landmarks) : null;
     const gaze = gazeInfo ? { gazeDirection: gazeInfo.direction, eyesOpen: true, yaw: gazeInfo.yaw, pitch: gazeInfo.pitch } : null;
 
-    const status = similarity >= VERIFICATION_COSINE_THRESHOLD
-      ? VerificationStatus.VERIFIED
-      : VerificationStatus.MISMATCH;
+    // ── Verified / covered / mismatch ────────────────────────────────────
+    // A failing similarity has two very different causes, and calling both
+    // "mismatch" is unfair as well as inaccurate: an impostor, or the genuine
+    // candidate whose face is partly obscured (hand, mask, hood, backlight,
+    // motion blur). Before accusing anyone of impersonation, check whether the
+    // frame was even good enough to judge. Poor frame → COVERED, which has its
+    // own gentler ladder and asks them to uncover their face.
+    //
+    // This is also what made face_covered reachable at all: it previously
+    // required `!face.embedding`, and detectAndEmbed always returns one.
+    let status;
+    if (similarity >= VERIFICATION_COSINE_THRESHOLD) {
+      status = VerificationStatus.VERIFIED;
+    } else {
+      const quality = evaluateFrameQuality(videoEl, face);
+      status = quality.overallScore < COVERED_QUALITY_SCORE
+        ? VerificationStatus.COVERED
+        : VerificationStatus.MISMATCH;
+
+      if (status === VerificationStatus.COVERED) {
+        console.warn(`[FaceVerification] Low similarity (${similarity.toFixed(3)}) on a poor frame (quality ${quality.overallScore}) — reporting COVERED, not MISMATCH. Issues: ${quality.issues.join('; ') || 'none listed'}`);
+      }
+    }
 
     return {
       status,

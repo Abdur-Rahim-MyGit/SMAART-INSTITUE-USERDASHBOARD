@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, ChevronDown, Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2, Trophy } from "@/components/icons";
 import { useTranslation } from 'react-i18next';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
@@ -141,7 +141,7 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
                             isLocked: !isEarned,
                             progress: isEarned ? 100 : 0,
                             icon: dbBadge?.icon || 'Award',
-                            color: dbBadge?.color || '#1a3884' // Deep Navy theme
+                            color: dbBadge?.color || '#045C9A' // Deep Navy theme
                         });
                     });
                 });
@@ -180,8 +180,8 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
             {/* Header with Filters */}
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
-                    <Trophy className="w-4.5 h-4.5 text-[#1a3884]" />
-                    <span className="text-[13.5px] font-extrabold uppercase tracking-wider text-[#002147] dark:text-white">
+                    <Trophy className="w-4.5 h-4.5 text-[#045C9A]" />
+                    <span className="text-[13.5px] font-extrabold uppercase tracking-wider text-[#072036] dark:text-white">
                         {t('badge_gallery.achievements_cabinet')}
                     </span>
                 </div>
@@ -191,7 +191,7 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
                         <select
                             value={activeCategory}
                             onChange={(e) => setActiveCategory(e.target.value)}
-                            className="w-full appearance-none rounded-xl border border-[#d8e6f7] bg-white px-4 py-2.5 pr-10 text-[12.5px] font-bold text-[#0d1f4e] shadow-sm outline-none transition-all hover:border-[#1a3884]/30 focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/20 sm:w-auto dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
+                            className="w-full appearance-none rounded-xl border border-[#d7ebf5] bg-white px-4 py-2.5 pr-10 text-[12.5px] font-bold text-[#072036] shadow-sm outline-none transition-all hover:border-[#045C9A]/30 focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/20 sm:w-auto dark:border-[#045C9A]/20 dark:bg-[#072036] dark:text-white"
                         >
                             {filterOptions.map((cat) => (
                                 <option key={cat.id} value={cat.id}>
@@ -199,7 +199,7 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
                                 </option>
                             ))}
                         </select>
-                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
                     </div>
                 </div>
             </div>

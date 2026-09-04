@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, BookOpen, Lightbulb, Upload, FileText, X, Loader2, Send, Trophy } from 'lucide-react';
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
+import {
+  BookOpen,
+  CheckCircle2,
+  Lightbulb,
+  Loader2,
+  Send,
+  Trophy,
+  Upload,
+  X,
+} from "@/components/icons";
 import { toast } from 'sonner';
 
 const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isCompleted, savedScore, savedTotalPoints, storageKey }) => {
@@ -302,39 +314,39 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
 
   if (completed && !showReview) {
     return (
-      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+      <div className="w-full h-full bg-white dark:bg-[#0d3a5f] p-4 md:p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto text-center py-8 space-y-6">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-6"
+            className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 mb-6"
           >
             <Trophy size={48} />
           </motion.div>
 
           <div>
-            <h3 className="text-3xl font-bold text-gray-800 dark:text-white">Assessment Complete!</h3>
-            <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
+            <h3 className="text-2xl font-extrabold tracking-tight text-[#072036] dark:text-white">Assessment Complete!</h3>
+            <p className="text-slate-500 dark:text-slate-400 mt-2">Here is how you performed</p>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 py-6">
             <div className="text-center">
-              <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
-              <div className="text-xs text-gray-550 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
+              <div className="text-3xl font-extrabold tabular-nums text-[#072036] dark:text-white">{score}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest">Your Score</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-gray-305 dark:text-slate-600">/</div>
+              <div className="text-3xl font-extrabold tabular-nums text-slate-300 dark:text-slate-600">/</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-slate-900 dark:text-white">{totalPoints}</div>
-              <div className="text-xs text-gray-550 dark:text-slate-400 uppercase tracking-wider">Total Points</div>
+              <div className="text-3xl font-extrabold tabular-nums text-[#072036] dark:text-white">{totalPoints}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Points</div>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={() => setShowReview(true)}
-              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
+              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#0d3a5f] border-2 border-[#045C9A] text-[#045C9A] rounded-xl font-bold shadow-sm transition-all hover:bg-[#045C9A]/5"
             >
               Review Responses
             </button>
@@ -342,7 +354,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
               onClick={() => {
                 if (onComplete) onComplete(score, totalPoints);
               }}
-              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+              className="w-full sm:w-auto rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
             >
               Continue to Next Step
             </button>
@@ -353,25 +365,25 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
   }
 
   return (
-    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#0d3a5f] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-8">
         {completed && showReview && (
           <button
             type="button"
             onClick={() => setShowReview(false)}
-            className="mb-4 text-sm font-semibold text-[#1a3884] hover:text-[#112b6b] transition-colors flex items-center gap-1.5"
+            className="mb-4 text-sm font-semibold text-[#045C9A] hover:text-[#034a7d] transition-colors flex items-center gap-1.5"
           >
             ← Back to results
           </button>
         )}
         
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
-          <div className="flex items-center gap-2 text-sm text-[#1a3884] dark:text-blue-400 mb-2 font-bold uppercase tracking-wider">
+        <div className="border-b border-[#d7ebf5] dark:border-white/10 pb-4">
+          <div className="flex items-center gap-2 text-sm text-[#045C9A] dark:text-[#A6D7E8] mb-2 font-bold uppercase tracking-widest">
             <BookOpen size={16} />
             <span>7. Case Study & Reflections</span>
           </div>
-          <h2 className="text-xl md:text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-xl md:text-2xl font-extrabold text-[#072036] dark:text-white">
             {title || "Real-World Problem Analysis"}
           </h2>
         </div>
@@ -380,10 +392,10 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-slate-50 dark:bg-slate-900/40 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-white/5 shadow-sm"
+          className="bg-[#F1F5F9] dark:bg-[#072036]/40 rounded-2xl p-6 md:p-8 border border-[#d7ebf5] dark:border-white/5 shadow-sm"
         >
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <h4 className="text-sm font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-3">Case Scenario / Narrative</h4>
+            <h4 className="text-sm font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-3">Case Scenario / Narrative</h4>
             <p className="text-slate-700 dark:text-slate-200 whitespace-pre-line leading-relaxed text-sm md:text-base font-medium">
               {content}
             </p>
@@ -393,8 +405,8 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
         {/* Reflection Questions List */}
         {hasQuestionsList ? (
           <div className="space-y-6">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span className="w-2.5 h-6 bg-[#1a3884] rounded-full inline-block" />
+            <h3 className="text-lg font-bold text-[#072036] dark:text-white flex items-center gap-2">
+              <span className="w-2.5 h-6 bg-[#045C9A] rounded-full inline-block" />
               Case Study Reflection Questions
             </h3>
 
@@ -412,34 +424,34 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
-                  className="bg-white dark:bg-[#002A5C] rounded-2xl p-5 md:p-6 border border-slate-200 dark:border-white/10 shadow-sm space-y-4"
+                  className="bg-white dark:bg-[#0d3a5f] rounded-2xl p-5 md:p-6 border border-[#d7ebf5] dark:border-white/10 shadow-sm space-y-4"
                 >
                   {/* Question Title */}
                   <div className="flex gap-3">
-                    <span className="w-7 h-7 bg-blue-100 dark:bg-[#1a3884]/30 text-[#1a3884] dark:text-blue-400 rounded-lg text-sm font-extrabold flex items-center justify-center shrink-0">
+                    <span className="w-7 h-7 bg-[#EAF7FD] dark:bg-[#045C9A]/30 text-[#045C9A] dark:text-[#A6D7E8] rounded-lg text-sm font-extrabold flex items-center justify-center shrink-0">
                       {qNum}
                     </span>
                     <div>
-                      <h4 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+                      <h4 className="text-base font-bold text-[#072036] dark:text-white leading-tight">
                         {q.question || q.questionText}
                       </h4>
                       {isEssay && (
-                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block mt-2">
+                        <span className="text-[10px] bg-[#F1F5F9] dark:bg-white/5 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest inline-block mt-2">
                           Essay (Max {q.wordLimit || 200} words)
                         </span>
                       )}
                       {isShortText && (
-                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block mt-2">
+                        <span className="text-[10px] bg-[#F1F5F9] dark:bg-white/5 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest inline-block mt-2">
                           Short Answer
                         </span>
                       )}
                       {isFileUpload && (
-                        <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block mt-2">
+                        <span className="text-[10px] bg-[#EAF7FD] dark:bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest inline-block mt-2">
                           File Upload Required
                         </span>
                       )}
                       {isMCQ && (
-                        <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block mt-2">
+                        <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest inline-block mt-2">
                           Multiple Choice Question
                         </span>
                       )}
@@ -455,7 +467,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                         onChange={(e) => handleEssayChange(idx, e.target.value)}
                         rows={4}
                         placeholder="Type your detailed essay response here..."
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#1a3884] focus:border-transparent transition-all resize-none outline-none disabled:opacity-60"
+                        className="w-full px-4 py-3 rounded-xl border border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-white/5 text-[#072036] dark:text-white text-sm focus:ring-2 focus:ring-[#045C9A] focus:border-transparent transition-all resize-none outline-none disabled:opacity-60"
                       />
                       <div className="flex justify-between items-center text-xs text-slate-400">
                         <span>Min. 5 characters required</span>
@@ -475,7 +487,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                         value={shortTextResponses[idx] || ''}
                         onChange={(e) => handleShortTextChange(idx, e.target.value)}
                         placeholder="Type your answer..."
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#1a3884] focus:border-transparent transition-all outline-none disabled:opacity-60"
+                        className="w-full px-4 py-2.5 rounded-xl border border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-white/5 text-[#072036] dark:text-white text-sm focus:ring-2 focus:ring-[#045C9A] focus:border-transparent transition-all outline-none disabled:opacity-60"
                       />
                     </div>
                   )}
@@ -489,8 +501,8 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                         onClick={() => !completed && !fileUploads[idx] && document.getElementById(`file-select-${idx}`).click()}
                         className={`border-2 border-dashed rounded-xl p-6 transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer ${
                           fileUploads[idx]
-                            ? 'border-green-500/50 bg-green-50/50 dark:bg-green-950/10'
-                            : 'border-slate-350 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-blue-400/50 bg-slate-50 dark:bg-slate-800/30'
+                            ? 'border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/10'
+                            : 'border-slate-300 dark:border-white/10 hover:border-[#045C9A] dark:hover:border-[#045C9A]/50 bg-[#F1F5F9] dark:bg-white/5'
                         }`}
                       >
                         <input
@@ -509,21 +521,21 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                               animate={{ opacity: 1 }}
                               className="flex flex-col items-center"
                             >
-                              <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin mb-2" />
-                              <p className="text-xs text-[#1a3884] font-semibold">Uploading to Skills Passport...</p>
+                              <Loader2 className="w-8 h-8 text-[#045C9A] animate-spin mb-2" />
+                              <p className="text-xs text-[#045C9A] font-semibold">Uploading to Skills Passport...</p>
                             </motion.div>
                           ) : fileUploads[idx] ? (
                             <motion.div
                               key="uploaded"
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="flex items-center gap-3 w-full max-w-md bg-white dark:bg-[#002A5C] p-3 rounded-lg border border-green-200 dark:border-green-800"
+                              className="flex items-center gap-3 w-full max-w-md bg-white dark:bg-[#0d3a5f] p-3 rounded-lg border border-emerald-200 dark:border-emerald-500/30"
                             >
-                              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/15 rounded-full flex items-center justify-center">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-slate-850 dark:text-white truncate">
+                                <p className="text-xs font-bold text-slate-800 dark:text-white truncate">
                                   {fileUploads[idx].name}
                                 </p>
                                 <p className="text-[10px] text-slate-400">
@@ -537,7 +549,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                                     e.stopPropagation();
                                     clearUploadedFile(idx);
                                   }}
-                                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                                  className="p-1 hover:bg-[#EAF7FD] dark:hover:bg-slate-800 rounded-full"
                                 >
                                   <X className="w-4 h-4 text-slate-400 hover:text-red-500" />
                                 </button>
@@ -550,9 +562,9 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                               animate={{ opacity: 1 }}
                               className="flex flex-col items-center text-center"
                             >
-                              <Upload className="w-8 h-8 text-slate-450 dark:text-slate-400 mb-2" />
+                              <Upload className="w-8 h-8 text-slate-400 dark:text-slate-400 mb-2" />
                               <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                Drag & drop file, or <span className="text-[#1a3884] dark:text-blue-400">browse</span>
+                                Drag & drop file, or <span className="text-[#045C9A] dark:text-[#A6D7E8]">browse</span>
                               </p>
                               <p className="text-[10px] text-slate-400 mt-1">
                                 Supported formats: PDF, Word, JPG, PNG (Max 5MB)
@@ -583,26 +595,26 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                               className={`w-full text-left p-3.5 rounded-xl border-2 transition-all text-xs md:text-sm font-semibold flex items-center justify-between ${
                                 showResult
                                   ? isCorrectVal
-                                    ? 'border-green-500 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300'
+                                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
                                     : isSelected && !isCorrectVal
-                                    ? 'border-red-500 bg-red-55/50 dark:bg-red-950/20 text-red-700 dark:text-red-300'
-                                    : 'border-slate-200 dark:border-white/5 opacity-55 bg-[#F8FAFC]'
+                                    ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20 text-red-700 dark:text-red-300'
+                                    : 'border-[#d7ebf5] dark:border-white/5 opacity-55 bg-[#F1F5F9]'
                                   : isSelected
-                                  ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
-                                  : 'border-slate-200 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-blue-400/50 bg-slate-50/50 dark:bg-slate-800/40'
+                                  ? 'border-[#045C9A] bg-[#EAF7FD] dark:bg-[#045C9A]/20'
+                                  : 'border-[#d7ebf5] dark:border-white/10 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/50 bg-[#F1F5F9]/60 dark:bg-white/[0.04]'
                               }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-[10px] ${
                                   showResult
                                     ? isCorrectVal
-                                      ? 'border-green-500 bg-green-500 text-white'
+                                      ? 'border-emerald-500 bg-emerald-500 text-white'
                                       : isSelected
                                       ? 'border-red-500 bg-red-500 text-white'
-                                      : 'border-slate-350 text-slate-400'
+                                      : 'border-slate-300 text-slate-400'
                                     : isSelected
-                                    ? 'border-[#1a3884] bg-[#1a3884] text-white'
-                                    : 'border-slate-300 dark:border-white/10 text-slate-550'
+                                    ? 'border-[#045C9A] bg-[#045C9A] text-white'
+                                    : 'border-[#d7ebf5] dark:border-white/10 text-slate-500'
                                 }`}>
                                   {showResult ? (
                                     isCorrectVal || isSelected ? (
@@ -616,12 +628,12 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                               {showResult && (
                                 <div className="flex items-center gap-2 text-[10px] md:text-xs">
                                   {isSelected && (
-                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">
+                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-[#d7ebf5]/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
                                       Your answer
                                     </span>
                                   )}
                                   {isCorrectVal && (
-                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-green-200/50 dark:bg-green-700/50 text-green-600 dark:text-green-300">
+                                    <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-200/50 dark:bg-emerald-500/30 text-emerald-600 dark:text-emerald-300">
                                       Correct
                                     </span>
                                   )}
@@ -638,10 +650,10 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
-                            className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 rounded-xl p-3.5 mt-2 flex gap-2"
+                            className="bg-[#EAF7FD] dark:bg-[#045C9A]/10 border border-[#d7ebf5] dark:border-[#045C9A]/30 rounded-xl p-3.5 mt-2 flex gap-2"
                           >
-                            <Lightbulb className="w-4 h-4 text-[#1a3884] dark:text-blue-400 shrink-0 mt-0.5" />
-                            <p className="text-xs text-[#1a3884] dark:text-blue-200 font-semibold leading-relaxed">
+                            <Lightbulb className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8] shrink-0 mt-0.5" />
+                            <p className="text-xs text-[#045C9A] dark:text-[#A6D7E8] font-semibold leading-relaxed">
                               {q.explanation}
                             </p>
                           </motion.div>
@@ -659,13 +671,13 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-[#002A5C] rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-sm"
+            className="bg-white dark:bg-[#0d3a5f] rounded-2xl p-6 border border-[#d7ebf5] dark:border-white/10 shadow-sm"
           >
             <div className="mb-6">
-              <span className="text-xs font-black text-[#1a3884] dark:text-blue-400 mb-2 block uppercase tracking-widest">
+              <span className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] mb-2 block uppercase tracking-widest">
                 Analysis Question
               </span>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-[#072036] dark:text-white">
                 {mcq.question}
               </h3>
             </div>
@@ -685,26 +697,26 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                     className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between text-sm font-semibold ${
                       showResult
                         ? isCorrectAnswer
-                          ? 'border-green-500 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300'
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
                           : isSelected && !isCorrectAnswer
                           ? 'border-red-500 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300'
-                          : 'border-slate-200 dark:border-white/5 opacity-55'
+                          : 'border-[#d7ebf5] dark:border-white/5 opacity-55'
                         : isSelected
-                        ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
-                        : 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 hover:border-[#1a3884]/40 dark:hover:border-blue-400/50'
+                        ? 'border-[#045C9A] bg-[#EAF7FD] dark:bg-[#045C9A]/20'
+                        : 'border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9]/60 dark:bg-white/[0.04] hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/50'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
                         showResult
                           ? isCorrectAnswer
-                            ? 'border-green-500 bg-green-500 text-white font-bold'
+                            ? 'border-emerald-500 bg-emerald-500 text-white font-bold'
                             : isSelected && !isCorrectAnswer
                             ? 'border-red-500 bg-red-500 text-white font-bold'
-                            : 'border-slate-350 text-slate-400'
+                            : 'border-slate-300 text-slate-400'
                           : isSelected
-                          ? 'border-[#1a3884] bg-[#1a3884] text-white'
-                          : 'border-slate-300 dark:border-white/10 text-slate-550'
+                          ? 'border-[#045C9A] bg-[#045C9A] text-white'
+                          : 'border-[#d7ebf5] dark:border-white/10 text-slate-500'
                       }`}>
                         {showResult ? (
                           isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (
@@ -722,12 +734,12 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                     {showResult && (
                       <div className="flex items-center gap-2 text-[10px] md:text-xs">
                         {isSelected && (
-                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">
+                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-[#d7ebf5]/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
                             Your answer
                           </span>
                         )}
                         {isCorrectAnswer && (
-                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-green-200/50 dark:bg-green-700/50 text-green-600 dark:text-green-300">
+                          <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-200/50 dark:bg-emerald-500/30 text-emerald-600 dark:text-emerald-300">
                             Correct
                           </span>
                         )}
@@ -744,10 +756,10 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6 flex gap-2"
+                  className="bg-[#EAF7FD] dark:bg-[#045C9A]/10 border border-[#d7ebf5] dark:border-[#045C9A]/30 rounded-xl p-4 mb-6 flex gap-2"
                 >
-                  <Lightbulb className="w-5 h-5 text-[#1a3884] dark:text-blue-400 shrink-0 mt-0.5" />
-                  <p className="text-sm text-[#1a3884] dark:text-blue-200 font-semibold leading-relaxed">
+                  <Lightbulb className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8] shrink-0 mt-0.5" />
+                  <p className="text-sm text-[#045C9A] dark:text-[#A6D7E8] font-semibold leading-relaxed">
                     {mcq.explanation}
                   </p>
                 </motion.div>
@@ -762,7 +774,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
             <button
               onClick={handleComplete}
               disabled={completed}
-              className={`w-full py-4 bg-gradient-to-r from-[#1a3884] to-[#112b6b] hover:from-[#112b6b] hover:to-[#002147] text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`w-full py-4 bg-gradient-to-r from-[#045C9A] to-[#034a7d] hover:from-[#034a7d] hover:to-[#072036] text-white rounded-2xl font-extrabold text-sm transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Send className="w-4 h-4" />
               {completed ? 'Case Study Analysis Completed' : 'Submit'}
@@ -774,7 +786,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 pb-8">
             <button
               onClick={() => setShowReview(false)}
-              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] dark:text-blue-400 rounded-xl font-bold transition-all hover:bg-[#1a3884]/5"
+              className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#0d3a5f] border-2 border-[#045C9A] text-[#045C9A] dark:text-[#A6D7E8] rounded-xl font-bold transition-all hover:bg-[#045C9A]/5"
             >
               Back to Summary
             </button>
@@ -782,7 +794,7 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
               onClick={() => {
                 if (onComplete) onComplete(score, totalPoints);
               }}
-              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+              className="w-full sm:w-auto rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
             >
               Continue to Next Step
             </button>

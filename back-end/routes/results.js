@@ -8,7 +8,7 @@ const { protect } = require('../middleware/auth');
 const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/assessmentAuth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
-const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
+const { getStageByCode, STAGE_DISTRIBUTIONS, getDurationMinutes } = require('../config/stage_distributions');
 const { scoreResponse, shuffleOptionsForQuestion } = require('../services/mcqScoring');
 
 /**
@@ -176,17 +176,9 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         const stageKey = stageInfo ? stageInfo.stage : null;
         const expectedQuestions = stageInfo ? stageInfo.totalQuestions : assessment.questions.length;
 
-        // Stage configurations (copied from frontend)
-        const STAGE_MAP = {
-          T1: { durationMinutes: 45 },
-          T2: { durationMinutes: 40 },
-          T3: { durationMinutes: 45 },
-          T4: { durationMinutes: 40 },
-          AIQ: { durationMinutes: 45 },
-          SQ: { durationMinutes: 45 },
-          PIQ: { durationMinutes: 45 },
-        };
-        const durationMinutes = stageKey ? (STAGE_MAP[stageKey]?.durationMinutes || 45) : (assessment.duration || 45);
+        // Shared with the submit path, so "expired on resume" and "submitted
+        // late" can never be measured against different limits.
+        const durationMinutes = getDurationMinutes(assessment);
 
         if (existingResult) {
             const elapsedSeconds = Math.floor((Date.now() - existingResult.startedAt.getTime()) / 1000);

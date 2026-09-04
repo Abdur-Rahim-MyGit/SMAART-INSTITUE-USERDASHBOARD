@@ -25,31 +25,51 @@
 export const COLOUR = { GREEN: 'green', AMBER: 'amber', RED: 'red' };
 
 /**
+ * How long a condition must be absent before its episode really ends.
+ *
+ * Sized to outlast detector flicker (a frame or two at the 400 ms tick rate)
+ * without outlasting a real change: step out of shot and face_absent still
+ * starts within a couple of seconds of you actually leaving.
+ */
+const CLEAR_GRACE_MS = 2500;
+
+/**
  * Stages are evaluated in order; `afterSeconds` is elapsed CONTINUOUS time in
- * the condition. A stage with an `event` reports to the server (red); a stage
+ * the condition.
+ *
+ * Amber stages are mostly set to 0 — the candidate sees the coaching the instant
+ * the condition is seen. That is free: amber never touches their record. What
+ * takes time is the RED stage, because that is the one that becomes evidence,
+ * and evidence should not be manufactured from a single noisy frame.
+ *
+ * Attention conditions (gaze, eyes, head-down) keep a delay even on amber:
+ * glancing at the keyboard is normal, and a message that flashes up every time
+ * someone looks away is noise the candidate learns to ignore. A stage with an `event` reports to the server (red); a stage
  * without one is purely local coaching (amber).
  */
 export const LADDER = {
   face_absent: [
-    { afterSeconds: 10, colour: COLOUR.AMBER, message: 'Center your face in the frame' },
-    { afterSeconds: 30, colour: COLOUR.RED, event: 'face_absent',
+    { afterSeconds: 2, colour: COLOUR.AMBER, message: 'Center your face in the frame' },
+    { afterSeconds: 20, colour: COLOUR.RED, event: 'face_absent',
       message: "We can't see you in the camera" },
     { afterSeconds: 60, colour: COLOUR.RED, event: 'student_absent_extended',
       message: 'Please return to your assessment' }
   ],
   face_covered: [
-    { afterSeconds: 10, colour: COLOUR.AMBER, message: 'Move anything covering your face' },
+    { afterSeconds: 2, colour: COLOUR.AMBER, message: 'Move anything covering your face' },
     { afterSeconds: 30, colour: COLOUR.RED, event: 'face_covered',
       message: 'Your face is still partly hidden' }
   ],
+  // A second person in frame is not ambiguous, so this does not need a long
+  // window — only long enough to survive someone walking past behind.
   multiple_faces: [
-    { afterSeconds: 4, colour: COLOUR.AMBER, message: 'Only you should be visible' },
-    { afterSeconds: 12, colour: COLOUR.RED, event: 'multiple_faces',
+    { afterSeconds: 0, colour: COLOUR.AMBER, message: 'Only you should be visible' },
+    { afterSeconds: 6, colour: COLOUR.RED, event: 'multiple_faces',
       message: 'Someone else is in the camera' }
   ],
   face_mismatch: [
-    { afterSeconds: 5, colour: COLOUR.AMBER, message: "Make sure it's you, clearly lit" },
-    { afterSeconds: 15, colour: COLOUR.RED, event: 'face_mismatch',
+    { afterSeconds: 0, colour: COLOUR.AMBER, message: "Make sure it's you, clearly lit" },
+    { afterSeconds: 8, colour: COLOUR.RED, event: 'face_mismatch',
       message: "The camera doesn't match your registered photo" }
   ],
   gaze_away: [
@@ -77,14 +97,21 @@ export const LADDER = {
   ],
   // Prohibited items detected by the object detector (YOLO).
   phone_detected: [
-    { afterSeconds: 2, colour: COLOUR.AMBER, message: 'Please put your phone away' },
-    { afterSeconds: 4, colour: COLOUR.RED, event: 'phone_detected',
+    { afterSeconds: 0, colour: COLOUR.AMBER, message: 'Please put your phone away' },
+    { afterSeconds: 3, colour: COLOUR.RED, event: 'phone_detected',
       message: 'A phone was visible during the assessment' }
   ],
   book_detected: [
-    { afterSeconds: 3, colour: COLOUR.AMBER, message: 'Notes and books are not allowed' },
-    { afterSeconds: 6, colour: COLOUR.RED, event: 'book_detected',
+    { afterSeconds: 0, colour: COLOUR.AMBER, message: 'Notes and books are not allowed' },
+    { afterSeconds: 4, colour: COLOUR.RED, event: 'book_detected',
       message: 'A book or notes were visible during the assessment' }
+  ],
+  // A second machine on the desk is the most innocent of the three and gets the
+  // longest rope: it must be there a while before it counts.
+  laptop_detected: [
+    { afterSeconds: 0, colour: COLOUR.AMBER, message: 'Only this device should be in view' },
+    { afterSeconds: 10, colour: COLOUR.RED, event: 'laptop_detected',
+      message: 'Another computer or screen was visible during the assessment' }
   ]
 };
 
@@ -110,9 +137,12 @@ export const createLadder = (ladder = LADDER) => {
 
     let episode = episodes.get(type);
     if (!episode) {
-      episode = { startedAt: nowMs, firedThrough: -1 };
+      episode = { startedAt: nowMs, firedThrough: -1, lastSeenAt: nowMs };
       episodes.set(type, episode);
     }
+    // Every observation refreshes the episode's liveness. clear() reads this to
+    // decide whether the condition is really gone or merely blinked.
+    episode.lastSeenAt = nowMs;
 
     const elapsedSeconds = Math.max(0, (nowMs - episode.startedAt) / 1000);
 
@@ -141,8 +171,25 @@ export const createLadder = (ladder = LADDER) => {
     return { colour: stage.colour, message: stage.message, elapsedSeconds, fire };
   };
 
-  /** The condition cleared — end the episode so it can escalate afresh later. */
-  const clear = (type) => episodes.delete(type);
+  /**
+   * The condition appears to have cleared.
+   *
+   * Deliberately NOT immediate. Detection flickers: a second person's face is
+   * missed for one frame as they turn, a phone leaves the crop for an instant,
+   * a face is lost to motion blur. Deleting the episode on the first contrary
+   * observation reset the timer every time that happened, so a condition that
+   * needs to persist for twelve seconds could be genuinely present for minutes
+   * and never once reach its threshold — the status pill showed the problem
+   * while the warning count stayed at zero.
+   *
+   * The episode now survives brief gaps and only ends once the condition has
+   * been absent for a continuous grace period.
+   */
+  const clear = (type, nowMs = Date.now()) => {
+    const episode = episodes.get(type);
+    if (!episode) return;
+    if (nowMs - episode.lastSeenAt >= CLEAR_GRACE_MS) episodes.delete(type);
+  };
 
   const clearAll = () => episodes.clear();
 

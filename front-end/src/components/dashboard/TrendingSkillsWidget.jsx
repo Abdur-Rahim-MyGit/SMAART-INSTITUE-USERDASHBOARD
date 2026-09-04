@@ -1,7 +1,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { TrendingUp, Zap } from "lucide-react";
+import {
+  TrendingUp,
+  Zap,
+} from "@/components/icons";
 
 // ── Static trending skill data (in production, fetch from /api/trending-skills)
 const TRENDING_SKILLS = [
@@ -38,7 +41,7 @@ const TrendingSkillsWidget = memo(() => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-1 h-4 bg-[#1a3884] dark:bg-blue-400 rounded-full" />
-            <TrendingUp className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
+            <TrendingUp className="w-3.5 h-3.5 text-[#0E2136] dark:text-blue-400" />
             <span className="text-xs font-extrabold text-slate-800 dark:text-white tracking-tight">Trending Industry Skills</span>
           </div>
           <div className="flex items-center gap-1 text-[9px] font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-100 dark:border-rose-500/20">

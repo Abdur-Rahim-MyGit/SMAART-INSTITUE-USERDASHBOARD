@@ -1,6 +1,11 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { RiTrophyLine, RiShieldCheckLine, RiSparklingLine, RiArrowUpLine } from "@remixicon/react";
+import {
+  RiArrowUpLine,
+  RiShieldCheckLine,
+  RiSparklingLine,
+  RiTrophyLine,
+} from "@/components/icons";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_DELAYS, COLORS } from "@/constants/dashboard";
 

@@ -50,10 +50,10 @@ const STAGE_MAP = {
 const getBandColor = (level) => {
   // Uniform professional styling with Brand Colors
   const style = {
-    bg: 'bg-[#1a3884]/5 dark:bg-[#1a3884]/10',
-    text: 'text-[#1a3884] dark:text-blue-300',
-    badge: 'bg-[#1a3884]/10 text-[#1a3884] border-[#1a3884]/20',
-    bar: 'bg-[#1a3884]', // Brand Teal
+    bg: 'bg-[#045C9A]/5 dark:bg-[#045C9A]/10',
+    text: 'text-[#045C9A] dark:text-[#A6D7E8]',
+    badge: 'bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20',
+    bar: 'bg-[#045C9A]', // Brand Teal
     glow: 'shadow-sm inner-shadow'
   };
 
@@ -70,13 +70,13 @@ const getBandColor = (level) => {
 
 // Quotient information with icons
 const quotientInfo = {
-  CRQ: { name: 'Cognitive Reasoning', fullName: 'Cognitive Reasoning Quotient', icon: <Brain className="w-8 h-8" />, desc: 'Critical thinking & logical reasoning' },
-  SRQ: { name: 'Self-regulation & Drive', fullName: 'Self-regulation & Drive Quotient', icon: <Heart className="w-8 h-8" />, desc: 'Motivation, resilience & emotional control' },
-  LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', icon: <BookOpen className="w-8 h-8" />, desc: 'Adaptability & continuous learning' },
-  SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', icon: <Users className="w-8 h-8" />, desc: 'Collaboration, empathy & communication' },
-  PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', icon: <Briefcase className="w-8 h-8" />, desc: 'Work ethic, reliability & delivery' },
-  DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: <Monitor className="w-8 h-8" />, desc: 'Tech proficiency & AI readiness' },
-  SEQ: { name: 'Social & Emotional', fullName: 'Social & Emotional Quotient', icon: <Sparkles className="w-8 h-8" />, desc: 'Emotional intelligence & social awareness' }
+  CRQ: { name: 'Cognitive Reasoning', fullName: 'Cognitive Reasoning Quotient', icon: <Brain className="w-5 h-5" />, desc: 'Critical thinking & logical reasoning' },
+  SRQ: { name: 'Self-regulation & Drive', fullName: 'Self-regulation & Drive Quotient', icon: <Heart className="w-5 h-5" />, desc: 'Motivation, resilience & emotional control' },
+  LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', icon: <BookOpen className="w-5 h-5" />, desc: 'Adaptability & continuous learning' },
+  SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', icon: <Users className="w-5 h-5" />, desc: 'Collaboration, empathy & communication' },
+  PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', icon: <Briefcase className="w-5 h-5" />, desc: 'Work ethic, reliability & delivery' },
+  DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: <Monitor className="w-5 h-5" />, desc: 'Tech proficiency & AI readiness' },
+  SEQ: { name: 'Social & Emotional', fullName: 'Social & Emotional Quotient', icon: <Sparkles className="w-5 h-5" />, desc: 'Emotional intelligence & social awareness' }
 };
 
 // Helper: Get feedback based on level (Simulated AI Response)
@@ -778,6 +778,8 @@ const BaseLineTest = () => {
     failAttentionCheck,
     verificationStatus,
     similarityScore,
+    diagnostics,
+    riskFlagged,
     isCameraWarmingUp,
     gazeDirection,
     // Escalation ladder
@@ -861,24 +863,24 @@ const BaseLineTest = () => {
 
 
   if (loading) return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center transition-colors duration-300">
+    <div className="min-h-screen bg-[#EAF7FD] dark:bg-[#072036] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] dark:border-blue-500 mx-auto mb-4"></div>
-        <p className="text-slate-655 dark:text-slate-350 text-lg font-medium">{t("baseline_test.loading_test", "Loading {{title}}...", { title: translatedTitle })}</p>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#045C9A] dark:border-[#045C9A] mx-auto mb-4"></div>
+        <p className="text-slate-600 dark:text-slate-300 text-lg font-medium">{t("baseline_test.loading_test", "Loading {{title}}...", { title: translatedTitle })}</p>
       </div>
     </div>
   );
 
   if (attemptInfo.locked) return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-xl mx-auto p-8 bg-white dark:bg-[#002147] rounded-3xl shadow-2xl border border-red-200 dark:border-red-950/20 relative overflow-hidden text-slate-900 dark:text-white">
+    <div className="min-h-screen bg-[#EAF7FD] dark:bg-[#072036] flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="text-center max-w-xl mx-auto p-8 bg-white dark:bg-[#0d3a5f] rounded-2xl shadow-sm border border-red-200 dark:border-red-950/20 relative overflow-hidden text-[#072036] dark:text-white">
         {/* Decorative background blur */}
         <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-red-500/5 rounded-full blur-[50px] pointer-events-none" />
         
         <div className="text-red-500 text-6xl mb-6 flex justify-center">
-          <AlertTriangle className="w-16 h-16 text-red-550 animate-pulse" />
+          <AlertTriangle className="w-16 h-16 text-red-500 animate-pulse" />
         </div>
-        <h2 className="text-3xl font-extrabold text-[#112b6b] dark:text-white mb-4">
+        <h2 className="text-3xl font-extrabold text-[#034a7d] dark:text-white mb-4">
           Assessment Locked Out
         </h2>
         <p className="text-slate-600 dark:text-slate-400 mb-8 text-base leading-relaxed">
@@ -887,17 +889,17 @@ const BaseLineTest = () => {
 
         {/* Attempt history list */}
         {attemptInfo.attempts && attemptInfo.attempts.length > 0 && (
-          <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-5 mb-8 border border-slate-100 dark:border-white/5 text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-4 flex items-center gap-2">
+          <div className="bg-[#F1F5F9] dark:bg-slate-800/40 rounded-2xl p-5 mb-8 border border-[#d7ebf5] dark:border-white/5 text-left">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-red-400" />
               Attempt History
             </h4>
             <div className="space-y-3">
               {attemptInfo.attempts.map((attempt) => (
-                <div key={attempt.attemptNumber} className="flex justify-between items-center text-sm py-2 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
+                <div key={attempt.attemptNumber} className="flex justify-between items-center text-sm py-2 border-b border-[#d7ebf5] dark:border-white/5 last:border-0 last:pb-0">
                   <span className="font-semibold text-slate-700 dark:text-slate-300">Attempt #{attempt.attemptNumber}</span>
                   <div className="flex items-center gap-4">
-                    <span className="text-slate-500 dark:text-slate-450 text-xs">{new Date(attempt.createdAt).toLocaleDateString()}</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-xs">{new Date(attempt.createdAt).toLocaleDateString()}</span>
                     <span className="font-bold text-red-600 dark:text-red-400">{attempt.stageScore}%</span>
                   </div>
                 </div>
@@ -909,7 +911,7 @@ const BaseLineTest = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
           <button
             onClick={handleRestartCourse}
-            className="px-8 py-3.5 bg-gradient-to-r from-red-500 to-red-650 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-red-550/20 hover:-translate-y-0.5 active:translate-y-0"
+            className="px-8 py-3.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-red-500/20 hover:-translate-y-0.5 active:translate-y-0"
           >
             <AlertTriangle className="w-5 h-5" />
             Restart Stage Courses
@@ -917,7 +919,7 @@ const BaseLineTest = () => {
           
           <button
             onClick={() => navigate("/dashboard/assessment-centre")}
-            className="px-7 py-3.5 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-350 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-[#003170] transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+            className="px-7 py-3.5 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-[#F1F5F9] dark:hover:bg-[#003170] transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
           >
             {t("baseline_test.back_to_assessments", "Back to Assessments")}
           </button>
@@ -927,12 +929,12 @@ const BaseLineTest = () => {
   );
 
   if (error) return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30 text-slate-900 dark:text-white">
+    <div className="min-h-screen bg-[#EAF7FD] dark:bg-[#072036] flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#0d3a5f] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30 text-[#072036] dark:text-white">
         <div className="text-red-500 text-5xl mb-4">⚠</div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t("baseline_test.error", "Error")}</h2>
+        <h2 className="text-2xl font-bold text-[#072036] dark:text-white mb-2">{t("baseline_test.error", "Error")}</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
-        <button onClick={() => navigate("/dashboard/assessment-centre")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
+        <button onClick={() => navigate("/dashboard/assessment-centre")} className="px-6 py-2 bg-[#045C9A] text-white rounded-lg hover:bg-[#0d3a5f] font-medium transition-colors">
           {t("baseline_test.back_to_assessments", "Back to Assessments")}
         </button>
       </div>
@@ -940,17 +942,18 @@ const BaseLineTest = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300 flex flex-col justify-center">
+    <div className={`min-h-screen bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white transition-colors duration-300 flex flex-col ${submitted ? "" : "justify-center"}`}>
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
-          onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, registrationCropUrl }) => {
+          onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, framesCaptured, registrationCropUrl }) => {
             setRegisteredFaceDescriptor(faceDescriptor);
             setRegisteredAllEmbeddings(allEmbeddings || null);
             setRegistrationMetadata({
               model: 'arcface-r50-onnx',
               qualityScore: registrationQualityScore || null,
-              framesCaptured: 5,
-              antispoofPassed: true,
+              framesCaptured: framesCaptured ?? null,
+              antispoofPassed: null, // No anti-spoof model is loaded — do not claim one passed.
+
               registrationCropUrl: registrationCropUrl || null,
               alignedCrops: alignedCrops || null,
             });
@@ -962,7 +965,7 @@ const BaseLineTest = () => {
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
       </div>
-      <main className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)] flex flex-col justify-center relative z-10 w-full">
+      <main className={`relative z-10 mx-auto w-full max-w-6xl p-4 md:p-6 lg:p-8 ${submitted ? "" : "min-h-[calc(100vh-4rem)] flex flex-col justify-center"}`}>
         {/* Immersive mesh glow effects */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <motion.div
@@ -972,7 +975,7 @@ const BaseLineTest = () => {
               scale: [1, 1.15, 0.9, 1],
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/10 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/30"
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#045C9A]/10 via-[#045C9A]/5 to-transparent rounded-full blur-[120px] dark:from-[#045C9A]/25"
           />
           <motion.div
             animate={{
@@ -981,30 +984,30 @@ const BaseLineTest = () => {
               scale: [1, 0.9, 1.1, 1],
             }}
             transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/10 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/30"
+            className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-[#034a7d]/10 via-[#045C9A]/5 to-transparent rounded-full blur-[120px] dark:from-[#034a7d]/25"
           />
         </div>
 
         {!submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8 relative z-10">
             {/* Main Question Area */}
-            <div className="flex-1 flex flex-col min-h-[540px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-2xl overflow-hidden relative text-slate-900 dark:text-white">
+            <div className="flex-1 flex flex-col min-h-[540px] bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-sm overflow-hidden relative text-[#072036] dark:text-white">
               {/* Background gradient effect */}
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#045C9A]/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="p-6 border-b border-slate-150 dark:border-blue-900/40 bg-slate-50/50 dark:bg-[#002a5c]/20 relative z-10">
+              <div className="p-6 border-b border-[#d7ebf5] dark:border-[#045C9A]/25 bg-[#F1F5F9]/60 dark:bg-[#0d3a5f]/20 relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setShowExitWarning(true)}
                       disabled={submitting || interactionLocked || timeExpired}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-blue-900/45 bg-white dark:bg-[#001c3d] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-[#002a5c] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl border border-[#d7ebf5] dark:border-[#045C9A]/25 bg-white dark:bg-[#0d3a5f] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 transition-all hover:bg-[#F1F5F9] dark:hover:bg-[#0d3a5f] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       {t("baseline_test.back", "Back")}
                     </button>
-                    <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white">{translatedTitle} <span className="text-[#1a3884] dark:text-blue-400">{stageKey}</span></h2>
+                    <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-[#034a7d] dark:text-white">{translatedTitle} <span className="text-[#045C9A] dark:text-[#A6D7E8]">{stageKey}</span></h2>
                     {stageConfig.maxAttempts > 1 && attemptInfo.attemptCount > 0 && (
                       <span className="ml-2 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-200 dark:border-amber-500/20">
                         Attempt {attemptInfo.attemptCount + 1} / {attemptInfo.maxAttempts}
@@ -1014,7 +1017,7 @@ const BaseLineTest = () => {
                   <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
                       {t("baseline_test.time_left", "Time Left")}:{" "}
-                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884] dark:text-blue-400"}`}>
+                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#045C9A] dark:text-[#A6D7E8]"}`}>
                         {formatCountdown(remainingSeconds)}
                       </span>
                     </div>
@@ -1027,9 +1030,9 @@ const BaseLineTest = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 bg-slate-200 dark:bg-[#00152E] rounded-full overflow-hidden border border-slate-100 dark:border-blue-900/20 relative">
+                  <div className="flex-1 h-2 bg-[#d7ebf5] dark:bg-[#072036] rounded-full overflow-hidden border border-[#d7ebf5] dark:border-[#045C9A]/20 relative">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-400 relative"
+                      className="h-full bg-gradient-to-r from-[#034a7d] to-[#045C9A] dark:from-[#045C9A] dark:to-[#A6D7E8] relative"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 0.5 }}
@@ -1038,17 +1041,17 @@ const BaseLineTest = () => {
                       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.25)_50%,rgba(255,255,255,0)_100%)] w-[50%] animate-pulse" />
                     </motion.div>
                   </div>
-                  <span className="text-xs font-bold text-[#1a3884] dark:text-blue-400 min-w-[3rem] text-right">{progress}%</span>
+                  <span className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] min-w-[3rem] text-right">{progress}%</span>
                 </div>
               </div>
 
               <div className="p-6 md:p-10 flex-1 relative z-10 flex flex-col justify-center gap-6">
                 <div className="mb-4 text-center">
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a3884]/10 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-300 text-xs font-extrabold uppercase tracking-widest mb-2.5 border border-[#1a3884]/20 dark:border-blue-500/20 shadow-xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 animate-ping" />
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#045C9A]/10 dark:bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] text-xs font-extrabold uppercase tracking-widest mb-2.5 border border-[#045C9A]/20 dark:border-[#045C9A]/25 shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8] animate-ping" />
                     {t("baseline_test.question_number", "Question {{current}} / {{total}}", { current: index + 1, total: questions.length })}
                   </span>
-                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-snug mb-2 tracking-tight">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#072036] dark:text-white leading-snug mb-2 tracking-tight">
                     {current?.questionText}
                   </h3>
                 </div>
@@ -1062,18 +1065,18 @@ const BaseLineTest = () => {
                         onClick={() => selectOption(option.value)}
                         disabled={interactionLocked || submitting || timeExpired}
                         className={`group relative p-4 md:p-5 min-h-[75px] md:min-h-[85px] rounded-2xl border-2 transition-all duration-350 text-left hover:scale-[1.01] hover:shadow-md active:scale-[0.995] ${isSelected
-                          ? 'border-[#1a3884] dark:border-blue-500 bg-[#1a3884]/5 dark:bg-blue-500/10 shadow-[0_4px_20px_rgba(26,56,132,0.15)] text-[#1a3884] dark:text-white font-bold'
-                          : 'border-slate-200 dark:border-blue-900/40 bg-white dark:bg-[#001c3d] hover:border-[#1a3884]/50 dark:hover:border-blue-400/50 hover:bg-blue-50/30 dark:hover:bg-[#002a5c] text-slate-700 dark:text-slate-200'
+                          ? 'border-[#045C9A] dark:border-[#045C9A] bg-[#045C9A]/5 dark:bg-[#045C9A]/10 shadow-[0_4px_20px_rgba(26,56,132,0.15)] text-[#045C9A] dark:text-white font-bold'
+                          : 'border-[#d7ebf5] dark:border-[#045C9A]/25 bg-white dark:bg-[#0d3a5f] hover:border-[#045C9A]/50 dark:hover:border-[#045C9A]/50 hover:bg-[#EAF7FD]/60 dark:hover:bg-[#0d3a5f] text-slate-700 dark:text-slate-200'
                           }`}
                       >
                         <div className="flex items-center gap-4 md:gap-5">
                           <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full border-2 flex items-center justify-center font-extrabold text-sm md:text-base shrink-0 transition-all duration-300 shadow-sm ${isSelected
-                            ? 'bg-gradient-to-br from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-blue-500 border-transparent text-white shadow-md scale-105'
-                            : 'border-slate-300 dark:border-blue-800/60 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
+                            ? 'bg-gradient-to-br from-[#034a7d] to-[#045C9A] dark:from-[#045C9A] dark:to-[#034a7d] border-transparent text-white shadow-md scale-105'
+                            : 'border-slate-300 dark:border-[#045C9A]/30 text-slate-400 dark:text-slate-500 group-hover:border-[#045C9A] dark:group-hover:border-[#045C9A]/50 group-hover:text-[#045C9A] dark:group-hover:text-[#A6D7E8]'
                             }`}>
                             {option.value}
                           </div>
-                          <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-200 font-semibold'}`}>
+                          <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#045C9A] dark:text-[#A6D7E8] font-bold' : 'text-slate-700 dark:text-slate-200 font-semibold'}`}>
                             {option.label}
                           </span>
                         </div>
@@ -1094,9 +1097,9 @@ const BaseLineTest = () => {
                           exit={{ opacity: 0, scale: 0.9 }}
                           onClick={nextQ}
                           disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
-                          className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2.5 ${timeElapsed < 5000
-                            ? 'bg-slate-200 dark:bg-[#001c3d] text-slate-450 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-blue-900/30'
-                            : 'bg-[#1a3884] dark:bg-blue-600 text-white hover:bg-[#277a84] dark:hover:bg-blue-500 hover:shadow-2xl hover:-translate-y-1'
+                          className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-[#045C9A]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2.5 ${timeElapsed < 5000
+                            ? 'bg-[#d7ebf5] dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-[#045C9A]/25'
+                            : 'bg-[#045C9A] dark:bg-[#045C9A] text-white hover:bg-[#0d3a5f] dark:hover:bg-[#034a7d] hover:shadow-sm hover:-translate-y-1'
                             }`}
                         >
                           {timeElapsed < 5000 ? (
@@ -1120,8 +1123,8 @@ const BaseLineTest = () => {
                         onClick={() => submit()}
                         disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered || !selectedValue}
                         className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2.5 ${(!allQuestionsAnswered || !selectedValue)
-                          ? 'bg-slate-200 dark:bg-[#001c3d] text-slate-450 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-blue-900/30'
-                          : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-2xl hover:-translate-y-1 shadow-md'
+                          ? 'bg-[#d7ebf5] dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-[#045C9A]/25'
+                          : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-sm hover:-translate-y-1 shadow-md'
                           }`}
                       >
                         {submitting ? (
@@ -1148,10 +1151,10 @@ const BaseLineTest = () => {
             </div>
 
             {/* Navigation Sidebar */}
-            <div className="lg:w-[320px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-blue-900/40 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6 text-slate-900 dark:text-white">
+            <div className="lg:w-[320px] bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6 text-[#072036] dark:text-white">
               <div>
-                <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Target className="text-[#1a3884] dark:text-blue-400" size={20} /> {t("baseline_test.question_map", "Question Map")}
+                <h4 className="text-lg font-bold text-[#072036] dark:text-white mb-4 flex items-center gap-2">
+                  <Target className="text-[#045C9A] dark:text-[#A6D7E8]" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
                   {questions.map((q, idx) => (
@@ -1160,10 +1163,10 @@ const BaseLineTest = () => {
                       onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
                         ${index === idx
-                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-400'
+                          ? 'bg-[#045C9A] dark:bg-[#045C9A] text-white shadow-md scale-105 border-2 border-emerald-400'
                           : selectedAnswers[q._id]
-                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-500/30'
-                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-blue-900/30'
+                            ? 'bg-[#045C9A]/10 dark:bg-[#045C9A]/15 text-[#045C9A] dark:text-[#A6D7E8] border border-[#045C9A]/20 dark:border-[#045C9A]/30'
+                            : 'bg-[#F1F5F9] dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 border border-[#d7ebf5]/5 dark:border-[#045C9A]/25'
                         }`}
                     >
                       {idx + 1}
@@ -1176,21 +1179,21 @@ const BaseLineTest = () => {
                 </div>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-blue-900/40">
+              <div className="space-y-3 pt-4 border-t border-[#d7ebf5] dark:border-[#045C9A]/25">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-550 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884] dark:bg-blue-500" /> {t("baseline_test.answered", "Answered")}</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#045C9A] dark:bg-[#045C9A]" /> {t("baseline_test.answered", "Answered")}</span>
+                  <span className="font-bold text-[#072036] dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-550 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C] border border-transparent dark:border-blue-900/30" /> {t("baseline_test.remaining", "Remaining")}</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#d7ebf5] dark:bg-[#0d3a5f] border border-transparent dark:border-[#045C9A]/25" /> {t("baseline_test.remaining", "Remaining")}</span>
+                  <span className="font-bold text-[#072036] dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
                 </div>
               </div>
 
 
 
               {/* DEV: Auto Answer */}
-              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-blue-900/40 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
+              <div className="pt-4 border-t border-dashed border-[#d7ebf5] dark:border-[#045C9A]/25 opacity-50 hover:opacity-100 transition-opacity flex flex-col gap-2">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
                   onClick={async () => {
@@ -1205,7 +1208,7 @@ const BaseLineTest = () => {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-emerald-50 dark:bg-emerald-955/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors border border-emerald-200 dark:border-emerald-800/20"
+                  className="w-full py-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors border border-emerald-200 dark:border-emerald-800/20"
                 >
                   {t("baseline_test.pass_dev", "⚡ Pass 70% (Dev)")}
                 </button>
@@ -1223,7 +1226,7 @@ const BaseLineTest = () => {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-rose-50 dark:bg-[#ff0000]/10 text-rose-700 dark:text-red-405 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-rose-100 dark:hover:bg-[#ff0000]/20 transition-colors border border-rose-200 dark:border-red-900/25"
+                  className="w-full py-2 bg-rose-50 dark:bg-[#ff0000]/10 text-rose-700 dark:text-red-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-rose-100 dark:hover:bg-[#ff0000]/20 transition-colors border border-rose-200 dark:border-red-900/25"
                 >
                   {t("baseline_test.fail_dev", "⚡ Fail (Dev)")}
                 </button>
@@ -1238,33 +1241,56 @@ const BaseLineTest = () => {
           >
             {/* Main Results Card */}
             {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-blue-900/40 rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto relative text-slate-900 dark:text-white">
-              
-              {/* Top Left User Info */}
-              <div className="absolute top-8 left-8 hidden sm:block text-left">
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{user?.fullName}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{user?.studentId}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.college?.collegeName || user?.collegeName || t("baseline_test.student", "Student")}</p>
-              </div>
+            <div className="relative mx-auto max-w-4xl rounded-2xl border border-[#d7ebf5] bg-white p-6 text-[#072036] shadow-sm sm:p-8 dark:border-[#045C9A]/25 dark:bg-[#072036] dark:text-white">
 
-              {/* Header Section */}
-              <div className="text-center mb-10 border-b border-slate-100 dark:border-white/8 pb-8 sm:mt-2">
+              {/* Header: candidate on the left, result identity on the right.
+                  The name block used to be absolutely positioned over a centred
+                  title, so the two collided at most widths. */}
+              <div className="mb-8 border-b border-[#d7ebf5] pb-6 dark:border-white/10">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      {t("baseline_test.candidate", "Candidate")}
+                    </p>
+                    <p className="mt-1 truncate text-[15px] font-bold text-[#072036] dark:text-white">{user?.fullName}</p>
+                    <p className="mt-0.5 text-[12px] font-medium tabular-nums text-slate-600 dark:text-slate-400">{user?.studentId}</p>
+                    <p className="text-[12px] font-medium text-slate-600 dark:text-slate-400">
+                      {user?.college?.collegeName || user?.collegeName || t("baseline_test.student", "Student")}
+                    </p>
+                  </div>
 
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
-                </h2>
+                  <div className="shrink-0 text-left sm:text-right">
+                    <h2 className="text-xl font-extrabold tracking-tight text-[#072036] dark:text-white sm:text-2xl">
+                      {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
+                    </h2>
+                    <p className="mt-1 text-[11px] font-medium tabular-nums text-slate-600 dark:text-slate-400">
+                      {t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}
+                      <span className="mx-1.5 text-slate-300 dark:text-slate-600">|</span>
+                      S_{stageConfig.name.toLowerCase()}
+                      {testResults?.attemptNumber ? (
+                        <>
+                          <span className="mx-1.5 text-slate-300 dark:text-slate-600">|</span>
+                          <span className="font-bold">
+                            {t("baseline_test.attempt_n", "Attempt #{{n}}", { n: testResults.attemptNumber })}
+                          </span>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                </div>
 
                 {/* Pass/Fail Badge for multi-attempt stages */}
                 {stageConfig.maxAttempts > 1 && testResults && (
-                  <div className="mb-3">
+                  <div className="mt-4">
                     {testResults.passed ? (
-                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-sm font-bold border border-emerald-200 dark:border-emerald-500/20">
-                        <CheckCircle2 className="w-4 h-4" /> PASSED — Score: {testResults.stageScore}% (Required: {stageConfig.passingPercentage}%)
+                      <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/70 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        {t("baseline_test.passed_with_score", "Passed — {{score}}% (required {{required}}%)", { score: testResults.stageScore, required: stageConfig.passingPercentage })}
                       </span>
                     ) : (
                       <div className="space-y-2">
                         {testResults.remainingAttempts !== undefined && testResults.remainingAttempts > 0 && (
-                          <p className="text-xs text-slate-555 dark:text-slate-400 font-medium">
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                             You have {testResults.remainingAttempts} attempt{testResults.remainingAttempts !== 1 ? 's' : ''} remaining. Each retry will have different questions.
                           </p>
                         )}
@@ -1283,66 +1309,63 @@ const BaseLineTest = () => {
                   <div className="mb-3">
                     <button
                       onClick={() => navigate('/dashboard/skills-vault')}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/5 dark:bg-[#1a3884]/10 text-[#1a3884] dark:text-blue-300 text-sm font-bold border border-[#1a3884]/20 hover:bg-[#1a3884]/10 transition"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#045C9A]/25 bg-[#EAF7FD] px-2.5 py-1 text-[11px] font-bold text-[#045C9A] transition-colors hover:bg-[#045C9A] hover:text-white dark:border-[#045C9A]/40 dark:bg-[#045C9A]/15 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
                     >
-                      <Award className="w-4 h-4" /> {t("baseline_test.certificate_earned", "Certificate Earned — View in Skills Vault")}
+                      <Award className="w-3.5 h-3.5" /> {t("baseline_test.certificate_earned", "Certificate Earned — View in Skills Vault")}
                     </button>
                   </div>
                 )}
 
-                <div className="flex items-center justify-center gap-2 text-slate-550 dark:text-slate-455 text-sm">
-                  <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
-                  <span>|</span>
-                  <span>S_{stageConfig.name.toLowerCase()}</span>
-                  {testResults?.attemptNumber && (
-                    <>
-                      <span>|</span>
-                      <span className="font-bold">Attempt #{testResults.attemptNumber}</span>
-                    </>
-                  )}
-                </div>
               </div>
 
-              {/* Professional Score Display */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-6 border border-slate-150 dark:border-blue-900/40">
-                <div className="text-center md:text-right">
-                  <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t("baseline_test.overall_score", "Overall Score")}</div>
-                  <div className="text-5xl font-bold text-slate-900 dark:text-white">
-                    {testResults?.stageScore || testResults?.baselineScore}
-                    <span className="text-2xl text-slate-400 ml-1">/100</span>
+              {/* Headline figures. These were one 48px hero number and a
+                  pill the same size as the page title; a report reads better
+                  with the two facts given equal, quieter weight. */}
+              <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-5 dark:border-white/10 dark:bg-[#072036]/60">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                    {t("baseline_test.overall_score", "Overall Score")}
+                  </div>
+                  <div className="mt-1.5 flex items-baseline gap-1 text-[#072036] dark:text-white">
+                    <span className="text-3xl font-extrabold tabular-nums">
+                      {testResults?.stageScore || testResults?.baselineScore}
+                    </span>
+                    <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">/ 100</span>
                   </div>
                 </div>
 
-                <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-blue-900/40" />
-
-                <div className="text-center md:text-left">
-                  <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t("baseline_test.proficiency_level", "Proficiency Level")}</div>
-                  {stageConfig.maxAttempts > 1 && testResults && !testResults.passed ? (
-                    <div className="text-2xl font-bold px-4 py-1 rounded-full inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
-                      {t("baseline_test.keep_improving", "Keep Improving")}
-                    </div>
-                  ) : (
-                    <div className={`text-2xl font-bold px-4 py-1 rounded-full inline-block ${getBandColor(testResults?.stageBand || 'Emerging').badge}`}>
-                      {t(`baseline_test.bands.${testResults?.stageBand || 'Emerging'}`, testResults?.stageBand || 'Emerging')}
-                    </div>
-                  )}
+                <div className="rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-5 dark:border-white/10 dark:bg-[#072036]/60">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                    {t("baseline_test.proficiency_level", "Proficiency Level")}
+                  </div>
+                  <div className="mt-1.5">
+                    {stageConfig.maxAttempts > 1 && testResults && !testResults.passed ? (
+                      <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-[13px] font-bold text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+                        {t("baseline_test.keep_improving", "Keep Improving")}
+                      </span>
+                    ) : (
+                      <span className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[13px] font-bold ${getBandColor(testResults?.stageBand || 'Emerging').badge}`}>
+                        {t(`baseline_test.bands.${testResults?.stageBand || 'Emerging'}`, testResults?.stageBand || 'Emerging')}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* T4 Final: Total Growth Δ + Learning Velocity (Blueprint v1.0) */}
               {stageKey === 'T4' && (testResults?.growthDelta != null || testResults?.plviBand) && (
                 <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-12">
-                  <div className="flex-1 text-center bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-5 border border-slate-150 dark:border-blue-900/40">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">{t("baseline_test.total_growth", "Total Growth (T1 → T4)")}</div>
-                    <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">
+                  <div className="flex-1 text-center bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl p-5 border border-[#d7ebf5] dark:border-[#045C9A]/25">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">{t("baseline_test.total_growth", "Total Growth (T1 → T4)")}</div>
+                    <div className="text-3xl font-bold text-[#045C9A] dark:text-[#A6D7E8]">
                       {testResults.growthDelta == null ? '—' : `${testResults.growthDelta >= 0 ? '+' : ''}${testResults.growthDelta} pts`}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{t("baseline_test.since_baseline", "since your baseline")}</div>
                   </div>
-                  <div className="flex-1 text-center bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-5 border border-slate-150 dark:border-blue-900/40">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-1">{t("baseline_test.learning_velocity", "Learning Velocity")}</div>
-                    <div className="text-3xl font-bold text-[#1a3884] dark:text-blue-300">{testResults.plviBand || '—'}</div>
-                    <div className="text-[11px] text-slate-550 dark:text-slate-450 mt-0.5">
+                  <div className="flex-1 text-center bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl p-5 border border-[#d7ebf5] dark:border-[#045C9A]/25">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">{t("baseline_test.learning_velocity", "Learning Velocity")}</div>
+                    <div className="text-3xl font-bold text-[#045C9A] dark:text-[#A6D7E8]">{testResults.plviBand || '—'}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {testResults.tDays ? `over ${testResults.tDays} ${testResults.tDaysBasis === 'active' ? 'active learning days' : 'days'}` : t("baseline_test.rate_of_growth", "rate of growth")}
                     </div>
                   </div>
@@ -1351,14 +1374,18 @@ const BaseLineTest = () => {
 
               {/* Quotient Cards Grid */}
               <div className="mb-12 relative z-10">
-                <motion.h3
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-3xl font-black text-[#002147] dark:text-white text-center mb-8"
+                  transition={{ delay: 0.4 }}
+                  className="mb-4 flex items-center gap-2.5"
                 >
-                  {t("baseline_test.quotient_breakdown", "Quotient-Wise Breakdown")}
-                </motion.h3>
+                  <span className="h-4 w-[3px] shrink-0 rounded-full bg-[#045C9A]" />
+                  <h3 className="text-[11px] font-extrabold uppercase tracking-widest text-[#072036] dark:text-slate-300">
+                    {t("baseline_test.quotient_breakdown", "Quotient-Wise Breakdown")}
+                  </h3>
+                  <span className="ml-1 hidden h-px flex-1 bg-[#d7ebf5] dark:bg-white/10 sm:block" />
+                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {(testResults?.quotientProfile || testResults?.t1Profile) ? Object.entries(testResults?.quotientProfile || testResults?.t1Profile).map(([quotient, data], index) => {
@@ -1370,60 +1397,53 @@ const BaseLineTest = () => {
                     return (
                       <motion.div
                         key={quotient}
-                        initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                        className="bg-white dark:bg-[#00152E]/60 border border-slate-200 dark:border-blue-900/40 rounded-xl p-5 hover:border-slate-350 dark:hover:border-blue-500/40 transition-all duration-300 text-slate-900 dark:text-white"
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.45 + Math.min(index, 6) * 0.06, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                        className="rounded-2xl border border-[#d7ebf5] bg-white p-5 text-[#072036] shadow-sm transition-all duration-300 hover:border-[#045C9A]/40 hover:shadow-md dark:border-[#045C9A]/25 dark:bg-[#072036]/60 dark:text-white dark:hover:border-[#045C9A]/45"
                       >
                         <div className="relative z-10">
                           {/* Header */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="text-slate-400">
+                          <div className="mb-3 flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
                                 {info.icon}
-                              </div>
-                              <div>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{quotient}</span>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{qName}</h4>
+                              </span>
+                              <div className="min-w-0">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{quotient}</span>
+                                <h4 className="text-[13px] font-bold leading-snug tracking-tight text-[#072036] dark:text-white">{qName}</h4>
                               </div>
                             </div>
-                            <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 dark:bg-blue-950 text-slate-600 dark:text-blue-300 border border-slate-200 dark:border-blue-900/40">
+                            <span className="shrink-0 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
                               {t(`baseline_test.bands.${data.level}`, data.level)}
                             </span>
                           </div>
 
                           {/* Description */}
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{qDesc}</p>
+                          <p className="mb-4 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">{qDesc}</p>
 
                           {/* Score Display */}
-                          <div className="flex items-end justify-between mb-4">
-                            <div>
-                              <div className="text-5xl font-black text-[#002147] dark:text-white">
-                                {data.rawScore}
-                                <span className="text-2xl text-slate-400 ml-1">%</span>
-                              </div>
+                          <div className="mb-3 flex items-end justify-between gap-3">
+                            <div className="flex items-baseline gap-0.5 text-[#072036] dark:text-white">
+                              <span className="text-2xl font-extrabold tabular-nums">{data.rawScore}</span>
+                              <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">%</span>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t("baseline_test.performance", "Performance")}</div>
-                              <div className="text-sm font-bold text-slate-600 dark:text-slate-350">
+                              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t("baseline_test.performance", "Performance")}</div>
+                              <div className="text-[12px] font-bold tabular-nums text-slate-700 dark:text-slate-200">
                                 {data.earned}/{data.possible} {t("baseline_test.correct", "correct")}
                               </div>
                             </div>
                           </div>
 
                           {/* Progress Bar */}
-                          <div className="relative h-3 w-full bg-slate-105 dark:bg-[#002147] rounded-full overflow-hidden border border-slate-200 dark:border-blue-900/20">
-                            {/* Threshold markers */}
-                            <div className="absolute left-[20%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
-                            <div className="absolute left-[40%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
-                            <div className="absolute left-[60%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
-                            <div className="absolute left-[80%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
-
+                          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-[#A6D7E8]/40 dark:bg-white/10">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${data.rawScore}%` }}
                               transition={{ delay: 0.9 + index * 0.1, duration: 1.2, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-500 dark:to-blue-400 relative"
+                              className="relative h-full rounded-full"
+                              style={{ background: "linear-gradient(90deg, #034a7d 0%, #045C9A 100%)" }}
                             />
                           </div>
 
@@ -1441,7 +1461,7 @@ const BaseLineTest = () => {
                     );
                   }) : (
                     <div className="col-span-3 text-center py-12">
-                      <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1a3884] border-t-transparent mx-auto mb-4" />
+                      <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#045C9A] border-t-transparent mx-auto mb-4" />
                       <p className="text-slate-400 text-lg">{t("baseline_test.processing_profile", "Processing your profile...")}</p>
                     </div>
                   )}
@@ -1453,11 +1473,11 @@ const BaseLineTest = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 mb-8 flex-wrap"
+                className="mt-8 flex flex-col flex-wrap items-center justify-center gap-3 border-t border-[#d7ebf5] pt-6 sm:flex-row dark:border-white/10"
               >
                 <button
                   onClick={() => downloadReport(user, testResults)}
-                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white px-5 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-[#F1F5F9] sm:w-auto dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-100 dark:hover:bg-[#0d3a5f]/70"
                 >
                   <Download className="w-4 h-4" />
                   {t("baseline_test.download_report", "Download Report")}
@@ -1474,7 +1494,7 @@ const BaseLineTest = () => {
                           initRef.current = false;
                           window.location.reload();
                         }}
-                        className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 hover:-translate-y-1 w-full sm:w-auto"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-[13px] font-semibold text-white shadow-md shadow-amber-500/20 transition-colors hover:bg-amber-600 sm:w-auto"
                       >
                         <RefreshCw className="w-4 h-4" />
                         Retry Assessment (Attempt {(testResults.attemptNumber || 0) + 1}/{testResults.maxAttempts || stageConfig.maxAttempts})
@@ -1482,7 +1502,7 @@ const BaseLineTest = () => {
                     ) : (
                       <button
                         onClick={handleRestartCourse}
-                        className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-bold hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-red-500/20 hover:-translate-y-1 w-full sm:w-auto"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-6 py-2.5 text-[13px] font-semibold text-white shadow-md shadow-rose-600/20 transition-colors hover:bg-rose-700 sm:w-auto"
                       >
                         <AlertTriangle className="w-4 h-4" />
                         Restart Course
@@ -1497,7 +1517,7 @@ const BaseLineTest = () => {
                       else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player");
                       else navigate("/dashboard/skills-passport");
                     }}
-                    className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#072036] px-6 py-2.5 text-[13px] font-semibold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] sm:w-auto dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white"
                   >
                     <TrendingUp className="w-4 h-4" />
                     {t("baseline_test.continue_journey", "Continue My Journey")}
@@ -1506,14 +1526,14 @@ const BaseLineTest = () => {
 
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white px-5 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-[#F1F5F9] sm:w-auto dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-100 dark:hover:bg-[#0d3a5f]/70"
                 >
                   {t("baseline_test.go_to_dashboard", "Go to Dashboard")}
                 </button>
 
                 <button
                   onClick={() => navigate("/dashboard/assessment-centre")}
-                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white px-5 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-[#F1F5F9] sm:w-auto dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-100 dark:hover:bg-[#0d3a5f]/70"
                 >
                   {t("baseline_test.all_assessments", "All Assessments")}
                 </button>
@@ -1529,22 +1549,22 @@ const BaseLineTest = () => {
       {
         showExitWarning && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#002147] p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-blue-900/40 text-slate-900 dark:text-white">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#0d3a5f] p-8 rounded-2xl shadow-sm max-w-md w-full border border-[#d7ebf5] dark:border-[#045C9A]/25 text-[#072036] dark:text-white">
               <div className="w-20 h-20 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">{t("baseline_test.exit_warning_title", "Don't Leave Yet!")}</h3>
+              <h3 className="text-2xl font-bold text-[#072036] dark:text-white text-center mb-4">{t("baseline_test.exit_warning_title", "Don't Leave Yet!")}</h3>
               <p className="text-slate-500 dark:text-slate-400 text-center mb-8">{t("baseline_test.exit_warning_desc", "Back navigation is disabled while the assessment is in progress. If you leave now, you will return to the assessment dashboard.")}</p>
               <div className="flex flex-col gap-3">
                 <button
                   onClick={leaveAssessmentPage}
-                  className="w-full py-4 bg-white dark:bg-[#001c3d] border border-slate-200 dark:border-blue-900/40 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-[#002a5c] transition-all shadow-sm"
+                  className="w-full py-4 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-[#045C9A]/25 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-[#F1F5F9] dark:hover:bg-[#0d3a5f] transition-all shadow-sm"
                 >
                   {t("baseline_test.leave_assessment", "Leave Assessment")}
                 </button>
                 <button onClick={() => {
                   setShowExitWarning(false);
-                }} className="w-full py-4 bg-[#1a3884] dark:bg-blue-600 text-white rounded-xl font-bold hover:bg-[#277a84] dark:hover:bg-blue-500 transition-all shadow-md">{t("baseline_test.continue_assessment", "Continue Assessment")}</button>
+                }} className="w-full py-4 bg-[#045C9A] dark:bg-[#045C9A] text-white rounded-xl font-bold hover:bg-[#0d3a5f] dark:hover:bg-[#034a7d] transition-all shadow-md">{t("baseline_test.continue_assessment", "Continue Assessment")}</button>
               </div>
             </motion.div>
           </div>
@@ -1564,6 +1584,7 @@ const BaseLineTest = () => {
         isOpen={isWarningVisible}
         warningsCount={warningsCount}
         maxWarnings={maxWarnings}
+        riskFlagged={riskFlagged}
         violationType={lastViolationType}
         onAcknowledge={acknowledgeWarning}
       />
@@ -1584,6 +1605,9 @@ const BaseLineTest = () => {
           similarityScore={similarityScore}
           isCameraWarmingUp={isCameraWarmingUp}
           gazeDirection={gazeDirection}
+          diagnostics={diagnostics}
+          nudgeMessage={nudgeMessage}
+          riskFlagged={riskFlagged}
         />
       )}
 

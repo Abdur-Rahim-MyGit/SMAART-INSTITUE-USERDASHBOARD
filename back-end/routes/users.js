@@ -422,6 +422,10 @@ router.post('/register-details', upload.fields([
 });
 
 // Save individual registration section (for progressive saving)
+// Use the incoming value whenever the client sent the key -- including "" and 0.
+// A plain `data.x || current` silently discards cleared fields and zero values.
+const pick = (incoming, current) => (incoming !== undefined ? incoming : current);
+
 router.patch('/register-section', async (req, res) => {
   try {
     const { email, section, data } = req.body;
@@ -478,24 +482,24 @@ router.patch('/register-section', async (req, res) => {
         }
       },
       'personalDetails': async () => {
-        registration.fullName = data.fullName || registration.fullName;
-        registration.nickname = data.nickname || registration.nickname;
-        registration.dob = data.dob || registration.dob;
-        registration.gender = data.gender || registration.gender;
-        registration.mobileNumber = data.mobileNumber || registration.mobileNumber;
-        registration.institution = data.institution || registration.institution;
+        registration.fullName = pick(data.fullName, registration.fullName);
+        registration.nickname = pick(data.nickname, registration.nickname);
+        registration.dob = pick(data.dob, registration.dob);
+        registration.gender = pick(data.gender, registration.gender);
+        registration.mobileNumber = pick(data.mobileNumber, registration.mobileNumber);
+        registration.institution = pick(data.institution, registration.institution);
         registration.department = typeof data.department === 'object'
           ? (data.department.fullName || data.department.name || '')
           : (data.department || registration.department);
-        registration.cgpa = data.cgpa || registration.cgpa;
-        registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
-        registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
-        registration.educationLevel = data.educationLevel || registration.educationLevel;
-        registration.batch = data.batch || registration.batch;
-        registration.bio = data.bio || registration.bio;
-        registration.timezone = data.timezone || registration.timezone;
-        registration.dateFormat = data.dateFormat || registration.dateFormat;
-        registration.notificationPrefs = data.notificationPrefs || registration.notificationPrefs;
+        registration.cgpa = pick(data.cgpa, registration.cgpa);
+        registration.yearOfStudy = pick(data.yearOfStudy, registration.yearOfStudy);
+        registration.yearOfPassing = pick(data.yearOfPassing, registration.yearOfPassing);
+        registration.educationLevel = pick(data.educationLevel, registration.educationLevel);
+        registration.batch = pick(data.batch, registration.batch);
+        registration.bio = pick(data.bio, registration.bio);
+        registration.timezone = pick(data.timezone, registration.timezone);
+        registration.dateFormat = pick(data.dateFormat, registration.dateFormat);
+        registration.notificationPrefs = pick(data.notificationPrefs, registration.notificationPrefs);
 
         if (data.profilePhoto) {
           registration.profilePhoto = data.profilePhoto;
@@ -503,12 +507,12 @@ router.patch('/register-section', async (req, res) => {
 
         if (data.address) {
           registration.address = {
-            street: data.address.street || registration.address?.street || '',
-            city: data.address.city || registration.address?.city || '',
-            state: data.address.state || registration.address?.state || '',
-            country: data.address.country || registration.address?.country || '',
-            district: data.address.district || registration.address?.district || '',
-            pincode: data.address.pincode || registration.address?.pincode || '',
+            street: pick(data.address.street, registration.address?.street ?? ''),
+            city: pick(data.address.city, registration.address?.city ?? ''),
+            state: pick(data.address.state, registration.address?.state ?? ''),
+            country: pick(data.address.country, registration.address?.country ?? ''),
+            district: pick(data.address.district, registration.address?.district ?? ''),
+            pincode: pick(data.address.pincode, registration.address?.pincode ?? ''),
           };
         }
 
@@ -539,12 +543,12 @@ router.patch('/register-section', async (req, res) => {
       },
       'address': async () => {
         registration.address = {
-          street: data.street || registration.address?.street || '',
-          city: data.city || registration.address?.city || '',
-          state: data.state || registration.address?.state || '',
-          country: data.country || registration.address?.country || '',
-          district: data.district || registration.address?.district || '',
-          pincode: data.pincode || registration.address?.pincode || '',
+          street: pick(data.street, registration.address?.street ?? ''),
+          city: pick(data.city, registration.address?.city ?? ''),
+          state: pick(data.state, registration.address?.state ?? ''),
+          country: pick(data.country, registration.address?.country ?? ''),
+          district: pick(data.district, registration.address?.district ?? ''),
+          pincode: pick(data.pincode, registration.address?.pincode ?? ''),
         };
       },
       'tenthDetails': async () => {
@@ -888,6 +892,39 @@ router.get('/register-details/:email', async (req, res) => {
     }
     const populatedDegree = studentForDetails?.degree || null;
     let academic = studentForDetails?.academic || {};
+
+    // Per-semester results, normalised from academicRecords (what the college
+    // upload writes) with a fallback to academic.semesterPerformances.
+    const rawSemesters = (studentForDetails?.academicRecords?.length
+      ? studentForDetails.academicRecords
+      : (academic?.semesterPerformances || []));
+
+    const semesterRows = [...rawSemesters]
+      .map((r) => ({
+        semesterNumber: Number(r.semesterNumber ?? r.semester),
+        sgpa: r.sgpa == null ? null : Number(r.sgpa),
+        cgpa: r.cgpa == null ? null : Number(r.cgpa),
+        creditsEarned: Number(r.creditsEarned ?? r.earnedCredits ?? 0),
+        totalCredits: Number(r.totalCredits ?? 0),
+        status: r.status || ''
+      }))
+      .filter((r) => Number.isFinite(r.semesterNumber))
+      .sort((a, b) => a.semesterNumber - b.semesterNumber);
+
+    const latestSem = semesterRows.length ? semesterRows[semesterRows.length - 1] : null;
+    const backlogCount = Array.isArray(studentForDetails?.activeArrears)
+      ? studentForDetails.activeArrears.length
+      : Number(academic?.activeBacklogs || 0);
+    // Forward the arrear rows, not just the count. The profile marks each
+    // backlog against the semester it was failed in, which the count alone
+    // cannot say.
+    const arrearRows = (Array.isArray(studentForDetails?.activeArrears) ? studentForDetails.activeArrears : [])
+      .map((a) => ({
+        subjectCode: a?.subjectCode || '',
+        subjectName: a?.subjectName || '',
+        credits: a?.credits == null ? null : Number(a.credits),
+        failedInSemester: a?.failedInSemester == null ? null : Number(a.failedInSemester),
+      }));
     if (studentForDetails && populatedDegree) {
       const dept = populatedDegree;
       academic = {
@@ -895,7 +932,11 @@ router.get('/register-details/:email', async (req, res) => {
         domain: academic?.domain || dept.domain || '',
         degreeGroup: academic?.degreeGroup || dept.fullName || dept.abbreviation || '',
         specialisation: academic?.specialisation || dept.specialization || '',
-        cgpa: academic?.cgpa || ''
+        cgpa: academic?.cgpa || '',
+        semesterPerformances: semesterRows,
+        activeBacklogs: backlogCount,
+        latestSemester: latestSem ? latestSem.semesterNumber : null,
+        overallCgpa: latestSem && latestSem.cgpa != null ? latestSem.cgpa : (academic?.overallCgpa ?? null),
       };
     } else {
       academic = {
@@ -903,7 +944,11 @@ router.get('/register-details/:email', async (req, res) => {
         domain: academic?.domain || '',
         degreeGroup: academic?.degreeGroup || '',
         specialisation: academic?.specialisation || '',
-        cgpa: academic?.cgpa || ''
+        cgpa: academic?.cgpa || '',
+        semesterPerformances: semesterRows,
+        activeBacklogs: backlogCount,
+        latestSemester: latestSem ? latestSem.semesterNumber : null,
+        overallCgpa: latestSem && latestSem.cgpa != null ? latestSem.cgpa : (academic?.overallCgpa ?? null),
       };
     }
 
@@ -920,6 +965,8 @@ router.get('/register-details/:email', async (req, res) => {
         college: user?.college || fallbackCollege || null,
         degree: populatedDegree,
         academic,
+        activeArrears: arrearRows,
+        activeBacklogs: backlogCount,
         department: studentDept,
         lastLogin: user?.lastLogin || null,
         previousLogin: user?.previousLogin || null
@@ -938,6 +985,8 @@ router.get('/register-details/:email', async (req, res) => {
       admissionDate: userObj.admissionDate || studentForDetails?.admissionDate || '',
       degree: populatedDegree,
       academic,
+      activeArrears: arrearRows,
+      activeBacklogs: backlogCount,
       department: studentDept,
       batch: userObj.batch || studentBatch || '',
       badges: aggregatedBadges,

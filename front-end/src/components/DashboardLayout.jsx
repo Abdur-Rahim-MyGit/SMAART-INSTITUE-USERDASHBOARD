@@ -2,29 +2,28 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  IconChevronRight as ChevronRight,
-  IconChevronDown as ChevronDown,
-  IconBell as Bell,
-  IconSettings as Settings,
-  IconSearch as Search,
-  IconCommand as Command,
-  IconKeyboard as Keyboard,
-  IconClock as Clock,
-  IconSun as Sun,
-  IconMoon as Moon,
-  IconInfoCircle as Info,
-  IconCircleCheck as CheckCircle,
-  IconAlertCircle as AlertCircle,
-  IconExternalLink as ExternalLink,
-  IconMenu2 as Menu,
-  IconStar as Star,
-  IconLogout as LogOut,
-  IconTrophy as Trophy,
-  IconUser as User,
-  IconWorld as Globe2,
-  IconX as X,
-  IconFlame as Flame,
-} from "@tabler/icons-react";
+  AlertCircle,
+  Bell,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Command,
+  ExternalLink,
+  Flame,
+  Globe2,
+  Info,
+  LogOut,
+  Menu,
+  Moon,
+  Search,
+  Settings,
+  Star,
+  Sun,
+  Trophy,
+  User,
+  X,
+} from "@/components/icons";
 import StreaksWidget from "@/components/dashboard/StreaksWidget";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
@@ -445,14 +444,13 @@ const DashboardLayout = () => {
   // Scroll-based transparent navbar effect
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const mainEl = document.querySelector('main');
-    const target = mainEl || window;
     const onScroll = () => {
-      const scrollTop = mainEl ? mainEl.scrollTop : window.scrollY;
-      setScrolled(scrollTop > 12);
+      setScrolled(window.scrollY > 12);
     };
-    target.addEventListener('scroll', onScroll, { passive: true });
-    return () => target.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Trigger once on mount to set initial state
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
   }, [location.pathname]);
 
   const fetchStreak = async () => {
@@ -875,7 +873,7 @@ const DashboardLayout = () => {
   const pageTitle = getPageTitle();
 
   return (
-    <div className={`min-h-screen bg-[#e8eff8] dark:bg-[#00152E] transition-colors duration-300`}>
+    <div className={`min-h-screen bg-[#e8eff8] dark:bg-[#072036] transition-colors duration-300`}>
       {/* Session Expiry Warning Modal */}
       <SessionExpiryWarning
         isVisible={showWarning}
@@ -888,50 +886,62 @@ const DashboardLayout = () => {
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isFullScreenPage ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[240px]')
+        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#072036] ${isFullScreenPage ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[240px]')
           }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
         {!isFullScreenPage && (
           <header className={`sticky top-0 z-40 backdrop-blur-xl border-none sm:border-b transition-all duration-300
             ${scrolled
-              ? 'bg-white/90 dark:bg-[#002147]/92 border-slate-200/40 dark:border-[#1a3884]/25 shadow-[0_1px_16px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_16px_rgba(0,0,0,0.35)]'
-              : 'bg-white/40 dark:bg-[#002147]/30 border-transparent shadow-none'
+              ? 'bg-white dark:bg-[#072036] border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-[0_1px_16px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_16px_rgba(0,0,0,0.35)]'
+              : 'bg-[#e8eff8] dark:bg-[#072036] border-transparent shadow-none'
             }`}>
             <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
 
-              {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}
+              {/* LEFT SECTION: mobile menu toggle only. The page title used to
+                  sit here, but the sidebar already marks the current page and
+                  the browser tab repeats it - three copies of the same word,
+                  and it pushed the search bar off-centre. */}
               <div className="flex items-center gap-4">
                 {/* Mobile Menu Toggle */}
                 <button
                   onClick={() => setIsMobileOpen(true)}
-                  className="lg:hidden p-2 bg-white dark:bg-[#002A5C] rounded-xl shadow-sm border border-slate-200 dark:border-[#1a3884]/20 text-slate-600 dark:text-slate-300 hover:text-[#1a3884] transition-all"
+                  className="lg:hidden p-2 bg-white dark:bg-[#0d3a5f] rounded-xl shadow-sm border border-[#d7ebf5] dark:border-[#045C9A]/20 text-slate-600 dark:text-slate-300 hover:text-[#045C9A] transition-all"
                   aria-label="Open menu"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
 
-                <div className="flex flex-col min-w-0 shrink">
 
-
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <motion.h1
-                      key={pageTitle}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-lg md:text-[20px] font-bold text-[#0d1f4e] dark:text-white transition-colors duration-300 truncate min-w-0"
-                    >
-                      {pageTitle}
-                    </motion.h1>
-                  </div>
-                </div>
               </div>
 
-              {/* CENTER SECTION: Premium Search Bar */}
-              <div className="hidden lg:flex flex-1 max-w-[480px] mx-10">
-                <div className="relative w-full group" ref={searchContainerRef}>
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#1a3884] transition-colors" />
+              {/* LEFT-ALIGNED SECTION: Premium Search Bar & Scrolled Greeting */}
+              <div className="hidden lg:flex flex-1 items-center ml-2 mr-auto gap-4 h-full">
+                <AnimatePresence>
+                  {scrolled && (
+                    <motion.div
+                      key="greeting"
+                      initial={{ opacity: 0, width: 0, x: -20 }}
+                      animate={{ opacity: 1, width: "auto", x: 0 }}
+                      exit={{ opacity: 0, width: 0, x: -20 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="whitespace-nowrap overflow-hidden flex items-center"
+                    >
+                      <span className="text-[17px] font-bold tracking-tight text-[#072036] dark:text-white flex items-center pr-2">
+                        Hello, {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Scrolling narrows the bar to make room for the greeting, but
+                    it stays a full search field -- no collapse-to-icon state. */}
+                <div
+                  className={`relative group transition-all duration-300 ${scrolled ? 'w-[320px]' : 'w-full max-w-[420px]'}`}
+                  ref={searchContainerRef}
+                >
+                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-4">
+                    <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#045C9A] transition-colors" />
                   </div>
                   <input
                     ref={searchInputRef}
@@ -944,33 +954,25 @@ const DashboardLayout = () => {
                     onFocus={() => setShowSearchResults(true)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder={t('dashboard.search_placeholder')}
-                    className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner dark:text-white"
+                    className="block w-full pl-11 pr-10 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#045C9A]/30 rounded-full text-sm placeholder-slate-400 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-[#045C9A]/5 transition-all shadow-inner"
                     aria-label="Search dashboard content"
                     aria-expanded={showSearchResults}
                     aria-controls="dashboard-search-results"
                     autoComplete="off"
                     spellCheck={false}
                   />
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
+                  <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-4">
                     {searchQuery && (
                       <button
                         onClick={() => {
                           setSearchQuery("");
                           searchInputRef.current?.focus();
                         }}
-                        className="p-1 hover:bg-slate-200 dark:hover:bg-[#002A5C] rounded-full transition-colors"
+                        className="p-1 hover:bg-slate-200 dark:hover:bg-[#0d3a5f] rounded-full transition-colors"
                       >
                         <X className="w-3.5 h-3.5 text-slate-400" />
                       </button>
                     )}
-                    <div className="group/key flex items-center justify-center px-2 py-1 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 bg-white dark:bg-[#002147] rounded-md border border-slate-200 border-b-[3px] dark:border-[#1a3884]/30 shadow-sm transition-all duration-200 cursor-default hover:border-b hover:translate-y-[2px] hover:shadow-none hover:bg-slate-50 dark:hover:bg-[#002A5C]">
-                      <span className="hidden group-hover/key:block whitespace-nowrap leading-none mt-[1px]">Ctrl + K</span>
-                      <div className="flex items-center gap-1 group-hover/key:hidden">
-                        <Keyboard className="w-3 h-3 text-slate-400 dark:text-slate-500" />
-                        <span className="leading-none mt-[1px]">K</span>
-                      </div>
-                    </div>
-
                   </div>
 
                   <AnimatePresence>
@@ -981,9 +983,9 @@ const DashboardLayout = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.98 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/8 bg-white dark:bg-[#002147] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl z-[100]"
+                        className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-2xl border border-[#d7ebf5]/80 dark:border-white/8 bg-white dark:bg-[#072036] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl z-[100]"
                       >
-                        <div className="border-b border-slate-200 dark:border-[#1a3884]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                        <div className="border-b border-[#d7ebf5] dark:border-[#045C9A]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 flex items-center justify-between">
                           <span>{searchQuery.trim() ? "Search results" : "Quick Navigation"}</span>
                           {!searchQuery.trim() && (
                             <span className="text-[10px] font-normal normal-case tracking-normal text-slate-400">Click any page to jump there</span>
@@ -999,7 +1001,7 @@ const DashboardLayout = () => {
                                 onMouseEnter={() => setActiveSearchIndex(index)}
                                 onClick={() => handleSearchNavigation(item)}
                                 className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${index === activeSearchIndex
-                                  ? "bg-blue-50 dark:bg-blue-900/20"
+                                  ? "bg-[#EAF7FD] dark:bg-blue-900/20"
                                   : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
                                   }`}
                               >
@@ -1008,7 +1010,7 @@ const DashboardLayout = () => {
                                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                                       {item.title}
                                     </span>
-                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${item.type === 'Page' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' :
+                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${item.type === 'Page' ? 'bg-[#EAF7FD] dark:bg-blue-900/30 text-[#045C9A] dark:text-blue-300' :
                                       item.type === 'Course' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300' :
                                         item.type === 'Track' ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300' :
                                           'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300'
@@ -1044,15 +1046,14 @@ const DashboardLayout = () => {
               <div className="flex items-center gap-4">
 
                 {/* Premium Glassmorphism Dock */}
-                <div className="hidden sm:flex items-center p-1.5 bg-white dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/60 rounded-full shadow-[0_4px_12px_-2px_rgba(0,0,0,0.05),0_2px_4px_-2px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)]">
+                <div className="hidden sm:flex items-center gap-0.5 h-11 px-1.5 bg-white dark:bg-white/[0.06] border border-[#d7ebf5] dark:border-white/15 rounded-xl shadow-sm">
 
-                  {/* 1. Live Time Widget */}
-                  <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-900/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.02)] border border-slate-100 dark:border-slate-700/50 mr-2">
-                    <div className="relative flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                      <div className="absolute w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping opacity-75" />
-                    </div>
-                    <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 font-mono tracking-tight mt-[1px]">
+                  {/* 1. Clock. Quiet, tabular, separated by a hairline rather
+                      than nested in its own tinted box. No status dot: it
+                      reports the time, not system health, and a pulsing green
+                      light implies a liveness signal that does not exist. */}
+                  <div className="hidden xl:flex items-center h-8 pl-2.5 pr-3 mr-1 border-r border-[#d7ebf5] dark:border-white/10">
+                    <span className="text-[12px] font-medium tabular-nums tracking-tight text-[#5B7180] dark:text-slate-300">
                       {formatTime(currentTime)}
                     </span>
                   </div>
@@ -1061,7 +1062,7 @@ const DashboardLayout = () => {
                     {/* 2. Theme Toggle */}
                     <button
                       onClick={toggleTheme}
-                      className="p-1.5 rounded-full text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all active:scale-95"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[#5B7180] dark:text-slate-300 hover:text-[#072036] dark:hover:text-white hover:bg-[#EAF7FD] dark:hover:bg-white/10 transition-colors active:scale-95"
                       aria-label="Toggle Theme"
                     >
                       {theme === 'dark' ? <Sun size={18} stroke={1.5} className="hover:rotate-45 transition-transform duration-300" /> : <Moon size={18} stroke={1.5} className="hover:-rotate-12 transition-transform duration-300" />}
@@ -1071,13 +1072,13 @@ const DashboardLayout = () => {
                     <div className="relative" ref={notificationRef}>
                       <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className={`relative p-1.5 rounded-full transition-all active:scale-95 group ${showNotifications ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
+                        className={`relative w-8 h-8 flex items-center justify-center rounded-lg transition-colors active:scale-95 group ${showNotifications ? 'bg-[#EAF7FD] dark:bg-white/15 text-[#072036] dark:text-white' : 'text-[#5B7180] dark:text-slate-300 hover:text-[#072036] dark:hover:text-white hover:bg-[#EAF7FD] dark:hover:bg-white/10'
                           }`}
                         aria-label="Notifications"
                       >
                         <Bell size={18} stroke={1.5} className="group-hover:rotate-12 transition-transform duration-300 origin-top" />
                         {unreadCount > 0 && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border border-white dark:border-slate-800 rounded-full shadow-sm animate-pulse"></span>
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#045C9A] dark:bg-[#A6D7E8] border border-white dark:border-slate-800 rounded-full shadow-sm"></span>
                         )}
                       </button>
 
@@ -1088,25 +1089,25 @@ const DashboardLayout = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-[100]"
+                            className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#072036] border border-[#d7ebf5]/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-[100]"
                           >
                             {/* Header */}
-                            <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-white">
-                                <Bell className="w-4 h-4" />
-                                <span className="text-sm font-bold tracking-wide">{t('notifications.title', 'Notifications')}</span>
+                            <div className="px-4 py-3 bg-slate-50 dark:bg-white/[0.04] border-b border-[#d7ebf5] dark:border-white/10 flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-[#072036] dark:text-white">
+                                <Bell className="w-4 h-4 text-[#0E2136] dark:text-[#A6D7E8]" />
+                                <span className="text-[13px] font-bold">{t('notifications.title', 'Notifications')}</span>
                               </div>
                               {unreadCount > 0 && (
-                                <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
+                                <span className="text-[10px] font-bold bg-[#045C9A]/10 dark:bg-white/10 px-2 py-0.5 rounded-full text-[#045C9A] dark:text-[#A6D7E8]">
                                   {unreadCount} {t('notifications.new', 'New')}
                                 </span>
                               )}
                             </div>
 
                             {/* Content */}
-                            <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#002147]">
+                            <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#072036]">
                               {notifications.length > 0 ? (
-                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                <div className="divide-y divide-slate-100 dark:divide-white/[0.07]">
                                   {notifications.slice(0, 5).map((n) => (
                                     <div
                                       key={n._id}
@@ -1114,19 +1115,19 @@ const DashboardLayout = () => {
                                         navigate('/notifications');
                                         setShowNotifications(false);
                                       }}
-                                      className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/40 dark:bg-slate-800/20' : ''}`}
+                                      className={`px-4 py-3 hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/60 dark:bg-white/[0.03]' : ''}`}
                                     >
                                       <div className="flex gap-3">
                                         <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                                          n.type === 'assessment' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' :
-                                            'bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400'
+                                          n.type === 'assessment' ? 'bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]' :
+                                            'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-300'
                                           }`}>
                                           {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
                                         </div>
                                         <div className="flex-1 min-w-0 pr-3">
                                           <div className="flex items-start gap-2 mb-1">
-                                            {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0 mt-[5px]" />}
-                                            <p className={`text-[12px] leading-relaxed ${!n.isRead ? 'font-bold text-[#0d1f4e] dark:text-white' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
+                                            {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[#045C9A] dark:bg-blue-400 shrink-0 mt-[5px]" />}
+                                            <p className={`text-[12px] leading-relaxed ${!n.isRead ? 'font-bold text-[#072036] dark:text-white' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
                                               {n.message}
                                             </p>
                                           </div>
@@ -1140,7 +1141,7 @@ const DashboardLayout = () => {
                                 </div>
                               ) : (
                                 <div className="py-12 flex flex-col items-center justify-center text-slate-400">
-                                  <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
+                                  <div className="w-16 h-16 bg-[#EAF7FD] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
                                     <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
                                   </div>
                                   <p className="text-sm font-medium">{t('notifications.empty.no_notifications', 'No notifications yet')}</p>
@@ -1154,7 +1155,7 @@ const DashboardLayout = () => {
                                 navigate('/notifications');
                                 setShowNotifications(false);
                               }}
-                              className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
+                              className="w-full py-2.5 bg-slate-50 dark:bg-white/[0.04] border-t border-[#d7ebf5] dark:border-white/10 text-[12px] font-semibold text-[#045C9A] dark:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.08] transition-colors flex items-center justify-center gap-2"
                             >
                               {t('notifications.view_all_notifications', 'View all notifications')}
                               <ExternalLink className="w-3 h-3" />
@@ -1168,9 +1169,9 @@ const DashboardLayout = () => {
                     <div className="relative" ref={languageRef}>
                       <button
                         onClick={() => setShowLanguages(!showLanguages)}
-                        className={`relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition-all active:scale-95 group ${showLanguages
-                          ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'
-                          : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
+                        className={`relative flex items-center gap-1.5 h-8 px-2 rounded-lg transition-colors active:scale-95 group ${showLanguages
+                          ? 'bg-[#EAF7FD] dark:bg-white/15 text-[#072036] dark:text-white'
+                          : 'text-[#5B7180] dark:text-slate-300 hover:text-[#072036] dark:hover:text-white hover:bg-[#EAF7FD] dark:hover:bg-white/10'
                           }`}
                         aria-label="Change Language"
                       >
@@ -1178,7 +1179,6 @@ const DashboardLayout = () => {
                         <span className="hidden md:inline text-[11px] font-bold tracking-[0.1em] mt-[1px]">
                           {activeLanguage.shortLabel}
                         </span>
-                        <ChevronDown className={`hidden md:block w-3 h-3 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400'}`} />
                       </button>
 
                       <AnimatePresence>
@@ -1188,9 +1188,9 @@ const DashboardLayout = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-[100]"
+                            className="absolute top-full right-0 mt-3 w-64 bg-white dark:bg-[#072036] border border-[#d7ebf5]/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-[100]"
                           >
-                            <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
+                            <div className="border-b border-[#d7ebf5] bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
                               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
                                 Language
                               </p>
@@ -1206,18 +1206,18 @@ const DashboardLayout = () => {
                                     i18n.changeLanguage(lang.code);
                                     setShowLanguages(false);
                                   }}
-                                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
-                                    ? 'bg-[#1a3884] text-white'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${activeLanguageCode === lang.code
+                                    ? 'bg-[#072036] dark:bg-[#045C9A] text-white'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-[#EAF7FD] dark:hover:bg-[#0d3a5f]'
                                     }`}
                                 >
-                                  <div className="flex items-center gap-3">
-                                    <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
+                                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <span className={`inline-flex h-6 min-w-[26px] shrink-0 items-center justify-center rounded-md px-1.5 text-[9px] font-extrabold tracking-[0.14em] ${activeLanguageCode === lang.code ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-300'}`}>
                                       {lang.shortLabel}
                                     </span>
-                                    <span>{lang.name}</span>
+                                    <span className="truncate">{lang.name}</span>
                                   </div>
-                                  <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
+                                  <span className="ml-2 shrink-0 max-w-[76px] truncate text-[11px] opacity-60 font-semibold">{lang.native}</span>
                                 </button>
                               ))}
                             </div>
@@ -1229,12 +1229,12 @@ const DashboardLayout = () => {
                     {/* 5. Daily Streak Glowing Flame Icon */}
                     <button
                       onClick={() => setShowStreakModal(true)}
-                      className="relative p-1.5 rounded-full text-[#1a3884] dark:text-blue-400 hover:text-[#112b6b] dark:hover:text-blue-300 hover:bg-[#1a3884]/8 dark:hover:bg-[#1a3884]/20 transition-all active:scale-95 group"
+                      className="relative w-8 h-8 flex items-center justify-center rounded-lg text-[#0E2136] dark:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 transition-colors active:scale-95 group"
                       aria-label="Daily Streaks"
                     >
-                      <Flame size={18} stroke={1.5} className="animate-pulse filter drop-shadow-[0_0_6px_rgba(26,56,132,0.5)]" />
+                      <Flame size={18} stroke={1.5} />
                       {streakCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-gradient-to-br from-[#1a3884] to-[#4c6ef5] text-white font-extrabold text-[8px] px-1 rounded-full min-w-[14px] text-center border border-white dark:border-slate-800 scale-90 shadow-sm">
+                        <span className="absolute -top-0.5 -right-0.5 bg-[#072036] dark:bg-white text-white dark:text-[#072036] font-bold text-[9px] leading-none px-1 py-[2px] rounded-full min-w-[15px] text-center ring-2 ring-white dark:ring-[#0d2b40]">
                           {streakCount}
                         </span>
                       )}
@@ -1250,39 +1250,41 @@ const DashboardLayout = () => {
                   onMouseLeave={handleMouseLeave}
                 >
                   <motion.div
-                    whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
-                    className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-white/10 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
+                    className="flex items-center gap-2.5 h-11 pl-1.5 sm:pr-3 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-white/[0.06] border-none sm:border border-[#d7ebf5] dark:border-white/15 rounded-xl shadow-none sm:shadow-sm cursor-pointer group transition-colors hover:bg-[#EAF7FD] dark:hover:bg-white/10"
                     onClick={handleProfileClick}
                     aria-expanded={isProfileMenuOpen}
                     aria-haspopup="true"
                   >
                     <div className="relative shrink-0">
-                      <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
-                      <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
+                      <div className="relative rounded-full ring-1 ring-[#d7ebf5] dark:ring-white/15">
                         {(profilePhoto || user?.profileImage || user?.profilePicture) ? (
                           <img
                             src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
                             alt="Avatar"
-                            className="w-9 h-9 rounded-full object-cover"
+                            className="w-8 h-8 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-[15px] font-bold pb-0.5">
+                          <div className="w-8 h-8 rounded-full bg-[#072036] dark:bg-[#045C9A] flex items-center justify-center text-white text-[13px] font-semibold">
                             {(user?.fullName?.charAt(0) || user?.firstName?.charAt(0) || 'U').toUpperCase()}
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="hidden sm:block text-left">
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
-                        {t(`dashboard.${getGreeting().toLowerCase().replace(' ', '_')}`)}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
+                    <div className="hidden sm:flex items-center gap-2 text-left">
+                      <div className="leading-tight">
+                        {/* Name first, role beneath. A greeting changes through
+                            the day and adds noise to persistent chrome; the
+                            role is stable and tells you which account you are
+                            signed in as. */}
+                        <p className="text-[13px] font-semibold text-[#072036] dark:text-slate-100 leading-none">
                           {user?.fullName || 'User'}
                         </p>
-                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
+                        <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#8A9BA8] dark:text-slate-400 leading-none">
+                          {t(`common.${(user?.role || 'student').toLowerCase()}`)}
+                        </p>
                       </div>
+                      <ChevronDown className={`w-3.5 h-3.5 shrink-0 text-[#8A9BA8] dark:text-slate-500 transition-transform duration-200 ${isProfileHovered ? 'rotate-180' : ''}`} />
                     </div>
                   </motion.div>
 
@@ -1356,13 +1358,13 @@ const DashboardLayout = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="relative max-w-md w-full bg-white dark:bg-[#002147] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/10"
+              className="relative max-w-md w-full bg-white dark:bg-[#072036] rounded-2xl overflow-hidden shadow-2xl border border-[#d7ebf5] dark:border-white/10"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
                 <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-[#1a3884] dark:text-blue-400 animate-pulse" />
-                  <span className="text-sm font-bold text-[#1a3884] dark:text-white uppercase tracking-wider">
+                  <Flame className="w-5 h-5 text-[#0E2136] dark:text-[#A6D7E8] animate-pulse" />
+                  <span className="text-sm font-bold text-[#045C9A] dark:text-white uppercase tracking-wider">
                     {t('streaks.modal_title', 'My Daily Streaks')}
                   </span>
                 </div>

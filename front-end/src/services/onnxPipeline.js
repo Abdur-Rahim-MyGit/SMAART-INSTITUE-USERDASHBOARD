@@ -35,6 +35,8 @@ const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
 const YOLO_MODEL = `${MODEL_BASE}/yolov8n.onnx`;
 const YOLO_INPUT_SIZE = 640;
 const YOLO_SCORE_THRESHOLD = 0.40;
+// Detections between this and the acting threshold are logged, never acted on.
+const YOLO_NEAR_MISS_SCORE = 0.18;
 const YOLO_NMS_THRESHOLD = 0.45;
 // COCO class id → violation label. Only these classes are reported.
 const YOLO_CLASSES_OF_INTEREST = { 67: 'phone', 73: 'book', 63: 'laptop' };
@@ -708,6 +710,32 @@ export const detectOnly = async (videoEl) => {
 
 export const isObjectDetectorReady = () => yoloSession !== null;
 
+/**
+ * What actually loaded. Phone and book detection depend entirely on the YOLO
+ * session, and its load is wrapped in a try/catch so that a missing model never
+ * breaks face verification — which also means it can be absent with nothing but
+ * one warning scrolling past. Call __proctorVision.status() to settle it.
+ */
+export const getPipelineStatus = () => ({
+  faceDetector: scrfdSession ? 'loaded' : 'MISSING',
+  faceRecogniser: arcfaceSession ? 'loaded' : 'MISSING',
+  objectDetector: yoloSession ? 'loaded' : 'MISSING — phone/book detection cannot run',
+  initialised: isInitialized,
+  initError: initError ? initError.message : null,
+  yoloScoreThreshold: YOLO_SCORE_THRESHOLD,
+  watchedClasses: Object.values(YOLO_CLASSES_OF_INTEREST),
+});
+
+if (typeof window !== 'undefined') {
+  window.__proctorVision = {
+    status() {
+      const s = getPipelineStatus();
+      console.log(s);
+      return s;
+    },
+  };
+}
+
 // Preprocess a frame for YOLO: resize to 640×640, RGB, normalised 0–1, NCHW.
 const videoToYoloTensor = (videoEl) => {
   if (!_yoloCanvas) {
@@ -753,6 +781,7 @@ export const detectObjects = async (videoEl) => {
     const at = (attr, a) => (attrsFirst ? dataArr[attr * numAnchors + a] : dataArr[a * numAttrs + attr]);
 
     const boxes = [], scores = [], classes = [];
+    const nearMisses = [];
     for (let a = 0; a < numAnchors; a++) {
       let bestScore = 0, bestCls = -1;
       for (const cid of Object.keys(YOLO_CLASSES_OF_INTEREST)) {
@@ -760,12 +789,22 @@ export const detectObjects = async (videoEl) => {
         const s = at(4 + c, a);
         if (s > bestScore) { bestScore = s; bestCls = c; }
       }
+      if (bestCls >= 0 && bestScore >= YOLO_NEAR_MISS_SCORE && bestScore < YOLO_SCORE_THRESHOLD) {
+        // Seen, but not confidently enough to act on. Logged because "the model
+        // never saw the phone" and "the model saw it at 0.31 against a 0.40 bar"
+        // are completely different problems with completely different fixes.
+        nearMisses.push(`${YOLO_CLASSES_OF_INTEREST[bestCls]} ${bestScore.toFixed(2)}`);
+      }
       if (bestScore < YOLO_SCORE_THRESHOLD || bestCls < 0) continue;
       const cx = at(0, a), cy = at(1, a), w = at(2, a), h = at(3, a);
       boxes.push([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]);
       scores.push(bestScore);
       classes.push(bestCls);
     }
+    if (nearMisses.length) {
+      console.log(`[OnnxPipeline] YOLO near-miss (below ${YOLO_SCORE_THRESHOLD} threshold): ${[...new Set(nearMisses)].join(', ')}`);
+    }
+
     if (!boxes.length) return [];
     const keep = nms(boxes, scores, YOLO_NMS_THRESHOLD);
     return keep.map(i => ({

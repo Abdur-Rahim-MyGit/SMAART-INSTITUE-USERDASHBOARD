@@ -4,6 +4,7 @@ import { assessmentApi } from '@/services/assessmentApi';
 import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from '@/data/courseStructureData';
 import { compareCourseIds } from '@/utils/courseUnlock';
 import { getCompletedCourseIds } from '@/utils/courseProgressStorage';
+import { getCareerIconKey } from '@/constants/careerIcons';
 
 export const useLearningPaths = (userId) => {
   const [paths, setPaths] = useState([]);
@@ -282,25 +283,16 @@ export default useLearningPaths;
 
 // ── Icon helpers ─────────────────────────────────────────────────────────────
 
-// Icon for career directions — based on keywords in the direction name
-const getIconForDirection = (name = '') => {
-  const n = name.toLowerCase();
-  if (n.includes('software') || n.includes('web') || n.includes('developer') || n.includes('engineering')) return 'Code';
-  if (n.includes('data') || n.includes('analytics') || n.includes('database') || n.includes('ai') || n.includes('machine') || n.includes('ml')) return 'Database';
-  if (n.includes('cloud') || n.includes('devops') || n.includes('infrastructure') || n.includes('network')) return 'Cloud';
-  return 'BookOpen';
-};
+// Icon for career directions — keyword rules live in one place so the card, the
+// widget and any future surface all tag a direction the same way.
+// The previous version only knew about software/data/cloud, so every marketing,
+// finance, legal or aviation direction fell through to a generic book. It also
+// substring-matched 'ai', which wrongly caught "Retail" and "Maintenance".
+const getIconForDirection = (name = '') => getCareerIconKey(name);
 
-// Icon for enrolled courses — based on category
-const getIconForCourse = (category) => {
-  const iconMap = {
-    'software': 'Code',
-    'data': 'Database',
-    'cloud': 'Cloud',
-    'default': 'BookOpen'
-  };
-  return iconMap[category?.toLowerCase()] || iconMap.default;
-};
+// Icon for enrolled courses — category is free text, so run it through the same
+// matcher rather than keeping a second, thinner lookup table.
+const getIconForCourse = (category) => getCareerIconKey(category);
 
 // Color for enrolled courses — based on category
 const getColorForCourse = (category) => {

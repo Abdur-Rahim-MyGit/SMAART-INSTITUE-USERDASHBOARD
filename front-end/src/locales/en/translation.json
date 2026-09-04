@@ -667,11 +667,14 @@
         "description": "Build ethical thinking and sustainability awareness"
       },
       "BC": {
-        "name": "British Council English",
-        "shortName": "BC",
-        "description": "Develop English communication skills with British Council certified courses"
+        "name": "English for Work",
+        "shortName": "English for Work",
+        "description": "Develop English communication skills with certified courses"
       }
-    }
+    },
+    "english_for_work": "English for Work",
+    "certified_programme": "Certified Programme",
+    "start_course": "Start Course"
   },
   "british_council_page": {
     "back": "Back to Courses",
@@ -756,7 +759,7 @@
     "guideline_active": "Stay actively engaged. Inactivity of 5 minutes or more is automatically recorded.",
     "integrity_warning_title": "Integrity & Security Warning",
     "warning_monitored": "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.",
-    "warning_limit": "A maximum of 3 warnings is allowed. A 4th security breach will result in immediate disqualification and account lockout.",
+    "warning_limit": "Repeated warnings raise a risk score. If it crosses the threshold, the attempt is recorded as unverified and you will need to re-sit it — each retry uses a different question set.",
     "resume_learning_journey": "Resume Learning Journey",
     "step_by_step_progress": "Step-by-step progress",
     "engagement_monitor": "Engagement monitor",
@@ -860,13 +863,14 @@
     "modal_badge": "Assessment Gate",
     "integrity_warning_title": "Integrity & Security Warning",
     "integrity_warning_1": "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.",
-    "integrity_warning_2": "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.",
+    "integrity_warning_2": "Repeated warnings raise a risk score. If it crosses the threshold, the attempt is recorded as unverified and you will need to re-sit it — each retry uses a different question set.",
     "terms_checkbox": "I have read the protocols and guidelines, and I agree to proceed with the assessment and integrity monitoring.",
     "min": "min",
     "locked": "Locked Out",
     "attempt_badge": "Attempt {{current}}/{{max}}",
     "restart_stage_button": "Locked - Restart Course Stage",
-    "retry_assessment": "Retry Assessment"
+    "retry_assessment": "Retry Assessment",
+    "title_full": "Assessments Centre"
   },
   "baseline_test": {
     "back": "Back",

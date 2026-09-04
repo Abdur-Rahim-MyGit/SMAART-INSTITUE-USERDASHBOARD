@@ -12,6 +12,10 @@ COPY . .
 #   docker compose build --build-arg VITE_API_URL=https://api.<your-domain>/api
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+# Admin/employer portal origin. Empty locally (the app falls back to the
+# current origin); set to the admin host for production builds.
+ARG VITE_ADMIN_URL
+ENV VITE_ADMIN_URL=$VITE_ADMIN_URL
 RUN npm run build
 # The AI proctoring loads the ONNX Runtime from /onnx-wasm/. Those files are
 # gitignored (large binaries) but ship inside the onnxruntime-web package, so

@@ -52,6 +52,16 @@ const serveOnnxRuntimeAssets = () => ({
 });
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Stamped into the bundle at build time and shown in the proctoring panel.
+  // A service worker can keep serving a previous bundle long after a rebuild,
+  // and without a visible marker there is no way to tell a fix that did not
+  // work from a fix that never loaded — which is a genuinely expensive thing
+  // to be unsure about while testing.
+  define: {
+    __BUILD_STAMP__: JSON.stringify(
+      new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    ),
+  },
   server: {
     host: "::",
     port: 8080,
@@ -149,7 +159,24 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+        // Without these the new worker installs but sits in "waiting" until
+        // every tab for this origin is closed, so a deploy keeps serving the
+        // previous bundle from cache -- a hard refresh does not help, because
+        // the worker answers the request before the network is consulted.
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // index.html must always come from the network, otherwise the cached
+        // copy keeps pointing at the previous hashed asset filenames.
+        navigateFallbackDenylist: [/^\/api/],
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'html-cache' }
+          }
+        ]
       },
       devOptions: {
         enabled: false

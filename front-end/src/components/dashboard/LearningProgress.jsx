@@ -1,9 +1,16 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Calendar, CheckCircle2, Plus, Trash2, Circle,
-  ChevronLeft, ChevronRight, ClipboardList
-} from "lucide-react";
+  Calendar,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Circle,
+  ClipboardList,
+  Plus,
+  Trash2,
+  X,
+} from "@/components/icons";
 import { todosAPI, apiCall } from "@/services/api";
 import { useTranslation } from "react-i18next";
 
@@ -25,12 +32,12 @@ const LearningProgress = memo(() => {
         todosAPI.getAll().catch(() => ({ success: false, data: [] })),
         apiCall('/analytics/calendar-events').catch(() => ({ success: false, data: [] }))
       ]);
-      
+
       let combined = [];
       if (todosRes?.success) {
         combined = [...(todosRes.data || [])];
       }
-      
+
       if (eventsRes?.success) {
         const globalEvents = (eventsRes.data || []).map(ev => ({
           _id: ev.id,
@@ -45,7 +52,7 @@ const LearningProgress = memo(() => {
         }));
         combined = [...combined, ...globalEvents];
       }
-      
+
       setTodos(combined);
     } catch (err) {
       console.error("Failed to fetch todos and events:", err);
@@ -154,14 +161,14 @@ const LearningProgress = memo(() => {
   const doneCount = selectedTodos.filter(t => t.completed).length;
 
   return (
-    <div className="font-sans bg-white dark:bg-[#001b3d] rounded-2xl border border-slate-200/60 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] overflow-hidden">
+    <div className="font-sans bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5]/60 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] overflow-hidden">
 
       {/* ── Calendar Section ────────────────────────── */}
       <div className="px-4 pt-4 pb-3">
 
         {/* Month Header */}
         <div className="flex items-center justify-between mb-3.5">
-          <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+          <span className="text-[15px] font-bold text-[#072036] dark:text-white tracking-tight">
             {monthLabel}
           </span>
           <div className="flex items-center gap-0.5">
@@ -184,7 +191,7 @@ const LearningProgress = memo(() => {
         <div className="grid grid-cols-7">
           {/* Day Name Headers */}
           {DAY_NAMES.map(d => (
-            <div key={d} className="text-center text-[10px] font-medium text-slate-400 dark:text-slate-600 uppercase tracking-[0.05em] pb-2 select-none">
+            <div key={d} className="text-center text-[10px] font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-[0.05em] pb-2 select-none">
               {d}
             </div>
           ))}
@@ -205,10 +212,10 @@ const LearningProgress = memo(() => {
                   onClick={() => setSelectedDate(new Date(year, month, d))}
                   className={`relative w-7 h-7 rounded-full text-xs transition-all duration-150 flex items-center justify-center select-none
                     ${sel
-                      ? "bg-[#1a3884] dark:bg-blue-500 text-white font-bold shadow-sm"
+                      ? "bg-[#072036] dark:bg-[#045C9A] text-white font-bold shadow-sm"
                       : tod
-                        ? "text-[#1a3884] dark:text-blue-400 font-semibold ring-[1.5px] ring-[#1a3884]/35 dark:ring-blue-500/35 bg-blue-50/60 dark:bg-blue-500/10"
-                        : "text-slate-500 dark:text-slate-400 font-normal hover:bg-slate-100 dark:hover:bg-white/8 hover:text-slate-700 dark:hover:text-slate-200"
+                        ? "text-[#072036] dark:text-[#A6D7E8] font-bold ring-2 ring-[#072036] dark:ring-[#A6D7E8] bg-[#EAF7FD] dark:bg-[#045C9A]/10"
+                        : "text-[#072036] dark:text-slate-300 font-medium hover:bg-[#EAF7FD] dark:hover:bg-white/10 hover:text-[#072036] dark:hover:text-white"
                     }`}
                 >
                   {d}
@@ -231,8 +238,8 @@ const LearningProgress = memo(() => {
         {/* Task Row Header */}
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#1a3884]/8 dark:bg-blue-500/10 flex items-center justify-center shrink-0">
-              <ClipboardList className="w-[14px] h-[14px] text-[#1a3884] dark:text-blue-400" />
+            <div className="w-7 h-7 rounded-lg bg-[#045C9A]/8 dark:bg-[#045C9A]/10 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-[14px] h-[14px] text-[#045C9A] dark:text-[#A6D7E8]" />
             </div>
             <div>
               {/* text-sm = 14px, font-semibold matches section-label hierarchy */}
@@ -251,15 +258,30 @@ const LearningProgress = memo(() => {
           </div>
           {/* + Add: text-xs (12px) font-semibold — standard button label size */}
           <button
-            onClick={() => setShowInput(v => !v)}
+            onClick={() => {
+              // Closing also discards what was typed, so reopening always
+              // starts clean rather than resurrecting a half-written task.
+              if (showInput) {
+                setNewTask("");
+                setNewPriority("medium");
+              }
+              setShowInput(v => !v);
+            }}
+            aria-label={showInput
+              ? t('calendar.cancel_add', 'Cancel adding task')
+              : t('dashboard.add', 'Add')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95
               ${showInput
-                ? "bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-slate-300"
-                : "bg-[#1a3884] dark:bg-blue-600 text-white shadow-sm hover:bg-[#132c6b] dark:hover:bg-blue-700"
+                ? "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-200 border border-transparent dark:border-white/15 hover:bg-slate-200 dark:hover:bg-white/[0.16]"
+                : "bg-[#072036] dark:bg-[#045C9A] text-white shadow-sm hover:bg-[#0d3a5f] dark:hover:bg-[#0673B8]"
               }`}
           >
-            <Plus className="w-3.5 h-3.5" />
-            {t('dashboard.add', 'Add')}
+            {showInput
+              ? <X className="w-3.5 h-3.5" />
+              : <Plus className="w-3.5 h-3.5" />}
+            {showInput
+              ? t('common.cancel', 'Cancel')
+              : t('dashboard.add', 'Add')}
           </button>
         </div>
 
@@ -273,7 +295,7 @@ const LearningProgress = memo(() => {
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="overflow-hidden"
             >
-              <div className="mb-2.5 space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-xl border border-slate-200/60 dark:border-white/[0.06]">
+              <div className="mb-2.5 space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-xl border border-[#d7ebf5]/60 dark:border-white/[0.06]">
                 {/* text-sm input for readable typing */}
                 <input
                   autoFocus
@@ -281,16 +303,16 @@ const LearningProgress = memo(() => {
                   onChange={e => setNewTask(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && addTodo()}
                   placeholder={t('calendar.task_name_placeholder', 'Task name…')}
-                  className="w-full text-sm px-3 py-2 rounded-lg bg-white dark:bg-[#001b3d] border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 dark:focus:ring-blue-500/20 transition-all"
+                  className="w-full text-sm px-3 py-2 rounded-lg bg-white dark:bg-white/[0.04] border border-[#d7ebf5] dark:border-white/15 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:focus:ring-blue-500/20 transition-all"
                 />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
                     {["low", "medium", "high"].map((p) => {
                       const active = newPriority === p;
                       const colors = {
-                        low: active ? "bg-emerald-500 text-white" : "text-slate-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600",
-                        medium: active ? "bg-amber-500 text-white" : "text-slate-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-600",
-                        high: active ? "bg-rose-500 text-white" : "text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600",
+                        low: active ? "bg-emerald-500 text-white" : "text-slate-500 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600",
+                        medium: active ? "bg-amber-500 text-white" : "text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-600",
+                        high: active ? "bg-rose-500 text-white" : "text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600",
                       };
                       return (
                         <button
@@ -307,7 +329,7 @@ const LearningProgress = memo(() => {
                   <button
                     onClick={addTodo}
                     disabled={adding || !newTask.trim()}
-                    className="px-3 py-1.5 bg-[#1a3884] dark:bg-blue-600 hover:bg-[#132c6b] text-white rounded-lg text-xs font-semibold disabled:opacity-40 transition-colors"
+                    className="px-3 py-1.5 bg-[#072036] dark:bg-[#045C9A] hover:bg-[#0d3a5f] dark:hover:bg-[#0673B8] text-white rounded-lg text-xs font-semibold disabled:opacity-40 transition-colors"
                   >
                     {adding ? "…" : t('calendar.save', 'Save')}
                   </button>
@@ -325,8 +347,8 @@ const LearningProgress = memo(() => {
             ))}
           </div>
         ) : selectedTodos.length === 0 ? (
-          <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/50 dark:border-white/[0.05]">
-            <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/[0.06] flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-[#d7ebf5]/50 dark:border-white/[0.05]">
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 border border-[#d7ebf5]/60 dark:border-white/[0.06] flex items-center justify-center shrink-0">
               <Calendar className="w-[14px] h-[14px] text-slate-400 dark:text-slate-500" />
             </div>
             <div>
@@ -352,7 +374,7 @@ const LearningProgress = memo(() => {
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -12, scale: 0.96 }}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-white/[0.04] border border-slate-200/50 dark:border-white/[0.06] group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-200"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white dark:bg-white/[0.04] border border-[#d7ebf5]/50 dark:border-white/[0.06] group hover:border-slate-300 dark:hover:border-white/[0.12] transition-all duration-200"
                   >
                     <button
                       onClick={() => !todo.isGlobalEvent && toggleTodo(todo._id, todo.completed)}
@@ -360,7 +382,7 @@ const LearningProgress = memo(() => {
                     >
                       {todo.completed
                         ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        : <Circle className={`w-4 h-4 ${todo.isGlobalEvent ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                        : <Circle className={`w-4 h-4 ${todo.isGlobalEvent ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-slate-300 dark:text-slate-600'}`} />
                       }
                     </button>
                     <div className="flex-1 min-w-0">

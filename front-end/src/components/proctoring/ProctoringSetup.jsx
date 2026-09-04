@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+// Material Symbols barrel -- the icon set used across the dashboard, courses,
+// profile, player and assessments. This screen pulled from @remixicon/react,
+// a third icon library, so its glyphs sat at a different weight again.
 import {
-  RiCameraLine,
-  RiCheckLine,
+  ArrowRight as RiArrowRightLine,
+  Camera as RiCameraLine,
+  Check as RiCheckLine,
+  Info as RiInformationLine,
+  Loader2 as RiLoader4Line,
+  Maximize as RiFullscreenLine,
+  Mic as RiSoundModuleLine,
   RiAlertLine,
-  RiShieldCheckLine,
-  RiInformationLine,
-  RiFullscreenLine,
-  RiArrowRightLine,
-  RiUserSmileLine,
-  RiLoader4Line,
-  RiSoundModuleLine,   // used for microphone row ✅
-  RiVolumeMuteLine,    // used for mic denied state ✅
-} from '@remixicon/react';
+  ShieldCheck as RiShieldCheckLine,
+  User as RiUserSmileLine,
+  VolumeX as RiVolumeMuteLine,
+} from "@/components/icons";
 // Registration uses the PROVEN main-thread detector (onnxPipeline via
 // faceVerificationService). The worker path was unreliable for the live
 // registration preview (createImageBitmap frame degraded SCRFD). The exam
@@ -187,19 +190,72 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     }
   };
 
-  // Handle microphone permission check (Disabled)
+  /**
+   * Microphone permission.
+   *
+   * This used to be a stub that simply set the state to 'allowed' without ever
+   * calling getUserMedia -- so the setup screen reported a working microphone
+   * that had never been asked for, and the exam's audio monitor then raised its
+   * own permission prompt mid-assessment. The mic is required, so it is now
+   * requested here, for real, before the candidate can continue.
+   *
+   * Only the permission matters at this stage: the audio monitor opens its own
+   * stream when the exam starts. The test stream is released immediately so the
+   * microphone indicator is not lit for the whole of setup.
+   */
   const requestMicAccess = async () => {
-    setMicState('allowed');
+    setMicState('checking');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setMicState('allowed');
+      return true;
+    } catch (err) {
+      console.warn('[ProctoringSetup] Microphone access denied:', err);
+      setMicState('denied');
+      return false;
+    }
   };
 
-  // Auto-request webcam on first render
+  /**
+   * Ask for camera and microphone in a single call, so the candidate sees one
+   * browser prompt rather than two. If the combined request fails we cannot
+   * tell which device the candidate refused, so each is then requested
+   * separately to give the two rows an accurate state.
+   */
+  const requestMediaAccess = async () => {
+    setCameraState('checking');
+    setMicState('checking');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
+        audio: true,
+      });
+
+      // Keep the camera for the live preview; drop the mic straight away.
+      stream.getAudioTracks().forEach((track) => {
+        stream.removeTrack(track);
+        track.stop();
+      });
+
+      localStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setCameraState('allowed');
+      setMicState('allowed');
+    } catch (err) {
+      console.warn('[ProctoringSetup] Combined media request failed, retrying per device:', err);
+      await requestWebcamAccess();
+      await requestMicAccess();
+    }
+  };
+
+  // Auto-request camera and microphone on first render
   useEffect(() => {
     if (step === 1 && cameraState === 'pending') {
-      const initMedia = async () => {
-        await requestWebcamAccess();
-        setMicState('allowed');
-      };
-      initMedia();
+      requestMediaAccess();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
@@ -288,7 +344,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
       // Ignore full-canvas background boxes (>98% of container)
       if (box.width * scaleX > displaySize.width * 0.98 || box.height * scaleY > displaySize.height * 0.98) return;
 
-      ctx.strokeStyle = '#22d3ee';
+      ctx.strokeStyle = '#A6D7E8';
       ctx.lineWidth = 2;
       ctx.strokeRect(box.x * scaleX, box.y * scaleY, box.width * scaleX, box.height * scaleY);
 
@@ -582,11 +638,26 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
     // before the exam engine's getUserMedia call can succeed
     setTimeout(() => {
       const regResult = registrationResultRef.current || {};
+
+      // Read the descriptor from the REF first. The ref is written in the same
+      // tick as registration finishes, whereas the state copy is only whatever
+      // this callback's closure captured — and handing the exam a stale null
+      // means the engine starts with no reference and (correctly) refuses to
+      // verify anyone, which reads to the candidate as "your face is not
+      // registered" moments after being told it was.
+      const descriptor = regResult.descriptor || registeredDescriptor || null;
+
+      if (!descriptor) {
+        console.error('[ProctoringSetup] ❌ Registration finished but no descriptor is available to hand to the exam engine. Identity verification cannot run.');
+      }
+
       onComplete({
-        faceDescriptor: registeredDescriptor,
+        faceDescriptor: descriptor,
         allEmbeddings: regResult.allEmbeddings || null,
         alignedCrops: regResult.alignedCrops || null,
-        registrationQualityScore: regResult.qualityScore || null,
+        registrationQualityScore: regResult.qualityScore ?? null,
+        registrationConfidence: regResult.confidence ?? null,
+        framesCaptured: regResult.framesCaptured ?? null,
         registrationCropUrl: regResult.alignedCrops?.[regResult.alignedCrops.length - 1] || null,
       });
     }, 1800);
@@ -648,17 +719,17 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/40 dark:bg-[#000F24]/80 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <div className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#072036]/40 dark:bg-[#072036]/80 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+      <div className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col">
 
         {/* Glow decorative effects */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#1a3884]/5 dark:bg-[#1a3884]/20 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#045C9A]/5 dark:bg-[#045C9A]/20 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Header */}
-        <div className="mb-4 border-b border-slate-100 dark:border-white/5 pb-3 shrink-0">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-cyan-400">{t('proctoring_setup.badge', 'AI Integrity Setup')}</span>
-          <h2 className="text-lg sm:text-xl font-black mt-0.5 leading-tight text-slate-900 dark:text-white">
+        <div className="mb-4 border-b border-[#d7ebf5] dark:border-white/5 pb-3 shrink-0">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#045C9A] dark:text-[#A6D7E8]">{t('proctoring_setup.badge', 'AI Integrity Setup')}</span>
+          <h2 className="text-lg sm:text-xl font-bold mt-0.5 leading-tight text-[#072036] dark:text-white">
             {t('proctoring_setup.preparing', 'Preparing: {{title}}', { title: assessmentTitle || t('proctoring_setup.default_assessment_title', 'SMAART Assessment') })}
           </h2>
         </div>
@@ -669,10 +740,10 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
             <div
               key={s}
               className={`h-1.5 rounded-full flex-1 transition-all duration-300 ${s === step
-                  ? 'bg-[#1a3884] dark:bg-cyan-400 w-12'
+                  ? 'bg-[#045C9A] dark:bg-[#A6D7E8] w-12'
                   : s < step
                     ? 'bg-emerald-500'
-                    : 'bg-slate-100 dark:bg-white/10'
+                    : 'bg-[#F1F5F9] dark:bg-white/10'
                 }`}
             />
           ))}
@@ -683,18 +754,18 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           {/* STEP 1: Camera & Hardware Checks */}
           {step === 1 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                <RiCameraLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.camera_hardware_title', 'Camera & Hardware Test')}
+              <h3 className="text-lg font-bold flex items-center gap-2 text-[#072036] dark:text-white">
+                <RiCameraLine className="text-[#045C9A] dark:text-[#A6D7E8]" /> {t('proctoring_setup.camera_hardware_title', 'Camera & Hardware Test')}
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-350">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 {t('proctoring_setup.camera_hardware_desc', 'To guarantee test credibility, a functioning webcam is required. Permissions must be explicitly granted.')}
               </p>
 
               <div className="space-y-3">
                 {/* Camera Row */}
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
+                <div className="flex items-center justify-between p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-slate-200/50 dark:bg-white/5 rounded-xl">
+                    <div className="p-2.5 bg-[#d7ebf5]/50 dark:bg-white/5 rounded-xl">
                       <RiCameraLine size={20} className="text-slate-600 dark:text-slate-300" />
                     </div>
                     <div>
@@ -716,15 +787,15 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   ) : (
                     <button
                       onClick={requestWebcamAccess}
-                      className="px-4 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95"
+                      className="px-4 py-2 bg-[#045C9A] hover:bg-[#034a7d] text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95"
                     >{t('proctoring_setup.grant_access', 'Grant Access')}</button>
                   )}
                 </div>
 
-                {/* Microphone Row (NEW) (Temporarily Hidden)
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
+                {/* Microphone Row */}
+                <div className="flex items-center justify-between p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-slate-200/50 dark:bg-white/5 rounded-xl">
+                    <div className="p-2.5 bg-[#d7ebf5]/50 dark:bg-white/5 rounded-xl">
                       <RiSoundModuleLine size={20} className="text-slate-600 dark:text-slate-300" />
                     </div>
                     <div>
@@ -745,7 +816,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       </span>
                       <button
                         onClick={requestMicAccess}
-                        className="text-xs font-bold text-[#1a3884] dark:text-cyan-400 hover:underline"
+                        className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] hover:underline"
                       >
                         Retry
                       </button>
@@ -759,12 +830,11 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </button>
                   )}
                 </div>
-                */}
 
                 {/* Network Row */}
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl">
+                <div className="flex items-center justify-between p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-slate-200/50 dark:bg-white/5 rounded-xl">
+                    <div className="p-2.5 bg-[#d7ebf5]/50 dark:bg-white/5 rounded-xl">
                       <RiShieldCheckLine size={20} className="text-slate-600 dark:text-slate-300" />
                     </div>
                     <div>
@@ -779,7 +849,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                       {t('proctoring_setup.network_good', 'Good ({{latency}}ms)', { latency: networkLatency })}
                     </span>
                   ) : (
-                    <span className="text-xs font-bold text-yellow-655 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-100 dark:border-yellow-500/25">
+                    <span className="text-xs font-bold text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 px-3 py-1.5 rounded-full border border-yellow-100 dark:border-yellow-500/25">
                       {t('proctoring_setup.network_unstable', 'Unstable ({{latency}}ms)', { latency: networkLatency })}
                     </span>
                   )}
@@ -791,8 +861,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           {/* STEP 2: Compliance Consent + Assessment Rules */}
           {step === 2 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                <RiShieldCheckLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.security_consent_title', 'Security Compliance Consent')}
+              <h3 className="text-lg font-bold flex items-center gap-2 text-[#072036] dark:text-white">
+                <RiShieldCheckLine className="text-[#045C9A] dark:text-[#A6D7E8]" /> {t('proctoring_setup.security_consent_title', 'Security Compliance Consent')}
               </h3>
 
               {/* Why each permission is required */}
@@ -800,15 +870,19 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">This assessment requires the following access:</p>
                 <div className="space-y-1.5">
                   <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                     <span><strong>Camera access</strong> — We use your camera to check your identity at the start and throughout the test.</span>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
+                    <span><strong>Microphone access</strong> — We listen for voices in the room during the test. No audio is recorded or stored.</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                     <span><strong>Browser monitoring</strong> — We check if you leave the test tab or switch to another window, so the session stays fair.</span>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1a3884] dark:bg-cyan-400" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                     <span><strong>Full-screen mode</strong> — Full-screen removes distractions and prevents access to other apps while you test.</span>
                   </div>
                 </div>
@@ -818,7 +892,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               </div>
 
               {/* Assessment Rules */}
-              <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl p-4">
+              <div className="bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl p-4">
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-2 uppercase tracking-wide">Assessment Rules</p>
                 <ul className="space-y-1.5">
                   {[
@@ -830,26 +904,26 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     'Do not use your phone or look away repeatedly.'
                   ].map((rule, i) => (
                     <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                      <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-slate-500" />
+                      <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-[#F1F5F9]0" />
                       <span>{rule}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/15 dark:border-[#1a3884]/40 rounded-2xl p-4 flex gap-3 items-start">
-                <RiInformationLine size={20} className="text-[#1a3884] dark:text-cyan-400 shrink-0 mt-0.5" />
+              <div className="bg-[#045C9A]/5 dark:bg-[#045C9A]/20 border border-[#045C9A]/15 dark:border-[#045C9A]/40 rounded-2xl p-4 flex gap-3 items-start">
+                <RiInformationLine size={20} className="text-[#045C9A] dark:text-[#A6D7E8] shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Violations are reviewed by a human before any serious action is taken. The system flags behaviour for review — it does not make automatic failure decisions.
                 </div>
               </div>
 
-              <label className="flex items-start gap-3 mt-4 p-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl cursor-pointer hover:bg-slate-100/50 dark:hover:bg-white/10 transition-all select-none">
+              <label className="flex items-start gap-3 mt-4 p-3 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl cursor-pointer hover:bg-[#F1F5F9]/50 dark:hover:bg-white/10 transition-all select-none">
                 <input
                   type="checkbox"
                   checked={consentGranted}
                   onChange={(e) => setConsentGranted(e.target.checked)}
-                  className="w-4 h-4 rounded mt-0.5 accent-[#1a3884] dark:accent-cyan-400"
+                  className="w-4 h-4 rounded mt-0.5 accent-[#045C9A] dark:accent-cyan-400"
                 />
                 <span className="text-xs text-slate-700 dark:text-slate-300">
                   I understand why these permissions are required, accept the assessment rules, and consent to face registration and identity verification.
@@ -861,15 +935,15 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           {/* STEP 3: Face Registration */}
           {step === 3 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 flex flex-col items-center">
-              <h3 className="text-lg font-bold text-center self-start flex items-center gap-2 text-slate-900 dark:text-white">
-                <RiUserSmileLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.face_registration_title', 'Face Registration')}
+              <h3 className="text-lg font-bold text-center self-start flex items-center gap-2 text-[#072036] dark:text-white">
+                <RiUserSmileLine className="text-[#045C9A] dark:text-[#A6D7E8]" /> {t('proctoring_setup.face_registration_title', 'Face Registration')}
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-350 text-left self-start">
+              <p className="text-sm text-slate-600 dark:text-slate-300 text-left self-start">
                 {t('proctoring_setup.face_registration_desc', 'Look straight into the camera. The AI will capture your face identity and verify you throughout the assessment.')}
               </p>
 
               {/* Video + Registration UI */}
-              <div className="relative w-56 h-42 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-[#1a3884]/30 shadow-lg">
+              <div className="relative w-56 h-42 bg-slate-950 rounded-2xl overflow-hidden border-2 border-[#d7ebf5] dark:border-[#045C9A]/30 shadow-lg">
                 <video
                   ref={videoRef}
                   width={640}
@@ -910,7 +984,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                 {registrationState === 'registering' && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-black/60 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center gap-2">
-                      <RiLoader4Line size={16} className="text-cyan-400 animate-spin" />
+                      <RiLoader4Line size={16} className="text-[#045C9A] dark:text-[#A6D7E8] animate-spin" />
                       <span className="text-xs text-white font-bold">
                         {t('proctoring_setup.capturing_progress', 'Capturing {{current}}/{{total}}', { current: registrationProgress.current, total: registrationProgress.total })}
                       </span>
@@ -931,7 +1005,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                 {/* Model loading overlay */}
                 {modelLoadState === 'loading' && (
                   <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center">
-                    <RiLoader4Line size={24} className="text-cyan-400 animate-spin mb-2" />
+                    <RiLoader4Line size={24} className="text-[#045C9A] dark:text-[#A6D7E8] animate-spin mb-2" />
                     <span className="text-xs text-cyan-300 font-bold">{t('proctoring_setup.loading_ai_models', 'Loading AI Models')}</span>
                     <div className="w-32 h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
                       <motion.div
@@ -958,7 +1032,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </span>
                     <button
                       onClick={loadAIModels}
-                      className="px-5 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-1.5"
+                      className="px-5 py-2 bg-[#045C9A] hover:bg-[#034a7d] text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-1.5"
                     >
                       <RiLoader4Line size={13} /> {t('proctoring_setup.retry_model_load', 'Retry')}
                     </button>
@@ -999,7 +1073,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     </div>
                     <button
                       onClick={retryRegistration}
-                      className="px-5 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center gap-1.5"
+                      className="px-5 py-2 bg-[#045C9A] hover:bg-[#034a7d] text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center gap-1.5"
                     >
                       <RiLoader4Line size={13} /> {t('proctoring_setup.retry_registration', 'Retry Registration')}
                     </button>
@@ -1053,27 +1127,27 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           {/* STEP 4: Fullscreen Setup */}
           {step === 4 && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                <RiFullscreenLine className="text-[#1a3884] dark:text-cyan-400" /> {t('proctoring_setup.fullscreen_title', 'Locked Fullscreen Mode')}
+              <h3 className="text-lg font-bold flex items-center gap-2 text-[#072036] dark:text-white">
+                <RiFullscreenLine className="text-[#045C9A] dark:text-[#A6D7E8]" /> {t('proctoring_setup.fullscreen_title', 'Locked Fullscreen Mode')}
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-350 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {t('proctoring_setup.fullscreen_desc', 'This assessment requires full screen alignment. Moving outside full screen boundaries is counted as a security violation.')}
               </p>
 
-              <div className="p-4 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-2xl flex flex-col gap-4 items-center justify-center text-center">
+              <div className="p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl flex flex-col gap-4 items-center justify-center text-center">
                 {isFullScreenActive ? (
                   <div className="space-y-2">
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full inline-flex items-center gap-1 border border-emerald-100 dark:border-emerald-500/25">
                       <RiCheckLine size={16} /> {t('proctoring_setup.fullscreen_active', 'Fullscreen Active')}
                     </span>
-                    <p className="text-xs text-slate-500 dark:text-slate-450 font-medium">{t('proctoring_setup.ready_to_launch', 'Assessment is ready to launch.')}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('proctoring_setup.ready_to_launch', 'Assessment is ready to launch.')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{t('proctoring_setup.fullscreen_instruction', 'Click the button below to toggle fullscreen.')}</p>
                     <button
                       onClick={triggerFullscreen}
-                      className="px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] text-white text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+                      className="px-5 py-2.5 bg-[#045C9A] hover:bg-[#034a7d] text-white text-xs font-bold rounded-xl transition-all inline-flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95"
                     >
                       <RiFullscreenLine size={16} /> {t('proctoring_setup.request_fullscreen', 'Request Full Screen')}
                     </button>
@@ -1085,7 +1159,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
         </div>
 
         {/* Footer controls */}
-        <div className="mt-4 pt-3 border-t border-slate-150 dark:border-white/5 flex justify-between items-center gap-3 shrink-0">
+        <div className="mt-4 pt-3 border-t border-[#d7ebf5] dark:border-white/5 flex justify-between items-center gap-3 shrink-0">
           {/* Skip face registration — dev/testing convenience only */}
           {import.meta.env.DEV && step === 3 && registrationState !== 'registered' && (
             <button
@@ -1101,15 +1175,15 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               <button
                 onClick={handleNextStep}
                 disabled={
-                  (step === 1 && cameraState !== 'allowed') ||
+                  (step === 1 && (cameraState !== 'allowed' || micState !== 'allowed')) ||
                   (step === 2 && !consentGranted) ||
                   (step === 3 && registrationState !== 'registered')
                 }
-                className={`px-6 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${((step === 1 && cameraState === 'allowed') ||
+                className={`px-6 py-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${((step === 1 && cameraState === 'allowed' && micState === 'allowed') ||
                     (step === 2 && consentGranted) ||
                     (step === 3 && registrationState === 'registered'))
-                    ? 'bg-[#1a3884] hover:bg-[#112b6b] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent'
+                    ? 'bg-[#045C9A] hover:bg-[#034a7d] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'
+                    : 'bg-[#F1F5F9] dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent'
                   }`}
               >
                 {t('proctoring_setup.continue_button', 'Continue')} <RiArrowRightLine size={16} />
