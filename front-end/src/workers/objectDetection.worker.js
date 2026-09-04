@@ -195,6 +195,27 @@ const detect = async (bitmap, face) => {
   };
 };
 
+/**
+ * A freshly created ONNX session's first run is commonly several times
+ * slower than every run after it -- the runtime is still choosing kernels
+ * and compiling its execution plan, not just doing arithmetic. Model load
+ * happens the moment this worker starts, well before the exam camera is
+ * even active (registration and setup give it seconds of head start), so
+ * paying that one-time cost here on a throwaway blank frame means the
+ * candidate's FIRST real frame, right as the exam opens, is already fast
+ * instead of carrying that hidden delay.
+ */
+const warmUp = async () => {
+  try {
+    const blank = new ort.Tensor('float32', new Float32Array(3 * INPUT_SIZE * INPUT_SIZE), [1, 3, INPUT_SIZE, INPUT_SIZE]);
+    const t0 = Date.now();
+    await session.run({ [session.inputNames[0]]: blank });
+    console.log(`[ObjectWorker] warm-up pass done in ${Date.now() - t0}ms`);
+  } catch (err) {
+    console.warn('[ObjectWorker] warm-up pass failed (non-fatal):', err?.message || err);
+  }
+};
+
 const init = async () => {
   if (session) { postMessage({ type: 'INIT_COMPLETE', model: modelName }); return; }
   const opts = { executionProviders: ['wasm'], graphOptimizationLevel: 'all', enableCpuMemArena: true, enableMemPattern: true };
@@ -205,6 +226,7 @@ const init = async () => {
       session = await ort.InferenceSession.create(candidate, opts);
       modelName = candidate.split('/').pop();
       console.log(`[ObjectWorker] ✅ loaded ${modelName}`);
+      await warmUp();
       break;
     } catch (err) {
       console.warn(`[ObjectWorker] ${candidate} failed:`, err?.message || err);
