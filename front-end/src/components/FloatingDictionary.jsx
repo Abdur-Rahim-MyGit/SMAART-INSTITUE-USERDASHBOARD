@@ -216,7 +216,7 @@ const FloatingDictionary = ({ variant = "floating" }) => {
                         <div className="px-4 py-3.5 border-b border-[#045C9A]/10 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-[#045C9A] to-[#034a7d] text-white">
                             <div className="flex items-center gap-2">
                                 <IconBook2 stroke={1.5} className="w-4 h-4 text-[#A6D7E8]" />
-                                <h3 className="text-sm font-bold tracking-tight">Quick Dictionary</h3>
+                                <h3 className="text-sm font-bold tracking-tight text-white dark:text-white">Quick Dictionary</h3>
                             </div>
                             <button
                                 onClick={() => navigate("/dashboard/dictionary")}
