@@ -2,6 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const StageResult = require('../models/StageResult');
 const BaseLineResult = require('../models/BaseLineResult');
+const Result = require('../models/Result');
+const Assessment = require('../models/Assessment');
+const ProctoringSession = require('../models/ProctoringSession');
+const ProctoringEvent = require('../models/ProctoringEvent');
+const { getStageByCode } = require('../config/stage_distributions');
 const { protect } = require('../middleware/auth');
 const { computePLVI, totalGrowth } = require('../utils/plvi');
 const { countActiveLearningDays } = require('../utils/activeDays');
@@ -404,6 +409,52 @@ router.post('/restart-course', async (req, res) => {
 });
 
 /**
+ * Remove the raw attempt records behind a stage: the Result documents (which
+ * carry attemptNumber and any pending review) and the proctoring sessions and
+ * events bound to them.
+ *
+ * Resetting used to delete only the StageResult / BaseLineResult summaries.
+ * The retake budget is counted from the Result attempts, and a held attempt
+ * leaves a locked ProctoringSession behind, so after a "successful" reset the
+ * very next attempt was numbered as if nothing had been cleared and was held
+ * again on submission. From the candidate's side the button did nothing.
+ *
+ * @param {string} userId
+ * @param {string|null} stageKey  'T1'..'T4', or null for every stage
+ */
+const purgeAttemptRecords = async (userId, stageKey) => {
+    const assessments = await Assessment.find({}).select('_id assessmentCode').lean();
+    const assessmentIds = assessments
+        .filter((a) => {
+            const info = getStageByCode(a.assessmentCode);
+            if (!info) return false;
+            return stageKey ? info.stage === stageKey : true;
+        })
+        .map((a) => a._id);
+
+    if (assessmentIds.length === 0) {
+        return { results: 0, sessions: 0, events: 0 };
+    }
+
+    const results = await Result.find({ userId, assessmentId: { $in: assessmentIds } }).select('_id').lean();
+    const resultIds = results.map((r) => r._id);
+
+    const sessions = await ProctoringSession.find({
+        userId,
+        $or: [{ resultId: { $in: resultIds } }, { assessmentId: { $in: assessmentIds } }]
+    }).select('_id').lean();
+    const sessionIds = sessions.map((s) => s._id);
+
+    const [eventsDel, sessionsDel, resultsDel] = await Promise.all([
+        sessionIds.length ? ProctoringEvent.deleteMany({ sessionId: { $in: sessionIds } }) : { deletedCount: 0 },
+        sessionIds.length ? ProctoringSession.deleteMany({ _id: { $in: sessionIds } }) : { deletedCount: 0 },
+        resultIds.length ? Result.deleteMany({ _id: { $in: resultIds } }) : { deletedCount: 0 }
+    ]);
+
+    return { results: resultsDel.deletedCount, sessions: sessionsDel.deletedCount, events: eventsDel.deletedCount };
+};
+
+/**
  * DELETE /api/stageresults/reset/:userId/:stage
  * DEV: Reset stage results for testing
  */
@@ -414,17 +465,22 @@ router.delete('/reset/:userId/:stage', async (req, res) => {
         const stageKey = stage.toUpperCase();
 
         if (stageKey === 'ALL') {
-            const [result, blResult] = await Promise.all([
+            const [result, blResult, purged] = await Promise.all([
                 StageResult.deleteMany({ userId }),
-                BaseLineResult.deleteMany({ userId })
+                BaseLineResult.deleteMany({ userId }),
+                purgeAttemptRecords(userId, null)
             ]);
+            console.log(`♻️ Reset ALL for user ${userId}: ${result.deletedCount} stage results, ${blResult.deletedCount} baseline results, ${purged.results} attempts, ${purged.sessions} proctoring sessions, ${purged.events} events`);
             return res.json({
                 success: true,
-                message: `Deleted all (${result.deletedCount}) stage results and (${blResult.deletedCount}) baseline results for user ${userId}`
+                message: `Deleted all (${result.deletedCount}) stage results, (${blResult.deletedCount}) baseline results and (${purged.results}) attempts for user ${userId}`
             });
         }
 
-        const result = await StageResult.deleteMany({ userId, stage: stageKey });
+        const [result, purged] = await Promise.all([
+            StageResult.deleteMany({ userId, stage: stageKey }),
+            purgeAttemptRecords(userId, stageKey)
+        ]);
 
         // If T1, also clear BaseLineResult
         let baselineDeleted = 0;
@@ -433,9 +489,10 @@ router.delete('/reset/:userId/:stage', async (req, res) => {
             baselineDeleted = blResult.deletedCount;
         }
 
+        console.log(`♻️ Reset ${stageKey} for user ${userId}: ${result.deletedCount} stage results, ${purged.results} attempts, ${purged.sessions} proctoring sessions, ${purged.events} events`);
         res.json({
             success: true,
-            message: `Deleted ${result.deletedCount} stage results${baselineDeleted ? ` and ${baselineDeleted} baseline results` : ''} for user ${userId}, stage ${stageKey}`
+            message: `Deleted ${result.deletedCount} stage results${baselineDeleted ? ` and ${baselineDeleted} baseline results` : ''} and ${purged.results} attempts for user ${userId}, stage ${stageKey}`
         });
     } catch (err) {
         console.error('❌ Error resetting stage results:', err);
