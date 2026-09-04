@@ -150,19 +150,11 @@ const COURSE_GUIDELINES = [
 ];
 
 /* Theater mode (YouTube style): the video takes the full content width and the
-   curriculum drops below it. Remembered per browser. */
-const THEATER_STORAGE_KEY = "smaart_course_player_theater";
+   curriculum drops below it. It is per visit: every course opens in the default
+   view. */
 /* One easing for every element that moves when theater mode toggles, so the
    video, the lesson card and the curriculum all settle together. */
 const LAYOUT_TRANSITION = { layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } };
-const readTheaterPreference = () => {
-  try {
-    return localStorage.getItem(THEATER_STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-};
-
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -189,7 +181,7 @@ const CoursePlayer = () => {
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
-  const [isTheater, setIsTheater] = useState(readTheaterPreference);
+  const [isTheater, setIsTheater] = useState(false);
   // This page is its own scroll container (h-screen overflow-y-auto), so
   // window.scrollTo has no effect here; scroll the root element instead.
   const pageRef = useRef(null);
@@ -202,16 +194,7 @@ const CoursePlayer = () => {
     }
     window.scrollTo({ top: 0, left: 0, behavior });
   };
-  const toggleTheater = () =>
-    setIsTheater((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(THEATER_STORAGE_KEY, next ? "1" : "0");
-      } catch {
-        /* preference is a convenience; ignore storage failures */
-      }
-      return next;
-    });
+  const toggleTheater = () => setIsTheater((prev) => !prev);
   const acknowledgedCount = COURSE_GUIDELINES.filter((g) => acknowledgedGuidelines[g.id]).length;
   const allGuidelinesAcknowledged = acknowledgedCount === COURSE_GUIDELINES.length;
   const toggleGuideline = (id) =>

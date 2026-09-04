@@ -564,7 +564,8 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
             >
               {/* Simple & Premium Play Button Container */}
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white text-[#045C9A] dark:bg-[#072036] dark:text-[#A6D7E8] shadow-2xl border border-[#d7ebf5] dark:border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-[#045C9A]/20">
-                <Play fill={1} className="w-7 h-7 sm:w-8 sm:h-8 ml-1" />
+                {/* Material's play_arrow sits left of centre in its box; nudge it right */}
+                <Play fill={1} weight={500} className="w-10 h-10 sm:w-12 sm:h-12 translate-x-[3px]" />
               </div>
             </motion.div>
           )}
