@@ -26,7 +26,16 @@ const INPUT_SIZE = 640;
 const CLASSES_OF_INTEREST = { 67: 'phone', 73: 'book', 63: 'laptop' };
 // Phone and book bars are low; the engine compensates by requiring the
 // object on three of the last five checks before it counts.
-const CLASS_THRESHOLDS = { 67: 0.25, 73: 0.30, 63: 0.45 };
+//
+// Laptop was 0.45. A hand-held phone or book, shown flat toward the camera,
+// scores weakly as "laptop" rather than "phone" -- a flat rectangle held up
+// reads as a laptop screen to the model -- and 0.45 is the bar for an actual
+// desk laptop filling a big share of frame, which scores far higher than that
+// in practice. Observed field data: a held phone scored laptop 0.13-0.14
+// and was rejected outright by the 0.45 bar. Lowered to 0.28, just above
+// phone's 0.25, so a genuinely idle laptop (which scores much higher) still
+// clears it easily while a misclassified held object now has a chance.
+const CLASS_THRESHOLDS = { 67: 0.25, 73: 0.30, 63: 0.28 };
 const DEFAULT_THRESHOLD = 0.40;
 const NEAR_MISS_SCORE = 0.12;
 const NMS_THRESHOLD = 0.45;
