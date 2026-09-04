@@ -159,6 +159,12 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        // These four are already precached (with their own revision hash) via
+        // includeAssets above. Without this, the glob scan above also matches
+        // them in dist/ and adds a second precache entry with a DIFFERENT
+        // hash for the same URL, which throws
+        // "add-to-cache-list-conflicting-entries" at service-worker install.
+        globIgnores: ['favicon.png', 'logo.png', 'pwa-192x192.png', 'pwa-512x512.png'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         // Without these the new worker installs but sits in "waiting" until
         // every tab for this origin is closed, so a deploy keeps serving the
