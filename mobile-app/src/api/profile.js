@@ -48,8 +48,53 @@ export async function completeRegistration({ email, fullName, mobileNumber, pers
   form.append('fullName', fullName);
   form.append('mobileNumber', mobileNumber);
 
+  // GET /register-details returns the personal fields FLAT (nickname, bio,
+  // address, … spread from the registration subdoc), not under a
+  // `personalDetails` key — while POST expects them re-nested under
+  // `personalDetails`. Rebuild the merge base from the flat record, otherwise
+  // web-entered values are blanked by the POST's `|| ''` defaults.
+  const existingPersonalDetails = {
+    nickname: existing.nickname,
+    dob: existing.dob,
+    gender: existing.gender,
+    institution: existing.institution,
+    department: existing.department,
+    cgpa: existing.cgpa,
+    yearOfStudy: existing.yearOfStudy,
+    yearOfPassing: existing.yearOfPassing,
+    alternateMobile: existing.alternateMobile,
+    bio: existing.bio,
+    batch: existing.batch,
+    educationLevel: existing.educationLevel,
+    profilePhoto: existing.profilePhoto,
+  };
+  // Drop undefineds so they don't shadow anything during the spread below.
+  Object.keys(existingPersonalDetails).forEach((k) => {
+    if (existingPersonalDetails[k] === undefined || existingPersonalDetails[k] === null) {
+      delete existingPersonalDetails[k];
+    }
+  });
+
+  // The wizard prefills from the existing record, so an empty value it sends
+  // (e.g. its hardcoded `street: ''`) is never a deliberate clear — only
+  // non-empty mobile answers may override what the web already has.
+  const incomingPersonalDetails = {};
+  Object.entries(personalDetails || {}).forEach(([k, v]) => {
+    if (k === 'address') return;
+    if (v !== undefined && v !== null && v !== '') incomingPersonalDetails[k] = v;
+  });
+
+  const mergedAddress = { ...(existing.address || {}) };
+  Object.entries(personalDetails?.address || {}).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') mergedAddress[k] = v;
+  });
+
   const merged = {
-    personalDetails: { ...(existing.personalDetails || {}), ...personalDetails },
+    personalDetails: {
+      ...existingPersonalDetails,
+      ...incomingPersonalDetails,
+      address: mergedAddress,
+    },
     tenthDetails: sections.tenthDetails ?? existing.tenthDetails ?? {},
     twelfthDetails: sections.twelfthDetails ?? existing.twelfthDetails ?? {},
     higherEducation: sections.higherEducation ?? existing.higherEducation ?? [],

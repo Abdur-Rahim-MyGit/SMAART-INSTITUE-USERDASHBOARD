@@ -11,6 +11,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import SkeletonBox from './SkeletonBox';
+import { FadeSlideIn } from './Motion';
 import { colors, radius, shadow } from '../theme';
 
 const STATS = [
@@ -23,7 +24,7 @@ export default function QuickStatsBar({ streak = 0, level = 1, enrolled = 0, loa
   const values = { streak, level, enrolled };
 
   return (
-    <View style={styles.container}>
+    <FadeSlideIn duration={380} style={styles.container}>
       {STATS.map((stat, idx) => (
         <React.Fragment key={stat.key}>
           <View style={styles.statItem}>
@@ -44,7 +45,7 @@ export default function QuickStatsBar({ streak = 0, level = 1, enrolled = 0, loa
           {idx < STATS.length - 1 && <View style={styles.divider} />}
         </React.Fragment>
       ))}
-    </View>
+    </FadeSlideIn>
   );
 }
 

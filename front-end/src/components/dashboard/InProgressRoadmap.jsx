@@ -2,16 +2,16 @@ import { memo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  CheckCircle2,
-  PlayCircle,
-  Circle,
   ArrowRight,
+  BookOpen,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
-  BookOpen,
-  Zap,
+  Circle,
+  PlayCircle,
   Rocket,
-} from "lucide-react";
+  Zap,
+} from "@/components/icons";
 
 // ── Colour palettes (cycles per card) ────────────────────────────────────────
 const PALETTE = [
@@ -333,7 +333,7 @@ const InProgressRoadmap = memo(({ courses = [], loading = false }) => {
           </h2>
           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full
                            bg-[#1a3884]/10 dark:bg-[#1a3884]/30 text-[10px] font-extrabold
-                           text-[#1a3884] dark:text-blue-400">
+                           text-[#0E2136] dark:text-blue-400">
             {courses.length}
           </span>
         </div>

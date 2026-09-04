@@ -1,16 +1,100 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
-import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration } from '@/services/faceVerificationService';
+import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady, getLastObjectNearMisses } from '@/services/faceVerificationService';
+import { initObjectDetectionWorker, isObjectWorkerReady, getObjectWorkerModel, detectObjectsInWorker } from '@/workers/objectDetectionClient';
 import { proctoringApi } from '@/services/proctoringApi';
-import { startAudioMonitoring, stopAudioMonitoring } from '@/services/audioMonitorService';
+import { startAudioMonitoring, stopAudioMonitoring, getLastGates } from '@/services/audioMonitorService';
+import { getPipelineStatus } from '@/services/onnxPipeline';
 import proctoringWorker from '@/workers/proctoringWorkerClient';
 import { initGaze as initMediaPipeGaze, detectGaze as detectMediaPipeGaze, isGazeReady as isMediaPipeGazeReady } from '@/services/mediapipeGaze';
 import { calculateGazeAndPose } from '@/services/gazeTrackingService';
-import { evaluateLiveness } from '@/services/livenessService';
+// NOTE: livenessService.evaluateLiveness is deliberately NOT wired. It was
+// imported here but never called, which read as spoof protection that does not
+// exist. Presentation-attack detection is still an open gap — see the audit.
 import { createLadder, COLOUR } from '@/services/proctoringLadder';
 import { runEnvironmentChecks, watchForDuplicateWindows } from '@/services/environmentSignals';
 import { toast } from 'sonner';
+
+/**
+ * Every camera stream this engine has opened.
+ *
+ * There is no browser API to enumerate streams another piece of code is
+ * holding, so the only way to guarantee a release is to remember what we
+ * acquired. `stopCamera` previously tried to cover that gap by calling
+ * getUserMedia again -- which opened a NEW stream in order to close it, and so
+ * turned the camera light back on at the exact moment the candidate left the
+ * exam. Tracks remove themselves here when they end.
+ */
+const acquiredStreams = new Set();
+
+const trackStream = (stream) => {
+  if (!stream) return stream;
+  acquiredStreams.add(stream);
+  stream.getTracks().forEach((track) => {
+    track.addEventListener('ended', () => {
+      if (stream.getTracks().every((t) => t.readyState === 'ended')) {
+        acquiredStreams.delete(stream);
+      }
+    });
+  });
+  return stream;
+};
+
+/**
+ * Weak-but-real indicators that the exam is running inside a VM or over a
+ * remote desktop session.
+ *
+ * None of these is conclusive on its own -- a low-end laptop can look like a
+ * VM -- which is why the event is weighted at 25 rather than treated as proof.
+ * Two or more agreeing signals is the bar for reporting.
+ */
+const detectRemoteOrVirtualDisplay = () => {
+  const reasons = [];
+
+  try {
+    // Remote desktop sessions commonly negotiate down to 16-bit colour.
+    if (typeof screen !== 'undefined' && screen.colorDepth && screen.colorDepth < 24) {
+      reasons.push(`colour depth ${screen.colorDepth}-bit`);
+    }
+
+    // Software rasterisers and hypervisor display adapters name themselves.
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL) || '') : '';
+      const flagged = ['vmware', 'virtualbox', 'parallels', 'llvmpipe', 'swiftshader', 'basic render', 'microsoft basic'];
+      if (renderer && flagged.some((name) => renderer.toLowerCase().includes(name))) {
+        reasons.push(`display adapter "${renderer}"`);
+      }
+    } else {
+      reasons.push('no hardware WebGL');
+    }
+
+    // A single logical core is vanishingly rare on real 2020s hardware.
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 1) {
+      reasons.push(`${navigator.hardwareConcurrency} CPU core`);
+    }
+  } catch (err) {
+    console.warn('[ProctoringEngine] Remote/VM probe failed:', err);
+  }
+
+  // One signal is noise; two agreeing signals is worth recording.
+  return reasons.length >= 2 ? reasons.join(', ') : null;
+};
+
+/** Stop every stream this engine opened. Never re-acquires. */
+const releaseAllStreams = () => {
+  acquiredStreams.forEach((stream) => {
+    try {
+      stream.getTracks().forEach((track) => track.stop());
+    } catch (err) {
+      console.warn('[ProctoringEngine] Failed to stop a track:', err);
+    }
+  });
+  acquiredStreams.clear();
+};
 
 // Helper to capture a frame from the video stream as a JPEG Blob
 const captureScreenshot = (videoElement) => {
@@ -41,7 +125,62 @@ const FACE_CHECK_INTERVAL = 400; // 400ms (~2.5 FPS real-time responsiveness)
 // 174 MB ArcFace identity verify runs only every Nth tick so it doesn't block
 // the main thread every second (which stuttered the exam countdown).
 const IDENTITY_EVERY_TICKS = 2; // ArcFace identity check ~every 2 s
-const OBJECT_CHECK_INTERVAL = 3000; // YOLO object detection ~every 3 s
+// Consecutive disagreeing ArcFace frames before identity is called a mismatch.
+// Absorbs a single bad frame (blink / head turn / motion blur) without giving a
+// real impostor room: at ~800 ms per identity tick this costs under a second
+// against the mismatch ladder's 15 s red stage.
+const IDENTITY_MISMATCH_STREAK = 3;
+// YOLO object detection cadence.
+//
+// This was 3 s, which is LONGER than the ladder's grace period for a condition
+// that has blinked. A single tick where the phone was turned edge-on or moved
+// out of crop therefore ended the episode, and the phone ladder (red at 4 s)
+// needs consecutive detections to get there — so a phone held in plain view
+// could be missed indefinitely. At 1.5 s two ticks fit inside the grace window,
+// so brief occlusions no longer reset the timer.
+const OBJECT_CHECK_INTERVAL = 1000;
+
+// ── Liveness (presentation-attack detection) ────────────────────────────────
+// There is no anti-spoof model in the bundle — the shipped MN3-AntiSpoof file
+// is invalid — so liveness is derived from motion instead, using the Face Mesh
+// signals already computed for gaze.
+//
+// The premise is simple and hard to defeat with a still image: over three
+// quarters of a minute a living person ALWAYS blinks, and their head always
+// drifts by at least a couple of degrees. A photo held up to the lens produces
+// landmark output that is not merely stable but numerically identical frame to
+// frame — every range below collapses to zero at once.
+//
+// All four signals must be flat together before anything is reported. Postural
+// sway alone is normally several degrees and MediaPipe's own estimation noise
+// is around one, so a genuine candidate clears these bars without trying; the
+// thresholds exist only to leave room for that noise.
+const LIVENESS_SAMPLE_INTERVAL_MS = 200;   // Also the gaze/attention cadence
+const LIVENESS_WINDOW_MS = 45 * 1000;      // Evidence window before judging
+const LIVENESS_MIN_POSE_RANGE_DEG = 1.5;   // Degrees of yaw/pitch travel
+const LIVENESS_MIN_EAR_RANGE = 0.03;       // Eye-aperture travel
+
+/**
+ * Detected COCO labels that map to a proctoring condition.
+ *
+ * `laptop` used to be detected and then thrown away, on the reasoning that a
+ * candidate at a desk often has a second machine legitimately in shot. That is
+ * true, and it is also exactly how a second screen gets used to look something
+ * up. It is now reported — with the longest window and the lowest weight of the
+ * three, so an idle machine on the desk costs far less than a phone in hand.
+ */
+const OBJECT_CONDITIONS = {
+  phone: 'phone_detected',
+  book: 'book_detected',
+  laptop: 'laptop_detected',
+};
+// An object has to be seen on OBJECT_CONFIRM_TICKS of the last
+// OBJECT_CONFIRM_WINDOW ticks before its condition opens, and be absent for a
+// whole window before it clears. One tick is a single frame: a book turned
+// edge-on or a hand passing the lens can read as a phone for one frame, and
+// the detector's alternating zoom passes can miss a real phone on the off tick.
+const OBJECT_CONFIRM_TICKS = 3;
+const OBJECT_CONFIRM_WINDOW = 5;
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -50,6 +189,84 @@ const MAX_WARNINGS = 3;
 
 // Liveness ping. Must stay well under the server's HEARTBEAT_GAP_MS (30s).
 const HEARTBEAT_INTERVAL = 10 * 1000;
+
+/**
+ * Window and focus events are raw browser signals, not judged episodes.
+ *
+ * Camera conditions go through the ladder, which reports a condition at most
+ * once per continuous episode. tab_switch / minimize / fullscreen_exit call
+ * reportViolation directly, so nothing stopped a single alt-tab -- or the
+ * warning card itself taking focus -- from recording several violations in a
+ * row. One physical action should cost one warning.
+ */
+const WINDOW_EVENT_COOLDOWN_MS = 10 * 1000;
+
+// How long the window must stay unfocused before it counts as leaving the exam.
+// Long enough to ride out a notification or a stray click on browser chrome,
+// short enough that actually switching away is still caught.
+const WINDOW_BLUR_GRACE_MS = 2500;
+
+/**
+ * Minimum gap between two recorded violations OF THE SAME TYPE.
+ *
+ * Every type has one. Camera conditions get a long gap because they are judged
+ * over a duration already: if someone genuinely has a second person in the room
+ * for two minutes, that is one situation to warn about, not ten. Deliberate
+ * actions (leaving the window, copying) get a shorter gap because repeating
+ * them is a repeated choice.
+ */
+const DEFAULT_EVENT_COOLDOWN_MS = 45 * 1000;
+
+/**
+ * Events whose cooldown restarts when the candidate dismisses a warning card.
+ *
+ * Closing the card moves focus back to the exam, and that movement must not be
+ * read as the candidate leaving it again. Only focus-related events need this;
+ * a camera condition is unaffected by where the pointer went.
+ */
+const FOCUS_SENSITIVE_EVENTS = ['tab_switch', 'minimize', 'fullscreen_exit', 'inactivity'];
+const EVENT_COOLDOWN_MS = {
+  // Deliberate, repeatable actions.
+  tab_switch: WINDOW_EVENT_COOLDOWN_MS,
+  minimize: WINDOW_EVENT_COOLDOWN_MS,
+  fullscreen_exit: WINDOW_EVENT_COOLDOWN_MS,
+  inactivity: WINDOW_EVENT_COOLDOWN_MS,
+  copy_detected: WINDOW_EVENT_COOLDOWN_MS,
+  paste_detected: WINDOW_EVENT_COOLDOWN_MS,
+  restricted_shortcut: WINDOW_EVENT_COOLDOWN_MS,
+  context_menu: WINDOW_EVENT_COOLDOWN_MS,
+
+  // Continuous conditions — one warning per situation, not per detection.
+  multiple_faces: 90 * 1000,
+  face_mismatch: 90 * 1000,
+  face_absent: 60 * 1000,
+  face_covered: 60 * 1000,
+  gaze_away: 60 * 1000,
+  eyes_closed: 60 * 1000,
+  looking_down: 60 * 1000,
+  voice_detected: 60 * 1000,
+  multiple_voices: 120 * 1000,
+  phone_detected: 30 * 1000,
+  book_detected: 30 * 1000,
+  laptop_detected: 60 * 1000,
+};
+
+/**
+ * Keyboard shortcuts blocked during an assessment.
+ *
+ * Print and Save are how a paper leaves the room as a file; the devtools
+ * shortcuts are how the DOM (and therefore the question text) is read straight
+ * out of the page.
+ */
+const isRestrictedShortcut = (e) => {
+  const key = (e.key || '').toLowerCase();
+  if (e.key === 'F12') return 'Developer tools';
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(key)) return 'Developer tools';
+  if ((e.ctrlKey || e.metaKey) && key === 'p') return 'Print';
+  if ((e.ctrlKey || e.metaKey) && key === 's') return 'Save page';
+  if ((e.ctrlKey || e.metaKey) && key === 'u') return 'View source';
+  return null;
+};
 
 // Escalation thresholds and copy now live in the ladder module, which is pure
 // and unit-tested. See services/proctoringLadder.js.
@@ -63,7 +280,40 @@ export const useProctoringEngine = ({
   onLockout = null // Custom submit callback
 }) => {
   const [warningsCount, setWarningsCount] = useState(0);
+  // The SERVER owns the warning budget and sends it with every decision. Until
+  // the first decision arrives we render the local fallback, but we must never
+  // keep showing it afterwards — the UI was telling candidates "1 of 3" while
+  // the real budget was 10, which makes an early warning look far more serious
+  // than it is.
+  const [maxWarnings, setMaxWarnings] = useState(MAX_WARNINGS);
+  // Has the attempt already crossed the line that holds it for review? The
+  // warning count does NOT answer this — the risk score decides, and it gets
+  // there first.
+  const [riskFlagged, setRiskFlagged] = useState(false);
+
+  /**
+   * Live diagnostics, surfaced in the proctoring panel.
+   *
+   * Every failure on this system so far has been invisible on screen and
+   * obvious in one console line — a detector that silently failed to load, a
+   * gate that could never open, a reference that never arrived. Asking someone
+   * mid-test to open devtools and read a log is not a workable way to find
+   * those. The panel shows the same facts where the person testing is already
+   * looking.
+   */
+  const [diagnostics, setDiagnostics] = useState({
+    models: null,
+    audio: null,
+    objects: '',
+    objectsAt: 0,
+    sessionId: null,
+    sessionError: null,
+  });
   const [isWarningVisible, setIsWarningVisible] = useState(false);
+  // Read inside reportViolation, which is a stable callback.
+  const isWarningVisibleRef = useRef(false);
+  // eventType -> timestamp of the last report, for the cooldown above.
+  const lastReportAtRef = useRef({});
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lastViolationType, setLastViolationType] = useState('');
   const [proctoringSessionId, setProctoringSessionId] = useState(null);
@@ -82,6 +332,10 @@ export const useProctoringEngine = ({
   const [isCameraWarmingUp, setIsCameraWarmingUp] = useState(false);
   const [isFaceDetected, setIsFaceDetected] = useState(false);
   const [faceCount, setFaceCount] = useState(0);
+  // Mirror of faceCount readable from interval callbacks (the gaze loop runs on
+  // its own cadence and must not evaluate attention while nobody — or more than
+  // one person — is in frame).
+  const faceCountRef = useRef(0);
   const [cameraError, setCameraError] = useState(null);
 
   // Face Verification State
@@ -120,16 +374,64 @@ export const useProctoringEngine = ({
   const heartbeatIntervalRef = useRef(null);
   const verifyInFlightRef = useRef(false);
   const faceTickRef = useRef(0); // counts verification ticks to pace identity checks
+  // Last verdict ArcFace actually produced. Presence-only ticks replay this
+  // rather than inventing one, so identity can never be upgraded by a model
+  // that does not do identity.
+  const lastIdentityVerdictRef = useRef(null);
+  // Highest warning count the candidate has already acknowledged.
+  const lastAcknowledgedWarningsRef = useRef(0);
+  // Fires once per session if the exam runs with no registered face at all.
+  const unregisteredReportedRef = useRef(false);
+  // Rolling liveness evidence window, and a one-shot latch so a spoof is
+  // reported once rather than every window that follows it.
+  const livenessRef = useRef(null);
+  const spoofReportedRef = useRef(false);
+  // Recent detection history per object label (see OBJECT_CONFIRM_TICKS).
+  const objectSeenTicksRef = useRef({});
+  // A detection pass can outlast the 1 s tick on a slow machine; never stack.
+  const objectPassInFlightRef = useRef(false);
+  // Last face box (video pixels) so the object detector can zoom on the hands.
+  const lastFaceBoxRef = useRef(null);
+  // Consecutive ArcFace frames that disagreed with the registered face. One
+  // bad frame is a blink or a turn; several in a row is a different person.
+  const mismatchStreakRef = useRef(0);
 
   const environmentIntervalRef = useRef(null);
   const duplicateWindowCleanupRef = useRef(null);
+  // Pending focus-loss report, cancelled if focus comes back in time.
+  const blurTimerRef = useRef(null);
   // Each environment signal is reported once per session — a second monitor
   // that stays plugged in is one fact, not one per minute.
   const environmentReportedRef = useRef(new Set());
   const proctoringSessionIdRef = useRef(null);
+  // NOTE: useRef only uses its argument on the FIRST render. This hook is called
+  // from the assessment player on every render, including the ones before setup
+  // has finished — when the descriptor is still null. So these refs latched null
+  // at mount and never picked the reference up afterwards, no matter how well
+  // registration went. The verification tick reads the refs, found nothing, and
+  // took the no-reference path for the whole exam.
+  //
+  // That is the deeper cause of the original complaint. Before this file failed
+  // closed, the no-reference path reported 'verified' for any face present — so
+  // ANY person sitting down passed, and the recognition model was never
+  // consulted once. The effect below is what actually connects registration to
+  // verification.
   const registeredFaceDescriptorRef = useRef(registeredFaceDescriptor);
   const registeredAllEmbeddingsRef = useRef(registeredAllEmbeddings);
+
+  useEffect(() => {
+    registeredFaceDescriptorRef.current = registeredFaceDescriptor || null;
+    registeredAllEmbeddingsRef.current = registeredAllEmbeddings || null;
+
+    if (registeredFaceDescriptor) {
+      // A fresh reference means any earlier "cannot verify" state is stale.
+      unregisteredReportedRef.current = false;
+      const poses = Array.isArray(registeredAllEmbeddings) ? registeredAllEmbeddings.length : 0;
+      console.log(`[ProctoringEngine] ✅ Reference face received — ${registeredFaceDescriptor.length}-d descriptor, ${poses} enrolled pose(s).`);
+    }
+  }, [registeredFaceDescriptor, registeredAllEmbeddings]);
   const workerRef = useRef(null);
+  const objectIntervalRef = useRef(null);
   // Main-thread MediaPipe gaze. When active, it overrides the worker's SCRFD
   // gaze estimate (richer eye/head-pose). Falls back to worker gaze if it never
   // becomes ready.
@@ -165,6 +467,10 @@ export const useProctoringEngine = ({
   useEffect(() => {
     workerRef.current = null;
     if (!isReady()) loadModels().catch(() => { });
+    // The object detector runs in its own worker so a large model never
+    // blocks the face checks or the page. Falls back to the main thread only
+    // where workers are unavailable.
+    initObjectDetectionWorker().catch(() => { });
   }, []);
 
   // Sync reference embeddings with the shared worker whenever they change.
@@ -184,13 +490,17 @@ export const useProctoringEngine = ({
     try {
       console.log('[ProctoringEngine] Requesting media stream...');
       const constraints = {
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
+        // 720p where the camera allows it: the face pipeline resizes to its
+        // own 640 input regardless, but the object detector's zoomed passes
+        // get real pixels, which is what a small phone at arm's length needs.
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 15 } },
         audio: false // No audio processing needed to protect privacy
       };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = trackStream(await navigator.mediaDevices.getUserMedia(constraints));
       // Handle race condition: component might have unmounted or isActive became false while waiting for camera permission
       if (!isActiveRef.current || hasLockedOutRef.current) {
         stream.getTracks().forEach((track) => track.stop());
+        acquiredStreams.delete(stream);
         return;
       }
 
@@ -252,29 +562,38 @@ export const useProctoringEngine = ({
       streamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
+      acquiredStreams.delete(streamRef.current);
       streamRef.current = null;
     }
     if (videoRef.current) {
       const srcStream = videoRef.current.srcObject;
       if (srcStream && srcStream.getTracks) {
         srcStream.getTracks().forEach(track => track.stop());
+        acquiredStreams.delete(srcStream);
       }
+      // Detach the stream but keep the element: nulling the ref left every
+      // other callback without a video source if proctoring re-activated
+      // within the same mount.
       videoRef.current.srcObject = null;
-      videoRef.current = null;
+      try { videoRef.current.pause(); } catch (err) { /* element already torn down */ }
     }
-    
-    // As a nuclear fallback, stop any lingering media streams requested by this window
-    try {
-        navigator.mediaDevices?.getUserMedia({ video: true, audio: false })
-            .then(stream => stream.getTracks().forEach(track => track.stop()))
-            .catch(() => {});
-    } catch(e) {}
+
+    // Catch-all for anything opened but not held in streamRef -- e.g. a
+    // permission grant that resolved after teardown began.
+    releaseAllStreams();
 
     setIsCameraActive(false);
     setIsFaceDetected(false);
-    setFaceCount(0);
+    setFaceCount(0); faceCountRef.current = 0;
     setVerificationStatus('no_face');
     setSimilarityScore(0);
+
+    // Per-attempt identity/liveness state must not survive into the next one.
+    lastIdentityVerdictRef.current = null;
+    mismatchStreakRef.current = 0;
+    livenessRef.current = null;
+    spoofReportedRef.current = false;
+    unregisteredReportedRef.current = false;
   }, []);
 
   /**
@@ -392,6 +711,10 @@ export const useProctoringEngine = ({
     serverTierRef.current = decision.tier || 'ok';
     setWarningsCount(decision.warnings ?? 0);
     warningsCountRef.current = decision.warnings ?? 0;
+    if (typeof decision.maxWarnings === 'number' && decision.maxWarnings > 0) {
+      setMaxWarnings(decision.maxWarnings);
+    }
+    setRiskFlagged(!!decision.riskFlagged);
 
     if (decision.held || decision.tier === 'held') {
       setTier('held');
@@ -405,12 +728,49 @@ export const useProctoringEngine = ({
       setNudgeMessage('');
     }
     setTier(decision.tier || 'ok');
-    setIsWarningVisible(decision.tier === 'warn' || decision.tier === 'pause');
+
+    // Show the card for a NEW violation only.
+    //
+    // The server sets tier 'warn' as soon as totalViolations > 0 and leaves it
+    // there for the rest of the attempt — it describes the session's standing,
+    // not a fresh event. Treating that standing as "show the card" meant every
+    // later server reply re-opened the same warning: acknowledge it, answer a
+    // question, and it was back, with the counter unchanged because nothing new
+    // had actually happened.
+    const warnings = decision.warnings ?? 0;
+    const isNewViolation = warnings > lastAcknowledgedWarningsRef.current;
+    const showCard = isNewViolation && (decision.tier === 'warn' || decision.tier === 'pause');
+
+    isWarningVisibleRef.current = showCard;
+    setIsWarningVisible(showCard);
   }, []);
 
   // Tier 2+ — record a violation with the server and obey what it returns.
   const reportViolation = useCallback(async (eventType, displayMessage) => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
+
+    // ── Never stack a violation on top of a warning card ────────────────
+    // While the card is up the candidate is reading it, not sitting the exam.
+    // The card also takes focus, which fires blur by itself. This used to apply
+    // only to window events, so a camera condition could record a second
+    // violation while the candidate was still reading about the first — which
+    // is what made warnings appear to repeat no matter how fast they clicked
+    // "Acknowledge & Resume".
+    if (isWarningVisibleRef.current) return;
+
+    // ── One violation per type per cooldown window ───────────────────────
+    // A flickering detection (a picture frame on the wall read as a second face
+    // for a moment, lost, then found again) starts a fresh ladder episode every
+    // time it reappears, and each episode is entitled to fire again. Without a
+    // floor on how often a type may be recorded, one unstable signal can spend
+    // a candidate's entire warning budget.
+    const cooldown = EVENT_COOLDOWN_MS[eventType] ?? DEFAULT_EVENT_COOLDOWN_MS;
+    const last = lastReportAtRef.current[eventType] || 0;
+    if (Date.now() - last < cooldown) {
+      console.log(`[ProctoringEngine] ${eventType} suppressed — fired ${Math.round((Date.now() - last) / 1000)}s ago, cooldown ${cooldown / 1000}s.`);
+      return;
+    }
+    lastReportAtRef.current[eventType] = Date.now();
 
     // The nudge has escalated; stop showing the gentle version.
     nudgeRef.current = '';
@@ -423,7 +783,7 @@ export const useProctoringEngine = ({
       let severity = 'low';
       if (eventType === 'attention_check_fail' || eventType === 'fullscreen_exit') {
         severity = 'medium';
-      } else if (eventType === 'multiple_faces' || eventType === 'face_mismatch') {
+      } else if (eventType === 'multiple_faces' || eventType === 'face_mismatch' || eventType === 'spoof_detected') {
         severity = 'high';
       } else if (eventType === 'face_absent' || eventType === 'face_covered') {
         severity = 'medium';
@@ -464,8 +824,29 @@ export const useProctoringEngine = ({
         });
 
         if (response && response.success) {
+          setDiagnostics((d) => ({ ...d, sessionError: null }));
           applyDecision(response.proctoring);
+        } else {
+          // The server answered, but not with a decision. The warning card and
+          // the counter are BOTH driven by that decision, so without one the
+          // candidate sees nothing at all.
+          console.error(`[ProctoringEngine] ❌ Server rejected ${eventType}:`, response);
+          setDiagnostics((d) => ({ ...d, sessionError: `Server rejected ${eventType}` }));
         }
+      } else {
+        // No session id. Detection is working perfectly and NOTHING is being
+        // recorded — the violation is dropped here, silently, and the panel
+        // looks identical to a healthy exam. This was invisible: warnings sat
+        // at 0 forever with no indication that the exam was never registered.
+        console.error(
+          `%c[PROCTOR] NO SESSION — "${eventType}" was detected but NOT recorded. ` +
+          `The proctoring session failed to start; look for "Error starting proctoring session" above.`,
+          'background:#b91c1c;color:#fff;padding:2px 6px;border-radius:3px;font-weight:bold'
+        );
+        setDiagnostics((d) => ({ ...d, sessionError: 'No session — nothing is being recorded' }));
+        // Surface it to the candidate as coaching, so detection is at least
+        // visibly alive rather than appearing dead.
+        setNudgeRef.current?.(displayMessage || `Detected: ${eventType}`);
       }
     } catch (error) {
       // The server is the authority, so a failed report is NOT treated as a
@@ -598,25 +979,48 @@ export const useProctoringEngine = ({
           // different person stays "mismatch" and never flips to "verified".
           const quick = await detectFacesFast(videoRef.current);
           if (!quick.error) {
-            setFaceCount(quick.faceCount);
+            lastFaceBoxRef.current = quick.faceCount === 1 ? (quick.faces?.[0]?.box || null) : null;
+            setFaceCount(quick.faceCount); faceCountRef.current = quick.faceCount;
             if (quick.gaze?.gazeDirection) {
               setGazeDirection(quick.gaze.gazeDirection);
             }
             if (quick.faceCount === 0) {
-              setVerificationStatus('no_face');
+              setVerificationStatus(VerificationStatus.NO_FACE);
               setIsFaceDetected(false);
               clearCondition('multiple_faces', 'face_mismatch', 'face_covered');
               observeCondition('face_absent');
             } else if (quick.faceCount > 1) {
-              setVerificationStatus('multiple_faces');
+              setVerificationStatus(VerificationStatus.MULTIPLE_FACES);
               setIsFaceDetected(false);
               clearCondition('face_absent', 'face_mismatch', 'face_covered');
               observeCondition('multiple_faces');
             } else {
-              // Exactly one face present — restore active verification status immediately
-              setIsFaceDetected(true);
-              setVerificationStatus('verified');
-              clearCondition('face_absent', 'multiple_faces', 'face_mismatch');
+              // Exactly one face present. A presence tick knows only THAT a
+              // face is there, never WHOSE it is — SCRFD does not identify.
+              // So it may only clear the conditions it can actually disprove
+              // (absent / multiple) and must REPLAY the last identity verdict
+              // that ArcFace produced. Stamping 'verified' here was the bug
+              // that let a different person sit down and pass: it overwrote a
+              // real mismatch every 800 ms and reset the mismatch ladder
+              // before it could ever reach its 15 s red stage.
+              clearCondition('face_absent', 'multiple_faces');
+              const lastVerdict = lastIdentityVerdictRef.current;
+
+              if (lastVerdict === VerificationStatus.MISMATCH) {
+                setIsFaceDetected(false);
+                setVerificationStatus(VerificationStatus.MISMATCH);
+                observeCondition('face_mismatch');   // keep the episode running
+              } else if (lastVerdict === VerificationStatus.COVERED) {
+                setIsFaceDetected(false);
+                setVerificationStatus(VerificationStatus.COVERED);
+                observeCondition('face_covered');
+              } else if (lastVerdict === VerificationStatus.VERIFIED) {
+                setIsFaceDetected(true);
+                setVerificationStatus(VerificationStatus.VERIFIED);
+                clearCondition('face_mismatch', 'face_covered');
+              }
+              // No identity verdict yet (first ticks after start): show the
+              // face as present but claim nothing about identity.
             }
           }
           return; // finally{} resets verifyInFlightRef
@@ -635,41 +1039,65 @@ export const useProctoringEngine = ({
           return;
         }
 
-        setVerificationStatus(result.status);
+        // ── Record what ArcFace actually decided ────────────────────────
+        // Only identity-bearing verdicts update the retained verdict.
+        // NO_FACE / MULTIPLE_FACES are facts about presence, not about who the
+        // person is, so they must not erase a standing mismatch.
+        if (result.status === VerificationStatus.MISMATCH) {
+          mismatchStreakRef.current += 1;
+        } else if (result.status === VerificationStatus.VERIFIED) {
+          mismatchStreakRef.current = 0;
+        }
+
+        // A single disagreeing frame is a blink, a yawn or a head turn. Only a
+        // run of them is a different person. Identity runs ~every 800 ms, so
+        // this costs well under a second against a 15 s red stage.
+        let effectiveStatus = result.status;
+        if (result.status === VerificationStatus.MISMATCH &&
+            mismatchStreakRef.current < IDENTITY_MISMATCH_STREAK) {
+          effectiveStatus = VerificationStatus.VERIFIED;
+        }
+
+        if (effectiveStatus === VerificationStatus.VERIFIED ||
+            effectiveStatus === VerificationStatus.MISMATCH ||
+            effectiveStatus === VerificationStatus.COVERED) {
+          lastIdentityVerdictRef.current = effectiveStatus;
+        }
+
+        setVerificationStatus(effectiveStatus);
         setSimilarityScore(result.similarity || 0);
-        setFaceCount(result.faceCount);
-        setIsFaceDetected(result.status === VerificationStatus.VERIFIED);
+        setFaceCount(result.faceCount); faceCountRef.current = result.faceCount;
+        setIsFaceDetected(effectiveStatus === VerificationStatus.VERIFIED);
 
         // Handle each verification status through the duration ladder:
         // green below the first threshold, amber coaching in the middle (never
         // recorded), red once a stage carries a server event. One continuous
         // episode escalates once rather than re-firing on a loop.
-        switch (result.status) {
+        switch (effectiveStatus) {
           case VerificationStatus.VERIFIED:
             clearCondition('face_absent', 'multiple_faces', 'face_mismatch', 'face_covered');
 
-            // ── Gaze analysis (piggy-backed from verifyFace) ──────────────
-            if (result.gaze) {
-              const { gazeDirection: dir, eyesOpen } = result.gaze;
+            // ── Gaze analysis (fallback only) ─────────────────────────────
+            // MediaPipe Face Mesh owns attention when it is loaded: it has 468
+            // landmarks, real lid contours (eyes_closed) and a proper head-pose
+            // matrix (looking_down). This SCRFD-derived path has five points and
+            // no eye state at all, so it is a degraded stand-in used only while
+            // Face Mesh is unavailable — and it must never fight the good signal
+            // for the same ladder conditions.
+            if (result.gaze && !mpGazeActiveRef.current) {
+              const { gazeDirection: dir } = result.gaze;
               setGazeDirection(dir);
 
-              if (!eyesOpen) {
-                clearCondition('gaze_away');
-                observeCondition('eyes_closed');
-              } else if (dir !== 'center') {
-                clearCondition('eyes_closed');
+              if (dir !== 'center') {
                 observeCondition('gaze_away');
               } else {
-                clearCondition('gaze_away', 'eyes_closed');
+                clearCondition('gaze_away');
               }
-            }
 
-            // ── Head pose ────────────────────────────────────────────────
-            // Sustained downward tilt is the best available proxy for reading
-            // a phone in the lap. It is inference, never proof — which is why
-            // it only feeds a flag and needs a long window to fire.
-            if (result.headPose?.calibrated) {
-              if (result.headPose.pose === 'down') {
+              // 5-point SCRFD gives a usable pitch but no eyelids. Downward
+              // posture is still worth tracking; eye closure genuinely cannot
+              // be judged here, so it is left to Face Mesh rather than faked.
+              if (dir === 'looking_down') {
                 observeCondition('looking_down');
               } else {
                 clearCondition('looking_down');
@@ -701,9 +1129,11 @@ export const useProctoringEngine = ({
             break;
         }
       } else {
-        // No registered descriptor — fallback to basic detection (legacy
-        // behavior). Presence-only: this branch reads nothing but faceCount,
-        // so there is no reason to run the recognition net every second.
+        // No registered descriptor. This branch runs presence-only detection —
+        // it CANNOT tell who is in frame, so it must fail CLOSED. It used to
+        // report 'verified' for any face present, which meant a session that
+        // lost its registration (reload, resumed attempt, failed enrolment)
+        // silently accepted anybody for the whole exam.
         const result = await detectFacesFast(videoRef.current);
 
         if (result.error) {
@@ -711,12 +1141,24 @@ export const useProctoringEngine = ({
           return;
         }
 
-        setFaceCount(result.faceCount);
+        lastFaceBoxRef.current = result.faceCount === 1 ? (result.faces?.[0]?.box || null) : null;
+        setFaceCount(result.faceCount); faceCountRef.current = result.faceCount;
         if (result.gaze?.gazeDirection) {
           setGazeDirection(result.gaze.gazeDirection);
         }
-        setIsFaceDetected(result.isFacePresent);
-        setVerificationStatus(result.isFacePresent ? 'verified' : 'no_face');
+        setIsFaceDetected(false);
+        setVerificationStatus(result.isFacePresent ? 'unregistered' : 'no_face');
+
+        // Identity is unverifiable for this session — say so once, loudly,
+        // rather than pretending every face is the right one.
+        if (!unregisteredReportedRef.current) {
+          unregisteredReportedRef.current = true;
+          console.error('[ProctoringEngine] No registered face embedding — identity cannot be verified this session.');
+          reportViolationRef.current?.(
+            'face_mismatch',
+            'Your registered face could not be loaded, so your identity cannot be confirmed.'
+          );
+        }
 
         // Same ladder as the verified path — one escalating episode per
         // condition rather than a repeating counter.
@@ -739,10 +1181,145 @@ export const useProctoringEngine = ({
     }
   };
 
-  // NOTE: Object detection (phone/book/laptop) now runs INSIDE the shared AI
-  // worker as part of each PROCESS_FRAME tick (~3 s YOLO cadence). Its results
-  // arrive on TICK_RESULT.objects and are mapped to the ladder in the worker
-  // result handler above. No separate main-thread object loop is needed.
+  /**
+   * Prohibited items in frame.
+   *
+   * Runs on the same main-thread pipeline as face verification, because that
+   * is the pipeline the exam actually uses. Presence is fed to the ladder like
+   * any other condition, so a phone must be visible for a few seconds before
+   * anything is recorded -- a single frame of a hand near a pocket is not
+   * evidence, and the ladder's amber stage asks the candidate to put it away
+   * before anything reaches their record.
+   */
+  /**
+   * Reset the liveness evidence window. Called at the start of a window and
+   * whenever continuity breaks (candidate leaves frame, a second person
+   * appears) — evidence only means something if it is unbroken.
+   */
+  const resetLivenessWindow = (now) => {
+    livenessRef.current = {
+      startedAt: now,
+      blinks: 0,
+      lastEyesOpen: true,
+      yawMin: Infinity, yawMax: -Infinity,
+      pitchMin: Infinity, pitchMax: -Infinity,
+      earMin: Infinity, earMax: -Infinity,
+    };
+  };
+
+  /**
+   * Accumulate one Face Mesh sample into the liveness window and judge the
+   * window once it is full.
+   *
+   * Deliberately conservative: it reports only when a face has been present and
+   * COMPLETELY motionless for the whole window — no blink, no head drift, no
+   * change in eye aperture. Calling someone a cheat is a serious claim, and a
+   * candidate who is simply sitting very still must never trip it.
+   *
+   * Known limit, stated rather than hidden: this catches a printed photo or a
+   * still image on a screen. It does NOT catch a pre-recorded video of the
+   * candidate, which blinks and moves like the real person. Defeating replay
+   * needs either a trained anti-spoof model or a challenge-response step.
+   */
+  const trackLiveness = (g) => {
+    if (spoofReportedRef.current) return;
+
+    const now = Date.now();
+    if (!livenessRef.current) resetLivenessWindow(now);
+    const w = livenessRef.current;
+
+    if (typeof g.yaw === 'number') {
+      w.yawMin = Math.min(w.yawMin, g.yaw);
+      w.yawMax = Math.max(w.yawMax, g.yaw);
+    }
+    if (typeof g.pitch === 'number') {
+      w.pitchMin = Math.min(w.pitchMin, g.pitch);
+      w.pitchMax = Math.max(w.pitchMax, g.pitch);
+    }
+    if (typeof g.ear === 'number') {
+      w.earMin = Math.min(w.earMin, g.ear);
+      w.earMax = Math.max(w.earMax, g.ear);
+    }
+
+    // A blink is the open → closed transition, counted once per closure.
+    if (w.lastEyesOpen && g.eyesOpen === false) w.blinks += 1;
+    w.lastEyesOpen = g.eyesOpen !== false;
+
+    if (now - w.startedAt < LIVENESS_WINDOW_MS) return;
+
+    const yawRange = w.yawMax - w.yawMin;
+    const pitchRange = w.pitchMax - w.pitchMin;
+    // If EAR was never computed this window we cannot judge eye motion, so the
+    // range is treated as large — the check fails toward the candidate.
+    const earRange = w.earMax > -Infinity ? w.earMax - w.earMin : 1;
+
+    const frozen =
+      w.blinks === 0 &&
+      yawRange < LIVENESS_MIN_POSE_RANGE_DEG &&
+      pitchRange < LIVENESS_MIN_POSE_RANGE_DEG &&
+      earRange < LIVENESS_MIN_EAR_RANGE;
+
+    if (frozen) {
+      spoofReportedRef.current = true;
+      console.warn(
+        `[ProctoringEngine] Liveness FAILED — blinks=0, yaw range=${yawRange.toFixed(2)}°, ` +
+        `pitch range=${pitchRange.toFixed(2)}°, EAR range=${earRange.toFixed(4)} over ${LIVENESS_WINDOW_MS / 1000}s.`
+      );
+      reportViolationRef.current?.(
+        'spoof_detected',
+        'The camera image did not move for a sustained period, which is consistent with a photo rather than a live person.'
+      );
+    }
+
+    resetLivenessWindow(now);
+  };
+
+  const runObjectDetection = async () => {
+    if (!isActiveRef.current || hasLockedOutRef.current) return;
+    if (!videoRef.current) return;
+    const useWorker = isObjectWorkerReady();
+    if (!useWorker && !isObjectDetectorReady()) return;
+    if (objectPassInFlightRef.current) return;
+    objectPassInFlightRef.current = true;
+
+    try {
+      let found, near;
+      if (useWorker) {
+        const result = await detectObjectsInWorker(videoRef.current, { face: lastFaceBoxRef.current });
+        if (!result) return; // worker busy with the previous frame: skip this tick
+        found = result.found;
+        near = result.nearMisses;
+      } else {
+        found = await detectObjects(videoRef.current);
+        near = getLastObjectNearMisses();
+      }
+      const labels = new Set((found || []).map((o) => o.label));
+
+      if (found && found.length) {
+        const summary = found.map((o) => `${o.label} ${o.score.toFixed(2)}`).join(', ');
+        console.log(`[ProctoringEngine] Objects: ${summary}`);
+        setDiagnostics((d) => ({ ...d, objects: summary, objectsAt: Date.now() }));
+      } else {
+        // Weak guesses the model did not act on go to the console only. They
+        // are useful when tuning thresholds and misleading on the panel, where
+        // "near: laptop 0.17" read as a laptop being reported.
+        if (near?.length) console.debug(`[ProctoringEngine] Object near-misses: ${near.join(', ')}`);
+        setDiagnostics((d) => ({ ...d, objects: '', objectsAt: Date.now() }));
+      }
+
+      Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
+        const history = [...(objectSeenTicksRef.current[label] || []), labels.has(label)].slice(-OBJECT_CONFIRM_WINDOW);
+        objectSeenTicksRef.current[label] = history;
+        const hits = history.filter(Boolean).length;
+        if (hits >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
+        else if (hits === 0) clearCondition(condition);
+      });
+    } catch (err) {
+      console.warn('[ProctoringEngine] Object detection tick failed:', err);
+    } finally {
+      objectPassInFlightRef.current = false;
+    }
+  };
 
   // Visibility changes
   const handleVisibilityChange = useCallback(() => {
@@ -752,12 +1329,40 @@ export const useProctoringEngine = ({
   }, [reportViolation]);
 
   // Focus changes
+  /**
+   * Focus loss, judged over a duration rather than an instant.
+   *
+   * The old handler waited 150 ms and then recorded a violation. That is far
+   * shorter than the ordinary interruptions of using a computer: an OS
+   * notification, the camera indicator, a click landing on browser chrome, or
+   * the warning card itself appearing all steal focus for a few hundred
+   * milliseconds and hand it straight back. Candidates were being warned for
+   * things they did not do, repeatedly, which is exactly the kind of thing that
+   * rattles someone mid-exam.
+   *
+   * Now the window has to STAY unfocused. Focus returning inside the grace
+   * period cancels the pending report entirely.
+   */
   const handleBlur = useCallback(() => {
-    setTimeout(() => {
-      if (document.hidden) return; // Handled by visibility change
-      reportViolation('minimize', 'Warning: Window focus lost.');
-    }, 150);
+    if (blurTimerRef.current) return; // already counting
+
+    blurTimerRef.current = setTimeout(() => {
+      blurTimerRef.current = null;
+
+      if (document.hidden) return;        // tab_switch owns this case
+      if (document.hasFocus()) return;    // came back — nothing happened
+
+      reportViolation('minimize', 'Warning: You left the assessment window.');
+    }, WINDOW_BLUR_GRACE_MS);
   }, [reportViolation]);
+
+  /** Focus returned within the grace period — cancel the pending report. */
+  const handleFocus = useCallback(() => {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+  }, []);
 
   // Fullscreen changes
   const handleFullscreenChange = useCallback(() => {
@@ -805,7 +1410,15 @@ export const useProctoringEngine = ({
   }, [reportViolation]);
 
   const acknowledgeWarning = useCallback(() => {
+    isWarningVisibleRef.current = false;
     setIsWarningVisible(false);
+    // Everything recorded so far has now been seen. The card returns only when
+    // the count rises again.
+    lastAcknowledgedWarningsRef.current = warningsCountRef.current;
+    // Restart the cooldown: dismissing the card moves focus, and that must not
+    // immediately count as the candidate leaving the exam again.
+    const now = Date.now();
+    FOCUS_SENSITIVE_EVENTS.forEach((type) => { lastReportAtRef.current[type] = now; });
     // Leaving Tier 3 unblocks the exam and restarts the clock. The warnings
     // already recorded stand — this only dismisses the blocking card.
     setTier((current) => (current === 'pause' ? 'warn' : current));
@@ -816,6 +1429,7 @@ export const useProctoringEngine = ({
   // Stable refs for event handlers so the main effect doesn't re-fire
   const handleVisibilityChangeRef = useRef(handleVisibilityChange);
   const handleBlurRef = useRef(handleBlur);
+  const handleFocusRef = useRef(handleFocus);
   const handleFullscreenChangeRef = useRef(handleFullscreenChange);
   const resetInactivityTimerRef = useRef(resetInactivityTimer);
   const reportViolationRef = useRef(reportViolation);
@@ -826,6 +1440,7 @@ export const useProctoringEngine = ({
 
   useEffect(() => { handleVisibilityChangeRef.current = handleVisibilityChange; }, [handleVisibilityChange]);
   useEffect(() => { handleBlurRef.current = handleBlur; }, [handleBlur]);
+  useEffect(() => { handleFocusRef.current = handleFocus; }, [handleFocus]);
   useEffect(() => { handleFullscreenChangeRef.current = handleFullscreenChange; }, [handleFullscreenChange]);
   useEffect(() => { resetInactivityTimerRef.current = resetInactivityTimer; }, [resetInactivityTimer]);
   useEffect(() => { reportViolationRef.current = reportViolation; }, [reportViolation]);
@@ -883,6 +1498,8 @@ export const useProctoringEngine = ({
           const sessionId = response.data._id;
           setProctoringSessionId(sessionId);
           proctoringSessionIdRef.current = sessionId;
+          setDiagnostics((d) => ({ ...d, sessionId, sessionError: null }));
+          console.log(`[ProctoringEngine] ✅ Proctoring session started: ${sessionId}`);
           setWarningsCount(response.data.totalViolations || 0);
           warningsCountRef.current = response.data.totalViolations || 0;
 
@@ -906,6 +1523,19 @@ export const useProctoringEngine = ({
           const reportEnvironment = async () => {
             try {
               const findings = await runEnvironmentChecks(streamRef.current);
+
+              // Remote-desktop / VM indicators are a property of the machine,
+              // so they are probed once rather than on every sweep.
+              if (!environmentReportedRef.current.has('remote_access_suspected')) {
+                const remoteEvidence = detectRemoteOrVirtualDisplay();
+                if (remoteEvidence) {
+                  findings.push({
+                    eventType: 'remote_access_suspected',
+                    details: `Signals consistent with a virtual machine or remote desktop: ${remoteEvidence}.`,
+                  });
+                }
+              }
+
               findings.forEach((f) => {
                 if (!environmentReportedRef.current.has(f.eventType)) {
                   environmentReportedRef.current.add(f.eventType);
@@ -953,6 +1583,11 @@ export const useProctoringEngine = ({
         }
       } catch (err) {
         console.error('Error starting proctoring session:', err);
+        setDiagnostics((d) => ({
+          ...d,
+          sessionId: null,
+          sessionError: `Session failed to start: ${err?.message || 'unknown error'}`,
+        }));
         if (err.data && err.data.isLocked) {
           navigate('/assessment-held', {
             replace: true,
@@ -974,6 +1609,11 @@ export const useProctoringEngine = ({
       onVoiceDetected: () => {
         if (isActiveRef.current && !hasLockedOutRef.current) {
           reportViolationRef.current?.('voice_detected', 'Warning: Sustained speech detected during the exam. Talking is not permitted.');
+        }
+      },
+      onMultipleVoices: () => {
+        if (isActiveRef.current && !hasLockedOutRef.current) {
+          reportViolationRef.current?.('multiple_voices', 'Warning: More than one voice was heard in the room.');
         }
       },
       onProlongedSilence: () => {
@@ -999,14 +1639,53 @@ export const useProctoringEngine = ({
     scheduleAttentionCheckRef.current();
 
     // Stable wrapper functions that delegate to latest refs
+    const onPageHide = () => releaseAllStreams();
+
+    // Content-capture guards. The handlers block the action as well as
+    // recording it: a warning after the paper has already been copied is a
+    // record of a leak, not a prevention of one.
+    const onCopy = (e) => {
+      const selection = String(window.getSelection?.() || '').trim();
+      e.preventDefault();
+      reportViolationRef.current?.(
+        'copy_detected',
+        selection
+          ? 'Copying assessment content is not permitted.'
+          : 'A copy action was blocked during the assessment.'
+      );
+    };
+    const onPaste = (e) => {
+      e.preventDefault();
+      reportViolationRef.current?.('paste_detected', 'Pasting into the assessment is not permitted.');
+    };
+    const onContextMenu = (e) => {
+      e.preventDefault();
+      reportViolationRef.current?.('context_menu', 'The right-click menu is disabled during the assessment.');
+    };
+    const onKeyDown = (e) => {
+      const blocked = isRestrictedShortcut(e);
+      if (!blocked) return;
+      e.preventDefault();
+      reportViolationRef.current?.('restricted_shortcut', `${blocked} is disabled during the assessment.`);
+    };
     const onVisibilityChange = () => handleVisibilityChangeRef.current();
     const onBlur = () => handleBlurRef.current();
+    const onFocus = () => handleFocusRef.current();
     const onFullscreenChange = () => handleFullscreenChangeRef.current();
     const onActivity = () => resetInactivityTimerRef.current();
 
     // Set up tab / window listeners
     document.addEventListener('visibilitychange', onVisibilityChange);
+    // Closing the tab or a hard navigation never runs React cleanup; pagehide
+    // does, and unlike unload it also fires on the bfcache path.
+    window.addEventListener('pagehide', onPageHide);
     window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('copy', onCopy);
+    document.addEventListener('cut', onCopy);
+    document.addEventListener('paste', onPaste);
+    document.addEventListener('contextmenu', onContextMenu);
+    document.addEventListener('keydown', onKeyDown);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
@@ -1023,6 +1702,10 @@ export const useProctoringEngine = ({
     // state change) and YOLO (objects ~every 3 s) — all off the main thread.
     faceIntervalRef.current = setInterval(runFaceVerification, FACE_CHECK_INTERVAL);
 
+    // Prohibited items on their own, slower cadence -- YOLO is far heavier than
+    // the presence check and does not need to run at face rate.
+    objectIntervalRef.current = setInterval(runObjectDetection, OBJECT_CHECK_INTERVAL);
+
     // MediaPipe Face Mesh gaze runs on the MAIN THREAD (it can't run in a module
     // worker). Lazy-load it, then poll gaze on a light cadence; it overrides the
     // worker's SCRFD gaze once ready. Non-blocking — failure keeps SCRFD gaze.
@@ -1031,11 +1714,68 @@ export const useProctoringEngine = ({
       if (!videoRef.current || !isActiveRef.current || hasLockedOutRef.current) return;
       if (!isMediaPipeGazeReady()) return;
       const g = detectMediaPipeGaze(videoRef.current);
-      if (g?.gazeDirection) {
-        mpGazeActiveRef.current = true;
-        setGazeDirection(g.gazeDirection);
+      if (!g?.gazeDirection) return;
+
+      mpGazeActiveRef.current = true;
+      setGazeDirection(g.gazeDirection);
+
+      // Attention conditions are only meaningful while exactly one face is in
+      // frame. With nobody there, face_absent already owns the episode; with
+      // two people, multiple_faces does. Feeding attention in those states
+      // would stack a second warning on the same physical event.
+      if (faceCountRef.current !== 1) {
+        clearCondition('gaze_away', 'eyes_closed', 'looking_down');
+        livenessRef.current = null; // continuity broken — start a fresh window
+        return;
       }
-    }, 300);
+
+      // ── Eyes closed ──────────────────────────────────────────────────
+      // Real EAR from the Face Mesh lid contours. Blinks cross the threshold
+      // for ~100 ms; the ladder needs 8 s before it even shows amber, so a
+      // normal blink rate never registers.
+      if (g.eyesOpen === false) {
+        clearCondition('gaze_away');
+        observeCondition('eyes_closed');
+      } else {
+        clearCondition('eyes_closed');
+
+        // ── Looking away ───────────────────────────────────────────────
+        if (g.gazeDirection !== 'center') {
+          observeCondition('gaze_away');
+        } else {
+          clearCondition('gaze_away');
+        }
+      }
+
+      // ── Head down ────────────────────────────────────────────────────
+      // Tracked independently of gaze_away: it has its own, much longer
+      // ladder because glancing at a keyboard is normal and only a sustained
+      // downward posture is the phone-in-lap proxy.
+      if (g.headDown) {
+        observeCondition('looking_down');
+      } else {
+        clearCondition('looking_down');
+      }
+
+      // ── Liveness ─────────────────────────────────────────────────────
+      trackLiveness(g);
+    }, LIVENESS_SAMPLE_INTERVAL_MS);
+
+    // Diagnostics poll. Cheap: two synchronous reads, once a second.
+    const diagnosticsTimer = setInterval(() => {
+      setDiagnostics((d) => ({
+        ...d,
+        models: {
+          ...getPipelineStatus(),
+          ...(isObjectWorkerReady()
+            ? { objectDetector: 'loaded', objectModel: `${getObjectWorkerModel()} · worker` }
+            : {}),
+        },
+        audio: getLastGates(),
+        // Objects go stale — a phone seen ten seconds ago is not in frame now.
+        objects: Date.now() - d.objectsAt > 6000 ? '' : d.objects,
+      }));
+    }, 1000);
 
     // Initial fullscreen check
     const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
@@ -1057,11 +1797,23 @@ export const useProctoringEngine = ({
     }
 
     return () => {
+      clearInterval(diagnosticsTimer);
       stopCamera();
       stopAudioMonitoring();
 
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onPageHide);
       window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
+      if (blurTimerRef.current) {
+        clearTimeout(blurTimerRef.current);
+        blurTimerRef.current = null;
+      }
+      document.removeEventListener('copy', onCopy);
+      document.removeEventListener('cut', onCopy);
+      document.removeEventListener('paste', onPaste);
+      document.removeEventListener('contextmenu', onContextMenu);
+      document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('fullscreenchange', onFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
       
@@ -1071,6 +1823,7 @@ export const useProctoringEngine = ({
 
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
       if (faceIntervalRef.current) clearInterval(faceIntervalRef.current);
+      if (objectIntervalRef.current) { clearInterval(objectIntervalRef.current); objectIntervalRef.current = null; }
       if (gazeIntervalRef.current) { clearInterval(gazeIntervalRef.current); gazeIntervalRef.current = null; }
       mpGazeActiveRef.current = false;
       if (fullscreenTimerRef.current) clearInterval(fullscreenTimerRef.current);
@@ -1079,10 +1832,11 @@ export const useProctoringEngine = ({
       if (duplicateWindowCleanupRef.current) { duplicateWindowCleanupRef.current(); duplicateWindowCleanupRef.current = null; }
       if (attentionTimerRef.current) clearTimeout(attentionTimerRef.current);
       
-      // Nuclear fix to ensure any running track is killed on unmount
-      if (window.localStream) {
-         window.localStream.getTracks().forEach(t => t.stop());
-      }
+      // Belt and braces: release anything still open, including a stream
+      // whose permission prompt resolved after this cleanup started.
+      // (This replaced a `window.localStream` check that could never fire --
+      // nothing in the codebase ever assigned that global.)
+      releaseAllStreams();
 
       if (proctoringSessionIdRef.current) {
         proctoringApi.completeSession(proctoringSessionIdRef.current).catch(err => {
@@ -1097,7 +1851,9 @@ export const useProctoringEngine = ({
 
   return {
     warningsCount,
-    maxWarnings: MAX_WARNINGS,
+    maxWarnings,
+    riskFlagged,
+    diagnostics,
     isWarningVisible,
     isLockedOut,
     lastViolationType,

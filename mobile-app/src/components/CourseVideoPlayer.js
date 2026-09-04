@@ -24,8 +24,8 @@
  * notice below. After a rebuild that includes `expo-video`, the real player
  * loads with no code change.
  */
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 let Impl = null;
@@ -43,9 +43,18 @@ export const isVideoPlaybackAvailable = () => Impl !== null;
 
 function VideoUnavailable() {
   const missingNativeModule = /native module/i.test(loadError?.message || '');
+  const fadeIn = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeIn]);
 
   return (
-    <View style={styles.shell}>
+    <Animated.View style={[styles.shell, { opacity: fadeIn }]}>
       <Feather name="film" size={26} color="rgba(255,255,255,0.5)" />
       <Text style={styles.title}>Video playback unavailable</Text>
       <Text style={styles.body}>
@@ -53,7 +62,7 @@ function VideoUnavailable() {
           ? 'This build was compiled before video support was added. Install a fresh development build to enable playback — everything else in this course works as normal.'
           : 'The video component could not be loaded on this device.'}
       </Text>
-    </View>
+    </Animated.View>
   );
 }
 

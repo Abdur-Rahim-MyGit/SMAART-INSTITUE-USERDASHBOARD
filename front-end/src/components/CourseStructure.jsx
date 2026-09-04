@@ -1,545 +1,300 @@
-
-import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
+import { forwardRef, useState, useEffect, useMemo } from "react";
 import {
-  IconCompass as CapacityIcon,
-  IconRocket as CapabilityIcon,
-  IconUsers as LeadershipIcon,
-  IconCircleCheckFilled as CheckCircle2,
-  IconArrowLeft as ArrowLeft,
-  IconBolt as Zap,
-  IconTrendingUp as TrendingUp,
-  IconPlayerPlayFilled as Play,
-  IconFingerprint as PIQIcon,
-  IconCpu as AIQIcon,
-  IconLeaf as SQIcon,
-  IconLanguage as BCIcon,
-  IconLock as LockIcon,
-  IconSearch as SearchIcon,
-  IconX as XIcon,
-  IconFilter as FilterIcon,
-  IconSparkles as SparklesIcon,
-  IconTrophy as TrophyIcon,
-  IconChevronRight as ChevronRightIcon,
-  IconArrowUpRight as ArrowUpRightIcon,
-  IconWorld as GlobeIcon,
-  IconAward as AwardIcon,
-  IconCheck as CheckIcon,
-  IconBrain as BrainIcon,
-  IconClock as ClockIcon,
-  IconCertificate as CertificateIcon,
-  IconBook as BookOpen,
-} from "@tabler/icons-react";
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from "framer-motion";
+// Material Symbols barrel -- the same icon set the dashboard, sidebar and
+// profile use. Importing straight from @tabler/icons-react here was the reason
+// this page's icons sat at a different weight and optical size to every other
+// screen.
+import {
+  ArrowRight,
+  Brain,
+  BritishCouncilIcon,
+  CheckCircle2,
+  Globe2,
+  Hub,
+  IconArrowLeft,
+  Layers,
+  Lock,
+  Play,
+  Search,
+  TrendingUp,
+  Trophy,
+  Users,
+  X,
+  Zap,
+} from "@/components/icons";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { STAGES, TRACKS, PIQ_TRACK, AIQ_TRACK, SQ_TRACK, BC_TRACK } from "@/data/courseStructureData";
+import { STAGES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK, BC_TRACK } from "@/data/courseStructureData";
 import { coursesAPI } from "@/services/api";
 import {
   isStageUnlocked as checkStageUnlocked,
   isTrackUnlocked as checkTrackUnlocked,
   isCourseUnlockedInStage,
   isCapacityDevUnlock,
-  normalizeCourseId,
-  ENFORCE_PROGRESSION_GATES,
+  compareCourseIds,
 } from "@/utils/courseUnlock";
 
-/* ─── Stage visual config ─── */
-const STAGE_CONFIG = {
-  1: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBg: "bg-white dark:bg-[#071330]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
-    tag: "Stage 1 • Foundations",
-    estimatedTime: "~8.5 Hours",
-    Icon: CapacityIcon,
-    color: "#1a3884",
-    accentGlow: "rgba(26, 56, 132, 0.12)",
-  },
-  2: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBg: "bg-white dark:bg-[#071330]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
-    tag: "Stage 2 • Intermediate",
-    estimatedTime: "~7.0 Hours",
-    Icon: CapabilityIcon,
-    color: "#1a3884",
-    accentGlow: "rgba(26, 56, 132, 0.12)",
-  },
-  3: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBg: "bg-white dark:bg-[#071330]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    lightAccent: "bg-[#1a3884]/10 text-[#0d1f4e] border-[#1a3884]/20 dark:bg-[#1a3884]/30 dark:text-[#4f7dff] dark:border-[#4f7dff]/40",
-    tag: "Stage 3 • Advanced",
-    estimatedTime: "~5.5 Hours",
-    Icon: LeadershipIcon,
-    color: "#1a3884",
-    accentGlow: "rgba(26, 56, 132, 0.12)",
+/** True when progress records this course as finished, in any of its id forms. */
+const isCompletedCourse = (userProgress, courseId) =>
+  (userProgress?.completedCourses || []).some((done) => compareCourseIds(done, courseId));
+
+/* ─── Shared surface tokens ───────────────────────────────────────────────
+   One place for the card, chip and progress styles so a stage card, a track
+   card and a module card cannot drift apart the way they had. The values are
+   the dashboard's: #045C9A brand, #072036 ink, #d7ebf5 hairline, #EAF7FD tint,
+   #A6D7E8 dark-mode accent. */
+const SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const SURFACE_HOVER =
+  "hover:shadow-xl hover:shadow-[#045C9A]/10 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/50";
+const SURFACE_MUTED =
+  "bg-[#F1F5F9]/80 dark:bg-[#0d3a5f]/50 border border-[#d7ebf5] dark:border-white/5";
+const PANEL = "bg-[#F1F5F9] dark:bg-[#072036]/60 border border-[#d7ebf5] dark:border-white/10";
+const CHIP_BRAND =
+  "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]";
+const CHIP_LOCKED =
+  "border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300";
+const CHIP_DONE =
+  "border border-emerald-200/70 dark:border-emerald-500/25 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+const LABEL = "text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400";
+const PROGRESS_TRACK = "h-1.5 w-full overflow-hidden rounded-full bg-[#A6D7E8]/40 dark:bg-white/10";
+const PROGRESS_FILL = "linear-gradient(90deg, #034a7d 0%, #045C9A 100%)";
+
+/* ─── Motion system ───────────────────────────────────────────────────────
+   One easing curve and one set of variants for the whole page, so nothing
+   arrives on its own timing. EASE is the dashboard's curve; the durations are
+   deliberately short -- corporate motion should feel like the interface
+   settling, not like an animation playing. Everything here collapses to a
+   plain cross-fade when the viewer has asked for reduced motion. */
+const EASE = [0.25, 0.1, 0.25, 1];
+
+const SECTION = {
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: EASE, staggerChildren: 0.06, delayChildren: 0.05 },
   },
 };
 
-/* ─── Track visual config ─── */
-const TRACK_CONFIG = {
-  PIQ: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    Icon: PIQIcon,
-  },
-  AIQ: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    Icon: AIQIcon,
-  },
-  SQ: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    Icon: SQIcon,
-  },
-  BC: {
-    gradient: "from-[#0d1f4e] via-[#132c66] to-[#1a3884]",
-    cardBorder: "border-[#1a3884]/15 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40",
-    badgeBg: "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#4f7dff] border-[#1a3884]/20 dark:border-[#4f7dff]/30",
-    accentColor: "#1a3884",
-    Icon: BCIcon,
-  },
+const ITEM = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: EASE } },
 };
 
+const STATIC = { hidden: {}, show: {}, exit: {} };
 
+/* Counts up to its value instead of snapping -- the same treatment the
+   dashboard hero gives its progress figure. */
+const AnimatedPercent = ({ value, reduced }) => {
+  const count = useMotionValue(reduced ? value : 0);
+  const rounded = useTransform(count, (v) => Math.round(v));
 
-/* ─── Category card (top-level view) ─── */
-const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, userProgress, onClick, delay }) => {
+  useEffect(() => {
+    if (reduced) {
+      count.set(value);
+      return;
+    }
+    const controls = animate(count, value, { duration: 0.9, delay: 0.25, ease: EASE });
+    return controls.stop;
+  }, [value, count, reduced]);
+
+  return <motion.span>{rounded}</motion.span>;
+};
+
+/* Stage and track glyphs -- abstract business marks rather than pictograms.
+   A rocket and a robot face sat oddly next to a page of progress metrics; a
+   layered stack, a trend line and a network node read as the same register as
+   the rest of the product. Colour is uniform brand blue: the old per-stage
+   palette implied a difference between stages that does not exist. */
+const STAGE_ICONS = { 1: Layers, 2: TrendingUp, 3: Users };
+const TRACK_ICONS = { PIQ: Brain, AIQ: Hub, SQ: Globe2, BC: BritishCouncilIcon };
+
+/* ─── Section heading (bar + label + rule), exactly as on the dashboard ─── */
+const SectionHeading = ({ title }) => (
+  <div className="flex min-w-0 flex-1 items-center gap-2.5">
+    <span className="h-4 w-[3px] shrink-0 rounded-full bg-[#045C9A]" />
+    <h2 className="text-xs font-bold uppercase tracking-wider text-[#072036] dark:text-slate-300">
+      {title}
+    </h2>
+    <span className="ml-1 hidden h-px flex-1 bg-[#d7ebf5] dark:bg-white/10 sm:block" />
+  </div>
+);
+
+/* ─── Pathway card ────────────────────────────────────────────────────────
+   One component for both stages and tracks. They are the same object to a
+   student -- a titled collection of modules with a progress figure -- so they
+   now render through the same markup instead of two near-copies that had
+   already drifted in type scale and hover behaviour. */
+const PathwayCard = forwardRef(({
+  icon: Icon,
+  title,
+  description,
+  badgeLabel,
+  metaLabel,
+  ctaLabel,
+  lockedMessage,
+  isUnlocked,
+  completedCount,
+  total,
+  onClick,
+  index = 0,
+}, ref) => {
   const { t } = useTranslation();
-  const [showAllModal, setShowAllModal] = useState(false);
-  const { Icon } = cfg;
-  const total = stage.totalCourses;
+  const reduced = useReducedMotion();
   const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const isComplete = total > 0 && completedCount >= total;
 
-  const spotlightBackground = useMotionTemplate`
-    radial-gradient(
-      600px circle at ${mouseX}px ${mouseY}px,
-      ${cfg.accentGlow || "rgba(26, 56, 132, 0.10)"},
-      transparent 80%
-    )
-  `;
-
-  function handleMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  const allCourses = stage.courses || [];
-  const previewCourses = allCourses.slice(0, 3);
-  const remainingCount = Math.max(0, allCourses.length - previewCourses.length);
+  const activate = () => {
+    if (isUnlocked) onClick();
+    else toast.error(lockedMessage);
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 25 }}
+      ref={ref}
+      layout={!reduced}
+      initial={reduced ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      className="h-full relative"
+      exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
+      transition={{
+        duration: 0.45,
+        delay: Math.min(index, 8) * 0.06,
+        ease: EASE,
+        layout: { duration: 0.35, ease: EASE },
+        exit: { duration: 0.2, ease: EASE },
+      }}
+      className="h-full"
     >
       <div
         role="button"
         tabIndex={0}
-        onClick={isUnlocked ? onClick : () => toast.error(t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage."))}
+        aria-disabled={!isUnlocked}
+        onClick={activate}
         onKeyDown={(e) => {
           if (e.key !== "Enter" && e.key !== " ") return;
           e.preventDefault();
-          if (isUnlocked) onClick();
-          else toast.error(t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage."));
+          activate();
         }}
-        onMouseMove={handleMouseMove}
-        className={`w-full h-full text-left p-4 rounded-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
-          ? `${cfg.cardBg || "bg-white dark:bg-[#081329]"} ${cfg.cardBorder || "border-slate-200 dark:border-white/10"} shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer`
-          : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-pointer"
-          }`}
+        className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 ${
+          isUnlocked
+            ? `${SURFACE} ${SURFACE_HOVER} hover:-translate-y-1.5 active:translate-y-0 active:transition-none motion-reduce:hover:translate-y-0`
+            : `${SURFACE_MUTED} hover:-translate-y-0.5 motion-reduce:hover:translate-y-0`
+        }`}
       >
-        {/* Spotlight Glow Effect */}
-        {isUnlocked && (
-          <motion.div
-            className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100 rounded-3xl z-0"
-            style={{ background: spotlightBackground }}
-          />
-        )}
-
-        {/* Dynamic Decorative Accent Gradient Pill */}
-
-        <div className="relative z-10 space-y-2">
-          {/* Icon + title share one row; the stage tag sits at the right */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                  ? "bg-[#1a3884]/[0.07] dark:bg-blue-950/50 border-[#1a3884]/15 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
-                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
-                  }`}
-              >
-                <Icon stroke={1.8} className="w-5 h-5" />
-              </div>
-              <h3
-                className={`text-[15px] font-bold tracking-tight transition-colors truncate group-hover:text-[#1a3884] dark:group-hover:text-blue-400 ${isUnlocked ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-slate-400"
-                  }`}
-              >
-                {t(`my_courses_page.stages.${stage.id}.name`, stage.name)}
-              </h3>
+        <div className="flex flex-1 flex-col p-5">
+          <div className="flex items-start gap-3">
+            <div
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ease-out ${
+                isUnlocked
+                  ? "border-[#d7ebf5] bg-[#F1F5F9] group-hover:scale-105 group-hover:border-[#045C9A]/50 group-hover:bg-[#EAF7FD] motion-reduce:group-hover:scale-100 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:group-hover:bg-[#045C9A]/20"
+                  : "border-[#d7ebf5] bg-slate-100 dark:border-white/10 dark:bg-white/5"
+              }`}
+            >
+              {isUnlocked ? (
+                <Icon className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
+              ) : (
+                <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+              )}
             </div>
 
-            <div className="flex flex-col items-end gap-0.5 shrink-0">
-              <span
-                className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${isUnlocked
-                  ? cfg.lightAccent || "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300"
-                  : "bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-500"
-                  }`}
-              >
-                {t(`my_courses_page.stage_n`, { n: stage.id })}
-              </span>
-              <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
-                {total} Modules
-              </div>
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
-            {t(`my_courses_page.stages.${stage.id}.description`, stage.description)}
-          </p>
-
-          {/* Course Preview Tags */}
-          {false && allCourses.length > 0 && (
-            <div className="pt-1 space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Key Topics Preview:
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                <span
+                  className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${CHIP_BRAND}`}
+                >
+                  {badgeLabel}
                 </span>
-                {allCourses.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAllModal((prev) => !prev);
-                    }}
-                    className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800/40 transition-all cursor-pointer shadow-xs flex items-center gap-1"
+                {!isUnlocked && (
+                  <span
+                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_LOCKED}`}
                   >
-                    View All
-                  </button>
+                    <Lock className="w-3 h-3" />
+                    {t("my_courses_page.locked", "Locked")}
+                  </span>
+                )}
+                {isUnlocked && isComplete && (
+                  <span
+                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_DONE}`}
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    {t("my_courses_page.completed", "Completed")}
+                  </span>
                 )}
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {previewCourses.map((c) => (
-                  <span
-                    key={c.id}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 truncate max-w-[200px]"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                    {c.title || c.id}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Progress Bar & CTA */}
-        <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 dark:border-white/5 space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
-              {t("my_courses_page.progression", "Progression")}
-            </span>
-            <span className="text-[#1a3884] dark:text-blue-400 font-extrabold">
-              {completedCount} / {total} Completed ({pct}%)
-            </span>
-          </div>
-
-          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 1, delay: delay + 0.2, ease: "easeOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-[#1a3884] to-[#2b52b8]"
-            />
-          </div>
-
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors flex items-center gap-1">
-              Explore Stage
-              <ArrowUpRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-            {!isUnlocked && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800/40">
-                <LockIcon className="w-3 h-3" /> Locked
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Interactive Popover Modal - Shows ALL Stage Modules */}
-      <AnimatePresence>
-        {showAllModal && allCourses.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            onClick={(e) => e.stopPropagation()}
-            onMouseLeave={() => setShowAllModal(false)}
-            className="absolute left-0 right-0 bottom-14 z-50 p-4 bg-white/95 dark:bg-[#071330]/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.28)] border border-blue-500/25 dark:border-white/20 space-y-3"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-white/10">
-              <div className="flex items-center gap-2">
-                <SparklesIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Full Stage Curriculum ({allCourses.length} Modules)
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowAllModal(false);
-                }}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-              >
-                <XIcon className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
-              {allCourses.map((c, idx) => (
-                <div
-                  key={c.id || idx}
-                  className="flex items-center gap-2 p-2.5 rounded-xl text-xs font-extrabold bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-200 transition-colors"
-                >
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 shrink-0">
-                    {c.id || `M${idx + 1}`}
-                  </span>
-                  <span className="truncate font-bold">{c.title || c.id}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
-/* ─── Track card (Parallel tracks) ─── */
-const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
-  const { t } = useTranslation();
-  const total = track.totalCourses;
-  const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
-  const cfg = TRACK_CONFIG[track.id] || TRACK_CONFIG.AIQ;
-  const Icon = cfg.Icon;
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const spotlightBackground = useMotionTemplate`
-    radial-gradient(
-      600px circle at ${mouseX}px ${mouseY}px,
-      rgba(26, 56, 132, 0.10),
-      transparent 80%
-    )
-  `;
-
-  function handleMouseMove({ currentTarget, clientX, clientY }) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  const previewCourses = (track.courses || []).slice(0, 3);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 25 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      className="h-full"
-    >
-      <button
-        type="button"
-        onClick={isUnlocked ? onClick : () => toast.error(t("my_courses_page.locked_toast", "Please complete required stages first."))}
-        onMouseMove={handleMouseMove}
-        className={`w-full h-full text-left p-4 rounded-2xl transition-all duration-500 group relative overflow-hidden flex flex-col justify-between border ${isUnlocked
-          ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-[#4f7dff]/40 shadow-lg hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer"
-          : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-pointer"
-          }`}
-      >
-        {/* Spotlight Glow Effect */}
-        {isUnlocked && (
-          <motion.div
-            className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100 rounded-3xl z-0"
-            style={{ background: spotlightBackground }}
-          />
-        )}
-
-        <div className="relative z-10 space-y-2">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                  ? "bg-[#1a3884]/[0.07] dark:bg-blue-950/50 border-[#1a3884]/15 dark:border-blue-900/30 text-[#1a3884] dark:text-blue-400 group-hover:scale-110"
-                  : "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400"
-                  }`}
-              >
-                <Icon stroke={1.8} className="w-5 h-5" />
-              </div>
-              <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight truncate transition-colors group-hover:text-[#1a3884] dark:group-hover:text-[#4f7dff]">
-                {track.id === 'BC' ? 'British Council' : t(`my_courses_page.tracks.${track.id}.shortName`, track.shortName || track.name)}
+              <h3 className="line-clamp-2 text-base font-bold leading-snug tracking-tight text-[#072036] dark:text-white">
+                {title}
               </h3>
-            </div>
-
-            <div className="flex flex-col items-end gap-0.5 shrink-0">
-              <span
-                className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${cfg.badgeBg}`}
-              >
-                Specialization Track
-              </span>
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
-                {total} {total === 1 ? "Course" : "Courses"}
-              </span>
+              <p className="mt-0.5 text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                {metaLabel}
+              </p>
             </div>
           </div>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 font-medium">
-            {t(`my_courses_page.tracks.${track.id}.description`, track.description)}
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {description}
           </p>
-        </div>
 
-        <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 dark:border-white/5 space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">
-              {t("my_courses_page.progression", "Progression")}
-            </span>
-            <span className="font-extrabold" style={{ color: cfg.accentColor }}>
-              {completedCount} / {total} Completed ({pct}%)
-            </span>
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className={LABEL}>{t("my_courses_page.progression", "Progression")}</span>
+              <span className="text-[13px] font-bold tabular-nums text-[#045C9A] dark:text-[#A6D7E8]">
+                {completedCount} / {total} · <AnimatedPercent value={pct} reduced={reduced} />%
+              </span>
+            </div>
+            <div className={PROGRESS_TRACK}>
+              <motion.div
+                initial={reduced ? false : { width: 0 }}
+                whileInView={{ width: `${pct}%` }}
+                viewport={{ once: true, amount: 0.6 }}
+                transition={{ duration: 0.9, delay: 0.25, ease: EASE }}
+                className="h-full rounded-full"
+                style={{ background: PROGRESS_FILL }}
+              />
+            </div>
           </div>
 
-          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 1, delay: delay + 0.2, ease: "easeOut" }}
-              className={`h-full rounded-full bg-gradient-to-r ${cfg.gradient}`}
-            />
-          </div>
-
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-[#1a3884] dark:group-hover:text-[#4f7dff] transition-colors flex items-center gap-1">
-              Start Learning Track
-              <ArrowUpRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-          </div>
-        </div>
-      </button>
-    </motion.div>
-  );
-};
-
-/* ─── Single course node for horizontal timeline ─── */
-const CourseTimelineNode = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick, delay, isLast }) => {
-  const { t } = useTranslation();
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay }}
-      className="flex items-start flex-1 min-w-[100px] max-w-[150px] relative group"
-    >
-      {/* Node column */}
-      <div className="flex flex-col items-center w-full">
-        {/* Circle button */}
-        <motion.button
-          type="button"
-          onClick={onClick}
-          whileHover={isUnlocked || isCompleted || isCurrent ? { scale: 1.12, y: -2 } : {}}
-          whileTap={isUnlocked || isCompleted || isCurrent ? { scale: 0.92 } : {}}
-          className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 border-2 transition-all duration-300 shadow-lg ${isCompleted
-            ? "bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-300 text-white shadow-emerald-500/25 ring-4 ring-emerald-500/10"
-            : isCurrent
-              ? "bg-[#1a3884] border-[#2b52b8] text-white shadow-[#1a3884]/35 ring-4 ring-[#1a3884]/20 animate-pulse"
-              : isUnlocked
-                ? "bg-white dark:bg-[#0d1b3e] border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-400 cursor-pointer shadow-md"
-                : "bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/60 text-slate-400 cursor-not-allowed"
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.stopPropagation();
+              activate();
+            }}
+            className={`group/btn mt-4 flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border text-sm font-semibold transition-colors ${
+              isUnlocked
+                ? "border-[#045C9A]/25 bg-[#EAF7FD] text-[#045C9A] hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/15 dark:bg-white/[0.06] dark:text-[#A6D7E8] dark:hover:border-transparent dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
+                : "border-[#d7ebf5] bg-slate-50 text-slate-500 hover:bg-slate-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-400 dark:hover:bg-white/[0.07]"
             }`}
-        >
-          {isCompleted ? (
-            <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
-          ) : isCurrent ? (
-            <Play className="w-5 h-5 fill-current ml-0.5" />
-          ) : isUnlocked ? (
-            <span className="text-sm font-black tracking-tight">{index + 1}</span>
-          ) : (
-            <LockIcon className="w-4 h-4" />
-          )}
-        </motion.button>
-
-        {/* Label below circle */}
-        <div className="mt-3 flex flex-col items-center text-center px-1 w-full">
-          <span
-            className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border mb-1.5 transition-colors ${isCompleted
-              ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60"
-              : isCurrent
-                ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/60 font-black"
-                : "bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10"
-              }`}
           >
-            {course.courseNumber || course.id}
-          </span>
-          <p
-            className={`text-[11px] font-bold leading-snug line-clamp-2 transition-colors ${isCompleted
-              ? "text-emerald-800 dark:text-emerald-300"
-              : isCurrent
-                ? "text-blue-600 dark:text-blue-400 font-extrabold"
-                : "text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200"
-              }`}
-          >
-            {course.title || t(`my_courses_page.courses.${course.id}.title`)}
-          </p>
+            {isUnlocked ? (
+              <>
+                {ctaLabel}
+                <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-0.5" />
+              </>
+            ) : (
+              <>
+                <Lock className="w-3 h-3" />
+                {t("my_courses_page.locked", "Locked")}
+              </>
+            )}
+          </button>
         </div>
       </div>
-
-      {/* Horizontal connector line */}
-      {!isLast && (
-        <div className="absolute top-7 left-[calc(50%+28px)] right-[calc(-50%+28px)] h-1 bg-slate-200 dark:bg-slate-700/60 rounded-full z-0 overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{
-              background: isCompleted
-                ? "linear-gradient(to right, #10b981, #14b8a6)"
-                : isCurrent
-                  ? "linear-gradient(to right, #2563eb, #6366f1)"
-                  : "transparent",
-            }}
-            initial={{ width: "0%" }}
-            animate={{ width: isCompleted ? "100%" : isCurrent ? "50%" : "0%" }}
-            transition={{ duration: 0.7, delay: delay + 0.15, ease: "easeOut" }}
-          />
-        </div>
-      )}
     </motion.div>
   );
-};
+});
+
+PathwayCard.displayName = "PathwayCard";
 
 /* ─── Stage detail view ─── */
 const filterPublishedCourses = (courses, publishedCourseCodes) => {
@@ -551,17 +306,28 @@ const filterPublishedCourses = (courses, publishedCourseCodes) => {
   return filtered.length > 0 ? filtered : courses;
 };
 
-const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publishedCourseCodes }) => {
+const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, publishedCourseCodes }) => {
   const { t } = useTranslation();
+  const reduced = useReducedMotion();
   const navigate = useNavigate();
-  const completedCount = (stage.courses || []).filter(c => userProgress.completedCourses?.includes(c.id)).length;
-  const totalCoursesCount = stage.totalCourses || stage.courses?.length || 1;
-  const pct = Math.round((completedCount / totalCoursesCount) * 100);
-
+  // Count the same modules the list below shows (published ones), so this
+  // figure always matches the "n / total" on the pathway card.
   const publishedStageCourses = filterPublishedCourses(stage.courses || [], publishedCourseCodes);
-  const isAssessmentUnlocked = !ENFORCE_PROGRESSION_GATES || (publishedStageCourses.length > 0 &&
-    publishedStageCourses.every(c => userProgress.completedCourses?.includes(c.id)));
+  const completedCount = publishedStageCourses.filter(c => isCompletedCourse(userProgress, c.id)).length;
+  const totalCoursesCount = publishedStageCourses.length || stage.totalCourses || stage.courses?.length || 1;
+  const pct = Math.round((completedCount / totalCoursesCount) * 100);
+  const remaining = Math.max(0, totalCoursesCount - completedCount);
 
+  const isAssessmentUnlocked =
+    publishedStageCourses.length > 0 &&
+    publishedStageCourses.every(c => isCompletedCourse(userProgress, c.id));
+  const modulesLeftForAssessment = publishedStageCourses.filter(
+    c => !isCompletedCourse(userProgress, c.id)
+  ).length;
+  const isAssessmentPassed = !!userProgress.assessmentsPassed?.includes(stage.assessmentGate);
+
+  const isStage = typeof stage.id === "number";
+  const StageIcon = (isStage ? STAGE_ICONS[stage.id] : TRACK_ICONS[stage.id]) || Zap;
   const isCourseUnlocked = (courseId) => isCourseUnlockedInStage(courseId, stage, userProgress);
 
   const handleCourseClick = (course, courseUnlocked) => {
@@ -572,230 +338,285 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
     if (onCourseClick) onCourseClick(course.id);
   };
 
+  const handleAssessmentClick = () => {
+    if (isAssessmentPassed) {
+      toast.success(t("my_courses_page.assessment_passed_toast", "Assessment passed & certified!"));
+    } else if (isAssessmentUnlocked) {
+      navigate(`/assessment/${stage.assessmentGate}`);
+    } else {
+      toast.error(
+        t("my_courses_page.assessment_locked_toast", "Finish the remaining {{count}} module(s) in this stage to unlock the assessment.", {
+          count: modulesLeftForAssessment,
+        })
+      );
+    }
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -15 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6"
+      variants={reduced ? STATIC : SECTION}
+      initial="hidden"
+      animate="show"
+      exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="space-y-4 sm:space-y-6"
     >
-      {/* Back Button */}
-      <div>
-        <button
-          type="button"
-          onClick={onBack}
-          className="group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-[#081329] border border-slate-200/90 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-extrabold hover:border-[#1a3884] hover:text-[#1a3884] transition-all shadow-sm hover:shadow-md cursor-pointer"
-        >
-          <ArrowLeft stroke={2.5} className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-[#1a3884] dark:text-blue-400" />
-          {t("my_courses_page.back_to_overview", "Back to Overview")}
-        </button>
-      </div>
+      {/* Back */}
+      <motion.button
+        variants={reduced ? STATIC : ITEM}
+        type="button"
+        onClick={onBack}
+        className="group inline-flex items-center gap-2 rounded-xl border border-[#d7ebf5] bg-white px-4 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition-colors hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-100 dark:hover:bg-[#0d3a5f]/70"
+      >
+        <IconArrowLeft className="w-3.5 h-3.5 text-[#045C9A] transition-transform group-hover:-translate-x-0.5 dark:text-[#A6D7E8]" />
+        {t("my_courses_page.back_to_overview", "Back to Overview")}
+      </motion.button>
 
-      {/* ── Pristine White Stage Header Banner ── */}
-      <section className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#081329] p-4 sm:p-5 text-slate-900 dark:text-white shadow-xl border border-slate-200/90 dark:border-white/10">
+      {/* Stage header */}
+      <motion.section
+        variants={reduced ? STATIC : ITEM}
+        className={`relative overflow-hidden rounded-2xl ${SURFACE} p-5 sm:p-6`}
+      >
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          {/* Left Side: Title & Info */}
-          <div className="space-y-1.5 max-w-xl">
-            <div className="flex items-center gap-2 flex-wrap">
-              {typeof stage.id === 'number' && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
-                  Stage {stage.id}
-                </span>
-              )}
+        <div className="relative z-10 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+              <StageIcon className="w-6 h-6 text-[#045C9A] dark:text-[#A6D7E8]" />
             </div>
-            
-            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#00152E] dark:text-white">
-              {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.name`, stage.name) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
-            </h1>
-            
-            <p className="text-[13px] text-slate-500 dark:text-slate-300 leading-relaxed font-medium">
-              {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.description`, stage.description) : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
-            </p>
+            <div className="min-w-0 max-w-xl space-y-1.5">
+              <span
+                className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${CHIP_BRAND}`}
+              >
+                {isStage
+                  ? t("my_courses_page.stage_n", { n: stage.id })
+                  : stage.id === "BC"
+                    ? t("my_courses_page.certified_programme", "Certified Programme")
+                    : t("my_courses_page.specialization_track", "Specialization Track")}
+              </span>
+              <h1 className="text-xl font-bold tracking-tight text-[#072036] dark:text-white sm:text-2xl">
+                {isStage
+                  ? t(`my_courses_page.stages.${stage.id}.name`, stage.name)
+                  : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
+              </h1>
+              <p className="text-sm font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
+                {isStage
+                  ? t(`my_courses_page.stages.${stage.id}.description`, stage.description)
+                  : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
+              </p>
+            </div>
           </div>
 
-          {/* Right Side: Overall Progress Card + Assessment Card Side-by-Side */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-            {/* Radial Progress Card */}
-            <div className="flex items-center gap-3 bg-slate-50 dark:bg-white/5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shrink-0 w-full sm:w-auto">
-              <div className="relative w-11 h-11 flex-shrink-0">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" className="stroke-slate-200 dark:stroke-slate-700" strokeWidth="10" fill="none" />
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+            {/* Radial progress */}
+            <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${PANEL}`}>
+              <div className="relative h-11 w-11 shrink-0">
+                <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" className="stroke-[#A6D7E8]/50 dark:stroke-white/10" strokeWidth="10" fill="none" />
                   <motion.circle
                     cx="50" cy="50" r="40"
-                    className="stroke-[#1a3884] dark:stroke-blue-400"
+                    className="stroke-[#045C9A] dark:stroke-[#A6D7E8]"
                     strokeWidth="10" strokeLinecap="round" fill="none"
                     initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
                     animate={{ strokeDashoffset: 251.2 - (251.2 * (pct || 0)) / 100 }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-black text-slate-900 dark:text-white">{pct || 0}%</span>
+                  <span className="text-xs font-bold tabular-nums text-[#072036] dark:text-white">
+                    {pct || 0}%
+                  </span>
                 </div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-[10px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">Overall Progress</div>
-                <div className="text-base font-black text-slate-900 dark:text-white">{completedCount} / {totalCoursesCount} <span className="text-xs font-bold text-slate-400 dark:text-slate-500">Modules</span></div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{totalCoursesCount - completedCount} modules remaining</div>
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#072036] dark:text-[#A6D7E8]">
+                  {t("my_courses_page.overall_progress", "Overall Progress")}
+                </div>
+                <div className="text-[15px] font-bold tabular-nums text-[#072036] dark:text-white">
+                  {completedCount} / {totalCoursesCount}{" "}
+                  <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                    {t("my_courses_page.modules", "Modules")}
+                  </span>
+                </div>
+                <div className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
+                  {t("my_courses_page.modules_remaining", "{{count}} remaining", { count: remaining })}
+                </div>
               </div>
             </div>
 
-            {/* Assessment Gate Card - Placed next to Overall Progress */}
+            {/* Assessment gate */}
             {stage.assessmentGate && (
-              <div
-                onClick={() => {
-                  if (userProgress.assessmentsPassed?.includes(stage.assessmentGate)) {
-                    toast.success("Assessment passed & certified!");
-                  } else if (isAssessmentUnlocked) {
-                    navigate(`/assessment/${stage.assessmentGate}`);
-                  } else {
-                    toast.error(`You have to complete all ${publishedStageCourses.length || 10} modules below first!`);
-                  }
-                }}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all duration-300 cursor-pointer shrink-0 w-full sm:w-auto ${
-                  userProgress.assessmentsPassed?.includes(stage.assessmentGate)
-                    ? "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/40 hover:shadow-md"
+              <button
+                type="button"
+                onClick={handleAssessmentClick}
+                aria-disabled={!isAssessmentUnlocked && !isAssessmentPassed}
+                title={
+                  isAssessmentUnlocked || isAssessmentPassed
+                    ? undefined
+                    : t("my_courses_page.complete_modules_first", "Complete all {{count}} modules first", {
+                        count: publishedStageCourses.length || totalCoursesCount,
+                      })
+                }
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300 ${
+                  isAssessmentPassed
+                    ? "border-emerald-200/70 bg-emerald-50 hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-500/25 dark:bg-emerald-500/10"
                     : isAssessmentUnlocked
-                      ? "bg-[#1a3884]/[0.05] dark:bg-blue-950/30 border-[#1a3884]/20 dark:border-blue-800/40 hover:shadow-md hover:-translate-y-0.5"
-                      : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-700/50"
+                      ? "border-[#045C9A]/25 bg-[#EAF7FD] hover:-translate-y-0.5 hover:shadow-md dark:border-[#045C9A]/40 dark:bg-[#045C9A]/15"
+                      : "cursor-not-allowed border-[#d7ebf5] bg-[#F1F5F9] opacity-70 grayscale dark:border-white/10 dark:bg-[#072036]/60"
                 }`}
               >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-                  userProgress.assessmentsPassed?.includes(stage.assessmentGate)
-                    ? "bg-emerald-500 text-white border-emerald-400"
-                    : isAssessmentUnlocked
-                      ? "bg-[#1a3884] text-white border-[#1a3884]"
-                      : "bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/40"
-                }`}>
-                  <TrophyIcon className="w-4.5 h-4.5" />
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
+                    isAssessmentPassed
+                      ? "border-emerald-400 bg-emerald-500 text-white"
+                      : isAssessmentUnlocked
+                        ? "border-[#045C9A] bg-[#045C9A] text-white"
+                        : "border-[#d7ebf5] bg-white text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-500"
+                  }`}
+                >
+                  {isAssessmentPassed ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : isAssessmentUnlocked ? (
+                    <Trophy className="w-4 h-4" />
+                  ) : (
+                    <Lock className="w-4 h-4" />
+                  )}
                 </div>
 
-                <div className="space-y-0.5 text-left">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                    Assessment: {stage.assessmentGate}
+                <div className="space-y-0.5">
+                  <div className={LABEL}>
+                    {t("my_courses_page.assessment", "Assessment")} · {stage.assessmentGate}
                   </div>
-                  <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                    {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
-                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">✓ Passed & Certified</span>
-                    ) : isAssessmentUnlocked ? (
-                      <span className="text-[#1a3884] dark:text-blue-400 font-extrabold flex items-center gap-1">Start Assessment →</span>
-                    ) : (
-                      <span className="text-amber-600 dark:text-amber-400 font-extrabold flex items-center gap-1">🔒 Locked Assessment</span>
-                    )}
+                  <div className="text-[15px] font-bold text-[#072036] dark:text-white">
+                    {isAssessmentPassed
+                      ? t("my_courses_page.passed_certified", "Passed & certified")
+                      : isAssessmentUnlocked
+                        ? t("my_courses_page.start_assessment", "Start assessment")
+                        : t("my_courses_page.locked_assessment", "Locked assessment")}
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                    {isAssessmentUnlocked
-                      ? "Click to start assessment"
-                      : `Complete all ${publishedStageCourses.length || 10} modules first`}
+                  <div className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
+                    {isAssessmentPassed
+                      ? t("my_courses_page.assessment_complete", "Nothing left to do here")
+                      : isAssessmentUnlocked
+                        ? t("my_courses_page.click_to_start", "Click to begin")
+                        : t("my_courses_page.modules_left_first", "{{count}} more module(s) to unlock", {
+                            count: modulesLeftForAssessment,
+                          })}
                   </div>
                 </div>
-              </div>
+              </button>
             )}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ── Modules List Directory Grid ── */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-            Module Directory ({publishedStageCourses.length})
-          </h3>
-          <span className="text-xs font-bold text-slate-400 dark:text-slate-500 hidden sm:inline">
-            Click any module card to start learning
+      {/* Module directory */}
+      <motion.div variants={reduced ? STATIC : ITEM} className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <SectionHeading title={t("my_courses_page.module_directory", "Module Directory")} />
+          <span className="hidden shrink-0 text-[13px] font-medium text-slate-500 dark:text-slate-400 sm:inline">
+            {t("my_courses_page.click_module_hint", "Select a module to start learning")}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {(() => {
             // Only ONE module may be "Current": the tracked one, else the first
             // uncompleted unlocked module. (Previously every open module was
             // badged Current, drowning the completed/green states.)
             const firstOpenId = publishedStageCourses.find(
-              (c) => !userProgress.completedCourses?.includes(c.id) && isCourseUnlocked(c.id)
+              (c) => !isCompletedCourse(userProgress, c.id) && isCourseUnlocked(c.id)
             )?.id;
             return publishedStageCourses.map((course, idx) => {
-            const isCompleted = userProgress.completedCourses?.includes(course.id);
-            const isUnlocked = isCourseUnlocked(course.id);
-            const isCurrent = !isCompleted && (
-              userProgress.currentCourse === course.id ||
-              (!userProgress.currentCourse && course.id === firstOpenId));
+              const isCompleted = isCompletedCourse(userProgress, course.id);
+              const isUnlocked = isCourseUnlocked(course.id);
+              const isCurrent = !isCompleted && (
+                userProgress.currentCourse === course.id ||
+                (!userProgress.currentCourse && course.id === firstOpenId));
 
-            return (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: idx * 0.04 }}
-                onClick={() => handleCourseClick(course, isUnlocked)}
-                className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 cursor-pointer group ${isCompleted
-                  ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/30 hover:shadow-lg hover:-translate-y-0.5"
-                  : isCurrent
-                    ? "bg-[#1a3884]/[0.04] dark:bg-blue-950/30 border-[#1a3884]/30 dark:border-blue-700/50 shadow-md ring-1 ring-[#1a3884]/15 hover:shadow-xl hover:-translate-y-0.5"
-                    : isUnlocked
-                      ? "bg-white dark:bg-[#081329] border-slate-200 dark:border-white/10 hover:border-[#1a3884]/40 dark:hover:border-blue-500/40 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
-                      : "bg-slate-50/70 dark:bg-[#050b18]/60 border-slate-200/60 dark:border-white/5 opacity-75 cursor-not-allowed"
+              return (
+                <motion.div
+                  key={course.id}
+                  initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: Math.min(idx, 8) * 0.045, ease: EASE }}
+                  onClick={() => handleCourseClick(course, isUnlocked)}
+                  className={`group flex cursor-pointer flex-col gap-3 rounded-2xl p-5 transition-all duration-300 ease-out ${
+                    isUnlocked ? "hover:-translate-y-1 motion-reduce:hover:translate-y-0" : ""
+                  } ${
+                    isCompleted
+                      ? "border border-emerald-200/70 bg-emerald-50/50 shadow-sm hover:shadow-lg dark:border-emerald-500/25 dark:bg-emerald-500/[0.07]"
+                      : isCurrent
+                        ? "border border-[#045C9A]/35 bg-[#EAF7FD]/70 shadow-sm ring-1 ring-[#045C9A]/15 hover:shadow-xl dark:border-[#045C9A]/45 dark:bg-[#045C9A]/10"
+                        : isUnlocked
+                          ? `${SURFACE} ${SURFACE_HOVER}`
+                          : `${SURFACE_MUTED} cursor-not-allowed`
                   }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border ${isCompleted
-                        ? "bg-emerald-500 text-white border-emerald-400 shadow-md"
-                        : isCurrent
-                          ? "bg-[#1a3884] text-white border-[#1a3884] shadow-md"
-                          : isUnlocked
-                            ? "bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-white/10"
-                            : "bg-slate-200 dark:bg-slate-800 text-slate-400 border-slate-300 dark:border-slate-700"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-[13px] font-bold tabular-nums ${
+                          isCompleted
+                            ? "border-emerald-400 bg-emerald-500 text-white"
+                            : isCurrent
+                              ? "border-[#045C9A] bg-[#045C9A] text-white"
+                              : isUnlocked
+                                ? "border-[#d7ebf5] bg-[#F1F5F9] text-[#072036] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-slate-200"
+                                : "border-[#d7ebf5] bg-slate-100 text-slate-400 dark:border-white/10 dark:bg-white/5"
                         }`}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 className="w-5 h-5" />
-                      ) : (
-                        course.courseNumber || course.id
-                      )}
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                          Module {idx + 1}
-                        </span>
-                        {isCurrent && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#1a3884]/10 dark:bg-blue-900/60 text-[#1a3884] dark:text-blue-300">
-                            Current
-                          </span>
+                      >
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : isCurrent ? (
+                          <Play className="w-5 h-5" />
+                        ) : (
+                          course.courseNumber || course.id
                         )}
                       </div>
-                      <h4 className="text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                        {course.title || t(`my_courses_page.courses.${course.id}.title`)}
-                      </h4>
+
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className={LABEL}>
+                            {t("my_courses_page.module_n", "Module {{n}}", { n: idx + 1 })}
+                          </span>
+                          {isCurrent && (
+                            <span
+                              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_BRAND}`}
+                            >
+                              {t("my_courses_page.current", "Current")}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="line-clamp-1 text-[15px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
+                          {course.title || t(`my_courses_page.courses.${course.id}.title`)}
+                        </h4>
+                      </div>
                     </div>
+
+                    {isCompleted ? (
+                      <span
+                        className={`inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_DONE}`}
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        {t("my_courses_page.passed", "Passed")}
+                      </span>
+                    ) : !isUnlocked ? (
+                      <Lock className="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                    ) : null}
                   </div>
 
-                  {isCompleted ? (
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
-                      ✓ Passed
-                    </span>
-                  ) : !isUnlocked ? (
-                    <LockIcon className="w-4 h-4 text-slate-400 shrink-0" />
-                  ) : null}
-                </div>
-
-                {course.subtitle && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 font-medium">
-                    {course.subtitle}
-                  </p>
-                )}
-              </motion.div>
-            );
+                  {course.subtitle && (
+                    <p className="line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                      {course.subtitle}
+                    </p>
+                  )}
+                </motion.div>
+              );
             });
           })()}
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
@@ -803,10 +624,10 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 /* ─── Main Component ─── */
 const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null, continueWatching = null, user }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const reduced = useReducedMotion();
+  const isCourseComplete = (courseId) => isCompletedCourse(userProgress, courseId);
   const [selectedStageId, setSelectedStageId] = useState(null);
   const [dbCourses, setDbCourses] = useState([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState("all");
 
@@ -823,15 +644,13 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         if (active) {
           toast.error(t("my_courses_page.courses_load_failed", "Couldn't load the latest courses. Showing a cached view — please refresh to try again."));
         }
-      } finally {
-        if (active) setLoadingCourses(false);
       }
     };
     loadCourses();
     return () => { active = false; };
   }, [t]);
 
-  const { activeStages = [], activeTracks = [], activeBcTracks = [] } = useMemo(() => {
+  const { activeStages = [], activeTracks = [] } = useMemo(() => {
     const student = user;
     const isStudent = student?.role === 'student' || (!student?.role && student?.college);
 
@@ -925,9 +744,9 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       },
       {
         id: 'BC',
-        name: t("my_courses_page.english_course_title", 'English Course'),
-        shortName: 'English Course',
-        description: t("my_courses_page.english_course_desc", 'Develop English communication skills with certified interactive modules'),
+        name: t("my_courses_page.english_for_work", 'English for Work'),
+        shortName: t("my_courses_page.english_for_work", 'English for Work'),
+        description: t("my_courses_page.english_course_desc", 'Build the workplace English you need for interviews, meetings and written communication.'),
         color: '#0284c7',
         courses: BC_TRACK,
         totalCourses: BC_TRACK.length,
@@ -940,8 +759,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       const allFiltered = filterTrackList(templateTracks);
       return {
         activeStages: STAGES,
-        activeTracks: allFiltered.filter(t => t.id !== 'BC'),
-        activeBcTracks: allFiltered.filter(t => t.id === 'BC')
+        activeTracks: allFiltered,
       };
     }
 
@@ -1040,278 +858,349 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       s.totalCourses = s.courses.length;
     });
 
-    templateTracks.forEach(t => {
-      t.courses.sort(sortCourses);
-      t.totalCourses = t.courses.length;
+    templateTracks.forEach(tr => {
+      tr.courses.sort(sortCourses);
+      tr.totalCourses = tr.courses.length;
     });
 
     const allFilteredTracks = filterTrackList(templateTracks);
 
     return {
       activeStages: templateStages.filter(s => s.courses.length > 0),
-      activeTracks: allFilteredTracks.filter(t => t.courses.length > 0),
+      activeTracks: allFilteredTracks.filter(tr => tr.courses.length > 0),
     };
   }, [dbCourses, t, user]);
 
-  const uniqueCompleted = [...new Set((userProgress.completedCourses || []).map(id => normalizeCourseId(id)))];
-  const totalCompleted = uniqueCompleted.length;
-  const totalCoursesCount =
-    (activeStages || []).reduce((a, s) => a + (s.totalCourses || 0), 0) +
-    (activeTracks || []).reduce((a, t) => a + (t.totalCourses || 0), 0);
-  const overallPct = totalCoursesCount > 0 ? Math.round((totalCompleted / totalCoursesCount) * 100) : 0;
-
   const selectedStage =
     (activeStages || []).find(s => s.id === selectedStageId) ||
-    (activeTracks || []).find(t => t.id === selectedStageId);
+    (activeTracks || []).find(tr => tr.id === selectedStageId);
 
-  const selectedCfg = STAGE_CONFIG[selectedStageId] || {
-    tag: selectedStage?.id + ' Track',
-    Icon: Zap,
-    color: selectedStage?.color || '#1a3884'
-  };
-
-  const { filteredStages, filteredTracks } = useMemo(() => {
+  const { filteredStages, filteredTracks, filteredEnglish } = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
+    const matchesTrack = (tr) =>
+      tr.name.toLowerCase().includes(query) ||
+      (tr.shortName || "").toLowerCase().includes(query) ||
+      tr.description.toLowerCase().includes(query) ||
+      tr.courses.some(c => (c.title || "").toLowerCase().includes(query));
 
-    const stages = (activeFilterTab === "tracks" || activeFilterTab === "bc")
+    const stages = activeFilterTab !== "all" && activeFilterTab !== "stages"
       ? []
       : !query
         ? activeStages
-        : activeStages.filter(s =>
-          s.name.toLowerCase().includes(query) ||
-          s.description.toLowerCase().includes(query) ||
-          s.courses.some(c => (c.title || "").toLowerCase().includes(query))
+        : activeStages.filter(st =>
+          st.name.toLowerCase().includes(query) ||
+          st.description.toLowerCase().includes(query) ||
+          st.courses.some(c => (c.title || "").toLowerCase().includes(query))
         );
 
-    let tracksBase = activeTracks;
-    if (activeFilterTab === "stages") {
-      tracksBase = [];
-    } else if (activeFilterTab === "bc") {
-      tracksBase = activeTracks.filter(t => t.id === 'BC');
-    } else if (activeFilterTab === "tracks") {
-      tracksBase = activeTracks.filter(t => t.id !== 'BC');
-    }
-
-    const tracks = !query
-      ? tracksBase
-      : tracksBase.filter(t =>
-        t.name.toLowerCase().includes(query) ||
-        t.shortName.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query) ||
-        t.courses.some(c => (c.title || "").toLowerCase().includes(query))
-      );
+    const readinessBase = activeFilterTab !== "all" && activeFilterTab !== "tracks"
+      ? []
+      : activeTracks.filter(tr => tr.id !== "BC");
+    const englishBase = activeFilterTab !== "all" && activeFilterTab !== "english"
+      ? []
+      : activeTracks.filter(tr => tr.id === "BC");
 
     return {
       filteredStages: stages,
-      filteredTracks: tracks,
+      filteredTracks: query ? readinessBase.filter(matchesTrack) : readinessBase,
+      filteredEnglish: query ? englishBase.filter(matchesTrack) : englishBase,
     };
   }, [activeStages, activeTracks, searchQuery, activeFilterTab]);
 
-  return (
-    <div className="w-full relative min-h-screen bg-transparent transition-colors duration-500 overflow-hidden">
-      {/* Ambient navy wash — two slow, small drifts. The previous version used
-          three 550-650px multi-hue orbs that dominated the page behind the
-          content; these stay subtle and on-theme. */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <motion.div
-          animate={{ x: [0, 25, -15, 0], y: [0, -20, 15, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#1a3884]/[0.07] dark:bg-[#1a3884]/20 blur-[110px]"
-        />
-        <motion.div
-          animate={{ x: [0, -25, 20, 0], y: [0, 20, -15, 0] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 -right-24 w-80 h-80 rounded-full bg-[#0d1f4e]/[0.06] dark:bg-[#0d1f4e]/25 blur-[120px]"
-        />
-      </div>
+  const hasResults =
+    filteredStages.length > 0 || filteredTracks.length > 0 || filteredEnglish.length > 0;
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-6 p-4 sm:p-6 lg:p-8">
+  const FILTER_TABS = [
+    { id: "all", label: t("my_courses_page.all_pathways", "All Pathways") },
+    { id: "stages", label: t("my_courses_page.human_intelligence_stages", "Human Intelligence Stages") },
+    { id: "tracks", label: t("my_courses_page.readiness_tracks", "Readiness Tracks") },
+    { id: "english", label: t("my_courses_page.english_for_work", "English for Work") },
+  ];
+
+  return (
+    <div className="relative w-full">
+      <div className="relative z-10 flex flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
         {!selectedStageId && (
           <>
-            {/* World-Class Premium White Hero Section */}
-            <motion.div
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#071330] p-4 sm:p-5 shadow-[0_4px_20px_rgba(26,56,132,0.05)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-slate-200/80 dark:border-white/10"
+            {/* ── Page hero ── */}
+            <motion.section
+              variants={reduced ? STATIC : SECTION}
+              initial="hidden"
+              animate="show"
+              className={`relative w-full overflow-hidden rounded-2xl ${SURFACE}`}
             >
-              {/* Soft Ambient Radial Wash Backgrounds */}
-              <div className="absolute top-0 right-0 w-56 h-56 bg-[#1a3884]/[0.06] rounded-full blur-3xl pointer-events-none" />
+              <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                {/* Left Side: Title & Subtitle */}
-                <div className="space-y-2 max-w-2xl">
-                  <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#0d1f4e] dark:text-white leading-snug">
-                    Human Intelligence & Readiness Pathways
-                  </h1>
-
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-300 leading-relaxed font-medium">
-                    Experience a structured, multi-tier curriculum designed to build core capability, technical readiness, and vision.
-                  </p>
-
+              <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0 max-w-2xl">
+                  <motion.h1
+                    variants={reduced ? STATIC : ITEM}
+                    className="text-xl font-bold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                    style={{ letterSpacing: "-0.02em" }}
+                  >
+                    {t("my_courses_page.page_title", "Human Intelligence & Readiness Pathways")}
+                  </motion.h1>
+                  <motion.p
+                    variants={reduced ? STATIC : ITEM}
+                    className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm"
+                  >
+                    {t("my_courses_page.page_subtitle", "A structured, multi-tier curriculum designed to build core capability, technical readiness, and vision.")}
+                  </motion.p>
                 </div>
 
-                {/* Right Side: Hero Action (Continue Learning Element) */}
                 {continueWatching && (
-                  <div className="flex-shrink-0 lg:max-w-md w-full">
+                  <motion.div
+                    variants={reduced ? STATIC : ITEM}
+                    className="w-full shrink-0 sm:max-w-sm lg:w-auto lg:min-w-[320px]"
+                  >
                     {continueWatching}
-                  </div>
+                  </motion.div>
                 )}
               </div>
-            </motion.div>
+            </motion.section>
 
-            {/* Filter & Search Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white dark:bg-[#081329] p-4 rounded-2xl border border-slate-200 dark:border-white/10 shadow-md">
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
-                <button
-                  type="button"
-                  onClick={() => setActiveFilterTab("all")}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap ${activeFilterTab === "all"
-                    ? "bg-[#1a3884] dark:bg-blue-600 text-white shadow-md"
-                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-                    }`}
-                >
-                  All Pathways
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveFilterTab("stages")}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap ${activeFilterTab === "stages"
-                    ? "bg-[#1a3884] dark:bg-blue-600 text-white shadow-md"
-                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-                    }`}
-                >
-                  Human Intelligence Stages ({activeStages.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveFilterTab("tracks")}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap ${activeFilterTab === "tracks"
-                    ? "bg-[#1a3884] dark:bg-blue-600 text-white shadow-md"
-                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-                    }`}
-                >
-                  Readiness Tracks ({activeTracks.filter(t => t.id !== 'BC').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveFilterTab("bc")}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap ${activeFilterTab === "bc"
-                    ? "bg-[#1a3884] dark:bg-blue-600 text-white shadow-md"
-                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10"
-                    }`}
-                >
-                  English Course ({activeTracks.filter(t => t.id === 'BC').length})
-                </button>
+            {/* ── Filters & search ── */}
+            <motion.div
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.12, ease: EASE }}
+              className={`flex flex-col items-stretch justify-between gap-4 rounded-2xl p-4 sm:flex-row sm:items-center ${SURFACE}`}
+            >
+              <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                {FILTER_TABS.map((tab) => {
+                  const isActive = activeFilterTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveFilterTab(tab.id)}
+                      aria-pressed={isActive}
+                      className={`relative inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-xl border px-4 text-xs font-bold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 ${
+                        isActive
+                          ? "border-transparent text-white dark:text-[#072036]"
+                          : "border-[#d7ebf5] bg-[#F1F5F9] text-slate-600 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:bg-white/10"
+                      }`}
+                    >
+                      {/* The selected state is one element that travels between
+                          tabs, so switching filters reads as a single movement. */}
+                      {isActive && (
+                        <motion.span
+                          layoutId="pathway-filter-pill"
+                          transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }}
+                          className="absolute inset-0 rounded-xl bg-[#045C9A] shadow-sm dark:bg-[#A6D7E8]"
+                        />
+                      )}
+                      <span className="relative">{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
-              <div className="relative sm:w-72 flex-shrink-0">
-                <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <div className="group relative w-full shrink-0 sm:w-64 lg:w-72">
+                <Search className="pointer-events-none absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-[#045C9A] dark:group-focus-within:text-[#A6D7E8]" />
                 <input
                   type="text"
-                  placeholder="Search modules, topics..."
+                  autoComplete="off"
+                  spellCheck="false"
+                  aria-label={t("my_courses_page.search_placeholder", "Search modules, topics...")}
+                  placeholder={t("my_courses_page.search_placeholder", "Search modules, topics...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="h-9 w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-9 pr-9 text-sm font-medium text-[#072036] placeholder-slate-400 transition-colors focus:border-[#045C9A]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder-slate-500 dark:focus:bg-[#072036]"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    aria-label={t("my_courses_page.clear_search", "Clear search")}
+                    className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:hover:bg-white/10 dark:hover:text-[#A6D7E8]"
                   >
-                    <XIcon className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
-            </div>
+            </motion.div>
           </>
         )}
 
-        <div className="w-full relative">
+        <div className="relative w-full">
           <AnimatePresence mode="wait">
             {!selectedStageId ? (
               <motion.div
                 key="cards"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-12"
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: EASE }}
+                className="space-y-6 sm:space-y-8"
               >
                 {filteredStages.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <BrainIcon className="w-6 h-6 text-[#1a3884] dark:text-[#4f7dff]" />
-                        Human Intelligence Stages
-                      </h2>
-                      <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />
-                    </div>
+                  <motion.section
+                    variants={reduced ? STATIC : SECTION}
+                    initial="hidden"
+                    animate="show"
+                    className="space-y-4"
+                  >
+                    <motion.div variants={reduced ? STATIC : ITEM}>
+                      <SectionHeading
+                        title={t("my_courses_page.human_intelligence_stages", "Human Intelligence Stages")}
+                      />
+                    </motion.div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <motion.div layout={!reduced} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      <AnimatePresence mode="popLayout">
                       {filteredStages.map((stage, i) => {
-                        const cfg = STAGE_CONFIG[stage.id] || { tag: `Stage ${stage.id}`, Icon: CapacityIcon, color: "#112b6b" };
                         const unlocked = checkStageUnlocked(stage, userProgress);
-                        const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+                        const visibleCourses = filterPublishedCourses(stage.courses || [], publishedCourseCodes);
+                        const completed = visibleCourses.filter(c => isCourseComplete(c.id)).length;
+                        const total = visibleCourses.length || stage.totalCourses || stage.courses.length;
 
                         return (
-                          <CategoryCard
+                          <PathwayCard
                             key={stage.id}
-                            stage={stage}
-                            cfg={cfg}
+                            icon={STAGE_ICONS[stage.id] || Target}
+                            title={t(`my_courses_page.stages.${stage.id}.name`, stage.name)}
+                            description={t(`my_courses_page.stages.${stage.id}.description`, stage.description)}
+                            badgeLabel={t("my_courses_page.stage_n", { n: stage.id })}
+                            metaLabel={t("my_courses_page.n_modules", "{{count}} modules", { count: total })}
+                            ctaLabel={t("my_courses_page.explore_stage", "Explore Stage")}
+                            lockedMessage={t("my_courses_page.locked_toast", "Please complete previous stages to unlock this stage.")}
                             isUnlocked={unlocked}
                             completedCount={completed}
-                            userProgress={userProgress}
-                            delay={i * 0.1}
+                            total={total}
+                            index={i}
                             onClick={() => setSelectedStageId(stage.id)}
                           />
                         );
                       })}
-                    </div>
-                  </div>
+                      </AnimatePresence>
+                    </motion.div>
+                  </motion.section>
                 )}
 
                 {filteredTracks.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <GlobeIcon className="w-6 h-6 text-[#1a3884] dark:text-[#4f7dff]" />
-                        Readiness Tracks & English Course
-                      </h2>
-                      <div className="h-px flex-1 bg-slate-200 dark:bg-white/10 ml-4 hidden sm:block" />
-                    </div>
+                  <motion.section
+                    variants={reduced ? STATIC : SECTION}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.15 }}
+                    className="space-y-4"
+                  >
+                    <motion.div variants={reduced ? STATIC : ITEM}>
+                      <SectionHeading
+                        title={t("my_courses_page.readiness_tracks", "Readiness Tracks")}
+                      />
+                    </motion.div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <motion.div layout={!reduced} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      <AnimatePresence mode="popLayout">
                       {filteredTracks.map((track, i) => {
                         const unlocked = checkTrackUnlocked(track, userProgress);
-                        const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
+                        const visibleCourses = filterPublishedCourses(track.courses || [], publishedCourseCodes);
+                        const completed = visibleCourses.filter(c => isCourseComplete(c.id)).length;
+                        const total = visibleCourses.length || track.totalCourses || track.courses.length;
 
                         return (
-                          <TrackCard
+                          <PathwayCard
                             key={track.id}
-                            track={track}
+                            icon={TRACK_ICONS[track.id] || Zap}
+                            title={t(`my_courses_page.tracks.${track.id}.shortName`, track.shortName || track.name)}
+                            description={t(`my_courses_page.tracks.${track.id}.description`, track.description)}
+                            badgeLabel={t("my_courses_page.specialization_track", "Specialization Track")}
+                            metaLabel={t("my_courses_page.n_courses", "{{count}} courses", { count: total })}
+                            ctaLabel={t("my_courses_page.start_track", "Start Track")}
+                            lockedMessage={t("my_courses_page.locked_toast", "Please complete required stages first.")}
                             isUnlocked={unlocked}
                             completedCount={completed}
-                            delay={0.2 + (i * 0.1)}
+                            total={total}
+                            index={i}
                             onClick={() => setSelectedStageId(track.id)}
                           />
                         );
                       })}
+                      </AnimatePresence>
+                    </motion.div>
+                  </motion.section>
+                )}
+
+                {/* English for Work — its own pathway. It was previously tacked
+                    onto the Readiness Tracks heading, which read as a footnote
+                    rather than a programme in its own right. */}
+                {filteredEnglish.length > 0 && (
+                  <motion.section
+                    variants={reduced ? STATIC : SECTION}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.15 }}
+                    className="space-y-4"
+                  >
+                    <motion.div variants={reduced ? STATIC : ITEM}>
+                      <SectionHeading title={t("my_courses_page.english_for_work", "English for Work")} />
+                    </motion.div>
+
+                    <motion.div layout={!reduced} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      <AnimatePresence mode="popLayout">
+                      {filteredEnglish.map((track, i) => {
+                        const unlocked = checkTrackUnlocked(track, userProgress);
+                        const visibleCourses = filterPublishedCourses(track.courses || [], publishedCourseCodes);
+                        const completed = visibleCourses.filter(c => isCourseComplete(c.id)).length;
+                        const total = visibleCourses.length || track.totalCourses || track.courses.length;
+
+                        return (
+                          <PathwayCard
+                            key={track.id}
+                            icon={TRACK_ICONS[track.id] || BritishCouncilIcon}
+                            title={t("my_courses_page.english_for_work", "English for Work")}
+                            description={t(`my_courses_page.tracks.${track.id}.description`, track.description)}
+                            badgeLabel={t("my_courses_page.certified_programme", "Certified Programme")}
+                            metaLabel={t("my_courses_page.n_courses", "{{count}} courses", { count: total })}
+                            ctaLabel={t("my_courses_page.start_course", "Start Course")}
+                            lockedMessage={t("my_courses_page.locked_toast", "Please complete required stages first.")}
+                            isUnlocked={unlocked}
+                            completedCount={completed}
+                            total={total}
+                            index={i}
+                            onClick={() => setSelectedStageId(track.id)}
+                          />
+                        );
+                      })}
+                      </AnimatePresence>
+                    </motion.div>
+                  </motion.section>
+                )}
+
+                {/* Empty state — a search or filter that matched nothing */}
+                {!hasResults && (
+                  <motion.div
+                    initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: EASE }}
+                    className="rounded-2xl border border-dashed border-[#d7ebf5] bg-[#F1F5F9]/60 px-5 py-12 text-center dark:border-white/10 dark:bg-[#072036]/40"
+                  >
+                    <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white dark:border-white/10 dark:bg-[#0d3a5f]">
+                      <Search className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
                     </div>
-                  </div>
+                    <p className="text-[15px] font-bold text-[#072036] dark:text-white">
+                      {t("my_courses_page.no_results", "No pathways match your search")}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                      {t("my_courses_page.no_results_hint", "Try a different keyword, or switch back to All Pathways.")}
+                    </p>
+                  </motion.div>
                 )}
               </motion.div>
             ) : (
-              <motion.div key={`stage-${selectedStageId}`}>
-                <StageDetailView
-                  stage={selectedStage}
-                  cfg={selectedCfg}
-                  userProgress={userProgress}
-                  onBack={() => setSelectedStageId(null)}
-                  onCourseClick={onCourseClick}
-                  publishedCourseCodes={publishedCourseCodes}
-                />
-              </motion.div>
+              selectedStage && (
+                <motion.div key={`stage-${selectedStageId}`}>
+                  <StageDetailView
+                    stage={selectedStage}
+                    userProgress={userProgress}
+                    onBack={() => setSelectedStageId(null)}
+                    onCourseClick={onCourseClick}
+                    publishedCourseCodes={publishedCourseCodes}
+                  />
+                </motion.div>
+              )
             )}
           </AnimatePresence>
         </div>

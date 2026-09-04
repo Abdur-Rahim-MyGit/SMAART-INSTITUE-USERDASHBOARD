@@ -2,26 +2,26 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This page pulled from @tabler/icons-react, which
+// is why its icons sat at a different weight to the rest of the product.
 import {
+    ArrowRight,
+    CheckCircle2,
+    ChevronRight,
+    Clock,
+    Eye,
+    FileText,
     IconArrowLeft as ArrowLeft,
-    IconArrowRight as ArrowRight,
-    IconCertificate as Award,
-    IconActivity as Brain,
-    IconCircleCheckFilled as CheckCircle2,
-    IconChevronRight as ChevronRight,
-    IconClock as Clock,
-    IconX as CloseIcon,
-    IconEye as Eye,
-    IconFileText as FileText,
-    IconInfoCircle as Info,
-    IconAlertTriangle as AlertTriangle,
-    IconStack2 as Layers,
-    IconPlayerPlayFilled as Play,
-    IconRefresh as RotateCcw,
-    IconTrendingUp as TrendingUp,
-} from "@tabler/icons-react";
+    Play,
+    RiAlertLine as AlertTriangle,
+    RotateCcw,
+    ShieldCheck,
+    X as CloseIcon,
+} from "@/components/icons";
 import { assessmentApi } from "@/services/assessmentApi";
-import PageHero from "@/components/ui/PageHero";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import { toast } from "sonner";
 
 const DEFAULT_STAGES = [
@@ -154,12 +154,6 @@ const mapAssessmentToStage = (ass) => {
     };
 };
 
-const METRICS = [
-    { label: "Guided Stages", value: "4", icon: Layers },
-    { label: "Quotients", value: "6", icon: Brain },
-    { label: "Reports", value: "Instant", icon: Award },
-];
-
 const fadeUp = {
     initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
@@ -168,6 +162,20 @@ const fadeUp = {
 };
 
 const AssessmentsDashboard = () => {
+    // The constellation canvas paints from a prop, not CSS, so it has to be
+    // told when the dark class flips -- same observer the dashboard uses.
+    const [isDarkTheme, setIsDarkTheme] = useState(
+        typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+    );
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDarkTheme(document.documentElement.classList.contains("dark"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [stageStatus, setStageStatus] = useState({});
@@ -210,7 +218,11 @@ const AssessmentsDashboard = () => {
                         .filter((s) => ["T1", "T2", "T3", "T4"].includes(s.key));
                     const order = { T1: 1, T2: 2, T3: 3, T4: 4 };
                     mappedStages.sort((a, b) => (order[a.key] || 99) - (order[b.key] || 99));
-                    setStages(mappedStages);
+                    // An empty array is still a "successful" response, so guard
+                    // on the mapped length as well: without this, a tenant whose
+                    // admin has published no T1-T4 assessments got a blank page
+                    // with no cards and no explanation.
+                    setStages(mappedStages.length > 0 ? mappedStages : DEFAULT_STAGES);
                 } else {
                     setStages(DEFAULT_STAGES);
                 }
@@ -274,9 +286,19 @@ const AssessmentsDashboard = () => {
     };
 
     return (
-        <div className="bg-transparent transition-colors duration-300 min-h-screen pb-8">
-            <main>
-                <div className="mx-auto max-w-7xl space-y-6 p-8">
+        <PageTransition>
+        <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+            {/* Same ambient layer as the dashboard and courses pages */}
+            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+                <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+            </div>
+            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+                <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+                <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+            </div>
+
+            <main className="relative z-10">
+                <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
 
                     {/* Back Button */}
                     <div className="flex items-center sm:hidden">
@@ -284,44 +306,53 @@ const AssessmentsDashboard = () => {
                             onClick={() => navigate("/dashboard")}
                             className="group flex items-center gap-3 w-fit selection:bg-transparent"
                         >
-                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
-                                <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 shadow-sm border border-[#d7ebf5] dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:border-[#d7ebf5] dark:group-hover:border-[#045C9A]/40 transition-all duration-300">
+                                <ArrowLeft className="h-4 w-4 text-[#034a7d] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
                             </div>
-                            <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
+                            <span className="text-[#034a7d] dark:text-[#A6D7E8] text-xs font-extrabold uppercase tracking-widest transition-colors group-hover:text-[#045C9A] dark:group-hover:text-white">
                                 {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
                             </span>
                         </button>
                     </div>
 
-                    {/* Consolidated Premium Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
+                    {/* Page hero -- same structure, padding and type scale as the
+                        courses page hero, so the two read as one product. */}
+                    <motion.section
+                        initial={{ opacity: 0, y: -16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col xl:flex-row gap-6 justify-between"
+                        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                        className="relative w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
                     >
-                        <div className="flex-1">
-                            <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                {t("assessments_dashboard.title_main", "Assessments")}{" "}
-                                <span className="text-[#1a3884] dark:text-blue-300">{t("assessments_dashboard.title_sub", "Centre")}</span>
-                            </h1>
-                            <p className="mt-1.5 text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-                                {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
-                            </p>
-                        </div>
+                        <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-                        <div className="flex items-center shrink-0">
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleResetAll}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-xs font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 w-full sm:w-auto"
-                            >
-                                <RotateCcw stroke={1.5} className="h-3.5 w-3.5" />
-                                {t("assessments_dashboard.reset_assessments", "Reset")}
-                            </motion.button>
+                        <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="min-w-0 max-w-2xl">
+                                <h1
+                                    className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                                    style={{ letterSpacing: "-0.02em" }}
+                                >
+                                    {t("assessments_dashboard.title_full", "Assessments Centre")}
+                                </h1>
+                                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                    {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
+                                </p>
+                            </div>
+
+                            {/* Destructive, but secondary: it reads as a quiet
+                                control and only turns red on hover, rather than
+                                sitting in the header permanently alarmed. */}
+                            <div className="shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={handleResetAll}
+                                    className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-4 text-xs font-bold text-slate-600 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 sm:w-auto dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:border-rose-500/30 dark:hover:bg-rose-500/10 dark:hover:text-rose-300"
+                                >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
+                                </button>
+                            </div>
                         </div>
-                    </motion.div>
+                    </motion.section>
 
                     <motion.section
                         initial={{ opacity: 0, y: 16 }}
@@ -369,31 +400,31 @@ const AssessmentsDashboard = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             transition={{ type: "spring", duration: 0.5, bounce: 0.15 }}
-                            className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-2xl dark:border-slate-800 dark:bg-[#002147] flex flex-col max-h-[85vh] mx-auto"
+                            className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-2xl dark:border-white/10 dark:bg-[#072036] flex flex-col max-h-[85vh] mx-auto"
                         >
                             {/* Modal Header */}
-                            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800/80 flex-shrink-0">
+                            <div className="flex items-center justify-between border-b border-[#d7ebf5] px-5 py-4 dark:border-white/10 flex-shrink-0">
                                 <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-300 mb-0.5">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8] mb-0.5">
                                         {t("assessments_dashboard.modal_badge", "Assessment Gate")}
                                     </p>
-                                    <h3 className="text-[17px] font-extrabold tracking-tight text-[#0d1f4e] dark:text-slate-100">
+                                    <h3 className="text-[17px] font-extrabold tracking-tight text-[#072036] dark:text-slate-100">
                                         {t(`assessments_dashboard.stages.${selectedStage.key}.title`, selectedStage.title)}
                                     </h3>
                                 </div>
                                 <button
                                     onClick={() => setSelectedStage(null)}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-200 transition-colors flex-shrink-0"
+                                    className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-[#EAF7FD] hover:text-slate-600 dark:hover:bg-[#0d3a5f] dark:hover:text-slate-200 transition-colors flex-shrink-0"
                                 >
-                                    <CloseIcon stroke={1.5} className="h-4 w-4" />
+                                    <CloseIcon className="h-4 w-4" />
                                 </button>
                             </div>
 
                             {/* Modal Body */}
                             <div className="overflow-y-auto flex-1 px-5 py-5 space-y-4">
                                 {/* Stage description & summary */}
-                                <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-5 dark:border-white/10 dark:bg-slate-800/40">
-                                    <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-350">
+                                <div className="rounded-2xl border border-[#d7ebf5] bg-[#F1F5F9] p-5 dark:border-white/10 dark:bg-white/5">
+                                    <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-300">
                                         {t(`assessments_dashboard.stages.${selectedStage.key}.description`, selectedStage.description)}
                                     </p>
                                     <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -406,35 +437,29 @@ const AssessmentsDashboard = () => {
 
                                 {/* Integrity & Security Warning */}
                                 <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-950/10">
-                                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-[0.2em] mb-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
+                                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-widest mb-3">
+                                        <ShieldCheck className="h-4 w-4 shrink-0" />
                                         {t("assessments_dashboard.integrity_warning_title", "Integrity & Security Warning")}
                                     </div>
                                     <div className="space-y-2.5">
                                         <div className="flex gap-2.5 items-start">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600 dark:text-amber-550 shrink-0 mt-0.5 fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
+                                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                                             <p className="text-[12px] font-bold leading-relaxed text-amber-900 dark:text-amber-300">
                                                 {t("assessments_dashboard.integrity_warning_1", "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.")}
                                             </p>
                                         </div>
                                         <div className="flex gap-2.5 items-start">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600 dark:text-amber-550 shrink-0 mt-0.5 fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
+                                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                                             <p className="text-[12px] font-bold leading-relaxed text-amber-900 dark:text-amber-300">
-                                                {t("assessments_dashboard.integrity_warning_2", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}
+                                                {t("assessments_dashboard.integrity_warning_2", "Repeated warnings raise a risk score. If it crosses the threshold, the attempt is recorded as unverified and you will need to re-sit it \u2014 each retry uses a different question set.")}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Checkbox agreement */}
-                                <div className="border-t border-slate-100 pt-5 dark:border-slate-800">
-                                    <label className="relative flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/50 dark:border-white/10 dark:bg-[#002A5C]/40 dark:hover:bg-[#002A5C]/60">
+                                <div className="border-t border-[#d7ebf5] pt-5 dark:border-white/10">
+                                    <label className="relative flex cursor-pointer items-start gap-3 rounded-2xl border border-[#d7ebf5] bg-[#F1F5F9] p-4 transition-all hover:bg-[#EAF7FD] dark:border-white/10 dark:bg-[#0d3a5f]/40 dark:hover:bg-[#0d3a5f]/60">
                                         <input
                                             type="checkbox"
                                             checked={agreedToTerms}
@@ -442,7 +467,7 @@ const AssessmentsDashboard = () => {
                                             className="peer sr-only"
                                         />
                                         {/* Custom checkbox box */}
-                                        <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border border-slate-300 bg-white text-white transition-all peer-checked:border-[#1a3884] peer-checked:bg-[#1a3884] dark:border-slate-600 dark:bg-slate-800 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500 shadow-sm">
+                                        <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border border-[#d7ebf5] bg-white text-white transition-all peer-checked:border-[#045C9A] peer-checked:bg-[#045C9A] dark:border-white/10 dark:bg-white/5 dark:peer-checked:border-[#A6D7E8] dark:peer-checked:bg-[#A6D7E8] shadow-sm">
                                             <svg
                                                 className={`h-3 w-3 stroke-current stroke-[3.5px] transition-opacity duration-200 ${agreedToTerms ? "opacity-100" : "opacity-0"}`}
                                                 viewBox="0 0 24 24"
@@ -459,10 +484,10 @@ const AssessmentsDashboard = () => {
                             </div>
 
                             {/* Modal Footer */}
-                            <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-[#F8FAFC] px-6 py-5 dark:border-slate-800/80 dark:bg-slate-900/60">
+                            <div className="flex items-center justify-end gap-3 border-t border-[#d7ebf5] bg-[#F1F5F9] px-6 py-5 dark:border-white/10 dark:bg-[#072036]/60">
                                 <button
                                     onClick={() => setSelectedStage(null)}
-                                    className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#002147] dark:text-slate-300 dark:hover:bg-[#002A5C] transition-all"
+                                    className="rounded-xl border border-[#d7ebf5] bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-700 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#072036] dark:text-slate-300 dark:hover:bg-[#0d3a5f] transition-all"
                                 >
                                     {t("common.cancel", "Cancel")}
                                 </button>
@@ -474,8 +499,8 @@ const AssessmentsDashboard = () => {
                                         navigate(`/assessment/${stageKey}`);
                                     }}
                                     className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-300 ${agreedToTerms
-                                            ? "bg-[#1a3884] hover:bg-[#002147] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
-                                            : "bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none"
+                                            ? "bg-[#045C9A] hover:bg-[#072036] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
+                                            : "bg-slate-300 dark:bg-white/5 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none"
                                         }`}
                                 >
                                     <Play size={16} className="h-4 w-4 fill-white" />
@@ -487,6 +512,7 @@ const AssessmentsDashboard = () => {
                 )}
             </AnimatePresence>
         </div>
+        </PageTransition>
     );
 };
 
@@ -499,19 +525,19 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="group"
+            transition={{ delay: Math.min(index, 8) * 0.06, duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+            className="group h-full"
         >
             <div
                 onClick={onAction}
-                className={`relative cursor-pointer overflow-hidden rounded-[20px] border bg-white transition-all duration-300 dark:bg-[#002147] hover:-translate-y-0.5 ${
+                className={`relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300 ease-out hover:-translate-y-1.5 motion-reduce:hover:translate-y-0 dark:bg-[#0d3a5f] ${
                     completed
                         ? "border-emerald-200 shadow-sm hover:shadow-md dark:border-emerald-800/20"
                         : stageData?.locked
                         ? "border-red-200 shadow-sm hover:shadow-md dark:border-red-900/20"
-                        : "border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.05)] hover:shadow-[0_6px_20px_rgba(26,56,132,0.1)] hover:border-[#1a3884]/30 dark:border-white/10"
+                        : "border-[#d7ebf5] shadow-[0_2px_16px_rgba(4,92,154,0.05)] hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] hover:border-[#045C9A]/30 dark:border-white/10"
                 }`}
             >
                 <div className="p-5 sm:p-6">
@@ -522,18 +548,18 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                     completed
                                         ? "bg-emerald-500 border-emerald-600 text-white shadow-sm"
                                         : stageData?.locked
-                                        ? "bg-red-500 border-red-650 text-white shadow-sm"
-                                        : "bg-white border-[#d8e6f7] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
+                                        ? "bg-red-500 border-red-600 text-white shadow-sm"
+                                        : "bg-white border-[#d7ebf5] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-400"
                                 }`}
                             >
                                 {completed ? <CheckCircle2 className="h-5 w-5" /> : `0${index + 1}`}
                             </div>
 
                             <div className="min-w-0 pt-0.5">
-                                <h3 className="text-[15px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-slate-100">
+                                <h3 className="text-[15px] font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
                                     {t(`assessments_dashboard.stages.${stage.key}.title`, stage.title)}
                                 </h3>
-                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                                     {t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}
                                 </p>
                             </div>
@@ -541,21 +567,21 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 
                         {completed ? (
                             <div className="flex-shrink-0">
-                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                <span className="inline-flex items-center gap-1 rounded border border-emerald-200/70 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
                                     <CheckCircle2 className="h-3 w-3" />
                                     {t("assessments_dashboard.verified", "Verified")}
                                 </span>
                             </div>
                         ) : stageData?.locked ? (
                             <div className="flex-shrink-0">
-                                <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[9.5px] font-black uppercase tracking-widest text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300 animate-pulse">
+                                <span className="inline-flex items-center gap-1 rounded border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-rose-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300 animate-pulse">
                                     <AlertTriangle className="h-3 w-3" />
                                     {t("assessments_dashboard.locked", "Locked Out")}
                                 </span>
                             </div>
                         ) : stageData?.attemptCount > 0 ? (
                             <div className="flex-shrink-0">
-                                <span className="inline-flex items-center gap-1 rounded-full border border-amber-250 bg-amber-50 px-2.5 py-1 text-[9.5px] font-black uppercase tracking-widest text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+                                <span className="inline-flex items-center gap-1 rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
                                     <RotateCcw className="h-3 w-3 animate-spin-slow" />
                                     {t("assessments_dashboard.attempt_badge", "Attempt {{current}}/{{max}}", { current: stageData.attemptCount, max: stageData.attemptCount + stageData.remainingAttempts })}
                                 </span>
@@ -563,7 +589,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         ) : null}
                     </div>
 
-                    <p className="mb-3 text-[12px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                    <p className="mb-4 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
                         {t(`assessments_dashboard.stages.${stage.key}.description`, stage.description)}
                     </p>
 
@@ -579,39 +605,39 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             event.stopPropagation();
                             onAction();
                         }}
-                        className={`flex w-full items-center justify-center gap-2.5 rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-300 ${
+                        className={`group/btn mt-auto flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border text-[13px] font-semibold transition-colors ${
                             completed
-                                ? "border border-[#d8e6f7] bg-white text-slate-700 hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300"
+                                ? "border-[#d7ebf5] bg-white text-slate-700 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-200 dark:hover:bg-[#0d3a5f]/70"
                                 : stageData?.locked
-                                ? "bg-red-650 text-white shadow-sm hover:bg-red-700 hover:shadow-md"
+                                ? "border-rose-200 bg-rose-50 text-rose-700 hover:border-transparent hover:bg-rose-600 hover:text-white dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
                                 : stageData?.attemptCount > 0
-                                ? "bg-amber-600 hover:bg-amber-650 text-white shadow-sm hover:shadow-md"
-                                : "bg-[#1a3884] text-white shadow-sm hover:bg-[#112b6b] hover:shadow-md"
+                                ? "border-amber-200 bg-amber-50 text-amber-700 hover:border-transparent hover:bg-amber-500 hover:text-white dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
+                                : "border-[#045C9A]/25 bg-[#EAF7FD] text-[#045C9A] hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/15 dark:bg-white/[0.06] dark:text-[#A6D7E8] dark:hover:border-transparent dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
                         }`}
                     >
                         {completed ? (
                             <>
-                                <Eye stroke={1.5} className="h-4 w-4" />
-                                {t("assessments_dashboard.view_report", "View Performance Report")}
-                                <ChevronRight stroke={1.5} className="ml-auto h-4 w-4 opacity-40" />
+                                <Eye className="h-4 w-4 shrink-0" />
+                                <span>{t("assessments_dashboard.view_report", "View Performance Report")}</span>
+                                <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
                             </>
                         ) : stageData?.locked ? (
                             <>
-                                <AlertTriangle className="h-4 w-4" />
-                                {t("assessments_dashboard.restart_stage_button", "Locked - Restart Course Stage")}
-                                <ChevronRight className="ml-auto h-4 w-4 opacity-80" />
+                                <AlertTriangle className="h-4 w-4 shrink-0" />
+                                <span>{t("assessments_dashboard.restart_stage_button", "Restart Course Stage")}</span>
+                                <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
                             </>
                         ) : stageData?.attemptCount > 0 ? (
                             <>
-                                <Play className="h-4 w-4 fill-white" />
-                                {t("assessments_dashboard.retry_assessment", "Retry Assessment")}
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-85 transition-transform group-hover:translate-x-1" />
+                                <Play fill={1} className="h-4 w-4 shrink-0" />
+                                <span>{t("assessments_dashboard.retry_assessment", "Retry Assessment")}</span>
+                                <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
                             </>
                         ) : (
                             <>
-                                <Play size={16} className="h-4 w-4 fill-white" />
-                                {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
-                                <ArrowRight stroke={1.5} className="ml-auto h-4 w-4 opacity-80 transition-transform group-hover:translate-x-1" />
+                                <Play fill={1} className="h-4 w-4 shrink-0" />
+                                <span>{t("assessments_dashboard.start_stage", "Start Stage Assessment")}</span>
+                                <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
                             </>
                         )}
                     </button>
@@ -624,9 +650,9 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 const InfoChip = ({ icon: Icon, label }) => (
     <motion.span
         whileHover={{ y: -1, scale: 1.02 }}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-sm dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-300"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300"
     >
-        <Icon stroke={1.5} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+        <Icon className="h-3.5 w-3.5 shrink-0" />
         {label}
     </motion.span>
 );
@@ -636,27 +662,27 @@ const SkeletonGrid = () => (
         {[0, 1, 2, 3].map((item) => (
             <div
                 key={item}
-                className="overflow-hidden rounded-[28px] border border-slate-100 bg-white animate-pulse dark:border-white/10 dark:bg-slate-900/60"
+                className="overflow-hidden rounded-[28px] border border-[#d7ebf5] bg-white animate-pulse dark:border-white/10 dark:bg-[#072036]/60"
             >
-                <div className="h-1 bg-slate-100 dark:bg-[#003170]" />
+                <div className="h-1 bg-[#F1F5F9] dark:bg-[#003170]" />
                 <div className="space-y-5 p-6 sm:p-7">
                     <div className="flex items-start gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-[#003170]" />
+                        <div className="h-12 w-12 rounded-2xl bg-[#F1F5F9] dark:bg-[#003170]" />
                         <div className="flex-1 space-y-3 pt-2">
-                            <div className="h-5 w-3/5 rounded bg-slate-100 dark:bg-[#003170]" />
-                            <div className="h-3 w-2/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                            <div className="h-5 w-3/5 rounded bg-[#F1F5F9] dark:bg-[#003170]" />
+                            <div className="h-3 w-2/5 rounded bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <div className="h-4 w-full rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
-                        <div className="h-4 w-4/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-4 w-full rounded bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
+                        <div className="h-4 w-4/5 rounded bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
                     </div>
                     <div className="flex gap-3">
-                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
-                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
-                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
                     </div>
-                    <div className="h-14 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                    <div className="h-14 rounded-2xl bg-[#F1F5F9] dark:bg-[#0d3a5f]" />
                 </div>
             </div>
         ))}

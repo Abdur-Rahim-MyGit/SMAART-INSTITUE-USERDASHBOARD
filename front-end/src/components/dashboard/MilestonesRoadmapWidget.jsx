@@ -2,9 +2,15 @@ import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  BookOpen, ClipboardCheck, FileText, Briefcase,
-  CheckCircle2, Circle, Lock, ChevronRight
-} from "lucide-react";
+  BookOpen,
+  Briefcase,
+  CheckCircle2,
+  ChevronRight,
+  Circle,
+  ClipboardCheck,
+  FileText,
+  Lock,
+} from "@/components/icons";
 
 const MilestonesRoadmapWidget = memo(({ paths = [], assessmentData = null }) => {
   const navigate = useNavigate();
@@ -140,7 +146,7 @@ const MilestonesRoadmapWidget = memo(({ paths = [], assessmentData = null }) => 
                 ) : isLocked ? (
                   <Lock className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                 ) : (
-                  <Circle className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                  <Circle className="w-4 h-4 text-[#0E2136] dark:text-blue-400" />
                 )}
                 {idx < STEPS.length - 1 && (
                   <div className={`w-px h-3 mt-1 ${step.done ? "bg-emerald-200 dark:bg-emerald-500/30" : "bg-slate-200 dark:bg-[#1a3884]/20"}`} />

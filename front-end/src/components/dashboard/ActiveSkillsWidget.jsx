@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, Zap, Layers, Map, Target, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  Map,
+  Target,
+  Terminal,
+  Zap,
+} from "@/components/icons";
 import { useTheme } from '../../contexts/ThemeContext';
 import CertificateModal from '../CertificateModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -154,7 +163,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
     }
 
     if (loadingSkills) {
-        return <div className="w-full h-48 bg-slate-100 dark:bg-[#002147]/50 rounded-3xl animate-pulse mb-6" />;
+        return <div className="w-full h-48 bg-slate-100 dark:bg-[#072036]/50 rounded-2xl animate-pulse mb-6" />;
     }
 
     const currentPath = validPaths[activeTab];
@@ -173,19 +182,19 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
     return (
         <motion.div 
-            className="w-full mb-6 rounded-3xl overflow-hidden bg-white/80 dark:bg-[#002147]/70 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 shadow-[0_8px_30px_rgba(26,56,132,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] group/widget relative"
+            className="w-full mb-6 rounded-2xl overflow-hidden bg-white/80 dark:bg-[#0d3a5f]/70 backdrop-blur-xl border border-[#d7ebf5]/60 dark:border-white/10 shadow-[0_8px_30px_rgba(26,56,132,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] group/widget relative"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
         >
             {/* Header & Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:px-6 sm:py-5 border-b border-slate-100 dark:border-white/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:px-6 sm:py-5 border-b border-[#d7ebf5] dark:border-white/5">
                 <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/40 border border-blue-100/30 dark:border-blue-900/20">
-                        <Target className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[#EAF7FD] dark:bg-[#072036]/40 border border-[#A6D7E8]/30 dark:border-[#0d3a5f]/20">
+                        <Target className="w-5 h-5 text-[#0E2136] dark:text-[#A6D7E8]" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                        <h2 className="text-[15px] font-bold tracking-tight text-[#072036] dark:text-white leading-tight">
                             {t('dashboard.active_skills_to_master', 'Active Skills to Master')}
                         </h2>
                         <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
@@ -195,7 +204,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                 </div>
 
                 {/* Pathway Tabs */}
-                <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-black/20 border border-slate-200/30 dark:border-white/5 w-full sm:w-auto overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-black/20 border border-[#d7ebf5]/30 dark:border-white/5 w-full sm:w-auto overflow-x-auto no-scrollbar">
                     {validPaths.map((path, idx) => {
                         const isActive = activeTab === idx;
                         const label = path.id === 'primary' 
@@ -210,8 +219,8 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                                 onClick={() => setActiveTab(idx)}
                                 className={`flex-1 sm:flex-none whitespace-nowrap px-4 py-2 text-[11px] font-extrabold rounded-xl transition-all duration-300 ${
                                     isActive 
-                                        ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md shadow-blue-500/10'
-                                        : 'text-slate-500 dark:text-slate-400 hover:text-[#1a3884] dark:hover:text-white'
+                                        ? 'bg-[#072036] dark:bg-[#045C9A] text-white shadow-md shadow-[#072036]/15'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-[#045C9A] dark:hover:text-white'
                                 }`}
                             >
                                 {label}
@@ -238,9 +247,9 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                         {/* Left Arrow Overlay Button */}
                         <button
                             onClick={() => scroll('left')}
-                            className={`absolute z-10 w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 shadow-md flex items-center justify-center transition-all duration-300 left-3 hover:scale-105 active:scale-95 ${
+                            className={`absolute z-10 w-8 h-8 rounded-full border border-[#d7ebf5] dark:border-white/10 shadow-md flex items-center justify-center transition-all duration-300 left-3 hover:scale-105 active:scale-95 ${
                                 canScrollLeft 
-                                ? 'opacity-100 cursor-pointer bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-blue-400' 
+                                ? 'opacity-100 cursor-pointer bg-white dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8]' 
                                 : 'opacity-0 pointer-events-none'
                             }`}
                             style={{ top: 'calc(50% - 16px)' }}
@@ -251,9 +260,9 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                         {/* Right Arrow Overlay Button */}
                         <button
                             onClick={() => scroll('right')}
-                            className={`absolute z-10 w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 shadow-md flex items-center justify-center transition-all duration-300 right-3 hover:scale-105 active:scale-95 ${
+                            className={`absolute z-10 w-8 h-8 rounded-full border border-[#d7ebf5] dark:border-white/10 shadow-md flex items-center justify-center transition-all duration-300 right-3 hover:scale-105 active:scale-95 ${
                                 canScrollRight 
-                                ? 'opacity-100 cursor-pointer bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-blue-400' 
+                                ? 'opacity-100 cursor-pointer bg-white dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8]' 
                                 : 'opacity-0 pointer-events-none'
                             }`}
                             style={{ top: 'calc(50% - 16px)' }}
@@ -265,7 +274,7 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
 
                 {loadingRoleSkills ? (
                     <div className="flex flex-col items-center justify-center h-36 z-10 bg-transparent">
-                        <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-3.5" />
+                        <div className="w-8 h-8 border-2 border-[#045C9A]/30 border-t-blue-500 rounded-full animate-spin mb-3.5" />
                         <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Mapping skills to pathway...</span>
                     </div>
                 ) : displayedSkills.length > 0 ? (
@@ -284,15 +293,15 @@ const ActiveSkillsWidget = ({ userEmail, paths }) => {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-36 text-center rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
-                        <div className="w-10 h-10 rounded-2xl mb-2.5 flex items-center justify-center bg-slate-100 dark:bg-white/5 border border-slate-200/50 dark:border-white/10">
-                            <Layers className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                    <div className="flex flex-col items-center justify-center h-36 text-center rounded-2xl border border-dashed border-[#d7ebf5] dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+                        <div className="w-10 h-10 rounded-2xl mb-2.5 flex items-center justify-center bg-slate-100 dark:bg-white/5 border border-[#d7ebf5]/50 dark:border-white/10">
+                            <Layers className="w-5 h-5 text-[#A6D7E8] dark:text-slate-500" />
                         </div>
-                        <p className="text-xs font-black text-slate-700 dark:text-slate-300">
+                        <p className="text-xs font-extrabold text-slate-700 dark:text-slate-300">
                             {t('dashboard.no_active_skills', 'No active skills in this pathway.')}
                         </p>
                         <p className="text-[10px] font-bold text-slate-450 dark:text-slate-400 mt-1 px-4 max-w-sm leading-normal">
-                            {t('dashboard.jump_into_roadmap', 'Jump into the Career Roadmap for')} <strong className="text-blue-600 dark:text-blue-400">{currentPath?.title}</strong> {t('dashboard.to_start_mastering', 'to start mastering new skills!')}
+                            {t('dashboard.jump_into_roadmap', 'Jump into the Career Roadmap for')} <strong className="text-[#045C9A] dark:text-[#A6D7E8]">{currentPath?.title}</strong> {t('dashboard.to_start_mastering', 'to start mastering new skills!')}
                         </p>
                     </div>
                 )}
@@ -309,41 +318,41 @@ const SkillDashboardCard = ({ skill, onMarkDone, idx }) => {
             title={skill.skillName}
             whileHover={{ y: -5, scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className={`w-[235px] min-h-[175px] flex-shrink-0 p-4 rounded-2xl flex flex-col justify-between bg-white dark:bg-[#002A5C]/40 border transition-all duration-300 relative overflow-hidden ${
+            className={`w-[235px] min-h-[175px] flex-shrink-0 p-4 rounded-2xl flex flex-col justify-between bg-white dark:bg-[#0d3a5f]/40 border transition-all duration-300 relative overflow-hidden ${
                 isHovered 
-                    ? 'shadow-lg border-blue-500/40 shadow-blue-500/5 dark:shadow-black/20' 
-                    : 'border-slate-200/70 dark:border-white/5 shadow-sm'
+                    ? 'shadow-lg border-[#045C9A]/40 shadow-blue-500/5 dark:shadow-black/20' 
+                    : 'border-[#d7ebf5]/70 dark:border-white/5 shadow-sm'
             }`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* Soft Ambient Corner Blue Glow */}
-            <div className={`absolute -top-12 -right-12 w-24 h-24 rounded-full blur-xl pointer-events-none transition-opacity duration-300 bg-blue-500/10 dark:bg-blue-450/10 ${isHovered ? 'opacity-100' : 'opacity-40'}`} />
+            <div className={`absolute -top-12 -right-12 w-24 h-24 rounded-full blur-xl pointer-events-none transition-opacity duration-300 bg-[#045C9A]/10 dark:bg-blue-450/10 ${isHovered ? 'opacity-100' : 'opacity-40'}`} />
 
             {/* Permanent top accent line */}
             <div className="absolute top-0 left-0 right-0 h-[4px] bg-slate-105 dark:bg-white/5" />
-            <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-blue-500/40 via-indigo-500/40 to-blue-500/40" />
-            <div className={`absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
+            <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-[#045C9A]/40 via-indigo-500/40 to-[#045C9A]/40" />
+            <div className={`absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-[#045C9A] via-indigo-500 to-[#045C9A] transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
 
             {/* Content Top */}
             <div className="relative z-10 flex-1 flex flex-col">
                 <div className="flex justify-between items-start gap-2.5 mb-3">
-                    <span className="text-xs font-black tracking-tight text-slate-800 dark:text-white line-clamp-3 leading-snug">
+                    <span className="text-xs font-extrabold tracking-tight text-slate-800 dark:text-white line-clamp-3 leading-snug">
                         {skill.skillName}
                     </span>
-                    <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-950/40 border border-blue-100/30 dark:border-blue-900/20 flex-shrink-0">
-                        <Target className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-[#EAF7FD] dark:bg-[#072036]/40 border border-[#A6D7E8]/30 dark:border-[#0d3a5f]/20 flex-shrink-0">
+                        <Target className="w-3.5 h-3.5 text-[#0E2136] dark:text-[#A6D7E8]" />
                     </div>
                 </div>
 
                 {/* Status Indicator */}
                 <div className="mt-auto mb-3">
-                    <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-black/10 border border-slate-200/50 dark:border-white/5 py-1 px-2 w-max rounded-lg">
+                    <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-black/10 border border-[#d7ebf5]/50 dark:border-white/5 py-1 px-2 w-max rounded-lg">
                         <span className="relative flex h-1.5 w-1.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-blue-400"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#045C9A]"></span>
                         </span>
-                        <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             In Progress
                         </span>
                     </div>
@@ -355,8 +364,8 @@ const SkillDashboardCard = ({ skill, onMarkDone, idx }) => {
                 onClick={(e) => { e.stopPropagation(); onMarkDone(); }}
                 className={`relative z-10 w-full py-2 px-3 rounded-xl text-[11px] font-extrabold transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer border ${
                     isHovered
-                        ? 'bg-[#1a3884] dark:bg-blue-600 text-white border-transparent shadow-md shadow-blue-500/10'
-                        : 'bg-[#f0f4ff] dark:bg-[#1a3884]/20 text-[#1a3884] dark:text-blue-400 border border-[#1a3884]/15 dark:border-blue-400/20 hover:bg-[#1a3884] hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-transparent dark:hover:border-transparent'
+                        ? 'bg-[#072036] dark:bg-[#045C9A] text-white border-transparent shadow-md shadow-[#072036]/15'
+                        : 'bg-[#EAF7FD] dark:bg-[#045C9A]/20 text-[#045C9A] dark:text-[#A6D7E8] border border-[#045C9A]/15 dark:border-[#045C9A]/20 hover:bg-[#045C9A] hover:text-white dark:hover:bg-[#045C9A] dark:hover:text-white hover:border-transparent dark:hover:border-transparent'
                 }`}
             >
                 <CheckCircle2 className="w-3.5 h-3.5" />

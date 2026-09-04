@@ -1,24 +1,27 @@
 /**
- * SupportScreen — help requests and formal grievances (SRS Phase 7, FR-SUP-01/02).
+ * SupportScreen — IT Support tickets + Grievance Redressal, in one screen.
  *
- * Ports `front-end/src/pages/SupportTicketsPage.jsx` and `GrievancesPage.jsx`
- * into one screen with two tabs. Replaces the ComingSoon stub.
+ * Port of `front-end/src/pages/SupportTicketsPage.jsx` and `GrievancesPage.jsx`
+ * against the same `back-end/routes/tickets.js` / `grievances.js` endpoints.
+ * Both web pages share the same New/History pill-tab shape, so they're folded
+ * into one screen with a top-level IT Support / Grievances switch instead of
+ * two separate stack screens — matches the single "Support & Grievances"
+ * drawer entry this app already has.
  *
- * They share a screen but not a system, and the distinction is deliberate:
- *
- *   Support ticket — "something is broken / I need help". Auto-assigned to IT
- *                    support, bridged to the ITSM platform, has a priority.
- *   Grievance      — a formal complaint. Student-only, can be submitted
- *                    anonymously, carries its own audit trail, no priority.
- *
- * Submitting the wrong one wastes everybody's time, so the tab switch carries
- * a one-line explanation of which is which rather than leaving it to be guessed.
+ * Deliberately dropped from the web version: file attachments (no
+ * expo-image-picker/expo-document-picker dependency in this app yet — every
+ * other new-screen pass in this codebase has made the same cut) and the ITSM
+ * reference-number banner. Everything else — categories, priority, the
+ * response thread, anonymous grievances, the closed/resolved reply lock —
+ * matches the web behavior exactly.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -32,518 +35,572 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import SkeletonBox from '../../components/SkeletonBox';
-import {
-  getTickets,
-  getGrievances,
-  createTicket,
-  createGrievance,
-  TICKET_CATEGORIES,
-  TICKET_PRIORITIES,
-  GRIEVANCE_CATEGORIES,
-  STATUS_META,
-  LIMITS,
-  labelFor,
-} from '../../api/support';
+import { ticketsAPI } from '../../api/tickets';
+import { grievancesAPI } from '../../api/grievances';
 
-const TABS = [
-  {
-    key: 'ticket',
-    label: 'Support',
-    blurb: 'Something broken, or you need help using the platform.',
-    empty: 'No support tickets yet.',
-    cta: 'New ticket',
-  },
-  {
-    key: 'grievance',
-    label: 'Grievances',
-    blurb: 'A formal complaint. Handled separately, and can be anonymous.',
-    empty: 'No grievances raised.',
-    cta: 'Raise a grievance',
-  },
+const TICKET_CATEGORIES = [
+  { value: 'technical', label: 'Technical' },
+  { value: 'account', label: 'Account' },
+  { value: 'course', label: 'Course' },
+  { value: 'assessment', label: 'Assessment' },
+  { value: 'course & assessment', label: 'Course & Assessment' },
+  { value: 'career Direction', label: 'Career Direction' },
+  { value: 'placement issue', label: 'Placement' },
+  { value: 'certificates & badges issue', label: 'Certificates & Badges' },
+  { value: 'billing', label: 'Billing' },
+  { value: 'content', label: 'Course Content' },
+  { value: 'feedback', label: 'Feedback' },
+  { value: 'other', label: 'Other' },
 ];
 
-function toneColor(tone, c) {
+const GRIEVANCE_CATEGORIES = [
+  { value: 'placement', label: 'Placement' },
+  { value: 'course', label: 'Course' },
+  { value: 'assessment', label: 'Assessment' },
+  { value: 'badges', label: 'Badges' },
+  { value: 'certificate', label: 'Certificate' },
+  { value: 'career-direction', label: 'Career Direction' },
+  { value: 'skill-passport', label: 'Skill Passport' },
+  { value: 'other-suggestion', label: 'Suggestion' },
+];
+
+const PRIORITIES = ['low', 'medium', 'high'];
+
+function statusStyle(status, themeColors) {
+  if (status === 'resolved') return { bg: `${themeColors.success}22`, fg: themeColors.success };
+  if (status === 'in-progress') return { bg: `${themeColors.primaryBright}22`, fg: themeColors.primaryBright };
+  if (status === 'open' || status === 'pending') return { bg: `${themeColors.warning}22`, fg: themeColors.warning };
+  return { bg: `${themeColors.textMuted}22`, fg: themeColors.textMuted };
+}
+
+function StatusPill({ status, themeColors }) {
+  const s = statusStyle(status, themeColors);
   return (
-    { good: c.success, warn: c.warning, info: c.primaryBright, muted: c.iconMuted }[tone] ||
-    c.iconMuted
+    <View style={[styles.pill, { backgroundColor: s.bg }]}>
+      <Text style={[styles.pillText, { color: s.fg }]}>{String(status || '').replace('-', ' ')}</Text>
+    </View>
   );
 }
 
-function formatDate(value) {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+function Chips({ options, value, onChange, themeColors }) {
+  return (
+    <View style={styles.chipRow}>
+      {options.map((opt) => {
+        const selected = value === opt.value;
+        return (
+          <Pressable
+            key={opt.value}
+            onPress={() => onChange(opt.value)}
+            style={[
+              styles.chip,
+              {
+                borderColor: selected ? themeColors.primaryBright : themeColors.border,
+                backgroundColor: selected ? `${themeColors.primaryBright}18` : 'transparent',
+              },
+            ]}
+          >
+            <Text style={[styles.chipText, { color: selected ? themeColors.primaryBright : themeColors.textMuted }]}>
+              {opt.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
 }
 
-/** A status chip, shared by both systems (their vocabularies overlap). */
-function StatusChip({ status, colors }) {
-  const meta = STATUS_META[status] || { label: status || 'Unknown', tone: 'muted' };
-  const tint = toneColor(meta.tone, colors);
+function FieldLabel({ children, themeColors }) {
+  return <Text style={[styles.fieldLabel, { color: themeColors.textMuted }]}>{children}</Text>;
+}
+
+function TextField({ themeColors, isDark, ...props }) {
   return (
-    <View style={[styles.statusChip, { backgroundColor: `${tint}1A`, borderColor: `${tint}55` }]}>
-      <Text style={[styles.statusText, { color: tint }]}>{meta.label}</Text>
-    </View>
+    <TextInput
+      placeholderTextColor={themeColors.textMuted}
+      style={[
+        styles.input,
+        props.multiline && styles.inputMultiline,
+        { color: themeColors.text, borderColor: themeColors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#FFFFFF' },
+      ]}
+      {...props}
+    />
   );
 }
 
 export default function SupportScreen({ navigation }) {
   const { colors: themeColors, theme } = useTheme();
+  const { user } = useAuth();
   const isDark = theme === 'dark';
 
-  const [tab, setTab] = useState('ticket');
+  const [section, setSection] = useState('tickets'); // 'tickets' | 'grievances'
+  const [mode, setMode] = useState('create'); // 'create' | 'history'
+
   const [tickets, setTickets] = useState([]);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
   const [grievances, setGrievances] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [grievancesLoading, setGrievancesLoading] = useState(false);
 
-  // Composer
-  const [composing, setComposing] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState(null);
-  const [priority, setPriority] = useState('medium');
-  const [anonymous, setAnonymous] = useState(false);
+  const [ticketForm, setTicketForm] = useState({ title: '', description: '', category: 'technical', priority: 'medium' });
+  const [grievanceForm, setGrievanceForm] = useState({ title: '', description: '', category: 'course', isAnonymous: false });
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const load = useCallback(async () => {
-    // One failing system must not blank the other — a grievance 403 for a
-    // non-student account is expected, and should not hide their tickets.
-    const [t, g] = await Promise.allSettled([getTickets(), getGrievances()]);
-    setTickets(t.status === 'fulfilled' ? t.value : []);
-    setGrievances(g.status === 'fulfilled' ? g.value : []);
-    setLoading(false);
+  const [detail, setDetail] = useState(null); // { type: 'ticket'|'grievance', item }
+  const [replyText, setReplyText] = useState('');
+  const [replying, setReplying] = useState(false);
+
+  const loadTickets = useCallback(async () => {
+    setTicketsLoading(true);
+    try {
+      // The server defaults to limit=10 with pagination this screen doesn't
+      // render — request enough to show the full history.
+      const res = await ticketsAPI.getMyTickets({ limit: 100 });
+      setTickets(res.data || []);
+    } catch {
+      setTickets([]);
+    } finally {
+      setTicketsLoading(false);
+    }
+  }, []);
+
+  const loadGrievances = useCallback(async () => {
+    setGrievancesLoading(true);
+    try {
+      const res = await grievancesAPI.getMyGrievances();
+      setGrievances(res.data || []);
+    } catch {
+      setGrievances([]);
+    } finally {
+      setGrievancesLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (mode !== 'history') return;
+    if (section === 'tickets') loadTickets();
+    else loadGrievances();
+  }, [mode, section, loadTickets, loadGrievances]);
 
-  useEffect(() => navigation.addListener('focus', load), [navigation, load]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  }, [load]);
-
-  const isTicketTab = tab === 'ticket';
-  const items = isTicketTab ? tickets : grievances;
-  const activeTab = TABS.find((t) => t.key === tab);
-  const categories = isTicketTab ? TICKET_CATEGORIES : GRIEVANCE_CATEGORIES;
-  const limits = isTicketTab ? LIMITS.ticket : LIMITS.grievance;
-
-  const openCount = useMemo(
-    () => items.filter((i) => i.status !== 'closed' && i.status !== 'resolved').length,
-    [items]
-  );
-
-  const resetComposer = () => {
-    setTitle('');
-    setDescription('');
-    setCategory(null);
-    setPriority('medium');
-    setAnonymous(false);
-  };
-
-  const validation = useMemo(() => {
-    const t = title.trim();
-    const d = description.trim();
-    if (!t) return 'Add a short title.';
-    if (t.length < limits.title[0]) return `Title needs at least ${limits.title[0]} characters.`;
-    if (t.length > limits.title[1]) return `Title cannot exceed ${limits.title[1]} characters.`;
-    if (!d) return 'Describe what happened.';
-    if (d.length < limits.description[0])
-      return `Description needs at least ${limits.description[0]} characters.`;
-    if (d.length > limits.description[1])
-      return `Description cannot exceed ${limits.description[1]} characters.`;
-    if (!category) return 'Pick a category.';
-    return null;
-  }, [title, description, category, limits]);
-
-  const submit = async () => {
-    if (validation || submitting) return;
+  const submitTicket = async () => {
+    const title = ticketForm.title.trim();
+    const description = ticketForm.description.trim();
+    if (title.length < 5) return setFormError('Title needs at least 5 characters.');
+    if (description.length < 10) return setFormError('Description needs at least 10 characters.');
+    setFormError('');
     setSubmitting(true);
     try {
-      if (isTicketTab) {
-        const created = await createTicket({
-          title: title.trim(),
-          description: description.trim(),
-          category,
-          priority,
-        });
-        setTickets((prev) => [created, ...prev]);
-      } else {
-        const created = await createGrievance({
-          title: title.trim(),
-          description: description.trim(),
-          category,
-          isAnonymous: anonymous,
-        });
-        setGrievances((prev) => [created, ...prev]);
-      }
-      setComposing(false);
-      resetComposer();
+      await ticketsAPI.createTicket({
+        title,
+        description,
+        category: ticketForm.category,
+        priority: ticketForm.priority,
+      });
+      setTicketForm({ title: '', description: '', category: 'technical', priority: 'medium' });
+      setMode('history');
+      loadTickets();
     } catch (err) {
-      // Both systems answer with `error`; express-validator adds `errors[]`.
-      const payload = err?.response?.data;
-      const message =
-        payload?.errors?.[0]?.msg || payload?.error || payload?.message || 'Please try again.';
-      Alert.alert("Couldn't submit", message);
+      setFormError(err?.data?.error || err?.message || "Couldn't submit — please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const openDetail = (item) =>
-    navigation.navigate('SupportDetail', {
-      kind: tab,
-      id: item._id,
-      reference: item.ticketId || item.grievanceId || null,
-    });
+  const submitGrievance = async () => {
+    const title = grievanceForm.title.trim();
+    const description = grievanceForm.description.trim();
+    if (!title) return setFormError('Title is required.');
+    if (!description) return setFormError('Description is required.');
+    setFormError('');
+    setSubmitting(true);
+    try {
+      await grievancesAPI.createGrievance({
+        title,
+        description,
+        category: grievanceForm.category,
+        isAnonymous: grievanceForm.isAnonymous,
+      });
+      setGrievanceForm({ title: '', description: '', category: 'course', isAnonymous: false });
+      setMode('history');
+      loadGrievances();
+    } catch (err) {
+      setFormError(err?.data?.error || err?.message || "Couldn't submit — please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openDetail = (type, item) => {
+    setReplyText('');
+    setDetail({ type, item });
+  };
+
+  const sendReply = async () => {
+    const message = replyText.trim();
+    if (!message || !detail) return;
+    setReplying(true);
+    try {
+      let updated;
+      if (detail.type === 'ticket') {
+        const res = await ticketsAPI.addResponse(detail.item._id, message);
+        updated = res.data;
+        setTickets((prev) => prev.map((t) => (t._id === updated._id ? updated : t)));
+      } else {
+        const res = await grievancesAPI.respond(detail.item._id, message);
+        updated = res.data;
+        setGrievances((prev) => prev.map((g) => (g._id === updated._id ? updated : g)));
+      }
+      setDetail({ type: detail.type, item: updated });
+      setReplyText('');
+    } catch (err) {
+      Alert.alert("Couldn't send", err?.data?.error || err?.message || 'Please try again.');
+    } finally {
+      setReplying(false);
+    }
+  };
+
+  const list = section === 'tickets' ? tickets : grievances;
+  const listLoading = section === 'tickets' ? ticketsLoading : grievancesLoading;
+  const replyLocked = detail?.type === 'ticket' && (detail.item.status === 'closed' || detail.item.status === 'resolved');
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: themeColors.bg }]} edges={['top']}>
-      <RNStatusBar
-        barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={themeColors.bg}
-      />
+      <RNStatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={themeColors.bg} />
 
       <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
         <Pressable
           onPress={() => navigation.goBack()}
           hitSlop={10}
-          style={[
-            styles.backBtn,
-            {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-              borderColor: themeColors.border,
-            },
-          ]}
+          style={[styles.backBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)', borderColor: themeColors.border }]}
         >
           <Feather name="arrow-left" size={19} color={themeColors.text} />
         </Pressable>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.eyebrow, { color: themeColors.textMuted }]}>
-            {openCount > 0 ? `${openCount} still open` : 'Nothing outstanding'}
-          </Text>
-          <Text style={[styles.title, { color: themeColors.text }]}>Help & Grievances</Text>
+          <Text style={[styles.title, { color: themeColors.text }]}>Support & Grievances</Text>
+          <Text style={[styles.subtitle, { color: themeColors.textMuted }]}>We're here to help</Text>
         </View>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabsWrap}>
-        <View style={[styles.tabs, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          {TABS.map((t) => {
-            const active = tab === t.key;
-            const count = t.key === 'ticket' ? tickets.length : grievances.length;
+      <View style={styles.segmentWrap}>
+        <View style={[styles.segment, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+          {[
+            { key: 'tickets', label: 'IT Support', icon: 'life-buoy' },
+            { key: 'grievances', label: 'Grievances', icon: 'shield' },
+          ].map((s) => {
+            const selected = section === s.key;
             return (
               <Pressable
-                key={t.key}
-                onPress={() => setTab(t.key)}
-                style={[
-                  styles.tab,
-                  active && { backgroundColor: themeColors.primaryBright },
-                ]}
+                key={s.key}
+                onPress={() => { setSection(s.key); setFormError(''); }}
+                style={[styles.segmentBtn, selected && { backgroundColor: themeColors.primaryBright }]}
               >
-                <Text
-                  style={[styles.tabText, { color: active ? '#FFFFFF' : themeColors.textMuted }]}
-                >
-                  {t.label}
-                  {count > 0 ? ` · ${count}` : ''}
-                </Text>
+                <Feather name={s.icon} size={14} color={selected ? '#FFFFFF' : themeColors.textMuted} />
+                <Text style={[styles.segmentText, { color: selected ? '#FFFFFF' : themeColors.textMuted }]}>{s.label}</Text>
               </Pressable>
             );
           })}
         </View>
-        <Text style={[styles.tabBlurb, { color: themeColors.textMuted }]}>{activeTab.blurb}</Text>
+
+        <View style={styles.tabRow}>
+          {[
+            { key: 'create', label: section === 'tickets' ? 'New Ticket' : 'Submit', icon: 'plus' },
+            { key: 'history', label: 'History', icon: 'clock' },
+          ].map((t) => {
+            const selected = mode === t.key;
+            return (
+              <Pressable
+                key={t.key}
+                onPress={() => { setMode(t.key); setFormError(''); }}
+                style={[styles.tabBtn, { borderColor: themeColors.border }, selected && { borderColor: themeColors.text }]}
+              >
+                <Feather name={t.icon} size={12} color={selected ? themeColors.text : themeColors.textMuted} />
+                <Text style={[styles.tabText, { color: selected ? themeColors.text : themeColors.textMuted }]}>{t.label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={themeColors.primaryBright}
-            colors={[themeColors.primaryBright]}
-          />
+          mode === 'history' ? (
+            <RefreshControl
+              refreshing={listLoading}
+              onRefresh={section === 'tickets' ? loadTickets : loadGrievances}
+              tintColor={themeColors.primaryBright}
+              colors={[themeColors.primaryBright]}
+            />
+          ) : undefined
         }
       >
-        <Pressable
-          onPress={() => setComposing(true)}
-          style={({ pressed }) => [
-            styles.newBtn,
-            { backgroundColor: themeColors.primaryBright, opacity: pressed ? 0.85 : 1 },
-          ]}
-        >
-          <Feather name="plus" size={17} color="#FFFFFF" />
-          <Text style={styles.newBtnText}>{activeTab.cta}</Text>
-        </Pressable>
+        {mode === 'create' ? (
+          <View style={[styles.formCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            {!!formError && (
+              <View style={[styles.errorBanner, { backgroundColor: `${themeColors.danger}18` }]}>
+                <Feather name="alert-circle" size={14} color={themeColors.danger} />
+                <Text style={[styles.errorText, { color: themeColors.danger }]}>{formError}</Text>
+              </View>
+            )}
 
-        {loading ? (
-          <View style={{ gap: 12, marginTop: 16 }}>
+            {section === 'tickets' ? (
+              <>
+                <FieldLabel themeColors={themeColors}>Title</FieldLabel>
+                <TextField
+                  themeColors={themeColors}
+                  isDark={isDark}
+                  value={ticketForm.title}
+                  onChangeText={(v) => setTicketForm((f) => ({ ...f, title: v }))}
+                  placeholder="Short summary of the issue"
+                  maxLength={100}
+                />
+                <FieldLabel themeColors={themeColors}>Description</FieldLabel>
+                <TextField
+                  themeColors={themeColors}
+                  isDark={isDark}
+                  value={ticketForm.description}
+                  onChangeText={(v) => setTicketForm((f) => ({ ...f, description: v }))}
+                  placeholder="What happened, and what did you expect instead?"
+                  multiline
+                  maxLength={2000}
+                />
+                <FieldLabel themeColors={themeColors}>Category</FieldLabel>
+                <Chips
+                  options={TICKET_CATEGORIES}
+                  value={ticketForm.category}
+                  onChange={(v) => setTicketForm((f) => ({ ...f, category: v }))}
+                  themeColors={themeColors}
+                />
+                <FieldLabel themeColors={themeColors}>Priority</FieldLabel>
+                <Chips
+                  options={PRIORITIES.map((p) => ({ value: p, label: p[0].toUpperCase() + p.slice(1) }))}
+                  value={ticketForm.priority}
+                  onChange={(v) => setTicketForm((f) => ({ ...f, priority: v }))}
+                  themeColors={themeColors}
+                />
+                <Pressable
+                  onPress={submitTicket}
+                  disabled={submitting}
+                  style={[styles.submitBtn, { backgroundColor: themeColors.primaryBright, opacity: submitting ? 0.6 : 1 }]}
+                >
+                  {submitting ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Text style={styles.submitText}>Submit Ticket</Text>}
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <View style={[styles.infoCallout, { backgroundColor: `${themeColors.primaryBright}12` }]}>
+                  <Feather name="shield" size={14} color={themeColors.primaryBright} />
+                  <Text style={[styles.infoCalloutText, { color: themeColors.textMuted }]}>
+                    Grievances go straight to SMAART Administration. Turn on anonymous mode to hide your identity.
+                  </Text>
+                </View>
+                <FieldLabel themeColors={themeColors}>Title</FieldLabel>
+                <TextField
+                  themeColors={themeColors}
+                  isDark={isDark}
+                  value={grievanceForm.title}
+                  onChangeText={(v) => setGrievanceForm((f) => ({ ...f, title: v }))}
+                  placeholder="What's this grievance about?"
+                  maxLength={100}
+                />
+                <FieldLabel themeColors={themeColors}>Description</FieldLabel>
+                <TextField
+                  themeColors={themeColors}
+                  isDark={isDark}
+                  value={grievanceForm.description}
+                  onChangeText={(v) => setGrievanceForm((f) => ({ ...f, description: v }))}
+                  placeholder="Describe the issue in detail"
+                  multiline
+                  maxLength={2000}
+                />
+                <FieldLabel themeColors={themeColors}>Category</FieldLabel>
+                <Chips
+                  options={GRIEVANCE_CATEGORIES}
+                  value={grievanceForm.category}
+                  onChange={(v) => setGrievanceForm((f) => ({ ...f, category: v }))}
+                  themeColors={themeColors}
+                />
+                <View style={styles.anonRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.fieldLabel, { color: themeColors.text, marginBottom: 2 }]}>Submit anonymously</Text>
+                    <Text style={[styles.anonHint, { color: themeColors.textMuted }]}>Hides your name from admins reviewing this.</Text>
+                  </View>
+                  <Switch
+                    value={grievanceForm.isAnonymous}
+                    onValueChange={(v) => setGrievanceForm((f) => ({ ...f, isAnonymous: v }))}
+                    trackColor={{ false: themeColors.border, true: `${themeColors.primaryBright}80` }}
+                    thumbColor={grievanceForm.isAnonymous ? themeColors.primaryBright : '#F4F3F4'}
+                  />
+                </View>
+                <Pressable
+                  onPress={submitGrievance}
+                  disabled={submitting}
+                  style={[styles.submitBtn, { backgroundColor: themeColors.primaryBright, opacity: submitting ? 0.6 : 1 }]}
+                >
+                  {submitting ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Text style={styles.submitText}>Submit Grievance</Text>}
+                </Pressable>
+              </>
+            )}
+          </View>
+        ) : listLoading ? (
+          <View style={{ gap: 12 }}>
             {[0, 1, 2].map((i) => (
-              <SkeletonBox key={i} width="100%" height={96} borderRadius={16} />
+              <SkeletonBox key={i} width="100%" height={104} borderRadius={16} />
             ))}
           </View>
-        ) : items.length === 0 ? (
+        ) : list.length === 0 ? (
           <View style={styles.empty}>
-            <Feather
-              name={isTicketTab ? 'life-buoy' : 'shield'}
-              size={30}
-              color={themeColors.iconMuted}
-            />
-            <Text style={[styles.emptyTitle, { color: themeColors.text }]}>{activeTab.empty}</Text>
-            <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>
-              {activeTab.blurb}
+            <View style={[styles.emptyIconWrap, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+              <Feather name={section === 'tickets' ? 'life-buoy' : 'inbox'} size={28} color={themeColors.primaryBright} />
+            </View>
+            <Text style={[styles.emptyTitle, { color: themeColors.text }]}>
+              {section === 'tickets' ? 'No support tickets yet' : 'No grievances yet'}
             </Text>
+            <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>
+              {section === 'tickets'
+                ? "You haven't raised any IT support requests."
+                : "You haven't submitted anything to the grievance portal."}
+            </Text>
+            <Pressable onPress={() => setMode('create')} style={[styles.emptyBtn, { backgroundColor: themeColors.primaryBright }]}>
+              <Text style={styles.emptyBtnText}>{section === 'tickets' ? 'Submit a Ticket' : 'Submit a Grievance'}</Text>
+            </Pressable>
           </View>
         ) : (
-          <View style={{ gap: 12, marginTop: 16 }}>
-            {items.map((item) => (
-              <Pressable
-                key={item._id}
-                onPress={() => openDetail(item)}
-                style={({ pressed }) => [
-                  styles.card,
-                  {
-                    backgroundColor: themeColors.card,
-                    borderColor: themeColors.border,
-                    opacity: pressed ? 0.85 : 1,
-                  },
-                ]}
-              >
-                <View style={styles.cardTop}>
-                  <Text style={[styles.cardTitle, { color: themeColors.text }]} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <StatusChip status={item.status} colors={themeColors} />
-                </View>
-
-                <Text style={[styles.cardBody, { color: themeColors.textMuted }]} numberOfLines={2}>
-                  {item.description}
-                </Text>
-
-                <View style={styles.cardFoot}>
-                  <Text style={[styles.metaText, { color: themeColors.iconMuted }]}>
-                    {labelFor(categories, item.category)}
-                  </Text>
-                  <Text style={[styles.metaDot, { color: themeColors.iconMuted }]}>·</Text>
-                  <Text style={[styles.metaText, { color: themeColors.iconMuted }]}>
-                    {formatDate(item.createdAt)}
-                  </Text>
-                  {!!item.isAnonymous && (
-                    <>
-                      <Text style={[styles.metaDot, { color: themeColors.iconMuted }]}>·</Text>
-                      <Feather name="eye-off" size={11} color={themeColors.iconMuted} />
-                      <Text style={[styles.metaText, { color: themeColors.iconMuted }]}>
-                        Anonymous
+          <View style={{ gap: 12 }}>
+            {list.map((item) => {
+              const idLabel = section === 'tickets' ? item.ticketId : item.grievanceId;
+              return (
+                <Pressable
+                  key={item._id}
+                  onPress={() => openDetail(section === 'tickets' ? 'ticket' : 'grievance', item)}
+                  style={[styles.itemCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                >
+                  <View style={[styles.itemBar, { backgroundColor: themeColors.primaryBright }]} />
+                  <View style={{ flex: 1, paddingLeft: 10 }}>
+                    <View style={styles.itemTop}>
+                      <Text style={[styles.itemId, { color: themeColors.textMuted }]}>#{idLabel || item._id.slice(-6)}</Text>
+                      <StatusPill status={item.status} themeColors={themeColors} />
+                    </View>
+                    {section === 'grievances' && item.isAnonymous && (
+                      <Text style={[styles.anonBadge, { color: themeColors.primaryBright }]}>ANONYMOUS</Text>
+                    )}
+                    <Text style={[styles.itemTitle, { color: themeColors.text }]} numberOfLines={1}>{item.title}</Text>
+                    <Text style={[styles.itemDesc, { color: themeColors.textMuted }]} numberOfLines={2}>{item.description}</Text>
+                    <View style={styles.itemFooter}>
+                      <Text style={[styles.itemMeta, { color: themeColors.textMuted }]}>
+                        {new Date(item.createdAt).toLocaleDateString()}
                       </Text>
-                    </>
-                  )}
-                  {(item.responses?.length ?? 0) > 0 && (
-                    <>
-                      <Text style={[styles.metaDot, { color: themeColors.iconMuted }]}>·</Text>
-                      <Feather name="message-circle" size={11} color={themeColors.primaryBright} />
-                      <Text style={[styles.metaText, { color: themeColors.primaryBright }]}>
-                        {item.responses.length}
-                      </Text>
-                    </>
-                  )}
-                </View>
-
-                {!!(item.ticketId || item.grievanceId) && (
-                  <Text style={[styles.reference, { color: themeColors.iconMuted }]}>
-                    {item.ticketId || item.grievanceId}
-                  </Text>
-                )}
-              </Pressable>
-            ))}
+                      {item.responses?.length > 0 && (
+                        <View style={styles.itemMetaRow}>
+                          <Feather name="message-square" size={11} color={themeColors.primaryBright} />
+                          <Text style={[styles.itemMeta, { color: themeColors.primaryBright }]}>
+                            {item.responses.length} {item.responses.length === 1 ? 'response' : 'responses'}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </Pressable>
+              );
+            })}
           </View>
         )}
       </ScrollView>
 
-      {/* ── Composer ───────────────────────────────────────────────────── */}
-      <Modal
-        visible={composing}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={() => setComposing(false)}
-      >
-        <SafeAreaView style={[styles.screen, { backgroundColor: themeColors.bg }]} edges={['top']}>
-          <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
-            <Pressable
-              onPress={() => setComposing(false)}
-              hitSlop={10}
-              style={[
-                styles.backBtn,
-                {
-                  backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                  borderColor: themeColors.border,
-                },
-              ]}
-            >
-              <Feather name="x" size={19} color={themeColors.text} />
-            </Pressable>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.eyebrow, { color: themeColors.textMuted }]}>
-                {isTicketTab ? 'Goes to IT support' : 'Goes to the grievance officer'}
-              </Text>
-              <Text style={[styles.title, { color: themeColors.text }]}>{activeTab.cta}</Text>
-            </View>
-          </View>
-
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+      <Modal visible={!!detail} animationType="slide" transparent onRequestClose={() => setDetail(null)}>
+        <View style={styles.modalBackdrop}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={[styles.modalCard, { backgroundColor: themeColors.bg }]}
           >
-            <Text style={[styles.fieldLabel, { color: themeColors.textMuted }]}>Title</Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              placeholder="A one-line summary"
-              placeholderTextColor={themeColors.iconMuted}
-              maxLength={limits.title[1]}
-              style={[
-                styles.input,
-                { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text },
-              ]}
-            />
-
-            <Text style={[styles.fieldLabel, { color: themeColors.textMuted }]}>Category</Text>
-            <View style={styles.optionWrap}>
-              {categories.map((c) => {
-                const active = category === c.value;
-                return (
-                  <Pressable
-                    key={c.value}
-                    onPress={() => setCategory(c.value)}
-                    style={[
-                      styles.option,
-                      {
-                        backgroundColor: active ? themeColors.primaryBright : themeColors.card,
-                        borderColor: active ? themeColors.primaryBright : themeColors.border,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        { color: active ? '#FFFFFF' : themeColors.textMuted },
-                      ]}
-                    >
-                      {c.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {isTicketTab && (
+            {detail && (
               <>
-                <Text style={[styles.fieldLabel, { color: themeColors.textMuted }]}>Priority</Text>
-                <View style={styles.optionWrap}>
-                  {TICKET_PRIORITIES.map((pri) => {
-                    const active = priority === pri.value;
-                    return (
-                      <Pressable
-                        key={pri.value}
-                        onPress={() => setPriority(pri.value)}
-                        style={[
-                          styles.option,
-                          {
-                            backgroundColor: active ? themeColors.primaryBright : themeColors.card,
-                            borderColor: active ? themeColors.primaryBright : themeColors.border,
-                          },
-                        ]}
-                      >
-                        <Text
+                <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.itemId, { color: themeColors.textMuted }]}>
+                      #{(detail.type === 'ticket' ? detail.item.ticketId : detail.item.grievanceId) || detail.item._id.slice(-6)}
+                    </Text>
+                    <Text style={[styles.modalTitle, { color: themeColors.text }]}>{detail.item.title}</Text>
+                  </View>
+                  <StatusPill status={detail.item.status} themeColors={themeColors} />
+                  <Pressable onPress={() => setDetail(null)} hitSlop={10} style={{ marginLeft: 12 }}>
+                    <Feather name="x" size={20} color={themeColors.text} />
+                  </Pressable>
+                </View>
+
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.modalScroll}>
+                  <Text style={[styles.modalDesc, { color: themeColors.textMuted }]}>{detail.item.description}</Text>
+
+                  <Text style={[styles.groupLabel, { color: themeColors.textMuted, marginTop: 18 }]}>
+                    {detail.item.responses?.length > 0 ? 'RESPONSES' : 'NO RESPONSES YET'}
+                  </Text>
+                  <View style={{ gap: 10, marginTop: 8 }}>
+                    {(detail.item.responses || []).map((resp, idx) => {
+                      // `respondedBy` is populated on list/reply responses; if
+                      // it ever arrives as a raw id, fall back to comparing it
+                      // against the signed-in user's id.
+                      const isYou =
+                        resp.respondedBy?.role === 'student' ||
+                        String(resp.respondedBy?._id || resp.respondedBy || '') ===
+                          String(user?._id || user?.id || '');
+                      return (
+                        <View
+                          key={idx}
                           style={[
-                            styles.optionText,
-                            { color: active ? '#FFFFFF' : themeColors.textMuted },
+                            styles.replyBubble,
+                            {
+                              backgroundColor: isYou ? `${themeColors.primaryBright}18` : themeColors.card,
+                              borderColor: themeColors.border,
+                              alignSelf: isYou ? 'flex-end' : 'flex-start',
+                            },
                           ]}
                         >
-                          {pri.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+                          <Text style={[styles.replyAuthor, { color: themeColors.textMuted }]}>
+                            {isYou ? 'You' : resp.respondedBy?.fullName || 'Support Team'}
+                          </Text>
+                          <Text style={[styles.replyText, { color: themeColors.text }]}>{resp.message}</Text>
+                          <Text style={[styles.replyTime, { color: themeColors.textMuted }]}>
+                            {new Date(resp.respondedAt).toLocaleString()}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </ScrollView>
+
+                {replyLocked ? (
+                  <View style={[styles.lockedNote, { borderTopColor: themeColors.border }]}>
+                    <Feather name="lock" size={12} color={themeColors.textMuted} />
+                    <Text style={[styles.lockedText, { color: themeColors.textMuted }]}>
+                      This ticket is {detail.item.status} — no further replies.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={[styles.replyRow, { borderTopColor: themeColors.border }]}>
+                    <TextInput
+                      value={replyText}
+                      onChangeText={setReplyText}
+                      placeholder="Write a reply…"
+                      placeholderTextColor={themeColors.textMuted}
+                      style={[styles.replyInput, { color: themeColors.text, borderColor: themeColors.border }]}
+                      multiline
+                    />
+                    <Pressable
+                      onPress={sendReply}
+                      disabled={replying || !replyText.trim()}
+                      style={[styles.sendBtn, { backgroundColor: themeColors.primaryBright, opacity: replying || !replyText.trim() ? 0.5 : 1 }]}
+                    >
+                      {replying ? <ActivityIndicator size="small" color="#FFFFFF" /> : <Feather name="send" size={16} color="#FFFFFF" />}
+                    </Pressable>
+                  </View>
+                )}
               </>
             )}
-
-            <Text style={[styles.fieldLabel, { color: themeColors.textMuted }]}>
-              What happened?
-            </Text>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Include what you were doing, what you expected, and what happened instead."
-              placeholderTextColor={themeColors.iconMuted}
-              multiline
-              maxLength={limits.description[1]}
-              style={[
-                styles.textarea,
-                { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text },
-              ]}
-            />
-            <Text style={[styles.counter, { color: themeColors.iconMuted }]}>
-              {description.trim().length} / {limits.description[1]}
-            </Text>
-
-            {!isTicketTab && (
-              <View
-                style={[
-                  styles.anonRow,
-                  { backgroundColor: themeColors.card, borderColor: themeColors.border },
-                ]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.anonTitle, { color: themeColors.text }]}>
-                    Submit anonymously
-                  </Text>
-                  <Text style={[styles.anonText, { color: themeColors.textMuted }]}>
-                    Your name is hidden from the administrator reviewing this. You can still see it
-                    and reply here.
-                  </Text>
-                </View>
-                <Switch
-                  value={anonymous}
-                  onValueChange={setAnonymous}
-                  trackColor={{ false: themeColors.border, true: themeColors.primaryBright }}
-                />
-              </View>
-            )}
-
-            {!!validation && title.length + description.length > 0 && (
-              <Text style={[styles.validation, { color: themeColors.warning }]}>{validation}</Text>
-            )}
-
-            <Pressable
-              onPress={submit}
-              disabled={!!validation || submitting}
-              style={[
-                styles.submitBtn,
-                {
-                  backgroundColor: themeColors.primaryBright,
-                  opacity: validation || submitting ? 0.5 : 1,
-                },
-              ]}
-            >
-              {submitting ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.submitText}>
-                  {isTicketTab ? 'Submit ticket' : 'Submit grievance'}
-                </Text>
-              )}
-            </Pressable>
-          </ScrollView>
-        </SafeAreaView>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -555,63 +612,74 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 12,
     paddingHorizontal: 18, paddingVertical: 12, borderBottomWidth: 1,
   },
-  backBtn: {
-    width: 40, height: 40, borderRadius: 20, borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  eyebrow: { fontSize: 11.5, fontWeight: '600' },
-  title: { fontSize: 21, fontWeight: '800', letterSpacing: -0.4 },
+  backBtn: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 19, fontWeight: '800', letterSpacing: -0.3 },
+  subtitle: { fontSize: 12, fontWeight: '600', marginTop: 1 },
 
-  tabsWrap: { paddingHorizontal: 20, paddingTop: 14, gap: 8 },
-  tabs: { flexDirection: 'row', borderWidth: 1, borderRadius: 999, padding: 4, gap: 4 },
-  tab: { flex: 1, borderRadius: 999, paddingVertical: 9, alignItems: 'center' },
-  tabText: { fontSize: 13, fontWeight: '800' },
-  tabBlurb: { fontSize: 12, lineHeight: 17, paddingHorizontal: 4 },
+  segmentWrap: { paddingHorizontal: 20, paddingTop: 14, gap: 10 },
+  segment: { flexDirection: 'row', borderRadius: 14, borderWidth: 1, padding: 4, gap: 4 },
+  segmentBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 9, borderRadius: 11 },
+  segmentText: { fontSize: 12.5, fontWeight: '800' },
 
-  scroll: { padding: 20, paddingBottom: 40 },
+  tabRow: { flexDirection: 'row', gap: 8 },
+  tabBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, borderWidth: 1.2 },
+  tabText: { fontSize: 12, fontWeight: '700' },
 
-  newBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderRadius: 14, paddingVertical: 13,
-  },
-  newBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  scroll: { padding: 20, paddingBottom: 60 },
+
+  formCard: { borderWidth: 1, borderRadius: 18, padding: 16 },
+  errorBanner: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, borderRadius: 10, padding: 10, marginBottom: 14 },
+  errorText: { fontSize: 12, fontWeight: '600', flex: 1 },
+  fieldLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 7, marginTop: 4 },
+  input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 13, paddingVertical: 11, fontSize: 14, fontWeight: '500', marginBottom: 4 },
+  inputMultiline: { minHeight: 100, textAlignVertical: 'top' },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 4 },
+  chip: { paddingHorizontal: 13, paddingVertical: 8, borderRadius: 999, borderWidth: 1.2 },
+  chipText: { fontSize: 12, fontWeight: '700' },
+  anonRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10, marginBottom: 4 },
+  anonHint: { fontSize: 11.5, fontWeight: '500' },
+  infoCallout: { flexDirection: 'row', alignItems: 'flex-start', gap: 9, borderRadius: 12, padding: 12, marginBottom: 16 },
+  infoCalloutText: { flex: 1, fontSize: 11.5, fontWeight: '500', lineHeight: 16 },
+  submitBtn: { marginTop: 14, borderRadius: 14, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' },
+  submitText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
 
   empty: { alignItems: 'center', gap: 10, paddingVertical: 60, paddingHorizontal: 30 },
+  emptyIconWrap: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   emptyTitle: { fontSize: 16, fontWeight: '800' },
   emptyText: { fontSize: 13, textAlign: 'center', lineHeight: 19 },
+  emptyBtn: { marginTop: 10, paddingHorizontal: 20, paddingVertical: 11, borderRadius: 12 },
+  emptyBtnText: { color: '#FFFFFF', fontSize: 12.5, fontWeight: '800' },
 
-  card: { borderWidth: 1, borderRadius: 16, padding: 15 },
-  cardTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  cardTitle: { flex: 1, fontSize: 14.5, fontWeight: '800', lineHeight: 20 },
-  cardBody: { fontSize: 12.5, fontWeight: '500', lineHeight: 18, marginTop: 6 },
-  cardFoot: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 10, flexWrap: 'wrap' },
-  metaText: { fontSize: 11, fontWeight: '600' },
-  metaDot: { fontSize: 11 },
-  reference: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 6 },
+  itemCard: { flexDirection: 'row', borderWidth: 1, borderRadius: 16, padding: 14, overflow: 'hidden' },
+  itemBar: { width: 4, borderRadius: 2, marginRight: -4 },
+  itemTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  itemId: { fontSize: 10.5, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
+  pill: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999 },
+  pillText: { fontSize: 10.5, fontWeight: '800', textTransform: 'capitalize' },
+  anonBadge: { fontSize: 9.5, fontWeight: '800', letterSpacing: 0.6, marginTop: 4 },
+  itemTitle: { fontSize: 15, fontWeight: '800', marginTop: 6, marginBottom: 3 },
+  itemDesc: { fontSize: 12.5, fontWeight: '500', lineHeight: 18, marginBottom: 8 },
+  itemFooter: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  itemMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  itemMeta: { fontSize: 11, fontWeight: '600' },
 
-  statusChip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
-  statusText: { fontSize: 10.5, fontWeight: '800' },
+  groupLabel: { fontSize: 10.5, fontWeight: '800', letterSpacing: 1 },
 
-  fieldLabel: { fontSize: 11.5, fontWeight: '800', letterSpacing: 0.5, marginBottom: 8, marginTop: 18 },
-  input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14 },
-  textarea: {
-    borderWidth: 1, borderRadius: 12, padding: 14, fontSize: 14,
-    minHeight: 140, textAlignVertical: 'top',
-  },
-  counter: { fontSize: 11, fontWeight: '600', marginTop: 6, textAlign: 'right' },
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  modalCard: { height: '86%', borderTopLeftRadius: 24, borderTopRightRadius: 24, overflow: 'hidden' },
+  modalHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 18, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 16, fontWeight: '800', marginTop: 3 },
+  modalScroll: { padding: 18, paddingBottom: 30 },
+  modalDesc: { fontSize: 13.5, lineHeight: 20, fontWeight: '500' },
 
-  optionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  option: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 13, paddingVertical: 8 },
-  optionText: { fontSize: 12.5, fontWeight: '700' },
+  replyBubble: { maxWidth: '85%', borderWidth: 1, borderRadius: 14, padding: 12 },
+  replyAuthor: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4, textTransform: 'uppercase', marginBottom: 3 },
+  replyText: { fontSize: 13, fontWeight: '500', lineHeight: 18 },
+  replyTime: { fontSize: 9.5, fontWeight: '600', marginTop: 5 },
 
-  anonRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    borderWidth: 1, borderRadius: 14, padding: 14, marginTop: 18,
-  },
-  anonTitle: { fontSize: 13.5, fontWeight: '800' },
-  anonText: { fontSize: 11.5, lineHeight: 16, marginTop: 3 },
-
-  validation: { fontSize: 12.5, fontWeight: '700', marginTop: 16 },
-  submitBtn: { borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginTop: 20 },
-  submitText: { color: '#FFFFFF', fontSize: 14.5, fontWeight: '800' },
+  lockedNote: { flexDirection: 'row', alignItems: 'center', gap: 7, padding: 16, borderTopWidth: 1 },
+  lockedText: { fontSize: 12, fontWeight: '600' },
+  replyRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, padding: 14, borderTopWidth: 1 },
+  replyInput: { flex: 1, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, fontSize: 13, maxHeight: 90 },
+  sendBtn: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
 });

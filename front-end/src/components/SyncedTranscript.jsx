@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlignLeft, Captions, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
+import {
+  AlignLeft,
+  Captions,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from "@/components/icons";
 import { DEMO_TRANSCRIPT_VTT } from "@/constants/demoMedia";
 import { parseTranscript } from "@/utils/transcriptParser";
 import { coursesAPI } from "@/services/api";
@@ -145,21 +154,21 @@ const SyncedTranscript = ({
   const fullTranscript = cues.map((cue) => cue.text).join(" ");
 
   return (
-    <div className="bg-[#F8FAFC] rounded-xl border border-slate-200/70 overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-slate-200/70 bg-white">
+    <div className="bg-[#F1F5F9] rounded-xl border border-[#d7ebf5]/70 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-[#d7ebf5]/70 bg-white">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#1a3884]/10 flex items-center justify-center text-[#1a3884]">
+          <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 flex items-center justify-center text-[#045C9A]">
             <Captions className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900">{title}</h4>
-            <p className="text-xs text-gray-500">{cues.length} synced lines</p>
+            <h4 className="font-semibold text-[#072036]">{title}</h4>
+            <p className="text-xs text-slate-500">{cues.length} synced lines</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => setIsFullView((value) => !value)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#1a3884] text-white text-sm font-semibold hover:bg-[#112b6b] transition-colors"
+          className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
         >
           <AlignLeft className="w-4 h-4" />
           {isFullView ? "Synced Lines" : "Full Transcript"}
@@ -168,7 +177,7 @@ const SyncedTranscript = ({
       </div>
 
       {isLoading ? (
-        <div className="min-h-[180px] flex items-center justify-center text-[#1a3884]">
+        <div className="min-h-[180px] flex items-center justify-center text-[#045C9A]">
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>
       ) : (
@@ -203,13 +212,13 @@ const SyncedTranscript = ({
                     onClick={() => onCueClick?.(cue.start)}
                     className={`w-full text-left rounded-xl p-4 transition-all border ${
                       isActive
-                        ? "bg-white border-[#1a3884] shadow-sm"
+                        ? "bg-white border-[#045C9A] shadow-sm"
                         : "bg-white/60 border-transparent hover:bg-white"
                     } ${onCueClick ? "cursor-pointer" : "cursor-default"}`}
                     aria-current={isActive ? "true" : undefined}
                   >
                     <div className="flex gap-3">
-                      <span className={`text-xs font-bold tabular-nums mt-1 ${isActive ? "text-[#1a3884]" : "text-gray-400"}`}>
+                      <span className={`text-xs font-bold tabular-nums mt-1 ${isActive ? "text-[#045C9A]" : "text-slate-400"}`}>
                         {formatTime(cue.start)}
                       </span>
                       <span className={`leading-6 ${isActive ? "text-gray-950 font-semibold" : "text-gray-600"}`}>

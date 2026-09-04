@@ -567,3 +567,38 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .dark input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+/* --- Google Material Symbols --------------------------------------------
+   The dashboard icon set. Material Symbols is a variable icon font, so an
+   icon is a <span> whose text is the ligature name. Google's stylesheet
+   already declares the @font-face and the base class; these rules add the
+   layout behaviour the old SVG icons had, so the swap is invisible to
+   surrounding flex/grid layouts.
+   Rendered through <MaterialIcon> - see src/components/icons/. */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  overflow: hidden;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  user-select: none;
+}
+
+/* Icons sit on a text baseline in some widgets; keep them optically centred. */
+.material-symbols-outlined::before,
+.material-symbols-outlined::after {
+  content: none;
+}

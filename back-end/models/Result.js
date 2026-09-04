@@ -115,6 +115,20 @@ const resultSchema = new mongoose.Schema({
         enum: ['in-progress', 'completed', 'abandoned', 'pending_review'],
         default: 'in-progress'
     },
+    // Set when the submission arrived after the attempt's time limit. Answers
+    // recorded past the deadline are discarded at submit, so this records that
+    // the attempt overran rather than silently changing the score.
+    timedOut: {
+        type: Boolean,
+        default: false
+    },
+    // How the attempt ended: the candidate pressed submit, the client
+    // auto-submitted at zero, or the server found it past its deadline.
+    submissionReason: {
+        type: String,
+        enum: ['manual', 'auto', 'timeout'],
+        default: 'manual'
+    },
     // Whether the score may be shown to the candidate. A held attempt keeps
     // every answer but withholds the outcome until review completes.
     scoreReleased: {

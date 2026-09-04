@@ -1,9 +1,18 @@
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
-const { getStageByCode } = require('../config/stage_distributions');
+const { getStageByCode, getDurationMinutes } = require('../config/stage_distributions');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { isFeatureEnabled } = require('../helpers/featureFlag');
 const { evaluateAttempt, applyHold, buildHeldResponse } = require('../services/proctoringGate');
+
+/**
+ * Seconds past the deadline that still count as on time.
+ *
+ * The client auto-submits when its own countdown hits zero; that request then
+ * has to travel. Without a grace window an honest candidate on a slow
+ * connection would be penalised for their latency.
+ */
+const SUBMIT_GRACE_SECONDS = 60;
 
 const determineLevel = (pct) => {
     if (pct >= 81) return 'Advanced';
@@ -90,6 +99,44 @@ const submitAssessment = async (req, res) => {
                 success: false,
                 error: 'Assessment not found'
             });
+        }
+
+        // ── TIME LIMIT (enforced at submit, not only on resume) ─────────────
+        // The clock was previously checked in one place only: when an attempt
+        // was RESUMED. A candidate who simply kept the page open past the limit
+        // and submitted late was graded as though they had finished on time.
+        //
+        // A late submission is not rejected -- that would throw away answers
+        // given honestly inside the limit. Instead the attempt is marked as
+        // timed out and any answer recorded after the deadline is dropped, so
+        // the extra minutes confer no advantage.
+        const durationMinutes = getDurationMinutes(assessment);
+        const deadline = new Date(result.startedAt.getTime() + durationMinutes * 60 * 1000);
+        const secondsLate = Math.floor((Date.now() - deadline.getTime()) / 1000);
+        const isLateSubmission = secondsLate > SUBMIT_GRACE_SECONDS;
+
+        if (isLateSubmission) {
+            const answeredAfterDeadline = result.responses.filter(
+                (r) => r.answeredAt && r.answeredAt.getTime() > deadline.getTime()
+            );
+
+            console.warn(
+                `⌛ [LATE SUBMIT] Result ${resultId} arrived ${secondsLate}s past its ` +
+                `${durationMinutes}-minute limit. Discarding ${answeredAfterDeadline.length} ` +
+                `answer(s) recorded after the deadline.`
+            );
+
+            answeredAfterDeadline.forEach((r) => {
+                r.selectedValue = 'UNANSWERED';
+                r.isCorrect = false;
+                r.score = 0;
+            });
+
+            result.timedOut = true;
+            result.submissionReason = 'timeout';
+            if (typeof result.updateAnsweredCount === 'function') {
+                result.updateAnsweredCount();
+            }
         }
 
         // ── PROCTORING SUBMIT GATE ──────────────────────────────────────────
@@ -451,8 +498,11 @@ const submitAssessment = async (req, res) => {
             responseData.stage = stageInfo.stage;
             responseData.assessmentType = `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`;
 
-            // Set percentage for badge checking
+            // Set percentage for badge checking — and keep the response's
+            // displayed percentage in sync with the weighted stage score, so
+            // the score the student sees is the one pass/fail was decided on.
             percentage = stageScore;
+            responseData.percentage = stageScore;
 
             // Save to StageResult collection (always — both pass and fail)
             try {

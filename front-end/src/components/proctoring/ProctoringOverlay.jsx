@@ -57,6 +57,15 @@ const STATUS_CONFIG = {
     textColor: 'text-red-500',
     icon: RiUserUnfollowLine
   },
+  // No registered face for this session, so identity cannot be checked at all.
+  // Distinct from no_face: someone IS in frame — we just cannot say who.
+  unregistered: {
+    label: 'Not Verified',
+    fullLabel: 'Identity Not Verified',
+    dotColor: 'bg-red-500 animate-pulse',
+    textColor: 'text-red-500',
+    icon: RiUserUnfollowLine
+  },
   model_unavailable: {
     label: 'Initialising…',
     fullLabel: 'Initialising AI…',
@@ -80,6 +89,9 @@ export const ProctoringOverlay = ({
   faceCount,
   warningsCount,
   maxWarnings,
+  diagnostics = null,
+  nudgeMessage = '',
+  riskFlagged = false,
   isFullScreen,
   fullscreenCountdown,
   onRequestFullscreen,
@@ -147,7 +159,7 @@ export const ProctoringOverlay = ({
               const h = box.height * scaleY;
 
               const isOK = verificationStatus === 'verified' || verificationStatus === 'ok';
-              const strokeColor = verificationStatus === 'covered' ? '#F59E0B' : (verificationStatus === 'mismatch' || verificationStatus === 'multiple_faces' || verificationStatus === 'no_face') ? '#EF4444' : '#10B981';
+              const strokeColor = verificationStatus === 'covered' ? '#F59E0B' : (verificationStatus === 'mismatch' || verificationStatus === 'multiple_faces' || verificationStatus === 'no_face' || verificationStatus === 'unregistered') ? '#EF4444' : '#10B981';
               const dotColor = '#06B6D4';
 
               // 1. Draw Bounding Box
@@ -235,6 +247,12 @@ export const ProctoringOverlay = ({
             <span className="text-[10px] font-black text-slate-800 dark:text-slate-200 tracking-wide uppercase">
               AI Proctoring
             </span>
+            {/* Build stamp. A service worker can serve a previous bundle long
+                after a rebuild, and without this there is no way to tell a fix
+                that did not work from one that never loaded. */}
+            <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">
+              {typeof __BUILD_STAMP__ !== 'undefined' ? __BUILD_STAMP__ : '—'}
+            </span>
           </div>
           <button
             onClick={() => setIsMinimized(!isMinimized)}
@@ -287,6 +305,17 @@ export const ProctoringOverlay = ({
           </div>
         )}
 
+        {/* ── Live coaching ────────────────────────────────────────────────
+            The amber stage of the ladder. It appears the instant a condition is
+            seen and costs the candidate nothing — its whole job is to let them
+            fix the problem before anything is recorded. It had nowhere to be
+            displayed on this page, so the instant feedback was invisible. */}
+        {nudgeMessage && (
+          <div className="mb-1.5 px-2 py-1.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 text-[10px] font-bold text-amber-700 dark:text-amber-300 leading-snug animate-pulse">
+            {nudgeMessage}
+          </div>
+        )}
+
         {/* Info Rows */}
         <div className="space-y-1 text-[10px]">
           {/* Verification Status Row */}
@@ -325,6 +354,119 @@ export const ProctoringOverlay = ({
               {warningsCount} / {maxWarnings}
             </span>
           </div>
+
+          {/* ── Review status ─────────────────────────────────────────────
+              The count above is NOT what decides the attempt. The risk score
+              is, and it reaches its limit first: two phone detections is 70
+              against a threshold of 60, so "2 / 10" can mean already held while
+              appearing to leave eight in hand. That is worse than an alarming
+              message — it is a reassuring one that happens to be false. The
+              threshold itself stays unpublished; only the verdict is shown. */}
+          {riskFlagged && (
+            <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 px-2 py-1.5 rounded">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+              <span className="font-bold text-red-600 dark:text-red-400 leading-snug">
+                This attempt will be reviewed before your score is released.
+              </span>
+            </div>
+          )}
+
+          {/* ── Live diagnostics ──────────────────────────────────────────
+              Shown only when a diagnostics object is passed in, so candidates
+              never see it. Every failure on this system so far has been
+              invisible on screen and plain in one log line; whoever is testing
+              should not have to open devtools to find out that the object
+              detector never loaded or that a voice gate is stuck shut. */}
+          {diagnostics && (
+            <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded px-2 py-1.5">
+              {/* Always open. This was a collapsed <details>, which meant the
+                  one thing that could explain a failure was hidden behind a
+                  click nobody knew to make. */}
+              <div className="text-slate-500 dark:text-slate-400 font-medium mb-1">
+                Diagnostics
+              </div>
+
+              <div className="space-y-1 font-mono text-[9px] leading-relaxed">
+                {/* Recording link. If this is not ok, nothing else matters —
+                    conditions can detect perfectly and every one is dropped. */}
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">recording</span>
+                  <span className={diagnostics.sessionId && !diagnostics.sessionError ? 'text-emerald-600' : 'text-red-500 font-bold'}>
+                    {diagnostics.sessionId && !diagnostics.sessionError ? 'ok' : 'NOT RECORDING'}
+                  </span>
+                </div>
+                {diagnostics.sessionError && (
+                  <div className="text-red-500 font-bold break-words">{diagnostics.sessionError}</div>
+                )}
+                {/* Models — a MISSING detector means that whole feature is dead */}
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">face model</span>
+                  <span className={diagnostics.models?.faceRecogniser === 'loaded' ? 'text-emerald-600' : 'text-red-500 font-bold'}>
+                    {diagnostics.models?.faceRecogniser === 'loaded' ? 'ok' : 'MISSING'}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">object model</span>
+                  <span className={diagnostics.models?.objectDetector === 'loaded' ? 'text-emerald-600' : 'text-red-500 font-bold'}>
+                    {diagnostics.models?.objectDetector === 'loaded' ? (diagnostics.models?.objectModel ? `ok · ${diagnostics.models.objectModel.replace('.onnx', '')}` : 'ok') : 'MISSING'}
+                  </span>
+                </div>
+
+                {/* Identity — the number the whole face check turns on */}
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">face score</span>
+                  <span className={similarityScore >= 0.4 ? 'text-emerald-600' : 'text-amber-600'}>
+                    {similarityScore ? similarityScore.toFixed(3) : '—'}
+                  </span>
+                </div>
+
+                {/* Audio — which of the three gates is refusing to open */}
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">mic</span>
+                  <span className={diagnostics.audio?.micActive && diagnostics.audio?.micHealthy !== false ? 'text-emerald-600' : 'text-red-500 font-bold'}>
+                    {!diagnostics.audio?.micActive
+                      ? 'OFF'
+                      : diagnostics.audio?.micHealthy === false
+                        ? 'NO AUDIO'
+                        : (diagnostics.audio?.calibrated ? 'listening' : 'calibrating')}
+                  </span>
+                </div>
+                {diagnostics.audio?.calibrated && (() => {
+                  // One plain-language line instead of raw RMS and gate names.
+                  // "quiet": at or near the room's calibrated noise floor.
+                  // "noise": louder than the room, but not shaped like speech.
+                  // "speech": all three checks agree; counts toward a warning
+                  // once sustained for the configured number of seconds.
+                  const au = diagnostics.audio;
+                  const streak = au.speechStreak || 0;
+                  const need = au.speechSecondsToReport || 5;
+                  let label = 'quiet';
+                  let cls = 'text-slate-400';
+                  if (au.isSpeechFrame || streak > 0) {
+                    label = `speech ${streak}/${need}s`;
+                    cls = streak >= need - 1 ? 'text-red-500 font-bold' : 'text-amber-600';
+                  } else if (au.energyAboveFloor) {
+                    label = 'noise';
+                    cls = 'text-slate-500';
+                  }
+                  return (
+                    <div className="flex justify-between gap-2">
+                      <span className="text-slate-400">sound</span>
+                      <span className={cls}>{label}</span>
+                    </div>
+                  );
+                })()}
+
+                {/* Objects — what YOLO can actually see right now */}
+                <div className="flex justify-between gap-2">
+                  <span className="text-slate-400">objects</span>
+                  <span className={diagnostics.objects ? 'text-amber-600' : 'text-slate-400'}>
+                    {diagnostics.objects || 'none'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {!isFullScreen && (
             <button

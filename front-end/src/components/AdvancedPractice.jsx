@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, Lightbulb, Target, Trophy } from 'lucide-react';
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
+import {
+  CheckCircle2,
+  Lightbulb,
+  Target,
+  Trophy,
+  XCircle,
+} from "@/components/icons";
 import { toast } from 'sonner';
 
 const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storageKey, savedScore, savedTotalPoints }) => {
@@ -108,37 +117,37 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
     }
 
     return (
-      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+      <div className="w-full h-full bg-white dark:bg-[#0d3a5f] p-4 md:p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-6 text-center py-8">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-6 animate-bounce">
+          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 mb-6 animate-bounce">
             <Trophy size={40} />
           </div>
-          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Advanced Practice Complete!</h3>
+          <h3 className="text-2xl font-extrabold tracking-tight text-[#072036] dark:text-white">Advanced Practice Complete!</h3>
           <p className="text-slate-500 dark:text-slate-400">Here is your performance summary</p>
           
           <div className="flex justify-center items-center gap-4 py-4 text-2xl font-bold">
-            <span className="text-slate-900 dark:text-white">{score}</span>
-            <span className="text-gray-400">/</span>
+            <span className="text-[#072036] dark:text-white">{score}</span>
+            <span className="text-slate-400">/</span>
             <span className="text-slate-600 dark:text-slate-400">{totalQuestions}</span>
           </div>
 
-          <div className="text-left space-y-6 pt-6 border-t border-slate-200 dark:border-white/10">
-            <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200">Review Responses</h4>
+          <div className="text-left space-y-6 pt-6 border-t border-[#d7ebf5] dark:border-white/10">
+            <h4 className="text-lg font-bold text-[#072036] dark:text-slate-200">Review Responses</h4>
             {questions.map((q, qIndex) => {
               const selectedIdx = selectedAnswers[qIndex];
               
               if (q.type === 'reflection') {
                 return (
-                  <div key={qIndex} className="p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-white/5 space-y-3">
-                    <p className="font-semibold text-slate-900 dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
-                    <div className="p-3 bg-white dark:bg-[#002A5C] rounded-lg border border-slate-100 dark:border-white/5">
-                      <p className="text-xs text-slate-450 uppercase font-bold mb-1">Your Reflection</p>
-                      <p className="text-sm text-slate-850 dark:text-slate-200 italic">
+                  <div key={qIndex} className="p-4 bg-[#F1F5F9]/60 dark:bg-white/5 rounded-xl border border-[#d7ebf5] dark:border-white/5 space-y-3">
+                    <p className="font-semibold text-[#072036] dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
+                    <div className="p-3 bg-white dark:bg-[#0d3a5f] rounded-lg border border-[#d7ebf5] dark:border-white/5">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Your Reflection</p>
+                      <p className="text-sm text-slate-800 dark:text-slate-200 italic">
                         {selectedIdx || "No response provided"}
                       </p>
                     </div>
                     {q.explanation && (
-                      <div className="text-xs text-blue-700 dark:text-blue-200 bg-blue-55/50 dark:bg-blue-900/15 p-3 rounded-lg">
+                      <div className="text-xs text-[#045C9A] dark:text-[#A6D7E8] bg-[#EAF7FD]/50 dark:bg-[#045C9A]/15 p-3 rounded-lg">
                         <strong>Explanation/Ideal Response:</strong> {q.explanation}
                       </div>
                     )}
@@ -149,8 +158,8 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
               // scenario-mcq
               const correctIdx = q.correctAnswer;
               return (
-                <div key={qIndex} className="p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-white/5 space-y-3">
-                  <p className="font-semibold text-slate-900 dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
+                <div key={qIndex} className="p-4 bg-[#F1F5F9]/60 dark:bg-white/5 rounded-xl border border-[#d7ebf5] dark:border-white/5 space-y-3">
+                  <p className="font-semibold text-[#072036] dark:text-white">{qIndex + 1}. {q.scenario || q.question}</p>
                   <div className="space-y-2">
                     {q.options && q.options.map((option, idx) => {
                       const isUserChoice = selectedIdx === idx;
@@ -158,19 +167,19 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
                       
                       let optionClass = "p-3 rounded-lg border text-sm flex items-center justify-between ";
                       if (isCorrect) {
-                        optionClass += "border-green-500 bg-green-50/50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
+                        optionClass += "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400";
                       } else if (isUserChoice) {
-                        optionClass += "border-red-500 bg-red-55/50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
+                        optionClass += "border-red-500 bg-red-50/50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
                       } else {
-                        optionClass += "border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-400";
+                        optionClass += "border-[#d7ebf5] dark:border-white/5 text-slate-600 dark:text-slate-400";
                       }
 
                       return (
                         <div key={idx} className={optionClass}>
                           <span>{String.fromCharCode(65 + idx)}. {option}</span>
                           <div className="flex items-center gap-2 text-xs">
-                            {isUserChoice && <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">Your answer</span>}
-                            {isCorrect && <CheckCircle2 size={16} className="text-green-500" />}
+                            {isUserChoice && <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-[#d7ebf5]/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">Your answer</span>}
+                            {isCorrect && <CheckCircle2 size={16} className="text-emerald-500" />}
                             {isUserChoice && !isCorrect && <XCircle size={16} className="text-red-500" />}
                           </div>
                         </div>
@@ -178,7 +187,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
                     })}
                   </div>
                   {q.explanation && (
-                    <div className="text-xs text-blue-700 dark:text-blue-205 bg-blue-55/50 dark:bg-blue-900/15 p-3 rounded-lg">
+                    <div className="text-xs text-[#045C9A] dark:text-[#A6D7E8] bg-[#EAF7FD]/50 dark:bg-[#045C9A]/15 p-3 rounded-lg">
                       <strong>Explanation:</strong> {q.explanation}
                     </div>
                   )}
@@ -192,7 +201,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
               if (onComplete) onComplete(score, totalQuestions);
               toast.success('Advanced Practice completed!');
             }}
-            className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all mt-6"
+            className="mt-6 w-full sm:w-auto rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
           >
             Continue to Next Step
           </button>
@@ -202,25 +211,25 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
   }
 
   return (
-    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#0d3a5f] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
+        <div className="border-b border-[#d7ebf5] dark:border-white/10 pb-4">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-              <Target size={14} className="text-[#1a3884] dark:text-blue-400" />
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400">
+              <Target size={14} className="text-[#045C9A] dark:text-[#A6D7E8]" />
               <span>Advanced Practice</span>
             </div>
-            <span className="text-xs font-extrabold text-[#1a3884] dark:text-blue-400">
+            <span className="text-xs font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
               {getAnsweredCount()}/{questions?.length} Questions
             </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-3">
+          <h2 className="text-xl md:text-2xl font-bold text-[#072036] dark:text-white mb-3">
             {content}
           </h2>
-          <div className="h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
+          <div className="h-2 bg-[#d7ebf5] dark:bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-[#1a3884] rounded-full"
+              className="h-full bg-[#045C9A] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
@@ -235,13 +244,13 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-white/10"
+            className="bg-[#F1F5F9] dark:bg-[#0d3a5f] rounded-2xl p-6 md:p-8 border border-[#d7ebf5] dark:border-white/10"
           >
             <div className="mb-6">
-              <span className="text-xs font-bold text-slate-450 dark:text-slate-400 mb-1.5 block uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-400 mb-1.5 block uppercase tracking-widest">
                 {currentQuestion.type === 'scenario-mcq' ? 'Scenario Analysis' : 'Reflection'} - Question {currentQuestionIndex + 1} of {questions?.length}
               </span>
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-4 leading-snug md:leading-relaxed">
+              <h3 className="text-lg md:text-xl font-bold text-[#072036] dark:text-white mb-4 leading-snug md:leading-relaxed">
                 {currentQuestion.scenario || currentQuestion.question}
               </h3>
             </div>
@@ -265,26 +274,26 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
                       className={`w-full text-left p-4 md:p-5 rounded-2xl border-2 transition-all duration-300 font-medium ${
                         showResult
                           ? isCorrectAnswer
-                            ? 'border-green-500 bg-green-55/10 dark:bg-green-900/20'
+                            ? 'border-emerald-500 bg-emerald-50/10 dark:bg-emerald-500/10'
                             : isSelected && !isCorrectAnswer
-                            ? 'border-red-500 bg-red-55/10 dark:bg-red-900/20'
-                            : 'border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002A5C] opacity-50'
+                            ? 'border-red-500 bg-red-50/10 dark:bg-red-900/20'
+                            : 'border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-[#0d3a5f] opacity-50'
                           : isSelected
-                          ? 'border-[#1a3884] bg-[#1a3884]/5'
-                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-slate-350 dark:hover:border-slate-655'
+                          ? 'border-[#045C9A] bg-[#045C9A]/5'
+                          : 'border-[#d7ebf5] dark:border-white/10 bg-white dark:bg-[#0d3a5f] hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-center gap-3.5">
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                           showResult
                             ? isCorrectAnswer
-                              ? 'border-green-500 bg-green-500'
+                              ? 'border-emerald-500 bg-emerald-500'
                               : isSelected && !isCorrectAnswer
                               ? 'border-red-500 bg-red-500'
-                              : 'border-slate-300 dark:border-slate-600'
+                              : 'border-[#d7ebf5] dark:border-white/10'
                             : isSelected
-                            ? 'border-[#1a3884] bg-[#1a3884]'
-                            : 'border-slate-300 dark:border-slate-600'
+                            ? 'border-[#045C9A] bg-[#045C9A]'
+                            : 'border-[#d7ebf5] dark:border-white/10'
                         }`}>
                           {showResult ? (
                             isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (
@@ -303,11 +312,11 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
                         <span className={`text-sm md:text-base font-semibold ${
                           showResult
                             ? isCorrectAnswer
-                              ? 'text-green-700 dark:text-green-300'
+                              ? 'text-emerald-700 dark:text-emerald-300'
                               : isSelected && !isCorrectAnswer
-                              ? 'text-red-750 dark:text-red-300'
+                              ? 'text-red-700 dark:text-red-300'
                               : 'text-slate-600 dark:text-slate-400'
-                            : 'text-slate-750 dark:text-slate-200'
+                            : 'text-slate-700 dark:text-slate-200'
                         }`}>
                           {option}
                         </span>
@@ -323,7 +332,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
               <div className="mb-6">
                 <textarea
                   placeholder="Share your reflection..."
-                  className="w-full p-5 rounded-2xl border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-900 dark:text-white focus:border-[#1a3884] focus:outline-none min-h-[140px] transition-all font-medium text-sm md:text-base"
+                  className="w-full p-5 rounded-2xl border-2 border-[#d7ebf5] dark:border-white/10 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white focus:border-[#045C9A] focus:outline-none min-h-[140px] transition-all font-medium text-sm md:text-base"
                   onChange={(e) => handleAnswerSelect(currentQuestionIndex, e.target.value)}
                   disabled={showExplanation[currentQuestionIndex]}
                 />
@@ -337,15 +346,15 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-blue-50/80 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/40 rounded-2xl p-5 mb-6"
+                  className="bg-[#EAF7FD]/80 dark:bg-[#045C9A]/10 border border-[#d7ebf5]/50 dark:border-[#045C9A]/30 rounded-2xl p-5 mb-6"
                 >
                   <div className="flex items-start gap-2.5">
-                    <Lightbulb className="w-5 h-5 text-[#1a3884] dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <Lightbulb className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8] flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-extrabold uppercase tracking-wider text-[#1a3884] dark:text-blue-400 mb-1">
+                      <p className="text-xs font-extrabold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8] mb-1">
                         Explanation
                       </p>
-                      <p className="text-sm text-[#1a3884] dark:text-blue-200 font-medium leading-relaxed">
+                      <p className="text-sm text-[#045C9A] dark:text-[#A6D7E8] font-medium leading-relaxed">
                         {currentQuestion.explanation}
                       </p>
                     </div>
@@ -355,18 +364,18 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted, storage
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-white/10">
+            <div className="flex items-center justify-between pt-6 border-t border-[#d7ebf5] dark:border-white/10">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-[#002A5C] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-[#EAF7FD] dark:hover:bg-[#0d3a5f] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
                 disabled={!showExplanation[currentQuestionIndex]}
-                className="px-7 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                className="rounded-xl px-6 py-3 text-[13px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
               >
                 {isLastQuestion ? (allAnswered ? 'Completed' : 'Complete') : 'Next'}
               </button>

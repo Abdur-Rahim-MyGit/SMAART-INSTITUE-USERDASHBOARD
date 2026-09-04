@@ -1,9 +1,38 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, PlayCircle, FileText, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert, StickyNote, Fingerprint, GraduationCap, ShieldCheck, Activity, Play, HelpCircle, Layers, Briefcase } from "lucide-react";
+// Material Symbols barrel -- the same icon set the dashboard, sidebar, courses
+// list and profile use. This page pulled straight from lucide-react, which is
+// why its icons read at a different weight and optical size to every other
+// screen. Aliases keep the existing JSX call sites unchanged.
+import {
+  IconArrowLeft as ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Clock,
+  Target,
+  CheckCircle2,
+  Lock,
+  ChevronRight,
+  PlayCircle,
+  FileText,
+  ClipboardList as StickyNote,
+  Sparkles,
+  Star,
+  RiAlertLine as AlertTriangle,
+  IconId as Fingerprint,
+  ShieldCheck,
+  Check,
+  ClipboardCheck,
+  Play,
+  HelpCircle,
+  Layers,
+  Briefcase,
+  FitScreen,
+} from "@/components/icons";
 import { useTranslation } from "react-i18next";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
 import FlashcardTask from "@/components/FlashcardTask";
@@ -74,68 +103,58 @@ const getStepIcon = (step, stepData, status, isActive) => {
     return <FileText className="w-4 h-4" />;
   }
 
-  return <Play className="w-3.5 h-3.5 fill-current" />;
+  return <Play fill={1} className="w-3.5 h-3.5" />;
 };
 
-const STAGE_THEME = {
-  capacity: {
-    gradient: "from-blue-50/70 via-[#f0f4ff]/60 to-indigo-50/70 dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#312e81]",
-    badgeBg: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-    accentGlow: "from-indigo-500 to-cyan-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  capability: {
-    gradient: "from-teal-50/70 via-[#e6f4f1]/60 to-emerald-50/70 dark:from-[#042f2e] dark:via-[#115e59] dark:to-[#0d9488]",
-    badgeBg: "bg-teal-500/15 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
-    accentGlow: "from-teal-500 to-emerald-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  leadership: {
-    gradient: "from-purple-50/70 via-[#f3e8ff]/60 to-[#faf5ff]/70 dark:from-[#2e1065] dark:via-[#581c87] dark:to-[#7e22ce]",
-    badgeBg: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-    accentGlow: "from-purple-600 to-violet-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  piq: {
-    gradient: "from-violet-50/70 via-fuchsia-50/60 to-slate-50/70 dark:from-[#31103f] dark:via-[#581c87] dark:to-[#7c3aed]",
-    badgeBg: "bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-    accentGlow: "from-violet-600 to-fuchsia-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  aiq: {
-    gradient: "from-blue-50/70 via-cyan-50/60 to-slate-50/70 dark:from-[#0c2a4a] dark:via-[#1e3a8a] dark:to-[#2563eb]",
-    badgeBg: "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-blue-500/10 text-blue-600 dark:text-cyan-400",
-    accentGlow: "from-blue-600 to-cyan-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  siq: {
-    gradient: "from-emerald-50/70 via-green-50/60 to-slate-50/70 dark:from-[#064e3b] dark:via-[#047857] dark:to-[#10b981]",
-    badgeBg: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    accentGlow: "from-emerald-600 to-teal-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  },
-  unknown: {
-    gradient: "from-blue-50/70 via-indigo-50/60 to-slate-50/70 dark:from-[#0d1f4e] dark:via-[#1a3884] dark:to-[#0f2d6b]",
-    badgeBg: "bg-blue-500/15 text-blue-700 dark:text-cyan-300 border-blue-200 dark:border-blue-500/30",
-    activeStep: "bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md",
-    iconBg: "bg-blue-500/10 text-blue-600 dark:text-cyan-400",
-    accentGlow: "from-blue-600 to-cyan-400",
-    btnClass: "bg-[#1a3884] hover:bg-[#132c6b] text-white dark:bg-[#1e40af] dark:hover:bg-[#1a3884]",
-  }
+/* One theme for every stage and track. The player carried a per-stage rainbow
+   (indigo / teal / purple / violet / emerald) that matched nothing else in the
+   product -- the dashboard, courses list and profile are all one brand blue. */
+const COURSE_THEME = {
+  badgeBg:
+    "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] border border-[#045C9A]/20 dark:border-[#045C9A]/40",
+  btnClass:
+    "bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none",
 };
 
+/* Pre-start acknowledgements. Every item must be ticked before the learning
+   journey can begin; the copy lives in translation.json under course_player. */
+const COURSE_GUIDELINES = [
+  {
+    id: "active_engagement",
+    titleKey: "course_player.guideline_engagement_title",
+    titleDefault: "Active Engagement",
+    textKey: "course_player.guideline_engagement_text",
+    textDefault: "User inactivity of 5 minutes or more is automatically recorded for security & progress validation.",
+  },
+  {
+    id: "academic_integrity",
+    titleKey: "course_player.guideline_integrity_title",
+    titleDefault: "Academic Integrity",
+    textKey: "course_player.guideline_integrity_text",
+    textDefault: "All assessments and reflections must be completed independently by the enrolled student.",
+  },
+  {
+    id: "sequential_order",
+    titleKey: "course_player.guideline_sequence_title",
+    titleDefault: "Sequential Order",
+    textKey: "course_player.guideline_sequence_text",
+    textDefault: "Lessons must be completed in order to unlock subsequent modules and assessments.",
+  },
+  {
+    id: "certification_eligibility",
+    titleKey: "course_player.guideline_certification_title",
+    titleDefault: "Certification Eligibility",
+    textKey: "course_player.guideline_certification_text",
+    textDefault: "Official course completion is granted upon meeting all required milestone criteria.",
+  },
+];
+
+/* Theater mode (YouTube style): the video takes the full content width and the
+   curriculum drops below it. It is per visit: every course opens in the default
+   view. */
+/* One easing for every element that moves when theater mode toggles, so the
+   video, the lesson card and the curriculum all settle together. */
+const LAYOUT_TRANSITION = { layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } };
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -161,6 +180,25 @@ const CoursePlayer = () => {
   const [dynamicFlow, setDynamicFlow] = useState(null);
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
+  const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
+  const [isTheater, setIsTheater] = useState(false);
+  // This page is its own scroll container (h-screen overflow-y-auto), so
+  // window.scrollTo has no effect here; scroll the root element instead.
+  const pageRef = useRef(null);
+  const scrollPageToTop = (behavior = "smooth") => {
+    const el = pageRef.current;
+    if (el && typeof el.scrollTo === "function") {
+      el.scrollTo({ top: 0, left: 0, behavior });
+    } else if (el) {
+      el.scrollTop = 0;
+    }
+    window.scrollTo({ top: 0, left: 0, behavior });
+  };
+  const toggleTheater = () => setIsTheater((prev) => !prev);
+  const acknowledgedCount = COURSE_GUIDELINES.filter((g) => acknowledgedGuidelines[g.id]).length;
+  const allGuidelinesAcknowledged = acknowledgedCount === COURSE_GUIDELINES.length;
+  const toggleGuideline = (id) =>
+    setAcknowledgedGuidelines((prev) => ({ ...prev, [id]: !prev[id] }));
   const [activeStep, setActiveStep] = useState(null);
   const [completedSteps, setCompletedSteps] = useState({});
   const [activeTab, setActiveTab] = useState('preview');
@@ -172,6 +210,21 @@ const CoursePlayer = () => {
     width: typeof window !== "undefined" ? window.innerWidth : 1200,
     height: typeof window !== "undefined" ? window.innerHeight : 800,
   });
+
+  // The constellation canvas paints itself from a theme prop rather than CSS,
+  // so it has to be told when the dark class flips -- same observer the
+  // dashboard and courses pages use.
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -285,7 +338,7 @@ const CoursePlayer = () => {
     return { stageKey: 'course_player.stages.unknown', stageNameKey: 'course_player.stages.unknown', typeKey: 'unknown' };
   }, [dbCourse, courseId]);
 
-  const currentTheme = useMemo(() => STAGE_THEME[typeKey] || STAGE_THEME.unknown, [typeKey]);
+  const currentTheme = COURSE_THEME;
 
   const formattedDisplayType = useMemo(() => {
     if (typeKey === 'aiq' || typeKey === 'piq' || typeKey === 'siq') {
@@ -296,6 +349,15 @@ const CoursePlayer = () => {
 
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
+  // Theater widens every step to a single column with the curriculum below.
+  // Only steps with a video also get the YouTube-style black band; quizzes,
+  // flash cards and practice keep their card and simply use the full width.
+  const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
+  const activeStepHasVideo =
+    activeStepData?.contentType === 'video-text' ||
+    (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
+  const theaterLayout = isTheater;
+  const theaterBand = isTheater && activeStepHasVideo;
 
   const isCompleted = useMemo(() => {
     if (!totalSteps) return false;
@@ -473,7 +535,7 @@ const CoursePlayer = () => {
     setCurrentVideoTime(0);
     setCurrentVideoDuration(0);
     setVideoWatched(false);
-    window.scrollTo(0, 0);
+    scrollPageToTop("auto");
 
     if (courseId) {
       const userId = currentUser?._id || currentUser?.id || 'anon';
@@ -572,13 +634,18 @@ const CoursePlayer = () => {
   };
 
   const handleStartCourse = () => {
+    if (!allGuidelinesAcknowledged) {
+      toast.warning(t("course_player.acknowledge_all_guidelines", "Please acknowledge all guidelines to continue."));
+      return;
+    }
     setShowIntro(false);
     const allDone = stepNumbers.every(step => completedSteps[step]);
     const resumeStep = stepNumbers.find(step => !completedSteps[step]) || (allDone ? lastStepKey : '1');
     setActiveStep(resumeStep);
     setVideoWatched(false);
     handleStartStep(resumeStep);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+    // Wait one frame so the lesson view has replaced the intro before scrolling.
+    requestAnimationFrame(() => scrollPageToTop("auto"));
   };
 
   const handleStepClick = (stepNumber) => {
@@ -588,7 +655,7 @@ const CoursePlayer = () => {
       setVideoWatched(false);
       if (isActivating) {
         handleStartStep(stepNumber);
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+        requestAnimationFrame(() => scrollPageToTop("smooth"));
       }
     } else {
       toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
@@ -852,39 +919,60 @@ const CoursePlayer = () => {
       case 'video-text': {
         const isPlaceholderVideo = !stepData.videoUrl;
         const playbackUrl = stepData.videoUrl || TEMP_VIDEO_URL;
+        // In theater mode the lesson card becomes a flex column and this wrapper
+        // dissolves (display: contents) so the video can be ordered above the
+        // card header as a full-bleed dark band, without remounting the player.
         return (
-          <div className="space-y-4">
+          <div className={theaterLayout ? "contents" : "space-y-4"}>
             {playbackUrl && (
-              <div className="rounded-3xl overflow-hidden relative">
+              <motion.div
+                layout
+                transition={LAYOUT_TRANSITION}
+                className={
+                  theaterLayout
+                    ? "order-first relative -mx-4 sm:-mx-6 lg:-mx-8 mb-5 bg-black h-[calc(100vh-4.75rem)] min-h-[360px]"
+                    : "rounded-2xl overflow-hidden relative"
+                }
+              >
                 {isPlaceholderVideo && (
-                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/95 text-white text-[11px] font-bold shadow-lg backdrop-blur-sm">
+                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/95 text-white text-xs font-bold shadow-lg backdrop-blur-sm">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                <CustomVideoPlayer
-                  videoUrl={playbackUrl}
-                  title={stepData.title}
-                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
-                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
-                  onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time, dur) => {
-                    setCurrentVideoTime(time);
-                    if (dur) setCurrentVideoDuration(dur);
-                  }}
-                  onNext={activeStep !== lastStepKey ? () => {
-                    const nextStep = (parseInt(activeStep) + 1).toString();
-                    handleStepComplete(activeStep);
-                    setActiveStep(nextStep);
-                    setVideoWatched(false);
-                  } : null}
-                />
-              </div>
+                {/* Theater: the band is as tall as the viewport; the player takes
+                    that height and centres itself, leaving black on either side. */}
+                <motion.div
+                  layout
+                  transition={LAYOUT_TRANSITION}
+                  className={theaterLayout ? "mx-auto h-full max-w-full aspect-video" : "w-full"}
+                >
+                  <CustomVideoPlayer
+                    videoUrl={playbackUrl}
+                    title={stepData.title}
+                    initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                    initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
+                    onProgressUpdate={handleVideoProgressUpdate}
+                    onTimeUpdate={(time, dur) => {
+                      setCurrentVideoTime(time);
+                      if (dur) setCurrentVideoDuration(dur);
+                    }}
+                    onNext={activeStep !== lastStepKey ? () => {
+                      const nextStep = (parseInt(activeStep) + 1).toString();
+                      handleStepComplete(activeStep);
+                      setActiveStep(nextStep);
+                      setVideoWatched(false);
+                    } : null}
+                    isTheater={theaterLayout}
+                    onToggleTheater={toggleTheater}
+                  />
+                </motion.div>
+              </motion.div>
             )}
 
             {stepData.assessmentData && (videoWatched || isStepCompleted) && (
               <div className="mt-6">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.micro_assessment", "Micro-Assessment")}</h4>
+                <h4 className="font-semibold text-[#072036] dark:text-white mb-3">{t("course_player.micro_assessment", "Micro-Assessment")}</h4>
                 {renderMicroAssessment(stepData, stepLetter, isStepCompleted)}
               </div>
             )}
@@ -943,8 +1031,10 @@ const CoursePlayer = () => {
         return (
           <div className="space-y-6 h-full overflow-y-auto pb-8">
             {playbackUrl && (
-              <div className="rounded-3xl overflow-hidden max-w-4xl mx-auto">
+              <div className={`rounded-2xl overflow-hidden mx-auto ${theaterLayout ? "max-w-none" : "max-w-4xl"}`}>
                 <CustomVideoPlayer
+                  isTheater={isTheater}
+                  onToggleTheater={toggleTheater}
                   videoUrl={playbackUrl}
                   title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
                   initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
@@ -975,7 +1065,7 @@ const CoursePlayer = () => {
       default:
         return (
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <p className="text-gray-700 dark:text-slate-200 whitespace-pre-line leading-relaxed">
+            <p className="text-slate-700 dark:text-slate-200 whitespace-pre-line leading-relaxed">
               {stepData.content}
             </p>
           </div>
@@ -1010,22 +1100,22 @@ const CoursePlayer = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f4f7fc] dark:bg-[#040915] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-cyan-400"></div>
+      <div className="min-h-screen bg-[#EAF7FD] dark:bg-[#072036] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#045C9A] dark:border-[#A6D7E8]"></div>
       </div>
     );
   }
 
   if (!loading && !course && !dynamicFlow) {
     return (
-      <div className="min-h-screen bg-[#f4f7fc] dark:bg-[#040915] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EAF7FD] dark:bg-[#072036] flex items-center justify-center">
         <div className="text-center p-8">
-          <Lock className="w-16 h-16 text-slate-400 dark:text-cyan-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#0d1f4e] dark:text-white mb-2">{t("course_player.course_not_found")}</h2>
+          <Lock className="w-16 h-16 text-slate-400 dark:text-[#A6D7E8] mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-[#072036] dark:text-white mb-2">{t("course_player.course_not_found")}</h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">{t("course_player.course_not_found_desc")}</p>
           <button
             onClick={handleBack}
-            className="px-6 py-3 bg-[#1a3884] dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg"
+            className="px-5 py-2.5 bg-[#072036] hover:bg-[#0d3a5f] text-white dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] rounded-xl text-[13px] font-semibold shadow-md shadow-[#072036]/20 dark:shadow-none transition-colors"
           >
             {t("course_player.back_to_courses")}
           </button>
@@ -1035,62 +1125,99 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-[#f4f7fc] dark:bg-[#040915] text-slate-900 dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-12">
+    <div ref={pageRef} className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-28">
+      {/* Ambient layer, matching the dashboard and courses pages. Fixed rather
+          than absolute because this page's own root is the scroll container --
+          an absolute layer would scroll away with the lesson content. */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-25">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
 
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+      </div>
 
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-transparent border-b border-slate-200/80 dark:border-blue-500/30 mb-2">
+        <div className="bg-transparent border-b border-[#d7ebf5] dark:border-[#045C9A]/30 mb-2">
           <div className="w-full px-0 py-2.5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-wrap items-center gap-3 sm:gap-5">
                 <button
                   onClick={handleBack}
-                  className="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-cyan-400 transition-all duration-300 font-bold text-xs cursor-pointer"
+                  className="group flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] transition-all duration-300 font-bold text-sm cursor-pointer"
                 >
-                  <div className="w-8.5 h-8.5 rounded-xl flex items-center justify-center border border-slate-200 dark:border-blue-500/30 bg-white dark:bg-blue-950/50 group-hover:border-cyan-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 transition-all shadow-xs">
-                    <ArrowLeft className="w-4 h-4 text-blue-600 dark:text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-[#d7ebf5] dark:border-[#045C9A]/30 bg-white dark:bg-[#0d3a5f] group-hover:border-[#045C9A]/50 group-hover:bg-[#EAF7FD] dark:group-hover:bg-[#045C9A]/20 transition-all shadow-sm">
+                    <ArrowLeft className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8] group-hover:-translate-x-0.5 transition-transform" />
                   </div>
                   <span>{t("course_player.back_to_overview")}</span>
                 </button>
-                <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-blue-500/30" />
+                <div className="hidden sm:block h-5 w-px bg-[#d7ebf5] dark:bg-[#045C9A]/30" />
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className={`${currentTheme.badgeBg} font-black px-3.5 py-1 text-xs uppercase tracking-wider shadow-sm`}>
+                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider shadow-none`}>
                     {t(stageKey)}
                   </Badge>
-                  <span className="text-[17px] font-black tracking-tight text-[#0d1f4e] dark:text-white">
+                  <span className="text-base font-bold tracking-tight text-[#072036] dark:text-white">
                     {t(stageNameKey)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                {/* Optional Header Right Content */}
+              <div className="flex items-center gap-2">
+                {!showIntro && (
+                  <button
+                    type="button"
+                    onClick={toggleTheater}
+                    aria-pressed={isTheater}
+                    title={isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}
+                    className={`hidden lg:inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                      isTheater
+                        ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                        : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-[#045C9A]/30 text-slate-700 dark:text-slate-200 hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/20 shadow-sm'
+                    }`}
+                  >
+                    <FitScreen weight={500} fill={isTheater ? 1 : 0} className="w-4 h-4" />
+                    <span>{isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}</span>
+                  </button>
+                )}
+                <FloatingDictionary variant="docked" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <main className="pt-2 sm:pt-4 space-y-6">
+        <main className={theaterBand ? "space-y-6" : "pt-2 sm:pt-4 space-y-6"}>
           {/* Course Info Header */}
           {!showIntro && (
-            <div className="text-left mb-6 mt-2 space-y-1">
-              <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
-                {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-[#0d1f4e] dark:text-white tracking-tight leading-tight">
-                {course.title}
-              </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
-                {course.subtitle}
-              </p>
-            </div>
+            <AnimatePresence initial={false}>
+              {!theaterBand && (
+                <motion.div
+                  key="course-title-full"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-left mb-4 mt-1 space-y-1"
+                >
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+                    {course.title}
+                  </h1>
+                  <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
+                    {course.subtitle}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
 
-          <div className={showIntro ? "flex justify-center" : "grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"}>
+          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${theaterLayout ? "" : "lg:grid-cols-3"}`}>
             {/* Left Column - Video and Content */}
-            <div className={showIntro ? "max-w-5xl w-full mx-auto" : "lg:col-span-2"}>
+            <motion.div layout transition={LAYOUT_TRANSITION} className={showIntro ? "max-w-5xl w-full mx-auto" : (theaterLayout ? "w-full" : "lg:col-span-2")}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1103,45 +1230,51 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.98 }}
-                      className="w-full max-w-3xl mx-auto p-6 sm:p-8 bg-white/95 dark:bg-gradient-to-b dark:from-[#0d1f4e] dark:via-[#0a183d] dark:to-[#07112c] text-slate-900 dark:text-white rounded-3xl border border-slate-200/90 dark:border-blue-500/30 shadow-xl dark:shadow-2xl space-y-6 text-left relative overflow-hidden"
+                      className="relative w-full max-w-3xl mx-auto overflow-hidden rounded-2xl bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm p-6 sm:p-8 space-y-6 text-left text-[#072036] dark:text-white"
                     >
                       {/* Top Meta Bar */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-blue-500/20">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-[#045C9A]/25">
                         <div className="flex items-center gap-2">
-                          <span className={`px-3.5 py-1 rounded-full ${currentTheme.badgeBg} text-xs font-black uppercase tracking-wider`}>
+                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-semibold uppercase tracking-wider`}>
                             {t(stageKey)}
                           </span>
-                          <span className="px-3.5 py-1 rounded-full bg-slate-100 dark:bg-blue-950/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-blue-500/20 text-xs font-bold">
+                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
                             {t(stageNameKey)}
                           </span>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-300">
+                        <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
                           <span className="flex items-center gap-1.5">
-                            <Fingerprint className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />
-                            Course ID: <strong className="text-slate-900 dark:text-white">{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</strong>
+                            <Fingerprint className="w-3.5 h-3.5 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            {t("course_player.course_id", "Course ID")}
+                            <strong className="font-bold tabular-nums text-[#072036] dark:text-white">
+                              {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                            </strong>
                           </span>
-                          <span>•</span>
+                          <span className="h-3 w-px bg-[#d7ebf5] dark:bg-white/10" />
                           <span className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                            45 min
+                            <Clock className="w-3.5 h-3.5 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            <span className="tabular-nums">45 min</span>
                           </span>
                         </div>
                       </div>
 
                       {/* Header Info */}
                       <div className="space-y-2">
-                        <h1 className="text-2xl sm:text-3xl font-black text-[#0d1f4e] dark:text-white tracking-tight leading-tight">
+                        <h1
+                          className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight"
+                          style={{ letterSpacing: "-0.02em" }}
+                        >
                           {course.title}
                         </h1>
-                        <p className="text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-2xl">
+                        <p className="max-w-2xl text-[15px] font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
                           {course.subtitle}
                         </p>
                       </div>
 
                       {/* Banner Image */}
                       {(dbCourse?.banner || course?.banner) && (
-                        <div className="rounded-2xl overflow-hidden border border-slate-200/80 dark:border-blue-500/30 shadow-md relative h-52 sm:h-60 w-full">
+                        <div className="relative h-52 w-full overflow-hidden rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/20 sm:h-60">
                           <img
                             src={dbCourse.banner || course.banner}
                             alt={course.title}
@@ -1150,38 +1283,83 @@ const CoursePlayer = () => {
                         </div>
                       )}
 
-                      {/* Important Disclaimers & Guidelines Box */}
-                      <div className="p-5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-500/40 text-amber-950 dark:text-amber-200 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                          <span className="text-xs font-black uppercase tracking-wider">Important Disclaimers & Guidelines</span>
+                      {/* Important Disclaimers & Guidelines - acknowledgement checklist */}
+                      <div className="rounded-2xl border border-[#d7ebf5] bg-[#F1F5F9] p-5 dark:border-[#045C9A]/25 dark:bg-[#072036]/60">
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-white/10">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="p-1.5 bg-[#045C9A]/10 dark:bg-[#045C9A]/20 rounded-lg shrink-0">
+                              <ClipboardCheck className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#072036] dark:text-white">
+                                {t("course_player.important_guidelines", "Important Disclaimers & Guidelines")}
+                              </p>
+                              <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
+                                {t("course_player.guidelines_hint", "Please read and acknowledge each point before you begin.")}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider tabular-nums transition-colors ${
+                              allGuidelinesAcknowledged
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                : "border-[#d7ebf5] bg-white text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300"
+                            }`}
+                          >
+                            {t("course_player.guidelines_progress", "{{done}} of {{total}} acknowledged", {
+                              done: acknowledgedCount,
+                              total: COURSE_GUIDELINES.length,
+                            })}
+                          </span>
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-medium text-amber-900/90 dark:text-amber-300/90 leading-relaxed">
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Active Engagement:</strong> User inactivity of 5 minutes or more is automatically recorded for security & progress validation.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Academic Integrity:</strong> All assessments and reflections must be completed independently by the enrolled student.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Sequential Order:</strong> Lessons must be completed in order to unlock subsequent modules and assessments.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Certification Eligibility:</strong> Official course completion is granted upon meeting all required milestone criteria.</span>
-                          </div>
+
+                        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                          {COURSE_GUIDELINES.map((guideline) => {
+                            const checked = !!acknowledgedGuidelines[guideline.id];
+                            return (
+                              <label
+                                key={guideline.id}
+                                className={`group flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors select-none ${
+                                  checked
+                                    ? "border-[#045C9A]/40 bg-white dark:border-[#A6D7E8]/40 dark:bg-[#0d3a5f]"
+                                    : "border-[#d7ebf5] bg-white hover:border-[#045C9A]/30 dark:border-white/10 dark:bg-[#0d3a5f]/60 dark:hover:border-[#A6D7E8]/30"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="peer sr-only"
+                                  checked={checked}
+                                  onChange={() => toggleGuideline(guideline.id)}
+                                />
+                                <span
+                                  aria-hidden="true"
+                                  className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[#045C9A]/40 ${
+                                    checked
+                                      ? "border-[#045C9A] bg-[#045C9A] text-white dark:border-[#A6D7E8] dark:bg-[#A6D7E8] dark:text-[#072036]"
+                                      : "border-slate-300 bg-white group-hover:border-[#045C9A] dark:border-white/25 dark:bg-transparent dark:group-hover:border-[#A6D7E8]"
+                                  }`}
+                                >
+                                  {checked && <Check className="w-3 h-3" />}
+                                </span>
+                                <span className="min-w-0 text-sm leading-relaxed">
+                                  <span className="block font-bold text-[#072036] dark:text-white">
+                                    {t(guideline.titleKey, guideline.titleDefault)}
+                                  </span>
+                                  <span className="block font-medium text-slate-600 dark:text-slate-400">
+                                    {t(guideline.textKey, guideline.textDefault)}
+                                  </span>
+                                </span>
+                              </label>
+                            );
+                          })}
                         </div>
                       </div>
 
                       {/* Primary CTA & Footer */}
                       <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-300">
-                          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                          <span>Secure session protocol initialized</span>
+                        <div className="flex items-center gap-2 text-[13px] font-semibold text-slate-600 dark:text-slate-400">
+                          <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                          <span>{t("course_player.secure_session", "Secure session protocol initialized")}</span>
                         </div>
 
                         <motion.button
@@ -1189,7 +1367,11 @@ const CoursePlayer = () => {
                           whileTap={{ scale: 0.98 }}
                           type="button"
                           onClick={handleStartCourse}
-                          className={`w-full sm:w-auto px-8 py-3.5 ${currentTheme.btnClass} rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2.5 cursor-pointer`}
+                          disabled={!allGuidelinesAcknowledged}
+                          title={allGuidelinesAcknowledged ? undefined : t("course_player.acknowledge_all_guidelines", "Please acknowledge all guidelines to continue.")}
+                          className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-all sm:w-auto ${currentTheme.btnClass} ${
+                            allGuidelinesAcknowledged ? "cursor-pointer" : "cursor-not-allowed opacity-50 shadow-none"
+                          }`}
                         >
                           <span>
                             {Object.keys(completedSteps).length > 0
@@ -1207,9 +1389,9 @@ const CoursePlayer = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3 }}
-                      className="p-8 text-center bg-slate-50 dark:bg-blue-950/40 rounded-2xl border border-slate-200/80 dark:border-blue-500/30"
+                      className="p-8 text-center bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30"
                     >
-                      <Sparkles className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                      <Sparkles className="w-12 h-12 text-[#045C9A] dark:text-[#A6D7E8] mx-auto mb-4" />
                       <h4 className="font-bold text-slate-600 dark:text-slate-300">
                         {t("course_player.select_a_lesson", "Select a lesson to continue")}
                       </h4>
@@ -1222,46 +1404,67 @@ const CoursePlayer = () => {
                     <div className="space-y-6">
                       <motion.div
                         key="active-step"
+                        layout
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="p-5 sm:p-7 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-3xl border border-slate-100 dark:border-white/[0.04] mb-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden text-left"
+                        transition={LAYOUT_TRANSITION}
+                        className={
+                          theaterBand
+                            ? "flex flex-col mb-6 text-left text-[#072036] dark:text-white"
+                            : "p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left"
+                        }
                       >
-                        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#1a3884]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-100 dark:border-slate-800">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-[#1a3884] text-white flex items-center justify-center font-black text-xl shadow-lg shrink-0">
+                        {!theaterBand && (
+                          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
+                        )}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="w-11 h-11 rounded-xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#072036]/15 shrink-0 tabular-nums">
                               {activeStep}
                             </div>
-                            <div>
-                              <h3 className="font-black text-xl sm:text-2xl text-[#0d1f4e] dark:text-white leading-tight tracking-tight">
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {theaterBand && (
+                                  <>
+                                    <span>{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                    <span>{course.title}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                  </>
+                                )}
+                                {t("course_player.step_of", "Step {{step}} of {{total}}", { step: activeStep, total: totalSteps })}
+                              </p>
+                              <h3 className="mt-0.5 text-lg sm:text-xl font-bold text-[#072036] dark:text-white leading-tight tracking-tight truncate">
                                 {activeStep === '1' ? t("course_player.step_why", "Why") : activeStep === '2' ? t("course_player.step_story", "Story") : (learningFlowData?.steps?.[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`)}
                               </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="w-2 h-2 rounded-full bg-[#1a3884] animate-pulse" />
-                                <p className="text-[10px] font-black text-[#1a3884] uppercase tracking-widest">{t("course_player.active_session", "ACTIVE SESSION")}</p>
-                              </div>
                             </div>
                           </div>
-                          {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
-                            !learningFlowData?.steps?.[activeStep]?.assessmentData && (
-                              <div className="px-4 py-2 bg-slate-50 dark:bg-blue-950/40 rounded-xl text-xs font-black text-slate-600 dark:text-blue-200 border border-slate-200/60 dark:border-white/[0.05] shadow-xs shrink-0 flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-[#1a3884]" />
-                                <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}</span>
-                              </div>
-                            )}
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#045C9A]/20 bg-[#045C9A]/10 px-2.5 py-1 text-xs font-semibold text-[#045C9A] dark:border-[#A6D7E8]/25 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                              {t("course_player.active_session_label", "Active session")}
+                            </span>
+                            {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
+                              !learningFlowData?.steps?.[activeStep]?.assessmentData && (
+                                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300 tabular-nums">
+                                  <Clock className="w-3.5 h-3.5 text-[#045C9A] dark:text-[#A6D7E8]" />
+                                  {learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}
+                                </span>
+                              )}
+                          </div>
                         </div>
 
                         {learningFlowData?.steps?.[activeStep] ? (
                           renderStepContent(learningFlowData.steps[activeStep], activeStep)
                         ) : (
-                          <div className="p-8 text-center bg-slate-50 dark:bg-blue-950/40 rounded-2xl border border-slate-200/80 dark:border-blue-500/30">
-                            <Sparkles className="w-12 h-12 text-cyan-400 mx-auto mb-4 animate-pulse" />
+                          <div className="p-8 text-center bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30">
+                            <Sparkles className="w-12 h-12 text-[#045C9A] dark:text-[#A6D7E8] mx-auto mb-4 animate-pulse" />
                             <h4 className="font-bold text-slate-600 dark:text-slate-300">{t("course_player.content_coming_soon")}</h4>
                             <p className="text-sm text-slate-500 dark:text-slate-400">{t("course_player.step_preparing", { step: activeStep })}</p>
                             <button
                               onClick={() => handleStepComplete(activeStep)}
-                              className={`mt-6 px-6 py-2.5 ${currentTheme.btnClass} rounded-xl font-bold text-xs uppercase tracking-wider shadow-md`}
+                              className={`mt-6 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors ${currentTheme.btnClass}`}
                             >
                               {t("course_player.complete_step")}
                             </button>
@@ -1272,7 +1475,7 @@ const CoursePlayer = () => {
                           learningFlowData?.steps?.[activeStep]?.contentType !== 'notes' && (
                           <button
                             onClick={handleNextLesson}
-                            className={`w-full px-6 py-4 ${currentTheme.btnClass} rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl transform hover:scale-[1.01] mt-6`}
+                            className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition-colors ${currentTheme.btnClass}`}
                           >
                             {t("course_player.unlock_next_course")}
                             <ChevronRight className="w-4 h-4" />
@@ -1283,46 +1486,46 @@ const CoursePlayer = () => {
 
                       {/* Side-by-side Tab switcher buttons & Content below active-step card if contentType is video-text */}
                       {learningFlowData?.steps?.[activeStep]?.contentType === 'video-text' && (
-                        <div className="space-y-6">
+                        <motion.div layout transition={LAYOUT_TRANSITION} className="space-y-6">
                           <div className="flex flex-wrap items-center gap-3">
                             <button
                               onClick={() => setActiveTab('preview')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-extrabold transition-all duration-300 text-xs cursor-pointer shadow-xs border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'preview'
-                                  ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md shadow-blue-900/10'
-                                  : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/[0.02] text-slate-500 dark:text-slate-400 border-slate-200/80 dark:border-white/[0.05] shadow-sm'
+                                  ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                                  : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
                               }`}
                             >
-                              <BookOpen size={14} className="stroke-[2.2]" />
+                              <BookOpen size={14} />
                               <span>{t("course_player.preview")}</span>
                             </button>
 
                             <button
                               onClick={() => setActiveTab('transcription')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-extrabold transition-all duration-300 text-xs cursor-pointer shadow-xs border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'transcription'
-                                  ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md shadow-blue-900/10'
-                                  : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/[0.02] text-slate-500 dark:text-slate-400 border-slate-200/80 dark:border-white/[0.05] shadow-sm'
+                                  ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                                  : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
                               }`}
                             >
-                              <FileText size={14} className="stroke-[2.2]" />
+                              <FileText size={14} />
                               <span>{t("course_player.transcription")}</span>
                             </button>
 
                             <button
                               onClick={() => setActiveTab('notes')}
-                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-extrabold transition-all duration-300 text-xs cursor-pointer shadow-xs border ${
+                              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer border ${
                                 activeTab === 'notes'
-                                  ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md shadow-blue-900/10'
-                                  : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-white/[0.02] text-slate-500 dark:text-slate-400 border-slate-200/80 dark:border-white/[0.05] shadow-sm'
+                                  ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                                  : 'bg-white dark:bg-[#0d3a5f] hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 border-[#d7ebf5] dark:border-white/10 shadow-sm'
                               }`}
                             >
-                              <StickyNote size={14} className="stroke-[2.2]" />
+                              <StickyNote size={14} />
                               <span>{t("course_player.notes", "Notes")}</span>
                             </button>
                           </div>
 
-                          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 border border-slate-100 dark:border-white/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.02)] text-left">
+                          <div className="bg-white dark:bg-[#0d3a5f] rounded-2xl p-5 sm:p-7 border border-[#d7ebf5] dark:border-white/[0.03] shadow-sm text-left">
                             <AnimatePresence mode="wait">
                               {activeTab === 'preview' && (
                                 <motion.div
@@ -1332,34 +1535,34 @@ const CoursePlayer = () => {
                                   exit={{ opacity: 0, y: -10 }}
                                   transition={{ duration: 0.2 }}
                                 >
-                                  <div className="bg-slate-50 dark:bg-[#071336]/90 border border-slate-200 dark:border-blue-500/30 rounded-2xl p-6 transition-colors duration-300 text-slate-900 dark:text-white">
-                                    <h4 className="font-extrabold text-slate-900 dark:text-white mb-3">{t("course_player.lesson_preview")}</h4>
+                                  <div className="bg-[#F1F5F9] dark:bg-[#0d3a5f]/90 border border-[#d7ebf5] dark:border-[#045C9A]/30 rounded-2xl p-6 transition-colors duration-300 text-[#072036] dark:text-white">
+                                    <h4 className="mb-3 text-base font-bold text-[#072036] dark:text-white">{t("course_player.lesson_preview")}</h4>
                                     {(activeStep === '1' || activeStep === '2' || activeStep === '3') && learningFlowData?.steps?.[activeStep]?.title ? (
                                       <div className="space-y-2 mb-3">
-                                        <h5 className="font-black text-sm sm:text-base text-[#1a3884] dark:text-cyan-300">
+                                        <h5 className="font-bold text-sm sm:text-base text-[#045C9A] dark:text-[#A6D7E8]">
                                           {learningFlowData.steps[activeStep].title}
                                         </h5>
                                         {activeStep === '3' && learningFlowData.steps[activeStep].diagramUrl && (
-                                          <div className="my-4 rounded-xl overflow-hidden border border-slate-200 dark:border-blue-500/30 bg-white dark:bg-[#050e26] p-2 max-w-lg mx-auto">
+                                          <div className="my-4 rounded-xl overflow-hidden border border-[#d7ebf5] dark:border-[#045C9A]/30 bg-white dark:bg-[#0d3a5f] p-2 max-w-lg mx-auto">
                                             <img src={learningFlowData.steps[activeStep].diagramUrl} alt={t("course_player.framework_diagram", "Framework Diagram")} className="w-full h-auto object-contain max-h-64" />
                                           </div>
                                         )}
-                                        <p className="text-slate-600 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-line">
+                                        <p className="text-slate-600 dark:text-slate-200 text-[15px] leading-relaxed whitespace-pre-line">
                                           {learningFlowData.steps[activeStep].content || t("course_player.lesson_preview_desc")}
                                         </p>
                                       </div>
                                     ) : (
-                                      <p className="text-slate-600 dark:text-slate-200 leading-relaxed mb-3">
+                                      <p className="text-slate-600 dark:text-slate-200 text-[15px] leading-relaxed mb-3">
                                         {learningFlowData?.steps?.[activeStep]?.content || t("course_player.lesson_preview_desc")}
                                       </p>
                                     )}
-                                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-slate-500 dark:text-slate-300">
+                                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-sm text-slate-500 dark:text-slate-300">
                                       <div className="flex items-center gap-2">
-                                        <Clock className="w-4 h-4 text-[#1a3884] dark:text-cyan-400" />
+                                        <Clock className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                                         <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min")}</span>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <PlayCircle className="w-4 h-4 text-[#1a3884] dark:text-cyan-400" />
+                                        <PlayCircle className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                                         <span>{t("course_player.video_lesson")}</span>
                                       </div>
                                     </div>
@@ -1397,135 +1600,150 @@ const CoursePlayer = () => {
                               )}
                             </AnimatePresence>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                     </div>
                   )}
                 </AnimatePresence>
               </motion.div>
-            </div>
+            </motion.div>
 
             {!showIntro && (
-              <div className="lg:col-span-1">
+              <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "w-full" : "lg:col-span-1"}>
                 <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: theaterLayout ? 0 : 20, y: theaterLayout ? 20 : 0 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="space-y-6 text-left"
+                  className="text-left"
                 >
-                  {/* Progress Card */}
-                  <div className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-100 dark:border-white/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.03)] text-slate-900 dark:text-white">
-                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#1a3884]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-[#1a3884] dark:text-cyan-400 flex items-center justify-center border border-blue-500/20 shadow-xs">
-                        <Target className="w-5 h-5 stroke-[2.2]" />
-                      </div>
-                      <h3 className="text-base font-black text-[#0d1f4e] dark:text-white">
-                        {t("course_player.progress", "Progress")}
-                      </h3>
-                    </div>
+                  {/* Progress + Curriculum in one card so the step list stays above the fold */}
+                  <div className="relative overflow-hidden bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/[0.03] shadow-sm text-[#072036] dark:text-white">
+                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
 
-                    <div className="space-y-4">
-                      {/* Content Progress */}
-                      <div className="space-y-1.5 text-left">
-                        <div className="flex items-center justify-between text-xs font-black text-slate-700 dark:text-slate-300">
-                          <span>{t("course_player.content_progress", "Content Progress")}</span>
-                          <span className="text-[#1a3884] dark:text-cyan-300">{overallContentProgress}%</span>
-                        </div>
-                        <div className="w-full h-2.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden border border-slate-200/50 dark:border-white/10 p-0.5">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${overallContentProgress}%` }}
-                            className="h-full bg-gradient-to-r from-[#1a3884] to-[#3b82f6] rounded-full"
-                            transition={{ type: "spring", bounce: 0, duration: 1 }}
-                          />
+                    {/* Progress strip */}
+                    <div className="p-5 sm:p-6 border-b border-[#d7ebf5] dark:border-white/10">
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs shrink-0">
+                            <Target className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-base font-bold text-[#072036] dark:text-white leading-tight">
+                              {t("course_player.progress", "Progress")}
+                            </h3>
+                            <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400 tabular-nums">
+                              {t("course_player.steps_completed_of", "{{done}} of {{total}} steps completed", {
+                                done: Object.keys(completedSteps).length,
+                                total: totalSteps,
+                              })}
+                            </p>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Steps Completed */}
-                      <div className="space-y-1.5 text-left">
-                        <div className="flex items-center justify-between text-xs font-black text-slate-700 dark:text-slate-300">
-                          <span>{t("course_player.steps_completed", "Steps Completed")}</span>
-                          <span className="text-[#1a3884] dark:text-cyan-300">
-                            {Object.keys(completedSteps).length}/{totalSteps}
-                          </span>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
+                        {/* Content Progress */}
+                        <div className="space-y-1.5 text-left">
+                          <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
+                            <span>{t("course_player.content_progress", "Content Progress")}</span>
+                            <span className="text-[#045C9A] dark:text-[#A6D7E8] tabular-nums">{overallContentProgress}%</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${overallContentProgress}%` }}
+                              className="h-full bg-gradient-to-r from-[#034a7d] to-[#045C9A] rounded-full"
+                              transition={{ type: "spring", bounce: 0, duration: 1 }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full h-2.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden border border-slate-200/50 dark:border-white/10 p-0.5">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(Object.keys(completedSteps).length / totalSteps) * 100}%` }}
-                            className="h-full bg-gradient-to-r from-[#16a34a] to-[#4ade80] rounded-full"
-                            transition={{ type: "spring", bounce: 0, duration: 1 }}
-                          />
+
+                        {/* Steps Completed */}
+                        <div className="space-y-1.5 text-left">
+                          <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
+                            <span>{t("course_player.steps_completed", "Steps Completed")}</span>
+                            <span className="text-[#045C9A] dark:text-[#A6D7E8] tabular-nums">
+                              {Object.keys(completedSteps).length}/{totalSteps}
+                            </span>
+                          </div>
+                          <div className="w-full h-2.5 bg-[#F1F5F9] dark:bg-white/10 rounded-full overflow-hidden border border-[#d7ebf5] dark:border-white/10 p-0.5">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(Object.keys(completedSteps).length / totalSteps) * 100}%` }}
+                              className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
+                              transition={{ type: "spring", bounce: 0, duration: 1 }}
+                            />
+                          </div>
                         </div>
+                      </motion.div>
+                    </div>
+
+                    {/* Curriculum */}
+                    <div className="p-5 sm:p-6">
+                      <div className="flex items-center justify-between gap-3 mb-4">
+                        <h3 className="text-base font-bold text-[#072036] dark:text-white flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:text-[#A6D7E8] flex items-center justify-center border border-[#045C9A]/20 shadow-xs">
+                            <PlayCircle className="w-5 h-5" />
+                          </div>
+                          {t("course_player.curriculum", "Curriculum")}
+                        </h3>
+                        <span className="px-3 py-1 bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/25 rounded-full text-sm font-bold tabular-nums">
+                          {Object.keys(completedSteps).length}/{totalSteps}
+                        </span>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Curriculum Flow Card */}
-                  <div className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-100 dark:border-white/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.03)] text-slate-900 dark:text-white">
-                    <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#1a3884]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-base font-black text-[#0d1f4e] dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-[#1a3884] dark:text-cyan-400 flex items-center justify-center border border-blue-500/20 shadow-xs">
-                          <PlayCircle className="w-5 h-5 stroke-[2.2]" />
-                        </div>
-                        {t("course_player.curriculum", "Curriculum")}
-                      </h3>
-                      <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/60 text-[#1a3884] dark:text-blue-300 border border-blue-100 dark:border-blue-500/20 rounded-full text-xs font-black">
-                        {Object.keys(completedSteps).length}/{totalSteps}
-                      </span>
-                    </div>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
+                        {stepNumbers.map((step) => {
+                          const status = getStepStatus(step);
+                          const stepData = learningFlowData?.steps?.[step];
+                          const isActive = activeStep === step;
 
-                    <div className="space-y-2.5">
-                      {stepNumbers.map((step) => {
-                        const status = getStepStatus(step);
-                        const stepData = learningFlowData?.steps?.[step];
-                        const isActive = activeStep === step;
-
-                        return (
-                          <button
-                            key={step}
-                            disabled={status === 'locked'}
-                            onClick={() => handleStepClick(step)}
-                            className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 border text-left cursor-pointer hover:-translate-y-0.5 hover:shadow-md ${isActive
-                              ? 'bg-[#1a3884] dark:bg-[#1e40af] border-[#1a3884] dark:border-[#1e40af] text-white shadow-md shadow-blue-900/15'
-                              : status === 'completed'
-                                ? 'bg-[#f0fdf4] dark:bg-[#072212]/40 border-[#dcfce7] dark:border-[#14532d]/25 text-[#15803d] dark:text-[#4ade80] hover:border-[#bbf7d0]'
-                                : status === 'locked'
-                                  ? 'opacity-40 cursor-not-allowed border-slate-100/60 dark:border-slate-800 bg-slate-50 dark:bg-[#06112d]/60 text-slate-400'
-                                  : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-white/[0.03] text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700'
-                              }`}
-                          >
-                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-xs transition-colors ${isActive ? 'bg-white/20 text-white' :
-                              status === 'completed' ? 'bg-[#dcfce7] dark:bg-[#14532d]/45 text-[#15803d] dark:text-[#4ade80] border border-[#bbf7d0] dark:border-[#166534]/30' :
-                                status === 'locked' ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200/50 dark:border-slate-700/50' : 'bg-blue-50 dark:bg-blue-950/60 text-[#1a3884] dark:text-blue-300 border border-blue-100 dark:border-blue-900/50 shadow-xs'
-                              }`}>
-                              {getStepIcon(step, stepData, status, isActive)}
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-xs truncate ${isActive ? 'text-white' : 'text-slate-900 dark:text-slate-100'}`}>
-                                {step === '1' ? t("course_player.step_why", "Why") : step === '2' ? t("course_player.step_story", "Story") : (stepData?.title || `${t("course_player.curriculum")} ${step}`)}
-                              </h4>
-                              <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 mt-0.5">
-                                <Clock size={11} className={isActive ? 'text-white/80' : 'text-slate-400'} />
-                                <span className={isActive ? 'text-white/90' : ''}>
-                                  {stepData?.duration || t("course_player.five_ten_min", "5 min")}
-                                </span>
+                          return (
+                            <motion.button
+                              layout
+                              transition={LAYOUT_TRANSITION}
+                              whileHover={status === 'locked' ? undefined : { y: -2 }}
+                              whileTap={status === 'locked' ? undefined : { scale: 0.99 }}
+                              key={step}
+                              disabled={status === 'locked'}
+                              onClick={() => handleStepClick(step)}
+                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-colors duration-300 border text-left cursor-pointer hover:shadow-md ${isActive
+                                ? 'bg-[#045C9A] dark:bg-[#045C9A] border-[#045C9A] dark:border-[#045C9A] text-white shadow-md shadow-[#072036]/15'
+                                : status === 'completed'
+                                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/70 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300'
+                                  : status === 'locked'
+                                    ? 'opacity-40 cursor-not-allowed border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9] dark:bg-[#072036]/60 text-slate-400'
+                                    : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-white/[0.03] text-slate-800 dark:text-slate-200 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/40'
+                                }`}
+                            >
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-sm transition-colors ${isActive ? 'bg-white/20 text-white' :
+                                status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30' :
+                                  status === 'locked' ? 'bg-[#F1F5F9] dark:bg-white/5 text-slate-400 border border-[#d7ebf5] dark:border-white/10' : 'bg-[#EAF7FD] dark:bg-[#0d3a5f] text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/30 shadow-xs'
+                                }`}>
+                                {getStepIcon(step, stepData, status, isActive)}
                               </div>
-                            </div>
 
-                            {status !== 'locked' && !isActive && (
-                              <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                            )}
-                          </button>
-                        );
-                      })}
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`font-bold text-[15px] leading-tight truncate ${isActive ? 'text-white' : 'text-[#072036] dark:text-slate-100'}`}>
+                                  {step === '1' ? t("course_player.step_why", "Why") : step === '2' ? t("course_player.step_story", "Story") : (stepData?.title || `${t("course_player.curriculum")} ${step}`)}
+                                </h4>
+                                <div className={`flex items-center gap-1.5 text-[13px] font-semibold mt-1 ${isActive ? 'text-white/90' : 'text-slate-500 dark:text-slate-400'}`}>
+                                  <Clock size={13} className={isActive ? 'text-white/80' : 'text-slate-400'} />
+                                  <span>{stepData?.duration || t("course_player.five_ten_min", "5 min")}</span>
+                                </div>
+                              </div>
+
+                              {status !== 'locked' && !isActive && (
+                                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                              )}
+                            </motion.button>
+                          );
+                        })}
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
-              </div>
+              </motion.div>
             )}
           </div>
         </main>
@@ -1550,7 +1768,7 @@ const CoursePlayer = () => {
                   height={windowSize.height}
                   recycle={false}
                   numberOfPieces={500}
-                  colors={['#1a3884', '#112b6b', '#2b5a9e', '#4c6ef5', '#ffd700']}
+                  colors={['#045C9A', '#034a7d', '#0b7cc4', '#A6D7E8', '#EAF7FD']}
                   style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1001, pointerEvents: 'none' }}
                 />
 
@@ -1560,10 +1778,10 @@ const CoursePlayer = () => {
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.8, opacity: 0, y: 20 }}
                   transition={{ type: "spring", duration: 0.5 }}
-                  className="bg-white dark:bg-[#001a3d] rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(26,56,132,0.3)] border border-[#d8e6f7] dark:border-[#1a3884]/30 relative overflow-hidden flex flex-col items-center z-[1000]"
+                  className="bg-white dark:bg-[#0d3a5f] rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(7,32,54,0.28)] border border-[#d7ebf5] dark:border-[#045C9A]/30 relative overflow-hidden flex flex-col items-center z-[1000]"
                 >
                   {/* Subtle Glow */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-gradient-to-b from-[#1a3884]/8 to-transparent rounded-full blur-2xl pointer-events-none" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-gradient-to-b from-[#045C9A]/8 to-transparent rounded-full blur-2xl pointer-events-none" />
 
                   {/* Unlocked Hex Badge */}
                   <div className="flex justify-center mb-6 relative z-10">
@@ -1589,7 +1807,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="text-[28px] font-black text-[#1a3884] dark:text-blue-300 mb-1"
+                      className="mb-1 text-2xl font-bold tracking-tight text-[#072036] dark:text-white"
                     >
                       {t("course_player.congratulations_exclaim", "Congratulations!")}
                     </motion.h2>
@@ -1597,7 +1815,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="text-[15px] font-extrabold text-slate-600 dark:text-slate-400"
+                      className="text-[13px] font-medium text-[#35566b] dark:text-slate-400"
                     >
                       {t("course_player.badge_unlocked", "You have unlocked this badge")}
                     </motion.p>
@@ -1608,11 +1826,11 @@ const CoursePlayer = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="w-full bg-gradient-to-r from-green-50/60 to-emerald-50/60 dark:from-green-950/10 dark:to-emerald-950/10 rounded-2xl p-4 mb-6 border border-green-200/60 dark:border-green-800/30 relative z-10"
+                    className="relative z-10 mb-6 w-full rounded-2xl border border-emerald-200/70 bg-emerald-50 p-4 dark:border-emerald-500/25 dark:bg-emerald-500/10"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-extrabold text-green-700 dark:text-green-400">{t("course_player.your_progress")}</span>
-                      <span className="text-xs font-black text-green-700 dark:text-green-400">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">{t("course_player.your_progress")}</span>
+                      <span className="text-[11px] font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
                         {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
                       </span>
                     </div>
@@ -1623,7 +1841,7 @@ const CoursePlayer = () => {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: 0.6 + idx * 0.05 }}
-                          className="flex-1 h-2 bg-[#15803d] dark:bg-[#4ade80] rounded-full"
+                          className="h-2 flex-1 rounded-full bg-emerald-600 dark:bg-emerald-400"
                         />
                       ))}
                     </div>
@@ -1643,7 +1861,7 @@ const CoursePlayer = () => {
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ delay: 0.7 + star * 0.1, type: "spring", stiffness: 200 }}
                       >
-                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                        <Star className="w-5 h-5 text-amber-400" />
                       </motion.div>
                     ))}
                   </motion.div>
@@ -1654,7 +1872,7 @@ const CoursePlayer = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                     onClick={handleNextLesson}
-                    className="w-full py-3.5 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-sm font-extrabold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] relative z-10"
+                    className="relative z-10 flex w-full items-center justify-center gap-2 rounded-xl bg-[#072036] px-6 py-3 text-[13px] font-semibold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white"
                   >
                     {t("course_player.continue_to_next_lesson")}
                     <ChevronRight className="w-4 h-4" />
@@ -1666,7 +1884,6 @@ const CoursePlayer = () => {
           document.body
         )}
       </div>
-      <FloatingDictionary />
       {/* FloatingNotes removed — Notes moved into the tab panel above */}
       <ActivityWarningModal
         isOpen={isWarningVisible}

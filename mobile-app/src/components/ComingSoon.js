@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import ScreenContainer from './ScreenContainer';
+import { FadeSlideIn } from './Motion';
 import { radius, shadow } from '../theme';
 import { useTheme } from '../context/ThemeContext';
 
@@ -10,12 +11,12 @@ export default function ComingSoon({ title, description, docSection, icon = 'clo
 
   return (
     <ScreenContainer contentStyle={styles.content}>
-      <View style={styles.wrap}>
+      <FadeSlideIn duration={400} style={styles.wrap}>
         <View
           style={[
             styles.iconBadge,
             {
-              backgroundColor: themeColors.theme === 'dark' ? '#182235' : '#FFFFFF',
+              backgroundColor: themeColors.theme === 'dark' ? themeColors.card : '#FFFFFF',
               borderColor: themeColors.border,
             },
           ]}
@@ -26,7 +27,7 @@ export default function ComingSoon({ title, description, docSection, icon = 'clo
           style={[
             styles.tag,
             {
-              backgroundColor: themeColors.theme === 'dark' ? 'rgba(255,255,255,0.06)' : '#E2E8F0',
+              backgroundColor: themeColors.theme === 'dark' ? 'rgba(255,255,255,0.06)' : themeColors.bgSecondary,
               borderColor: themeColors.border,
             },
           ]}
@@ -40,7 +41,7 @@ export default function ComingSoon({ title, description, docSection, icon = 'clo
             See {docSection} in the requirements doc for the full spec.
           </Text>
         ) : null}
-      </View>
+      </FadeSlideIn>
     </ScreenContainer>
   );
 }

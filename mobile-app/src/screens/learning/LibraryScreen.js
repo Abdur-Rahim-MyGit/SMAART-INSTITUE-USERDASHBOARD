@@ -10,9 +10,9 @@
  * without the backend being down, so it degrades to a stated error rather than
  * an empty list.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
+  Animated,
   Image,
   Linking,
   Pressable,
@@ -26,6 +26,39 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+import SkeletonBox from '../../components/SkeletonBox';
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>{children}</Animated.View>;
+}
+
+function PressScale({ onPress, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 const CATEGORIES = [
   { id: 'career development', label: 'Career' },
@@ -96,67 +129,78 @@ export default function LibraryScreen({ navigation }) {
         </View>
       </View>
 
-      <View style={styles.controls}>
-        <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <Feather name="search" size={16} color={themeColors.iconMuted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={submitSearch}
-            returnKeyType="search"
-            placeholder="Search books…"
-            placeholderTextColor={themeColors.textMuted}
-            style={[styles.searchInput, { color: themeColors.text }]}
-            autoCorrect={false}
-          />
-        </View>
+      <AnimatedSection delay={60}>
+        <View style={styles.controls}>
+          <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Feather name="search" size={16} color={themeColors.iconMuted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              onSubmitEditing={submitSearch}
+              returnKeyType="search"
+              placeholder="Search books…"
+              placeholderTextColor={themeColors.textMuted}
+              style={[styles.searchInput, { color: themeColors.text }]}
+              autoCorrect={false}
+            />
+          </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chips}
-        >
-          {CATEGORIES.map((c) => {
-            const on = category === c.id && !query.trim();
-            return (
-              <Pressable
-                key={c.id}
-                onPress={() => {
-                  setQuery('');
-                  setCategory(c.id);
-                }}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: on ? themeColors.primaryBright : themeColors.card,
-                    borderColor: on ? themeColors.primaryBright : themeColors.border,
-                  },
-                ]}
-              >
-                <Text style={[styles.chipText, { color: on ? '#FFFFFF' : themeColors.textMuted }]}>
-                  {c.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chips}
+          >
+            {CATEGORIES.map((c) => {
+              const on = category === c.id && !query.trim();
+              return (
+                <PressScale
+                  key={c.id}
+                  onPress={() => {
+                    setQuery('');
+                    setCategory(c.id);
+                  }}
+                  style={[
+                    styles.chip,
+                    {
+                      backgroundColor: on ? themeColors.primaryBright : themeColors.card,
+                      borderColor: on ? themeColors.primaryBright : themeColors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.chipText, { color: on ? '#FFFFFF' : themeColors.textMuted }]}>
+                    {c.label}
+                  </Text>
+                </PressScale>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </AnimatedSection>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator color={themeColors.primaryBright} />
+          <View style={{ gap: 12 }}>
+            {[0, 1, 2, 3].map((i) => (
+              <View key={i} style={[styles.book, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+                <SkeletonBox width={48} height={68} borderRadius={6} />
+                <View style={{ flex: 1, gap: 8 }}>
+                  <SkeletonBox width="80%" height={13} borderRadius={5} />
+                  <SkeletonBox width="55%" height={11} borderRadius={5} />
+                  <SkeletonBox width="35%" height={10} borderRadius={5} />
+                </View>
+              </View>
+            ))}
           </View>
         ) : error ? (
           <View style={styles.centered}>
             <Feather name="wifi-off" size={26} color={themeColors.textMuted} />
             <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>{error}</Text>
-            <Pressable
+            <PressScale
               onPress={() => fetchBooks(query.trim() || category)}
               style={[styles.retry, { backgroundColor: themeColors.primaryBright }]}
             >
               <Text style={styles.retryText}>Try again</Text>
-            </Pressable>
+            </PressScale>
           </View>
         ) : books.length === 0 ? (
           <View style={styles.centered}>
@@ -165,19 +209,18 @@ export default function LibraryScreen({ navigation }) {
           </View>
         ) : (
           <View style={{ gap: 12 }}>
-            {books.map((b) => {
+            {books.map((b, idx) => {
               const info = b.volumeInfo || {};
               const thumb = info.imageLinks?.thumbnail?.replace('http://', 'https://');
               return (
-                <Pressable
-                  key={b.id}
+                <AnimatedSection key={b.id} delay={Math.min(idx * 40, 280)}>
+                <PressScale
                   onPress={() => info.infoLink && Linking.openURL(info.infoLink).catch(() => {})}
-                  style={({ pressed }) => [
+                  style={[
                     styles.book,
                     {
                       backgroundColor: themeColors.card,
                       borderColor: themeColors.border,
-                      opacity: pressed ? 0.85 : 1,
                     },
                   ]}
                 >
@@ -214,7 +257,8 @@ export default function LibraryScreen({ navigation }) {
                   </View>
 
                   <Feather name="external-link" size={15} color={themeColors.iconMuted} />
-                </Pressable>
+                </PressScale>
+                </AnimatedSection>
               );
             })}
           </View>

@@ -1,6 +1,14 @@
 import { memo, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, RotateCcw, Timer, Music, Volume2, VolumeX } from "lucide-react";
+import {
+  Music,
+  Pause,
+  Play,
+  RotateCcw,
+  Timer,
+  Volume2,
+  VolumeX,
+} from "@/components/icons";
 
 const MODES = [
   { label: "Focus",       minutes: 25, color: "#1a3884" },
@@ -199,7 +207,7 @@ const FocusTimerWidget = memo(() => {
       <div className="px-5 pt-4 pb-3 border-b border-slate-100 dark:border-[#1a3884]/20">
         <div className="flex items-center gap-2">
           <div className="w-1 h-4 bg-[#1a3884] dark:bg-blue-400 rounded-full" />
-          <Timer className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
+          <Timer className="w-3.5 h-3.5 text-[#0E2136] dark:text-blue-400" />
           <span className="text-xs font-extrabold text-slate-800 dark:text-white tracking-tight">Focus Timer</span>
           {sessions > 0 && (
             <span className="ml-auto text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-500/20">

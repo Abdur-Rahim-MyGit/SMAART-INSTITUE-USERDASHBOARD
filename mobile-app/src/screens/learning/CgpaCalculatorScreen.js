@@ -11,10 +11,11 @@
  * pass, and manual entry against `GET/POST /cgpa` already gives a fully
  * working calculator.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Pressable,
   ScrollView,
   StatusBar as RNStatusBar,
@@ -28,6 +29,38 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import { getCgpa, saveCgpa } from '../../api/cgpa';
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>{children}</Animated.View>;
+}
+
+function PressScale({ onPress, disabled, style, children, hitSlop }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled} hitSlop={hitSlop}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 // --- CONFIG & CONSTANTS (ported verbatim from CGPACalculator.jsx) ---
 const GRADE_MAPPING = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, C: 5 };
@@ -323,29 +356,31 @@ export default function CgpaCalculatorScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={{ gap: 8 }}>
-          {METHODS.map((m) => {
-            const active = activeMethod === m.id;
-            return (
-              <Pressable
-                key={m.id}
-                onPress={() => setActiveMethod(m.id)}
-                style={[
-                  styles.methodChip,
-                  {
-                    backgroundColor: active ? themeColors.primaryBright : themeColors.card,
-                    borderColor: active ? themeColors.primaryBright : themeColors.border,
-                  },
-                ]}
-              >
-                <Text style={[styles.methodChipText, { color: active ? '#FFFFFF' : themeColors.text }]}>{m.name}</Text>
-                <Text style={[styles.methodChipBadge, { color: active ? 'rgba(255,255,255,0.8)' : themeColors.textMuted }]}>
-                  {m.badge}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+        <AnimatedSection delay={60}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={{ gap: 8 }}>
+            {METHODS.map((m) => {
+              const active = activeMethod === m.id;
+              return (
+                <PressScale
+                  key={m.id}
+                  onPress={() => setActiveMethod(m.id)}
+                  style={[
+                    styles.methodChip,
+                    {
+                      backgroundColor: active ? themeColors.primaryBright : themeColors.card,
+                      borderColor: active ? themeColors.primaryBright : themeColors.border,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.methodChipText, { color: active ? '#FFFFFF' : themeColors.text }]}>{m.name}</Text>
+                  <Text style={[styles.methodChipBadge, { color: active ? 'rgba(255,255,255,0.8)' : themeColors.textMuted }]}>
+                    {m.badge}
+                  </Text>
+                </PressScale>
+              );
+            })}
+          </ScrollView>
+        </AnimatedSection>
 
         {loading ? (
           <View style={{ marginTop: 16, gap: 10 }}>
@@ -353,13 +388,14 @@ export default function CgpaCalculatorScreen({ navigation }) {
             <SkeletonBox width="100%" height={80} borderRadius={18} />
           </View>
         ) : activeMethod === 'quick' ? (
+          <AnimatedSection delay={120}>
           <View style={{ marginTop: 16 }}>
             <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>COURSE DURATION</Text>
             <View style={styles.durationRow}>
               {[2, 3, 4, 5].map((years) => {
                 const active = courseDurationYears === years;
                 return (
-                  <Pressable
+                  <PressScale
                     key={years}
                     onPress={() => handleDurationChange(years)}
                     style={[
@@ -373,7 +409,7 @@ export default function CgpaCalculatorScreen({ navigation }) {
                     <Text style={{ color: active ? '#FFFFFF' : themeColors.text, fontSize: 12.5, fontWeight: '700' }}>
                       {years}y
                     </Text>
-                  </Pressable>
+                  </PressScale>
                 );
               })}
             </View>
@@ -417,14 +453,16 @@ export default function CgpaCalculatorScreen({ navigation }) {
               Quick Entry is calculated on this device only and isn't saved to your profile.
             </Text>
           </View>
+          </AnimatedSection>
         ) : (
+          <AnimatedSection delay={120}>
           <View style={{ marginTop: 16 }}>
             <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>SEMESTER</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 8 }}>
               {SEMESTERS.map((sem) => {
                 const active = activeSemester === sem;
                 return (
-                  <Pressable
+                  <PressScale
                     key={sem}
                     onPress={() => setActiveSemester(sem)}
                     style={[
@@ -438,7 +476,7 @@ export default function CgpaCalculatorScreen({ navigation }) {
                     <Text style={{ color: active ? '#FFFFFF' : themeColors.text, fontSize: 12.5, fontWeight: '700' }}>
                       {sem}
                     </Text>
-                  </Pressable>
+                  </PressScale>
                 );
               })}
             </ScrollView>
@@ -492,14 +530,14 @@ export default function CgpaCalculatorScreen({ navigation }) {
             </View>
 
             <View style={styles.subjectActionsRow}>
-              <Pressable onPress={handleAddSubject} style={[styles.smallBtn, { borderColor: themeColors.border }]}>
+              <PressScale onPress={handleAddSubject} style={[styles.smallBtn, { borderColor: themeColors.border }]}>
                 <Feather name="plus" size={14} color={themeColors.text} />
                 <Text style={[styles.smallBtnText, { color: themeColors.text }]}>Add Subject</Text>
-              </Pressable>
-              <Pressable onPress={handleClearSemester} style={[styles.smallBtn, { borderColor: themeColors.border }]}>
+              </PressScale>
+              <PressScale onPress={handleClearSemester} style={[styles.smallBtn, { borderColor: themeColors.border }]}>
                 <Feather name="rotate-ccw" size={14} color={themeColors.danger} />
                 <Text style={[styles.smallBtnText, { color: themeColors.danger }]}>Clear</Text>
-              </Pressable>
+              </PressScale>
             </View>
 
             <Text style={[styles.hintText, { color: themeColors.textMuted }]}>
@@ -547,7 +585,7 @@ export default function CgpaCalculatorScreen({ navigation }) {
 
             {!!saveError && <Text style={[styles.errorText, { color: themeColors.danger }]}>{saveError}</Text>}
 
-            <Pressable
+            <PressScale
               onPress={handleSave}
               disabled={!calculation || calculation.isPending || saving}
               style={[
@@ -564,8 +602,9 @@ export default function CgpaCalculatorScreen({ navigation }) {
                 <Feather name="check" size={16} color="#FFFFFF" />
               )}
               <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save & Sync to Profile'}</Text>
-            </Pressable>
+            </PressScale>
           </View>
+          </AnimatedSection>
         )}
       </ScrollView>
     </SafeAreaView>

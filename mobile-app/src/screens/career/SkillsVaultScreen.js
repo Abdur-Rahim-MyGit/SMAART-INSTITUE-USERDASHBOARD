@@ -13,8 +13,9 @@
  * ID/QR" widget is a separate lookup feature, not per-owned-certificate
  * verification, and is left as a follow-up.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Linking,
   Pressable,
   RefreshControl,
@@ -32,6 +33,42 @@ import { useAuth } from '../../context/AuthContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import { getMyCertificates } from '../../api/certificates';
 import { getEarnedBadges } from '../../api/badges';
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 const TABS = [
   { id: 'certificates', label: 'Certificates', icon: 'award' },
@@ -161,7 +198,7 @@ export default function SkillsVaultScreen({ navigation }) {
         }
       >
         {/* Stat tiles */}
-        <View style={styles.statsRow}>
+        <AnimatedSection delay={0} style={styles.statsRow}>
           <View style={[styles.statTile, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
             <View style={[styles.statIcon, { backgroundColor: themeColors.pillBg }]}>
               <Feather name="award" size={15} color={themeColors.primaryBright} />
@@ -184,10 +221,10 @@ export default function SkillsVaultScreen({ navigation }) {
               <Text style={[styles.statLabel, { color: themeColors.textMuted }]}>Badges earned</Text>
             </View>
           </View>
-        </View>
+        </AnimatedSection>
 
         {/* Tabs */}
-        <View style={styles.tabsRow}>
+        <AnimatedSection delay={60} style={styles.tabsRow}>
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -208,7 +245,7 @@ export default function SkillsVaultScreen({ navigation }) {
               </Pressable>
             );
           })}
-        </View>
+        </AnimatedSection>
 
         {/* ── Certificates tab ── */}
         {activeTab === 'certificates' && (
@@ -237,7 +274,7 @@ export default function SkillsVaultScreen({ navigation }) {
               </Text>
             </View>
           ) : (
-            <View style={{ gap: 14 }}>
+            <AnimatedSection delay={0} style={{ gap: 14 }}>
               {certs.map((c) => (
                 <View
                   key={c.certificateId}
@@ -303,7 +340,7 @@ export default function SkillsVaultScreen({ navigation }) {
                   </View>
                 </View>
               ))}
-            </View>
+            </AnimatedSection>
           )
         )}
 
@@ -333,7 +370,7 @@ export default function SkillsVaultScreen({ navigation }) {
               </Text>
             </View>
           ) : (
-            <View>
+            <AnimatedSection delay={0}>
               {badgeCategories.length > 2 && (
                 <ScrollView
                   horizontal
@@ -397,17 +434,17 @@ export default function SkillsVaultScreen({ navigation }) {
                   </View>
                 ))}
               </View>
-            </View>
+            </AnimatedSection>
           )
         )}
 
         {/* ── Flashcards tab ── */}
         {activeTab === 'flashcards' && (
-          <View style={styles.flashGrid}>
+          <AnimatedSection delay={0} style={styles.flashGrid}>
             {QUOTIENT_FLASHCARDS.map((card, i) => {
               const open = flippedIndex === i;
               return (
-                <Pressable
+                <PressCard
                   key={card.code}
                   onPress={() => setFlippedIndex(open ? null : i)}
                   style={[
@@ -437,10 +474,10 @@ export default function SkillsVaultScreen({ navigation }) {
                       {open ? 'Tap to flip back' : 'Tap to reveal'}
                     </Text>
                   </View>
-                </Pressable>
+                </PressCard>
               );
             })}
-          </View>
+          </AnimatedSection>
         )}
       </ScrollView>
     </SafeAreaView>

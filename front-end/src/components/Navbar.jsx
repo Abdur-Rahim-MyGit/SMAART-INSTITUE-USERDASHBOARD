@@ -11,6 +11,17 @@ import { useTranslation } from "react-i18next";
 import blueLogo from "@/assets/blue.png";
 import whiteLogo from "@/assets/white.png";
 
+// Employer portal lives in the admin app, on its own host in production.
+// VITE_ADMIN_URL is baked in at build time (see the Dockerfile ARG). When it
+// is missing we fall back to the current origin rather than localhost, so a
+// deployed build degrades to a same-host path instead of a dead link that
+// only ever worked on a developer machine.
+const ADMIN_ORIGIN =
+  import.meta.env.VITE_ADMIN_URL ||
+  (typeof window !== "undefined" ? window.location.origin : "");
+
+const EMPLOYER_REGISTER_URL = `${ADMIN_ORIGIN}/employer/register`;
+
 const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
   const { theme, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
@@ -201,7 +212,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 </div>
 
                 <a
-                  href={`${import.meta.env.VITE_ADMIN_URL || 'http://localhost:3000'}/employer/register`}
+                  href={EMPLOYER_REGISTER_URL}
                   className={`text-sm font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 ${scrolled ? 'text-[#1a3884] dark:text-white' : 'text-[#1a3884] dark:text-white'}`}
                 >
                   For Employers
@@ -295,7 +306,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
 
             <div className="pt-4 flex flex-col gap-3">
               <a
-                href="http://localhost:3000/employer/register"
+                href={EMPLOYER_REGISTER_URL}
                 className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors"
               >
                 For Employers

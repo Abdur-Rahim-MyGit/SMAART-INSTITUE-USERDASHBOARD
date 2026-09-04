@@ -4,6 +4,10 @@ import { ThemeProvider } from "./contexts/ThemeContext.jsx";
 import "./index.css";
 import "./smaart-design-system.css";
 import "./i18n-setup";
+import { installMediaStreamRegistry } from "./utils/mediaStreams";
+
+// Register every camera/microphone stream so a held attempt can shut them all.
+installMediaStreamRegistry();
 
 // DEV ONLY — kill any stale PWA service worker.
 // This app registers a service worker (PWAPrompt → useRegisterSW). Once

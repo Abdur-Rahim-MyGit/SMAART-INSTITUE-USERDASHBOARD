@@ -147,4 +147,43 @@ const getStageConfig = (stageKey) => {
     return STAGE_DISTRIBUTIONS[key] || null;
 };
 
-module.exports = { STAGE_DISTRIBUTIONS, getStageByCode, getStageConfig };
+/**
+ * Time allowed per stage, in minutes.
+ *
+ * Single source of truth. This lived as an inline `STAGE_MAP` inside the
+ * /start route, commented "copied from frontend" -- so the number that decides
+ * when an attempt is resumed-and-expired had no relationship to the number
+ * that would decide whether a submission is late. Both now read this.
+ */
+const STAGE_DURATION_MINUTES = {
+    T1: 45,
+    T2: 40,
+    T3: 45,
+    T4: 40,
+    AIQ: 45,
+    SQ: 45,
+    PIQ: 45,
+};
+
+const DEFAULT_DURATION_MINUTES = 45;
+
+/**
+ * Minutes allowed for an assessment. Prefers the stage table, falls back to a
+ * duration set on the assessment document, then to the default.
+ */
+const getDurationMinutes = (assessment) => {
+    const stageInfo = assessment?.assessmentCode ? getStageByCode(assessment.assessmentCode) : null;
+    if (stageInfo && STAGE_DURATION_MINUTES[stageInfo.stage]) {
+        return STAGE_DURATION_MINUTES[stageInfo.stage];
+    }
+    return Number(assessment?.duration) || DEFAULT_DURATION_MINUTES;
+};
+
+module.exports = {
+    STAGE_DISTRIBUTIONS,
+    STAGE_DURATION_MINUTES,
+    DEFAULT_DURATION_MINUTES,
+    getStageByCode,
+    getStageConfig,
+    getDurationMinutes,
+};

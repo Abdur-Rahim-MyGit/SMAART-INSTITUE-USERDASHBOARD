@@ -5,15 +5,14 @@ import MainTabs from './MainTabs';
 import NotificationsScreen from '../screens/notifications/NotificationsScreen';
 import SettingsScreen from '../screens/profile/SettingsScreen';
 import SupportScreen from '../screens/support/SupportScreen';
-import SupportDetailScreen from '../screens/support/SupportDetailScreen';
 import AssessmentsScreen from '../screens/assessments/AssessmentsScreen';
-import AssessmentPlayerScreen from '../screens/assessments/AssessmentPlayerScreen';
-import ProctoringConsentScreen from '../screens/proctoring/ProctoringConsentScreen';
 import CertificatesScreen from '../screens/learning/CertificatesScreen';
 import NotesScreen from '../screens/learning/NotesScreen';
 import LibraryScreen from '../screens/learning/LibraryScreen';
 import CareerCoachChatScreen from '../screens/career/CareerCoachChatScreen';
 import SkillsVaultScreen from '../screens/career/SkillsVaultScreen';
+import JobDetailScreen from '../screens/career/JobDetailScreen';
+import ResumeBuilderScreen from '../screens/career/ResumeBuilderScreen';
 import PerformanceScreen from '../screens/performance/PerformanceScreen';
 import VisionBoardScreen from '../screens/community/VisionBoardScreen';
 import VisionBoardDetailScreen from '../screens/community/VisionBoardDetailScreen';
@@ -46,6 +45,31 @@ function LazyFaceVerificationTestScreen(props) {
   );
 }
 
+// Same reason, same fix: AssessmentPlayerScreen now pulls in ProctoringGate
+// (react-native-vision-camera) and useProctoringSession (onnxFacePipeline →
+// onnxruntime-react-native) via top-level imports. Those native modules must
+// not be touched until a student actually opens an assessment — importing
+// them eagerly here was crashing app startup for every session with
+// "Cannot read property 'install' of null" (the native side isn't linked/
+// ready yet at bundle-eval time), not just for students who proctor.
+const AssessmentPlayerScreen = React.lazy(() =>
+  import('../screens/assessments/AssessmentPlayerScreen')
+);
+
+function LazyAssessmentPlayerScreen(props) {
+  return (
+    <Suspense
+      fallback={
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator color={colors.navy} />
+        </View>
+      }
+    >
+      <AssessmentPlayerScreen {...props} />
+    </Suspense>
+  );
+}
+
 const Stack = createNativeStackNavigator();
 
 // Inner navigator — wrapped in DrawerProvider context.
@@ -69,15 +93,11 @@ function AppNavigator() {
         {/* The player owns its own chrome (timer, progress, exit guard) and must
             not be dismissable by a stack back button mid-attempt. */}
         <Stack.Screen
-          name="ProctoringConsent"
-          component={ProctoringConsentScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="AssessmentPlayer"
-          component={AssessmentPlayerScreen}
+          component={LazyAssessmentPlayerScreen}
           options={{ headerShown: false, gestureEnabled: false }}
         />
+
 
         {/* Learning-tab satellites — each owns its own header. */}
         <Stack.Screen name="Certificates" component={CertificatesScreen} options={{ headerShown: false }} />
@@ -90,6 +110,8 @@ function AppNavigator() {
         <Stack.Screen name="CareerDirections" component={CareerDirectionsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Toolkit" component={ToolkitScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Dictionary" component={DictionaryScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="JobDetail" component={JobDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ResumeBuilder" component={ResumeBuilderScreen} options={{ headerShown: false }} />
 
         {/* Learning-tab satellites (cont.) */}
         <Stack.Screen name="CgpaCalculator" component={CgpaCalculatorScreen} options={{ headerShown: false }} />
@@ -120,11 +142,6 @@ function AppNavigator() {
         <Stack.Screen
           name="Support"
           component={SupportScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SupportDetail"
-          component={SupportDetailScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

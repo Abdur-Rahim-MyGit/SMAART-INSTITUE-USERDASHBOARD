@@ -648,9 +648,9 @@
         "description": "Développez la réflexion éthique et la sensibilisation au développement durable"
       },
       "BC": {
-        "name": "Anglais British Council",
-        "shortName": "BC",
-        "description": "Développez vos compétences en communication anglaise avec des cours certifiés British Council"
+        "name": "English for Work",
+        "shortName": "English for Work",
+        "description": "Développez vos compétences en communication anglaise avec des cours certifiés"
       }
     },
     "locked_toast": "Veuillez terminer les étapes précédentes pour débloquer ce cours.",

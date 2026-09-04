@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const AIProfile = require('../models/AIProfile');
 const ChatMessage = require('../models/ChatMessage');
 const User = require('../models/User');
@@ -641,8 +642,10 @@ exports.getChatHistory = async (req, res) => {
 // Get all chat sessions
 exports.getChatSessions = async (req, res) => {
     try {
+        // Aggregation pipelines don't cast — a string user id never matches the
+        // ObjectId stored on ChatMessage, which made this always return [].
         const sessions = await ChatMessage.aggregate([
-            { $match: { userId: req.user.id } },
+            { $match: { userId: new mongoose.Types.ObjectId(String(req.user._id || req.user.id)) } },
             {
                 $group: {
                     _id: '$sessionId',
