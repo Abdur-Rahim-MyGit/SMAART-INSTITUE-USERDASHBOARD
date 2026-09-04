@@ -910,6 +910,7 @@
     "leave_assessment": "Leave Assessment",
     "continue_assessment": "Continue Assessment",
     "baseline_established": "Baseline Established",
+    "candidate": "Candidate",
     "assessment_complete": "{{name}} Assessment Complete",
     "result_id": "Result ID: {{id}}",
     "overall_score": "Overall Score",
