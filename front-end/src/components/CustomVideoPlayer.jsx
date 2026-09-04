@@ -511,7 +511,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 <div className="w-14 h-14 rounded-full border-2 border-[#045C9A]/20 border-t-cyan-400 animate-spin" />
                 <Sparkles className="w-6 h-6 text-[#045C9A] dark:text-[#A6D7E8] absolute animate-pulse" />
               </div>
-              <span className="text-xs font-extrabold text-[#A6D7E8] tracking-widest uppercase">Loading Media...</span>
+              <span className="text-[11px] font-semibold text-[#A6D7E8] tracking-wider uppercase">Loading media</span>
             </div>
           </motion.div>
         )}
@@ -636,7 +636,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 </div>
 
                 {/* Time Display */}
-                <div className="text-[11px] sm:text-xs font-bold tabular-nums border-l border-[#d7ebf5] dark:border-white/15 pl-3 h-5 flex items-center text-slate-500 dark:text-slate-300">
+                <div className="text-xs font-semibold tabular-nums border-l border-[#d7ebf5] dark:border-white/15 pl-3 h-5 flex items-center text-slate-500 dark:text-slate-300">
                   <span className="text-[#045C9A] dark:text-[#A6D7E8]">{formatTime(currentTime)}</span>
                   <span className="mx-1 opacity-40">/</span>
                   <span className="opacity-70">{formatTime(videoDuration)}</span>
@@ -648,7 +648,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {title && (
                   <div className="hidden lg:flex items-center gap-2 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-full px-3 py-1 backdrop-blur-md">
                     <span className="w-2 h-2 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8] animate-pulse shadow-[0_0_8px_rgba(26,56,132,0.5)] dark:shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8]">NOW PLAYING</span>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#045C9A] dark:text-[#A6D7E8]">Now playing</span>
                     <span className="text-xs font-bold truncate max-w-[180px] text-[#072036] dark:text-white">{title}</span>
                   </div>
                 )}
@@ -670,7 +670,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
                     <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
-                    <span className="text-xs font-extrabold">{playbackSpeed}x</span>
+                    <span className="text-xs font-semibold tabular-nums">{playbackSpeed}x</span>
                   </button>
 
                   {/* Speed Menu Dropdown */}
@@ -694,7 +694,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                             }`}
                           >
                             <span>{speed}x</span>
-                            {speed === 1 && <span className="text-[10px] opacity-60 font-normal">(Normal)</span>}
+                            {speed === 1 && <span className="text-[11px] opacity-60 font-normal">(Normal)</span>}
                           </button>
                         ))}
                       </motion.div>
@@ -839,7 +839,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 <h3 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">
                   Awesome Job! 🎉
                 </h3>
-                <p className="text-white/60 text-[10px] sm:text-[11px] font-semibold mt-1 mb-4">
+                <p className="text-white/60 text-xs font-medium mt-1 mb-4">
                   Lesson completed successfully
                 </p>
               </motion.div>
@@ -860,7 +860,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }
                   }}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15
-                             text-white/90 text-[10px] sm:text-[11px] font-bold hover:bg-white/5 hover:border-white/25
+                             text-white/90 text-xs font-semibold hover:bg-white/5 hover:border-white/25
                              transition-all active:scale-95 cursor-pointer"
                 >
                   <RotateCcw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -873,7 +873,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                   }}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl
                              bg-gradient-to-r from-[#045C9A] via-[#045C9A] to-[#045C9A]
-                             text-white text-[10px] sm:text-[11px] font-bold
+                             text-white text-xs font-semibold
                              shadow-md shadow-[#072036]/30 hover:shadow-lg hover:shadow-[#045C9A]/20
                              transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
                 >

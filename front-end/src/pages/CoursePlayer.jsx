@@ -919,7 +919,7 @@ const CoursePlayer = () => {
               <div
                 className={
                   isTheater
-                    ? "order-first relative -mx-5 -mt-5 mb-6 overflow-hidden bg-[#061a2e] sm:-mx-7 sm:-mt-7"
+                    ? "order-first relative -mx-5 -mt-5 mb-6 overflow-hidden bg-black sm:-mx-7 sm:-mt-7"
                     : "rounded-2xl overflow-hidden relative"
                 }
               >
@@ -929,10 +929,7 @@ const CoursePlayer = () => {
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                <div
-                  className={isTheater ? "mx-auto w-full" : undefined}
-                  style={isTheater ? { maxWidth: "calc(76vh * 16 / 9)" } : undefined}
-                >
+                <div className="w-full">
                   <CustomVideoPlayer
                     videoUrl={playbackUrl}
                     title={stepData.title}
@@ -1141,7 +1138,7 @@ const CoursePlayer = () => {
                 </button>
                 <div className="hidden sm:block h-5 w-px bg-[#d7ebf5] dark:bg-[#045C9A]/30" />
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest shadow-none`}>
+                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider shadow-none`}>
                     {t(stageKey)}
                   </Badge>
                   <span className="text-base font-bold tracking-tight text-[#072036] dark:text-white">
@@ -1161,17 +1158,31 @@ const CoursePlayer = () => {
         <main className="pt-2 sm:pt-4 space-y-6">
           {/* Course Info Header */}
           {!showIntro && (
-            <div className="text-left mb-4 mt-1 space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
-                {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
-              </span>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
-                {course.title}
-              </h1>
-              <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
-                {course.subtitle}
-              </p>
-            </div>
+            isTheater ? (
+              <div className="text-left mb-4 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                </span>
+                <h1 className="text-lg font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+                  {course.title}
+                </h1>
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
+                  {course.subtitle}
+                </p>
+              </div>
+            ) : (
+              <div className="text-left mb-4 mt-1 space-y-1">
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                  {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                </span>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+                  {course.title}
+                </h1>
+                <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
+                  {course.subtitle}
+                </p>
+              </div>
+            )
           )}
 
           <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${isTheater ? "" : "lg:grid-cols-3"}`}>
@@ -1194,10 +1205,10 @@ const CoursePlayer = () => {
                       {/* Top Meta Bar */}
                       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-[#045C9A]/25">
                         <div className="flex items-center gap-2">
-                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-bold uppercase tracking-widest`}>
+                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-semibold uppercase tracking-wider`}>
                             {t(stageKey)}
                           </span>
-                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
+                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
                             {t(stageNameKey)}
                           </span>
                         </div>
@@ -1221,7 +1232,7 @@ const CoursePlayer = () => {
                       {/* Header Info */}
                       <div className="space-y-2">
                         <h1
-                          className="text-xl sm:text-2xl font-extrabold text-[#072036] dark:text-white tracking-tight leading-tight"
+                          className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight"
                           style={{ letterSpacing: "-0.02em" }}
                         >
                           {course.title}
@@ -1250,7 +1261,7 @@ const CoursePlayer = () => {
                               <ClipboardCheck className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[11px] font-bold uppercase tracking-widest text-[#072036] dark:text-white">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#072036] dark:text-white">
                                 {t("course_player.important_guidelines", "Important Disclaimers & Guidelines")}
                               </p>
                               <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
@@ -1259,7 +1270,7 @@ const CoursePlayer = () => {
                             </div>
                           </div>
                           <span
-                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest tabular-nums transition-colors ${
+                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider tabular-nums transition-colors ${
                               allGuidelinesAcknowledged
                                 ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400"
                                 : "border-[#d7ebf5] bg-white text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300"
@@ -1370,27 +1381,32 @@ const CoursePlayer = () => {
                       >
                         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="w-11 h-11 rounded-xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#072036]/15 shrink-0 tabular-nums">
                               {activeStep}
                             </div>
-                            <div>
-                              <h3 className="font-bold text-xl sm:text-2xl text-[#072036] dark:text-white leading-tight tracking-tight">
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {t("course_player.step_of", "Step {{step}} of {{total}}", { step: activeStep, total: totalSteps })}
+                              </p>
+                              <h3 className="mt-0.5 text-lg sm:text-xl font-bold text-[#072036] dark:text-white leading-tight tracking-tight truncate">
                                 {activeStep === '1' ? t("course_player.step_why", "Why") : activeStep === '2' ? t("course_player.step_story", "Story") : (learningFlowData?.steps?.[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`)}
                               </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="w-2 h-2 rounded-full bg-[#045C9A] animate-pulse" />
-                                <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">{t("course_player.active_session", "ACTIVE SESSION")}</p>
-                              </div>
                             </div>
                           </div>
-                          {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
-                            !learningFlowData?.steps?.[activeStep]?.assessmentData && (
-                              <div className="px-4 py-2 bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl text-sm font-bold text-slate-600 dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-white/[0.05] shadow-xs shrink-0 flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-[#045C9A]" />
-                                <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}</span>
-                              </div>
-                            )}
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#045C9A]/20 bg-[#045C9A]/10 px-2.5 py-1 text-xs font-semibold text-[#045C9A] dark:border-[#A6D7E8]/25 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                              {t("course_player.active_session_label", "Active session")}
+                            </span>
+                            {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
+                              !learningFlowData?.steps?.[activeStep]?.assessmentData && (
+                                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300 tabular-nums">
+                                  <Clock className="w-3.5 h-3.5 text-[#045C9A] dark:text-[#A6D7E8]" />
+                                  {learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}
+                                </span>
+                              )}
+                          </div>
                         </div>
 
                         {learningFlowData?.steps?.[activeStep] ? (
@@ -1577,7 +1593,7 @@ const CoursePlayer = () => {
                             </p>
                           </div>
                         </div>
-                        <span className="text-2xl font-extrabold tabular-nums tracking-tight text-[#045C9A] dark:text-[#A6D7E8] shrink-0">
+                        <span className="text-2xl font-bold tabular-nums tracking-tight text-[#045C9A] dark:text-[#A6D7E8] shrink-0">
                           {overallContentProgress}%
                         </span>
                       </div>
@@ -1744,7 +1760,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="mb-1 text-2xl font-extrabold tracking-tight text-[#072036] dark:text-white"
+                      className="mb-1 text-2xl font-bold tracking-tight text-[#072036] dark:text-white"
                     >
                       {t("course_player.congratulations_exclaim", "Congratulations!")}
                     </motion.h2>
@@ -1766,7 +1782,7 @@ const CoursePlayer = () => {
                     className="relative z-10 mb-6 w-full rounded-2xl border border-emerald-200/70 bg-emerald-50 p-4 dark:border-emerald-500/25 dark:bg-emerald-500/10"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">{t("course_player.your_progress")}</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">{t("course_player.your_progress")}</span>
                       <span className="text-[11px] font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
                         {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
                       </span>
