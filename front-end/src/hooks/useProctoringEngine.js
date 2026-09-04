@@ -188,7 +188,15 @@ const OBJECT_CONDITIONS = {
 // multi-tick toll.
 const OBJECT_CONFIRM_TICKS = 3;
 const OBJECT_CONFIRM_WINDOW = 5;
-const OBJECT_INSTANT_SCORE = { phone: 0.55, book: 0.55, laptop: 0.55 };
+// A flat 0.55 for every class left a wide dead zone: a detection that
+// legitimately cleared the accept bar (worker's CLASS_THRESHOLDS: phone 0.25,
+// book 0.30, laptop 0.28) but scored, say, 0.40 was already a real,
+// above-bar detection -- yet it still paid the full multi-second wait meant
+// for a borderline first frame. A margin over each class's own accept bar
+// keeps the guard against single-frame noise while letting most genuine,
+// already-accepted detections through immediately instead of only the
+// strongest ones.
+const OBJECT_INSTANT_SCORE = { phone: 0.40, book: 0.45, laptop: 0.43 };
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
