@@ -24,7 +24,9 @@ const MODEL_CANDIDATES = ['yolov8m.onnx', 'yolov8s.onnx', 'yolov8n.onnx'].map((f
 
 const INPUT_SIZE = 640;
 const CLASSES_OF_INTEREST = { 67: 'phone', 73: 'book', 63: 'laptop' };
-const CLASS_THRESHOLDS = { 67: 0.30, 73: 0.40, 63: 0.45 };
+// Phone and book bars are low; the engine compensates by requiring the
+// object on three of the last five checks before it counts.
+const CLASS_THRESHOLDS = { 67: 0.25, 73: 0.30, 63: 0.45 };
 const DEFAULT_THRESHOLD = 0.40;
 const NEAR_MISS_SCORE = 0.12;
 const NMS_THRESHOLD = 0.45;
@@ -139,10 +141,34 @@ const runPass = async (bitmap, region, nearMisses) => {
   return found;
 };
 
-const detect = async (bitmap) => {
+/**
+ * Region around the candidate's face and hands, from the last known face box.
+ * Objects held up to the camera are held beside or just below the face, so a
+ * crop spanning three face-widths either side and from the hairline down to
+ * chest height puts them in front of the model at two to three times the
+ * size the full frame gives.
+ */
+const focusFromFace = (face, vw, vh) => {
+  if (!face || !(face.width > 0) || !(face.height > 0)) return null;
+  const cx = face.x + face.width / 2;
+  const w = Math.min(vw, Math.max(face.width * 5, vw * 0.45));
+  const h = Math.min(vh, Math.max(face.height * 4.5, vh * 0.55));
+  const sx = Math.round(Math.min(Math.max(0, cx - w / 2), vw - w));
+  const sy = Math.round(Math.min(Math.max(0, face.y - face.height * 0.6), vh - h));
+  return { sx, sy, sw: Math.round(w), sh: Math.round(h) };
+};
+
+const detect = async (bitmap, face) => {
   const vw = bitmap.width, vh = bitmap.height;
   const nearMisses = [];
   let found = await runPass(bitmap, null, nearMisses);
+  if (found.length === 0) {
+    const focus = focusFromFace(face, vw, vh);
+    if (focus) {
+      // Aim at the hands beside the face first; it is where a held object is.
+      found = await runPass(bitmap, focus, nearMisses);
+    }
+  }
   if (found.length === 0) {
     const bandX = Math.round(vw * 0.15), bandW = Math.round(vw * 0.70);
     const zoom = zoomLower
@@ -179,12 +205,12 @@ const init = async () => {
 };
 
 self.onmessage = async (e) => {
-  const { type, id, bitmap } = e.data || {};
+  const { type, id, bitmap, face } = e.data || {};
   if (type === 'INIT') { await init(); return; }
   if (type === 'DETECT') {
     try {
       if (!session || !bitmap) { postMessage({ type: 'RESULT', id, found: [], nearMisses: [] }); return; }
-      const result = await detect(bitmap);
+      const result = await detect(bitmap, face || null);
       postMessage({ type: 'RESULT', id, ...result });
     } catch (err) {
       postMessage({ type: 'RESULT', id, found: [], nearMisses: [], error: err?.message || String(err) });

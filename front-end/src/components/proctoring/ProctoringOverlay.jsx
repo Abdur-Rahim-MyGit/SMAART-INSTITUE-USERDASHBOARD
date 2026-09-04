@@ -431,26 +431,31 @@ export const ProctoringOverlay = ({
                         : (diagnostics.audio?.calibrated ? 'listening' : 'calibrating')}
                   </span>
                 </div>
-                {diagnostics.audio?.calibrated && (
-                  <div className="flex justify-between gap-2">
-                    <span className="text-slate-400">level</span>
-                    <span className={diagnostics.audio.energyAboveFloor ? 'text-emerald-600' : 'text-slate-400'}>
-                      {(diagnostics.audio.rms ?? 0).toFixed(4)} / {(diagnostics.audio.energyRequired ?? 0).toFixed(4)}
-                    </span>
-                  </div>
-                )}
-                {diagnostics.audio?.calibrated && (
-                  <div className="flex justify-between gap-2">
-                    <span className="text-slate-400">voice gates</span>
-                    <span>
-                      <span className={diagnostics.audio.energyAboveFloor ? 'text-emerald-600' : 'text-slate-400'}>vol</span>
-                      {' '}
-                      <span className={diagnostics.audio.isSpectrallyPeaked ? 'text-emerald-600' : 'text-slate-400'}>tone</span>
-                      {' '}
-                      <span className={diagnostics.audio.isRhythmic ? 'text-emerald-600' : 'text-slate-400'}>rhythm</span>
-                    </span>
-                  </div>
-                )}
+                {diagnostics.audio?.calibrated && (() => {
+                  // One plain-language line instead of raw RMS and gate names.
+                  // "quiet": at or near the room's calibrated noise floor.
+                  // "noise": louder than the room, but not shaped like speech.
+                  // "speech": all three checks agree; counts toward a warning
+                  // once sustained for the configured number of seconds.
+                  const au = diagnostics.audio;
+                  const streak = au.speechStreak || 0;
+                  const need = au.speechSecondsToReport || 5;
+                  let label = 'quiet';
+                  let cls = 'text-slate-400';
+                  if (au.isSpeechFrame || streak > 0) {
+                    label = `speech ${streak}/${need}s`;
+                    cls = streak >= need - 1 ? 'text-red-500 font-bold' : 'text-amber-600';
+                  } else if (au.energyAboveFloor) {
+                    label = 'noise';
+                    cls = 'text-slate-500';
+                  }
+                  return (
+                    <div className="flex justify-between gap-2">
+                      <span className="text-slate-400">sound</span>
+                      <span className={cls}>{label}</span>
+                    </div>
+                  );
+                })()}
 
                 {/* Objects — what YOLO can actually see right now */}
                 <div className="flex justify-between gap-2">

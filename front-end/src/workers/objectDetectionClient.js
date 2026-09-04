@@ -63,7 +63,7 @@ export const isObjectWorkerBusy = () => pending.size > 0;
  * Detect prohibited objects in the current video frame, off the main thread.
  * Returns null when the worker is unavailable or already busy.
  */
-export const detectObjectsInWorker = async (videoEl, timeoutMs = 8000) => {
+export const detectObjectsInWorker = async (videoEl, { face = null, timeoutMs = 8000 } = {}) => {
   if (!isObjectWorkerReady() || !videoEl || videoEl.readyState < 2) return null;
   if (pending.size > 0) return null;
   let bitmap;
@@ -79,6 +79,6 @@ export const detectObjectsInWorker = async (videoEl, timeoutMs = 8000) => {
       resolve({ found: [], nearMisses: [], error: 'timeout' });
     }, timeoutMs);
     pending.set(id, { resolve, timer });
-    worker.postMessage({ type: 'DETECT', id, bitmap }, [bitmap]);
+    worker.postMessage({ type: 'DETECT', id, bitmap, face }, [bitmap]);
   });
 };

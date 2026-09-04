@@ -179,8 +179,8 @@ const OBJECT_CONDITIONS = {
 // whole window before it clears. One tick is a single frame: a book turned
 // edge-on or a hand passing the lens can read as a phone for one frame, and
 // the detector's alternating zoom passes can miss a real phone on the off tick.
-const OBJECT_CONFIRM_TICKS = 2;
-const OBJECT_CONFIRM_WINDOW = 3;
+const OBJECT_CONFIRM_TICKS = 3;
+const OBJECT_CONFIRM_WINDOW = 5;
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -390,6 +390,8 @@ export const useProctoringEngine = ({
   const objectSeenTicksRef = useRef({});
   // A detection pass can outlast the 1 s tick on a slow machine; never stack.
   const objectPassInFlightRef = useRef(false);
+  // Last face box (video pixels) so the object detector can zoom on the hands.
+  const lastFaceBoxRef = useRef(null);
   // Consecutive ArcFace frames that disagreed with the registered face. One
   // bad frame is a blink or a turn; several in a row is a different person.
   const mismatchStreakRef = useRef(0);
@@ -977,6 +979,7 @@ export const useProctoringEngine = ({
           // different person stays "mismatch" and never flips to "verified".
           const quick = await detectFacesFast(videoRef.current);
           if (!quick.error) {
+            lastFaceBoxRef.current = quick.faceCount === 1 ? (quick.faces?.[0]?.box || null) : null;
             setFaceCount(quick.faceCount); faceCountRef.current = quick.faceCount;
             if (quick.gaze?.gazeDirection) {
               setGazeDirection(quick.gaze.gazeDirection);
@@ -1138,6 +1141,7 @@ export const useProctoringEngine = ({
           return;
         }
 
+        lastFaceBoxRef.current = result.faceCount === 1 ? (result.faces?.[0]?.box || null) : null;
         setFaceCount(result.faceCount); faceCountRef.current = result.faceCount;
         if (result.gaze?.gazeDirection) {
           setGazeDirection(result.gaze.gazeDirection);
@@ -1281,7 +1285,7 @@ export const useProctoringEngine = ({
     try {
       let found, near;
       if (useWorker) {
-        const result = await detectObjectsInWorker(videoRef.current);
+        const result = await detectObjectsInWorker(videoRef.current, { face: lastFaceBoxRef.current });
         if (!result) return; // worker busy with the previous frame: skip this tick
         found = result.found;
         near = result.nearMisses;
