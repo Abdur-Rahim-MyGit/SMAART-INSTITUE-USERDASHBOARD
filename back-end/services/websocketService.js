@@ -20,10 +20,16 @@ function getUserIdFromToken(token) {
 function initWebSocket(httpServer) {
   const wss = new WebSocketServer({ noServer: true });
 
-  // In production, only the configured frontend origin may open a credentialed
+  // In production, only the configured frontend origin(s) may open a credentialed
   // socket connection. In development, any localhost origin is allowed.
+  // FRONTEND_URL may be a comma-separated list (Docker frontend + Vite dev
+  // server) — split it the same way the Express CORS middleware in server.js
+  // does, otherwise the whole string is compared as one origin and never matches.
   const isProduction = process.env.NODE_ENV === 'production';
-  const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+  const allowedOrigins = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean);
 
   io = new SocketIOServer(httpServer, {
     path: '/socket.io',
