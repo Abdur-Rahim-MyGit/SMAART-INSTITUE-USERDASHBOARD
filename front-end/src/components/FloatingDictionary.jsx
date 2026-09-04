@@ -12,7 +12,12 @@ import { useNavigate } from "react-router-dom";
  * ✅ Auto-searches as user types (debounced 400ms)
  * ✅ Shows instant definitions
  */
-const FloatingDictionary = () => {
+/* variant="floating" (default): a fixed round button in the bottom-right corner.
+   variant="docked": an inline pill for a page header; the panel drops down from
+   the top-right instead of rising from the corner, so it never covers content
+   the reader is scrolling through. */
+const FloatingDictionary = ({ variant = "floating" }) => {
+    const docked = variant === "docked";
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [result, setResult] = useState(null);
@@ -148,7 +153,23 @@ const FloatingDictionary = () => {
 
     return (
         <>
-            {/* Floating Bar Trigger */}
+            {/* Trigger */}
+            {docked ? (
+                <button
+                    type="button"
+                    onClick={() => setOpen(!open)}
+                    aria-expanded={open}
+                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                        open
+                            ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                            : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-[#045C9A]/30 text-slate-700 dark:text-slate-200 hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/20 shadow-sm'
+                    }`}
+                    title="Quick Dictionary"
+                >
+                    {open ? <X className="w-4 h-4" /> : <IconBook2 stroke={2} className="w-4 h-4" />}
+                    <span>Dictionary</span>
+                </button>
+            ) : (
             <motion.div
                 layout
                 onClick={() => setOpen(!open)}
@@ -179,16 +200,17 @@ const FloatingDictionary = () => {
                     </div>
                 )}
             </motion.div>
+            )}
 
             {/* Panel */}
             <AnimatePresence>
                 {open && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        initial={{ opacity: 0, y: docked ? -12 : 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                        exit={{ opacity: 0, y: docked ? -12 : 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
+                        className={`fixed ${docked ? 'top-20 right-4 sm:right-8' : 'bottom-24 right-6'} z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden`}
                     >
                         {/* Header */}
                         <div className="px-4 py-3.5 border-b border-[#045C9A]/10 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-[#045C9A] to-[#034a7d] text-white">

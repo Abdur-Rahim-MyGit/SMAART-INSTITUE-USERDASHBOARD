@@ -29,6 +29,8 @@ import {
   HelpCircle,
   Layers,
   Briefcase,
+  TheaterNormal,
+  TheaterWide,
 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 import NeuralBackground from "@/components/ui/NeuralBackground";
@@ -186,6 +188,14 @@ const CoursePlayer = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
   const [isTheater, setIsTheater] = useState(readTheaterPreference);
+  // Theater only reshapes the page for steps that actually have a video;
+  // quizzes and practice keep the default two-column view so the setting can
+  // always be changed from the header.
+  const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
+  const activeStepHasVideo =
+    activeStepData?.contentType === 'video-text' ||
+    (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
+  const theaterLayout = isTheater && activeStepHasVideo;
   const toggleTheater = () =>
     setIsTheater((prev) => {
       const next = !prev;
@@ -914,11 +924,11 @@ const CoursePlayer = () => {
         // dissolves (display: contents) so the video can be ordered above the
         // card header as a full-bleed dark band, without remounting the player.
         return (
-          <div className={isTheater ? "contents" : "space-y-4"}>
+          <div className={theaterLayout ? "contents" : "space-y-4"}>
             {playbackUrl && (
               <div
                 className={
-                  isTheater
+                  theaterLayout
                     ? "order-first relative mb-6"
                     : "rounded-2xl overflow-hidden relative"
                 }
@@ -932,8 +942,8 @@ const CoursePlayer = () => {
                 {/* Theater: as wide as the screen height allows, so the whole
                     video and its controls stay on screen without scrolling. */}
                 <div
-                  className={isTheater ? "mx-auto w-full rounded-2xl overflow-hidden" : "w-full"}
-                  style={isTheater ? { maxWidth: "calc((100vh - 13rem) * 16 / 9)" } : undefined}
+                  className={theaterLayout ? "mx-auto w-full rounded-2xl overflow-hidden" : "w-full"}
+                  style={theaterLayout ? { maxWidth: "calc((100vh - 13rem) * 16 / 9)" } : undefined}
                 >
                   <CustomVideoPlayer
                     videoUrl={playbackUrl}
@@ -1019,7 +1029,7 @@ const CoursePlayer = () => {
         return (
           <div className="space-y-6 h-full overflow-y-auto pb-8">
             {playbackUrl && (
-              <div className={`rounded-2xl overflow-hidden mx-auto ${isTheater ? "max-w-none" : "max-w-4xl"}`}>
+              <div className={`rounded-2xl overflow-hidden mx-auto ${theaterLayout ? "max-w-none" : "max-w-4xl"}`}>
                 <CustomVideoPlayer
                   isTheater={isTheater}
                   onToggleTheater={toggleTheater}
@@ -1152,8 +1162,24 @@ const CoursePlayer = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                {/* Optional Header Right Content */}
+              <div className="flex items-center gap-2">
+                {!showIntro && (
+                  <button
+                    type="button"
+                    onClick={toggleTheater}
+                    aria-pressed={isTheater}
+                    title={isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}
+                    className={`hidden lg:inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                      isTheater
+                        ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                        : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-[#045C9A]/30 text-slate-700 dark:text-slate-200 hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/20 shadow-sm'
+                    }`}
+                  >
+                    {isTheater ? <TheaterNormal className="w-4 h-4" /> : <TheaterWide className="w-4 h-4" />}
+                    <span>{isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}</span>
+                  </button>
+                )}
+                <FloatingDictionary variant="docked" />
               </div>
             </div>
           </div>
@@ -1163,7 +1189,7 @@ const CoursePlayer = () => {
         <main className="pt-2 sm:pt-4 space-y-6">
           {/* Course Info Header */}
           {!showIntro && (
-            isTheater ? (
+            theaterLayout ? (
               <div className="text-left mb-4 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
@@ -1190,9 +1216,9 @@ const CoursePlayer = () => {
             )
           )}
 
-          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${isTheater ? "" : "lg:grid-cols-3"}`}>
+          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${theaterLayout ? "" : "lg:grid-cols-3"}`}>
             {/* Left Column - Video and Content */}
-            <div className={showIntro ? "max-w-5xl w-full mx-auto" : (isTheater ? "w-full" : "lg:col-span-2")}>
+            <div className={showIntro ? "max-w-5xl w-full mx-auto" : (theaterLayout ? "w-full" : "lg:col-span-2")}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1382,7 +1408,7 @@ const CoursePlayer = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${isTheater ? "flex flex-col" : ""}`}
+                        className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${theaterLayout ? "flex flex-col" : ""}`}
                       >
                         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
@@ -1568,9 +1594,9 @@ const CoursePlayer = () => {
             </div>
 
             {!showIntro && (
-              <div className={isTheater ? "w-full" : "lg:col-span-1"}>
+              <div className={theaterLayout ? "w-full" : "lg:col-span-1"}>
                 <motion.div
-                  initial={{ opacity: 0, x: isTheater ? 0 : 20, y: isTheater ? 20 : 0 }}
+                  initial={{ opacity: 0, x: theaterLayout ? 0 : 20, y: theaterLayout ? 20 : 0 }}
                   animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-left"
@@ -1603,7 +1629,7 @@ const CoursePlayer = () => {
                         </span>
                       </div>
 
-                      <div className={`grid grid-cols-1 gap-4 ${isTheater ? "sm:grid-cols-2" : ""}`}>
+                      <div className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
                         {/* Content Progress */}
                         <div className="space-y-1.5 text-left">
                           <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -1654,7 +1680,7 @@ const CoursePlayer = () => {
                         </span>
                       </div>
 
-                      <div className={isTheater ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
+                      <div className={theaterLayout ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
                         {stepNumbers.map((step) => {
                           const status = getStepStatus(step);
                           const stepData = learningFlowData?.steps?.[step];
@@ -1842,7 +1868,6 @@ const CoursePlayer = () => {
           document.body
         )}
       </div>
-      <FloatingDictionary />
       {/* FloatingNotes removed — Notes moved into the tab panel above */}
       <ActivityWarningModal
         isOpen={isWarningVisible}

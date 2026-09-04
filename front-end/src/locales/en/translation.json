@@ -749,6 +749,8 @@
     "steps_completed_of": "{{done}} of {{total}} steps completed",
     "step_of": "Step {{step}} of {{total}}",
     "active_session_label": "Active session",
+    "theater_mode": "Theater mode",
+    "default_view": "Default view",
     "course_completed": "Course Completed",
     "all_steps_validated": "All steps validated",
     "curriculum": "Curriculum",
