@@ -424,7 +424,11 @@ const DashboardLayout = () => {
 
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
   const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
-  const isFullScreenPage = isCareerAgentDashboard || location.pathname === '/dashboard/assessments/baseline' || isImmersiveRoute;
+  // The baseline test page manages its own height: the exam view fills the
+  // viewport, but the results report that replaces it is taller than one
+  // screen and must scroll with the document rather than be clipped.
+  const isBaselineAssessment = location.pathname === '/dashboard/assessments/baseline';
+  const isFullScreenPage = isCareerAgentDashboard || isBaselineAssessment || isImmersiveRoute;
 
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
@@ -1348,7 +1352,7 @@ const DashboardLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className={isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 lg:h-[calc(100vh-70px)] lg:overflow-hidden" : "")}>
+        <div className={isBaselineAssessment ? "p-0 min-h-screen overflow-x-hidden" : (isFullScreenPage ? "p-0 h-screen overflow-hidden" : ((location.pathname === '/dashboard/resume-builder' || location.pathname === '/vision-board-pro/create') ? "p-0 lg:h-[calc(100vh-70px)] lg:overflow-hidden" : ""))}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

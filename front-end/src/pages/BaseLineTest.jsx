@@ -812,6 +812,31 @@ const BaseLineTest = () => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
+  // Once the report is on screen the proctored session is over: leave browser
+  // fullscreen so the student gets a normal, scrollable results page.
+  useEffect(() => {
+    if (!submitted) return;
+    const fullscreenElement =
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement;
+    if (!fullscreenElement) return;
+    try {
+      const exit =
+        document.exitFullscreen ||
+        document.webkitExitFullscreen ||
+        document.mozCancelFullScreen ||
+        document.msExitFullscreen;
+      const result = exit?.call(document);
+      if (result && typeof result.catch === "function") {
+        result.catch(() => {});
+      }
+    } catch {
+      // Leaving fullscreen is best-effort; the report still renders without it.
+    }
+  }, [submitted]);
+
   useEffect(() => {
     if (submitted || loading) return;
 
