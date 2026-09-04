@@ -31,8 +31,14 @@ const getOrt = () => {
 const MODEL_BASE = '/models/onnx';
 const SCRFD_MODEL = `${MODEL_BASE}/scrfd_500m_bnkps.onnx`; // updated filename
 const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
-// Object detector (optional) — YOLOv8n exported to ONNX, COCO 80 classes.
-const YOLO_MODEL = `${MODEL_BASE}/yolov8n.onnx`;
+// Object detector (optional) — YOLOv8 exported to ONNX, COCO 80 classes.
+// Tried in order: the first file present wins. Drop a larger export into
+// public/models/onnx/ (yolo export model=yolov8m.pt format=onnx imgsz=640
+// opset=12) and it is picked up without a code change. Bigger is markedly
+// better on small, plain objects such as the back of a phone; it is also
+// slower, which the engine tolerates by skipping a tick rather than stacking.
+const YOLO_MODEL_CANDIDATES = ['yolov8m.onnx', 'yolov8s.onnx', 'yolov8n.onnx'].map((f) => `${MODEL_BASE}/${f}`);
+let yoloModelName = null;
 const YOLO_INPUT_SIZE = 640;
 const YOLO_SCORE_THRESHOLD = 0.40;
 // Per-class floors. A phone is the costliest false alarm (it escalates fastest)
@@ -44,6 +50,12 @@ const YOLO_CLASS_THRESHOLDS = { 67: 0.30, 73: 0.40, 63: 0.45 };
 const YOLO_MIN_AREA_RATIO = 0.0015;
 const YOLO_NUM_CLASSES = 80;
 const YOLO_PERSON_CLASS = 0;
+// Classes the model routinely confuses with a hand-held phone. Losing to one
+// of these does not veto a phone: a remote-shaped object held up to the
+// screen is the very thing being looked for. Losing to anything else (bottle,
+// cup, handbag...) still does.
+const YOLO_PHONE_LIKE = new Set([65 /* remote */, 62 /* tv */, 64 /* mouse */, 66 /* keyboard */]);
+const YOLO_CLASS_NAMES = { 0: 'person', 26: 'handbag', 27: 'tie', 39: 'bottle', 41: 'cup', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'phone', 73: 'book', 74: 'clock' };
 // Near-misses from the most recent pass, for the diagnostics panel.
 let lastObjectNearMisses = [];
 export const getLastObjectNearMisses = () => lastObjectNearMisses;
@@ -164,13 +176,24 @@ export const initPipeline = async (onProgress) => {
 
     // OPTIONAL object detector. Its absence must NEVER break the face pipeline —
     // if the model file isn't present, object detection simply no-ops.
-    try {
-      report(97, 'Loading object detector (YOLO)...');
-      yoloSession = await ort.InferenceSession.create(YOLO_MODEL, sessionOpts);
-      console.log('[OnnxPipeline] ✅ YOLO object detector loaded.');
-    } catch (yoloErr) {
-      yoloSession = null;
-      console.warn('[OnnxPipeline] ⚠️ YOLO model unavailable — object detection disabled:', yoloErr.message);
+    report(97, 'Loading object detector (YOLO)...');
+    yoloSession = null;
+    for (const candidate of YOLO_MODEL_CANDIDATES) {
+      try {
+        // A missing file is a 404 whose body ORT then fails to parse; check
+        // first so the fallback is quiet and the real error is not masked.
+        const head = await fetch(candidate, { method: 'HEAD' });
+        if (!head.ok) continue;
+        yoloSession = await ort.InferenceSession.create(candidate, sessionOpts);
+        yoloModelName = candidate.split('/').pop();
+        console.log(`[OnnxPipeline] ✅ YOLO object detector loaded (${yoloModelName}).`);
+        break;
+      } catch (yoloErr) {
+        console.warn(`[OnnxPipeline] ⚠️ ${candidate} failed to load:`, yoloErr.message);
+      }
+    }
+    if (!yoloSession) {
+      console.warn('[OnnxPipeline] ⚠️ No YOLO model available — object detection disabled.');
     }
     report(100, 'Models ready ✓');
 
@@ -735,6 +758,7 @@ export const getPipelineStatus = () => ({
   faceDetector: scrfdSession ? 'loaded' : 'MISSING',
   faceRecogniser: arcfaceSession ? 'loaded' : 'MISSING',
   objectDetector: yoloSession ? 'loaded' : 'MISSING — phone/book detection cannot run',
+  objectModel: yoloModelName,
   initialised: isInitialized,
   initError: initError ? initError.message : null,
   yoloScoreThreshold: YOLO_SCORE_THRESHOLD,
@@ -823,17 +847,23 @@ const runYoloPass = async (videoEl, region, nearMisses) => {
     // to "person": a phone held up beside the face sits on anchors that also
     // score the person highly, and requiring it to out-score the person
     // silently dropped phones in exactly the pose that matters most.
-    let bestScore = 0, bestCls = -1, bestOther = 0;
+    let bestScore = 0, bestCls = -1, bestOther = 0, bestOtherCls = -1;
     for (let c = 0; c < numClasses; c++) {
       const sc = at(4 + c, a);
       if (c in YOLO_CLASSES_OF_INTEREST) {
         if (sc > bestScore) { bestScore = sc; bestCls = c; }
       } else if (c !== YOLO_PERSON_CLASS && sc > bestOther) {
-        bestOther = sc;
+        bestOther = sc; bestOtherCls = c;
       }
     }
     if (bestCls < 0 || bestScore < YOLO_NEAR_MISS_SCORE) continue;
-    if (bestOther > bestScore) continue; // the model thinks it is something else
+    if (bestOther > bestScore && !(bestCls === 67 && YOLO_PHONE_LIKE.has(bestOtherCls))) {
+      // The model thinks it is something else. Say so: this was the silent
+      // path, and "no phone seen" and "phone seen but called a handbag" need
+      // different fixes.
+      nearMisses.push(`${YOLO_CLASSES_OF_INTEREST[bestCls]} ${bestScore.toFixed(2)} < ${YOLO_CLASS_NAMES[bestOtherCls] || `cls${bestOtherCls}`} ${bestOther.toFixed(2)}`);
+      continue;
+    }
 
     const threshold = YOLO_CLASS_THRESHOLDS[bestCls] ?? YOLO_SCORE_THRESHOLD;
     if (bestScore < threshold) {

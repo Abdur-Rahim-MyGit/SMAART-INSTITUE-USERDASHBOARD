@@ -408,7 +408,7 @@ export const ProctoringOverlay = ({
                 <div className="flex justify-between gap-2">
                   <span className="text-slate-400">object model</span>
                   <span className={diagnostics.models?.objectDetector === 'loaded' ? 'text-emerald-600' : 'text-red-500 font-bold'}>
-                    {diagnostics.models?.objectDetector === 'loaded' ? 'ok' : 'MISSING'}
+                    {diagnostics.models?.objectDetector === 'loaded' ? (diagnostics.models?.objectModel ? `ok · ${diagnostics.models.objectModel.replace('.onnx', '')}` : 'ok') : 'MISSING'}
                   </span>
                 </div>
 
