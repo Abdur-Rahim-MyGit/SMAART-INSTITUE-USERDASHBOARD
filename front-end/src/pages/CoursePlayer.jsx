@@ -153,6 +153,9 @@ const COURSE_GUIDELINES = [
 /* Theater mode (YouTube style): the video takes the full content width and the
    curriculum drops below it. Remembered per browser. */
 const THEATER_STORAGE_KEY = "smaart_course_player_theater";
+/* One easing for every element that moves when theater mode toggles, so the
+   video, the lesson card and the curriculum all settle together. */
+const LAYOUT_TRANSITION = { layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } };
 const readTheaterPreference = () => {
   try {
     return localStorage.getItem(THEATER_STORAGE_KEY) === "1";
@@ -926,7 +929,9 @@ const CoursePlayer = () => {
         return (
           <div className={theaterLayout ? "contents" : "space-y-4"}>
             {playbackUrl && (
-              <div
+              <motion.div
+                layout
+                transition={LAYOUT_TRANSITION}
                 className={
                   theaterLayout
                     ? "order-first relative mb-6"
@@ -941,7 +946,9 @@ const CoursePlayer = () => {
                 )}
                 {/* Theater: as wide as the screen height allows, so the whole
                     video and its controls stay on screen without scrolling. */}
-                <div
+                <motion.div
+                  layout
+                  transition={LAYOUT_TRANSITION}
                   className={theaterLayout ? "mx-auto w-full rounded-2xl overflow-hidden" : "w-full"}
                   style={theaterLayout ? { maxWidth: "calc((100vh - 13rem) * 16 / 9)" } : undefined}
                 >
@@ -964,8 +971,8 @@ const CoursePlayer = () => {
                     isTheater={isTheater}
                     onToggleTheater={toggleTheater}
                   />
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
 
             {stepData.assessmentData && (videoWatched || isStepCompleted) && (
@@ -1189,8 +1196,16 @@ const CoursePlayer = () => {
         <main className="pt-2 sm:pt-4 space-y-6">
           {/* Course Info Header */}
           {!showIntro && (
-            theaterLayout ? (
-              <div className="text-left mb-4 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <AnimatePresence mode="wait" initial={false}>
+            {theaterLayout ? (
+              <motion.div
+                key="course-title-compact"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+                className="text-left mb-4 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1"
+              >
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
                 </span>
@@ -1200,9 +1215,16 @@ const CoursePlayer = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
                   {course.subtitle}
                 </p>
-              </div>
+              </motion.div>
             ) : (
-              <div className="text-left mb-4 mt-1 space-y-1">
+              <motion.div
+                key="course-title-full"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.2 }}
+                className="text-left mb-4 mt-1 space-y-1"
+              >
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                   {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
                 </span>
@@ -1212,13 +1234,14 @@ const CoursePlayer = () => {
                 <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
                   {course.subtitle}
                 </p>
-              </div>
-            )
+              </motion.div>
+            )}
+            </AnimatePresence>
           )}
 
           <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${theaterLayout ? "" : "lg:grid-cols-3"}`}>
             {/* Left Column - Video and Content */}
-            <div className={showIntro ? "max-w-5xl w-full mx-auto" : (theaterLayout ? "w-full" : "lg:col-span-2")}>
+            <motion.div layout transition={LAYOUT_TRANSITION} className={showIntro ? "max-w-5xl w-full mx-auto" : (theaterLayout ? "w-full" : "lg:col-span-2")}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1405,9 +1428,11 @@ const CoursePlayer = () => {
                     <div className="space-y-6">
                       <motion.div
                         key="active-step"
+                        layout
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
+                        transition={LAYOUT_TRANSITION}
                         className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${theaterLayout ? "flex flex-col" : ""}`}
                       >
                         <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
@@ -1471,7 +1496,7 @@ const CoursePlayer = () => {
 
                       {/* Side-by-side Tab switcher buttons & Content below active-step card if contentType is video-text */}
                       {learningFlowData?.steps?.[activeStep]?.contentType === 'video-text' && (
-                        <div className="space-y-6">
+                        <motion.div layout transition={LAYOUT_TRANSITION} className="space-y-6">
                           <div className="flex flex-wrap items-center gap-3">
                             <button
                               onClick={() => setActiveTab('preview')}
@@ -1585,16 +1610,16 @@ const CoursePlayer = () => {
                               )}
                             </AnimatePresence>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                     </div>
                   )}
                 </AnimatePresence>
               </motion.div>
-            </div>
+            </motion.div>
 
             {!showIntro && (
-              <div className={theaterLayout ? "w-full" : "lg:col-span-1"}>
+              <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "w-full" : "lg:col-span-1"}>
                 <motion.div
                   initial={{ opacity: 0, x: theaterLayout ? 0 : 20, y: theaterLayout ? 20 : 0 }}
                   animate={{ opacity: 1, x: 0, y: 0 }}
@@ -1629,7 +1654,7 @@ const CoursePlayer = () => {
                         </span>
                       </div>
 
-                      <div className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
                         {/* Content Progress */}
                         <div className="space-y-1.5 text-left">
                           <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -1663,7 +1688,7 @@ const CoursePlayer = () => {
                             />
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* Curriculum */}
@@ -1680,18 +1705,22 @@ const CoursePlayer = () => {
                         </span>
                       </div>
 
-                      <div className={theaterLayout ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
                         {stepNumbers.map((step) => {
                           const status = getStepStatus(step);
                           const stepData = learningFlowData?.steps?.[step];
                           const isActive = activeStep === step;
 
                           return (
-                            <button
+                            <motion.button
+                              layout
+                              transition={LAYOUT_TRANSITION}
+                              whileHover={status === 'locked' ? undefined : { y: -2 }}
+                              whileTap={status === 'locked' ? undefined : { scale: 0.99 }}
                               key={step}
                               disabled={status === 'locked'}
                               onClick={() => handleStepClick(step)}
-                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 border text-left cursor-pointer hover:-translate-y-0.5 hover:shadow-md ${isActive
+                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-colors duration-300 border text-left cursor-pointer hover:shadow-md ${isActive
                                 ? 'bg-[#045C9A] dark:bg-[#045C9A] border-[#045C9A] dark:border-[#045C9A] text-white shadow-md shadow-[#072036]/15'
                                 : status === 'completed'
                                   ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/70 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300'
@@ -1720,14 +1749,14 @@ const CoursePlayer = () => {
                               {status !== 'locked' && !isActive && (
                                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                               )}
-                            </button>
+                            </motion.button>
                           );
                         })}
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
-              </div>
+              </motion.div>
             )}
           </div>
         </main>
