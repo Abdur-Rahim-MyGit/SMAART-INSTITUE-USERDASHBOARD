@@ -38,6 +38,7 @@ import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningMod
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import { stopAllMediaStreams } from "@/utils/mediaStreams";
+import ExamWatermark from "@/components/proctoring/ExamWatermark";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -1028,6 +1029,12 @@ const BaseLineTest = () => {
             <div className="flex-1 flex flex-col min-h-[540px] bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-[#045C9A]/25 shadow-sm overflow-hidden relative text-[#072036] dark:text-white">
               {/* Background gradient effect */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#045C9A]/5 rounded-full blur-[100px] pointer-events-none" />
+              {/* Traceability: any photo of the paper carries who took it and when */}
+              <ExamWatermark
+                name={user?.fullName}
+                studentId={user?.studentId}
+                reference={resultId ? `${stageKey}-${String(resultId).slice(-6).toUpperCase()}` : stageKey}
+              />
 
               <div className="p-6 border-b border-[#d7ebf5] dark:border-[#045C9A]/25 bg-[#F1F5F9]/60 dark:bg-[#0d3a5f]/20 relative z-10">
                 <div className="flex justify-between items-center mb-4">
