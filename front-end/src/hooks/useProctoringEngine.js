@@ -173,10 +173,13 @@ const OBJECT_CONDITIONS = {
   book: 'book_detected',
   laptop: 'laptop_detected',
 };
-// An object has to be seen on this many consecutive ticks before its condition
-// opens. One tick is a single frame; a book turned edge-on or a hand passing
-// the lens can read as a phone for exactly one frame.
+// An object has to be seen on OBJECT_CONFIRM_TICKS of the last
+// OBJECT_CONFIRM_WINDOW ticks before its condition opens, and be absent for a
+// whole window before it clears. One tick is a single frame: a book turned
+// edge-on or a hand passing the lens can read as a phone for one frame, and
+// the detector's alternating zoom passes can miss a real phone on the off tick.
 const OBJECT_CONFIRM_TICKS = 2;
+const OBJECT_CONFIRM_WINDOW = 3;
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -382,8 +385,10 @@ export const useProctoringEngine = ({
   // reported once rather than every window that follows it.
   const livenessRef = useRef(null);
   const spoofReportedRef = useRef(false);
-  // Consecutive detection ticks per object label (see OBJECT_CONFIRM_TICKS).
+  // Recent detection history per object label (see OBJECT_CONFIRM_TICKS).
   const objectSeenTicksRef = useRef({});
+  // A detection pass can outlast the 1 s tick on a slow machine; never stack.
+  const objectPassInFlightRef = useRef(false);
   // Consecutive ArcFace frames that disagreed with the registered face. One
   // bad frame is a blink or a turn; several in a row is a different person.
   const mismatchStreakRef = useRef(0);
@@ -478,7 +483,10 @@ export const useProctoringEngine = ({
     try {
       console.log('[ProctoringEngine] Requesting media stream...');
       const constraints = {
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
+        // 720p where the camera allows it: the face pipeline resizes to its
+        // own 640 input regardless, but the object detector's zoomed passes
+        // get real pixels, which is what a small phone at arm's length needs.
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 15 } },
         audio: false // No audio processing needed to protect privacy
       };
       const stream = trackStream(await navigator.mediaDevices.getUserMedia(constraints));
@@ -1260,6 +1268,8 @@ export const useProctoringEngine = ({
   const runObjectDetection = async () => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
     if (!videoRef.current || !isObjectDetectorReady()) return;
+    if (objectPassInFlightRef.current) return;
+    objectPassInFlightRef.current = true;
 
     try {
       const found = await detectObjects(videoRef.current);
@@ -1277,14 +1287,16 @@ export const useProctoringEngine = ({
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
-        const seen = labels.has(label);
-        const ticks = seen ? (objectSeenTicksRef.current[label] || 0) + 1 : 0;
-        objectSeenTicksRef.current[label] = ticks;
-        if (ticks >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
-        else if (!seen) clearCondition(condition);
+        const history = [...(objectSeenTicksRef.current[label] || []), labels.has(label)].slice(-OBJECT_CONFIRM_WINDOW);
+        objectSeenTicksRef.current[label] = history;
+        const hits = history.filter(Boolean).length;
+        if (hits >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
+        else if (hits === 0) clearCondition(condition);
       });
     } catch (err) {
       console.warn('[ProctoringEngine] Object detection tick failed:', err);
+    } finally {
+      objectPassInFlightRef.current = false;
     }
   };
 

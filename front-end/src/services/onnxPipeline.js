@@ -39,7 +39,7 @@ const YOLO_SCORE_THRESHOLD = 0.40;
 // and also the class most often confused with books, remotes and hands, so it
 // needs a little more confidence than the generic floor; a laptop is large and
 // distinctive but frequently in shot legitimately.
-const YOLO_CLASS_THRESHOLDS = { 67: 0.35, 73: 0.40, 63: 0.45 };
+const YOLO_CLASS_THRESHOLDS = { 67: 0.30, 73: 0.40, 63: 0.45 };
 // Ignore specks: a detection smaller than this share of the frame is noise.
 const YOLO_MIN_AREA_RATIO = 0.0015;
 const YOLO_NUM_CLASSES = 80;
@@ -47,6 +47,8 @@ const YOLO_PERSON_CLASS = 0;
 // Near-misses from the most recent pass, for the diagnostics panel.
 let lastObjectNearMisses = [];
 export const getLastObjectNearMisses = () => lastObjectNearMisses;
+// Which half of the centre band the next zoomed pass looks at.
+let zoomLower = false;
 const YOLO_PAD_VALUE = 114 / 255;
 // Detections between this and the acting threshold are logged, never acted on.
 const YOLO_NEAR_MISS_SCORE = 0.12;
@@ -877,7 +879,16 @@ export const detectObjects = async (videoEl) => {
     let found = await runYoloPass(videoEl, null, nearMisses);
 
     if (found.length === 0) {
-      const zoom = { sx: Math.round(vw * 0.2), sy: 0, sw: Math.round(vw * 0.6), sh: Math.round(vh * 0.8) };
+      // Zoom on the centre band, alternating between its upper half (phone
+      // held beside the face) and lower half (phone held at chest level or in
+      // the lap) on successive calls. One zoom per call keeps the tick cheap;
+      // the engine's confirmation window tolerates a miss on the off tick.
+      const bandX = Math.round(vw * 0.15);
+      const bandW = Math.round(vw * 0.70);
+      const zoom = zoomLower
+        ? { sx: bandX, sy: Math.round(vh * 0.40), sw: bandW, sh: Math.round(vh * 0.60) }
+        : { sx: bandX, sy: 0, sw: bandW, sh: Math.round(vh * 0.60) };
+      zoomLower = !zoomLower;
       found = await runYoloPass(videoEl, zoom, nearMisses);
     }
 
