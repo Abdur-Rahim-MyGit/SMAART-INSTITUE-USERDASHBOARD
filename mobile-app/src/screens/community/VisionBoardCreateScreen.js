@@ -9,9 +9,10 @@
  * `POST /api/vision-board-pro` immediately — no cover-photo picker this pass
  * (expo-image-picker isn't an installed dependency yet; see deferred notes).
  */
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -29,6 +30,42 @@ import { visionBoardAPI } from '../../api/visionBoard';
 
 const TITLE_LIMIT = 50;
 const DESCRIPTION_LIMIT = 250;
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, disabled, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 function GoalEditor({ label, icon, goals, setGoals, placeholder, themeColors, isDark }) {
   const updateGoal = (index, value) => {
@@ -78,7 +115,7 @@ function GoalEditor({ label, icon, goals, setGoals, placeholder, themeColors, is
         onPress={addGoal}
         style={[
           styles.addBtn,
-          { borderColor: themeColors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC' },
+          { borderColor: themeColors.border, backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#EAF7FD' },
         ]}
       >
         <Feather name="plus" size={14} color={themeColors.primaryBright} />
@@ -186,69 +223,77 @@ export default function VisionBoardCreateScreen({ navigation }) {
             </View>
           )}
 
-          <View style={{ gap: 8 }}>
-            <View style={styles.fieldHead}>
-              <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Title</Text>
-              <Text style={[styles.charCount, { color: themeColors.iconMuted }]}>
-                {title.length}/{TITLE_LIMIT}
-              </Text>
+          <AnimatedSection delay={0}>
+            <View style={{ gap: 8 }}>
+              <View style={styles.fieldHead}>
+                <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Title</Text>
+                <Text style={[styles.charCount, { color: themeColors.iconMuted }]}>
+                  {title.length}/{TITLE_LIMIT}
+                </Text>
+              </View>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                maxLength={TITLE_LIMIT}
+                placeholder="e.g. My 2027 Vision"
+                placeholderTextColor={themeColors.textMuted}
+                style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+              />
             </View>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              maxLength={TITLE_LIMIT}
-              placeholder="e.g. My 2027 Vision"
-              placeholderTextColor={themeColors.textMuted}
-              style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
-            />
-          </View>
+          </AnimatedSection>
 
-          <View style={{ gap: 8, marginTop: 18 }}>
-            <View style={styles.fieldHead}>
-              <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Description</Text>
-              <Text style={[styles.charCount, { color: themeColors.iconMuted }]}>
-                {description.length}/{DESCRIPTION_LIMIT}
-              </Text>
+          <AnimatedSection delay={60}>
+            <View style={{ gap: 8, marginTop: 18 }}>
+              <View style={styles.fieldHead}>
+                <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>Description</Text>
+                <Text style={[styles.charCount, { color: themeColors.iconMuted }]}>
+                  {description.length}/{DESCRIPTION_LIMIT}
+                </Text>
+              </View>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                maxLength={DESCRIPTION_LIMIT}
+                multiline
+                placeholder="What does this vision board represent?"
+                placeholderTextColor={themeColors.textMuted}
+                style={[
+                  styles.textarea,
+                  { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text },
+                ]}
+              />
             </View>
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              maxLength={DESCRIPTION_LIMIT}
-              multiline
-              placeholder="What does this vision board represent?"
-              placeholderTextColor={themeColors.textMuted}
-              style={[
-                styles.textarea,
-                { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text },
-              ]}
-            />
-          </View>
+          </AnimatedSection>
 
-          <View style={{ marginTop: 22 }}>
-            <GoalEditor
-              label="Short-Term Goals"
-              icon="zap"
-              goals={shortTermGoals}
-              setGoals={setShortTermGoals}
-              placeholder="e.g. Finish my portfolio site"
-              themeColors={themeColors}
-              isDark={isDark}
-            />
-          </View>
+          <AnimatedSection delay={120}>
+            <View style={{ marginTop: 22 }}>
+              <GoalEditor
+                label="Short-Term Goals"
+                icon="zap"
+                goals={shortTermGoals}
+                setGoals={setShortTermGoals}
+                placeholder="e.g. Finish my portfolio site"
+                themeColors={themeColors}
+                isDark={isDark}
+              />
+            </View>
+          </AnimatedSection>
 
-          <View style={{ marginTop: 22 }}>
-            <GoalEditor
-              label="Long-Term Goals"
-              icon="flag"
-              goals={longTermGoals}
-              setGoals={setLongTermGoals}
-              placeholder="e.g. Land a role as a data analyst"
-              themeColors={themeColors}
-              isDark={isDark}
-            />
-          </View>
+          <AnimatedSection delay={180}>
+            <View style={{ marginTop: 22 }}>
+              <GoalEditor
+                label="Long-Term Goals"
+                icon="flag"
+                goals={longTermGoals}
+                setGoals={setLongTermGoals}
+                placeholder="e.g. Land a role as a data analyst"
+                themeColors={themeColors}
+                isDark={isDark}
+              />
+            </View>
+          </AnimatedSection>
 
-          <Pressable
+          <PressCard
             onPress={submit}
             disabled={!canSubmit}
             style={[
@@ -257,7 +302,7 @@ export default function VisionBoardCreateScreen({ navigation }) {
             ]}
           >
             <Text style={styles.submitText}>{saving ? 'Creating…' : 'Create Vision Board'}</Text>
-          </Pressable>
+          </PressCard>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

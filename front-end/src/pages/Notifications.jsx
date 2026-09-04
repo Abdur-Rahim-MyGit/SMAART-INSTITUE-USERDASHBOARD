@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { NotificationsSkeleton } from '@/components/SkeletonPatterns';
 import { useNotifications } from '@/contexts/NotificationContext';
-import { apiCall } from '@/services/api';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const ICON_MAP = {
   trophy: Trophy,
@@ -52,8 +52,33 @@ const TYPE_LABELS = {
   system: 'notifications.types.system',
 };
 
+// icon = vivid accent used for the icon chip (and dark-mode label text);
+// text = a darkened variant used for the label on light backgrounds, so it
+// still meets AA contrast at the small uppercase type-label size.
+const TYPE_ACCENTS = {
+  badge: { icon: '#d97706', text: '#92400e' },
+  assessment: { icon: '#7c3aed', text: '#6d28d9' },
+  course: { icon: '#059669', text: '#047857' },
+  achievement: { icon: '#1a3884', text: '#1a3884' },
+  community: { icon: '#db2777', text: '#be185d' },
+  coaching: { icon: '#0d9488', text: '#0f766e' },
+  support: { icon: '#ea580c', text: '#9a3412' },
+  task: { icon: '#4f46e5', text: '#3730a3' },
+  certificate: { icon: '#0891b2', text: '#0e7490' },
+  system: { icon: '#64748b', text: '#475569' },
+};
+
 const Notifications = () => {
   const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const getTypeAccent = (notification) => {
+    const accent = TYPE_ACCENTS[notification.type] || TYPE_ACCENTS.system;
+    return {
+      icon: notification.color || accent.icon,
+      label: notification.color || (isDark ? accent.icon : accent.text),
+    };
+  };
   const {
     notifications,
     unreadCount,
@@ -70,17 +95,6 @@ const Notifications = () => {
   const [filter, setFilter] = useState('all');
   const [dateRange, setDateRange] = useState('all_time');
   const navigate = useNavigate();
-
-  const fetchSummary = useCallback(async () => {
-    try {
-      const data = await apiCall('/notifications/summary');
-      if (data?.success) {
-        setSummary(data.summary);
-      }
-    } catch (error) {
-      console.error('Error fetching summary:', error);
-    }
-  }, []);
 
   useEffect(() => {
     const options = { unreadOnly: filter === 'unread' };
@@ -101,10 +115,6 @@ const Notifications = () => {
       console.error('Error fetching notifications:', error);
     });
   }, [fetchNotifications, filter, dateRange]);
-
-  useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary]);
 
   const handleRefresh = async () => {
     const options = { unreadOnly: filter === 'unread' };
@@ -234,14 +244,15 @@ const Notifications = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#002147]"
+          className="relative overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.03)] dark:border-white/[0.03] dark:bg-slate-900"
         >
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#1a3884]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
           {/* Header & Filters Section */}
           <div className="p-4 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3 sm:gap-4">
-                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-[#1a3884] shadow-sm">
-                  <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-[#1a3884] shadow-md">
+                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold text-[#0d1f4e] dark:text-white">{t('notifications.title', 'Notifications')}</h1>
@@ -323,18 +334,32 @@ const Notifications = () => {
             {isLoading ? (
               <div className="p-4"><NotificationsSkeleton /></div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800/50">
-                  <Bell className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="relative mb-6 h-[120px] w-[120px]">
+                  <div className={`absolute -inset-4 rounded-full ${filter === 'unread' ? 'bg-emerald-500/10' : 'bg-[#1a3884]/8'}`} />
+                  <div className={`relative flex h-[120px] w-[120px] items-center justify-center rounded-full border shadow-[0_20px_40px_-18px_rgba(0,0,0,0.2)] ${filter === 'unread'
+                      ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-transparent'
+                      : 'border-[#d8e6f7] bg-gradient-to-br from-[#F8FAFC] to-white dark:border-[#1a3884]/30 dark:from-[#1a3884]/10 dark:to-transparent'
+                    }`}>
+                    {filter === 'unread' ? (
+                      <Check className="h-11 w-11 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
+                    ) : (
+                      <Bell className="h-10 w-10 text-[#1a3884] dark:text-blue-400" />
+                    )}
+                  </div>
                 </div>
-                <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
-                  {filter === 'unread' ? t('notifications.empty.no_unread', 'No unread notifications') : t('notifications.empty.no_notifications', 'No notifications yet')}
+                <h2 className="mb-2 text-lg font-bold text-[#0d1f4e] dark:text-white">
+                  {filter === 'unread' ? t('notifications.empty.no_unread', "You're all caught up!") : t('notifications.empty.no_notifications', 'No notifications yet')}
                 </h2>
-                <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
+                <p className="max-w-sm text-sm font-medium text-slate-500 dark:text-slate-400">
                   {filter === 'unread'
-                    ? t('notifications.empty.unread_desc', "You're all caught up! Check back later for new updates.")
-                    : t('notifications.empty.notifications_desc', "When you get notifications, they'll appear here. Stay tuned!")}
+                    ? t('notifications.empty.unread_desc', "Nothing new right now. Check back later for updates.")
+                    : t('notifications.empty.notifications_desc', "Course milestones, assessment results, and community activity will show up here the moment they happen.")}
                 </p>
+                <div className="mt-5 inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-xs font-semibold text-slate-500 dark:border-white/5 dark:bg-white/[0.03] dark:text-slate-400">
+                  <Bell className="h-3.5 w-3.5" />
+                  {t('notifications.empty.tip', "We'll ping the bell icon the moment something new arrives")}
+                </div>
               </div>
             ) : (
               <div className="flex flex-col">
@@ -349,6 +374,7 @@ const Notifications = () => {
                       <AnimatePresence>
                         {items.map((notification) => {
                           const IconComponent = getIcon(notification.icon);
+                          const accent = getTypeAccent(notification);
 
                           return (
                             <motion.div
@@ -367,11 +393,11 @@ const Notifications = () => {
                               >
                                 <div
                                   className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl"
-                                  style={{ backgroundColor: `${notification.color || '#1a3884'}15` }}
+                                  style={{ backgroundColor: `${accent.icon}15` }}
                                 >
                                   <IconComponent
                                     className="h-5 w-5 sm:h-6 sm:w-6"
-                                    style={{ color: notification.color || '#1a3884' }}
+                                    style={{ color: accent.icon }}
                                   />
                                 </div>
 
@@ -379,7 +405,7 @@ const Notifications = () => {
                                   <div className="flex items-start justify-between gap-3">
                                     <div>
                                       <p className="text-[14px] font-bold text-[#0d1f4e] dark:text-white leading-tight mb-0.5">{notification.title}</p>
-                                      <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#1a3884]/60 dark:text-blue-400">
+                                      <span className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: accent.label }}>
                                         {t(TYPE_LABELS[notification.type] || notification.type, notification.type)}
                                       </span>
                                     </div>

@@ -4,8 +4,8 @@
  * Implements a modern floating capsule navigation bar (without Assessments tab as requested),
  * supporting both light (white) and dark (black) modes with fixed capsule sizes to avoid icon squishing.
  */
-import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
 import HomeScreen from '../screens/home/HomeScreen';
@@ -25,14 +25,35 @@ const TAB_ICONS = {
   Profile: 'user',
 };
 
-// Premium tab icon with fixed indicator bounds to prevent icon squishing
+// Premium tab icon with fixed indicator bounds to prevent icon squishing,
+// plus a spring pop-in on the pill/icon when it becomes focused.
 function TabIcon({ name, focused, themeColors }) {
+  const pop = useRef(new Animated.Value(focused ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(pop, {
+      toValue: focused ? 1 : 0,
+      useNativeDriver: true,
+      speed: 22,
+      bounciness: 9,
+    }).start();
+  }, [focused, pop]);
+
+  const scale = pop.interpolate({ inputRange: [0, 1], outputRange: [0.88, 1] });
+
   return (
     <View style={styles.iconContainer}>
-      <View
+      <Animated.View
         style={[
           styles.pillIndicator,
-          focused && { backgroundColor: themeColors.theme === 'dark' ? 'rgba(59, 130, 246, 0.18)' : 'rgba(37, 99, 235, 0.08)' },
+          {
+            transform: [{ scale }],
+            backgroundColor: focused
+              ? themeColors.theme === 'dark'
+                ? 'rgba(43, 143, 204, 0.22)'
+                : 'rgba(4, 92, 154, 0.1)'
+              : 'transparent',
+          },
         ]}
       >
         <Feather
@@ -40,7 +61,7 @@ function TabIcon({ name, focused, themeColors }) {
           size={19}
           color={focused ? themeColors.primaryBright : themeColors.textMuted}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 }

@@ -1118,11 +1118,22 @@ const DashboardLayout = () => {
                                       className={`px-4 py-3 hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/60 dark:bg-white/[0.03]' : ''}`}
                                     >
                                       <div className="flex gap-3">
-                                        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                                          n.type === 'assessment' ? 'bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]' :
-                                            'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-300'
+                                        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                          {
+                                            course: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                            assessment: 'bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]',
+                                            badge: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+                                            achievement: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+                                            coaching: 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+                                            community: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400',
+                                            task: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
+                                            certificate: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400',
+                                            support: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
+                                          }[n.type] || 'bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400'
                                           }`}>
-                                          {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                                          {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> :
+                                            (n.type === 'badge' || n.type === 'achievement') ? <Trophy className="w-4 h-4" /> :
+                                              <Info className="w-4 h-4" />}
                                         </div>
                                         <div className="flex-1 min-w-0 pr-3">
                                           <div className="flex items-start gap-2 mb-1">

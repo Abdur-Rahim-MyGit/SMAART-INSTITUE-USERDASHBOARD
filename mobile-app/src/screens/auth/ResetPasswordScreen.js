@@ -18,6 +18,7 @@ import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import PasswordRules from '../../components/PasswordRules';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { resetPassword } from '../../api/auth';
 import { formatServerPasswordError, validatePassword } from '../../utils/password';
 import { colors, radius } from '../../theme';
@@ -80,6 +81,7 @@ export default function ResetPasswordScreen({ route, navigation }) {
   if (done) {
     return (
       <AuthScreenLayout title="Password updated" subtitle="You can now sign in with your new password">
+        <FadeSlideIn duration={420}>
         <View style={styles.successCard}>
           <View style={styles.successIcon}>
             <Feather name="check" size={26} color={colors.success} />
@@ -96,6 +98,7 @@ export default function ResetPasswordScreen({ route, navigation }) {
           icon="arrow-right"
           onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Login' }] })}
         />
+        </FadeSlideIn>
       </AuthScreenLayout>
     );
   }
@@ -106,6 +109,7 @@ export default function ResetPasswordScreen({ route, navigation }) {
       subtitle={`Enter the code sent to\n${email}`}
       onBack={() => navigation.goBack()}
     >
+      <FadeSlideIn duration={400}>
       <PillInput
         label="Reset Code"
         icon="key"
@@ -173,6 +177,7 @@ export default function ResetPasswordScreen({ route, navigation }) {
           disabled={!canSubmit}
         />
       )}
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }

@@ -1,22 +1,12 @@
-/**
- * OtpVerifyScreen — Redesigned Verify OTP Screen.
- *
- * Layout matches LoginScreen.js exactly:
- *  - Slate dark top section with back button outline circle
- *  - "Verify OTP" header and email subtitle
- *  - Curved white sheet containing input forms
- *  - Pill-shaped OTP input with custom grey border (placeholder: "Enter your OTP")
- *  - Vibrant blue action pill buttons
- */
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Platform,
   Pressable,
   StatusBar as RNStatusBar,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,6 +14,8 @@ import { Feather } from '@expo/vector-icons';
 import { resendLoginOtp, verifyLoginOtp } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { colors, radius, shadow } from '../../theme';
+import { FadeSlideIn, PressScale, useShake } from '../../components/Motion';
+import PillInput from '../../components/PillInput';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
 
@@ -37,6 +29,7 @@ export default function OtpVerifyScreen({ route, navigation }) {
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [forceLogoutPrompt, setForceLogoutPrompt] = useState(false);
+  const shakeStyle = useShake(error);
 
   const handleVerify = async (forceLogout = false) => {
     if (!otp) {
@@ -50,11 +43,6 @@ export default function OtpVerifyScreen({ route, navigation }) {
       const res = await verifyLoginOtp(tempToken, otp, forceLogout);
       setForceLogoutPrompt(false);
 
-      // FR-AUTH-05 — first login on an admin-issued password. The server has
-      // just swapped our login OTP for a fresh `password-change` tempToken;
-      // hand that to ChangePasswordScreen, which finishes the sign-in natively.
-      // (This used to dead-end by telling the student to go use the web
-      // dashboard — that redirect is gone.)
       if (res.requirePasswordChange && res.tempToken) {
         navigation.navigate('ChangePassword', {
           tempToken: res.tempToken,
@@ -102,110 +90,114 @@ export default function OtpVerifyScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <RNStatusBar barStyle="light-content" backgroundColor={colors.navyDark} />
+      <RNStatusBar barStyle="light-content" backgroundColor={colors.navyDarkest} />
 
       {/* Top Header */}
-      <View style={styles.topHeader}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={12}
-          style={styles.backBtn}
-        >
-          <Feather name="arrow-left" size={20} color="#FFFFFF" />
-        </Pressable>
+      <FadeSlideIn duration={380}>
+        <View style={styles.topHeader}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            hitSlop={12}
+            style={styles.backBtn}
+          >
+            <Feather name="arrow-left" size={20} color="#FFFFFF" />
+          </Pressable>
 
-        <Text style={styles.headerTitle}>Verify OTP</Text>
-        <Text style={styles.headerSubtitle}>
-          Enter the verification code sent to{'\n'}{email}
-        </Text>
-      </View>
+          <Text style={styles.headerTitle}>Verify OTP</Text>
+          <Text style={styles.headerSubtitle}>
+            Enter the verification code sent to{'\n'}{email}
+          </Text>
+        </View>
+      </FadeSlideIn>
 
-      {/* White Curved Form Card */}
-      <View style={styles.formCard}>
-        {/* OTP Input Label */}
-        <Text style={styles.inputLabel}>OTP Verification Code</Text>
-        <View style={styles.inputRow}>
-          <Feather name="key" size={18} color="#64748B" style={styles.inputIcon} />
-          <TextInput
-            style={styles.textInput}
+      {/* Obsidian Curved Form Card */}
+      <FadeSlideIn duration={420} delay={90} style={{ flex: 1 }}>
+        <View style={styles.formCard}>
+          {/* OTP Input Component */}
+          <PillInput
+            label="OTP Verification Code"
+            icon="key"
             placeholder="Enter your OTP"
-            placeholderTextColor={colors.mutedLight}
             keyboardType="number-pad"
             maxLength={6}
             value={otp}
             onChangeText={setOtp}
           />
-        </View>
 
-        {/* Info Banner */}
-        {info ? (
-          <View style={styles.infoBanner}>
-            <Feather name="check-circle" size={16} color={colors.success} />
-            <Text style={styles.infoText}>{info}</Text>
-          </View>
-        ) : null}
+          {/* Info Banner */}
+          {info ? (
+            <View style={styles.infoBanner}>
+              <Feather name="check-circle" size={16} color={colors.success} />
+              <Text style={styles.infoText}>{info}</Text>
+            </View>
+          ) : null}
 
-        {/* Error Banner */}
-        {error ? (
-          <View style={styles.errorBanner}>
-            <Feather name="alert-circle" size={16} color={colors.danger} />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        ) : null}
+          {/* Error Banner */}
+          {error ? (
+            <Animated.View style={[styles.errorBanner, shakeStyle]}>
+              <Feather name="alert-circle" size={16} color={colors.danger} />
+              <Text style={styles.errorText}>{error}</Text>
+            </Animated.View>
+          ) : null}
 
-        {/* Action Buttons */}
-        {forceLogoutPrompt ? (
-          <>
-            <Pressable
-              style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
-              onPress={() => handleVerify(true)}
+          {/* Action Buttons */}
+          {forceLogoutPrompt ? (
+            <>
+              <PressScale
+                style={styles.loginBtn}
+                pressedStyle={styles.loginBtnPressed}
+                scaleTo={0.98}
+                onPress={() => handleVerify(true)}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Text style={styles.loginBtnText}>Force Logout & Continue</Text>
+                    <Feather name="log-out" size={16} color="#FFFFFF" style={styles.btnIcon} />
+                  </>
+                )}
+              </PressScale>
+
+              <Pressable
+                style={({ pressed }) => [styles.cancelBtn, pressed && styles.cancelBtnPressed]}
+                onPress={() => {
+                  setForceLogoutPrompt(false);
+                  setError('');
+                }}
+              >
+                <Text style={styles.cancelBtnText}>Cancel</Text>
+              </Pressable>
+            </>
+          ) : (
+            <PressScale
+              style={styles.loginBtn}
+              pressedStyle={styles.loginBtnPressed}
+              scaleTo={0.98}
+              onPress={() => handleVerify(false)}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Text style={styles.loginBtnText}>Force Logout & Continue</Text>
-                  <Feather name="log-out" size={16} color="#FFFFFF" style={styles.btnIcon} />
+                  <Text style={styles.loginBtnText}>Verify Code</Text>
+                  <Feather name="arrow-right" size={16} color="#FFFFFF" style={styles.btnIcon} />
                 </>
               )}
-            </Pressable>
+            </PressScale>
+          )}
 
-            <Pressable
-              style={({ pressed }) => [styles.cancelBtn, pressed && styles.cancelBtnPressed]}
-              onPress={() => {
-                setForceLogoutPrompt(false);
-                setError('');
-              }}
-            >
-              <Text style={styles.cancelBtnText}>Cancel</Text>
-            </Pressable>
-          </>
-        ) : (
           <Pressable
-            style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
-            onPress={() => handleVerify(false)}
-            disabled={loading}
+            style={({ pressed }) => [styles.resendBtn, pressed && styles.resendBtnPressed]}
+            onPress={handleResend}
+            disabled={resending}
           >
-            {loading ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <>
-                <Text style={styles.loginBtnText}>Verify Code</Text>
-                <Feather name="arrow-right" size={16} color="#FFFFFF" style={styles.btnIcon} />
-              </>
-            )}
+            <Text style={styles.resendBtnText}>Resend OTP Code</Text>
           </Pressable>
-        )}
-
-        <Pressable
-          style={({ pressed }) => [styles.resendBtn, pressed && styles.resendBtnPressed]}
-          onPress={handleResend}
-          disabled={resending}
-        >
-          <Text style={styles.resendBtnText}>Resend OTP Code</Text>
-        </Pressable>
-      </View>
+        </View>
+      </FadeSlideIn>
     </SafeAreaView>
   );
 }
@@ -213,21 +205,21 @@ export default function OtpVerifyScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.navyDark,
+    backgroundColor: colors.navyDarkest,
   },
   topHeader: {
     paddingHorizontal: 24,
     paddingTop: STATUS_BAR_HEIGHT + 14,
     paddingBottom: 28,
-    backgroundColor: colors.navyDark,
+    backgroundColor: colors.navyDarkest,
   },
   backBtn: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.22)',
+    borderColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -246,10 +238,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  // White Curved Form Card
+  // Obsidian Curved Form Card
   formCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.navyDark,
     borderTopLeftRadius: 36,
     borderTopRightRadius: 36,
     paddingHorizontal: 24,
@@ -258,59 +250,39 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
 
-  // Custom Pill Inputs
-  inputLabel: {
-    fontSize: 10.5,
-    fontWeight: '800',
-    color: colors.muted,
-    letterSpacing: 1,
-    marginBottom: 8,
-    marginLeft: 14,
-    textTransform: 'uppercase',
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#F9FAFB',
-    paddingHorizontal: 18,
-    marginBottom: 24,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 14.5,
-    fontWeight: '600',
-    color: colors.text,
-    paddingVertical: 0,
-  },
-
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.dangerBg,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 20,
   },
-  errorText: { color: colors.danger, fontSize: 12, fontWeight: '600', marginLeft: 8, flex: 1 },
+  errorText: {
+    color: colors.danger,
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
 
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
-    borderRadius: radius.sm,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderRadius: radius.md,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 20,
   },
-  infoText: { color: colors.success, fontSize: 12, fontWeight: '600', marginLeft: 8, flex: 1 },
+  infoText: {
+    color: colors.success,
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
 
   // Submit/Verify Button
   loginBtn: {
@@ -343,19 +315,20 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
+    borderColor: '#334155',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
   cancelBtnPressed: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     transform: [{ scale: 0.98 }],
   },
   cancelBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#4B5563',
+    color: '#F8FAFC',
   },
 
   // Resend OTP Link
@@ -369,7 +342,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   resendBtnText: {
-    color: colors.primary,
+    color: colors.primaryBright,
     fontWeight: '800',
     fontSize: 14,
   },

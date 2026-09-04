@@ -6,9 +6,10 @@
  * The player already writes per-course notes; this is the cross-course view
  * that was missing, so notes are findable without reopening each course.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -23,6 +24,38 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import { getNotes, saveCourseNote, deleteCourseNote } from '../../api/notes';
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>{children}</Animated.View>;
+}
+
+function PressScale({ onPress, disabled, style, children, hitSlop }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled} hitSlop={hitSlop}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function NotesScreen({ navigation }) {
   const { colors: themeColors, theme } = useTheme();
@@ -131,24 +164,26 @@ export default function NotesScreen({ navigation }) {
         </View>
       </View>
 
-      <View style={styles.searchWrap}>
-        <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <Feather name="search" size={16} color={themeColors.iconMuted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search your notes…"
-            placeholderTextColor={themeColors.textMuted}
-            style={[styles.searchInput, { color: themeColors.text }]}
-            autoCorrect={false}
-          />
-          {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={10}>
-              <Feather name="x-circle" size={16} color={themeColors.iconMuted} />
-            </Pressable>
-          )}
+      <AnimatedSection delay={60}>
+        <View style={styles.searchWrap}>
+          <View style={[styles.search, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Feather name="search" size={16} color={themeColors.iconMuted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search your notes…"
+              placeholderTextColor={themeColors.textMuted}
+              style={[styles.searchInput, { color: themeColors.text }]}
+              autoCorrect={false}
+            />
+            {query.length > 0 && (
+              <Pressable onPress={() => setQuery('')} hitSlop={10}>
+                <Feather name="x-circle" size={16} color={themeColors.iconMuted} />
+              </Pressable>
+            )}
+          </View>
         </View>
-      </View>
+      </AnimatedSection>
 
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -183,11 +218,11 @@ export default function NotesScreen({ navigation }) {
           </View>
         ) : (
           <View style={{ gap: 12 }}>
-            {filtered.map((note) => {
+            {filtered.map((note, idx) => {
               const editing = editingId === note.courseId;
               return (
+                <AnimatedSection key={note.courseId} delay={Math.min(idx * 50, 300)}>
                 <View
-                  key={note.courseId}
                   style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
                 >
                   <View style={styles.cardTop}>
@@ -225,13 +260,13 @@ export default function NotesScreen({ navigation }) {
                         style={[
                           styles.editor,
                           {
-                            backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#EAF7FD',
                             borderColor: themeColors.border,
                             color: themeColors.text,
                           },
                         ]}
                       />
-                      <Pressable
+                      <PressScale
                         disabled={saving || !draft.trim()}
                         onPress={() => saveEdit(note)}
                         style={[
@@ -240,7 +275,7 @@ export default function NotesScreen({ navigation }) {
                         ]}
                       >
                         <Text style={styles.saveText}>{saving ? 'Saving…' : 'Save'}</Text>
-                      </Pressable>
+                      </PressScale>
                     </>
                   ) : (
                     <Text style={[styles.noteBody, { color: themeColors.textMuted }]} numberOfLines={5}>
@@ -248,6 +283,7 @@ export default function NotesScreen({ navigation }) {
                     </Text>
                   )}
                 </View>
+                </AnimatedSection>
               );
             })}
           </View>

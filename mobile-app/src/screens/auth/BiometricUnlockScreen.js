@@ -20,6 +20,7 @@ import Banner from '../../components/Banner';
 import { useAuth } from '../../context/AuthContext';
 import { getBiometricCapability, promptBiometric } from '../../utils/biometrics';
 import { colors, radius, shadow } from '../../theme';
+import { FadeSlideIn } from '../../components/Motion';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
 
@@ -74,7 +75,7 @@ export default function BiometricUnlockScreen() {
     <SafeAreaView style={styles.container}>
       <RNStatusBar barStyle="light-content" backgroundColor={colors.navyDark} />
 
-      <View style={styles.content}>
+      <FadeSlideIn duration={420} style={styles.content}>
         <View style={styles.iconRing}>
           <Feather name={icon} size={38} color={colors.primaryBright} />
         </View>
@@ -97,7 +98,7 @@ export default function BiometricUnlockScreen() {
             <Text style={styles.signOutText}>Sign out and use password</Text>
           </Pressable>
         </View>
-      </View>
+      </FadeSlideIn>
     </SafeAreaView>
   );
 }
@@ -115,9 +116,9 @@ const styles = StyleSheet.create({
     width: 92,
     height: 92,
     borderRadius: 46,
-    backgroundColor: 'rgba(59,130,246,0.14)',
+    backgroundColor: 'rgba(20,120,184,0.14)',
     borderWidth: 1.5,
-    borderColor: 'rgba(59,130,246,0.35)',
+    borderColor: 'rgba(20,120,184,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 26,

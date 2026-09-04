@@ -299,5 +299,60 @@ router.post('/:id/duplicate', protect, async (req, res) => {
   }
 });
 
+// @desc    Render this resume to a PDF and return a downloadable URL.
+//          Mobile's export path: it has no DOM for the web's html2canvas
+//          render, so the server renders with pdfkit (services/resumePdf.js)
+//          into the public uploads mount. The filename carries a random
+//          suffix so it can't be guessed from the resume id, and previous
+//          exports of the same resume are removed on each render.
+// @route   GET /api/resumes/:id/pdf
+// @access  Private
+router.get('/:id/pdf', protect, resumeExportLimiter, async (req, res) => {
+  try {
+    const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!resume) {
+      return res.status(404).json({ success: false, message: 'Resume not found' });
+    }
+
+    // Reuse an existing verification record (created by POST /:id/export) so
+    // the PDF footer carries the same public ID recruiters can verify.
+    let verification = null;
+    const fingerprint = buildResumeFingerprint(resume.toObject());
+    const record = await ResumeVerification.findOne({ userId: req.user._id, fingerprint });
+    if (record) {
+      const origin =
+        process.env.FRONTEND_URL ||
+        process.env.CLIENT_URL ||
+        `${req.protocol}://${req.get('host')}`;
+      verification = {
+        resumePublicId: record.resumePublicId,
+        verificationUrl: `${origin.replace(/\/$/, '')}${buildVerificationPath(record.resumePublicId, record.fingerprint)}`,
+      };
+    }
+
+    const { renderResumePdf } = require('../services/resumePdf');
+    const buffer = await renderResumePdf(resume, verification);
+
+    const fs = require('fs');
+    const path = require('path');
+    const crypto = require('crypto');
+    const dir = path.join(__dirname, '..', 'uploads', 'resumes');
+    fs.mkdirSync(dir, { recursive: true });
+
+    const prefix = `resume-${resume._id}-`;
+    for (const f of fs.readdirSync(dir)) {
+      if (f.startsWith(prefix)) fs.unlinkSync(path.join(dir, f));
+    }
+
+    const filename = `${prefix}${crypto.randomBytes(8).toString('hex')}.pdf`;
+    fs.writeFileSync(path.join(dir, filename), buffer);
+
+    res.json({ success: true, url: `/uploads/resumes/${filename}` });
+  } catch (error) {
+    console.error('[Resumes] PDF export failed:', error);
+    res.status(500).json({ success: false, message: 'Failed to render the resume PDF' });
+  }
+});
+
 module.exports = router;
 

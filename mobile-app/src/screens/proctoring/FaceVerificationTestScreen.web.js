@@ -24,7 +24,7 @@ export default function FaceVerificationTestScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBg,
+    backgroundColor: colors.surface,
     padding: 24,
     borderRadius: 12,
     borderWidth: 1,
@@ -34,12 +34,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.muted,
     lineHeight: 20,
     marginBottom: 16,
   },

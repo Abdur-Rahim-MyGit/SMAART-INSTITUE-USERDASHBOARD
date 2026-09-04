@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.navyDarkest,
     borderTopLeftRadius: 36,
     borderTopRightRadius: 36,
     ...shadow.card,
