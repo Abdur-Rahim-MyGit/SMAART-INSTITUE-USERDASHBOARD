@@ -193,7 +193,17 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    // Theater mode and layout animations resize the player without a window
+    // resize; observe the element itself so the confetti canvas matches it.
+    let observer = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      observer = new ResizeObserver(() => updateDimensions());
+      observer.observe(containerRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      if (observer) observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -764,13 +774,13 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
             className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Confetti — lighter count so it doesn't obscure the card */}
-            <div className="absolute inset-0 pointer-events-none">
+            {/* Confetti sized to the player; more pieces on a larger player */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <Confetti
                 width={containerDimensions.width}
                 height={containerDimensions.height}
                 recycle={false}
-                numberOfPieces={180}
+                numberOfPieces={containerDimensions.width > 1100 ? 320 : 180}
                 gravity={0.18}
                 colors={['#045C9A', '#072036', '#FFD700', '#FFFFFF', '#34d399']}
               />
@@ -782,7 +792,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.85, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 260, damping: 22, delay: 0.15 }}
-              className="relative bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-2xl rounded-2xl px-6 py-5 sm:px-8 sm:py-6 w-[90%] max-w-[280px] shadow-2xl border border-white/10 text-center"
+              className="relative bg-[#072036]/95 backdrop-blur-2xl rounded-2xl px-6 py-6 sm:px-10 sm:py-8 w-[90%] max-w-[300px] sm:max-w-[440px] shadow-2xl border border-white/10 text-center"
             >
               {/* Subtle glow behind card */}
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#045C9A]/15 to-emerald-500/10 -z-10 blur-xl" />
@@ -792,12 +802,12 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 initial={{ scale: 0, rotate: -30 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 280, delay: 0.3 }}
-                className="w-11 h-11 sm:w-13 sm:h-13 mx-auto mb-2 sm:mb-3 relative"
+                className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 relative"
               >
-                <div className="w-11 h-11 sm:w-13 sm:h-13 mx-auto bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-600/30">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-600/30">
                   <motion.svg
                     viewBox="0 0 24 24"
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-current"
+                    className="w-6 h-6 sm:w-8 sm:h-8 text-white stroke-current"
                     fill="none"
                     strokeWidth="3.2"
                     strokeLinecap="round"
@@ -825,7 +835,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       top: `${50 + 48 * Math.sin(i * 2.5)}%`,
                     }}
                   >
-                    <Sparkles fill={1} className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                    <Sparkles fill={1} className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
                   </motion.div>
                 ))}
               </motion.div>
@@ -836,17 +846,17 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.55 }}
               >
-                <h3 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">
-                  Awesome Job! 🎉
+                <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight tracking-tight">
+                  Awesome job!
                 </h3>
-                <p className="text-white/60 text-xs font-medium mt-1 mb-4">
+                <p className="text-white/70 text-sm sm:text-[15px] font-medium mt-1.5 mb-6">
                   Lesson completed successfully
                 </p>
               </motion.div>
 
               {/* Action buttons — compact row */}
               <motion.div
-                className="flex gap-2 justify-center items-center"
+                className="flex gap-3 justify-center items-center"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
@@ -859,11 +869,11 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       videoRef.current.play();
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15
-                             text-white/90 text-xs font-semibold hover:bg-white/5 hover:border-white/25
+                  className="flex items-center gap-2 px-4 py-2.5 sm:px-5 rounded-xl border border-white/20
+                             text-white text-sm font-semibold hover:bg-white/10 hover:border-white/30
                              transition-all active:scale-95 cursor-pointer"
                 >
-                  <RotateCcw className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <RotateCcw className="w-4 h-4" />
                   Replay
                 </button>
                 <button
@@ -871,14 +881,13 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     setShowSuccess(false);
                     if (onNext) onNext();
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl
-                             bg-gradient-to-r from-[#045C9A] via-[#045C9A] to-[#045C9A]
-                             text-white text-xs font-semibold
-                             shadow-md shadow-[#072036]/30 hover:shadow-lg hover:shadow-[#045C9A]/20
+                  className="flex items-center gap-2 px-5 py-2.5 sm:px-6 rounded-xl
+                             bg-[#A6D7E8] text-[#072036] text-sm font-semibold
+                             shadow-md shadow-black/30 hover:bg-white
                              transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
                 >
                   {onNext ? nextLabel : 'Continue'}
-                  <Play fill={1} className="w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5" />
+                  <Play fill={1} className="w-4 h-4" />
                 </button>
               </motion.div>
             </motion.div>
