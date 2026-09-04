@@ -410,20 +410,20 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
             {/* Radial progress */}
             <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${PANEL}`}>
-              <div className="relative h-11 w-11 shrink-0">
+              <div className="relative h-14 w-14 shrink-0">
                 <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" className="stroke-[#A6D7E8]/50 dark:stroke-white/10" strokeWidth="10" fill="none" />
+                  <circle cx="50" cy="50" r="42" className="stroke-[#A6D7E8]/50 dark:stroke-white/10" strokeWidth="8" fill="none" />
                   <motion.circle
-                    cx="50" cy="50" r="40"
+                    cx="50" cy="50" r="42"
                     className="stroke-[#045C9A] dark:stroke-[#A6D7E8]"
-                    strokeWidth="10" strokeLinecap="round" fill="none"
-                    initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
-                    animate={{ strokeDashoffset: 251.2 - (251.2 * (pct || 0)) / 100 }}
+                    strokeWidth="8" strokeLinecap="round" fill="none"
+                    initial={{ strokeDasharray: "263.9", strokeDashoffset: "263.9" }}
+                    animate={{ strokeDashoffset: 263.9 - (263.9 * (pct || 0)) / 100 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-bold tabular-nums text-[#072036] dark:text-white">
+                  <span className={`font-bold tabular-nums leading-none text-[#072036] dark:text-white ${(pct || 0) >= 100 ? "text-[10px]" : "text-xs"}`}>
                     {pct || 0}%
                   </span>
                 </div>
