@@ -23,6 +23,8 @@ import {
   RiAlertLine as AlertTriangle,
   IconId as Fingerprint,
   ShieldCheck,
+  Check,
+  ClipboardCheck,
   Play,
   HelpCircle,
   Layers,
@@ -113,6 +115,39 @@ const COURSE_THEME = {
     "bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none",
 };
 
+/* Pre-start acknowledgements. Every item must be ticked before the learning
+   journey can begin; the copy lives in translation.json under course_player. */
+const COURSE_GUIDELINES = [
+  {
+    id: "active_engagement",
+    titleKey: "course_player.guideline_engagement_title",
+    titleDefault: "Active Engagement",
+    textKey: "course_player.guideline_engagement_text",
+    textDefault: "User inactivity of 5 minutes or more is automatically recorded for security & progress validation.",
+  },
+  {
+    id: "academic_integrity",
+    titleKey: "course_player.guideline_integrity_title",
+    titleDefault: "Academic Integrity",
+    textKey: "course_player.guideline_integrity_text",
+    textDefault: "All assessments and reflections must be completed independently by the enrolled student.",
+  },
+  {
+    id: "sequential_order",
+    titleKey: "course_player.guideline_sequence_title",
+    titleDefault: "Sequential Order",
+    textKey: "course_player.guideline_sequence_text",
+    textDefault: "Lessons must be completed in order to unlock subsequent modules and assessments.",
+  },
+  {
+    id: "certification_eligibility",
+    titleKey: "course_player.guideline_certification_title",
+    titleDefault: "Certification Eligibility",
+    textKey: "course_player.guideline_certification_text",
+    textDefault: "Official course completion is granted upon meeting all required milestone criteria.",
+  },
+];
+
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -138,6 +173,11 @@ const CoursePlayer = () => {
   const [dynamicFlow, setDynamicFlow] = useState(null);
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
+  const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
+  const acknowledgedCount = COURSE_GUIDELINES.filter((g) => acknowledgedGuidelines[g.id]).length;
+  const allGuidelinesAcknowledged = acknowledgedCount === COURSE_GUIDELINES.length;
+  const toggleGuideline = (id) =>
+    setAcknowledgedGuidelines((prev) => ({ ...prev, [id]: !prev[id] }));
   const [activeStep, setActiveStep] = useState(null);
   const [completedSteps, setCompletedSteps] = useState({});
   const [activeTab, setActiveTab] = useState('preview');
@@ -564,6 +604,10 @@ const CoursePlayer = () => {
   };
 
   const handleStartCourse = () => {
+    if (!allGuidelinesAcknowledged) {
+      toast.warning(t("course_player.acknowledge_all_guidelines", "Please acknowledge all guidelines to continue."));
+      return;
+    }
     setShowIntro(false);
     const allDone = stepNumbers.every(step => completedSteps[step]);
     const resumeStep = stepNumbers.find(step => !completedSteps[step]) || (allDone ? lastStepKey : '1');
@@ -1158,30 +1202,75 @@ const CoursePlayer = () => {
                         </div>
                       )}
 
-                      {/* Important Disclaimers & Guidelines Box */}
-                      <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Important Disclaimers &amp; Guidelines</span>
+                      {/* Important Disclaimers & Guidelines - acknowledgement checklist */}
+                      <div className="rounded-2xl border border-[#d7ebf5] bg-[#F1F5F9] p-5 dark:border-[#045C9A]/25 dark:bg-[#072036]/60">
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-white/10">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="p-1.5 bg-[#045C9A]/10 dark:bg-[#045C9A]/20 rounded-lg shrink-0">
+                              <ClipboardCheck className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#072036] dark:text-white">
+                                {t("course_player.important_guidelines", "Important Disclaimers & Guidelines")}
+                              </p>
+                              <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                                {t("course_player.guidelines_hint", "Please read and acknowledge each point before you begin.")}
+                              </p>
+                            </div>
+                          </div>
+                          <span
+                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest tabular-nums transition-colors ${
+                              allGuidelinesAcknowledged
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                : "border-[#d7ebf5] bg-white text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300"
+                            }`}
+                          >
+                            {t("course_player.guidelines_progress", "{{done}} of {{total}} acknowledged", {
+                              done: acknowledgedCount,
+                              total: COURSE_GUIDELINES.length,
+                            })}
+                          </span>
                         </div>
-                        
-                        <div className="grid grid-cols-1 gap-x-5 gap-y-2.5 text-[13px] font-medium leading-relaxed text-amber-900/90 dark:text-amber-300/90 md:grid-cols-2">
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Active Engagement:</strong> User inactivity of 5 minutes or more is automatically recorded for security & progress validation.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Academic Integrity:</strong> All assessments and reflections must be completed independently by the enrolled student.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Sequential Order:</strong> Lessons must be completed in order to unlock subsequent modules and assessments.</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
-                            <span><strong>Certification Eligibility:</strong> Official course completion is granted upon meeting all required milestone criteria.</span>
-                          </div>
+
+                        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                          {COURSE_GUIDELINES.map((guideline) => {
+                            const checked = !!acknowledgedGuidelines[guideline.id];
+                            return (
+                              <label
+                                key={guideline.id}
+                                className={`group flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors select-none ${
+                                  checked
+                                    ? "border-[#045C9A]/40 bg-white dark:border-[#A6D7E8]/40 dark:bg-[#0d3a5f]"
+                                    : "border-[#d7ebf5] bg-white hover:border-[#045C9A]/30 dark:border-white/10 dark:bg-[#0d3a5f]/60 dark:hover:border-[#A6D7E8]/30"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="peer sr-only"
+                                  checked={checked}
+                                  onChange={() => toggleGuideline(guideline.id)}
+                                />
+                                <span
+                                  aria-hidden="true"
+                                  className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[#045C9A]/40 ${
+                                    checked
+                                      ? "border-[#045C9A] bg-[#045C9A] text-white dark:border-[#A6D7E8] dark:bg-[#A6D7E8] dark:text-[#072036]"
+                                      : "border-slate-300 bg-white group-hover:border-[#045C9A] dark:border-white/25 dark:bg-transparent dark:group-hover:border-[#A6D7E8]"
+                                  }`}
+                                >
+                                  {checked && <Check className="w-3 h-3" />}
+                                </span>
+                                <span className="min-w-0 text-[13px] leading-relaxed">
+                                  <span className="block font-bold text-[#072036] dark:text-white">
+                                    {t(guideline.titleKey, guideline.titleDefault)}
+                                  </span>
+                                  <span className="block font-medium text-slate-600 dark:text-slate-400">
+                                    {t(guideline.textKey, guideline.textDefault)}
+                                  </span>
+                                </span>
+                              </label>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -1197,7 +1286,11 @@ const CoursePlayer = () => {
                           whileTap={{ scale: 0.98 }}
                           type="button"
                           onClick={handleStartCourse}
-                          className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold transition-colors sm:w-auto ${currentTheme.btnClass}`}
+                          disabled={!allGuidelinesAcknowledged}
+                          title={allGuidelinesAcknowledged ? undefined : t("course_player.acknowledge_all_guidelines", "Please acknowledge all guidelines to continue.")}
+                          className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold transition-all sm:w-auto ${currentTheme.btnClass} ${
+                            allGuidelinesAcknowledged ? "cursor-pointer" : "cursor-not-allowed opacity-50 shadow-none"
+                          }`}
                         >
                           <span>
                             {Object.keys(completedSteps).length > 0
