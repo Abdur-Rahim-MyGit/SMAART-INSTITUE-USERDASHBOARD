@@ -919,7 +919,7 @@ const CoursePlayer = () => {
               <div
                 className={
                   isTheater
-                    ? "order-first relative -mx-5 -mt-5 mb-6 overflow-hidden bg-black sm:-mx-7 sm:-mt-7"
+                    ? "order-first relative mb-6"
                     : "rounded-2xl overflow-hidden relative"
                 }
               >
@@ -929,7 +929,12 @@ const CoursePlayer = () => {
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                <div className="w-full">
+                {/* Theater: as wide as the screen height allows, so the whole
+                    video and its controls stay on screen without scrolling. */}
+                <div
+                  className={isTheater ? "mx-auto w-full rounded-2xl overflow-hidden" : "w-full"}
+                  style={isTheater ? { maxWidth: "calc((100vh - 13rem) * 16 / 9)" } : undefined}
+                >
                   <CustomVideoPlayer
                     videoUrl={playbackUrl}
                     title={stepData.title}
