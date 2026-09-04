@@ -173,6 +173,10 @@ const OBJECT_CONDITIONS = {
   book: 'book_detected',
   laptop: 'laptop_detected',
 };
+// An object has to be seen on this many consecutive ticks before its condition
+// opens. One tick is a single frame; a book turned edge-on or a hand passing
+// the lens can read as a phone for exactly one frame.
+const OBJECT_CONFIRM_TICKS = 2;
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -378,6 +382,8 @@ export const useProctoringEngine = ({
   // reported once rather than every window that follows it.
   const livenessRef = useRef(null);
   const spoofReportedRef = useRef(false);
+  // Consecutive detection ticks per object label (see OBJECT_CONFIRM_TICKS).
+  const objectSeenTicksRef = useRef({});
   // Consecutive ArcFace frames that disagreed with the registered face. One
   // bad frame is a blink or a turn; several in a row is a different person.
   const mismatchStreakRef = useRef(0);
@@ -1266,8 +1272,11 @@ export const useProctoringEngine = ({
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
-        if (labels.has(label)) observeCondition(condition);
-        else clearCondition(condition);
+        const seen = labels.has(label);
+        const ticks = seen ? (objectSeenTicksRef.current[label] || 0) + 1 : 0;
+        objectSeenTicksRef.current[label] = ticks;
+        if (ticks >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
+        else if (!seen) clearCondition(condition);
       });
     } catch (err) {
       console.warn('[ProctoringEngine] Object detection tick failed:', err);
