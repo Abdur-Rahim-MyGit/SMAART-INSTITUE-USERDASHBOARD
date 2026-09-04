@@ -37,12 +37,16 @@ const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
 // opset=12) and it is picked up without a code change. Bigger is markedly
 // better on small, plain objects such as the back of a phone; it is also
 // slower, which the engine tolerates by skipping a tick rather than stacking.
-// On the main thread only the small model is ever loaded: it is the fallback
-// for browsers without Web Workers. With a worker, objectDetection.worker.js
-// owns object detection and tries the larger exports first.
+// The main thread loads object-detection models ONLY as a fallback for
+// browsers without Web Workers, which in practice is none. With a worker,
+// objectDetection.worker.js owns object detection end to end and tries the
+// larger exports first. Loading anything here too used to mean a second,
+// redundant model download racing the worker's for the same bandwidth on
+// every fresh page load -- pure waste on the slow first load candidates
+// actually feel, contributing to it rather than helping it.
 const YOLO_MODEL_CANDIDATES = (typeof Worker === 'undefined'
   ? ['yolov8m.onnx', 'yolov8s.onnx', 'yolov8n.onnx']
-  : ['yolov8n.onnx']).map((f) => `${MODEL_BASE}/${f}`);
+  : []).map((f) => `${MODEL_BASE}/${f}`);
 let yoloModelName = null;
 const YOLO_INPUT_SIZE = 640;
 const YOLO_SCORE_THRESHOLD = 0.40;
@@ -180,7 +184,9 @@ export const initPipeline = async (onProgress) => {
     report(95, 'ArcFace loaded ✓');
 
     // OPTIONAL object detector. Its absence must NEVER break the face pipeline —
-    // if the model file isn't present, object detection simply no-ops.
+    // if the model file isn't present, object detection simply no-ops. Empty
+    // on every realistic browser now (see YOLO_MODEL_CANDIDATES above) — the
+    // worker owns this — so this loop is a no-op there and costs nothing.
     report(97, 'Loading object detector (YOLO)...');
     yoloSession = null;
     for (const candidate of YOLO_MODEL_CANDIDATES) {
