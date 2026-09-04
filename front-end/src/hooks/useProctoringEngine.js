@@ -1298,13 +1298,19 @@ export const useProctoringEngine = ({
       if (found && found.length) {
         const summary = found.map((o) => `${o.label} ${o.score.toFixed(2)}`).join(', ');
         console.log(`[ProctoringEngine] Objects: ${summary}`);
-        setDiagnostics((d) => ({ ...d, objects: summary, objectsAt: Date.now() }));
+        setDiagnostics((d) => ({ ...d, objects: summary, objectsConfirmed: true, objectsAt: Date.now() }));
       } else {
-        // Weak guesses the model did not act on go to the console only. They
-        // are useful when tuning thresholds and misleading on the panel, where
-        // "near: laptop 0.17" read as a laptop being reported.
+        // Nothing cleared the bar. Show the model's best weak guess anyway,
+        // clearly marked as unconfirmed — "objects: none" carries no
+        // information for tuning; "below: book 0.14" says exactly what the
+        // model saw and by how much it missed.
         if (near?.length) console.debug(`[ProctoringEngine] Object near-misses: ${near.join(', ')}`);
-        setDiagnostics((d) => ({ ...d, objects: '', objectsAt: Date.now() }));
+        setDiagnostics((d) => ({
+          ...d,
+          objects: near?.length ? `below: ${near.join(', ')}` : '',
+          objectsConfirmed: false,
+          objectsAt: Date.now(),
+        }));
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {

@@ -460,7 +460,13 @@ export const ProctoringOverlay = ({
                 {/* Objects — what YOLO can actually see right now */}
                 <div className="flex justify-between gap-2">
                   <span className="text-slate-400">objects</span>
-                  <span className={diagnostics.objects ? 'text-amber-600' : 'text-slate-400'}>
+                  <span className={
+                    diagnostics.objectsConfirmed
+                      ? 'text-amber-600 font-bold'
+                      : diagnostics.objects
+                        ? 'text-slate-400 italic'
+                        : 'text-slate-400'
+                  }>
                     {diagnostics.objects || 'none'}
                   </span>
                 </div>
