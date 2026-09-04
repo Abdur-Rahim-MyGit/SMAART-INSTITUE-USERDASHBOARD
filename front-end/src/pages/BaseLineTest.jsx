@@ -812,14 +812,10 @@ const BaseLineTest = () => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
-  // Once the report is on screen the proctored session is over: clear any
-  // scroll lock left behind by a modal, start the report at the top, and leave
-  // browser fullscreen so the student gets a normal, scrollable results page.
+  // Once the report is on screen the proctored session is over: leave browser
+  // fullscreen so the student gets a normal, scrollable results page.
   useEffect(() => {
     if (!submitted) return;
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     const fullscreenElement =
       document.fullscreenElement ||
       document.webkitFullscreenElement ||
