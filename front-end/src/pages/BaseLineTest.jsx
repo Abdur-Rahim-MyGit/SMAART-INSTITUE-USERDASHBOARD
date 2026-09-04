@@ -810,6 +810,26 @@ const BaseLineTest = () => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
+  // Once the results page is shown the proctored session is over: make sure
+  // nothing left behind by the test (fullscreen mode, a body scroll lock from
+  // a modal) stops the user from scrolling the report.
+  useEffect(() => {
+    if (!submitted) return;
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+    const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsElement) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        const result = exit?.call(document);
+        if (result && typeof result.catch === "function") result.catch(() => {});
+      } catch {
+        /* ignore — leaving fullscreen is best-effort */
+      }
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [submitted]);
+
   useEffect(() => {
     if (submitted || loading) return;
 
@@ -940,7 +960,7 @@ const BaseLineTest = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300 flex flex-col justify-center">
+    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300 ${submitted ? 'overflow-y-auto' : 'flex flex-col justify-center'}`}>
       {!submitted && !loading && !error && !setupCompleted && (
         <ProctoringSetup
           onComplete={({ faceDescriptor, allEmbeddings, alignedCrops, registrationQualityScore, registrationCropUrl }) => {
@@ -962,7 +982,7 @@ const BaseLineTest = () => {
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
       </div>
-      <main className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto min-h-[calc(100vh-4rem)] flex flex-col justify-center relative z-10 w-full">
+      <main className={`p-4 md:p-6 lg:p-8 max-w-6xl mx-auto relative z-10 w-full ${submitted ? 'pb-16' : 'min-h-[calc(100vh-4rem)] flex flex-col justify-center'}`}>
         {/* Immersive mesh glow effects */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <motion.div
@@ -1234,29 +1254,41 @@ const BaseLineTest = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-5xl mx-auto py-8 px-4"
+            className="w-full max-w-5xl mx-auto py-4 sm:py-8"
           >
             {/* Main Results Card */}
-            {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-blue-900/40 rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto relative text-slate-900 dark:text-white">
-              
-              {/* Top Left User Info */}
-              <div className="absolute top-8 left-8 hidden sm:block text-left">
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{user?.fullName}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{user?.studentId}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.college?.collegeName || user?.collegeName || t("baseline_test.student", "Student")}</p>
-              </div>
+            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-blue-900/40 rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10 max-w-4xl mx-auto relative text-slate-900 dark:text-white">
 
-              {/* Header Section */}
-              <div className="text-center mb-10 border-b border-slate-100 dark:border-white/8 pb-8 sm:mt-2">
-
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
-                </h2>
+              {/* Header Section: candidate on the left, outcome on the right */}
+              <div className="mb-8 border-b border-slate-100 dark:border-white/8 pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+                  <div className="text-left min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 mb-1">{t("baseline_test.candidate", "Candidate")}</p>
+                    <p className="text-base font-bold text-slate-800 dark:text-slate-100 leading-tight">{user?.fullName}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{user?.studentId}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 break-words">{user?.college?.collegeName || user?.collegeName || t("baseline_test.student", "Student")}</p>
+                  </div>
+                  <div className="text-left sm:text-right sm:flex-shrink-0">
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-2">
+                      {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
+                    </h2>
+                    <div className="flex flex-wrap items-center sm:justify-end gap-x-2 gap-y-1 text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+                      <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
+                      <span className="text-slate-300 dark:text-slate-600">|</span>
+                      <span>S_{stageConfig.name.toLowerCase()}</span>
+                      {testResults?.attemptNumber && (
+                        <>
+                          <span className="text-slate-300 dark:text-slate-600">|</span>
+                          <span className="font-bold text-slate-700 dark:text-slate-200">Attempt #{testResults.attemptNumber}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Pass/Fail Badge for multi-attempt stages */}
                 {stageConfig.maxAttempts > 1 && testResults && (
-                  <div className="mb-3">
+                  <div className="mt-5">
                     {testResults.passed ? (
                       <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-sm font-bold border border-emerald-200 dark:border-emerald-500/20">
                         <CheckCircle2 className="w-4 h-4" /> PASSED — Score: {testResults.stageScore}% (Required: {stageConfig.passingPercentage}%)
@@ -1280,7 +1312,7 @@ const BaseLineTest = () => {
 
                 {/* Certificate earned chip (auto-issued on passing a stage gate) */}
                 {testResults?.passed && ['T2', 'T3', 'T4'].includes(stageKey) && (
-                  <div className="mb-3">
+                  <div className="mt-4">
                     <button
                       onClick={() => navigate('/dashboard/skills-vault')}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/5 dark:bg-[#1a3884]/10 text-[#1a3884] dark:text-blue-300 text-sm font-bold border border-[#1a3884]/20 hover:bg-[#1a3884]/10 transition"
@@ -1290,21 +1322,10 @@ const BaseLineTest = () => {
                   </div>
                 )}
 
-                <div className="flex items-center justify-center gap-2 text-slate-550 dark:text-slate-455 text-sm">
-                  <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
-                  <span>|</span>
-                  <span>S_{stageConfig.name.toLowerCase()}</span>
-                  {testResults?.attemptNumber && (
-                    <>
-                      <span>|</span>
-                      <span className="font-bold">Attempt #{testResults.attemptNumber}</span>
-                    </>
-                  )}
-                </div>
               </div>
 
               {/* Professional Score Display */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-6 border border-slate-150 dark:border-blue-900/40">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 mb-10 bg-slate-50 dark:bg-[#00152E]/60 rounded-xl p-6 border border-slate-150 dark:border-blue-900/40">
                 <div className="text-center md:text-right">
                   <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{t("baseline_test.overall_score", "Overall Score")}</div>
                   <div className="text-5xl font-bold text-slate-900 dark:text-white">
@@ -1350,15 +1371,19 @@ const BaseLineTest = () => {
               )}
 
               {/* Quotient Cards Grid */}
-              <div className="mb-12 relative z-10">
-                <motion.h3
+              <div className="mb-10 relative z-10">
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="text-3xl font-black text-[#002147] dark:text-white text-center mb-8"
+                  className="flex items-center gap-3 mb-6"
                 >
-                  {t("baseline_test.quotient_breakdown", "Quotient-Wise Breakdown")}
-                </motion.h3>
+                  <span className="w-1 h-5 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                  <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-[#002147] dark:text-white">
+                    {t("baseline_test.quotient_breakdown", "Quotient-Wise Breakdown")}
+                  </h3>
+                  <span className="flex-1 h-px bg-slate-100 dark:bg-white/8" />
+                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {(testResults?.quotientProfile || testResults?.t1Profile) ? Object.entries(testResults?.quotientProfile || testResults?.t1Profile).map(([quotient, data], index) => {
@@ -1453,7 +1478,7 @@ const BaseLineTest = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 mb-8 flex-wrap"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mt-10 flex-wrap"
               >
                 <button
                   onClick={() => downloadReport(user, testResults)}
