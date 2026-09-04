@@ -1296,9 +1296,11 @@ export const useProctoringEngine = ({
         console.log(`[ProctoringEngine] Objects: ${summary}`);
         setDiagnostics((d) => ({ ...d, objects: summary, objectsAt: Date.now() }));
       } else {
-        // Show what the model saw but did not act on, so "not detected" can
-        // be told apart from "seen at 0.28 against a 0.35 bar".
-        setDiagnostics((d) => ({ ...d, objects: near?.length ? `near: ${near.join(', ')}` : '', objectsAt: Date.now() }));
+        // Weak guesses the model did not act on go to the console only. They
+        // are useful when tuning thresholds and misleading on the panel, where
+        // "near: laptop 0.17" read as a laptop being reported.
+        if (near?.length) console.debug(`[ProctoringEngine] Object near-misses: ${near.join(', ')}`);
+        setDiagnostics((d) => ({ ...d, objects: '', objectsAt: Date.now() }));
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
