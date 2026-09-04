@@ -138,7 +138,7 @@ const IDENTITY_MISMATCH_STREAK = 3;
 // needs consecutive detections to get there — so a phone held in plain view
 // could be missed indefinitely. At 1.5 s two ticks fit inside the grace window,
 // so brief occlusions no longer reset the timer.
-const OBJECT_CHECK_INTERVAL = 1000;
+const OBJECT_CHECK_INTERVAL = 700;
 
 // ── Liveness (presentation-attack detection) ────────────────────────────────
 // There is no anti-spoof model in the bundle — the shipped MN3-AntiSpoof file
@@ -179,8 +179,16 @@ const OBJECT_CONDITIONS = {
 // whole window before it clears. One tick is a single frame: a book turned
 // edge-on or a hand passing the lens can read as a phone for one frame, and
 // the detector's alternating zoom passes can miss a real phone on the off tick.
+//
+// That protection costs several seconds even on a clean, obvious hold — a
+// held-up phone filling the frame scores nothing like a stray edge case (0.88
+// observed in the field, against a 0.25 accept bar). A score comfortably
+// above the accept bar is not the kind of thing one bad frame produces, so it
+// fires the condition on the spot; only a borderline score pays the
+// multi-tick toll.
 const OBJECT_CONFIRM_TICKS = 3;
 const OBJECT_CONFIRM_WINDOW = 5;
+const OBJECT_INSTANT_SCORE = { phone: 0.55, book: 0.55, laptop: 0.55 };
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -1314,10 +1322,13 @@ export const useProctoringEngine = ({
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
-        const history = [...(objectSeenTicksRef.current[label] || []), labels.has(label)].slice(-OBJECT_CONFIRM_WINDOW);
+        const seen = labels.has(label);
+        const history = [...(objectSeenTicksRef.current[label] || []), seen].slice(-OBJECT_CONFIRM_WINDOW);
         objectSeenTicksRef.current[label] = history;
         const hits = history.filter(Boolean).length;
-        if (hits >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
+        const hit = seen && (found || []).find((o) => o.label === label);
+        const highConfidence = hit && hit.score >= (OBJECT_INSTANT_SCORE[label] ?? Infinity);
+        if (highConfidence || hits >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
         else if (hits === 0) clearCondition(condition);
       });
     } catch (err) {
