@@ -934,7 +934,7 @@ const CoursePlayer = () => {
                 transition={LAYOUT_TRANSITION}
                 className={
                   theaterLayout
-                    ? "order-first relative mb-6"
+                    ? "order-first relative -mx-4 sm:-mx-6 lg:-mx-8 mb-5 bg-black h-[calc(100vh-4.75rem)] min-h-[360px]"
                     : "rounded-2xl overflow-hidden relative"
                 }
               >
@@ -944,13 +944,12 @@ const CoursePlayer = () => {
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                {/* Theater: as wide as the screen height allows, so the whole
-                    video and its controls stay on screen without scrolling. */}
+                {/* Theater: the band is as tall as the viewport; the player takes
+                    that height and centres itself, leaving black on either side. */}
                 <motion.div
                   layout
                   transition={LAYOUT_TRANSITION}
-                  className={theaterLayout ? "mx-auto w-full rounded-2xl overflow-hidden" : "w-full"}
-                  style={theaterLayout ? { maxWidth: "calc((100vh - 13rem) * 16 / 9)" } : undefined}
+                  className={theaterLayout ? "mx-auto h-full max-w-full aspect-video" : "w-full"}
                 >
                   <CustomVideoPlayer
                     videoUrl={playbackUrl}
@@ -968,7 +967,7 @@ const CoursePlayer = () => {
                       setActiveStep(nextStep);
                       setVideoWatched(false);
                     } : null}
-                    isTheater={isTheater}
+                    isTheater={theaterLayout}
                     onToggleTheater={toggleTheater}
                   />
                 </motion.div>
@@ -1193,49 +1192,30 @@ const CoursePlayer = () => {
         </div>
 
         {/* Main Content */}
-        <main className="pt-2 sm:pt-4 space-y-6">
+        <main className={theaterLayout ? "space-y-6" : "pt-2 sm:pt-4 space-y-6"}>
           {/* Course Info Header */}
           {!showIntro && (
-            <AnimatePresence mode="wait" initial={false}>
-            {theaterLayout ? (
-              <motion.div
-                key="course-title-compact"
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.2 }}
-                className="text-left mb-4 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1"
-              >
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
-                </span>
-                <h1 className="text-lg font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
-                  {course.title}
-                </h1>
-                <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
-                  {course.subtitle}
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="course-title-full"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.2 }}
-                className="text-left mb-4 mt-1 space-y-1"
-              >
-                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
-                </span>
-                <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
-                  {course.title}
-                </h1>
-                <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
-                  {course.subtitle}
-                </p>
-              </motion.div>
-            )}
+            <AnimatePresence initial={false}>
+              {!theaterLayout && (
+                <motion.div
+                  key="course-title-full"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-left mb-4 mt-1 space-y-1"
+                >
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+                    {course.title}
+                  </h1>
+                  <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
+                    {course.subtitle}
+                  </p>
+                </motion.div>
+              )}
             </AnimatePresence>
           )}
 
@@ -1433,9 +1413,15 @@ const CoursePlayer = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={LAYOUT_TRANSITION}
-                        className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${theaterLayout ? "flex flex-col" : ""}`}
+                        className={
+                          theaterLayout
+                            ? "flex flex-col mb-6 text-left text-[#072036] dark:text-white"
+                            : "p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left"
+                        }
                       >
-                        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
+                        {!theaterLayout && (
+                          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
+                        )}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
                           <div className="flex items-center gap-3.5 min-w-0">
                             <div className="w-11 h-11 rounded-xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#072036]/15 shrink-0 tabular-nums">
@@ -1443,6 +1429,14 @@ const CoursePlayer = () => {
                             </div>
                             <div className="min-w-0">
                               <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {theaterLayout && (
+                                  <>
+                                    <span>{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                    <span>{course.title}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                  </>
+                                )}
                                 {t("course_player.step_of", "Step {{step}} of {{total}}", { step: activeStep, total: totalSteps })}
                               </p>
                               <h3 className="mt-0.5 text-lg sm:text-xl font-bold text-[#072036] dark:text-white leading-tight tracking-tight truncate">

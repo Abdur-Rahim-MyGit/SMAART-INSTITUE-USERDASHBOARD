@@ -464,7 +464,11 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   return (
     <div
       ref={containerRef}
-      className={`group relative aspect-video overflow-hidden cursor-pointer select-none transform-gpu bg-slate-950 rounded-2xl shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30 ${className}`}
+      className={`group relative aspect-video overflow-hidden cursor-pointer select-none transform-gpu bg-slate-950 ${
+        isTheater
+          ? 'rounded-none border-0 shadow-none w-full h-full'
+          : 'rounded-2xl shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30'
+      } ${className}`}
       style={{ transform: 'translateZ(0)' }}
       onMouseEnter={() => setShowControls(true)}
       onMouseMove={handleMouseMove}
