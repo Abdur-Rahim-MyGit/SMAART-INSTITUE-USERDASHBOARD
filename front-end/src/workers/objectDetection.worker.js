@@ -13,9 +13,10 @@ import * as ort from 'onnxruntime-web';
 
 ort.env.wasm.wasmPaths = '/onnx-wasm/';
 ort.env.wasm.simd = true;
-ort.env.wasm.numThreads = (typeof self !== 'undefined' && self.crossOriginIsolated)
-  ? Math.min(navigator.hardwareConcurrency || 2, 4)
-  : 1;
+// Multi-threaded WASM (numThreads > 1) hangs InferenceSession.create()
+// indefinitely once crossOriginIsolated is true — see the matching note in
+// services/onnxPipeline.js. Stay single-threaded unconditionally here too.
+ort.env.wasm.numThreads = 1;
 
 const MODEL_BASE = '/models/onnx';
 // First file present wins. A larger export dropped into public/models/onnx

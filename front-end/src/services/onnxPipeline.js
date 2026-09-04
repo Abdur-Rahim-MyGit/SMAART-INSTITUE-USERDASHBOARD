@@ -121,15 +121,16 @@ const configureOrtEnv = () => {
   // heavy 174 MB model is instead mitigated by running ArcFace identity checks
   // at a lower cadence than the 1 s SCRFD presence check (see
   // useProctoringEngine.runFaceVerification).
-  // Multi-threaded WASM needs SharedArrayBuffer, which requires cross-origin
-  // isolation (COOP/COEP headers). When available, use multiple threads — the
-  // single biggest SAFE speedup for the 174 MB ArcFace model and the likeliest
-  // cure for "face not detected" caused by a slow/stalled load on real machines.
-  // Otherwise stay single-threaded (previous behaviour), never crash.
+  // Multi-threaded WASM (numThreads > 1) needs SharedArrayBuffer, which
+  // requires cross-origin isolation (COOP/COEP headers) — and once that
+  // isolation was actually turned on, ORT's pthread worker pool hung
+  // indefinitely during InferenceSession.create() (no model fetch ever
+  // fires — confirmed via Network tab), the same class of worker-init
+  // failure the proxy note above already warned about. Blocking every
+  // assessment is far worse than the speedup, so stay single-threaded
+  // unconditionally until that hang is root-caused.
   // (SIMD is auto-detected by ORT 1.27 — no need to assert it.)
-  const isolated = (typeof self !== 'undefined' && self.crossOriginIsolated);
-  const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
-  ort.env.wasm.numThreads = isolated ? Math.min(cores, 8) : 1;
+  ort.env.wasm.numThreads = 1;
 };
 
 const report = (pct, msg) => {
