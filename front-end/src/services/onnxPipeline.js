@@ -37,7 +37,12 @@ const ARCFACE_MODEL = `${MODEL_BASE}/w600k_r50.onnx`;
 // opset=12) and it is picked up without a code change. Bigger is markedly
 // better on small, plain objects such as the back of a phone; it is also
 // slower, which the engine tolerates by skipping a tick rather than stacking.
-const YOLO_MODEL_CANDIDATES = ['yolov8m.onnx', 'yolov8s.onnx', 'yolov8n.onnx'].map((f) => `${MODEL_BASE}/${f}`);
+// On the main thread only the small model is ever loaded: it is the fallback
+// for browsers without Web Workers. With a worker, objectDetection.worker.js
+// owns object detection and tries the larger exports first.
+const YOLO_MODEL_CANDIDATES = (typeof Worker === 'undefined'
+  ? ['yolov8m.onnx', 'yolov8s.onnx', 'yolov8n.onnx']
+  : ['yolov8n.onnx']).map((f) => `${MODEL_BASE}/${f}`);
 let yoloModelName = null;
 const YOLO_INPUT_SIZE = 640;
 const YOLO_SCORE_THRESHOLD = 0.40;

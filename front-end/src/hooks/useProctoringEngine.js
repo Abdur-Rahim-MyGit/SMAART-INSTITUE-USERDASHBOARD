@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
 import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady, getLastObjectNearMisses } from '@/services/faceVerificationService';
+import { initObjectDetectionWorker, isObjectWorkerReady, getObjectWorkerModel, detectObjectsInWorker } from '@/workers/objectDetectionClient';
 import { proctoringApi } from '@/services/proctoringApi';
 import { startAudioMonitoring, stopAudioMonitoring, getLastGates } from '@/services/audioMonitorService';
 import { getPipelineStatus } from '@/services/onnxPipeline';
@@ -464,6 +465,10 @@ export const useProctoringEngine = ({
   useEffect(() => {
     workerRef.current = null;
     if (!isReady()) loadModels().catch(() => { });
+    // The object detector runs in its own worker so a large model never
+    // blocks the face checks or the page. Falls back to the main thread only
+    // where workers are unavailable.
+    initObjectDetectionWorker().catch(() => { });
   }, []);
 
   // Sync reference embeddings with the shared worker whenever they change.
@@ -1267,12 +1272,23 @@ export const useProctoringEngine = ({
 
   const runObjectDetection = async () => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
-    if (!videoRef.current || !isObjectDetectorReady()) return;
+    if (!videoRef.current) return;
+    const useWorker = isObjectWorkerReady();
+    if (!useWorker && !isObjectDetectorReady()) return;
     if (objectPassInFlightRef.current) return;
     objectPassInFlightRef.current = true;
 
     try {
-      const found = await detectObjects(videoRef.current);
+      let found, near;
+      if (useWorker) {
+        const result = await detectObjectsInWorker(videoRef.current);
+        if (!result) return; // worker busy with the previous frame: skip this tick
+        found = result.found;
+        near = result.nearMisses;
+      } else {
+        found = await detectObjects(videoRef.current);
+        near = getLastObjectNearMisses();
+      }
       const labels = new Set((found || []).map((o) => o.label));
 
       if (found && found.length) {
@@ -1282,8 +1298,7 @@ export const useProctoringEngine = ({
       } else {
         // Show what the model saw but did not act on, so "not detected" can
         // be told apart from "seen at 0.28 against a 0.35 bar".
-        const near = getLastObjectNearMisses();
-        setDiagnostics((d) => ({ ...d, objects: near.length ? `near: ${near.join(', ')}` : '', objectsAt: Date.now() }));
+        setDiagnostics((d) => ({ ...d, objects: near?.length ? `near: ${near.join(', ')}` : '', objectsAt: Date.now() }));
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
@@ -1744,7 +1759,12 @@ export const useProctoringEngine = ({
     const diagnosticsTimer = setInterval(() => {
       setDiagnostics((d) => ({
         ...d,
-        models: getPipelineStatus(),
+        models: {
+          ...getPipelineStatus(),
+          ...(isObjectWorkerReady()
+            ? { objectDetector: 'loaded', objectModel: `${getObjectWorkerModel()} · worker` }
+            : {}),
+        },
         audio: getLastGates(),
         // Objects go stale — a phone seen ten seconds ago is not in frame now.
         objects: Date.now() - d.objectsAt > 6000 ? '' : d.objects,
