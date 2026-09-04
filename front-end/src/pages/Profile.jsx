@@ -24,6 +24,7 @@ import {
   Shield,
   Trash2,
   TrendingUp,
+  Trophy,
   Upload,
   Users,
   X,
@@ -1450,9 +1451,9 @@ const Profile = () => {
                               <p className="text-xs text-slate-600 mt-1">{cert.issuer || cert.issuingOrg}</p>
 
                               <div className="mt-3 flex flex-wrap gap-2 text-[10px] text-slate-600">
-                                {cert.issueDate && (
+                                {(cert.yearOfCompletion || cert.issueDate) && (
                                   <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                    {t("profile_page.issued")}: {new Date(cert.issueDate).toLocaleDateString()}
+                                    {t("profile_page.issued")}: {cert.yearOfCompletion || new Date(cert.issueDate).getFullYear()}
                                   </span>
                                 )}
                                 {cert.qrCodeIdentifier && (
@@ -1511,8 +1512,9 @@ const Profile = () => {
                                 </p>
                               )}
                               {item.achievements && (
-                                <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-2 font-semibold">
-                                  🏆 {item.achievements}
+                                <p className="flex items-center gap-1.5 text-[11px] text-[#045C9A] dark:text-[#A6D7E8] mt-2 font-semibold">
+                                  <Trophy className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                                  <span>{item.achievements}</span>
                                 </p>
                               )}
                             </div>
