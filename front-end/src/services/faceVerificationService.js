@@ -18,7 +18,7 @@
  * The 68-point face-api landmark model continues to be loaded for gaze only.
  */
 
-import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError, detectObjects as detectObjectsRaw, isObjectDetectorReady as isObjectDetectorReadyRaw } from './onnxPipeline';
+import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError, detectObjects as detectObjectsRaw, isObjectDetectorReady as isObjectDetectorReadyRaw, getLastObjectNearMisses as getLastObjectNearMissesRaw } from './onnxPipeline';
 import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
 // NOTE: livenessService.evaluateLiveness is deliberately NOT wired. It was
 // imported here but never called, which read as spoof protection that does not
@@ -127,6 +127,7 @@ export const getModelLoadError = () => getOnnxInitError();
  */
 export const detectObjects = (videoEl) => detectObjectsRaw(videoEl);
 export const isObjectDetectorReady = () => isObjectDetectorReadyRaw();
+export const getLastObjectNearMisses = () => getLastObjectNearMissesRaw();
 
 export const getLoadError = () => null;
 export const getBackendInfo = () => ({ backend: 'onnx-wasm+webgl', isWebGL: true, isCPU: false });

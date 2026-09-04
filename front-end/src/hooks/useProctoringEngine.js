@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
-import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady } from '@/services/faceVerificationService';
+import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady, getLastObjectNearMisses } from '@/services/faceVerificationService';
 import { proctoringApi } from '@/services/proctoringApi';
 import { startAudioMonitoring, stopAudioMonitoring, getLastGates } from '@/services/audioMonitorService';
 import { getPipelineStatus } from '@/services/onnxPipeline';
@@ -1269,6 +1269,11 @@ export const useProctoringEngine = ({
         const summary = found.map((o) => `${o.label} ${o.score.toFixed(2)}`).join(', ');
         console.log(`[ProctoringEngine] Objects: ${summary}`);
         setDiagnostics((d) => ({ ...d, objects: summary, objectsAt: Date.now() }));
+      } else {
+        // Show what the model saw but did not act on, so "not detected" can
+        // be told apart from "seen at 0.28 against a 0.35 bar".
+        const near = getLastObjectNearMisses();
+        setDiagnostics((d) => ({ ...d, objects: near.length ? `near: ${near.join(', ')}` : '', objectsAt: Date.now() }));
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {

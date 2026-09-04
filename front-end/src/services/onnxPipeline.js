@@ -39,10 +39,14 @@ const YOLO_SCORE_THRESHOLD = 0.40;
 // and also the class most often confused with books, remotes and hands, so it
 // needs a little more confidence than the generic floor; a laptop is large and
 // distinctive but frequently in shot legitimately.
-const YOLO_CLASS_THRESHOLDS = { 67: 0.45, 73: 0.45, 63: 0.50 };
+const YOLO_CLASS_THRESHOLDS = { 67: 0.35, 73: 0.40, 63: 0.45 };
 // Ignore specks: a detection smaller than this share of the frame is noise.
-const YOLO_MIN_AREA_RATIO = 0.003;
+const YOLO_MIN_AREA_RATIO = 0.0015;
 const YOLO_NUM_CLASSES = 80;
+const YOLO_PERSON_CLASS = 0;
+// Near-misses from the most recent pass, for the diagnostics panel.
+let lastObjectNearMisses = [];
+export const getLastObjectNearMisses = () => lastObjectNearMisses;
 const YOLO_PAD_VALUE = 114 / 255;
 // Detections between this and the acting threshold are logged, never acted on.
 const YOLO_NEAR_MISS_SCORE = 0.18;
@@ -811,16 +815,23 @@ export const detectObjects = async (videoEl) => {
     const boxes = [], scores = [], classes = [];
     const nearMisses = [];
     for (let a = 0; a < numAnchors; a++) {
-      // The winner is decided over ALL classes. Picking the best of only the
-      // three watched classes meant an anchor the model was sure was a remote,
-      // a bottle or a hand still got reported as whichever of phone/book/laptop
-      // scored highest — a book with a weak phone score became a phone.
-      let bestScore = 0, bestCls = -1;
+      // Best watched class for this anchor, and the best of every OTHER class
+      // except "person". A watched object must beat the other objects (so a
+      // remote or a bottle is not reported as a phone) but is allowed to lose
+      // to "person": a phone held up beside the face sits on anchors that also
+      // score the person highly, and requiring it to out-score the person
+      // silently dropped phones in exactly the pose that matters most.
+      let bestScore = 0, bestCls = -1, bestOther = 0;
       for (let c = 0; c < numClasses; c++) {
         const s = at(4 + c, a);
-        if (s > bestScore) { bestScore = s; bestCls = c; }
+        if (c in YOLO_CLASSES_OF_INTEREST) {
+          if (s > bestScore) { bestScore = s; bestCls = c; }
+        } else if (c !== YOLO_PERSON_CLASS && s > bestOther) {
+          bestOther = s;
+        }
       }
-      if (bestCls < 0 || !(bestCls in YOLO_CLASSES_OF_INTEREST)) continue;
+      if (bestCls < 0 || bestScore < YOLO_NEAR_MISS_SCORE) continue;
+      if (bestOther > bestScore) continue; // the model thinks it is something else
 
       const threshold = YOLO_CLASS_THRESHOLDS[bestCls] ?? YOLO_SCORE_THRESHOLD;
       if (bestScore >= YOLO_NEAR_MISS_SCORE && bestScore < threshold) {
@@ -837,8 +848,9 @@ export const detectObjects = async (videoEl) => {
       scores.push(bestScore);
       classes.push(bestCls);
     }
+    lastObjectNearMisses = [...new Set(nearMisses)];
     if (nearMisses.length) {
-      console.log(`[OnnxPipeline] YOLO near-miss (below class threshold): ${[...new Set(nearMisses)].join(', ')}`);
+      console.log(`[OnnxPipeline] YOLO near-miss (below class threshold): ${lastObjectNearMisses.join(', ')}`);
     }
 
     if (!boxes.length) return [];
