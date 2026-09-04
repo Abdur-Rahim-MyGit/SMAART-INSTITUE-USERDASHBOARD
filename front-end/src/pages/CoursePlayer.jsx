@@ -191,14 +191,6 @@ const CoursePlayer = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
   const [isTheater, setIsTheater] = useState(readTheaterPreference);
-  // Theater only reshapes the page for steps that actually have a video;
-  // quizzes and practice keep the default two-column view so the setting can
-  // always be changed from the header.
-  const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
-  const activeStepHasVideo =
-    activeStepData?.contentType === 'video-text' ||
-    (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
-  const theaterLayout = isTheater && activeStepHasVideo;
   const toggleTheater = () =>
     setIsTheater((prev) => {
       const next = !prev;
@@ -363,6 +355,14 @@ const CoursePlayer = () => {
 
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
+  // Theater only reshapes the page for steps that actually have a video;
+  // quizzes and practice keep the default two-column view so the setting can
+  // always be changed from the header.
+  const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
+  const activeStepHasVideo =
+    activeStepData?.contentType === 'video-text' ||
+    (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
+  const theaterLayout = isTheater && activeStepHasVideo;
 
   const isCompleted = useMemo(() => {
     if (!totalSteps) return false;
