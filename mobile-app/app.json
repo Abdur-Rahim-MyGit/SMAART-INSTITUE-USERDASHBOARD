@@ -11,12 +11,14 @@
       "infoPlist": {
         "NSCameraUsageDescription": "SMAART Institute needs camera access to verify your identity during proctored assessments.",
         "NSMicrophoneUsageDescription": "SMAART Institute needs microphone access to monitor audio during proctored assessments.",
-        "NSFaceIDUsageDescription": "SMAART Institute uses Face ID to unlock your session without re-entering your password."
+        "NSFaceIDUsageDescription": "SMAART Institute uses Face ID to unlock your session without re-entering your password.",
+        "NSLocationWhenInUseUsageDescription": "SMAART Institute uses your location to detect your campus and enable location-aware features.",
+        "NSUserNotificationsUsageDescription": "Stay on top of classes, exam reminders, and campus announcements."
       }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#EAF7FD",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -24,7 +26,10 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
-        "android.permission.USE_BIOMETRIC"
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "package": "com.anonymous.smaartinstitutemobile"
     },
@@ -40,7 +45,30 @@
           "faceIDPermission": "SMAART Institute uses Face ID to unlock your session without re-entering your password."
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/smaart-mark.png",
+          "color": "#2563EB"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SMAART Institute uses your location to detect your campus and enable location-aware features."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A0F1D",
+          "image": "./assets/smaart-logo.png",
+          "imageWidth": 260,
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-audio"
     ],
     "extra": {
       "eas": {

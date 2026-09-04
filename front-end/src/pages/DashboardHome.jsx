@@ -15,7 +15,9 @@ import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
 import { isCapacityDevUnlock, compareCourseIds } from "@/utils/courseUnlock";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
-import { RiAlertLine } from "@remixicon/react";
+import {
+  RiAlertLine,
+} from "@/components/icons";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { clearCareerAgentStorage } from "@/contexts/UserContextFixed";
@@ -112,29 +114,53 @@ const DashboardHome = () => {
 
   if ((userLoading || dashboardLoading) && !loadingError) {
     return (
-      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
-        {/* Skeleton Hero */}
-        <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-
-        {/* Skeleton Banners */}
-        <div className="w-full h-48 sm:h-64 lg:h-80 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-
-        {/* Skeleton Progress */}
-        <div className="w-full h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-
-        {/* Skeleton Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
-        </div>
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 bg-[#EAF7FD] dark:bg-[#072036] overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col gap-4 sm:gap-6 w-full"
+        >
+          {/* Skeleton Hero */}
+          <motion.div 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5" 
+          />
+          {/* Skeleton Banners */}
+          <motion.div 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+            className="w-full h-48 sm:h-64 lg:h-80 bg-slate-200 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5" 
+          />
+          {/* Skeleton Grid */}
+          <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+            <div className="flex-1 space-y-4 sm:space-y-6">
+              <motion.div 
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                className="w-full h-48 bg-slate-200 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5" 
+              />
+              <motion.div 
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                className="w-full h-48 bg-slate-200 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5" 
+              />
+            </div>
+            <motion.div 
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              className="w-full xl:w-[300px] 2xl:w-[340px] h-[500px] shrink-0 bg-slate-200 dark:bg-white/5 rounded-2xl border border-white/50 dark:border-white/5" 
+            />
+          </div>
+        </motion.div>
       </div>
     );
   }
 
   if (loadingError) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E] p-6 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#EAF7FD] dark:bg-[#072036] p-6 text-center">
         <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
           <RiAlertLine className="w-8 h-8 text-red-500" />
         </div>
@@ -145,7 +171,7 @@ const DashboardHome = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-2.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+            className="px-6 py-2.5 bg-[#072036] hover:bg-[#0d3a5f] text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
           >
             Try Again
           </button>
@@ -163,7 +189,7 @@ const DashboardHome = () => {
               clearCareerAgentStorage(userId);
               window.location.href = '/';
             }}
-            className="px-6 py-2.5 bg-white dark:bg-[#002147] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
+            className="px-6 py-2.5 bg-white dark:bg-[#0d3a5f] text-slate-600 dark:text-slate-300 border border-[#d7ebf5] dark:border-white/10 rounded-xl font-semibold hover:bg-[#EAF7FD] dark:hover:bg-[#0d3a5f]/70 transition-all"
           >
             Logout & Reset
           </button>
@@ -184,26 +210,28 @@ const DashboardHome = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, staggerChildren: 0.15 }}
+          transition={{ duration: 0.6, staggerChildren: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-5 lg:p-6 pb-10 min-h-screen bg-transparent transition-colors duration-300 relative overflow-hidden"
         >
           {/* Animated Constellation Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {/* Constellation background, faded right down so it reads as a quiet
+              texture instead of competing with the cards. Matches MyCourses. */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-25">
             <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
           </div>
 
           {/* Ambient mesh glows */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#1a3884]/5 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/10" />
+            <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent rounded-full blur-[120px] dark:from-blue-900/10" />
             <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent rounded-full blur-[120px] dark:from-indigo-900/10" />
           </div>
 
           <div className="relative z-10 flex flex-col gap-4 sm:gap-6 w-full">
             {/* ── FULL WIDTH TOP: Hero & Banners ── */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="w-full space-y-4 sm:space-y-6"
             >
               {/* Hero */}
@@ -232,9 +260,9 @@ const DashboardHome = () => {
             <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
               {/* ── LEFT: Career Pathways ── */}
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
                 className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
               >
                 <CareerPathsWidget paths={paths} loading={pathsLoading} />
@@ -243,15 +271,15 @@ const DashboardHome = () => {
 
               {/* ── RIGHT: Calendar + Tasks ── */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
                 className="w-full xl:w-[300px] 2xl:w-[340px] shrink-0 self-start"
               >
                 {/* Section heading — same style as MY CAREER PATHS */}
                 <div className="flex items-center gap-2.5 mb-4">
-                  <span className="w-[3px] h-4 rounded-full bg-[#1a3884] dark:bg-blue-500 shrink-0" />
-                  <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                  <span className="w-[3px] h-4 rounded-full bg-[#045C9A] dark:bg-[#045C9A] shrink-0" />
+                  <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-[#072036] dark:text-slate-300">
                     My Activities
                   </h2>
                 </div>
@@ -267,5 +295,4 @@ const DashboardHome = () => {
 };
 
 export default DashboardHome;
-
 

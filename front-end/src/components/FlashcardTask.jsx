@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, CheckCircle2, Sparkles, Layers, HelpCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+  Lightbulb,
+  RotateCcw,
+  Sparkles,
+} from "@/components/icons";
 import { toast } from 'sonner';
 
 const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
@@ -68,12 +79,12 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
     <div className="w-full h-full bg-transparent p-0 overflow-y-auto relative overflow-hidden">
       <div className="max-w-4xl mx-auto space-y-6 relative z-10">
         {/* Header */}
-        <div className="border-b border-slate-100 dark:border-white/[0.05] pb-4">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400 mb-1.5">
+        <div className="border-b border-[#d7ebf5] dark:border-white/[0.05] pb-4">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#045C9A] dark:text-[#A6D7E8] mb-1.5">
             <RotateCcw size={12} strokeWidth={2.5} />
             <span>Flash Cards Activity</span>
           </div>
-          <h2 className="text-lg md:text-xl font-black text-[#0d1f4e] dark:text-white">
+          <h2 className="text-lg md:text-xl font-bold text-[#072036] dark:text-white">
             {content?.title || 'Flash Cards'}
           </h2>
         </div>
@@ -87,7 +98,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             className="relative w-full max-w-xl aspect-[16/10] cursor-pointer perspective-1000 group transition-all duration-500"
           >
             <motion.div
-              className="relative w-full h-full shadow-2xl rounded-3xl"
+              className="relative w-full h-full shadow-2xl rounded-2xl"
               initial={false}
               animate={{ rotateY: isFlipped ? 180 : 0 }}
               transition={{ duration: 0.6, type: 'spring', stiffness: 200, damping: 18 }}
@@ -95,7 +106,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             >
               {/* Front - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 rounded-3xl flex items-center justify-center p-6 border border-white/[0.08] overflow-hidden shadow-[0_20px_50px_rgba(26,56,132,0.22)] bg-gradient-to-br from-[#1a3884] via-[#122c6e] to-[#0b1b42]"
+                className="absolute inset-0 rounded-2xl flex items-center justify-center p-6 border border-white/[0.08] overflow-hidden shadow-[0_20px_50px_rgba(26,56,132,0.22)] bg-gradient-to-br from-[#045C9A] via-[#034a7d] to-[#072036]"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -110,17 +121,17 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                 
                 <div className="text-center space-y-6 relative z-10 flex flex-col items-center justify-between h-full py-4">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-                    <Sparkles size={11} className="text-blue-300 animate-pulse" />
-                    <span className="text-[9px] font-black text-blue-200 uppercase tracking-widest">Flashcard Front</span>
+                    <Sparkles size={11} className="text-[#A6D7E8] animate-pulse" />
+                    <span className="text-[9px] font-bold text-[#A6D7E8] uppercase tracking-widest">Flashcard Front</span>
                   </div>
                   
-                  <h3 className="text-lg sm:text-2xl font-black text-white leading-snug px-6 tracking-tight max-w-md">
+                  <h3 className="text-lg sm:text-2xl font-bold text-white leading-snug px-6 tracking-tight max-w-md">
                     {currentCard?.front}
                   </h3>
                   
                   <div className="flex flex-col items-center gap-2 opacity-55 hover:opacity-85 transition-opacity">
                     <div className="h-[2px] w-8 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-                    <span className="text-[9px] font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold text-white/80 uppercase tracking-widest flex items-center gap-1.5">
                       <RotateCcw size={11} strokeWidth={2.5} /> Tap to reveal answer
                     </span>
                   </div>
@@ -129,7 +140,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
  
               {/* Back - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 rounded-3xl flex items-center justify-center p-6 border border-slate-200/80 dark:border-white/[0.04] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.03)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] bg-gradient-to-br from-[#ffffff] to-[#f8fafc] dark:from-[#0f172a] dark:to-[#090d16]"
+                className="absolute inset-0 rounded-2xl flex items-center justify-center p-6 border border-[#d7ebf5] dark:border-white/[0.04] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.03)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] bg-gradient-to-br from-[#ffffff] to-[#F1F5F9] dark:from-[#072036] dark:to-[#072036]"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -140,18 +151,18 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                 transition={{ duration: 0.2 }}
               >
                 <div className="text-center space-y-6 relative z-10 flex flex-col items-center justify-between h-full py-4 w-full">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-xs">
-                    <Layers size={11} className="text-[#1a3884] dark:text-cyan-400" />
-                    <span className="text-[9px] font-black text-[#1a3884] dark:text-cyan-300 uppercase tracking-widest">The Solution</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 shadow-xs">
+                    <Layers size={11} className="text-[#045C9A] dark:text-[#A6D7E8]" />
+                    <span className="text-[9px] font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">The Solution</span>
                   </div>
                   
-                  <p className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200 leading-relaxed max-w-md px-6">
+                  <p className="text-sm sm:text-base font-bold text-[#072036] dark:text-slate-200 leading-relaxed max-w-md px-6">
                     {currentCard?.back}
                   </p>
                   
                   <div className="flex flex-col items-center gap-2 opacity-50 hover:opacity-85 transition-opacity">
-                    <div className="h-[2px] w-8 bg-gradient-to-r from-transparent via-[#1a3884]/30 dark:via-white/30 to-transparent" />
-                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="h-[2px] w-8 bg-gradient-to-r from-transparent via-[#045C9A]/30 dark:via-white/30 to-transparent" />
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                       <RotateCcw size={11} strokeWidth={2.5} /> Tap to flip back
                     </span>
                   </div>
@@ -171,10 +182,10 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                 }}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   idx === currentIndex
-                    ? 'w-8 bg-[#1a3884] dark:bg-blue-500'
+                    ? 'w-8 bg-[#045C9A] dark:bg-[#045C9A]'
                     : viewedCards.has(idx)
-                      ? 'w-2 bg-[#1a3884]/40 dark:bg-blue-500/40 hover:bg-[#1a3884]/60'
-                      : 'w-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300'
+                      ? 'w-2 bg-[#045C9A]/40 dark:bg-[#045C9A]/40 hover:bg-[#045C9A]/60'
+                      : 'w-2 bg-[#d7ebf5] dark:bg-white/5 hover:bg-slate-300'
                 }`}
                 aria-label={`Go to card ${idx + 1}`}
               />
@@ -186,19 +197,19 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0}
-              className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 shadow-sm flex items-center justify-center transition-all hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+              className="w-10 h-10 rounded-full border border-[#d7ebf5] dark:border-white/10 bg-white dark:bg-[#0d3a5f] text-slate-700 dark:text-slate-300 shadow-sm flex items-center justify-center transition-all hover:bg-[#F1F5F9] dark:hover:bg-white/5 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
             >
               <ChevronLeft size={18} strokeWidth={2.5} />
             </button>
  
-            <span className="text-xs font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase">
+            <span className="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase">
               {currentIndex + 1} of {flashcards.length}
             </span>
  
             <button
               onClick={handleNext}
               disabled={currentIndex === flashcards.length - 1}
-              className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 shadow-sm flex items-center justify-center transition-all hover:bg-slate-50 dark:hover:bg-white/5 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+              className="w-10 h-10 rounded-full border border-[#d7ebf5] dark:border-white/10 bg-white dark:bg-[#0d3a5f] text-slate-700 dark:text-slate-300 shadow-sm flex items-center justify-center transition-all hover:bg-[#F1F5F9] dark:hover:bg-white/5 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
             >
               <ChevronRight size={18} strokeWidth={2.5} />
             </button>
@@ -210,24 +221,24 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
               <button
                 onClick={handleMarkComplete}
                 disabled={!allCardsViewed}
-                className={`w-full max-w-md px-6 py-4 font-black rounded-2xl shadow-md transition-all duration-300 flex items-center justify-center gap-2.5 text-xs uppercase tracking-wider ${
+                className={`flex w-full max-w-md items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold transition-colors ${
                   allCardsViewed
-                    ? 'bg-gradient-to-r from-[#1a3884] via-[#2563eb] to-[#1a3884] hover:shadow-[0_10px_25px_rgba(37,99,235,0.25)] text-white hover:-translate-y-0.5 cursor-pointer active:scale-98'
-                    : 'bg-slate-100 dark:bg-slate-800/40 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200/50 dark:border-white/5'
+                    ? 'cursor-pointer bg-[#072036] text-white shadow-md shadow-[#072036]/20 hover:bg-[#0d3a5f] dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white'
+                    : 'cursor-not-allowed border border-[#d7ebf5] bg-[#F1F5F9] text-slate-400 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-500'
                 }`}
               >
-                <CheckCircle2 size={16} className="stroke-[2.2]" />
+                <CheckCircle2 size={16} />
                 Mark as Complete
               </button>
               {!allCardsViewed && (
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-extrabold tracking-wider uppercase animate-pulse">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                   Please view all cards to unlock completion ({viewedCards.size} / {flashcards.length})
                 </p>
               )}
             </div>
           ) : (
-            <div className="w-full max-w-md px-6 py-4 bg-[#f0fdf4] dark:bg-[#072212]/40 border border-[#dcfce7] dark:border-[#14532d]/25 text-[#15803d] dark:text-[#4ade80] font-black rounded-2xl flex items-center justify-center gap-2.5 text-xs uppercase tracking-wider shadow-xs">
-              <CheckCircle2 size={16} className="stroke-[2.2]" />
+            <div className="flex w-full max-w-md items-center justify-center gap-2 rounded-xl border border-emerald-200/70 bg-emerald-50 px-6 py-3 text-[13px] font-semibold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400">
+              <CheckCircle2 size={16} />
               Completed
             </div>
           )}
@@ -238,14 +249,14 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
           <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/40 rounded-2xl p-5">
             <div className="flex items-center gap-2.5 mb-3.5">
               <Lightbulb size={16} className="text-amber-600 dark:text-amber-400" />
-              <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-900 dark:text-amber-100">
+              <h3 className="font-extrabold text-sm uppercase tracking-widest text-amber-900 dark:text-amber-100">
                 Interview Prep Tips
               </h3>
             </div>
             <ul className="space-y-2.5">
               {content.interviewTips.map((tip, idx) => (
                 <li key={idx} className="text-sm text-amber-800 dark:text-amber-200 flex gap-2 font-medium leading-relaxed">
-                  <span className="font-black text-[#1a3884] dark:text-blue-400">{idx + 1}.</span>
+                  <span className="font-bold text-[#045C9A] dark:text-[#A6D7E8]">{idx + 1}.</span>
                   <span>{tip}</span>
                 </li>
               ))}

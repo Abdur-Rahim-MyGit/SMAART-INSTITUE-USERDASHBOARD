@@ -22,9 +22,12 @@ const NeuralBackground = ({ theme = 'light' }) => {
     const particleCount = 80;
     const connectionDistance = 150;
 
-    // Theme-based colors
-    const particleColor = theme === 'dark' ? 'rgba(100, 200, 255, 0.4)' : 'rgba(26, 56, 132, 0.5)';
-    const lineColor = theme === 'dark' ? 'rgba(100, 200, 255, 0.15)' : 'rgba(26, 56, 132, 0.1)';
+    // Theme-based colors. Light draws in the brand blue #045C9A, dark in the
+    // pale accent #A6D7E8 -- the same two the dashboard, courses list, profile
+    // and player use. (These were the old #1a3884 navy and a generic cyan,
+    // which is why the texture read slightly off-palette against the cards.)
+    const particleColor = theme === 'dark' ? 'rgba(166, 215, 232, 0.4)' : 'rgba(4, 92, 154, 0.5)';
+    const lineColor = theme === 'dark' ? 'rgba(166, 215, 232, 0.15)' : 'rgba(4, 92, 154, 0.1)';
 
     class Particle {
       constructor() {

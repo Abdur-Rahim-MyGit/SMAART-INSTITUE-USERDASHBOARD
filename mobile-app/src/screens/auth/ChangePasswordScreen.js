@@ -17,14 +17,15 @@
  * web, the endpoint refuses the change and returns `alreadyRegistered: true`
  * WITH a valid token — so we sign them in instead of showing an error.
  */
-import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, BackHandler, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import AuthScreenLayout from '../../components/AuthScreenLayout';
 import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import PasswordRules from '../../components/PasswordRules';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { firstLoginChangePassword } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import { formatServerPasswordError, validatePassword } from '../../utils/password';
@@ -38,6 +39,30 @@ export default function ChangePasswordScreen({ route, navigation }) {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // The OTP screen behind this one is dead — the server consumed its login-OTP
+  // record when it issued this tempToken. Android's hardware back would pop
+  // into it and any re-verify there fails confusingly, so back restarts login
+  // instead (mirrors `gestureEnabled: false` on iOS).
+  useEffect(() => {
+    const onBack = () => {
+      Alert.alert(
+        'Set your new password',
+        'You need to choose a new password before signing in. Going back will restart the login.',
+        [
+          { text: 'Stay', style: 'cancel' },
+          {
+            text: 'Restart login',
+            style: 'destructive',
+            onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }),
+          },
+        ]
+      );
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => sub.remove();
+  }, [navigation]);
 
   const policy = useMemo(() => validatePassword(password), [password]);
   const mismatch = confirm.length > 0 && confirm !== password;
@@ -85,6 +110,7 @@ export default function ChangePasswordScreen({ route, navigation }) {
       title={firstName ? `Welcome, ${firstName}` : 'Set your password'}
       subtitle="Your institution issued a temporary password. Choose your own to continue."
     >
+      <FadeSlideIn duration={400}>
       <View style={styles.noticeCard}>
         <Feather name="shield" size={16} color={colors.primary} />
         <Text style={styles.noticeText}>
@@ -131,6 +157,7 @@ export default function ChangePasswordScreen({ route, navigation }) {
       <Text style={styles.hint}>
         Your new password must be different from the temporary one you were given.
       </Text>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }
@@ -139,7 +166,7 @@ const styles = StyleSheet.create({
   noticeCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EAF7FD',
     borderWidth: 1,
     borderColor: '#BFDBFE',
     borderRadius: radius.lg,

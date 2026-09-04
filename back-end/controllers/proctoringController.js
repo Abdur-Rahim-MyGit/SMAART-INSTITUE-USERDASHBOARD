@@ -111,6 +111,15 @@ const buildDecision = (session) => {
     warnings: session.totalViolations,
     maxWarnings: MAX_WARNINGS,
     riskScore: session.riskScore,
+    // Whether the attempt has already crossed the line that holds it for review.
+    //
+    // The warning COUNT is not what decides an attempt's fate — the risk score
+    // is, and it gets there first. Two phone detections is 70 against a
+    // threshold of 60, so a candidate showing "2 of 10" can already be held
+    // while being told they have eight warnings left. Sending the verdict as a
+    // flag rather than the raw threshold keeps the number unpublished (see
+    // FLAG_CATEGORIES) while letting the client stop misinforming people.
+    riskFlagged: session.riskScore >= RISK_FLAG_THRESHOLD,
     status: session.status,
     held: !!session.isLocked,
     reason: session.lockReason || '',

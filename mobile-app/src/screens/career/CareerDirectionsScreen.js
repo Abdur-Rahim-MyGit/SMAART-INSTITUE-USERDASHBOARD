@@ -18,8 +18,9 @@
  * market intelligence, interview prep, resume tools, certifications, the
  * curated cascading direction selector, and the secondary/tertiary tabs.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -32,6 +33,42 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 import { useAuth } from '../../context/AuthContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import {
@@ -408,7 +445,7 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {step === 0 ? (
-          <>
+          <AnimatedSection delay={0}>
             <Field label="Full Name" icon="user" themeColors={themeColors}>
               <TextInput
                 style={[styles.input, { color: themeColors.text }]}
@@ -442,11 +479,11 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
                 onChangeText={setSpecialisation}
               />
             </Field>
-          </>
+          </AnimatedSection>
         ) : null}
 
         {step === 1 ? (
-          <>
+          <AnimatedSection delay={0}>
             <Field label="Target Role" icon="target" themeColors={themeColors}>
               <TextInput
                 style={[styles.input, { color: themeColors.text }]}
@@ -545,11 +582,11 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
                 );
               })}
             </View>
-          </>
+          </AnimatedSection>
         ) : null}
 
         {step === 2 ? (
-          <>
+          <AnimatedSection delay={0}>
             <View style={[styles.reviewCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
               <ReviewRow label="Name" value={fullName} themeColors={themeColors} />
               <ReviewRow label="Degree" value={degree || '—'} themeColors={themeColors} />
@@ -567,7 +604,7 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
                 refine your direction up to 5 times. After that, it locks in permanently.
               </Text>
             </View>
-          </>
+          </AnimatedSection>
         ) : null}
 
         {!!error && (
@@ -577,7 +614,7 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
           </View>
         )}
 
-        <Pressable
+        <PressCard
           onPress={handleNext}
           disabled={saving}
           style={[styles.primaryBtn, { backgroundColor: themeColors.primaryBright }, saving && { opacity: 0.6 }]}
@@ -586,7 +623,7 @@ function OnboardingGate({ navigation, themeColors, isDark, user, onDone }) {
             {saving ? 'Submitting…' : step === STEPS.length - 1 ? 'Submit & Build My Roadmap' : 'Continue'}
           </Text>
           {!saving && <Feather name={step === STEPS.length - 1 ? 'check' : 'arrow-right'} size={16} color="#FFFFFF" />}
-        </Pressable>
+        </PressCard>
       </ScrollView>
     </SafeAreaView>
   );
@@ -776,7 +813,7 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
         ) : (
           <>
             {/* Direction overview */}
-            <View style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <AnimatedSection delay={0} style={[styles.card, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
               <View style={styles.overviewHead}>
                 <View style={[styles.overviewIcon, { backgroundColor: themeColors.pillBg }]}>
                   <Feather name="compass" size={18} color={themeColors.primaryBright} />
@@ -789,11 +826,11 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
                 {directionData?.overview ||
                   'A detailed direction overview isn’t available for this specific target yet — your role roadmap below is still generated from live data.'}
               </Text>
-            </View>
+            </AnimatedSection>
 
             {/* Core roles */}
             {roles.length > 0 ? (
-              <View style={{ marginTop: 20 }}>
+              <AnimatedSection delay={60} style={{ marginTop: 20 }}>
                 <SectionLabel themeColors={themeColors} icon="briefcase">
                   Core Roles
                 </SectionLabel>
@@ -801,7 +838,7 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
                   {roles.map((role) => {
                     const selected = role === selectedRole;
                     return (
-                      <Pressable
+                      <PressCard
                         key={role}
                         onPress={() => setSelectedRole(role)}
                         style={[
@@ -813,15 +850,15 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
                         <Text style={[styles.chipText, { color: selected ? '#FFFFFF' : themeColors.textMuted, fontWeight: '800' }]}>
                           {role}
                         </Text>
-                      </Pressable>
+                      </PressCard>
                     );
                   })}
                 </View>
-              </View>
+              </AnimatedSection>
             ) : null}
 
             {/* Role narrative */}
-            <View style={{ marginTop: 20 }}>
+            <AnimatedSection delay={120} style={{ marginTop: 20 }}>
               <SectionLabel themeColors={themeColors} icon="user">
                 {selectedRole || 'Role'}
               </SectionLabel>
@@ -889,10 +926,10 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
                   ) : null}
                 </View>
               ) : null}
-            </View>
+            </AnimatedSection>
 
             {/* Skill roadmap */}
-            <View style={{ marginTop: 20, marginBottom: 12 }}>
+            <AnimatedSection delay={180} style={{ marginTop: 20, marginBottom: 12 }}>
               <SectionLabel themeColors={themeColors} icon="map">
                 Skill Roadmap
               </SectionLabel>
@@ -937,7 +974,7 @@ function DirectionDashboard({ navigation, themeColors, isDark, lockStatus, onRef
                   />
                 </View>
               )}
-            </View>
+            </AnimatedSection>
           </>
         )}
       </ScrollView>

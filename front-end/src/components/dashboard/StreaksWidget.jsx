@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from "framer-motion";
 import {
-  Flame,
-  Trophy,
-  Gift,
-  RefreshCw,
-  ShieldAlert,
   Calendar,
   Check,
   Coffee,
+  Flame,
+  Gift,
   Info,
+  RefreshCw,
+  ShieldAlert,
   Sparkles,
-} from "lucide-react";
+  Trophy,
+} from "@/components/icons";
 import { streaksAPI } from "@/services/streaksApi";
 import { useTranslation } from "react-i18next";
 
@@ -27,8 +27,6 @@ const AnimatedNumber = ({ value }) => {
 
   return <span>{displayed}</span>;
 };
-
-
 
 /* ── Spark particles ──────────────────────────────────────────── */
 const Sparks = ({ count = 10 }) =>
@@ -191,17 +189,17 @@ const StreaksWidget = ({ isModal = false }) => {
 
   if (loading) {
     return (
-      <div className={`w-full animate-pulse flex flex-col gap-6 min-w-[320px] ${isModal ? "p-0 bg-transparent" : "p-6 rounded-[24px] bg-white dark:bg-[#001a40]"}`}>
+      <div className={`w-full animate-pulse flex flex-col gap-6 min-w-[320px] ${isModal ? "p-0 bg-transparent" : "p-6 rounded-2xl bg-white dark:bg-[#0d3a5f]"}`}>
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-[#1a3884]/10 dark:bg-white/5" />
+          <div className="w-20 h-20 rounded-2xl bg-[#045C9A]/10 dark:bg-white/5" />
           <div className="space-y-2.5">
-            <div className="h-8 w-20 bg-[#1a3884]/10 dark:bg-white/5 rounded-md" />
-            <div className="h-4 w-36 bg-[#1a3884]/5 dark:bg-white/5 rounded-md" />
+            <div className="h-8 w-20 bg-[#045C9A]/10 dark:bg-white/5 rounded-md" />
+            <div className="h-4 w-36 bg-[#045C9A]/5 dark:bg-white/5 rounded-md" />
           </div>
         </div>
         <div className="flex gap-2">
           {[...Array(7)].map((_, i) => (
-            <div key={i} className="flex-1 aspect-square rounded-xl bg-[#1a3884]/10 dark:bg-white/5" />
+            <div key={i} className="flex-1 aspect-square rounded-xl bg-[#045C9A]/10 dark:bg-white/5" />
           ))}
         </div>
       </div>
@@ -225,44 +223,34 @@ const StreaksWidget = ({ isModal = false }) => {
       className={`relative w-full transition-colors duration-300 ${
         isModal
           ? "bg-transparent border-none shadow-none"
-          : "max-w-md mx-auto rounded-[32px] overflow-hidden bg-[#fafbfe] dark:bg-[#001a40] border border-slate-100 dark:border-white/10"
+          : "max-w-md mx-auto rounded-2xl overflow-hidden bg-[#ffffff] dark:bg-[#072036] border border-slate-100 dark:border-white/10"
       }`}
     >
-      <div className={isModal ? "flex flex-col gap-6" : "p-8 flex flex-col gap-10"}>
+      <div className={isModal ? "flex flex-col gap-5" : "p-5 flex flex-col gap-5"}>
 
         {/* Top Section: Flame + Numbers */}
-        <div className="flex items-center gap-6">
-          {/* Blue Flame Box */}
-          <div className="relative shrink-0">
-            {/* Soft shadow behind the box */}
-            <div className="absolute inset-1 bg-[#405cd2] blur-xl opacity-30 dark:opacity-50 rounded-3xl" />
-            
-            <motion.div
-              className="relative w-28 h-28 rounded-[1.75rem] bg-[#405cd2] flex items-center justify-center shadow-lg shadow-[#405cd2]/20 border border-white/10"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Flame className="w-14 h-14 text-white stroke-[2]" />
-            </motion.div>
+        <div className="flex items-center gap-4">
+          {/* Flame block. No blur glow, no hover scale - decoration that cost
+              height and made a metric panel read like a game screen. */}
+          <div className="relative w-14 h-14 shrink-0 rounded-xl bg-[#072036] dark:bg-[#045C9A] flex items-center justify-center">
+            <Flame className="w-7 h-7 text-white stroke-[2]" />
           </div>
 
-          {/* Stats Box */}
-          <div className="flex flex-col justify-center pt-2">
-            <div className="flex items-center gap-4">
-              <span className="text-[5rem] font-black text-[#0f172a] dark:text-white leading-[0.8] tracking-tighter">
+          {/* Count and its label share one baseline; longest sits beneath. */}
+          <div className="flex flex-col justify-center min-w-0">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[32px] font-bold text-[#072036] dark:text-white leading-none tracking-tight">
                 <AnimatedNumber value={streak} />
               </span>
-              <div className="border border-slate-200/80 dark:border-slate-700 rounded-full px-3 py-1 bg-white dark:bg-[#002147] shadow-sm mt-2">
-                <span className="text-[11px] font-black text-[#1e3a8a] dark:text-blue-400 tracking-widest uppercase">
-                  {t('streaks.day_streak', 'Day Streak')}
-                </span>
-              </div>
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#045C9A] dark:text-[#A6D7E8]">
+                {t('streaks.day_streak', 'Day Streak')}
+              </span>
             </div>
-            
-            <div className="flex items-center gap-2 mt-4 text-slate-500 dark:text-slate-400 ml-1">
-              <Trophy className="w-4 h-4 text-[#1e3a8a] dark:text-blue-400 stroke-[2]" />
-              <span className="text-[15px] font-semibold">{t('streaks.longest', 'Longest')}:</span>
-              <span className="text-[15px] font-black text-[#0f172a] dark:text-white">
+
+            <div className="flex items-center gap-1.5 mt-1.5 text-slate-500 dark:text-slate-400">
+              <Trophy className="w-3.5 h-3.5 shrink-0 text-[#0E2136] dark:text-[#A6D7E8] stroke-[2]" />
+              <span className="text-[12px] font-medium">{t('streaks.longest', 'Longest')}:</span>
+              <span className="text-[12px] font-bold text-[#072036] dark:text-white">
                 {streakData?.longestStreak || 0} {t('streaks.days', 'days')}
               </span>
             </div>
@@ -270,10 +258,10 @@ const StreaksWidget = ({ isModal = false }) => {
         </div>
 
         {/* Daily Activity Tracker */}
-        <div className="flex flex-col gap-5 mt-2">
-          <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 ml-1">
-            <Calendar className="w-4 h-4 stroke-[2]" />
-            <span className="text-[11px] font-extrabold uppercase tracking-widest">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+            <Calendar className="w-3.5 h-3.5 stroke-[2] shrink-0" />
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.14em]">
               {t('streaks.activity_tracker', 'Daily Activity Tracker (Sundays Rest)')}
             </span>
           </div>
@@ -282,37 +270,37 @@ const StreaksWidget = ({ isModal = false }) => {
             {trackDays.map((day, idx) => {
               const isActive = day.state === "active";
               const isSunday = day.state === "sunday";
-              
+
               return (
-                <div key={idx} className="flex flex-col items-center gap-3 w-[46px]">
+                <div key={idx} className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
                   {/* Pill Box */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    className={`w-full pt-3 pb-4 rounded-[1.5rem] flex flex-col items-center justify-center transition-all shadow-sm ${
-                      isActive 
-                        ? "bg-[#405cd2] text-white shadow-[#405cd2]/30 border-transparent" 
+                    className={`w-full py-2 rounded-lg flex flex-col items-center justify-center transition-colors ${
+                      isActive
+                        ? "bg-[#072036] dark:bg-[#045C9A] text-white shadow-[#072036]/30 border-transparent"
                         : "bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-400"
                     }`}
                   >
-                    <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isActive ? "opacity-90" : "text-slate-400"}`}>
+                    <span className={`text-[9px] font-extrabold uppercase tracking-[0.1em] mb-0.5 ${isActive ? "opacity-80" : "text-slate-400"}`}>
                       {day.name}
                     </span>
-                    <span className={`text-[17px] font-black leading-none ${isActive ? "" : "text-slate-300 dark:text-slate-500"}`}>
+                    <span className={`text-[13px] font-bold leading-none ${isActive ? "" : "text-slate-400 dark:text-slate-500"}`}>
                       {day.date}
                     </span>
                   </motion.div>
 
                   {/* Icon Below */}
-                  <div className="h-5 flex items-center justify-center">
+                  <div className="h-4 flex items-center justify-center">
                     {isActive && (
-                      <div className="w-4 h-4 rounded-full bg-[#1e3a8a] dark:bg-blue-400 flex items-center justify-center border-2 border-[#fafbfe] dark:border-[#001a40] shadow-sm transform -translate-y-1">
-                        <Check className="w-2.5 h-2.5 text-white stroke-[3]" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8] flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-white dark:text-[#072036] stroke-[3]" />
                       </div>
                     )}
                     {isSunday && (
-                      <Coffee className="w-4 h-4 text-slate-400 stroke-[2]" />
+                      <Coffee className="w-3.5 h-3.5 text-slate-400 stroke-[2]" />
                     )}
                   </div>
                 </div>
@@ -322,12 +310,12 @@ const StreaksWidget = ({ isModal = false }) => {
         </div>
 
         {/* Available Vouchers Banner */}
-        <div className="mt-1 flex items-center gap-3 w-full bg-[#f4f6fb] dark:bg-slate-800/50 border border-[#e2e8f0] dark:border-slate-700/50 py-3.5 px-5 rounded-xl shadow-sm">
-          <Gift className="w-5 h-5 text-[#1e3a8a] dark:text-blue-400 stroke-[2]" />
-          <span className="text-[13px] font-black text-[#1e3a8a] dark:text-blue-400 ml-1 tracking-wide">
+        <div className="flex items-center gap-2.5 w-full bg-[#EAF7FD] dark:bg-white/[0.04] border border-[#d7ebf5] dark:border-white/10 py-2.5 px-3.5 rounded-lg">
+          <Gift className="w-4 h-4 shrink-0 text-[#0E2136] dark:text-[#A6D7E8] stroke-[2]" />
+          <span className="text-[12px] font-semibold text-[#045C9A] dark:text-[#A6D7E8]">
             {t('streaks.available_vouchers', 'Available Vouchers')}: {activeVouchers.length}
           </span>
-          <Sparkles className="w-4 h-4 text-[#1e3a8a]/60 dark:text-blue-400/60 ml-auto" />
+          <Sparkles className="w-3.5 h-3.5 shrink-0 text-[#0E2136]/50 dark:text-[#A6D7E8]/50 ml-auto" />
         </div>
       </div>
 
@@ -357,30 +345,30 @@ const StreaksWidget = ({ isModal = false }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`${isModal ? "mb-4" : "mx-8 mb-8"} p-5 rounded-2xl bg-white dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 shadow-sm flex flex-col items-start gap-4`}
+            className={`${isModal ? "mb-4" : "mx-6 mb-6"} p-3.5 rounded-xl bg-white dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex flex-col items-start gap-3`}
           >
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-rose-50 dark:bg-rose-500/20 text-rose-500 rounded-xl shrink-0 mt-0.5 border border-rose-100">
-                <ShieldAlert className="w-5 h-5 animate-pulse" />
+              <div className="p-2 bg-rose-50 dark:bg-rose-500/20 text-rose-500 rounded-lg shrink-0 border border-rose-100 dark:border-rose-900/40">
+                <ShieldAlert className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-[15px] font-black text-slate-800 dark:text-white">{t('streaks.broken_title', 'Streak broken!')}</h4>
-                <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                <h4 className="text-[13px] font-bold text-slate-800 dark:text-white">{t('streaks.broken_title', 'Streak broken!')}</h4>
+                <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
                   {t('streaks.restore_instruction', 'Use a voucher to restore to')}{" "}
-                  <span className="text-rose-600 dark:text-rose-400 font-black">
+                  <span className="text-rose-600 dark:text-rose-400 font-bold">
                     {streakData.preResetStreak} {t('streaks.days', 'days')}
                   </span>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full shrink-0 mt-2">
+            <div className="flex items-center gap-2 w-full shrink-0">
               {activeVouchers.length > 0 ? (
                 <>
                   <select
                     value={selectedVoucher}
                     onChange={(e) => setSelectedVoucher(e.target.value)}
-                    className="flex-1 text-[13px] font-bold py-2.5 px-3 bg-slate-50 dark:bg-[#001a40] border border-slate-200 dark:border-white/10 rounded-xl text-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#405cd2]/30"
+                    className="flex-1 min-w-0 text-[12px] font-semibold py-2 px-2.5 bg-slate-50 dark:bg-white/[0.06] border border-slate-200 dark:border-white/15 rounded-lg text-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/30"
                   >
                     <option value="">{t('streaks.select_voucher', 'Select Voucher')}</option>
                     {activeVouchers.map((v, i) => (
@@ -392,14 +380,14 @@ const StreaksWidget = ({ isModal = false }) => {
                   <button
                     onClick={() => handleRestore(selectedVoucher)}
                     disabled={actionLoading || !selectedVoucher}
-                    className="py-2.5 px-5 bg-[#405cd2] hover:bg-[#304bc2] text-white rounded-xl text-[13px] font-black shadow-md active:translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-1.5 min-w-[100px]"
+                    className="py-2 px-3.5 shrink-0 bg-[#072036] dark:bg-[#045C9A] hover:bg-[#0d3a5f] dark:hover:bg-[#0673B8] text-white rounded-lg text-[12px] font-semibold disabled:opacity-50 disabled:pointer-events-none transition-colors flex items-center justify-center gap-1.5"
                   >
                     <RefreshCw className={`w-4 h-4 ${actionLoading ? "animate-spin" : ""}`} />
                     {t('streaks.restore_button', 'Restore')}
                   </button>
                 </>
               ) : (
-                <div className="text-[13px] font-black text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 py-2.5 px-4 rounded-xl flex items-center gap-2 border border-rose-100 w-full justify-center">
+                <div className="text-[13px] font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 py-2.5 px-4 rounded-xl flex items-center gap-2 border border-rose-100 w-full justify-center">
                   <Gift className="w-4 h-4" />
                   {t('streaks.no_active_vouchers', 'No Active Vouchers')}
                 </div>

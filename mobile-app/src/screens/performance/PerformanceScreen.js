@@ -17,8 +17,9 @@
  * This screen renders only the three fields that are: `metrics`, `courses`,
  * and `timeline`.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -35,7 +36,7 @@ import { getStudentAnalytics } from '../../api/analytics';
 
 const STATUS_META = {
   completed: { label: 'Completed', color: '#10B981', icon: 'check-circle' },
-  in_progress: { label: 'In progress', color: '#3B82F6', icon: 'play-circle' },
+  in_progress: { label: 'In progress', color: '#1478B8', icon: 'play-circle' },
   enrolled: { label: 'Enrolled', color: '#F59E0B', icon: 'circle' },
 };
 
@@ -60,6 +61,42 @@ function formatHours(minutesOrHours, isHours = false) {
   if (!hours) return '0h';
   if (hours < 1) return `${Math.round(hours * 60)}m`;
   return `${hours % 1 === 0 ? hours : hours.toFixed(1)}h`;
+}
+
+function AnimatedSection({ children, delay = 0 }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 450,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, disabled, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
 }
 
 export default function PerformanceScreen({ navigation }) {
@@ -108,7 +145,7 @@ export default function PerformanceScreen({ navigation }) {
 
   const tiles = metrics
     ? [
-        { key: 'avgProgress', label: 'Avg. progress', value: `${metrics.avgProgress ?? 0}%`, icon: 'trending-up', color: '#3B82F6' },
+        { key: 'avgProgress', label: 'Avg. progress', value: `${metrics.avgProgress ?? 0}%`, icon: 'trending-up', color: '#1478B8' },
         { key: 'hours', label: 'Hours spent', value: formatHours(metrics.totalHoursSpent, true), icon: 'clock', color: '#F59E0B' },
         { key: 'completed', label: 'Completed', value: `${metrics.completedCourses ?? 0}`, icon: 'check-circle', color: '#10B981' },
         { key: 'inProgress', label: 'In progress', value: `${metrics.inProgressCourses ?? 0}`, icon: 'play-circle', color: '#8B5CF6' },
@@ -167,16 +204,17 @@ export default function PerformanceScreen({ navigation }) {
           <View style={styles.empty}>
             <Feather name="alert-triangle" size={26} color={themeColors.danger} />
             <Text style={[styles.emptyText, { color: themeColors.textMuted }]}>{error}</Text>
-            <Pressable
+            <PressCard
               onPress={retry}
               style={[styles.retryBtn, { backgroundColor: themeColors.primaryBright }]}
             >
               <Feather name="refresh-cw" size={13} color="#FFFFFF" />
               <Text style={styles.retryText}>Try again</Text>
-            </Pressable>
+            </PressCard>
           </View>
         ) : (
           <>
+            <AnimatedSection delay={0}>
             <View style={styles.tileGrid}>
               {tiles.map((tile) => (
                 <View
@@ -191,8 +229,10 @@ export default function PerformanceScreen({ navigation }) {
                 </View>
               ))}
             </View>
+            </AnimatedSection>
 
             {timeline.length > 0 && (
+              <AnimatedSection delay={80}>
               <View style={styles.section}>
                 <Text style={[styles.sectionLabel, { color: themeColors.textMuted }]}>RECENT TREND</Text>
                 <View
@@ -224,6 +264,7 @@ export default function PerformanceScreen({ navigation }) {
                   </ScrollView>
                 </View>
               </View>
+              </AnimatedSection>
             )}
 
             <View style={styles.section}>
@@ -239,13 +280,13 @@ export default function PerformanceScreen({ navigation }) {
                 </View>
               ) : (
                 <View style={{ gap: 12 }}>
-                  {courses.map((c) => {
+                  {courses.map((c, idx) => {
                     const meta = statusMeta(c.status, themeColors);
                     const title = c.course?.title || c.course?.courseCode || c.course?.code || 'Course';
                     const progress = Math.max(0, Math.min(100, c.progress || 0));
                     return (
+                      <AnimatedSection key={c._id} delay={140 + idx * 50}>
                       <View
-                        key={c._id}
                         style={[styles.courseCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
                       >
                         <View style={styles.courseTop}>
@@ -279,6 +320,7 @@ export default function PerformanceScreen({ navigation }) {
                           </View>
                         </View>
                       </View>
+                      </AnimatedSection>
                     );
                   })}
                 </View>

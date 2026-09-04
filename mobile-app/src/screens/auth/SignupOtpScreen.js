@@ -8,12 +8,13 @@
  * 400s.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import AuthScreenLayout from '../../components/AuthScreenLayout';
 import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { resendSignupOtp, verifySignupOtp } from '../../api/auth';
 import { colors } from '../../theme';
 
@@ -39,6 +40,24 @@ export default function SignupOtpScreen({ route, navigation }) {
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS);
 
   const timerRef = useRef(null);
+  const resendPulse = useRef(new Animated.Value(1)).current;
+  const resendPulseLoop = useRef(null);
+
+  useEffect(() => {
+    if (resending) {
+      resendPulseLoop.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(resendPulse, { toValue: 0.4, duration: 500, useNativeDriver: true }),
+          Animated.timing(resendPulse, { toValue: 1, duration: 500, useNativeDriver: true }),
+        ])
+      );
+      resendPulseLoop.current.start();
+    } else {
+      resendPulseLoop.current?.stop();
+      resendPulse.setValue(1);
+    }
+    return () => resendPulseLoop.current?.stop();
+  }, [resending, resendPulse]);
 
   // One interval drives both counters — they only ever tick down together.
   useEffect(() => {
@@ -103,6 +122,7 @@ export default function SignupOtpScreen({ route, navigation }) {
       subtitle={`Enter the 6-digit code we sent to\n${email}`}
       onBack={() => navigation.goBack()}
     >
+      <FadeSlideIn duration={400}>
       <PillInput
         label="Verification Code"
         icon="key"
@@ -138,14 +158,21 @@ export default function SignupOtpScreen({ route, navigation }) {
       />
 
       <Pressable onPress={handleResend} disabled={cooldown > 0 || resending} style={styles.resendBtn}>
-        <Text style={[styles.resendText, cooldown > 0 && styles.resendTextDisabled]}>
+        <Animated.Text
+          style={[
+            styles.resendText,
+            cooldown > 0 && styles.resendTextDisabled,
+            resending && { opacity: resendPulse },
+          ]}
+        >
           {resending
             ? 'Sending…'
             : cooldown > 0
               ? `Resend code in ${formatClock(cooldown)}`
               : 'Resend Code'}
-        </Text>
+        </Animated.Text>
       </Pressable>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }

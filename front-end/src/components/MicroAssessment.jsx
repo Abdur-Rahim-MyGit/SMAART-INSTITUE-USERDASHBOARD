@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, AlertCircle, ArrowRight, Trophy, BookOpen } from 'lucide-react';
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
+import {
+  AlertCircle,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Trophy,
+  XCircle,
+} from "@/components/icons";
 import { courseEnrollmentAPI } from '../services/api';
 import {
   isAnswerCorrect,
@@ -188,30 +198,30 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
           : 'Practice quiz';
 
   return (
-    <div className="w-full bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
-      <div className="px-4 py-4 md:px-6 md:py-5 border-b border-slate-100 dark:border-white/10 bg-slate-50/80 dark:bg-[#001835]/50">
+    <div className="w-full bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 overflow-hidden">
+      <div className="px-4 py-4 md:px-6 md:py-5 border-b border-[#d7ebf5] dark:border-white/10 bg-[#F1F5F9]/80 dark:bg-[#072036]/50">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#1a3884]/10 flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-5 h-5 text-[#1a3884]" />
+            <div className="w-10 h-10 rounded-xl bg-[#045C9A]/10 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-5 h-5 text-[#045C9A]" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white truncate">
+              <h2 className="text-lg md:text-xl font-bold text-[#072036] dark:text-white truncate">
                 {assessmentData.title || 'Practice'}
               </h2>
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{headerSubtitle}</p>
             </div>
           </div>
           {step === 'quiz' && !showExplanation && (
-            <span className="text-xs font-semibold text-[#1a3884] bg-[#1a3884]/10 px-3 py-1 rounded-full w-fit">
+            <span className="text-xs font-semibold text-[#045C9A] bg-[#045C9A]/10 px-3 py-1 rounded-full w-fit">
               Score: {score}
             </span>
           )}
         </div>
         {step === 'quiz' && (
-          <div className="mt-3 h-1.5 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
+          <div className="mt-3 h-1.5 bg-[#d7ebf5] dark:bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-[#1a3884] rounded-full"
+              className="h-full bg-[#045C9A] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
             />
@@ -223,10 +233,10 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
         {/* INTRO STEP */}
         {step === 'intro' && (
           <div className="text-center space-y-3 md:space-y-6 py-4 md:py-8">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mx-auto text-[#1a3884] mb-2 md:mb-6">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#045C9A]/10 rounded-full flex items-center justify-center mx-auto text-[#045C9A] mb-2 md:mb-6">
                <AlertCircle className="w-10 h-10 md:w-12 md:h-12" />
-            </div>            <h3 className="text-2xl md:text-3xl font-black text-[#1a3884] dark:text-white tracking-tight">Ready for the Assessment?</h3>
-            <p className="text-slate-600 dark:text-slate-350 max-w-md mx-auto text-sm md:text-base leading-relaxed font-medium">
+            </div>            <h3 className="text-2xl md:text-2xl font-extrabold tracking-tight text-[#045C9A] dark:text-white tracking-tight">Ready for the Assessment?</h3>
+            <p className="text-slate-600 dark:text-slate-300 max-w-md mx-auto text-sm md:text-base leading-relaxed font-medium">
               You will answer <strong>{normalizeQuizQuestions(assessmentData?.questions || []).length} multiple-choice questions</strong>.
               {assessmentData?.shuffleQuestions !== false
                 ? ' Questions appear in random order.'
@@ -235,7 +245,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             </p>
             <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-10 py-4 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl font-bold text-base transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-[#1a3884]/20"
+              className="w-full sm:w-auto rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
             >
               Start Assessment
             </button>
@@ -252,7 +262,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                exit={{ opacity: 0, x: -20 }}
                className="space-y-6"
              >
-                <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-snug md:leading-relaxed">
+                <h3 className="text-lg md:text-xl font-bold text-[#072036] dark:text-white leading-snug md:leading-relaxed">
                   {currentQuestion.question}
                 </h3>
 
@@ -281,13 +291,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                            <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-all duration-300 ${
                              showResult
                                ? isCorrectOption
-                                 ? 'border-green-500 bg-green-500 text-white'
+                                 ? 'border-emerald-500 bg-emerald-500 text-white'
                                  : isSelected && !isCorrectOption
                                  ? 'border-red-500 bg-red-500 text-white'
-                                 : 'border-slate-300 dark:border-slate-600 text-slate-500'
+                                 : 'border-[#d7ebf5] dark:border-white/10 text-slate-500'
                                : isSelected
-                               ? 'border-[#1a3884] bg-[#1a3884] text-white'
-                               : 'border-slate-300 dark:border-slate-600 text-slate-500'
+                               ? 'border-[#045C9A] bg-[#045C9A] text-white'
+                               : 'border-[#d7ebf5] dark:border-white/10 text-slate-500'
                            }`}>
                              {showResult ? (
                                isCorrectOption || (isSelected && !isCorrectOption) ? (
@@ -320,7 +330,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                          <button
                            onClick={() => handleSubmitAnswer(selectedAnswer)}
                            disabled={selectedAnswer === null || isSubmitting}
-                           className="flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2.5 rounded-lg hover:bg-[#112b6b] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                           className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
                          >
                            Submit Answer
                            <ArrowRight size={16} />
@@ -329,7 +339,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                          <button
                            onClick={() => handleNextDelayed(selectedAnswer)}
                            disabled={selectedAnswer === null || isSubmitting}
-                           className="flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2.5 rounded-lg hover:bg-[#112b6b] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                           className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
                          >
                            {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
                            <ArrowRight size={16} />
@@ -342,9 +352,9 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-6 p-5 bg-blue-50 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/40 rounded-2xl text-blue-900 dark:text-blue-300"
+                      className="mt-6 p-5 bg-[#EAF7FD] dark:bg-[#045C9A]/10 border border-[#d7ebf5]/50 dark:border-[#045C9A]/30 rounded-2xl text-[#072036] dark:text-[#A6D7E8]"
                     >
-                       <p className="font-extrabold mb-1.5 flex items-center gap-2 text-sm uppercase tracking-wider text-[#1a3884] dark:text-blue-400">
+                       <p className="font-extrabold mb-1.5 flex items-center gap-2 text-sm uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8]">
                          <AlertCircle size={15} /> Explanation
                        </p>
                        <p className="text-sm font-medium leading-relaxed opacity-95">
@@ -353,7 +363,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                        <button
                          onClick={handleNextQuestion}
-                         className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-7 py-3 rounded-xl font-bold text-sm hover:bg-[#112b6b] transition-colors ml-auto shadow-md"
+                         className="ml-auto mt-4 flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
                        >
                          {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
                          <ArrowRight size={15} />
@@ -372,7 +382,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
              <button
                type="button"
                onClick={() => setStep('result')}
-               className="mb-6 text-sm font-semibold text-[#1a3884] hover:text-[#112b6b] transition-colors"
+               className="mb-6 text-sm font-semibold text-[#045C9A] hover:text-[#034a7d] transition-colors"
              >
                ← Back to results
              </button>
@@ -383,7 +393,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                animate={{ opacity: 1, y: 0 }}
                className="space-y-6"
              >
-                <h3 className="text-base md:text-xl font-medium text-gray-800 dark:text-slate-200">
+                <h3 className="text-base md:text-xl font-medium text-[#072036] dark:text-slate-200">
                   {shuffledQuestions[currentQuestionIndex].question}
                 </h3>
 
@@ -394,7 +404,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      const isCorrect = idx === getCorrectOptionIndex(q);
                      
                      let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between ";
-                     if (isCorrect) btnClass += "border-green-500 bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
+                     if (isCorrect) btnClass += "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400";
                      else if (isUserChoice) btnClass += "border-red-500 bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
                      else btnClass += "border-gray-100 dark:border-white/8 opacity-60";
 
@@ -408,11 +418,11 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                          </div>
                          <div className="flex items-center gap-2 flex-shrink-0">
                            {isUserChoice && (
-                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-[#003170] text-slate-600 dark:text-slate-300">
+                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-[#d7ebf5]/80 dark:bg-[#0d3a5f] text-slate-600 dark:text-slate-300">
                                Your answer
                              </span>
                            )}
-                           {isCorrect && <CheckCircle2 size={18} className="text-green-500" />}
+                           {isCorrect && <CheckCircle2 size={18} className="text-emerald-500" />}
                            {isUserChoice && !isCorrect && <XCircle size={18} className="text-red-500" />}
                          </div>
                        </div>
@@ -420,8 +430,8 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                   })}
                 </div>
 
-                <div className="bg-[#F8FAFC] dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-white/10">
-                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Explanation</p>
+                <div className="bg-[#F1F5F9] dark:bg-white/5 p-4 rounded-xl border border-[#d7ebf5] dark:border-white/10">
+                   <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Explanation</p>
                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       {shuffledQuestions[currentQuestionIndex].explanation || "No explanation provided for this question."}
                    </p>
@@ -431,14 +441,14 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     <button
                         onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                         disabled={currentQuestionIndex === 0}
-                        className="flex-1 px-4 py-2 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30"
+                        className="flex-1 px-4 py-2 border border-[#d7ebf5] dark:border-white/10 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30"
                     >
                         Previous
                     </button>
                     <button
                         onClick={() => setCurrentQuestionIndex(prev => Math.min(shuffledQuestions.length - 1, prev + 1))}
                         disabled={currentQuestionIndex === shuffledQuestions.length - 1}
-                        className="flex-1 px-4 py-2 bg-[#1a3884] text-white rounded-lg text-sm font-bold hover:bg-[#112b6b] disabled:opacity-30 transition-colors"
+                        className="flex-1 rounded-xl px-4 py-2.5 text-[13px] font-semibold disabled:opacity-30 bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
                     >
                         Next
                     </button>
@@ -453,27 +463,27 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }} 
-                className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600"
+                className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600"
               >
                 <Trophy size={48} />
               </motion.div>
               
                <div>
-                <h3 className="text-3xl font-bold text-gray-800 dark:text-white">Assessment Complete!</h3>
-                <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
+                <h3 className="text-2xl font-extrabold tracking-tight text-[#072036] dark:text-white">Assessment Complete!</h3>
+                <p className="text-slate-500 dark:text-slate-400 mt-2">Here is how you performed</p>
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 py-6">
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
-                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
+                    <div className="text-3xl font-extrabold tabular-nums text-[#072036] dark:text-white">{score}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest">Your Score</div>
                  </div>
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-gray-300 dark:text-slate-600">/</div>
+                    <div className="text-3xl font-extrabold tabular-nums text-slate-300 dark:text-slate-600">/</div>
                  </div>
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)}</div>
-                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Points</div>
+                    <div className="text-3xl font-extrabold tabular-nums text-[#072036] dark:text-white">{shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Points</div>
                  </div>
               </div>
 
@@ -483,13 +493,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                         setCurrentQuestionIndex(0);
                         setStep('review');
                     }}
-                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
+                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#0d3a5f] border-2 border-[#045C9A] text-[#045C9A] rounded-xl font-bold shadow-sm transition-all hover:bg-[#045C9A]/5"
                   >
                     Review Responses
                   </button>
                   <button
                     onClick={() => onComplete(score, shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0))}
-                    className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+                    className="w-full sm:w-auto rounded-xl px-6 py-3 text-[13px] font-semibold bg-[#072036] hover:bg-[#0d3a5f] text-white shadow-md shadow-[#072036]/20 dark:bg-[#A6D7E8] dark:hover:bg-white dark:text-[#072036] dark:shadow-none transition-colors"
                   >
                     Continue to Next Step
                   </button>

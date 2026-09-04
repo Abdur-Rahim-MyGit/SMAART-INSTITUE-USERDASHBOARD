@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { RiTargetLine, RiFlagLine, RiArrowRightLine, RiLoader4Line, RiStarLine, RiSparklingLine } from "@remixicon/react";
+import {
+  RiArrowRightLine,
+  RiFlagLine,
+  RiLoader4Line,
+  RiSparklingLine,
+  RiStarLine,
+  RiTargetLine,
+} from "@/components/icons";
 import { getActiveVision } from "@/features/visionBoard/services/visionBoardProApi";
 import { useNavigate } from "react-router-dom";
 

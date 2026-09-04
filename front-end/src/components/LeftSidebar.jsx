@@ -3,36 +3,35 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
-  IconLayoutDashboard as LayoutDashboard,
-  IconTrendingUp as TrendingUp,
-  IconBriefcase as Briefcase,
-  IconBook2 as BookOpen,
-  IconClipboardCheck as ClipboardCheck,
-  IconTool as Wrench,
-  IconAward as Award,
-  IconShieldCheck as ShieldCheck,
-  IconBulb as Lightbulb,
-  IconUsers as Users,
-  IconSettings as Settings,
-  IconHelpCircle as HelpCircle,
-  IconBell as Bell,
-  IconMenu2 as Menu,
-  IconChevronLeft as ChevronLeft,
-  IconChevronRight as ChevronRight,
-  IconChevronDown as ChevronDown,
-  IconWorld as Languages,
-  IconStar as Star,
-  IconLogout as LogOut,
-  IconUser as User,
-  IconX as X,
-  IconSparkles as Sparkles,
-  IconChecks as CheckCheck,
-  IconBrain as Brain,
-  IconSun as Sun,
-  IconMoon as Moon,
-  IconAlertTriangle as ShieldAlert,
-  IconLanguage as BritishCouncilIcon,
-} from "@tabler/icons-react";
+  Award,
+  Bell,
+  BookOpen,
+  Brain,
+  Briefcase,
+  CheckCheck,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardCheck,
+  HelpCircle,
+  Languages,
+  LayoutDashboard,
+  Lightbulb,
+  LogOut,
+  Menu,
+  Moon,
+  Settings,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Sun,
+  TrendingUp,
+  User,
+  Users,
+  Wrench,
+  X,
+} from "@/components/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import useUser from "@/hooks/useUser";
@@ -76,7 +75,6 @@ const menuGroups = [
     items: [
       { icon: LayoutDashboard, label: "sidebar.dashboard", path: "/dashboard", badge: null },
       { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
-      { icon: BritishCouncilIcon, label: "sidebar.british_council", path: "/dashboard/british-council", badge: null },
       { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
       { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
       { icon: Briefcase, label: "sidebar.placement", path: "/dashboard/placement", badge: null },
@@ -212,7 +210,6 @@ const LeftSidebar = () => {
   const [notifLoading, setNotifLoading] = useState(false);
   const notificationRef = useRef(null);
 
-
   // Fetch notifications
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -307,7 +304,6 @@ const LeftSidebar = () => {
     }
   };
 
-
   // Check if menu item is active
   const isActive = (path) => {
     if (!path) return false;
@@ -361,15 +357,15 @@ const LeftSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-[#00152E] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-2xl flex flex-col"
+            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-[#072036] border-r border-[#d7ebf5] dark:border-[#045C9A]/15 shadow-2xl flex flex-col"
           >
             {/* Mobile Header */}
-            <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
+            <div className="p-6 flex items-center justify-between border-b border-[#d7ebf5] dark:border-[#045C9A]/15">
               <Link to="/dashboard" className="flex items-center flex-1 pr-4">
-                <img 
-                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
-                  alt="SMAART Institute" 
-                  className="h-8 w-auto object-contain flex-shrink-0" 
+                <img
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy}
+                  alt="SMAART Institute"
+                  className="h-8 w-auto object-contain flex-shrink-0"
                 />
               </Link>
               <button
@@ -395,7 +391,7 @@ const LeftSidebar = () => {
 
                       const content = (
                         <>
-                          <Icon size={20} stroke={1.5} className={`w-5 h-5 ${active ? 'text-white' : 'text-[#1a3884]'}`} />
+                          <Icon size={20} stroke={1.5} className={`w-5 h-5 ${active ? 'text-white' : 'text-[#045C9A] group-hover:text-[#072036]'}`} />
                           <span className="font-medium text-sm">{label}</span>
                           {item.badge && (
                             <span className="ml-auto px-2 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded-full">
@@ -419,7 +415,7 @@ const LeftSidebar = () => {
                                 toggleTheme();
                                 setIsMobileOpen(false);
                               }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-white/5"
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-[#072036] dark:text-slate-300 hover:bg-[#EAF7FD] dark:hover:bg-white/5"
                             >
                               {content}
                             </button>
@@ -430,7 +426,7 @@ const LeftSidebar = () => {
                                 className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"
                               >
                                 <div className="flex items-center gap-3">
-                                  <Icon className="w-5 h-5 text-[#1a3884]" />
+                                  <Icon className="w-5 h-5 text-[#0E2136]" />
                                   <span className="font-medium text-sm">{label}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
@@ -469,7 +465,7 @@ const LeftSidebar = () => {
                                           setIsMobileOpen(false);
                                         }}
                                         className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${i18n.language === lang.code
-                                            ? 'bg-[#1a3884] text-white shadow-sm'
+                                            ? 'bg-[#072036] text-white shadow-sm'
                                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
                                           }`}
                                       >
@@ -485,8 +481,8 @@ const LeftSidebar = () => {
                               to={item.path}
                               onClick={() => setIsMobileOpen(false)}
                               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
-                                ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
-                                : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-white/5'
+                                ? 'bg-[#072036] text-white shadow-lg shadow-[#072036]/25'
+                                : 'text-[#072036] dark:text-slate-300 hover:bg-[#EAF7FD] dark:hover:bg-white/5'
                                 }`}
                             >
                               {content}
@@ -501,7 +497,7 @@ const LeftSidebar = () => {
             </div>
 
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-slate-100 dark:border-[#1a3884]/15 space-y-2">
+            <div className="p-4 border-t border-[#d7ebf5] dark:border-[#045C9A]/15 space-y-2">
               <button
                 onClick={() => {
                   handleLogout();
@@ -522,25 +518,25 @@ const LeftSidebar = () => {
         initial={false}
         animate={{ width: isCollapsed ? 70 : 240 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#00152E] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-xl`}
+        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#072036] border-r border-[#d7ebf5] dark:border-[#045C9A]/15 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
-        <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-[#1a3884]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
+        <div className={`flex flex-col items-start py-6 border-b border-[#d7ebf5] dark:border-[#045C9A]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden w-full">
             {isCollapsed ? (
-              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center shadow-md border border-slate-200/50 dark:border-white/5 relative overflow-hidden">
-                <img 
-                  src={theme === 'dark' ? smaartMarkWhite : smaartMarkNavy} 
-                  alt="S" 
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center shadow-md border border-[#d7ebf5]/50 dark:border-white/5 relative overflow-hidden">
+                <img
+                  src={theme === 'dark' ? smaartMarkWhite : smaartMarkNavy}
+                  alt="S"
                   className="w-7 h-7 object-contain"
                 />
               </div>
             ) : (
               <div className="flex items-center justify-between w-full">
-                <img 
-                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy} 
-                  alt="SMAART Institute" 
-                  className="h-8 w-auto object-contain flex-shrink-0" 
+                <img
+                  src={theme === 'dark' ? smaartLogoWhite : smaartLogoNavy}
+                  alt="SMAART Institute"
+                  className="h-8 w-auto object-contain flex-shrink-0"
                 />
               </div>
             )}
@@ -578,7 +574,7 @@ const LeftSidebar = () => {
                       {/* Icon */}
                       <div className={`relative ${isCollapsed ? '' : ''}`}>
                         <Icon size={20} stroke={1.5}
-                          className={`w-5 h-5 transition-colors ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884] dark:group-hover:text-white'
+                          className={`w-5 h-5 transition-all duration-300 ease-out group-hover:-translate-y-[2px] group-hover:scale-[1.15] ${active ? 'text-white' : 'text-[#045C9A] dark:text-slate-400 group-hover:text-[#072036] dark:group-hover:text-white'
                             }`}
                         />
                         {/* Tooltip for collapsed state */}
@@ -625,7 +621,7 @@ const LeftSidebar = () => {
                     <button
                       key={item.label}
                       onClick={toggleTheme}
-                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#1a3884]/30 dark:hover:text-white ${isCollapsed ? 'justify-center' : ''}`}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-[#072036] dark:text-slate-300 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/30 dark:hover:text-white ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
                     </button>
@@ -634,8 +630,8 @@ const LeftSidebar = () => {
                       key={item.path}
                       to={item.path}
                       className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
-                        ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#1a3884]/30 dark:hover:text-white'
+                        ? 'bg-[#072036] text-white shadow-md shadow-[#072036]/25'
+                        : 'text-[#072036] dark:text-slate-300 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/30 dark:hover:text-white'
                         } ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
@@ -648,18 +644,18 @@ const LeftSidebar = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 space-y-1">
+        <div className="p-3 border-t border-[#d7ebf5] dark:border-[#045C9A]/15 space-y-1">
           {/* Section left empty after removing notification button */}
         </div>
 
         {/* User Profile Section with Hover Card */}
-        <div 
-          className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-50"
+        <div
+          className="p-3 border-t border-[#d7ebf5] dark:border-[#045C9A]/15 relative z-50"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <div
-            className={`flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] dark:bg-white/5 cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-white/10 ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 p-2 rounded-xl bg-[#EAF7FD] dark:bg-white/[0.06] border border-transparent dark:border-white/10 cursor-pointer transition-colors hover:bg-slate-100 dark:hover:bg-white/[0.1] ${isCollapsed ? 'justify-center' : ''}`}
             onClick={() => navigate('/dashboard/profile')}
           >
             {/* Avatar - Fixed to College Logo */}
@@ -668,27 +664,27 @@ const LeftSidebar = () => {
                 <img
                   src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
                   alt={user.college.collegeName || "College Logo"}
-                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-white/5 border-2 border-slate-100 dark:border-[#1a3884]/30 p-1"
+                  className="w-9 h-9 rounded-lg object-contain bg-white border border-[#d7ebf5] dark:border-white/20 p-1 shrink-0"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-slate-100 dark:border-[#1a3884]/30">
+                <div className="w-9 h-9 rounded-lg bg-[#072036] dark:bg-[#045C9A] flex items-center justify-center border border-[#d7ebf5] dark:border-white/20 shrink-0">
                   <User size={20} stroke={1.5} className="w-6 h-6 text-white" />
                 </div>
               )}
             </div>
- 
+
             {/* User Info - Displaying College Name */}
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                <p className="font-semibold text-[13px] text-slate-900 dark:text-white truncate leading-tight">
                   {user?.college?.collegeName || 'College'}
                 </p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 truncate leading-none">
                   {t(`common.${(user?.role || 'student').toLowerCase()}`)}
                 </p>
               </div>
             )}
- 
+
             {/* Arrow Indicator */}
             {!isCollapsed && (
               <ChevronRight size={16} stroke={1.5} className="w-4 h-4 text-slate-400" />
@@ -707,11 +703,11 @@ const LeftSidebar = () => {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-                <ProfileHoverCard 
-                  user={user} 
-                  avatarData={avatarData} 
-                  onLogout={handleLogout} 
-                  onClose={closeProfileMenu} 
+                <ProfileHoverCard
+                  user={user}
+                  avatarData={avatarData}
+                  onLogout={handleLogout}
+                  onClose={closeProfileMenu}
                 />
               </motion.div>
             )}

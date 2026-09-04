@@ -1,6 +1,96 @@
 # Mobile App — Web Feature → Mobile Placement Map & Current Status
 
-_Last updated: 2026-08-06_
+_Last updated: 2026-08-25_
+
+> **2026-08-25 build, same day as the correction below.** In one continuous
+> pass, on top of the Notifications/Support build noted in Section 2:
+> - **Proctoring is now wired into a real assessment attempt** — a mandatory
+>   on-device face-registration gate (`ProctoringGate.js` +
+>   `useProctoringSession.js`) runs before the first question of every T1–T4
+>   attempt, then heartbeats every 10s and reports the app being backgrounded
+>   for the rest of the attempt. The server's tier decision (`ok/warn/pause/held`)
+>   is obeyed, never derived locally — a `held` attempt auto-submits what's
+>   answered and shows a dedicated review screen. **Deliberately not built**:
+>   continuous in-exam face re-verification, gaze/audio/environment checks —
+>   all of those need the camera mounted for the whole exam and a physical
+>   device to validate, which this pass didn't have either.
+> - **Assessment answers now actually survive a dropped write.** A failed
+>   `saveAnswer` used to be silently discarded — `submitAssessment` never
+>   resent anything, so the old "one dropped write is not fatal" comment was
+>   false. Failed writes are now queued, retried every 8s, and drained before
+>   every submit; a manual submit blocks (with a clear message) if any answer
+>   still can't reach the server.
+> - **Settings**: added a real in-app password change — this required a *new*
+>   backend route, `POST /api/auth/change-password`, since no self-service
+>   "change my password while logged in" endpoint existed anywhere in this
+>   product before (web included) — only the forced-first-login and
+>   forgot-password flows did. Also moved the dark-mode toggle into Settings
+>   (it only lived on Home before). Notification preferences are still not
+>   here — there's no backend concept of per-user prefs to control yet.
+> - **Home's notification bell badge is real now** — it was a hardcoded dot
+>   that always showed; it now reflects `GET /notifications/unread-count`,
+>   refreshed on every focus.
+> - **Career tab cleanup**: `JobDetailScreen` was fully built but orphaned
+>   (unregistered, unreferenced) — it's now the actual job-detail route,
+>   replacing `CareerScreen`'s old inline modal. Built `ResumeBuilderScreen`
+>   (full CRUD against `api/resumes.js`, linked from Toolkit) — **note**:
+>   `POST /resumes/:id/export` does not render a PDF, it only registers a
+>   verification record; there is still no working PDF export from mobile,
+>   and the builder says so rather than faking a button that does nothing.
+> - **Community**: group chat now polls every 3s while its overlay is open
+>   (matches the web's own non-Socket.io approach); added a Vision Board
+>   entry point on the Community tab itself, previously reachable only via
+>   the side drawer. The discussion/post feed (`api/communityFeed.js`, fully
+>   built backend) is still unused by any screen — left as a known gap, not
+>   built in this pass; it's new-feature scope, not cleanup.
+>
+> Still open after all of the above: push notifications (no `expo-notifications`
+> anywhere — needs a Firebase/Expo project decision this pass didn't have),
+> the `ENFORCE_PROGRESSION_GATES = false` call in `courseUnlock.js` (left
+> alone deliberately — flipping it changes what's visible to every student
+> and isn't a call to make without knowing why it was turned off), and the
+> whole app is still unverified on a physical device.
+
+> **2026-08-25 correction.** Everything below the "2026-08-06" status table and
+> detail sections was written before the 2026-08-17 commit ("mobile and
+> login") that built out real Assessments, Learning, Career, and Community
+> screens against live backend data — none of that got reflected back into
+> this doc at the time. A full source audit today found those four phases are
+> **substantially complete**, not 0%. See the corrected table immediately
+> below; the phase detail sections further down are left as historical
+> record of the Phase 1 push and are otherwise stale — don't trust their
+> "0%/stub" language for Assessments/Learning/Career/Community.
+>
+> **Corrected status (verified against source, 2026-08-25):**
+> - **Assessments** — Done. `AssessmentsScreen` + `AssessmentPlayerScreen` (513
+>   lines) fully wired to `assessments.js`/`results.js`/`stageresults.js`.
+>   Gaps: proctoring is built but **not wired into the actual attempt flow**
+>   (face pipeline only reachable as a standalone test screen); no offline
+>   answer buffering.
+> - **Learning** — Done. Real catalogue **and** a real video player
+>   (`expo-video`, resume-from-timestamp, server checkpointing) — not a
+>   catalogue-only stub. Certificates/Notes/Library/CGPA all real.
+>   `ENFORCE_PROGRESSION_GATES = false` — locking logic exists but is
+>   currently disabled.
+> - **Career** — Done. Job board with apply/offer flow, and a **live
+>   LLM-backed** AI Career Coach chat (OpenRouter). Gaps: no Resume Builder
+>   screen despite a ready backend + unused `api/resumes.js`; `JobDetailScreen`
+>   is fully built but not registered in `AppStack` / never navigated to.
+> - **Community** — Done for a reduced scope (Notices + Study Groups + Vision
+>   Board). Gaps: group chat has no live polling; the discussion/post feed
+>   (`api/communityFeed.js`, fully built backend) has zero UI using it;
+>   MindCare doesn't exist anywhere (confirmed aspirational, per this doc's
+>   own earlier caveat).
+> - **Notifications & Support** — Were `ComingSoon` stubs; **replaced today**
+>   with real screens (`NotificationsScreen`, `SupportScreen`) against the
+>   already-complete `notifications.js` / `tickets.js` / `grievances.js`
+>   backend routes. See "2026-08-25 build" note in Section 2 below.
+> - **Settings** — Still only the biometric toggle works. Theme switching
+>   exists but lives as a button on `HomeScreen`, not in Settings. No
+>   notification prefs, no in-app password change.
+> - Still genuinely unbuilt: push notifications (no `expo-notifications`
+>   anywhere), Resume Builder, physical-device verification of biometrics/face
+>   pipeline/OTP delivery (still emulator/web-only as far as this repo shows).
 
 This document answers one question: **for every feature that already exists on the web
 dashboard, where does it go in `mobile-app/`, and how far along is it?** It sits alongside
@@ -96,7 +186,7 @@ convention), and which backend routes it talks to (all reusable as-is per SRS Ap
 | Web source | Mobile target | Backend routes (reused as-is) | Notes |
 |---|---|---|---|
 | `DashboardHome.jsx` + `HeroSection`, `CollegeBanners` | `screens/home/HomeScreen.js` (**done, real data — updated 2026-08-04**) | `courseEnrollments.js` (`GET /courseEnrollments/student/:studentId`), `stageresults.js` (`GET /stageresults/user/:userId/status`), `colleges.js` (`GET /colleges/:id/banners`) | Now shows a real "Continue Learning" card (furthest-along in-progress enrollment + progress bar), a real "Next Up" assessment CTA (simplified T1→T2→T3→T4 cascade off real stage-status, without the web's course-ID cross-referencing since course-gating isn't wired yet), and a real auto-rotating college banner carousel. CTAs still navigate to the (still-stub) Assessments/Learning tabs, which is honest since those aren't built yet. `CareerPathsWidget`/`ActiveSkillsWidget`/`LearningProgress` (calendar+todos) were **not** ported — the first two need career-agent-shaped data transforms not worth building before Career (Phase 5) exists, and the calendar/todos widget is a substantial feature of its own; revisit once those phases land. |
-| Hamburger side menu (new — not a 1:1 web port) | `components/SideDrawer.js` (**new**), triggered from a hamburger icon in `HomeScreen.js`'s hero row | — | Custom-built (no `@react-navigation/drawer` — avoids adding gesture-handler/reanimated as new native deps) slide-in panel: profile summary, My Profile, Notifications, Settings, Support & Grievances, Face Verification Test (Beta), Log Out. Notifications/Settings/Support are new lightweight `ComingSoon`-based stub screens registered on `AppStack` (`screens/notifications/`, `screens/profile/SettingsScreen.js`, `screens/support/`) so the menu has somewhere honest to go. **Only wired into Home for now** — other tab screens don't have a header/hamburger yet; decide whether to extract a shared `AppHeader` component once a second screen needs one rather than duplicating the hero-row hamburger pattern. |
+| Hamburger side menu (new — not a 1:1 web port) | `components/SideDrawer.js` (**new**), triggered from a hamburger icon in `HomeScreen.js`'s hero row | — | Custom-built (no `@react-navigation/drawer` — avoids adding gesture-handler/reanimated as new native deps) slide-in panel: profile summary, My Profile, Notifications, Settings, Support & Grievances, Face Verification Test (Beta), Log Out. Notifications and Support are now real screens (**built 2026-08-25**, see row below) against the live backend; Settings is still partial (biometric toggle only). **Only wired into Home for now** — other tab screens don't have a header/hamburger yet; decide whether to extract a shared `AppHeader` component once a second screen needs one rather than duplicating the hero-row hamburger pattern. |
 | `StudentOnboarding` first-run wizard | Fold into `HomeScreen.js` as a conditional first-run banner, not a separate screen | `students.js` | Low priority — SRS marks full onboarding (FR-AUTH-12) as **Should**, not **Must**. Still not built. |
 
 ### 📝 Assessments tab
@@ -151,9 +241,9 @@ the catch-all "More" tab, matching the single "Profile" tab already in `MainTabs
 |---|---|---|---|
 | `Profile.jsx` | `screens/profile/ProfileScreen.js` (**exists, partial** — view + logout only today) | `students.js`, `users.js` | Add edit-profile fields. |
 | `Settings.jsx` | `screens/profile/SettingsScreen.js` (**partial — security section built 2026-08-06**) | `users.js` | Has the FR-AUTH-09 biometric toggle, single-session status, and device info. Still to add: in-app password change, theme switch (`ThemeContext` exists but nothing toggles it yet), notification prefs. |
-| `Notifications.jsx` + `NotificationContext.jsx` (Socket.io) | `screens/notifications/NotificationCenterScreen.js` (**new**) | `notifications.js` | **Don't port the Socket.io client 1:1.** SRS FR-SUP-03 explicitly wants this replaced by native push (FCM/APNs via `expo-notifications`) — the in-app list should just be a REST list/mark-read/delete screen against `notifications.js`; keep Socket.io (if at all) only for a live badge count while foregrounded. |
-| `SupportTicketsPage.jsx` | `screens/support/SupportTicketsScreen.js` (**new**) | `tickets.js` | |
-| `GrievancesPage.jsx` | `screens/support/GrievancesScreen.js` (**new**) | `grievances.js` | |
+| `Notifications.jsx` + `NotificationContext.jsx` (Socket.io) | `screens/notifications/NotificationsScreen.js` (**done — built 2026-08-25**) | `notifications.js` | Built as a REST list, not a Socket.io port, per the guidance this row used to give: filter (All/Unread), grouped-by-date list, mark read/mark all read/delete/clear all, load-more pagination. Refreshes on pull-to-refresh and screen focus instead of a live socket. Still open: no live badge count anywhere (Home's bell icon doesn't show an unread dot), and push notifications (`expo-notifications`) are still entirely unwired — FR-SUP-03 is not done. |
+| `SupportTicketsPage.jsx` | `screens/support/SupportScreen.js` (**done — built 2026-08-25**) | `tickets.js` | Folded into `SupportScreen.js` alongside Grievances (one screen, IT Support / Grievances segmented control) rather than a separate stack screen, to match the app's single "Support & Grievances" drawer entry. New ticket form, category + priority, history list, and a detail modal with the response thread (locked once a ticket is resolved/closed, matching the backend's own restriction). Attachments were dropped — no image/file-picker dependency exists in this app yet, same scope cut every other new-screen pass here has made. |
+| `GrievancesPage.jsx` | Folded into `SupportScreen.js` (**done — built 2026-08-25**, see row above) | `grievances.js` | Submit form (title/description/category/anonymous toggle), history list, detail modal with response thread. |
 
 ---
 
@@ -223,6 +313,19 @@ older one. Pick per context; don't "unify" them without a design decision.
 
 ## 6. Known blockers (don't re-diagnose these as new bugs)
 
+- **`[runtime not ready] TypeError: Cannot read property 'install' of null` on launch (fixed
+  2026-08-25).** Caused by the 2026-08-25 proctoring wiring: `AssessmentPlayerScreen.js` picked
+  up top-level imports of `ProctoringGate.js` (`react-native-vision-camera`) and
+  `useProctoringSession.js` → `facepipeline/onnxFacePipeline.js` (`onnxruntime-react-native`).
+  `AssessmentPlayerScreen` was a normal eager import in `AppStack.js`, so those native modules
+  were now touched at app startup for every session — not just when a student opens a proctored
+  assessment. This is exactly the failure mode `FaceVerificationTestScreen` was already wrapped
+  in `React.lazy()` to avoid (see the comment a few lines above it in `AppStack.js`). **Fix:**
+  `AssessmentPlayerScreen` is now lazy-loaded the same way (`LazyAssessmentPlayerScreen`) — the
+  whole proctoring/vision-camera/onnxruntime chain only loads once a student actually starts an
+  assessment. If this error comes back, check for a new top-level import of
+  `onnxruntime-react-native`, `react-native-vision-camera`, or anything under `facepipeline/`
+  that isn't behind a lazy boundary.
 - **Local *debug* builds work** (verified 2026-08-06 — app built, installed and launched on
   `emulator-5554`). Two separate Windows failures have hit this repo; don't conflate them:
   - `ninja: error: failed recompaction: Permission denied` at `:app:configureCMakeDebug` —

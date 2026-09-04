@@ -49,6 +49,10 @@ const SkillAssessmentPlayer = () => {
   const [error, setError] = useState(null);
   const [setupCompleted, setSetupCompleted] = useState(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
+  // All enrolled frame embeddings. Verifying against every enrolled pose is what
+  // absorbs the head turns and lighting shifts of a real sitting; the single
+  // median vector alone is noticeably less forgiving.
+  const [registeredAllEmbeddings, setRegisteredAllEmbeddings] = useState(null);
   const [registrationMetadata, setRegistrationMetadata] = useState(null);
   const [assessment, setAssessment] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -265,6 +269,8 @@ const SkillAssessmentPlayer = () => {
   const {
     warningsCount,
     maxWarnings,
+    diagnostics,
+    riskFlagged,
     isWarningVisible,
     lastViolationType,
     acknowledgeWarning,
@@ -297,6 +303,7 @@ const SkillAssessmentPlayer = () => {
     assessmentId: assessment?._id,
     isActive: !loading && !submitted && !error && !!assessment && setupCompleted,
     registeredFaceDescriptor,
+    registeredAllEmbeddings,
     registrationMetadata
   });
 
@@ -427,14 +434,28 @@ const SkillAssessmentPlayer = () => {
   if (!setupCompleted) {
     return (
       <ProctoringSetup
-        onComplete={({ faceDescriptor, alignedCropDataUrl }) => {
+        onComplete={({
+          faceDescriptor,
+          allEmbeddings,
+          registrationQualityScore,
+          framesCaptured,
+          registrationCropUrl,
+        }) => {
+          // Every field below used to be either dropped or invented here. The
+          // crop was read under a key the setup never sends; allEmbeddings was
+          // discarded entirely, so the exam verified against one median vector
+          // instead of all the enrolled poses; and the metadata was hard-coded
+          // to a 128-d face-api model with a perfect quality score and a passed
+          // anti-spoof check — none of which is true. The pipeline is 512-d
+          // ArcFace, and the real numbers arrive in this payload.
           setRegisteredFaceDescriptor(faceDescriptor);
+          setRegisteredAllEmbeddings(allEmbeddings || null);
           setRegistrationMetadata({
-            model: 'faceapi-128',
-            qualityScore: 100,
-            framesCaptured: 3,
-            antispoofPassed: true,
-            registrationCropUrl: alignedCropDataUrl || null,
+            model: 'arcface-r50-onnx',
+            qualityScore: registrationQualityScore ?? null,
+            framesCaptured: framesCaptured ?? null,
+            antispoofPassed: null, // No anti-spoof model is loaded — say so.
+            registrationCropUrl: registrationCropUrl || null,
           });
           setSetupCompleted(true);
         }}
@@ -851,6 +872,9 @@ const SkillAssessmentPlayer = () => {
           verificationStatus={verificationStatus}
           similarityScore={similarityScore}
           gazeDirection={gazeDirection}
+          diagnostics={diagnostics}
+          nudgeMessage={nudgeMessage}
+          riskFlagged={riskFlagged}
         />
       )}
 

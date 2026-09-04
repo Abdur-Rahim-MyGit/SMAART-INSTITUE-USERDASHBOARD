@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+// Material Symbols barrel -- the icon set used across the product. This file
+// pulled from @remixicon/react, a third icon library.
 import {
   RiAlertLine,
-  RiTimeLine,
-  RiCameraLine,
-  RiWindowLine,
-  RiUserUnfollowLine,
-  RiEyeOffLine
-} from '@remixicon/react';
+  Clock as RiTimeLine,
+  Camera as RiCameraLine,
+  Maximize as RiWindowLine,
+  Users as RiUserUnfollowLine,
+  Eye as RiEyeOffLine,
+  FileText as RiFileCopyLine,
+} from '@/components/icons';
 
 const VIOLATION_DETAILS = {
   tab_switch: {
@@ -119,6 +122,61 @@ const VIOLATION_DETAILS = {
     title: 'Browser Focus Lost',
     description: 'The assessment window lost active focus. Please remain on the exam screen.',
     icon: <RiWindowLine className="text-red-500 w-12 h-12" />
+  },
+  copy_detected: {
+    title: 'Copying Is Not Permitted',
+    description: 'Assessment questions may not be copied. The action was blocked and recorded.',
+    icon: <RiFileCopyLine className="text-red-500 w-12 h-12" />
+  },
+  paste_detected: {
+    title: 'Pasting Is Not Permitted',
+    description: 'Pasting text into the assessment was blocked and recorded.',
+    icon: <RiFileCopyLine className="text-red-500 w-12 h-12" />
+  },
+  restricted_shortcut: {
+    title: 'Shortcut Blocked',
+    description: 'Printing, saving and developer tools are disabled during the assessment.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  context_menu: {
+    title: 'Right-Click Disabled',
+    description: 'The browser context menu is disabled while the assessment is open.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  multiple_voices: {
+    title: 'More Than One Voice Heard',
+    description: 'Two different voices were detected in the room. You must sit the assessment alone.',
+    icon: <RiUserUnfollowLine className="text-red-500 w-12 h-12" />
+  },
+  remote_access_suspected: {
+    title: 'Remote Session Suspected',
+    description: 'This device shows signs of a virtual machine or remote desktop session.',
+    icon: <RiWindowLine className="text-red-500 w-12 h-12" />
+  },
+  second_screen_detected: {
+    title: 'Second Screen Detected',
+    description: 'Additional displays are not permitted. Disconnect any extra monitor.',
+    icon: <RiWindowLine className="text-red-500 w-12 h-12" />
+  },
+  virtual_camera_detected: {
+    title: 'Virtual Camera Detected',
+    description: 'The camera feed is not coming from a physical webcam.',
+    icon: <RiCameraLine className="text-red-500 w-12 h-12" />
+  },
+  microphone_disabled: {
+    title: 'Microphone Turned Off',
+    description: 'Microphone access was lost. A working microphone is required throughout.',
+    icon: <RiAlertLine className="text-red-500 w-12 h-12" />
+  },
+  prolonged_silence: {
+    title: 'Presence Check',
+    description: 'No sound or activity has been detected for several minutes. Please confirm you are still at your desk.',
+    icon: <RiTimeLine className="text-red-500 w-12 h-12" />
+  },
+  timing_anomaly: {
+    title: 'Timing Anomaly',
+    description: 'The assessment timing did not match the server record for this attempt.',
+    icon: <RiTimeLine className="text-red-500 w-12 h-12" />
   }
 };
 
@@ -126,6 +184,7 @@ export const ProctoringWarningModal = ({
   isOpen,
   warningsCount,
   maxWarnings,
+  riskFlagged = false,
   violationType,
   onAcknowledge
 }) => {
@@ -156,6 +215,8 @@ export const ProctoringWarningModal = ({
   if (!isOpen) return null;
 
   const displayMax = maxWarnings || 3;
+  // How many the candidate actually has left, never below zero.
+  const remaining = Math.max(0, displayMax - (warningsCount || 0));
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0F172A]/50 dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-colors duration-300">
@@ -189,11 +250,34 @@ export const ProctoringWarningModal = ({
 
         {/* Warning Statement */}
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-3.5 mb-6 text-xs text-red-750 dark:text-red-300 font-semibold leading-relaxed">
+          {/* Tell the candidate what is actually true.
+              This said "next violation will result in termination and lock-out"
+              on EVERY warning, including the first of ten. Telling someone
+              mid-exam that one more slip ends their attempt, when they in fact
+              have nine left, is frightening and simply false — and frightened
+              candidates look away from the screen, which trips more warnings. */}
           {warningsCount > maxWarnings ? (
             <span>Disqualification threshold reached. Submitting test...</span>
+          ) : riskFlagged ? (
+            /* Past the risk threshold. Counting down remaining warnings here
+               would be a lie in the reassuring direction — the attempt is
+               already going to review regardless of how many are "left". */
+            <span>
+              This attempt will now be reviewed before your score is released.
+              Your answers are saved either way — please carry on and finish.
+            </span>
+          ) : remaining <= 1 ? (
+            <span>
+              This is your final warning. Another violation will end the attempt.
+            </span>
+          ) : remaining <= 3 ? (
+            <span>
+              {remaining} warnings remaining before the attempt is held for review.
+            </span>
           ) : (
             <span>
-              Next violation will result in assessment termination and lock-out.
+              This has been recorded. You have {remaining} of {displayMax} warnings remaining —
+              your assessment is continuing normally.
             </span>
           )}
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ZoomIn, ZoomOut, RotateCcw, Loader2 } from 'lucide-react';
+import { Loader2, RotateCcw, X, ZoomIn, ZoomOut } from "@/components/icons";
 import { useTranslation } from 'react-i18next';
 
 const CROP_SIZE = 240;
@@ -160,7 +160,7 @@ const ImageCropperModal = ({ isOpen, imageSrc, onClose, onCrop, isSaving }) => {
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            className="bg-white dark:bg-[#002147] rounded-[28px] shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-100 dark:border-white/5"
+            className="bg-white dark:bg-[#0d3a5f] rounded-[28px] shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-100 dark:border-white/5"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -168,13 +168,13 @@ const ImageCropperModal = ({ isOpen, imageSrc, onClose, onCrop, isSaving }) => {
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                   Crop Profile Photo
                 </h3>
-                <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Drag and zoom to position perfectly
                 </p>
               </div>
               <button 
                 onClick={onClose} 
-                className="p-2 rounded-xl text-slate-400 hover:bg-slate-50 dark:hover:bg-[#002A5C] transition-colors"
+                className="p-2 rounded-xl text-slate-600 hover:bg-slate-50 dark:hover:bg-[#0d3a5f] transition-colors"
                 disabled={isSaving}
               >
                 <X className="w-5 h-5" />
@@ -224,7 +224,7 @@ const ImageCropperModal = ({ isOpen, imageSrc, onClose, onCrop, isSaving }) => {
             {/* Controls */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-3">
-                <ZoomOut className="w-4 h-4 text-slate-400" />
+                <ZoomOut className="w-4 h-4 text-slate-600" />
                 <input
                   type="range"
                   min="1"
@@ -232,15 +232,15 @@ const ImageCropperModal = ({ isOpen, imageSrc, onClose, onCrop, isSaving }) => {
                   step="0.01"
                   value={zoom}
                   onChange={(e) => setZoom(parseFloat(e.target.value))}
-                  className="flex-1 h-1.5 bg-slate-100 dark:bg-[#001E3D] rounded-lg appearance-none cursor-pointer accent-[#1a3884] dark:accent-blue-400"
+                  className="flex-1 h-1.5 bg-slate-100 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#045C9A] dark:accent-blue-400"
                 />
-                <ZoomIn className="w-4 h-4 text-slate-400" />
+                <ZoomIn className="w-4 h-4 text-slate-600" />
               </div>
 
               <div className="flex justify-center">
                 <button
                   onClick={() => { setZoom(1); setPosition({ x: 0, y: 0 }); }}
-                  className="text-xs font-semibold text-slate-400 dark:text-slate-400 hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[#002A5C]"
+                  className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-[#045C9A] dark:hover:text-blue-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[#0d3a5f]"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Reset Adjustment
@@ -253,14 +253,14 @@ const ImageCropperModal = ({ isOpen, imageSrc, onClose, onCrop, isSaving }) => {
               <button
                 onClick={onClose}
                 disabled={isSaving}
-                className="flex-1 py-3 px-4 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-[#002A5C] transition-colors"
+                className="flex-1 py-3 px-4 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-[#0d3a5f] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving || baseDimensions.width === 0}
-                className="flex-1 py-3 px-4 bg-[#1a3884] text-white rounded-2xl font-bold hover:bg-[#132c6b] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
+                className="flex-1 py-3 px-4 bg-[#045C9A] text-white rounded-2xl font-bold hover:bg-[#034a7d] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
               >
                 {isSaving ? (
                   <>

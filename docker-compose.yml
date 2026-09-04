@@ -31,6 +31,14 @@ services:
     environment:
       - PORT=5000
       - NODE_ENV=production
+      # LOCAL TESTING ONLY. Prints the login OTP (with the email and name) to
+      # this container's logs so you can read codes with show-otp.cmd instead of
+      # waiting for email. NODE_ENV is 'production' even locally, so without this
+      # the codes are hidden - emailService.js only prints them when NODE_ENV is
+      # 'development' OR LOG_OTP is 'true'.
+      # NEVER set this on the server: docker-compose.prod.yml deliberately omits
+      # it, so production writes no login codes to disk.
+      - LOG_OTP=true
       # In production mode the backend's CORS only accepts these browser
       # origins (comma-separated): the Docker frontend on :8081 and the Vite
       # dev server on :8080 for local development.
@@ -49,8 +57,18 @@ services:
       # backend URL (e.g. https://api.example.com/api) before building.
       args:
         VITE_API_URL: ${VITE_API_URL:-}
+        VITE_ADMIN_URL: ${VITE_ADMIN_URL:-}
     ports:
       - "8081:80"
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      default: {}
+      smaart-shared: {}
+
+# Shared with the admin project so nginx can proxy /employer/ to it.
+# Create once with:  docker network create smaart-shared
+networks:
+  smaart-shared:
+    external: true

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,13 +12,63 @@ import {
   Alert,
   Dimensions,
   Image,
+  Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { placementsAPI } from '../../api/placements';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+export function normalizeJobType(job) {
+  const combined = [job.displayType, job.type, job.jobType, job.employmentType]
+    .filter(Boolean)
+    .map((s) => String(s).toLowerCase())
+    .join(' ');
+  if (!combined) return 'other';
+  if (combined.includes('intern')) return 'internship';
+  if (combined.includes('part')) return 'part-time';
+  if (combined.includes('full') || combined.includes('permanent')) return 'full-time';
+  return 'other';
+}
+
+function AnimatedSection({ children, delay = 0, style }) {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: 420,
+      delay,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, delay]);
+
+  const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+
+  return (
+    <Animated.View style={[{ opacity: anim, transform: [{ translateY }] }, style]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+function PressCard({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () =>
+    Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 40 }).start();
+  const onPressOut = () =>
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 40 }).start();
+
+  return (
+    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} disabled={disabled}>
+      <Animated.View style={[{ transform: [{ scale }] }, style]}>{children}</Animated.View>
+    </Pressable>
+  );
+}
 
 export default function CareerScreen({ navigation }) {
   const { user } = useAuth();
@@ -37,11 +87,6 @@ export default function CareerScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all'); // 'all', 'full-time', 'part-time', 'internship'
   const [sourceFilter, setSourceFilter] = useState('all'); // 'all', 'smaartjobpostings', 'jobpostings'
-
-  // Modal Details
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [jobModalVisible, setJobModalVisible] = useState(false);
-  const [applying, setApplying] = useState(false);
 
   // Offer Letter Response State
   const [selectedOfferApp, setSelectedOfferApp] = useState(null);
@@ -87,9 +132,10 @@ export default function CareerScreen({ navigation }) {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    await fetchJobs();
-    if (activeTab === 'applied') await fetchApplications();
-    else if (activeTab === 'fairs') await fetchJobFairs();
+    // Applications are always loaded so "Already Applied" is accurate on the
+    // job board itself, not only after visiting the My Applications tab.
+    await Promise.all([fetchJobs(), fetchApplications()]);
+    if (activeTab === 'fairs') await fetchJobFairs();
     else if (activeTab === 'partners') await fetchPartners();
     setLoading(false);
   }, [activeTab]);
@@ -97,19 +143,6 @@ export default function CareerScreen({ navigation }) {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  // Normalize Job Type helper
-  const normalizeJobType = (job) => {
-    const combined = [job.displayType, job.type, job.jobType, job.employmentType]
-      .filter(Boolean)
-      .map((s) => String(s).toLowerCase())
-      .join(' ');
-    if (!combined) return 'other';
-    if (combined.includes('intern')) return 'internship';
-    if (combined.includes('part')) return 'part-time';
-    if (combined.includes('full') || combined.includes('permanent')) return 'full-time';
-    return 'other';
-  };
 
   // Filters logic
   const filteredJobs = useMemo(() => {
@@ -133,26 +166,36 @@ export default function CareerScreen({ navigation }) {
   }, [jobs, typeFilter, sourceFilter, searchQuery]);
 
   // Handle Job Application
-  const handleApply = async (job) => {
+  const handleApply = async (job, coverLetter) => {
     const alreadyApplied = applications.some((app) => (app.job?._id || app.job) === job._id);
     if (alreadyApplied) {
       Alert.alert('Already Applied', 'You have already submitted an application for this role.');
       return;
     }
 
-    setApplying(true);
+    // Server rejects letters under 50 words / over 6000 chars — mirror it here
+    // so the student gets immediate feedback instead of a round-trip error.
+    const letter = (coverLetter || '').trim();
+    const wordCount = letter ? letter.split(/\s+/).filter(Boolean).length : 0;
+    if (wordCount < 50) {
+      Alert.alert('Cover Letter Required', 'Please write a cover letter of at least 50 words for this job.');
+      return;
+    }
+    if (letter.length > 6000) {
+      Alert.alert('Cover Letter Too Long', 'Cover letter is too long (maximum 6000 characters).');
+      return;
+    }
+
     try {
       const source = job.sourceCollection || 'jobpostings';
       await placementsAPI.applyJob(source, job._id, {
-        coverLetter: 'Applied via SMAART Mobile App.',
+        coverLetter: letter,
       });
       Alert.alert('Application Submitted! 🎉', 'Your profile details have been sent to the employer.');
-      setJobModalVisible(false);
+      navigation.goBack();
       fetchApplications();
     } catch (err) {
       Alert.alert('Apply Failed', err.message || 'Please try again.');
-    } finally {
-      setApplying(false);
     }
   };
 
@@ -211,87 +254,93 @@ export default function CareerScreen({ navigation }) {
     if (norm.includes('selected') || norm.includes('accepted') || norm.includes('offer')) return '#10B981';
     if (norm.includes('review') || norm.includes('progress')) return '#F59E0B';
     if (norm.includes('rejected') || norm.includes('declined')) return '#EF4444';
-    return '#3B82F6';
+    return '#1478B8';
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.bg }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.bg }]} edges={['top']}>
       {/* Aurora Background */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <View style={[styles.auroraBlob, { backgroundColor: '#3B82F6', top: -80, left: -60, width: 280, height: 280, borderRadius: 140, opacity: theme === 'dark' ? 0.12 : 0.05 }]} />
+        <View style={[styles.auroraBlob, { backgroundColor: '#1478B8', top: -80, left: -60, width: 280, height: 280, borderRadius: 140, opacity: theme === 'dark' ? 0.12 : 0.05 }]} />
         <View style={[styles.auroraBlob, { backgroundColor: '#EC4899', top: 180, right: -120, width: 340, height: 340, borderRadius: 170, opacity: theme === 'dark' ? 0.08 : 0.04 }]} />
       </View>
 
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: themeColors.text }]}>Career Center</Text>
-        <Text style={[styles.headerSubtitle, { color: themeColors.textMuted }]}>
-          Explore placements, track job applications, and interact with hiring partners.
-        </Text>
-      </View>
+      <AnimatedSection delay={0}>
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { color: themeColors.text }]}>Career Center</Text>
+          <Text style={[styles.headerSubtitle, { color: themeColors.textMuted }]}>
+            Explore placements, track job applications, and interact with hiring partners.
+          </Text>
+        </View>
+      </AnimatedSection>
 
       {/* ── AI Career Coach entry (FR-CAR-01) ─────────────────────────────
           The coach is the tab's headline capability but had no entry point on
           mobile at all, so it sits above the placement tabs rather than inside
           them. */}
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={() => navigation.navigate('CareerCoachChat')}
-        style={[styles.coachCard, { backgroundColor: themeColors.primaryBright }]}
-      >
-        <View style={styles.coachIcon}>
-          <Feather name="compass" size={20} color="#FFFFFF" />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.coachTitle}>AI Career Coach</Text>
-          <Text style={styles.coachSub}>Ask about roles, skills and your next step</Text>
-        </View>
-        <Feather name="arrow-right" size={18} color="#FFFFFF" />
-      </TouchableOpacity>
+      <AnimatedSection delay={60}>
+        <PressCard
+          onPress={() => navigation.navigate('CareerCoachChat')}
+          style={[styles.coachCard, { backgroundColor: themeColors.primaryBright }]}
+        >
+          <View style={styles.coachIcon}>
+            <Feather name="compass" size={20} color="#FFFFFF" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.coachTitle}>AI Career Coach</Text>
+            <Text style={styles.coachSub}>Ask about roles, skills and your next step</Text>
+          </View>
+          <Feather name="arrow-right" size={18} color="#FFFFFF" />
+        </PressCard>
+      </AnimatedSection>
 
       {/* ── Career Directions entry ────────────────────────────────────────
           Second in-tab entry point for the direction-lock flow (getDirectionLockStatus
           → onboarding or dashboard), so it's discoverable here as well as from the
           side drawer's "Career Directions" item. */}
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={() => navigation.navigate('CareerDirections')}
-        style={[styles.directionsCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
-      >
-        <View style={[styles.directionsIcon, { backgroundColor: 'rgba(37, 99, 235, 0.1)' }]}>
-          <Feather name="compass" size={20} color={themeColors.primaryBright} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.directionsTitle, { color: themeColors.text }]}>Career Directions</Text>
-          <Text style={[styles.directionsSub, { color: themeColors.textMuted }]}>Lock a target role and get your skill roadmap</Text>
-        </View>
-        <Feather name="arrow-right" size={18} color={themeColors.textMuted} />
-      </TouchableOpacity>
+      <AnimatedSection delay={120}>
+        <PressCard
+          onPress={() => navigation.navigate('CareerDirections')}
+          style={[styles.directionsCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+        >
+          <View style={[styles.directionsIcon, { backgroundColor: 'rgba(4, 92, 154, 0.1)' }]}>
+            <Feather name="compass" size={20} color={themeColors.primaryBright} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.directionsTitle, { color: themeColors.text }]}>Career Directions</Text>
+            <Text style={[styles.directionsSub, { color: themeColors.textMuted }]}>Lock a target role and get your skill roadmap</Text>
+          </View>
+          <Feather name="arrow-right" size={18} color={themeColors.textMuted} />
+        </PressCard>
+      </AnimatedSection>
 
       {/* Segment Menu Tab Toggles */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer} contentContainerStyle={styles.tabsScroll}>
-        {[
-          { id: 'jobs', label: 'Explore Jobs', icon: 'briefcase' },
-          { id: 'applied', label: 'My Applications', icon: 'check-circle' },
-          { id: 'fairs', label: 'Job Fairs', icon: 'calendar' },
-          { id: 'partners', label: 'Our Partners', icon: 'users' },
-        ].map((tab) => (
-          <TouchableOpacity
-            key={tab.id}
-            style={[
-              styles.tabBtn,
-              { backgroundColor: themeColors.card, borderColor: themeColors.border },
-              activeTab === tab.id && { backgroundColor: themeColors.primaryBright, borderColor: themeColors.primaryBright },
-            ]}
-            onPress={() => {
-              setActiveTab(tab.id);
-              setSearchQuery('');
-            }}
-          >
-            <Feather name={tab.icon} size={13} color={activeTab === tab.id ? '#FFFFFF' : themeColors.textMuted} />
-            <Text style={[styles.tabBtnText, { color: activeTab === tab.id ? '#FFFFFF' : themeColors.text }]}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <AnimatedSection delay={170}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer} contentContainerStyle={styles.tabsScroll}>
+          {[
+            { id: 'jobs', label: 'Explore Jobs', icon: 'briefcase' },
+            { id: 'applied', label: 'My Applications', icon: 'check-circle' },
+            { id: 'fairs', label: 'Job Fairs', icon: 'calendar' },
+            { id: 'partners', label: 'Our Partners', icon: 'users' },
+          ].map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              style={[
+                styles.tabBtn,
+                { backgroundColor: themeColors.card, borderColor: themeColors.border },
+                activeTab === tab.id && { backgroundColor: themeColors.primaryBright, borderColor: themeColors.primaryBright },
+              ]}
+              onPress={() => {
+                setActiveTab(tab.id);
+                setSearchQuery('');
+              }}
+            >
+              <Feather name={tab.icon} size={13} color={activeTab === tab.id ? '#FFFFFF' : themeColors.textMuted} />
+              <Text style={[styles.tabBtnText, { color: activeTab === tab.id ? '#FFFFFF' : themeColors.text }]}>{tab.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </AnimatedSection>
 
       {loading ? (
         <View style={styles.loaderContainer}>
@@ -301,7 +350,7 @@ export default function CareerScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.bodyScroll} showsVerticalScrollIndicator={false}>
           {/* SEARCH & FILTERS ON EXPLORE TAB */}
           {activeTab === 'jobs' && (
-            <View style={styles.filtersSection}>
+            <AnimatedSection delay={0} style={styles.filtersSection}>
               {/* Search */}
               <View style={[styles.searchBar, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                 <Feather name="search" size={16} color={themeColors.textMuted} style={{ marginRight: 8 }} />
@@ -345,12 +394,12 @@ export default function CareerScreen({ navigation }) {
                   ))}
                 </ScrollView>
               </View>
-            </View>
+            </AnimatedSection>
           )}
 
           {/* CONTENT LIST RENDERING */}
           {activeTab === 'jobs' && (
-            <View style={styles.listContainer}>
+            <AnimatedSection delay={80} style={styles.listContainer}>
               {filteredJobs.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Feather name="info" size={32} color={themeColors.textMuted} />
@@ -363,17 +412,20 @@ export default function CareerScreen({ navigation }) {
                   const isSmaart = job.sourceCollection === 'smaartjobpostings';
 
                   return (
-                    <Pressable
+                    <PressCard
                       key={job._id}
                       style={[styles.jobCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
-                      onPress={() => {
-                        setSelectedJob(job);
-                        setJobModalVisible(true);
-                      }}
+                      onPress={() =>
+                        navigation.navigate('JobDetail', {
+                          job,
+                          alreadyApplied: applications.some((app) => (app.job?._id || app.job) === job._id),
+                          onApply: handleApply,
+                        })
+                      }
                     >
                       <View style={styles.cardTop}>
                         {/* Company Logo mock */}
-                        <View style={[styles.companyLogo, { backgroundColor: 'rgba(37, 99, 235, 0.08)' }]}>
+                        <View style={[styles.companyLogo, { backgroundColor: 'rgba(4, 92, 154, 0.08)' }]}>
                           <Text style={[styles.companyInit, { color: themeColors.primaryBright }]}>{companyInit}</Text>
                         </View>
                         <View style={styles.cardHeaderInfo}>
@@ -384,7 +436,7 @@ export default function CareerScreen({ navigation }) {
                             {job.displayCompany || job.company}
                           </Text>
                         </View>
-                        <View style={[styles.sourceTag, { backgroundColor: isSmaart ? '#1E293B' : 'rgba(37, 99, 235, 0.1)' }]}>
+                        <View style={[styles.sourceTag, { backgroundColor: isSmaart ? '#1E293B' : 'rgba(4, 92, 154, 0.1)' }]}>
                           <Text style={[styles.sourceTagText, { color: isSmaart ? '#FFFFFF' : themeColors.primaryBright }]}>
                             {isSmaart ? 'SMAART' : 'COLLEGE'}
                           </Text>
@@ -410,15 +462,15 @@ export default function CareerScreen({ navigation }) {
                           </View>
                         )}
                       </View>
-                    </Pressable>
+                    </PressCard>
                   );
                 })
               )}
-            </View>
+            </AnimatedSection>
           )}
 
           {activeTab === 'applied' && (
-            <View style={styles.listContainer}>
+            <AnimatedSection delay={80} style={styles.listContainer}>
               {applications.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Feather name="file-text" size={32} color={themeColors.textMuted} />
@@ -475,11 +527,11 @@ export default function CareerScreen({ navigation }) {
                   );
                 })
               )}
-            </View>
+            </AnimatedSection>
           )}
 
           {activeTab === 'fairs' && (
-            <View style={styles.listContainer}>
+            <AnimatedSection delay={80} style={styles.listContainer}>
               {fairs.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Feather name="calendar" size={32} color={themeColors.textMuted} />
@@ -507,11 +559,11 @@ export default function CareerScreen({ navigation }) {
                   </View>
                 ))
               )}
-            </View>
+            </AnimatedSection>
           )}
 
           {activeTab === 'partners' && (
-            <View style={styles.partnersGrid}>
+            <AnimatedSection delay={80} style={styles.partnersGrid}>
               {partners.length === 0 ? (
                 <View style={styles.emptyContainer}>
                   <Feather name="users" size={32} color={themeColors.textMuted} />
@@ -532,92 +584,10 @@ export default function CareerScreen({ navigation }) {
                   </View>
                 ))
               )}
-            </View>
+            </AnimatedSection>
           )}
         </ScrollView>
       )}
-
-      {/* JOB DETAILS OVERLAY MODAL */}
-      <Modal visible={jobModalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: themeColors.bg }]}>
-            <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
-              <Text style={[styles.modalHeaderTitle, { color: themeColors.text }]} numberOfLines={1}>
-                {selectedJob?.displayTitle || selectedJob?.title}
-              </Text>
-              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setJobModalVisible(false)}>
-                <Feather name="x" size={20} color={themeColors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
-              <Text style={[styles.detailSectionTitle, { color: themeColors.text }]}>Company</Text>
-              <Text style={[styles.detailValueText, { color: themeColors.textMuted }]}>
-                {selectedJob?.displayCompany || selectedJob?.company}
-              </Text>
-
-              <Text style={[styles.detailSectionTitle, { color: themeColors.text, marginTop: 14 }]}>Job Description</Text>
-              <Text style={[styles.detailValueText, { color: themeColors.textMuted, lineHeight: 18 }]}>
-                {selectedJob?.description || selectedJob?.jobDescription || 'Role details and requirements will be shared by the recruiter.'}
-              </Text>
-
-              <View style={styles.detailGrid}>
-                <View style={styles.detailGridCell}>
-                  <Text style={[styles.gridLabel, { color: themeColors.textMuted }]}>Location</Text>
-                  <Text style={[styles.gridValue, { color: themeColors.text }]}>
-                    {selectedJob?.displayLocation || selectedJob?.location || 'Remote'}
-                  </Text>
-                </View>
-                <View style={styles.detailGridCell}>
-                  <Text style={[styles.gridLabel, { color: themeColors.textMuted }]}>Employment Type</Text>
-                  <Text style={[styles.gridValue, { color: themeColors.text }]}>
-                    {selectedJob ? normalizeJobType(selectedJob) : 'Full-Time'}
-                  </Text>
-                </View>
-                {selectedJob?.ctc && (
-                  <View style={styles.detailGridCell}>
-                    <Text style={[styles.gridLabel, { color: themeColors.textMuted }]}>Compensation (CTC)</Text>
-                    <Text style={[styles.gridValue, { color: themeColors.text }]}>{selectedJob?.ctc}</Text>
-                  </View>
-                )}
-                {selectedJob?.deadline && (
-                  <View style={styles.detailGridCell}>
-                    <Text style={[styles.gridLabel, { color: themeColors.textMuted }]}>Application Deadline</Text>
-                    <Text style={[styles.gridValue, { color: themeColors.text }]}>
-                      {new Date(selectedJob.deadline).toLocaleDateString()}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {selectedJob?.skills && selectedJob.skills.length > 0 && (
-                <View style={{ marginTop: 14 }}>
-                  <Text style={[styles.detailSectionTitle, { color: themeColors.text }]}>Required Skills</Text>
-                  <View style={styles.skillsRow}>
-                    {selectedJob.skills.map((skill, index) => (
-                      <View key={index} style={[styles.skillTag, { backgroundColor: themeColors.border }]}>
-                        <Text style={[styles.skillTagText, { color: themeColors.text }]}>{skill}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={[styles.applyBtn, { backgroundColor: themeColors.primaryBright }, applying && { opacity: 0.6 }]}
-                disabled={applying}
-                onPress={() => handleApply(selectedJob)}
-              >
-                {applying ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.applyBtnText}>Apply for this job</Text>
-                )}
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
       {/* OFFER LETTER RESPOND MODAL */}
       <Modal visible={offerModalVisible} animationType="slide" transparent>
@@ -677,7 +647,7 @@ export default function CareerScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -692,7 +662,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 15,
-    shadowColor: '#2563EB',
+    shadowColor: '#045C9A',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.28,
     shadowRadius: 16,
@@ -962,7 +932,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 14,
-    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+    backgroundColor: 'rgba(4, 92, 154, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,

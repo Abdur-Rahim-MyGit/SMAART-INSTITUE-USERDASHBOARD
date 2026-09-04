@@ -30,6 +30,7 @@ import PillInput from '../../components/PillInput';
 import PillButton from '../../components/PillButton';
 import ChipSelect from '../../components/ChipSelect';
 import Banner from '../../components/Banner';
+import { FadeSlideIn } from '../../components/Motion';
 import { useAuth } from '../../context/AuthContext';
 import { completeRegistration, getRegistration, saveRegistrationSection } from '../../api/profile';
 import { colors, radius } from '../../theme';
@@ -278,6 +279,7 @@ export default function ProfileCompletionScreen() {
       subtitle="This unlocks assessments, courses and placement matching"
       onBack={step > 0 ? () => setStep((s) => s - 1) : undefined}
     >
+      <FadeSlideIn duration={400}>
       {/* Step indicator */}
       <View style={styles.stepper}>
         {STEPS.map((label, i) => (
@@ -468,6 +470,7 @@ export default function ProfileCompletionScreen() {
       <Pressable onPress={signOut} style={styles.footerBtn} hitSlop={8}>
         <Text style={styles.footerNote}>Sign out</Text>
       </Pressable>
+      </FadeSlideIn>
     </AuthScreenLayout>
   );
 }
@@ -493,7 +496,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 6,
   },
-  stepDotActive: { backgroundColor: '#EFF6FF', borderColor: colors.primary },
+  stepDotActive: { backgroundColor: '#EAF7FD', borderColor: colors.primary },
   stepDotDone: { backgroundColor: colors.success, borderColor: colors.success },
   stepNum: { fontSize: 11, fontWeight: '800', color: colors.mutedLight },
   stepNumActive: { color: colors.primary },
@@ -503,7 +506,7 @@ const styles = StyleSheet.create({
   finalNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EAF7FD',
     borderWidth: 1,
     borderColor: '#BFDBFE',
     borderRadius: radius.lg,

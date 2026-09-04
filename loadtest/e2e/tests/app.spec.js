@@ -14,11 +14,29 @@ const E2E_EMAIL = fixture.e2eEmail;
 const E2E_PASSWORD = fixture.e2ePassword;
 const OUT = '/loadtest/e2e-results';
 
+// Benign noise: hardcoded :5000 sockets, favicons, and the gitignored ONNX
+// models/WASM that are never present in CI.
+const IGNORE_RE = /:5000|socket|websocket|favicon|supabase|sitemap|robots|onnx-wasm|models\/onnx|ort\.min\.js|\.wasm/i;
+
 function trackProblems(page) {
   const problems = [];
-  page.on('console', (m) => { if (m.type() === 'error') problems.push('console: ' + m.text()); });
+  page.on('console', (m) => {
+    if (m.type() !== 'error') return;
+    // Chrome's "Failed to load resource: ... 404/500" console errors carry NO
+    // URL, so they can't be attributed (and used to fail the run even for
+    // ignorable resources). Every one of them is mirrored by a
+    // 'response'/'requestfailed' event below that DOES carry the URL — track
+    // those instead and skip the URL-less duplicate here.
+    if (/Failed to load resource/i.test(m.text())) return;
+    problems.push('console: ' + m.text());
+  });
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   page.on('requestfailed', (r) => problems.push('reqfail: ' + r.url() + ' ' + (r.failure() && r.failure().errorText)));
+  page.on('response', (r) => {
+    // Missing resources and server errors only — a 401/403 from an auth probe
+    // on a public page is normal, not a broken page.
+    if (r.status() === 404 || r.status() >= 500) problems.push(`badresponse: ${r.url()} ${r.status()}`);
+  });
   return problems;
 }
 
@@ -34,19 +52,15 @@ test('1. landing page loads and the SPA renders', async ({ page }) => {
 
   await page.screenshot({ path: `${OUT}/01-landing.png`, fullPage: true });
 
-  // Ignore benign third-party / websocket noise (sockets hardcode :5000), and missing gitignored ONNX models/WASM.
-  const fatal = problems.filter((p) => !/:5000|socket|websocket|favicon|supabase|sitemap|robots|onnx-wasm|models\/onnx|ort\.min\.js/i.test(p));
+  const fatal = problems.filter((p) => !IGNORE_RE.test(p));
   console.log(`[landing] problems=${problems.length} fatal=${fatal.length}`);
   if (problems.length) console.log(problems.slice(0, 8).join('\n'));
   expect(fatal, 'fatal browser errors').toHaveLength(0);
 });
 
 test('2. college search API (through the LB) returns the seeded college', async ({ page }) => {
-  // The login funnel begins with a public college search (GET /api/colleges).
-  // We exercise it through the load balancer via a browser-originated request.
-  // (The SPA's own search box currently builds the API URL as host:5000 for
-  //  non-localhost hosts — a frontend quirk flagged separately — so we hit the
-  //  API path directly here, which is what the search ultimately relies on.)
+  // The public college search still backs the institution pages; exercise it
+  // through the load balancer via a browser-originated request.
   const res = await page.request.get('/api/colleges?search=Load%20Test&limit=20');
   expect(res.status(), 'colleges search HTTP status').toBe(200);
   const text = await res.text();
@@ -55,18 +69,24 @@ test('2. college search API (through the LB) returns the seeded college', async 
     'seeded college present in search results').toBeTruthy();
 });
 
-test('4. UI college search works in-browser (validates same-origin /api fix)', async ({ page }) => {
-  // Drives the real SPA search box. Before the api.js fix this failed with
-  // "Failed to fetch" (SPA called host:5000). After the fix it calls /api
-  // same-origin through Nginx, so the seeded college now appears in the UI.
+test('4. UI login form works in-browser (validates same-origin /api)', async ({ page }) => {
+  // Drives the real SPA login form on /login (the page no longer has a
+  // college search box — the flow starts directly at email + password). A
+  // successful submit means the SPA's own same-origin /api/auth/login call
+  // went through Nginx and the backend answered with the OTP gate, whose
+  // 6-digit modal then renders.
   await page.goto('/login', { waitUntil: 'networkidle' });
-  const search = page.locator('input[placeholder*="college" i]').first();
-  await expect(search, 'college search box on /login').toBeVisible({ timeout: 20000 });
-  await search.fill('Load Test');
-  await expect(page.getByText(/Load Test Institute/i).first(),
-    'seeded college appears in the UI search results').toBeVisible({ timeout: 20000 });
-  await page.screenshot({ path: `${OUT}/05-ui-search.png`, fullPage: true });
-  console.log('[ui-search] SPA same-origin API call works');
+
+  const email = page.locator('#login-email');
+  await expect(email, 'email input on /login').toBeVisible({ timeout: 20000 });
+  await email.fill(E2E_EMAIL);
+  await page.locator('#login-password').fill(E2E_PASSWORD);
+  await page.locator('button[type="submit"]').first().click();
+
+  await expect(page.locator('input[aria-label*="OTP digit" i]').first(),
+    'OTP entry appears after login submit').toBeVisible({ timeout: 20000 });
+  await page.screenshot({ path: `${OUT}/05-ui-login-otp.png`, fullPage: true });
+  console.log('[ui-login] SPA same-origin /api/auth/login reached the OTP step');
 });
 
 test('3. login backend path (through the LB) reaches the OTP step', async ({ page }) => {

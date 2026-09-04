@@ -1,23 +1,25 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+// Material Symbols barrel -- the icon set the dashboard, courses list, profile
+// and course player all use. This file imported from lucide-react, so its icons
+// rendered at a different weight and optical size to the rest of the product.
 import {
-  Play,
-  Pause,
-  RotateCcw,
-  Volume2,
-  VolumeX,
   Maximize,
   Minimize,
-  MoreVertical,
-  Loader2,
+  Pause,
+  PictureInPicture as Tv,
+  Play,
+  RotateCcw,
   Settings,
-  Tv,
-  CheckCircle,
-  Sparkles
-} from 'lucide-react';
+  Sparkles,
+  TheaterNormal,
+  TheaterWide,
+  Volume2,
+  VolumeX,
+} from "@/components/icons";
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onTimeUpdate, onNext, nextLabel = "Next Lesson" }, ref) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onTimeUpdate, onNext, nextLabel = "Next Lesson", isTheater = false, onToggleTheater, className = "" }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -41,6 +43,9 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   const controlsTimeoutRef = useRef(null);
   const lastSyncTimeRef = useRef(0);
   const lastUrlRef = useRef(videoUrl);
+  // Latest theater toggle, read from the keyboard handler without re-binding it.
+  const onToggleTheaterRef = useRef(onToggleTheater);
+  useEffect(() => { onToggleTheaterRef.current = onToggleTheater; }, [onToggleTheater]);
 
   useImperativeHandle(ref, () => ({
     seekTo: (time) => {
@@ -279,6 +284,18 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!videoRef.current) return;
+      // Never hijack typing: the notes editor and quiz inputs share this page.
+      const target = e.target;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       switch (e.key.toLowerCase()) {
         case ' ':
@@ -301,6 +318,12 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
         case 'f':
           e.preventDefault();
           toggleFullscreen();
+          break;
+        case 't':
+          if (onToggleTheaterRef.current) {
+            e.preventDefault();
+            onToggleTheaterRef.current();
+          }
           break;
         default:
           break;
@@ -428,10 +451,10 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
     return (
       <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center rounded-xl overflow-hidden border-2 border-gray-300">
         <div className="p-6 rounded-full bg-white shadow-md mb-4 group-hover:scale-110 transition-transform duration-500">
-          <VolumeX className="w-12 h-12 text-gray-400" />
+          <VolumeX className="w-12 h-12 text-slate-400" />
         </div>
-        <h3 className="text-xl font-bold mb-2" style={{ color: '#002147' }}>Video Unavailable</h3>
-        <p className="text-sm max-w-xs text-center" style={{ color: '#1a3884' }}>
+        <h3 className="text-xl font-bold mb-2" style={{ color: '#072036' }}>Video Unavailable</h3>
+        <p className="text-sm max-w-xs text-center" style={{ color: '#045C9A' }}>
           {hasError ? "We encountered an error loading this video source." : "No valid video URL was provided for this lesson."}
         </p>
       </div>
@@ -441,7 +464,11 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
   return (
     <div
       ref={containerRef}
-      className="group relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-blue-500/30 cursor-pointer select-none transform-gpu bg-slate-950"
+      className={`group relative aspect-video overflow-hidden cursor-pointer select-none transform-gpu bg-slate-950 ${
+        isTheater
+          ? 'rounded-none border-0 shadow-none'
+          : 'rounded-2xl shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30'
+      } ${className}`}
       style={{ transform: 'translateZ(0)' }}
       onMouseEnter={() => setShowControls(true)}
       onMouseMove={handleMouseMove}
@@ -481,10 +508,10 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
           >
             <div className="flex flex-col items-center gap-3">
               <div className="relative flex items-center justify-center">
-                <div className="w-14 h-14 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin" />
-                <Sparkles className="w-6 h-6 text-cyan-400 absolute animate-pulse" />
+                <div className="w-14 h-14 rounded-full border-2 border-[#045C9A]/20 border-t-cyan-400 animate-spin" />
+                <Sparkles className="w-6 h-6 text-[#045C9A] dark:text-[#A6D7E8] absolute animate-pulse" />
               </div>
-              <span className="text-xs font-extrabold text-cyan-300 tracking-wider uppercase">Loading Media...</span>
+              <span className="text-xs font-extrabold text-[#A6D7E8] tracking-widest uppercase">Loading Media...</span>
             </div>
           </motion.div>
         )}
@@ -527,8 +554,8 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               }}
             >
               {/* Simple & Premium Play Button Container */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white text-[#1a3884] dark:bg-slate-900 dark:text-cyan-400 shadow-2xl border border-slate-200/50 dark:border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-cyan-500/20">
-                <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-current ml-1" />
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white text-[#045C9A] dark:bg-[#072036] dark:text-[#A6D7E8] shadow-2xl border border-[#d7ebf5] dark:border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-[#045C9A]/20">
+                <Play fill={1} className="w-7 h-7 sm:w-8 sm:h-8 ml-1" />
               </div>
             </motion.div>
           )}
@@ -543,15 +570,15 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-3 left-4 right-4 py-2.5 px-4 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl z-40 transition-opacity duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)]"
+            className="absolute bottom-3 left-4 right-4 py-2.5 px-4 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl border border-[#d7ebf5] dark:border-white/10 rounded-2xl z-40 transition-opacity duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)]"
           >
             {/* Scrubber Container */}
             <div className="relative group/scrubber mb-3">
               {/* Background Track */}
-              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-slate-200 dark:bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-[#d7ebf5] dark:bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
                 {/* Progress Bar with Simple Solid Color */}
                 <div
-                  className="h-full bg-[#1a3884] dark:bg-cyan-500"
+                  className="h-full bg-[#045C9A] dark:bg-[#A6D7E8]"
                   style={{ width: `${(currentTime / videoDuration) * 100}%` }}
                 />
               </div>
@@ -569,7 +596,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
 
               {/* Custom Thumb (Indicator) */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full pointer-events-none transition-transform scale-0 group-hover/scrubber:scale-125 bg-[#1a3884] dark:bg-cyan-400 ring-2 ring-white"
+                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full pointer-events-none transition-transform scale-0 group-hover/scrubber:scale-125 bg-[#045C9A] dark:bg-[#A6D7E8] ring-2 ring-white"
                 style={{ left: `calc(${(currentTime / videoDuration) * 100}% - 7px)` }}
               />
             </div>
@@ -580,17 +607,17 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Play/Pause */}
                 <button
                   onClick={togglePlay}
-                  className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title={isPlaying ? "Pause (Space)" : "Play (Space)"}
                 >
-                  {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-[#1a3884] dark:text-cyan-400" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-[#1a3884] dark:text-cyan-400" />}
+                  {isPlaying ? <Pause fill={1} className="w-5 h-5 sm:w-6 sm:h-6 text-[#045C9A] dark:text-[#A6D7E8]" /> : <Play fill={1} className="w-5 h-5 sm:w-6 sm:h-6 text-[#045C9A] dark:text-[#A6D7E8]" />}
                 </button>
 
                 {/* Volume Control */}
                 <div className="flex items-center gap-1 group/volume">
                   <button
                     onClick={toggleMute}
-                    className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                     title={isMuted ? "Unmute (M)" : "Mute (M)"}
                   >
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600 dark:text-slate-200" />}
@@ -603,14 +630,14 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       step="0.05"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-full accent-[#1a3884] dark:accent-cyan-400 h-1 cursor-pointer bg-slate-200 dark:bg-white/20 rounded-lg"
+                      className="w-full accent-[#045C9A] dark:accent-cyan-400 h-1 cursor-pointer bg-[#d7ebf5] dark:bg-white/20 rounded-lg"
                     />
                   </div>
                 </div>
 
                 {/* Time Display */}
-                <div className="text-[11px] sm:text-xs font-bold tabular-nums border-l border-slate-200 dark:border-white/15 pl-3 h-5 flex items-center text-slate-500 dark:text-slate-300">
-                  <span className="text-[#1a3884] dark:text-cyan-300">{formatTime(currentTime)}</span>
+                <div className="text-[11px] sm:text-xs font-bold tabular-nums border-l border-[#d7ebf5] dark:border-white/15 pl-3 h-5 flex items-center text-slate-500 dark:text-slate-300">
+                  <span className="text-[#045C9A] dark:text-[#A6D7E8]">{formatTime(currentTime)}</span>
                   <span className="mx-1 opacity-40">/</span>
                   <span className="opacity-70">{formatTime(videoDuration)}</span>
                 </div>
@@ -619,10 +646,10 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               <div className="flex items-center gap-1.5 sm:gap-3">
                 {/* Title / Info - Only shown when wide enough */}
                 {title && (
-                  <div className="hidden lg:flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1 backdrop-blur-md">
-                    <span className="w-2 h-2 rounded-full bg-[#1a3884] dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(26,56,132,0.5)] dark:shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#1a3884] dark:text-cyan-400">NOW PLAYING</span>
-                    <span className="text-xs font-bold truncate max-w-[180px] text-slate-800 dark:text-white">{title}</span>
+                  <div className="hidden lg:flex items-center gap-2 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-full px-3 py-1 backdrop-blur-md">
+                    <span className="w-2 h-2 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8] animate-pulse shadow-[0_0_8px_rgba(26,56,132,0.5)] dark:shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8]">NOW PLAYING</span>
+                    <span className="text-xs font-bold truncate max-w-[180px] text-[#072036] dark:text-white">{title}</span>
                   </div>
                 )}
 
@@ -635,14 +662,14 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                         setShowSpeedMenu(!showSpeedMenu);
                       }
                     }}
-                    className={`transition-all duration-200 p-1.5 sm:px-2.5 sm:py-1 rounded-xl flex items-center gap-1 border border-slate-200 dark:border-white/10 ${
+                    className={`transition-all duration-200 p-1.5 sm:px-2.5 sm:py-1 rounded-xl flex items-center gap-1 border border-[#d7ebf5] dark:border-white/10 ${
                       isCompleted 
-                        ? 'hover:text-[#1a3884] dark:hover:text-cyan-300 hover:border-[#1a3884]/40 dark:hover:border-cyan-400/40 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer text-slate-600 dark:text-slate-200' 
+                        ? 'hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:border-[#045C9A]/40 dark:hover:border-[#A6D7E8]/40 hover:bg-[#EAF7FD] dark:hover:bg-white/10 cursor-pointer text-slate-600 dark:text-slate-200' 
                         : 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/50'
                     }`}
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
-                    <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-[#1a3884] dark:text-cyan-400" />
+                    <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                     <span className="text-xs font-extrabold">{playbackSpeed}x</span>
                   </button>
 
@@ -653,7 +680,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute bottom-full mb-2 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-cyan-500/30 overflow-hidden min-w-[130px] p-1 z-50"
+                        className="absolute bottom-full mb-2 right-0 bg-white/95 dark:bg-[#0d3a5f]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-[#d7ebf5] dark:border-[#045C9A]/30 overflow-hidden min-w-[130px] p-1 z-50"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {[0.5, 0.75, 1, 1.25, 1.5, 2].map(speed => (
@@ -662,8 +689,8 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                             onClick={() => handleSpeedChange(speed)}
                             className={`w-full px-3 py-1.5 text-xs text-left rounded-xl transition-all flex items-center justify-between font-bold ${
                               playbackSpeed === speed 
-                                ? 'bg-[#1a3884]/10 dark:bg-cyan-500/20 text-[#1a3884] dark:text-cyan-300 border border-[#1a3884]/25 dark:border-cyan-500/30' 
-                                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white'
+                                ? 'bg-[#045C9A]/10 dark:bg-[#045C9A]/20 text-[#045C9A] dark:text-[#A6D7E8] border border-[#045C9A]/25 dark:border-[#045C9A]/30' 
+                                : 'text-slate-600 dark:text-slate-300 hover:bg-[#EAF7FD] dark:hover:bg-white/10 hover:text-[#072036] dark:hover:text-white'
                             }`}
                           >
                             <span>{speed}x</span>
@@ -686,7 +713,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }}
                     className={`transition-all duration-200 p-2 rounded-xl ${
                       isCompleted 
-                        ? 'text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer' 
+                        ? 'text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 cursor-pointer' 
                         : 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/50'
                     }`}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
@@ -695,10 +722,25 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                   </button>
                 )}
 
+                {/* Theater mode (page-level layout, YouTube style) */}
+                {onToggleTheater && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleTheater();
+                    }}
+                    className="hidden lg:inline-flex text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    title={isTheater ? 'Default view (T)' : 'Theater mode (T)'}
+                    aria-pressed={isTheater}
+                  >
+                    {isTheater ? <TheaterNormal className="w-5 h-5" /> : <TheaterWide className="w-5 h-5" />}
+                  </button>
+                )}
+
                 {/* Fullscreen */}
                 <button
                   onClick={toggleFullscreen}
-                  className="text-slate-600 dark:text-slate-200 hover:text-[#1a3884] dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title="Toggle Fullscreen (F)"
                 >
                   {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
@@ -730,7 +772,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 recycle={false}
                 numberOfPieces={180}
                 gravity={0.18}
-                colors={['#1a3884', '#002147', '#FFD700', '#FFFFFF', '#4ADE80']}
+                colors={['#045C9A', '#072036', '#FFD700', '#FFFFFF', '#34d399']}
               />
             </div>
 
@@ -740,10 +782,10 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.85, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 260, damping: 22, delay: 0.15 }}
-              className="relative bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-2xl rounded-3xl px-6 py-5 sm:px-8 sm:py-6 w-[90%] max-w-[280px] shadow-2xl border border-white/10 text-center"
+              className="relative bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-2xl rounded-2xl px-6 py-5 sm:px-8 sm:py-6 w-[90%] max-w-[280px] shadow-2xl border border-white/10 text-center"
             >
               {/* Subtle glow behind card */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#1a3884]/15 to-green-500/10 -z-10 blur-xl" />
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#045C9A]/15 to-emerald-500/10 -z-10 blur-xl" />
 
               {/* Icon */}
               <motion.div
@@ -752,7 +794,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 transition={{ type: "spring", stiffness: 280, delay: 0.3 }}
                 className="w-11 h-11 sm:w-13 sm:h-13 mx-auto mb-2 sm:mb-3 relative"
               >
-                <div className="w-11 h-11 sm:w-13 sm:h-13 mx-auto bg-gradient-to-tr from-[#16a34a] to-[#4ade80] rounded-full flex items-center justify-center shadow-lg shadow-[#15803d]/30">
+                <div className="w-11 h-11 sm:w-13 sm:h-13 mx-auto bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-full flex items-center justify-center shadow-lg shadow-emerald-600/30">
                   <motion.svg
                     viewBox="0 0 24 24"
                     className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-current"
@@ -783,7 +825,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       top: `${50 + 48 * Math.sin(i * 2.5)}%`,
                     }}
                   >
-                    <Sparkles className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-yellow-300 fill-yellow-300" />
+                    <Sparkles fill={1} className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
                   </motion.div>
                 ))}
               </motion.div>
@@ -794,7 +836,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.55 }}
               >
-                <h3 className="text-base sm:text-lg font-black text-white leading-tight tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-white leading-tight tracking-tight">
                   Awesome Job! 🎉
                 </h3>
                 <p className="text-white/60 text-[10px] sm:text-[11px] font-semibold mt-1 mb-4">
@@ -830,13 +872,13 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     if (onNext) onNext();
                   }}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl
-                             bg-gradient-to-r from-[#1a3884] via-[#2563eb] to-[#1a3884]
-                             text-white text-[10px] sm:text-[11px] font-black
-                             shadow-md shadow-blue-900/30 hover:shadow-lg hover:shadow-blue-500/20
+                             bg-gradient-to-r from-[#045C9A] via-[#045C9A] to-[#045C9A]
+                             text-white text-[10px] sm:text-[11px] font-bold
+                             shadow-md shadow-[#072036]/30 hover:shadow-lg hover:shadow-[#045C9A]/20
                              transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer"
                 >
                   {onNext ? nextLabel : 'Continue'}
-                  <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current ml-0.5" />
+                  <Play fill={1} className="w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5" />
                 </button>
               </motion.div>
             </motion.div>

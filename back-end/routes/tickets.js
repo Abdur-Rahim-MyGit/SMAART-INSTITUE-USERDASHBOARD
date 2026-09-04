@@ -251,6 +251,7 @@ router.get('/',
       const [tickets, total] = await Promise.all([
         SupportTicket.find(query)
           .populate('assignedTo', 'fullName email')
+          .populate('responses.respondedBy', 'fullName email role')
           .sort(sortOptions)
           .skip(skip)
           .limit(parseInt(limit))

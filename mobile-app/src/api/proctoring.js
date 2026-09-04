@@ -35,3 +35,9 @@ export const logEvent = (sessionId, event) =>
 
 export const completeSession = (sessionId) =>
   apiClient.post(`/proctoring/session/${sessionId}/complete`).then((r) => r.data);
+
+// Liveness ping — the signal is the MISSING request, not the response, so the
+// caller should fire this on an interval and not worry about individual
+// failures (see back-end/controllers/proctoringController.js `heartbeat`).
+export const heartbeat = (sessionId) =>
+  apiClient.post(`/proctoring/session/${sessionId}/heartbeat`).then((r) => r.data);

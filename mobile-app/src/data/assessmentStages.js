@@ -27,7 +27,7 @@ export const STAGE_KEYS = ['T1', 'T2', 'T3', 'T4'];
  * colour language across the app. T1 is the baseline and takes the brand blue.
  */
 export const STAGE_ACCENT = {
-  T1: '#2563EB',
+  T1: '#045C9A',
   T2: '#10B981',
   T3: '#8B5CF6',
   T4: '#F59E0B',

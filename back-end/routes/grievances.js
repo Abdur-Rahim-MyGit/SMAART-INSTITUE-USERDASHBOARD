@@ -77,6 +77,7 @@ router.get('/', protect, async (req, res) => {
     }
 
     const grievances = await Grievance.find({ student: req.user._id })
+      .populate('responses.respondedBy', 'fullName role')
       .sort({ createdAt: -1 });
 
     res.json({

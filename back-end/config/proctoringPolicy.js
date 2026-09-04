@@ -79,6 +79,26 @@ module.exports = {
     // Prohibited items in frame (YOLO object detection)
     phone_detected: 35,
     book_detected: 30,
+    // A second computer in shot. Weighted below phone and book because a desk
+    // machine is often innocent, but no longer ignored outright.
+    laptop_detected: 20,
+
+    // Content capture. Copying the paper is what actually damages a question
+    // bank -- one leaked set devalues every future sitting -- so these carry
+    // the same weight as a phone in frame.
+    copy_detected: 35,
+    paste_detected: 30,
+    restricted_shortcut: 15,
+    context_menu: 5,
+
+    // Presentation attack — the camera was shown a still image rather than a
+    // live person. Weighted with virtual_camera_detected: both mean the feed
+    // itself is fake, which is a deliberate act with no innocent reading.
+    spoof_detected: 45,
+
+    // Environment, continued
+    remote_access_suspected: 25,
+    multiple_voices: 30,
 
     // Device tampering — camera/mic turned off mid-exam
     microphone_disabled: 20,
@@ -113,12 +133,22 @@ module.exports = {
     {
       key: 'identity',
       label: 'Your identity could not be confirmed',
-      events: ['face_mismatch', 'virtual_camera_detected']
+      events: ['face_mismatch', 'virtual_camera_detected', 'spoof_detected']
     },
     {
       key: 'other_person',
       label: 'Another person was visible',
-      events: ['multiple_faces', 'voice_detected']
+      events: ['multiple_faces', 'voice_detected', 'multiple_voices']
+    },
+    {
+      key: 'content_capture',
+      label: 'Assessment content may have been copied',
+      events: ['copy_detected', 'paste_detected', 'restricted_shortcut']
+    },
+    {
+      key: 'remote_access',
+      label: 'The session showed signs of remote access',
+      events: ['remote_access_suspected']
     },
     {
       key: 'away',
@@ -138,7 +168,7 @@ module.exports = {
     {
       key: 'prohibited_item',
       label: 'A prohibited item was visible',
-      events: ['phone_detected', 'book_detected']
+      events: ['phone_detected', 'book_detected', 'laptop_detected']
     },
     {
       key: 'device_disabled',
