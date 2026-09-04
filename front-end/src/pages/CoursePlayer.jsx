@@ -29,8 +29,7 @@ import {
   HelpCircle,
   Layers,
   Briefcase,
-  TheaterNormal,
-  TheaterWide,
+  FitScreen,
 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 import NeuralBackground from "@/components/ui/NeuralBackground";
@@ -1195,7 +1194,7 @@ const CoursePlayer = () => {
                         : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-[#045C9A]/30 text-slate-700 dark:text-slate-200 hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/20 shadow-sm'
                     }`}
                   >
-                    {isTheater ? <TheaterNormal className="w-4 h-4" /> : <TheaterWide className="w-4 h-4" />}
+                    <FitScreen weight={500} fill={isTheater ? 1 : 0} className="w-4 h-4" />
                     <span>{isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}</span>
                   </button>
                 )}

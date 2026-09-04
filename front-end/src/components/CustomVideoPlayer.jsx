@@ -11,9 +11,8 @@ import {
   Play,
   RotateCcw,
   Settings,
+  FitScreen,
   Sparkles,
-  TheaterNormal,
-  TheaterWide,
   Volume2,
   VolumeX,
 } from "@/components/icons";
@@ -630,7 +629,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                     title={isMuted ? "Unmute (M)" : "Mute (M)"}
                   >
-                    {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-slate-600 dark:text-slate-200" />}
+                    {isMuted || volume === 0 ? <VolumeX weight={500} className="w-6 h-6 text-rose-500" /> : <Volume2 weight={500} className="w-6 h-6 text-slate-600 dark:text-slate-200" />}
                   </button>
                   <div className="w-0 group-hover/volume:w-20 overflow-hidden transition-all duration-300 flex items-center h-8">
                     <input
@@ -679,7 +678,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }`}
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
-                    <Settings className="w-4 h-4 sm:w-4 sm:h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
+                    <Settings weight={500} className="w-[18px] h-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
                     <span className="text-xs font-semibold tabular-nums">{playbackSpeed}x</span>
                   </button>
 
@@ -728,7 +727,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     }`}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
                   >
-                    <Tv className="w-5 h-5" />
+                    <Tv weight={500} className="w-6 h-6" />
                   </button>
                 )}
 
@@ -743,7 +742,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     title={isTheater ? 'Default view (T)' : 'Theater mode (T)'}
                     aria-pressed={isTheater}
                   >
-                    {isTheater ? <TheaterNormal className="w-5 h-5" /> : <TheaterWide className="w-5 h-5" />}
+                    <FitScreen weight={500} fill={isTheater ? 1 : 0} className="w-6 h-6" />
                   </button>
                 )}
 
@@ -753,7 +752,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                   className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title="Toggle Fullscreen (F)"
                 >
-                  {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                  {isFullscreen ? <Minimize weight={500} className="w-6 h-6" /> : <Maximize weight={500} className="w-6 h-6" />}
                 </button>
               </div>
             </div>
