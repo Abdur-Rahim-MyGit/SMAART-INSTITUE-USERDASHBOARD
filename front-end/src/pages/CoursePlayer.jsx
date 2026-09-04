@@ -1108,7 +1108,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-12">
+    <div className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-28">
       {/* Ambient layer, matching the dashboard and courses pages. Fixed rather
           than absolute because this page's own root is the scroll container --
           an absolute layer would scroll away with the lesson content. */}
