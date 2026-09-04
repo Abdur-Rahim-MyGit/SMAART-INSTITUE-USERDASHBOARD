@@ -968,10 +968,21 @@ export const useProctoringEngine = ({
     }
     verifyInFlightRef.current = true;
 
-    // Safety timeout to ensure verifyInFlightRef is never locked up permanently
-    setTimeout(() => {
+    // Safety net only — must NEVER fire while a real (if slow) identity check
+    // is still in flight. ArcFace runs single-threaded WASM (no
+    // crossOriginIsolated multi-threading — see onnxPipeline.js) and can
+    // genuinely take longer than a couple of seconds under load. Firing early
+    // reopens the gate mid-inference, letting the next 400ms tick start a
+    // SECOND overlapping ArcFace call on the same thread; those pile up and
+    // starve the whole main thread (including object detection's frame
+    // capture), which is what turned into the reported 12-20s lag across
+    // every check, not just identity. 8s is generous enough to never trip
+    // under a slow-but-working call, and finally{} below cancels it the
+    // moment the real call finishes so a stale timer can never clear the
+    // flag for a LATER, still-legitimately-running call.
+    const verifySafetyTimeoutId = setTimeout(() => {
       verifyInFlightRef.current = false;
-    }, 2500);
+    }, 8000);
 
     const descriptor = registeredFaceDescriptorRef.current;
 
@@ -1193,6 +1204,7 @@ export const useProctoringEngine = ({
     } catch (err) {
       console.error('[ProctoringEngine] Face verification tick failed:', err);
     } finally {
+      clearTimeout(verifySafetyTimeoutId);
       verifyInFlightRef.current = false;
     }
   };
