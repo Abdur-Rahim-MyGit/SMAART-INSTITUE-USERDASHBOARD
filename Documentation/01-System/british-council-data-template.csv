@@ -1,0 +1,5 @@
+bc_learner_id,email,full_name,cohort_id,onboarding_status,access_suspended,initial_level,current_level,live_classes_booked,live_classes_attended,live_classes_available,exercises_completed,exercises_total,average_grade_pct,last_activity_at,access_start_date,access_expiry_date
+BC-000001,student.one@example.edu.in,Student One,COH-2026-A,complete,false,A1,A2,8,7,12,42,50,86,2026-08-20,2026-06-01,2026-12-30
+BC-000002,student.two@example.edu.in,Student Two,COH-2026-A,complete,false,B1,B1,0,0,12,3,50,0,2026-06-04,2026-06-01,2026-12-30
+BC-000003,student.three@example.edu.in,Student Three,COH-2026-A,ongoing,false,A2,A2,4,2,12,18,50,64,2026-08-18,2026-06-01,2026-12-30
+BC-000004,student.four@example.edu.in,Student Four,COH-2026-B,complete,true,C1,C1,11,11,12,50,50,100,2026-08-22,2026-07-15,2027-01-15

@@ -46,6 +46,7 @@ import { assessmentApi } from '../../api/assessments';
 import { getStageConfig, STAGE_ACCENT } from '../../data/assessmentStages';
 import { useProctoringSession } from '../../facepipeline/useProctoringSession';
 import ProctoringGate from './ProctoringGate';
+import { QuotientBreakdown } from '../../components/QuotientBreakdown';
 
 /** Web blocks Next for this long on each question. Integrity rule, not UI. */
 const MIN_QUESTION_DWELL_MS = 5000;
@@ -497,6 +498,10 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
             <Text style={[styles.bandText, { color: accent }]}>{report.stageBand || report.bandLabel}</Text>
           </View>
         )}
+
+        {/* Renders nothing unless the submit response carried per-quotient
+            scores, so it is inert on assessments that do not report them. */}
+        <QuotientBreakdown report={report} />
 
         <Pressable
           style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 26 }]}
