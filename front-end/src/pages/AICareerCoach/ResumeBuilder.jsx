@@ -1634,7 +1634,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleCreateNew}
-                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] dark:bg-[#045C9A] dark:hover:bg-[#072036]"
+                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#0E2136] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                                 >
                                     <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
                                     {t('resume_builder.create_new', 'Create New Resume')}
@@ -1652,7 +1652,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 </div>
                                 <h3 className="text-lg font-bold text-[#072036] dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first resume to get started on your career journey.')}</p>
-                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#045C9A] text-white rounded-xl font-bold text-sm hover:bg-[#072036] transition-colors shadow-md">
+                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-xl font-bold text-sm transition-colors shadow-md">
                                     {t('resume_builder.create_first', 'Create First Resume')}
                                 </button>
                             </div>
@@ -1696,11 +1696,11 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         </div>
 
                                         <div className="grid grid-cols-3 border-t border-[#d7ebf5]/60 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
-                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#045C9A] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5">
+                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#0E2136] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5">
                                                 <IconPencil stroke={1.5} className="w-4 h-4" />
                                                 <span className="text-[10px] font-bold">{t('resume_builder.edit', 'Edit')}</span>
                                             </button>
-                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#045C9A] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5 disabled:opacity-50">
+                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#0E2136] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5 disabled:opacity-50">
                                                 {duplicatingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconCopy stroke={1.5} className="w-4 h-4" />}
                                                 <span className="text-[10px] font-bold">{t('resume_builder.copy', 'Copy')}</span>
                                             </button>
@@ -1775,12 +1775,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     </button>
                     {currentStep === steps.length - 1 && (
                         embedded ? (
-                            <button onClick={handleConfirmAndSave} disabled={saving || generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#045C9A]/15 hover:shadow-lg disabled:opacity-50 shrink-0">
+                            <button onClick={handleConfirmAndSave} disabled={saving || generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#0E2136]/20 hover:shadow-lg disabled:opacity-50 shrink-0">
                                 {saving || generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                                 <span>{t('resume_builder.confirm_save', 'Confirm & Save')}</span>
                             </button>
                         ) : (
-                            <button onClick={handleDownloadPDF} disabled={generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#045C9A]/15 hover:shadow-lg disabled:opacity-50 shrink-0">
+                            <button onClick={handleDownloadPDF} disabled={generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#0E2136]/20 hover:shadow-lg disabled:opacity-50 shrink-0">
                                 {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                                 <span>{t('resume_builder.download', 'Download')}<span className="hidden sm:inline"> {t('resume_builder.pdf', 'PDF')}</span></span>
                             </button>
@@ -1796,7 +1796,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             {/* Modern Responsive Stepper */}
                             <div className="bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[11px] font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">
+                                    <span className="text-[11px] font-bold text-[#0E2136] dark:text-[#A6D7E8] uppercase tracking-widest">
                                         {t('resume_builder.step_of', 'Step {{current}} of {{total}} :', { current: currentStep + 1, total: steps.length })} <span className="text-[#072036] dark:text-white">{steps[currentStep].label}</span>
                                     </span>
                                 </div>
@@ -1809,7 +1809,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         <div className="absolute inset-0 bg-[#d7ebf5] dark:bg-white/10 rounded-full" />
                                         {/* Active Progress Line */}
                                         <div
-                                            className="absolute left-0 top-0 bottom-0 bg-[#045C9A] rounded-full transition-all duration-550 ease-in-out"
+                                            className="absolute left-0 top-0 bottom-0 bg-[#0E2136] dark:bg-[#A6D7E8] rounded-full transition-all duration-550 ease-in-out"
                                             style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
                                         />
                                     </div>
@@ -1824,9 +1824,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 <button
                                                     onClick={() => handleStepClick(idx)}
                                                     className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${isActive
-                                                            ? 'bg-[#045C9A] text-white ring-4 ring-[#045C9A]/15 scale-110 shadow-md shadow-[#045C9A]/20'
+                                                            ? 'bg-[#0E2136] text-white ring-4 ring-[#0E2136]/15 scale-110 shadow-md shadow-[#0E2136]/25 dark:bg-[#A6D7E8] dark:text-[#072036] dark:ring-[#A6D7E8]/20'
                                                             : isCompleted
-                                                                ? 'bg-[#EAF7FD] dark:bg-[#A6D7E8]/15 text-[#045C9A] dark:text-[#A6D7E8] border border-[#045C9A]/30 dark:border-[#A6D7E8]/30 hover:bg-[#d7ebf5] dark:hover:bg-[#A6D7E8]/25'
+                                                                ? 'bg-[#EAF7FD] dark:bg-[#A6D7E8]/15 text-[#0E2136] dark:text-[#A6D7E8] border border-[#0E2136]/30 dark:border-[#A6D7E8]/30 hover:bg-[#d7ebf5] dark:hover:bg-[#A6D7E8]/25'
                                                                 : 'bg-white dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 border border-[#d7ebf5] dark:border-white/10 hover:border-[#045C9A]/40 dark:hover:border-white/20'
                                                         }`}
                                                     title={step.label}
@@ -1840,7 +1840,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
                                                 {/* Step label - hidden on mobile to avoid layout crowding */}
                                                 <span className={`absolute top-10 sm:top-11 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${isActive
-                                                        ? 'text-[#045C9A] dark:text-[#A6D7E8] font-extrabold'
+                                                        ? 'text-[#0E2136] dark:text-[#A6D7E8] font-extrabold'
                                                         : isCompleted
                                                             ? 'text-[#072036] dark:text-slate-300'
                                                             : 'text-slate-400 dark:text-slate-500'
@@ -1873,7 +1873,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.target_role', 'Target Role')}</label>
                                                 <div className="relative group/input">
                                                     <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'e.g. Frontend Developer, Marketing Executive')} value={resumeData.personalInfo.targetRole || ''} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'e.g. Frontend Developer, Marketing Executive')} value={resumeData.personalInfo.targetRole || ''} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1881,14 +1881,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.email_address', 'Email Address')}</label>
                                                     <div className="relative group/input">
                                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                        <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                     </div>
                                                 </div>
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.mobile_number', 'Mobile Number')}</label>
                                                     <div className="relative group/input">
                                                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                        <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1896,7 +1896,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
                                                 <div className="relative group/input">
                                                     <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                    <input type="text" placeholder={t('resume_builder.location_placeholder', 'City, State, Country')} value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                    <input type="text" placeholder={t('resume_builder.location_placeholder', 'City, State, Country')} value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1904,14 +1904,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.linkedin_url', 'LinkedIn URL')}</label>
                                                     <div className="relative group/input">
                                                         <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                        <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                     </div>
                                                 </div>
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.github_url', 'GitHub URL')}</label>
                                                     <div className="relative group/input">
                                                         <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
-                                                        <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-semibold shadow-sm" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1923,7 +1923,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('resume_builder.professional_summary', 'Professional Summary')}</label>
 
                                                 </div>
-                                                <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
+                                                <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:text-white transition-all text-sm font-semibold shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -1947,26 +1947,26 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.company', 'Company')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.company_placeholder', 'Company Name')} value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.company_placeholder', 'Company Name')} value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.job_role', 'Job Role')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.job_role_placeholder', 'e.g. Project Associate')} value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.job_role_placeholder', 'e.g. Project Associate')} value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.duration', 'Duration')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.duration_placeholder', 'e.g. 2021 - Present')} value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.duration_placeholder', 'e.g. 2021 - Present')} value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.exp_desc_placeholder', 'Key responsibilities and achievements...')} value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[100px] resize-none" rows={4}></textarea>
+                                                            <textarea placeholder={t('resume_builder.exp_desc_placeholder', 'Key responsibilities and achievements...')} value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[100px] resize-none" rows={4}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -1995,23 +1995,23 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.institution_name', 'Institution Name')}</label>
-                                                            <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.degree', 'Degree')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.year_of_passing', 'Year of Passing')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
                                                                 <div className="relative">
-                                                                    <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className={`w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 ${idx === 0 ? 'pr-10 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed text-emerald-800 dark:text-emerald-300 font-bold' : ''}`} readOnly={idx === 0} title={idx === 0 ? "Auto-synced from College Academic Records" : ""} />
+                                                                    <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className={`w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 ${idx === 0 ? 'pr-10 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed text-emerald-800 dark:text-emerald-300 font-bold' : ''}`} readOnly={idx === 0} title={idx === 0 ? "Auto-synced from College Academic Records" : ""} />
                                                                     {idx === 0 && (
                                                                         <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" title="Auto-synced from College Academic Records" />
                                                                     )}
@@ -2019,7 +2019,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2050,16 +2050,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.project_title', 'Project Title')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.project_name_placeholder', 'Project Name')} value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.project_name_placeholder', 'Project Name')} value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.project_link', 'Project Link')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[80px] resize-none" rows={3}></textarea>
+                                                            <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[80px] resize-none" rows={3}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -2101,7 +2101,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                         ...prev,
                                                                         skills: { ...prev.skills, technical: prev.skills.technical ? `${prev.skills.technical}, ${skill}` : skill }
                                                                     }));
-                                                                }} className="px-3 py-1.5 bg-white hover:bg-[#045C9A] dark:bg-slate-800 dark:hover:bg-[#045C9A] text-slate-700 hover:text-white dark:text-slate-300 text-[11px] font-bold rounded-xl border border-[#d7ebf5] hover:border-[#045C9A] dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-sm hover:shadow group/btn">
+                                                                }} className="px-3 py-1.5 bg-white hover:bg-[#0E2136] dark:bg-slate-800 dark:hover:bg-[#0E2136] text-slate-700 hover:text-white dark:text-slate-300 text-[11px] font-bold rounded-xl border border-[#d7ebf5] hover:border-[#0E2136] dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-sm hover:shadow group/btn">
                                                                     {skill} <Plus className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-white transition-colors" />
                                                                 </button>
                                                             );
@@ -2186,22 +2186,22 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         <div className="space-y-6 bg-white dark:bg-[#0d3a5f] p-8 rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm animate-fade-in">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.technical_skills', 'Technical Skills')}</label>
-                                                <textarea value={resumeData.skills.technical || ''} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={3} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
+                                                <textarea value={resumeData.skills.technical || ''} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={3} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.domain_skills', 'Domain Skills')}</label>
-                                                <textarea value={resumeData.skills.domain || ''} onChange={(e) => handleNestedChange('skills', 'domain', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.domain_placeholder', 'e.g. Project Management, Agile, Healthcare, Finance...')}></textarea>
+                                                <textarea value={resumeData.skills.domain || ''} onChange={(e) => handleNestedChange('skills', 'domain', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.domain_placeholder', 'e.g. Project Management, Agile, Healthcare, Finance...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.ai_skills', 'AI Skills')}</label>
-                                                <textarea value={resumeData.skills.ai || ''} onChange={(e) => handleNestedChange('skills', 'ai', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.ai_placeholder', 'e.g. Prompt Engineering, Midjourney, ChatGPT...')}></textarea>
+                                                <textarea value={resumeData.skills.ai || ''} onChange={(e) => handleNestedChange('skills', 'ai', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.ai_placeholder', 'e.g. Prompt Engineering, Midjourney, ChatGPT...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.languages', 'Languages')}</label>
-                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
+                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -2225,12 +2225,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.achievement_title', 'Achievement Title')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.ach_desc_placeholder', 'Provide some context about this achievement...')} value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[60px] resize-none" rows={2}></textarea>
+                                                            <textarea placeholder={t('resume_builder.ach_desc_placeholder', 'Provide some context about this achievement...')} value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[60px] resize-none" rows={2}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -2257,7 +2257,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className={`flex items-center gap-2 px-6 py-2.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#045C9A]/20 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#045C9A]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
+                                    className={`flex items-center gap-2 px-6 py-2.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#0E2136]/25 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#0E2136]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
                                 >
                                     {t('resume_builder.next_step', 'Next Step')}
                                     <ArrowRight className="w-4 h-4" />
@@ -2330,7 +2330,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         setSelectedTemplate(tpl.id);
                                                         setIsPreviewFullscreen(true);
                                                     }}
-                                                    className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#045C9A] hover:bg-[#072036] text-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
+                                                    className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" /> {t('resume_builder.preview_select', 'Preview & Select')}
                                                 </button>
