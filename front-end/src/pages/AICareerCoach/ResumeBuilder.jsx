@@ -1670,11 +1670,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
                                         {t('resume_builder.list_subtitle', 'Manage your tailored resumes and keep them ready for every application.')}
                                     </p>
-                                    {!resumeListLoading && resumeList.length > 0 && (
-                                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                                            <MetaChip icon={FileText} label={t('resume_builder.resume_count', '{{count}} resumes', { count: resumeList.length })} />
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div className="shrink-0">
