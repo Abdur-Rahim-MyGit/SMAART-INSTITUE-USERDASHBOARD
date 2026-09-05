@@ -20,7 +20,6 @@ import {
     IconArrowLeft,
     IconAlertTriangle,
     IconSparkles,
-    IconTarget,
 } from '@tabler/icons-react';
 import {
     FileText,
@@ -248,6 +247,20 @@ const BuilderBackdrop = ({ dark }) => (
             <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
         </div>
     </>
+);
+
+// Same chip the assessment stage cards use for "36 Qs / 45 min".
+const MetaChip = ({ icon: Icon, label, tone = 'neutral' }) => (
+    <span
+        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-bold ${
+            tone === 'success'
+                ? 'border-emerald-200/70 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300'
+                : 'border-[#d7ebf5] bg-[#F1F5F9] text-slate-600 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300'
+        }`}
+    >
+        <Icon className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">{label}</span>
+    </span>
 );
 
 const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, viewOnly = false, preloadedData = null }) => {
@@ -1596,123 +1609,208 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         return (
             <div className={`relative flex flex-col h-full overflow-hidden font-sans selection:bg-[#045C9A] selection:text-white ${embedded ? 'bg-[#F1F5F9] dark:bg-[#072036]' : 'bg-transparent'}`}>
                 {!embedded && <BuilderBackdrop dark={isDarkTheme} />}
-                <main className="relative z-10 flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
-                    <div className="max-w-6xl mx-auto space-y-6">
-                        {/* Header & Back Button */}
-                        <div className="flex items-center justify-between">
+                <main className="relative z-10 flex-1 overflow-y-auto">
+                    {/* Same container, gaps and padding as the assessments and
+                        courses pages, so the three read as one product. */}
+                    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
+
+                        {/* Back */}
+                        <div className="flex items-center">
                             <button
                                 onClick={() => {
                                     if (embedded && onClose) onClose();
-                                    else navigate("/dashboard/smaart-toolkit");
+                                    else navigate('/dashboard/smaart-toolkit');
                                 }}
-                                className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#072036] transition-all hover:text-[#045C9A] dark:text-slate-300"
+                                className="group flex w-fit items-center gap-3 selection:bg-transparent"
                             >
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                                    <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#072036] dark:text-slate-300" />
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:border-[#045C9A]/40 group-hover:shadow-md dark:border-white/10 dark:bg-white/5">
+                                    <IconArrowLeft stroke={2} className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
                                 </div>
-                                {t('resume_builder.back_to_toolkit', 'BACK TO TOOLKIT')}
+                                <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                                    {t('resume_builder.back_to_toolkit', 'Back to Toolkit')}
+                                </span>
                             </button>
                         </div>
-                        {/* Page Header */}
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
+
+                        {/* Page hero -- same structure, padding and type scale as the
+                            assessments and courses heroes. */}
+                        <motion.section
+                            initial={{ opacity: 0, y: -16 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                            className="relative overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#045C9A]/20 dark:bg-[#0d3a5f] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="relative w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
                         >
-                            <div className="flex-1">
-                                <h1 className="text-xl sm:text-2xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white" style={{ letterSpacing: '-0.02em' }}>
-                                    {t('resume_builder.list_title_1', 'My')} <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t('resume_builder.list_title_2', 'Resumes')}</span>
-                                </h1>
-                                <p className="mt-0.5 text-xs sm:text-sm font-medium leading-relaxed text-[#35566b] dark:text-slate-400 max-w-2xl">
-                                    {t('resume_builder.list_subtitle', 'Manage your tailored resumes and keep them ready for every application.')}
-                                </p>
-                            </div>
+                            <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-                            <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d7ebf5] dark:border-[#045C9A]/20 pt-3 md:pt-0 md:pl-6">
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleCreateNew}
-                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#0E2136] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
-                                >
-                                    <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
-                                    {t('resume_builder.create_new', 'Create New Resume')}
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                        {resumeListLoading ? (
-                            <div className="flex justify-center items-center h-64">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#045C9A]"></div>
-                            </div>
-                        ) : resumeList.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-64 text-center">
-                                <div className="w-16 h-16 rounded-2xl bg-[#EAF7FD] dark:bg-[#045C9A]/20 flex items-center justify-center mb-4">
-                                    <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+                                <div className="min-w-0 max-w-2xl">
+                                    <h1
+                                        className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                                        style={{ letterSpacing: '-0.02em' }}
+                                    >
+                                        {t('resume_builder.list_title_1', 'My')} {t('resume_builder.list_title_2', 'Resumes')}
+                                    </h1>
+                                    <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                        {t('resume_builder.list_subtitle', 'Manage your tailored resumes and keep them ready for every application.')}
+                                    </p>
+                                    {!resumeListLoading && resumeList.length > 0 && (
+                                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                                            <MetaChip icon={FileText} label={t('resume_builder.resume_count', '{{count}} resumes', { count: resumeList.length })} />
+                                        </div>
+                                    )}
                                 </div>
-                                <h3 className="text-lg font-bold text-[#072036] dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first resume to get started on your career journey.')}</p>
-                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-xl font-bold text-sm transition-colors shadow-md">
-                                    {t('resume_builder.create_first', 'Create First Resume')}
-                                </button>
+
+                                <div className="shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={handleCreateNew}
+                                        className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-[#0E2136] px-4 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#1b3457] hover:shadow-md sm:w-auto dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                                    >
+                                        <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
+                                        {t('resume_builder.create_new', 'Create New Resume')}
+                                    </button>
+                                </div>
                             </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {resumeList.map(resume => (
-                                    <div key={resume._id} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm hover:shadow-xl hover:border-[#045C9A]/30 dark:hover:border-[#A6D7E8]/30 transition-all duration-300 overflow-hidden flex flex-col group">
+                        </motion.section>
 
-                                        <div className="p-6 flex-1 flex flex-col items-center relative">
-                                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#EAF7FD] dark:bg-[#045C9A]/20 border border-[#d7ebf5] dark:border-[#045C9A]/30">
-                                                <IconFileDescription stroke={1.5} className="h-9 w-9 text-[#045C9A] dark:text-[#A6D7E8]" />
-                                            </div>
-
-                                            {renamingId === resume._id ? (
-                                                <div className="w-full mb-2">
-                                                    <input
-                                                        autoFocus
-                                                        value={renameValue}
-                                                        onChange={e => setRenameValue(e.target.value)}
-                                                        onKeyDown={e => {
-                                                            if (e.key === 'Enter') renameResume(resume._id, renameValue);
-                                                            if (e.key === 'Escape') setRenamingId(null);
-                                                        }}
-                                                        onBlur={() => renameResume(resume._id, renameValue)}
-                                                        className="w-full text-center font-bold text-[#072036] dark:text-white bg-slate-50 dark:bg-slate-800 border-b-2 border-[#045C9A] outline-none px-2 py-1"
-                                                    />
+                        <motion.section
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.45 }}
+                        >
+                            {resumeListLoading ? (
+                                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
+                                    {[0, 1, 2].map((item) => (
+                                        <div key={item} className="animate-pulse overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 sm:p-6 dark:border-white/10 dark:bg-[#0d3a5f]">
+                                            <div className="mb-4 flex items-start gap-3">
+                                                <div className="h-10 w-10 rounded-xl bg-[#F1F5F9] dark:bg-white/10" />
+                                                <div className="flex-1 space-y-2 pt-1">
+                                                    <div className="h-4 w-3/5 rounded bg-[#F1F5F9] dark:bg-white/10" />
+                                                    <div className="h-3 w-2/5 rounded bg-[#F1F5F9] dark:bg-white/10" />
                                                 </div>
-                                            ) : (
-                                                <div className="flex items-center gap-2 mb-2 w-full justify-center group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 rounded-lg p-1 transition-colors cursor-text" onClick={() => { setRenamingId(resume._id); setRenameValue(resume.versionName || t('resume_builder.default_name', 'My Resume')); }}>
-                                                    <h3 className="font-bold text-lg text-[#072036] dark:text-white truncate max-w-[80%]">{resume.versionName || t('resume_builder.default_name', 'My Resume')}</h3>
-                                                    <IconPencil stroke={2} className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                </div>
-                                            )}
-
-                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF7FD] dark:bg-[#045C9A]/20 text-[#045C9A] dark:text-[#A6D7E8] text-[10px] font-bold uppercase tracking-wider mb-4 border border-[#d7ebf5] dark:border-[#045C9A]/30">
-                                                <IconTarget stroke={2} className="w-3 h-3" />
-                                                <span className="truncate max-w-[150px]">{resume.targetRole || t('resume_builder.general_resume', 'General Resume')}</span>
                                             </div>
-
-                                            <p className="text-[10px] text-slate-400 font-medium">{t('resume_builder.last_updated', 'Last updated:')} {new Date(resume.updatedAt).toLocaleDateString()}</p>
+                                            <div className="mb-5 flex gap-2">
+                                                <div className="h-7 w-28 rounded-lg bg-[#F1F5F9] dark:bg-white/10" />
+                                                <div className="h-7 w-24 rounded-lg bg-[#F1F5F9] dark:bg-white/10" />
+                                            </div>
+                                            <div className="h-9 rounded-lg bg-[#F1F5F9] dark:bg-white/10" />
                                         </div>
-
-                                        <div className="grid grid-cols-3 border-t border-[#d7ebf5]/60 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
-                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#0E2136] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5">
-                                                <IconPencil stroke={1.5} className="w-4 h-4" />
-                                                <span className="text-[10px] font-bold">{t('resume_builder.edit', 'Edit')}</span>
-                                            </button>
-                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#0E2136] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5 disabled:opacity-50">
-                                                {duplicatingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconCopy stroke={1.5} className="w-4 h-4" />}
-                                                <span className="text-[10px] font-bold">{t('resume_builder.copy', 'Copy')}</span>
-                                            </button>
-                                            <button onClick={(e) => handleDeleteResume(resume._id, e)} disabled={deletingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-rose-500 hover:text-white text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50">
-                                                {deletingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconTrash stroke={1.5} className="w-4 h-4" />}
-                                                <span className="text-[10px] font-bold">{t('resume_builder.delete', 'Delete')}</span>
-                                            </button>
-                                        </div>
+                                    ))}
+                                </div>
+                            ) : resumeList.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#d7ebf5] bg-white/80 px-6 py-14 text-center dark:border-white/10 dark:bg-[#0d3a5f]/70">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                                        <IconFileDescription stroke={1.75} className="h-7 w-7" />
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                    <h3 className="text-base font-bold text-[#072036] dark:text-white">{t('resume_builder.no_resumes', 'No resumes yet')}</h3>
+                                    <p className="mt-1 max-w-sm text-sm text-slate-600 dark:text-slate-300">{t('resume_builder.no_resumes_desc', 'Create your first resume to get started on your career journey.')}</p>
+                                    <button onClick={handleCreateNew} className="mt-6 inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#0E2136] px-4 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white">
+                                        <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
+                                        {t('resume_builder.create_first', 'Create First Resume')}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
+                                    {resumeList.map((resume, index) => {
+                                        const name = resume.versionName || t('resume_builder.default_name', 'My Resume');
+                                        const templateName = t(`resume_builder.templates.${resume.template || 'classicBW'}.name`, (ATS_TEMPLATES[resume.template] || ATS_TEMPLATES.classicBW).name);
+                                        const updated = new Date(resume.updatedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                                        const verified = !!resume.verification?.resumePublicId;
+                                        const isRenaming = renamingId === resume._id;
+                                        return (
+                                            <motion.div
+                                                key={resume._id}
+                                                initial={{ opacity: 0, y: 12 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: Math.min(index, 8) * 0.06, duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+                                                className="group h-full"
+                                            >
+                                                <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-[0_2px_16px_rgba(4,92,154,0.05)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] motion-reduce:hover:translate-y-0 dark:border-white/10 dark:bg-[#0d3a5f]">
+                                                    <div className="flex flex-1 flex-col p-5 sm:p-6">
+                                                        {/* Header: icon badge + name + role, template tag on the right */}
+                                                        <div className="mb-4 flex items-start justify-between gap-3">
+                                                            <div className="flex min-w-0 items-start gap-3">
+                                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                                                                    <IconFileDescription stroke={1.75} className="h-5 w-5" />
+                                                                </div>
+                                                                <div className="min-w-0 pt-0.5">
+                                                                    {isRenaming ? (
+                                                                        <input
+                                                                            autoFocus
+                                                                            value={renameValue}
+                                                                            onChange={e => setRenameValue(e.target.value)}
+                                                                            onKeyDown={e => {
+                                                                                if (e.key === 'Enter') renameResume(resume._id, renameValue);
+                                                                                if (e.key === 'Escape') setRenamingId(null);
+                                                                            }}
+                                                                            onBlur={() => renameResume(resume._id, renameValue)}
+                                                                            className="w-full rounded-lg border border-[#045C9A] bg-white px-2 py-1 text-base font-bold leading-tight text-[#072036] outline-none ring-4 ring-[#045C9A]/10 dark:bg-[#072036] dark:text-white"
+                                                                        />
+                                                                    ) : (
+                                                                        <button
+                                                                            type="button"
+                                                                            title={t('resume_builder.rename', 'Rename')}
+                                                                            onClick={() => { setRenamingId(resume._id); setRenameValue(name); }}
+                                                                            className="group/name flex max-w-full items-center gap-1.5 text-left"
+                                                                        >
+                                                                            <h3 className="truncate text-base font-bold leading-tight tracking-tight text-[#072036] dark:text-white">{name}</h3>
+                                                                            <IconPencil stroke={2} className="h-3 w-3 shrink-0 text-slate-400 opacity-0 transition-opacity group-hover/name:opacity-100" />
+                                                                        </button>
+                                                                    )}
+                                                                    <p className="mt-0.5 truncate text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                                                        {resume.targetRole || t('resume_builder.general_resume', 'General Resume')}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <span className="shrink-0 rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                                                                {templateName}
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="mb-5 flex flex-wrap items-center gap-2">
+                                                            <MetaChip icon={Calendar} label={t('resume_builder.updated_on', 'Updated {{date}}', { date: updated })} />
+                                                            {verified
+                                                                ? <MetaChip icon={ShieldCheck} tone="success" label={t('resume_builder.verified', 'Verified')} />
+                                                                : <MetaChip icon={IconPencil} label={t('resume_builder.draft', 'Draft')} />}
+                                                        </div>
+
+                                                        {/* Footer: primary edit + two icon actions, same 36px rail as the stage cards */}
+                                                        <div className="mt-auto flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => handleEditResume(resume)}
+                                                                className="group/btn flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] text-[13px] font-semibold text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                                                            >
+                                                                <IconPencil stroke={2} className="h-4 w-4 shrink-0" />
+                                                                <span>{t('resume_builder.edit_resume', 'Edit Resume')}</span>
+                                                                <ArrowRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => handleDuplicateResume(resume._id, e)}
+                                                                disabled={duplicatingId === resume._id}
+                                                                title={t('resume_builder.copy', 'Duplicate')}
+                                                                aria-label={t('resume_builder.copy', 'Duplicate')}
+                                                                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#d7ebf5] bg-white text-slate-600 transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] hover:text-[#045C9A] disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
+                                                            >
+                                                                {duplicatingId === resume._id ? <Loader2 className="h-4 w-4 animate-spin" /> : <IconCopy stroke={1.75} className="h-4 w-4" />}
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => handleDeleteResume(resume._id, e)}
+                                                                disabled={deletingId === resume._id}
+                                                                title={t('resume_builder.delete', 'Delete')}
+                                                                aria-label={t('resume_builder.delete', 'Delete')}
+                                                                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#d7ebf5] bg-white text-slate-600 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:border-rose-500/30 dark:hover:bg-rose-500/10 dark:hover:text-rose-300"
+                                                            >
+                                                                {deletingId === resume._id ? <Loader2 className="h-4 w-4 animate-spin" /> : <IconTrash stroke={1.75} className="h-4 w-4" />}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </motion.section>
                     </div>
                 </main>
             </div>
