@@ -1,29 +1,40 @@
 const mongoose = require('mongoose');
 
 /**
- * EmployerLead — a self-serve submission from the public "/employer/register"
- * page on the user dashboard.
+ * EmployerLead — a FALLBACK record of a "/employer/register" submission.
  *
- * Deliberately NOT the admin project's full employer-portal account (that
- * still lives in the separate admin app when it's reachable). This is just a
- * lightweight inbound-inquiry record so a submission is never lost when the
- * admin app isn't running — someone on the team follows up and onboards the
- * employer manually from here.
+ * The primary destination for a submission is the admin project's own
+ * Recruiter collection (its real review queue) — routes/employerRegistration.js
+ * forwards every submission there first. This model only exists to make sure
+ * a submission is never silently lost when that forward call fails (the
+ * admin backend is down, unreachable, etc.): the same fields are saved here
+ * so someone can register the employer manually later.
+ *
+ * Field names mirror the admin project's own registration form exactly
+ * (Recruiter model / EmployerRegistration.js) rather than being renamed, so
+ * a saved fallback record can be replayed into the admin API as-is.
  */
 const employerLeadSchema = new mongoose.Schema({
   companyName: { type: String, required: true, trim: true },
-  contactName: { type: String, required: true, trim: true },
+  fullName: { type: String, required: true, trim: true }, // contact person
   designation: { type: String, trim: true },
+  branch: { type: String, trim: true },
   email: { type: String, required: true, lowercase: true, trim: true },
-  phone: { type: String, required: true, trim: true },
-  website: { type: String, trim: true },
-  industry: { type: String, trim: true },
-  companySize: { type: String, trim: true },
-  city: { type: String, trim: true },
-  message: { type: String, trim: true },
+  mobile: { type: String, required: true, trim: true },
+  country: { type: String, trim: true, default: 'India' },
+  gstin: { type: String, trim: true },
+  cin: { type: String, trim: true },
+  identifier: { type: String, trim: true }, // non-India business registration number
+  sourceType: { type: String, default: 'SMAART_NETWORK' },
+  termsAccepted: {
+    hiringTerms: { type: Boolean, default: false },
+    fairHiring: { type: Boolean, default: false },
+    dataProcessing: { type: Boolean, default: false },
+  },
 
+  forwardedToAdmin: { type: Boolean, default: false },
+  forwardError: String,
   status: { type: String, enum: ['New', 'Contacted', 'Converted', 'Not Interested'], default: 'New', index: true },
-  notifiedAt: Date,
 }, { timestamps: true });
 
 employerLeadSchema.index({ email: 1 });
