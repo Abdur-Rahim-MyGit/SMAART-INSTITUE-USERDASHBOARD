@@ -61,6 +61,11 @@ import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { apiCall } from '@/services/api';
 import { ATS_TEMPLATES, adaptData } from './ResumeTemplates';
 import NeuralBackground from '@/components/ui/NeuralBackground';
+// Same role -> icon matcher the dashboard's career-direction cards use, so a
+// resume badge for "Software Engineer" and a career-direction card for the
+// same role always show the same glyph.
+import { getCareerIconKey } from '@/constants/careerIcons';
+import { careerIcon } from '@/components/icons/career';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
@@ -1727,8 +1732,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         const name = resume.versionName || t('resume_builder.default_name', 'My Resume');
                                         const templateName = t(`resume_builder.templates.${resume.template || 'classicBW'}.name`, (ATS_TEMPLATES[resume.template] || ATS_TEMPLATES.classicBW).name);
                                         const updated = new Date(resume.updatedAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
-                                        const verified = !!resume.verification?.resumePublicId;
                                         const isRenaming = renamingId === resume._id;
+                                        const RoleIcon = careerIcon(getCareerIconKey(resume.targetRole));
                                         return (
                                             <motion.div
                                                 key={resume._id}
@@ -1743,7 +1748,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         <div className="mb-4 flex items-start justify-between gap-3">
                                                             <div className="flex min-w-0 items-start gap-3">
                                                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-                                                                    <IconFileDescription stroke={1.75} className="h-5 w-5" />
+                                                                    <RoleIcon className="h-5 w-5" />
                                                                 </div>
                                                                 <div className="min-w-0 pt-0.5">
                                                                     {isRenaming ? (
@@ -1781,9 +1786,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
                                                         <div className="mb-5 flex flex-wrap items-center gap-2">
                                                             <MetaChip icon={Calendar} label={t('resume_builder.updated_on', 'Updated {{date}}', { date: updated })} />
-                                                            {verified
-                                                                ? <MetaChip icon={ShieldCheck} tone="success" label={t('resume_builder.verified', 'Verified')} />
-                                                                : <MetaChip icon={IconPencil} label={t('resume_builder.draft', 'Draft')} />}
                                                         </div>
 
                                                         {/* Footer: primary edit + two icon actions, same 36px rail as the stage cards */}
