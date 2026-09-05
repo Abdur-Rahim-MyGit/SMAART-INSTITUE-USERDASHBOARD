@@ -40,24 +40,12 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "html"],
-      include: [
-        // Only instrument files that have test coverage in this phase.
-        // Untested files (proctoring engine, AI services, etc.) would
-        // drag the aggregate below any reasonable threshold.
-        "src/utils/colorUtils.js",
-        "src/utils/resumeSecurity.js",
-        "src/utils/assessmentTimerStorage.js",
-        "src/utils/courseUnlock.js",
-        "src/utils/microAssessmentUtils.js",
-        "src/hooks/useAuth.js",
-        "src/hooks/useUser.js",
-        "src/contexts/UserContextFixed.jsx",
-        "src/components/LoginCard.jsx",
-        "src/components/PrivateRoute.jsx",
-        "src/components/SecurityGuard.jsx",
-      ],
+      all: true,
+      include: ["src/**/*.{js,jsx,ts,tsx}"],
       exclude: [
         "src/**/*.test.*",
+        "src/**/*.spec.*",
+        "src/**/__tests__/**",
         "src/test/**",
         "src/**/*.d.ts",
       ],
