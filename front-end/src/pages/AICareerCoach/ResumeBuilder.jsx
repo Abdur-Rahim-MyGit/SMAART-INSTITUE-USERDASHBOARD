@@ -1512,7 +1512,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         return true;
     };
 
+    // Drives which way the step content slides: forward (next / a later step
+    // clicked) vs backward (previous / an earlier step clicked), so the
+    // transition reads as real motion through the form rather than a plain fade.
+    const [stepDirection, setStepDirection] = useState(1);
+
     const handleStepClick = (idx) => {
+        if (idx === currentStep) return;
+        setStepDirection(idx > currentStep ? 1 : -1);
         if (idx <= currentStep) {
             setCurrentStep(idx);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1528,6 +1535,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
             if (!validateStep(currentStep)) return;
+            setStepDirection(1);
             setCurrentStep(currentStep + 1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1535,9 +1543,18 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
     const prevStep = () => {
         if (currentStep > 0) {
+            setStepDirection(-1);
             setCurrentStep(currentStep - 1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+    };
+
+    // Step content slide: enters from the direction of travel, exits the
+    // opposite way, with a soft scale so it never feels like a hard cut.
+    const stepVariants = {
+        enter: (dir) => ({ opacity: 0, x: dir > 0 ? 36 : -36, scale: 0.99 }),
+        center: { opacity: 1, x: 0, scale: 1 },
+        exit: (dir) => ({ opacity: 0, x: dir > 0 ? -28 : 28, scale: 0.99 }),
     };
 
     if (loading && !viewOnly) {
@@ -1919,22 +1936,33 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
                                         return (
                                             <div key={step.id} className="relative z-10 flex flex-col items-center">
-                                                <button
+                                                <motion.button
                                                     onClick={() => handleStepClick(idx)}
-                                                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${isActive
-                                                            ? 'bg-[#0E2136] text-white ring-4 ring-[#0E2136]/15 scale-110 shadow-md shadow-[#0E2136]/25 dark:bg-[#A6D7E8] dark:text-[#072036] dark:ring-[#A6D7E8]/20'
+                                                    layout
+                                                    animate={{ scale: isActive ? 1.1 : 1 }}
+                                                    whileHover={{ scale: isActive ? 1.1 : 1.06 }}
+                                                    whileTap={{ scale: 0.94 }}
+                                                    transition={{ type: 'spring', stiffness: 420, damping: 24 }}
+                                                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 ${isActive
+                                                            ? 'bg-[#0E2136] text-white ring-4 ring-[#0E2136]/15 shadow-md shadow-[#0E2136]/25 dark:bg-[#A6D7E8] dark:text-[#072036] dark:ring-[#A6D7E8]/20'
                                                             : isCompleted
                                                                 ? 'bg-[#EAF7FD] dark:bg-[#A6D7E8]/15 text-[#0E2136] dark:text-[#A6D7E8] border border-[#0E2136]/30 dark:border-[#A6D7E8]/30 hover:bg-[#d7ebf5] dark:hover:bg-[#A6D7E8]/25'
                                                                 : 'bg-white dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 border border-[#d7ebf5] dark:border-white/10 hover:border-[#045C9A]/40 dark:hover:border-white/20'
                                                         }`}
                                                     title={step.label}
                                                 >
-                                                    {isCompleted ? (
-                                                        <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                                    ) : (
-                                                        <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                                    )}
-                                                </button>
+                                                    <AnimatePresence mode="wait" initial={false}>
+                                                        {isCompleted ? (
+                                                            <motion.span key="check" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.4, opacity: 0 }} transition={{ duration: 0.18 }} className="flex">
+                                                                <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                            </motion.span>
+                                                        ) : (
+                                                            <motion.span key="icon" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.4, opacity: 0 }} transition={{ duration: 0.18 }} className="flex">
+                                                                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                            </motion.span>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </motion.button>
 
                                                 {/* Step label - hidden on mobile to avoid layout crowding */}
                                                 <span className={`absolute top-10 sm:top-11 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${isActive
@@ -1952,7 +1980,17 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 <div className="h-2 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
                             </div>
 
-                            <div className="min-h-[400px]">
+                            <div className="min-h-[400px] overflow-hidden">
+                            <AnimatePresence mode="wait" custom={stepDirection} initial={false}>
+                            <motion.div
+                                key={steps[currentStep].id}
+                                custom={stepDirection}
+                                variants={stepVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                            >
                                 {steps[currentStep].id === 'personal' && (
                                     <div className="space-y-6">
                                         {/* Target Role is free text. It defaults to the primary career
@@ -2339,6 +2377,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         </button>
                                     </div>
                                 )}
+                            </motion.div>
+                            </AnimatePresence>
                             </div>
 
                             {/* Navigation buttons inside max-w-4xl card layout */}
@@ -2346,19 +2386,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 <button
                                     onClick={prevStep}
                                     disabled={currentStep === 0}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${currentStep === 0
+                                    className={`group/nav flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${currentStep === 0
                                         ? 'text-slate-300 dark:text-slate-700 bg-slate-100/50 dark:bg-slate-800/20 cursor-not-allowed opacity-50'
                                         : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#0d3a5f] hover:scale-[1.02] active:scale-95 shadow-sm'
                                         }`}
                                 >
-                                    <ArrowLeft className="w-4 h-4" /> {t('resume_builder.previous', 'Previous')}
+                                    <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover/nav:-translate-x-1" /> {t('resume_builder.previous', 'Previous')}
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className={`flex items-center gap-2 px-6 py-2.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#0E2136]/25 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#0E2136]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
+                                    className={`group/nav flex items-center gap-2 px-6 py-2.5 bg-[#0E2136] hover:bg-[#1b3457] text-white dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#0E2136]/25 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#0E2136]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
                                 >
                                     {t('resume_builder.next_step', 'Next Step')}
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/nav:translate-x-1" />
                                 </button>
                             </div>
                         </div>
