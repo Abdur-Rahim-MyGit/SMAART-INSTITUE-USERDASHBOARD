@@ -61,6 +61,7 @@ import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { apiCall } from '@/services/api';
 import { ATS_TEMPLATES, adaptData } from './ResumeTemplates';
+import NeuralBackground from '@/components/ui/NeuralBackground';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
@@ -116,7 +117,7 @@ const ResumeWatermark = () => (
 const TemplateThumbnail = ({ type }) => {
     if (type === 'classicBW') {
         return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+            <div className="w-full h-32 bg-white border border-[#d7ebf5] rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col items-center gap-1">
                     <div className="w-20 h-2 bg-slate-900 rounded-full" />
                     <div className="w-12 h-1 bg-slate-500 rounded-full" />
@@ -136,7 +137,7 @@ const TemplateThumbnail = ({ type }) => {
     }
     if (type === 'navySerif') {
         return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+            <div className="w-full h-32 bg-white border border-[#d7ebf5] rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex gap-2">
                     <div className="w-1.5 h-8 bg-blue-700 rounded-sm" />
                     <div className="flex flex-col gap-1">
@@ -148,14 +149,14 @@ const TemplateThumbnail = ({ type }) => {
                     <div className="w-16 h-1.5 bg-slate-800 rounded mb-1" />
                     <div className="w-full flex gap-1">
                         <div className="w-2 h-2 bg-blue-100 rounded-full" />
-                        <div className="w-4/5 h-1 bg-slate-350 rounded" />
+                        <div className="w-4/5 h-1 bg-slate-300 rounded" />
                     </div>
                     <div className="w-full flex gap-1">
                         <div className="w-2 h-2 bg-blue-100 rounded-full" />
-                        <div className="w-5/6 h-1 bg-slate-250 rounded" />
+                        <div className="w-5/6 h-1 bg-slate-200 rounded" />
                     </div>
                 </div>
-                <div className="w-full flex justify-between items-center pl-3 border-t border-slate-100 pt-1">
+                <div className="w-full flex justify-between items-center pl-3 border-t border-[#d7ebf5]/60 pt-1">
                     <div className="w-12 h-1 bg-slate-300 rounded" />
                     <div className="w-4 h-4 bg-slate-200 rounded-sm" />
                 </div>
@@ -164,22 +165,22 @@ const TemplateThumbnail = ({ type }) => {
     }
     if (type === 'charcoalCentered') {
         return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+            <div className="w-full h-32 bg-white border border-[#d7ebf5] rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col items-center gap-1">
-                    <div className="w-24 h-2 bg-[#002147] rounded-full" />
+                    <div className="w-24 h-2 bg-[#0d3a5f] rounded-full" />
                     <div className="w-36 h-[1px] bg-slate-200" />
                     <div className="w-20 h-1 bg-slate-400 rounded-full" />
                     <div className="w-36 h-[1px] bg-slate-200" />
                 </div>
                 <div className="flex flex-col gap-1.5 w-full">
-                    <div className="w-20 h-1.5 bg-[#002147] rounded" />
+                    <div className="w-20 h-1.5 bg-[#0d3a5f] rounded" />
                     <div className="w-full flex gap-2">
                         <div className="w-1/4 h-1 bg-slate-300 rounded" />
                         <div className="w-3/4 h-1 bg-slate-200 rounded" />
                     </div>
                 </div>
-                <div className="w-full flex justify-between items-center border-t border-[#002147]/20 pt-1">
-                    <div className="w-14 h-1 bg-slate-350 rounded" />
+                <div className="w-full flex justify-between items-center border-t border-[#0d3a5f]/20 pt-1">
+                    <div className="w-14 h-1 bg-slate-300 rounded" />
                     <div className="w-4 h-4 bg-slate-200 rounded-sm" />
                 </div>
             </div>
@@ -187,31 +188,31 @@ const TemplateThumbnail = ({ type }) => {
     }
     if (type === 'minimalModern') {
         return (
-            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+            <div className="w-full h-32 bg-white border border-[#d7ebf5] rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
                 <div className="flex flex-col gap-0.5">
                     <div className="w-20 h-2 bg-slate-800 rounded-sm" />
-                    <div className="w-16 h-1.5 bg-[#1a3884] rounded-sm" />
+                    <div className="w-16 h-1.5 bg-[#045C9A] rounded-sm" />
                 </div>
-                <div className="flex flex-col gap-1 w-full mt-1 border-b border-slate-200 pb-1">
+                <div className="flex flex-col gap-1 w-full mt-1 border-b border-[#d7ebf5] pb-1">
                     <div className="w-12 h-1.5 bg-slate-800 rounded-sm" />
                 </div>
                 <div className="flex flex-col gap-1 w-full mt-1">
                     <div className="w-full flex gap-1 pl-1">
-                        <div className="w-1 h-1 bg-[#1a3884] rounded-full mt-[1px]" />
+                        <div className="w-1 h-1 bg-[#045C9A] rounded-full mt-[1px]" />
                         <div className="w-5/6 h-1 bg-slate-300 rounded-sm" />
                     </div>
                 </div>
                 <div className="w-full flex gap-1 pl-1">
-                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">API</div>
-                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">React</div>
-                    <div className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[5px] text-slate-700">Node</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-[#d7ebf5] rounded text-[5px] text-slate-700">API</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-[#d7ebf5] rounded text-[5px] text-slate-700">React</div>
+                    <div className="px-1 py-0.5 bg-slate-100 border border-[#d7ebf5] rounded text-[5px] text-slate-700">Node</div>
                 </div>
             </div>
         );
     }
     // forestFormal
     return (
-        <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1 justify-between select-none pointer-events-none">
+        <div className="w-full h-32 bg-white border border-[#d7ebf5] rounded p-3 flex flex-col gap-1 justify-between select-none pointer-events-none">
             <div className="flex flex-col items-center">
                 <div className="w-24 h-2 bg-black rounded-full" />
                 <div className="w-14 h-1.5 bg-black rounded-full mt-0.5" />
@@ -227,12 +228,27 @@ const TemplateThumbnail = ({ type }) => {
                     <div className="w-5/6 h-1 bg-slate-700 rounded" />
                 </div>
             </div>
-            <div className="w-full h-[1px] bg-slate-350 mt-1" />
+            <div className="w-full h-[1px] bg-slate-300 mt-1" />
         </div>
     );
 };
 
 
+
+// Same ambient layer the dashboard, courses and assessments pages use, so the
+// builder reads as one product with them. Off inside the placement modal,
+// which paints its own surface.
+const BuilderBackdrop = ({ dark }) => (
+    <>
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+            <NeuralBackground theme={dark ? 'dark' : 'light'} />
+        </div>
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+            <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+            <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+        </div>
+    </>
+);
 
 const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, viewOnly = false, preloadedData = null }) => {
     const navigate = useNavigate();
@@ -270,6 +286,20 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [verifiedCgpa, setVerifiedCgpa] = useState(null);
 
     const [dataLoaded, setDataLoaded] = useState(false);
+
+    // The constellation canvas paints from a prop, not CSS, so it has to be
+    // told when the dark class flips -- same observer the dashboard uses.
+    const [isDarkTheme, setIsDarkTheme] = useState(
+        typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+    );
+    useEffect(() => {
+        if (embedded || typeof document === 'undefined') return undefined;
+        const observer = new MutationObserver(() => {
+            setIsDarkTheme(document.documentElement.classList.contains('dark'));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, [embedded]);
 
     // ── Builder core state ───────────────────────────────────────────────
     const [resumeId, setResumeId] = useState(null);
@@ -537,43 +567,38 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
     };
 
-    // ── Fetch skill chips when career path is selected ───────────────────
-    const fetchSkillChips = useCallback(async (roleName, email) => {
-        if (!roleName) return;
+    // ── Skill chips: the student's Completed / In Progress skills, grouped
+    //    Technical / Domain / AI. Progress records carry no category, so it is
+    //    resolved against the skill lists of ALL the student's career paths
+    //    (primary, secondary, tertiary). Resolving against the primary role
+    //    alone dumped every skill earned for the other two paths into
+    //    "Technical", which is why Domain and AI never showed anything.
+    const fetchSkillChips = useCallback(async (roleNames, email) => {
+        const roles = (roleNames || []).filter(Boolean);
+        if (roles.length === 0) return;
         setSkillChipsLoading(true);
         try {
-            const token = sessionStorage.getItem('token');
-            const headers = token ? { Authorization: `Bearer ${token}` } : {};
             const emailToUse = email || userEmail || JSON.parse(sessionStorage.getItem('user') || '{}').email || '';
 
-            const [roleRes, userSkillsRes] = await Promise.all([
-                apiCall(`/career-agent/role-skills/${encodeURIComponent(roleName)}`).catch(() => null),
+            const [userSkillsRes, ...roleResList] = await Promise.all([
                 emailToUse ? apiCall(`/career-agent/user-skills/${encodeURIComponent(emailToUse)}`).catch(() => null) : Promise.resolve(null),
+                ...roles.map(r => apiCall(`/career-agent/role-skills/${encodeURIComponent(r)}`).catch(() => null)),
             ]);
 
-            const roleSkills = roleRes?.skills || [];
+            const roleSkills = roleResList.flatMap(r => r?.skills || []);
             const userSkillsRaw = Array.isArray(userSkillsRes) ? userSkillsRes : [];
 
-            // Build mastered and in-progress from platform activity
             const mastered = userSkillsRaw.filter(s => s.status === 'Completed').map(s => s.skillName);
             const inProgress = userSkillsRaw.filter(s => s.status === 'In Progress').map(s => s.skillName);
-
-            // Suggested = role skills NOT in mastered/in-progress (case-insensitive)
-            const known = new Set([...mastered, ...inProgress].map(s => s.toLowerCase().trim()));
+            const known = new Set([...mastered, ...inProgress].map(s => (s || '').toLowerCase().trim()));
             const suggested = roleSkills
-                .filter(s => !known.has(s.skillName?.toLowerCase().trim()))
-                .filter(s => s.skillCategory !== 'Soft Skill')
-                .map(s => s.skillName);
-
-            const softSuggested = roleSkills
-                .filter(s => s.skillCategory === 'Soft Skill' && !known.has(s.skillName?.toLowerCase().trim()))
+                .filter(s => !known.has((s.skillName || '').toLowerCase().trim()) && s.skillCategory !== 'Soft Skill')
                 .map(s => s.skillName);
 
             setMasteredSkills(mastered);
             setInProgressSkills(inProgress);
-            setSuggestedSkills([...new Set([...suggested, ...softSuggested])]);
-            // Progress records carry no category — derive it from the role's
-            // skill list so the Technical / Domain / AI groups populate.
+            setSuggestedSkills([...new Set(suggested)]);
+
             const catLabel = (name) => {
                 const row = roleSkills.find(rs => (rs.skillName || '').toLowerCase().trim() === (name || '').toLowerCase().trim());
                 const c = row?.skillCategory;
@@ -592,12 +617,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
     }, [userEmail]);
 
-    // Trigger skill chip fetch when path selection changes
+    // Refetch once the career paths resolve. The typed Target Role does not
+    // drive this: suggestions come from the paths chosen in Career Directions,
+    // not from free text.
     useEffect(() => {
-        if (selectedCareerPath?.roleName && dataLoaded) {
-            fetchSkillChips(selectedCareerPath.roleName);
-        }
-    }, [selectedCareerPath, fetchSkillChips, dataLoaded]);
+        if (!dataLoaded) return;
+        const roles = [careerPaths.primary, careerPaths.secondary, careerPaths.tertiary].filter(Boolean);
+        if (roles.length) fetchSkillChips(roles);
+    }, [careerPaths, fetchSkillChips, dataLoaded]);
 
 
 
@@ -1502,13 +1529,13 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
     if (loading && !viewOnly) {
         return (
-            <div className="h-full w-full flex items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E]">
+            <div className="h-full w-full flex items-center justify-center bg-[#F1F5F9] dark:bg-[#072036]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative w-16 h-16">
-                        <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
-                        <div className="absolute inset-0 rounded-full border-4 border-t-blue-500 animate-spin"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-[#045C9A]/20"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-t-[#045C9A] animate-spin"></div>
                     </div>
-                    <p className="text-[#1a3884] dark:text-blue-400 font-bold animate-pulse uppercase tracking-widest text-xs">{t('resume_builder.loading', 'Loading Builder...')}</p>
+                    <p className="text-[#045C9A] dark:text-[#A6D7E8] font-bold animate-pulse uppercase tracking-widest text-xs">{t('resume_builder.loading', 'Loading Builder...')}</p>
                 </div>
             </div>
         );
@@ -1521,7 +1548,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             <div className="absolute bottom-[15mm] left-[15mm] right-[15mm] pt-4 border-t border-gray-300 flex justify-between items-center gap-4 text-left z-20 bg-white">
                 <div className="min-w-0">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#045C9A]" />
                         {ORG_NAME} {t('resume_builder.verified_resume', 'Verified Resume')}
                     </div>
                     <p className="mt-1 text-[9.5px] !text-gray-600">
@@ -1533,9 +1560,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     <p className="text-[8.5px] !text-gray-500 mt-0.5">{t('resume_builder.scan_qr', 'Scan the QR code to verify the authenticity of this document online.')}</p>
                 </div>
                 {verificationQr ? (
-                    <img src={verificationQr} alt="Resume verification QR code" className="w-12 h-12 border border-slate-200 bg-white p-0.5 shrink-0" />
+                    <img src={verificationQr} alt="Resume verification QR code" className="w-12 h-12 border border-[#d7ebf5] bg-white p-0.5 shrink-0" />
                 ) : (
-                    <div className="w-12 h-12 border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 border border-[#d7ebf5] bg-white flex items-center justify-center shrink-0">
                         <QrCode className="w-6 h-6 text-slate-400" />
                     </div>
                 )}
@@ -1567,8 +1594,9 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
     if (pageMode === 'list') {
         return (
-            <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
-                <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
+            <div className={`relative flex flex-col h-full overflow-hidden font-sans selection:bg-[#045C9A] selection:text-white ${embedded ? 'bg-[#F1F5F9] dark:bg-[#072036]' : 'bg-transparent'}`}>
+                {!embedded && <BuilderBackdrop dark={isDarkTheme} />}
+                <main className="relative z-10 flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
                     <div className="max-w-6xl mx-auto space-y-6">
                         {/* Header & Back Button */}
                         <div className="flex items-center justify-between">
@@ -1577,10 +1605,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     if (embedded && onClose) onClose();
                                     else navigate("/dashboard/smaart-toolkit");
                                 }}
-                                className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#112b6b] transition-all hover:text-[#1a3884] dark:text-slate-300"
+                                className="group flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#072036] transition-all hover:text-[#045C9A] dark:text-slate-300"
                             >
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                                    <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300" />
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
+                                    <IconArrowLeft stroke={2.5} className="h-4 w-4 text-[#072036] dark:text-slate-300" />
                                 </div>
                                 {t('resume_builder.back_to_toolkit', 'BACK TO TOOLKIT')}
                             </button>
@@ -1590,23 +1618,23 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, ease: "easeOut" }}
-                            className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                            className="relative overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#045C9A]/20 dark:bg-[#0d3a5f] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
                         >
                             <div className="flex-1">
-                                <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                    {t('resume_builder.list_title_1', 'My')} <span className="text-[#1a3884] dark:text-blue-300">{t('resume_builder.list_title_2', 'Resumes')}</span>
+                                <h1 className="text-xl sm:text-2xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white" style={{ letterSpacing: '-0.02em' }}>
+                                    {t('resume_builder.list_title_1', 'My')} <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t('resume_builder.list_title_2', 'Resumes')}</span>
                                 </h1>
-                                <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                                <p className="mt-0.5 text-xs sm:text-sm font-medium leading-relaxed text-[#35566b] dark:text-slate-400 max-w-2xl">
                                     {t('resume_builder.list_subtitle', 'Manage your tailored resumes and keep them ready for every application.')}
                                 </p>
                             </div>
 
-                            <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-3 md:pt-0 md:pl-6">
+                            <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d7ebf5] dark:border-[#045C9A]/20 pt-3 md:pt-0 md:pl-6">
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleCreateNew}
-                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#112b6b] dark:bg-blue-600 dark:hover:bg-blue-700"
+                                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] dark:bg-[#045C9A] dark:hover:bg-[#072036]"
                                 >
                                     <IconPlus stroke={2.5} className="h-3.5 w-3.5" />
                                     {t('resume_builder.create_new', 'Create New Resume')}
@@ -1615,27 +1643,27 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                         </motion.div>
                         {resumeListLoading ? (
                             <div className="flex justify-center items-center h-64">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a3884]"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#045C9A]"></div>
                             </div>
                         ) : resumeList.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-64 text-center">
-                                <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-[#1a3884]/20 flex items-center justify-center mb-4">
-                                    <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#1a3884] dark:text-blue-400" />
+                                <div className="w-16 h-16 rounded-2xl bg-[#EAF7FD] dark:bg-[#045C9A]/20 flex items-center justify-center mb-4">
+                                    <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#045C9A] dark:text-[#A6D7E8]" />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
+                                <h3 className="text-lg font-bold text-[#072036] dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first resume to get started on your career journey.')}</p>
-                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#1a3884] text-white rounded-xl font-bold text-sm hover:bg-[#132c6b] transition-colors shadow-md">
+                                <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#045C9A] text-white rounded-xl font-bold text-sm hover:bg-[#072036] transition-colors shadow-md">
                                     {t('resume_builder.create_first', 'Create First Resume')}
                                 </button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {resumeList.map(resume => (
-                                    <div key={resume._id} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-500/30 transition-all duration-300 overflow-hidden flex flex-col group">
+                                    <div key={resume._id} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm hover:shadow-xl hover:border-[#045C9A]/30 dark:hover:border-[#A6D7E8]/30 transition-all duration-300 overflow-hidden flex flex-col group">
 
                                         <div className="p-6 flex-1 flex flex-col items-center relative">
-                                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#1a3884]/20 border border-blue-100 dark:border-[#1a3884]/30">
-                                                <IconFileDescription stroke={1.5} className="h-9 w-9 text-[#1a3884] dark:text-blue-400" />
+                                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#EAF7FD] dark:bg-[#045C9A]/20 border border-[#d7ebf5] dark:border-[#045C9A]/30">
+                                                <IconFileDescription stroke={1.5} className="h-9 w-9 text-[#045C9A] dark:text-[#A6D7E8]" />
                                             </div>
 
                                             {renamingId === resume._id ? (
@@ -1649,17 +1677,17 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                             if (e.key === 'Escape') setRenamingId(null);
                                                         }}
                                                         onBlur={() => renameResume(resume._id, renameValue)}
-                                                        className="w-full text-center font-bold text-slate-800 dark:text-white bg-slate-50 dark:bg-slate-800 border-b-2 border-[#1a3884] outline-none px-2 py-1"
+                                                        className="w-full text-center font-bold text-[#072036] dark:text-white bg-slate-50 dark:bg-slate-800 border-b-2 border-[#045C9A] outline-none px-2 py-1"
                                                     />
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2 mb-2 w-full justify-center group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 rounded-lg p-1 transition-colors cursor-text" onClick={() => { setRenamingId(resume._id); setRenameValue(resume.versionName || t('resume_builder.default_name', 'My Resume')); }}>
-                                                    <h3 className="font-bold text-lg text-slate-800 dark:text-white truncate max-w-[80%]">{resume.versionName || t('resume_builder.default_name', 'My Resume')}</h3>
+                                                    <h3 className="font-bold text-lg text-[#072036] dark:text-white truncate max-w-[80%]">{resume.versionName || t('resume_builder.default_name', 'My Resume')}</h3>
                                                     <IconPencil stroke={2} className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-[#1a3884]/20 text-[#1a3884] dark:text-blue-300 text-[10px] font-bold uppercase tracking-wider mb-4 border border-blue-100 dark:border-[#1a3884]/30">
+                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF7FD] dark:bg-[#045C9A]/20 text-[#045C9A] dark:text-[#A6D7E8] text-[10px] font-bold uppercase tracking-wider mb-4 border border-[#d7ebf5] dark:border-[#045C9A]/30">
                                                 <IconTarget stroke={2} className="w-3 h-3" />
                                                 <span className="truncate max-w-[150px]">{resume.targetRole || t('resume_builder.general_resume', 'General Resume')}</span>
                                             </div>
@@ -1667,12 +1695,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             <p className="text-[10px] text-slate-400 font-medium">{t('resume_builder.last_updated', 'Last updated:')} {new Date(resume.updatedAt).toLocaleDateString()}</p>
                                         </div>
 
-                                        <div className="grid grid-cols-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
-                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5">
+                                        <div className="grid grid-cols-3 border-t border-[#d7ebf5]/60 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
+                                            <button onClick={() => handleEditResume(resume)} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#045C9A] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5">
                                                 <IconPencil stroke={1.5} className="w-4 h-4" />
                                                 <span className="text-[10px] font-bold">{t('resume_builder.edit', 'Edit')}</span>
                                             </button>
-                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#1a3884] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-slate-100 dark:border-white/5 disabled:opacity-50">
+                                            <button onClick={(e) => handleDuplicateResume(resume._id, e)} disabled={duplicatingId === resume._id} className="flex flex-col items-center justify-center py-3 gap-1 hover:bg-[#045C9A] hover:text-white text-slate-600 dark:text-slate-300 transition-colors border-r border-[#d7ebf5]/60 dark:border-white/5 disabled:opacity-50">
                                                 {duplicatingId === resume._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <IconCopy stroke={1.5} className="w-4 h-4" />}
                                                 <span className="text-[10px] font-bold">{t('resume_builder.copy', 'Copy')}</span>
                                             </button>
@@ -1693,9 +1721,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
     // --- Builder Mode Return ---
     return (
-        <div className="flex flex-col lg:h-full bg-[#F8FAFC] dark:bg-[#00152E] lg:overflow-hidden font-sans selection:bg-[#1a3884] selection:text-white">
+        <div className={`relative flex flex-col lg:h-full lg:overflow-hidden font-sans selection:bg-[#045C9A] selection:text-white ${embedded ? 'bg-[#F1F5F9] dark:bg-[#072036]' : 'bg-transparent'}`}>
+            {!embedded && <BuilderBackdrop dark={isDarkTheme} />}
             {/* Header */}
-            <header className="min-h-[4rem] flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-0 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm gap-3">
+            <header className="relative min-h-[4rem] flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-3 sm:py-0 bg-white dark:bg-[#0d3a5f] border-b border-[#d7ebf5] dark:border-white/8 z-30 shrink-0 shadow-sm gap-3">
                 <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
                     <button onClick={async () => {
                         if (embedded && onClose) {
@@ -1704,7 +1733,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             await fetchResumeList();
                             setPageMode('list');
                         }
-                    }} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-[10px] sm:text-[11px] text-slate-650 dark:text-slate-350 uppercase tracking-wider shrink-0">
+                    }} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-white/[0.06] hover:bg-[#EAF7FD] dark:hover:bg-white/10 border border-[#d7ebf5] dark:border-white/10 rounded-xl transition-all font-bold text-[10px] sm:text-[11px] text-[#072036] dark:text-slate-200 uppercase tracking-wider shrink-0 shadow-sm">
                         <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> {t('resume_builder.back', 'Back')}
                     </button>
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1713,7 +1742,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 <input
                                     value={versionName}
                                     onChange={(e) => setVersionName(e.target.value)}
-                                    className="text-sm sm:text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#1a3884] outline-none transition-colors w-28 sm:w-48 pr-6 truncate"
+                                    className="text-base sm:text-lg font-extrabold text-[#072036] dark:text-white tracking-tight leading-tight bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-600 focus:border-[#045C9A] outline-none transition-colors w-28 sm:w-48 pr-6 truncate"
                                     placeholder={t('resume_builder.resume_name_placeholder', 'Resume Name')}
                                 />
                                 <IconPencil stroke={2} className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -1722,29 +1751,36 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 dark:border-white/5">
-                    <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
+                <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-[#d7ebf5]/60 dark:border-white/5">
+                    <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#EAF7FD] dark:bg-[#045C9A]/20 text-[#045C9A] dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-[#045C9A]/30">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || t('resume_builder.secure_resume', 'Secure Resume')}</span>
                     </div>
+                    {/* Re-pull name, contact, education, experience, projects and
+                        certificates from the student's profile. Before this, a
+                        resume opened for editing never saw profile updates. */}
+                    <button onClick={() => handleSyncProfile(false)} disabled={isSyncing || saving} title={t('resume_builder.sync_profile_title', 'Refresh this resume with the latest details from your profile')} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-white/[0.06] hover:bg-[#EAF7FD] dark:hover:bg-white/10 text-[#072036] dark:text-slate-200 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-[#d7ebf5] dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                        <span className="hidden sm:inline">{t('resume_builder.sync_profile', 'Sync Profile')}</span>
+                    </button>
                     {currentStep !== steps.length - 1 && (
-                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+                        <button onClick={() => handleStepClick(steps.length - 1)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-white/[0.06] hover:bg-[#EAF7FD] dark:hover:bg-white/10 text-[#072036] dark:text-slate-200 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-[#d7ebf5] dark:border-white/10 shadow-sm shrink-0">
                             <Eye className="w-3.5 h-3.5" />
                             <span>{t('resume_builder.review', 'Review')}</span>
                         </button>
                     )}
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-55 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
+                    <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-white/[0.06] hover:bg-[#EAF7FD] dark:hover:bg-white/10 text-[#072036] dark:text-slate-200 rounded-xl transition-all font-semibold text-[11px] sm:text-xs border border-[#d7ebf5] dark:border-white/10 disabled:opacity-50 shadow-sm shrink-0">
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                         <span>{t('resume_builder.save', 'Save')}<span className="hidden sm:inline"> {t('resume_builder.progress', 'Progress')}</span></span>
                     </button>
                     {currentStep === steps.length - 1 && (
                         embedded ? (
-                            <button onClick={handleConfirmAndSave} disabled={saving || generating} className="flex items-center gap-1 px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50 shrink-0">
+                            <button onClick={handleConfirmAndSave} disabled={saving || generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#045C9A]/15 hover:shadow-lg disabled:opacity-50 shrink-0">
                                 {saving || generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                                 <span>{t('resume_builder.confirm_save', 'Confirm & Save')}</span>
                             </button>
                         ) : (
-                            <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-1 px-3 py-1.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-blue-600/10 hover:shadow-lg disabled:opacity-50 shrink-0">
+                            <button onClick={handleDownloadPDF} disabled={generating} className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-xl transition-all font-semibold text-[11px] sm:text-xs shadow-md shadow-[#045C9A]/15 hover:shadow-lg disabled:opacity-50 shrink-0">
                                 {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                                 <span>{t('resume_builder.download', 'Download')}<span className="hidden sm:inline"> {t('resume_builder.pdf', 'PDF')}</span></span>
                             </button>
@@ -1752,16 +1788,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     )}
                 </div>
             </header>
-            <main className="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
+            <main className="relative z-10 flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
                 {/* Form Section */}
                 <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden' : 'flex w-full'}`}>
                     <div className="flex-1 lg:overflow-y-auto custom-scrollbar">
                         <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
                             {/* Modern Responsive Stepper */}
-                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
+                            <div className="bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl p-4 sm:p-6 shadow-sm mb-6 sm:mb-8">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">
-                                        {t('resume_builder.step_of', 'Step {{current}} of {{total}} :', { current: currentStep + 1, total: steps.length })} <span className="text-slate-800 dark:text-slate-200">{steps[currentStep].label}</span>
+                                    <span className="text-[11px] font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">
+                                        {t('resume_builder.step_of', 'Step {{current}} of {{total}} :', { current: currentStep + 1, total: steps.length })} <span className="text-[#072036] dark:text-white">{steps[currentStep].label}</span>
                                     </span>
                                 </div>
 
@@ -1770,10 +1806,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     {/* Track line container */}
                                     <div className="absolute left-6 sm:left-20 right-6 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
                                         {/* Background Track Line */}
-                                        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800/60 rounded-full" />
+                                        <div className="absolute inset-0 bg-[#d7ebf5] dark:bg-white/10 rounded-full" />
                                         {/* Active Progress Line */}
                                         <div
-                                            className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-500 to-[#1a3884] rounded-full transition-all duration-550 ease-in-out"
+                                            className="absolute left-0 top-0 bottom-0 bg-[#045C9A] rounded-full transition-all duration-550 ease-in-out"
                                             style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
                                         />
                                     </div>
@@ -1788,10 +1824,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 <button
                                                     onClick={() => handleStepClick(idx)}
                                                     className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${isActive
-                                                            ? 'bg-[#1a3884] text-white ring-4 ring-blue-500/20 scale-110 shadow-md shadow-blue-500/10'
+                                                            ? 'bg-[#045C9A] text-white ring-4 ring-[#045C9A]/15 scale-110 shadow-md shadow-[#045C9A]/20'
                                                             : isCompleted
-                                                                ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-                                                                : 'bg-white dark:bg-[#002147] text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20'
+                                                                ? 'bg-[#EAF7FD] dark:bg-[#A6D7E8]/15 text-[#045C9A] dark:text-[#A6D7E8] border border-[#045C9A]/30 dark:border-[#A6D7E8]/30 hover:bg-[#d7ebf5] dark:hover:bg-[#A6D7E8]/25'
+                                                                : 'bg-white dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 border border-[#d7ebf5] dark:border-white/10 hover:border-[#045C9A]/40 dark:hover:border-white/20'
                                                         }`}
                                                     title={step.label}
                                                 >
@@ -1803,10 +1839,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 </button>
 
                                                 {/* Step label - hidden on mobile to avoid layout crowding */}
-                                                <span className={`absolute top-10 sm:top-11 text-[9px] sm:text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${isActive
-                                                        ? 'text-[#1a3884] dark:text-blue-400 font-extrabold scale-105'
+                                                <span className={`absolute top-10 sm:top-11 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${isActive
+                                                        ? 'text-[#045C9A] dark:text-[#A6D7E8] font-extrabold'
                                                         : isCompleted
-                                                            ? 'text-emerald-600 dark:text-emerald-400'
+                                                            ? 'text-[#072036] dark:text-slate-300'
                                                             : 'text-slate-400 dark:text-slate-500'
                                                     }`}>
                                                     {step.label}
@@ -1821,60 +1857,61 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             <div className="min-h-[400px]">
                                 {steps[currentStep].id === 'personal' && (
                                     <div className="space-y-6">
-                                        {/* Target role is set silently from the primary career path
-                                            (see handleCreateNew) — the picker card was removed. */}
-                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
+                                        {/* Target Role is free text. It defaults to the primary career
+                                            path (handleCreateNew) or the job title in the placement
+                                            modal, and the student can overwrite it with anything. */}
+                                        <div className="space-y-6 bg-white dark:bg-[#0d3a5f] p-4 sm:p-8 rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm">
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.full_name', 'Full Name')}</label>
                                                 <div className="relative group/input">
                                                     <User className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                                                    <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.full_name_title', 'Full name is verified from your profile and cannot be changed here.')} />
+                                                    <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-white/[0.06] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.full_name_title', 'Full name is verified from your profile and cannot be changed here.')} />
                                                 </div>
                                             </div>
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.target_role', 'Target Role')}</label>
                                                 <div className="relative group/input">
-                                                    <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'Set from your primary career path')} value={(embedded && jobContext) ? (jobContext.displayTitle || jobContext.title || jobContext.jobTitle || resumeData.personalInfo.targetRole) : resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.target_role_title', 'Target Role is automatically set based on your selected Career Path or Job.')} />
+                                                    <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'e.g. Frontend Developer, Marketing Executive')} value={resumeData.personalInfo.targetRole || ''} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.email_address', 'Email Address')}</label>
                                                     <div className="relative group/input">
-                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                        <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                        <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                     </div>
                                                 </div>
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.mobile_number', 'Mobile Number')}</label>
                                                     <div className="relative group/input">
-                                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                        <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                        <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
                                                 <div className="relative group/input">
-                                                    <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                    <input type="text" placeholder={t('resume_builder.location_placeholder', 'City, State, Country')} value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                    <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                    <input type="text" placeholder={t('resume_builder.location_placeholder', 'City, State, Country')} value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.linkedin_url', 'LinkedIn URL')}</label>
                                                     <div className="relative group/input">
-                                                        <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                        <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                        <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                     </div>
                                                 </div>
                                                 <div className="group">
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.github_url', 'GitHub URL')}</label>
                                                     <div className="relative group/input">
-                                                        <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#1a3884] dark:group-focus-within/input:text-blue-400 pointer-events-none" />
-                                                        <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:border-blue-400 dark:focus:ring-blue-400/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                        <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors group-focus-within/input:text-[#045C9A] dark:group-focus-within/input:text-[#A6D7E8] pointer-events-none" />
+                                                        <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl || ''} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:focus:border-[#A6D7E8] dark:focus:ring-[#A6D7E8]/10 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1886,7 +1923,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('resume_builder.professional_summary', 'Professional Summary')}</label>
 
                                                 </div>
-                                                <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
+                                                <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 rounded-2xl outline-none focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder={t('resume_builder.summary_placeholder', 'A brief overview of your professional background and key strengths...')}></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -1896,10 +1933,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div className="space-y-4">
                                         <AnimatePresence>
                                             {resumeData.experience.map((exp, idx) => (
-                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
-                                                            <Briefcase className="w-4 h-4 text-blue-500 shrink-0" />
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
+                                                    <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Briefcase className="w-4 h-4 text-[#045C9A] shrink-0" />
                                                             <span className="truncate">{exp.company || t('resume_builder.work_experience', 'Work Experience')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
@@ -1909,33 +1946,33 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.company', 'Company')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.company_placeholder', 'Company Name')} value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.company', 'Company')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.company_placeholder', 'Company Name')} value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.job_role', 'Job Role')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.job_role_placeholder', 'e.g. Project Associate')} value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.job_role', 'Job Role')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.job_role_placeholder', 'e.g. Project Associate')} value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.duration', 'Duration')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.duration_placeholder', 'e.g. 2021 - Present')} value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.duration', 'Duration')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.duration_placeholder', 'e.g. 2021 - Present')} value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.exp_desc_placeholder', 'Key responsibilities and achievements...')} value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[100px] resize-none" rows={4}></textarea>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.exp_desc_placeholder', 'Key responsibilities and achievements...')} value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[100px] resize-none" rows={4}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#1a3884] hover:text-[#1a3884] transition-all">
+                                        <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_experience', 'Add Experience')}
                                         </button>
                                     </div>
@@ -1945,10 +1982,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div className="space-y-4">
                                         <AnimatePresence>
                                             {resumeData.education.map((edu, idx) => (
-                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
-                                                            <GraduationCap className="w-4 h-4 text-emerald-500 shrink-0" />
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
+                                                    <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <GraduationCap className="w-4 h-4 text-[#045C9A] shrink-0" />
                                                             <span className="truncate">{edu.institution || t('resume_builder.education_details', 'Education Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
@@ -1957,39 +1994,39 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     </div>
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.institution_name', 'Institution Name')}</label>
-                                                            <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.institution_name', 'Institution Name')}</label>
+                                                            <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.degree', 'Degree')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.degree', 'Degree')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.year_of_passing', 'Year of Passing')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.year_of_passing', 'Year of Passing')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
                                                                 <div className="relative">
-                                                                    <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className={`w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 ${idx === 0 ? 'pr-10 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed text-emerald-800 dark:text-emerald-300 font-bold' : ''}`} readOnly={idx === 0} title={idx === 0 ? "Auto-synced from College Academic Records" : ""} />
+                                                                    <input type="text" placeholder={t('resume_builder.grade_placeholder', 'e.g. 8.5 CGPA')} value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className={`w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 ${idx === 0 ? 'pr-10 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed text-emerald-800 dark:text-emerald-300 font-bold' : ''}`} readOnly={idx === 0} title={idx === 0 ? "Auto-synced from College Academic Records" : ""} />
                                                                     {idx === 0 && (
                                                                         <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" title="Auto-synced from College Academic Records" />
                                                                     )}
                                                                 </div>
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.location', 'Location')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.city_state', 'City, State')} value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500 hover:text-emerald-500 transition-all">
+                                        <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_education', 'Add Education')}
                                         </button>
                                     </div>
@@ -1999,10 +2036,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div className="space-y-4">
                                         <AnimatePresence>
                                             {resumeData.projects.map((proj, idx) => (
-                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
-                                                            <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm overflow-hidden animate-fade-in">
+                                                    <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <FileText className="w-4 h-4 text-[#045C9A] shrink-0" />
                                                             <span className="truncate">{proj.title || t('resume_builder.project_details', 'Project Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
@@ -2012,23 +2049,23 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.project_title', 'Project Title')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.project_name_placeholder', 'Project Name')} value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.project_title', 'Project Title')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.project_name_placeholder', 'Project Name')} value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.project_link', 'Project Link')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.project_link', 'Project Link')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.link_placeholder', 'URL or [Link]')} value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[80px] resize-none" rows={3}></textarea>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[80px] resize-none" rows={3}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 hover:text-indigo-500 transition-all">
+                                        <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_project', 'Add Project')}
                                         </button>
                                     </div>
@@ -2038,12 +2075,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div className="space-y-6">
                                         {/* Job Context Skills */}
                                         {embedded && jobContext && jobSkills.length > 0 && (
-                                            <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-[#1a3884]/30 shadow-sm animate-fade-in relative overflow-hidden">
-                                                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-[#1a3884]/5 dark:to-indigo-900/5 pointer-events-none" />
+                                            <div className="bg-white dark:bg-[#0d3a5f] p-4 sm:p-6 rounded-2xl border border-[#045C9A]/30 shadow-sm animate-fade-in relative overflow-hidden">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-[#EAF7FD] to-[#F1F5F9] dark:from-[#045C9A]/5 dark:to-[#045C9A]/10 pointer-events-none" />
                                                 <div className="relative">
                                                     <div className="flex items-center gap-2 mb-4">
-                                                        <Briefcase className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                                                        <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">{t('resume_builder.job_required_skills', 'Job Required Skills')}</h3>
+                                                        <Briefcase className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
+                                                        <h3 className="text-sm font-bold text-[#072036] dark:text-white uppercase tracking-wider">{t('resume_builder.job_required_skills', 'Job Required Skills')}</h3>
                                                     </div>
                                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-4">
                                                         {t('resume_builder.job_skills_desc', 'Click to add these requested skills from the job posting to your technical skills.')}
@@ -2064,7 +2101,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                         ...prev,
                                                                         skills: { ...prev.skills, technical: prev.skills.technical ? `${prev.skills.technical}, ${skill}` : skill }
                                                                     }));
-                                                                }} className="px-3 py-1.5 bg-white hover:bg-[#1a3884] dark:bg-slate-800 dark:hover:bg-blue-600 text-slate-700 hover:text-white dark:text-slate-300 text-[11px] font-bold rounded-xl border border-slate-200 hover:border-[#1a3884] dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-sm hover:shadow group/btn">
+                                                                }} className="px-3 py-1.5 bg-white hover:bg-[#045C9A] dark:bg-slate-800 dark:hover:bg-[#045C9A] text-slate-700 hover:text-white dark:text-slate-300 text-[11px] font-bold rounded-xl border border-[#d7ebf5] hover:border-[#045C9A] dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-sm hover:shadow group/btn">
                                                                     {skill} <Plus className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-white transition-colors" />
                                                                 </button>
                                                             );
@@ -2074,67 +2111,97 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             </div>
                                         )}
 
-                                        {/* Suggestions Card */}
-                                        {careerPaths && userSkills.length > 0 && (
-                                            <div className="bg-white dark:bg-[#002147] p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <Sparkles className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                                                    <h3 className="text-sm font-bold text-slate-800 dark:text-white">{t('resume_builder.career_suggestions', 'Career Agent Suggestions')}</h3>
+                                        {/* Skills from the student's career paths: every Completed and
+                                            In Progress skill, grouped Technical / Domain / AI. */}
+                                        {(skillChipsLoading || userSkills.length > 0) && (
+                                            <div className="bg-white dark:bg-[#0d3a5f] p-4 sm:p-6 rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm animate-fade-in">
+                                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
+                                                    <div className="min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <Sparkles className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8] shrink-0" />
+                                                            <h3 className="text-sm font-bold text-[#072036] dark:text-white">{t('resume_builder.career_suggestions', 'Skills from your career path')}</h3>
+                                                        </div>
+                                                        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                            {t('resume_builder.career_suggestions_desc', 'Everything you have completed or are working on across your chosen career paths. Click a skill to add it to your resume.')}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 shrink-0">
+                                                        <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" />{t('resume_builder.skill_completed', 'Completed')}</span>
+                                                        <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" />{t('resume_builder.skill_in_progress', 'In progress')}</span>
+                                                    </div>
                                                 </div>
 
-                                                <div className="space-y-4">
-                                                    {[
-                                                        { label: 'Technical Skills', field: 'technical', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && s.skillCategory === 'Technical Skill').map(s => s.skillName) },
-                                                        { label: 'Domain Skills', field: 'domain', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && s.skillCategory === 'Domain Skill').map(s => s.skillName) },
-                                                        { label: 'AI Skills', field: 'ai', items: userSkills.filter(s => (s.status === 'Completed' || s.status === 'In Progress') && (s.skillCategory === 'AI Skill' || s.skillCategory === 'GenAI Skill')).map(s => s.skillName) }
-                                                    ].filter(g => g.items.length > 0).map((group, idx) => {
-                                                        const currentField = resumeData.skills[group.field] ? resumeData.skills[group.field].split(',').map(s => s.trim().toLowerCase()) : [];
-                                                        const available = group.items.filter(item => !currentField.includes(item.toLowerCase()));
-                                                        if (available.length === 0) return null;
-                                                        return (
-                                                            <div key={idx}>
-                                                                <div className="flex items-center gap-1.5 mb-2 text-blue-600 dark:text-blue-400">
-                                                                    <Plus className="w-3.5 h-3.5" />
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider">{group.label} (Click to add)</span>
+                                                {skillChipsLoading ? (
+                                                    <div className="flex items-center gap-2 py-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                                        <Loader2 className="w-4 h-4 animate-spin" /> {t('resume_builder.loading_skills', 'Loading your skills...')}
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-5">
+                                                        {[
+                                                            { label: t('resume_builder.technical_skills', 'Technical Skills'), field: 'technical', match: (c) => c === 'Technical Skill' },
+                                                            { label: t('resume_builder.domain_skills', 'Domain Skills'), field: 'domain', match: (c) => c === 'Domain Skill' },
+                                                            { label: t('resume_builder.ai_skills', 'AI Skills'), field: 'ai', match: (c) => c === 'AI Skill' || c === 'GenAI Skill' },
+                                                        ].map((group) => {
+                                                            const items = userSkills.filter(s => s.skillName && (s.status === 'Completed' || s.status === 'In Progress') && group.match(s.skillCategory));
+                                                            if (items.length === 0) return null;
+                                                            const currentField = (resumeData.skills[group.field] || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+                                                            return (
+                                                                <div key={group.field}>
+                                                                    <div className="flex items-center justify-between mb-2">
+                                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#045C9A] dark:text-[#A6D7E8]">{group.label}</span>
+                                                                        <span className="text-[10px] font-semibold tabular-nums text-slate-400">{items.length}</span>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {items.map(s => {
+                                                                            const added = currentField.includes(s.skillName.toLowerCase());
+                                                                            const done = s.status === 'Completed';
+                                                                            if (added) {
+                                                                                return (
+                                                                                    <span key={s.skillName} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold rounded-lg border border-emerald-200 dark:border-emerald-800/50 cursor-default">
+                                                                                        {s.skillName} <Check className="w-3 h-3" />
+                                                                                    </span>
+                                                                                );
+                                                                            }
+                                                                            return (
+                                                                                <button key={s.skillName} type="button" title={done ? t('resume_builder.skill_completed', 'Completed') : t('resume_builder.skill_in_progress', 'In progress')} onClick={() => {
+                                                                                    setResumeData(prev => ({
+                                                                                        ...prev,
+                                                                                        skills: { ...prev.skills, [group.field]: prev.skills[group.field] ? `${prev.skills[group.field]}, ${s.skillName}` : s.skillName }
+                                                                                    }));
+                                                                                }} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#EAF7FD] hover:bg-[#d7ebf5] dark:bg-[#045C9A]/20 dark:hover:bg-[#045C9A]/35 text-[#045C9A] dark:text-[#A6D7E8] text-[11px] font-bold rounded-lg border border-[#d7ebf5] dark:border-[#A6D7E8]/25 transition-colors shadow-sm">
+                                                                                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${done ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+                                                                                    {s.skillName} <Plus className="w-3 h-3" />
+                                                                                </button>
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 </div>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {available.map(skill => (
-                                                                        <button key={skill} onClick={() => {
-                                                                            setResumeData(prev => ({
-                                                                                ...prev,
-                                                                                skills: { ...prev.skills, [group.field]: prev.skills[group.field] ? `${prev.skills[group.field]}, ${skill}` : skill }
-                                                                            }));
-                                                                        }} className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[11px] font-bold rounded-lg border border-blue-200 dark:border-blue-800/50 transition-colors flex items-center gap-1 shadow-sm">
-                                                                            {skill} <Plus className="w-3 h-3" />
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 
-                                        <div className="space-y-6 bg-white dark:bg-[#002147] p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm animate-fade-in">
+                                        <div className="space-y-6 bg-white dark:bg-[#0d3a5f] p-8 rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm animate-fade-in">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.technical_skills', 'Technical Skills')}</label>
-                                                <textarea value={resumeData.skills.technical || ''} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={3} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
+                                                <textarea value={resumeData.skills.technical || ''} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={3} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.technical_placeholder', 'e.g. JavaScript, React, Node.js, Python, AWS...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.domain_skills', 'Domain Skills')}</label>
-                                                <textarea value={resumeData.skills.domain || ''} onChange={(e) => handleNestedChange('skills', 'domain', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.domain_placeholder', 'e.g. Project Management, Agile, Healthcare, Finance...')}></textarea>
+                                                <textarea value={resumeData.skills.domain || ''} onChange={(e) => handleNestedChange('skills', 'domain', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.domain_placeholder', 'e.g. Project Management, Agile, Healthcare, Finance...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.ai_skills', 'AI Skills')}</label>
-                                                <textarea value={resumeData.skills.ai || ''} onChange={(e) => handleNestedChange('skills', 'ai', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.ai_placeholder', 'e.g. Prompt Engineering, Midjourney, ChatGPT...')}></textarea>
+                                                <textarea value={resumeData.skills.ai || ''} onChange={(e) => handleNestedChange('skills', 'ai', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.ai_placeholder', 'e.g. Prompt Engineering, Midjourney, ChatGPT...')}></textarea>
                                             </div>
 
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.languages', 'Languages')}</label>
-                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#1a3884]/20 focus:border-[#1a3884] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
+                                                <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-medium resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -2144,10 +2211,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div className="space-y-4 animate-fade-in">
                                         <AnimatePresence>
                                             {resumeData.achievements.map((ach, idx) => (
-                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
-                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
-                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2 truncate">
-                                                            <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm overflow-hidden">
+                                                    <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Trophy className="w-4 h-4 text-[#045C9A] shrink-0" />
                                                             <span className="truncate">{ach.title || t('resume_builder.achievement_details', 'Achievement Details')}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
@@ -2157,19 +2224,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.achievement_title', 'Achievement Title')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.achievement_title', 'Achievement Title')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.achievement_title_placeholder', 'e.g. Best Student Award')} value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
-                                                            <textarea placeholder={t('resume_builder.ach_desc_placeholder', 'Provide some context about this achievement...')} value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
+                                                            <textarea placeholder={t('resume_builder.ach_desc_placeholder', 'Provide some context about this achievement...')} value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-medium dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[60px] resize-none" rows={2}></textarea>
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
+                                        <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_achievement', 'Add Achievement')}
                                         </button>
                                     </div>
@@ -2177,20 +2244,20 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             </div>
 
                             {/* Navigation buttons inside max-w-4xl card layout */}
-                            <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
+                            <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#d7ebf5] dark:border-white/10">
                                 <button
                                     onClick={prevStep}
                                     disabled={currentStep === 0}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${currentStep === 0
-                                        ? 'text-slate-350 dark:text-slate-700 bg-slate-100/50 dark:bg-slate-800/20 cursor-not-allowed opacity-50'
-                                        : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#002147] border border-slate-250 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#002A5C] hover:scale-[1.02] active:scale-95 shadow-sm'
+                                        ? 'text-slate-300 dark:text-slate-700 bg-slate-100/50 dark:bg-slate-800/20 cursor-not-allowed opacity-50'
+                                        : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#0d3a5f] hover:scale-[1.02] active:scale-95 shadow-sm'
                                         }`}
                                 >
                                     <ArrowLeft className="w-4 h-4" /> {t('resume_builder.previous', 'Previous')}
                                 </button>
                                 <button
                                     onClick={nextStep}
-                                    className={`flex items-center gap-2 px-6 py-2.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#1a3884]/20 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#1a3884]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
+                                    className={`flex items-center gap-2 px-6 py-2.5 bg-[#045C9A] hover:bg-[#072036] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow-md shadow-[#045C9A]/20 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#045C9A]/30 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
                                 >
                                     {t('resume_builder.next_step', 'Next Step')}
                                     <ArrowRight className="w-4 h-4" />
@@ -2203,30 +2270,30 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 {/* Preview Canvas (Shows on last step) */}
                 <section
                     ref={containerRef}
-                    className={`flex-1 flex flex-col lg:overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
+                    className={`flex-1 flex flex-col lg:overflow-hidden relative bg-slate-50 dark:bg-[#072036] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
                 >
                     {!isPreviewFullscreen ? (
                         /* Layout Template Selector Dashboard */
                         <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Selector Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-white dark:bg-[#0d3a5f] border-b border-[#d7ebf5] dark:border-white/10 shrink-0 shadow-sm">
                                 <button
                                     onClick={prevStep}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-205 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10 self-start sm:self-auto"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-[#d7ebf5] dark:border-white/10 self-start sm:self-auto"
                                 >
                                     <ArrowLeft className="w-3.5 h-3.5" /> {t('resume_builder.back_to_edit', 'Back to Edit Details')}
                                 </button>
-                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white text-center sm:text-left">{t('resume_builder.choose_template', 'Choose A Template Style')}</h2>
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-[#072036] dark:text-white text-center sm:text-left">{t('resume_builder.choose_template', 'Choose A Template Style')}</h2>
                                 <div className="hidden sm:block w-[130px]" />
                             </div>
 
                             {/* Template Grid Scroll Area */}
                             <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
                                 <div className="text-center max-w-xl mb-8">
-                                    <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-[#072036] dark:text-white mb-2">
                                         {t('resume_builder.select_ats_layout', 'Select an ATS-Friendly Layout')}
                                     </h1>
-                                    <p className="text-sm text-slate-600 dark:text-slate-405 leading-relaxed">
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                         {t('resume_builder.ats_layout_desc', 'Our templates are professionally designed and engineered to pass applicant tracking systems (ATS). Select a style below to view your resume in full-screen and download.')}
                                     </p>
                                 </div>
@@ -2235,10 +2302,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     {Object.values(ATS_TEMPLATES).map((tpl) => (
                                         <div
                                             key={tpl.id}
-                                            className="group flex flex-col bg-white dark:bg-slate-900 border border-slate-205 dark:border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
+                                            className="group flex flex-col bg-white dark:bg-slate-900 border border-[#d7ebf5] dark:border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
                                         >
                                             {/* Simulated Preview graphic */}
-                                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-white/5 flex items-center justify-center">
+                                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-[#d7ebf5]/60 dark:border-white/5 flex items-center justify-center">
                                                 <TemplateThumbnail type={tpl.id} />
                                             </div>
 
@@ -2246,10 +2313,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             <div className="p-5 flex-1 flex flex-col justify-between">
                                                 <div>
                                                     <div className="flex items-center justify-between gap-2 mb-2">
-                                                        <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                                                        <h3 className="font-bold text-[#072036] dark:text-white text-base">
                                                             {t(`resume_builder.templates.${tpl.id}.name`, tpl.name)}
                                                         </h3>
-                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-[#1a3884] dark:text-blue-300 whitespace-nowrap">
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EAF7FD] dark:bg-[#045C9A]/25 text-[#045C9A] dark:text-[#A6D7E8] whitespace-nowrap">
                                                             {t(`resume_builder.templates.${tpl.id}.tag`, tpl.tag)}
                                                         </span>
                                                     </div>
@@ -2263,7 +2330,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                         setSelectedTemplate(tpl.id);
                                                         setIsPreviewFullscreen(true);
                                                     }}
-                                                    className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#1a3884] hover:bg-[#152e6c] text-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
+                                                    className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#045C9A] hover:bg-[#072036] text-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" /> {t('resume_builder.preview_select', 'Preview & Select')}
                                                 </button>
@@ -2277,25 +2344,25 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                         /* Full Screen Interactive Preview */
                         <div className="flex-1 flex flex-col lg:overflow-hidden">
                             {/* Toolbar with navigation and controls */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-202 dark:border-white/10 shrink-0 shadow-md">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-white dark:bg-[#0d3a5f] border-b border-[#d7ebf5] dark:border-white/10 shrink-0 shadow-md">
                                 <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
                                     <button
                                         onClick={() => setIsPreviewFullscreen(false)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-655 dark:text-slate-355 bg-slate-105 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-202 dark:border-white/10"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-[#d7ebf5] dark:border-white/10"
                                     >
                                         <ArrowLeft className="w-3.5 h-3.5" /> {t('resume_builder.all_styles', 'All Styles')}
                                     </button>
                                 </div>
 
-                                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-white/5">
+                                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[#d7ebf5]/60 dark:border-white/5">
                                     <div className="flex items-center gap-2 flex-1 sm:flex-initial">
-                                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-505 dark:text-slate-400 hidden sm:block">
+                                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 hidden sm:block">
                                             {t('resume_builder.style', 'Style:')}
                                         </label>
                                         <select
                                             value={selectedTemplate}
                                             onChange={(e) => setSelectedTemplate(e.target.value)}
-                                            className="bg-slate-50 dark:bg-slate-800 border border-slate-202 dark:border-white/10 text-slate-855 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#1a3884] cursor-pointer w-full sm:w-auto"
+                                            className="bg-slate-50 dark:bg-slate-800 border border-[#d7ebf5] dark:border-white/10 text-[#072036] dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-[#045C9A] cursor-pointer w-full sm:w-auto"
                                         >
                                             {Object.values(ATS_TEMPLATES).map((tpl) => (
                                                 <option key={tpl.id} value={tpl.id}>
@@ -2304,40 +2371,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             ))}
                                         </select>
                                     </div>
-
-                                    {embedded ? (
-                                        <button
-                                            onClick={handleConfirmAndSave}
-                                            disabled={saving || generating}
-                                            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg flex-1 sm:flex-initial shrink-0"
-                                        >
-                                            {saving || generating ? (
-                                                <>
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('resume_builder.saving', 'Saving...')}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Save className="w-4 h-4" /> {t('resume_builder.confirm_save', 'Confirm & Save')}
-                                                </>
-                                            )}
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={handleConfirmAndSave}
-                                            disabled={saving || generating}
-                                            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-[#1a3884]/20 hover:shadow-lg flex-1 sm:flex-initial shrink-0"
-                                        >
-                                            {saving || generating ? (
-                                                <>
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('resume_builder.saving', 'Saving...')}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Save className="w-4 h-4" /> {t('resume_builder.save_progress', 'Save Progress')}
-                                                </>
-                                            )}
-                                        </button>
-                                    )}
+                                    {/* No save/confirm button here: the sticky header already
+                                        carries Save Progress and Confirm & Save / Download PDF. */}
                                 </div>
                             </div>
 
