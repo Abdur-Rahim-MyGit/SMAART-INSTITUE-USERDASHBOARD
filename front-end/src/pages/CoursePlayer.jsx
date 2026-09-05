@@ -1031,21 +1031,29 @@ const CoursePlayer = () => {
         return (
           <div className="space-y-6 h-full overflow-y-auto pb-8">
             {playbackUrl && (
-              <div className={`rounded-2xl overflow-hidden mx-auto ${theaterLayout ? "max-w-none" : "max-w-4xl"}`}>
-                <CustomVideoPlayer
-                  isTheater={isTheater}
-                  onToggleTheater={toggleTheater}
-                  videoUrl={playbackUrl}
-                  title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
-                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
-                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
-                  onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time, dur) => {
-                    setCurrentVideoTime(time);
-                    if (dur) setCurrentVideoDuration(dur);
-                  }}
-                  onNext={null}
-                />
+              <div
+                className={
+                  theaterLayout
+                    ? "relative -mx-4 sm:-mx-6 lg:-mx-8 mb-5 bg-black h-[calc(100vh-4.75rem)] min-h-[360px]"
+                    : "rounded-2xl overflow-hidden relative mx-auto max-w-4xl"
+                }
+              >
+                <div className={theaterLayout ? "mx-auto h-full max-w-full aspect-video" : "w-full"}>
+                  <CustomVideoPlayer
+                    isTheater={isTheater}
+                    onToggleTheater={toggleTheater}
+                    videoUrl={playbackUrl}
+                    title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
+                    initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                    initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
+                    onProgressUpdate={handleVideoProgressUpdate}
+                    onTimeUpdate={(time, dur) => {
+                      setCurrentVideoTime(time);
+                      if (dur) setCurrentVideoDuration(dur);
+                    }}
+                    onNext={null}
+                  />
+                </div>
               </div>
             )}
             <Notes
