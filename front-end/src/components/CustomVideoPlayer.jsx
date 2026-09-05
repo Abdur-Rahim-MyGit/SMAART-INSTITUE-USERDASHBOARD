@@ -617,7 +617,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Play/Pause */}
                 <button
                   onClick={togglePlay}
-                  className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title={isPlaying ? "Pause (Space)" : "Play (Space)"}
                 >
                   {isPlaying ? <Pause fill={1} className="w-5 h-5 sm:w-6 sm:h-6 text-[#045C9A] dark:text-[#A6D7E8]" /> : <Play fill={1} className="w-5 h-5 sm:w-6 sm:h-6 text-[#045C9A] dark:text-[#A6D7E8]" />}
@@ -627,7 +627,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 <div className="flex items-center gap-1 group/volume">
                   <button
                     onClick={toggleMute}
-                    className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    className="inline-flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                     title={isMuted ? "Unmute (M)" : "Mute (M)"}
                   >
                     {isMuted || volume === 0 ? <VolumeX weight={500} className="w-6 h-6 text-rose-500" /> : <Volume2 weight={500} className="w-6 h-6 text-slate-600 dark:text-slate-200" />}
@@ -721,9 +721,9 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                         togglePiP();
                       }
                     }}
-                    className={`transition-all duration-200 p-2 rounded-xl ${
-                      isCompleted 
-                        ? 'text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 cursor-pointer' 
+                    className={`inline-flex items-center justify-center transition-all duration-200 p-2 rounded-xl ${
+                      isCompleted
+                        ? 'text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 cursor-pointer'
                         : 'opacity-40 cursor-not-allowed text-slate-400 dark:text-white/50'
                     }`}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
@@ -739,7 +739,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       e.stopPropagation();
                       onToggleTheater();
                     }}
-                    className="hidden lg:inline-flex text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                    className="hidden lg:inline-flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                     title={isTheater ? 'Default view (T)' : 'Theater mode (T)'}
                     aria-pressed={isTheater}
                   >
@@ -750,7 +750,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 {/* Fullscreen */}
                 <button
                   onClick={toggleFullscreen}
-                  className="text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center justify-center text-slate-600 dark:text-slate-200 hover:text-[#045C9A] dark:hover:text-[#A6D7E8] hover:bg-[#EAF7FD] dark:hover:bg-white/10 p-2 rounded-xl transition-all duration-200 cursor-pointer"
                   title="Toggle Fullscreen (F)"
                 >
                   {isFullscreen ? <Minimize weight={500} className="w-6 h-6" /> : <Maximize weight={500} className="w-6 h-6" />}
