@@ -87,7 +87,7 @@ const NAV_SECTIONS = [
     label: 'SYSTEM',
     items: [
       { key: 'Settings',             tab: false, icon: 'settings',     label: 'Settings' },
-      { key: 'Support',              tab: false, icon: 'alert-circle', label: 'Grievance Redressal' },
+      { key: 'Support',              tab: false, icon: 'life-buoy',    label: 'Help & Grievances' },
       { key: 'FaceVerificationTest', tab: false, icon: 'camera',       label: 'Face Verification (Beta)' },
     ],
   },

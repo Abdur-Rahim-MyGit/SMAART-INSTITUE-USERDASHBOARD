@@ -463,7 +463,9 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
           console.log(`[Setup][diag] faceCount=${result.faceCount} stable=${faceStableCountRef.current} state=${registrationStateRef.current}`);
         }
 
-        if (result.faceCount === 1) {
+        // A confident detection is required before enrolment starts; the 0.35
+        // presence floor also fires on icons and shadows in a black frame.
+        if (result.faceCount === 1 && (result.faces[0]?.score ?? 0) >= 0.55) {
           noFaceTicks = 0;
           multiFaceTicks = 0;
           faceStableCountRef.current += 1;

@@ -51,6 +51,7 @@ export const ICON_NAMES = Object.freeze([
   "engineering",
   "error",
   "fact_check",
+  "fit_screen",
   "flag",
   "flight",
   "format_align_left",
@@ -136,8 +137,6 @@ export const ICON_NAMES = Object.freeze([
   "volume_up",
   "wand_stars",
   "warning",
-  "width_normal",
-  "width_wide",
   "work",
   "workspace_premium",
   "zoom_in",
@@ -218,6 +217,7 @@ export const Database = /*#__PURE__*/ icon("Database", "database");
 export const Edit2 = /*#__PURE__*/ icon("Edit2", "edit");
 export const ExternalLink = /*#__PURE__*/ icon("ExternalLink", "open_in_new");
 export const Eye = /*#__PURE__*/ icon("Eye", "visibility");
+export const FitScreen = /*#__PURE__*/ icon("FitScreen", "fit_screen");
 export const FileText = /*#__PURE__*/ icon("FileText", "description");
 export const Flame = /*#__PURE__*/ icon("Flame", "local_fire_department");
 export const Gift = /*#__PURE__*/ icon("Gift", "redeem");
@@ -325,8 +325,6 @@ export const Trophy = /*#__PURE__*/ icon("Trophy", "trophy");
 export const Upload = /*#__PURE__*/ icon("Upload", "upload");
 export const User = /*#__PURE__*/ icon("User", "person");
 export const Users = /*#__PURE__*/ icon("Users", "groups");
-export const TheaterNormal = /*#__PURE__*/ icon("TheaterNormal", "width_normal");
-export const TheaterWide = /*#__PURE__*/ icon("TheaterWide", "width_wide");
 export const Volume2 = /*#__PURE__*/ icon("Volume2", "volume_up");
 export const VolumeX = /*#__PURE__*/ icon("VolumeX", "volume_off");
 export const Wrench = /*#__PURE__*/ icon("Wrench", "handyman");

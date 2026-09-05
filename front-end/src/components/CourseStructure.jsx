@@ -64,7 +64,7 @@ const CHIP_LOCKED =
   "border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300";
 const CHIP_DONE =
   "border border-emerald-200/70 dark:border-emerald-500/25 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
-const LABEL = "text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400";
+const LABEL = "text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400";
 const PROGRESS_TRACK = "h-1.5 w-full overflow-hidden rounded-full bg-[#A6D7E8]/40 dark:bg-white/10";
 const PROGRESS_FILL = "linear-gradient(90deg, #034a7d 0%, #045C9A 100%)";
 
@@ -123,7 +123,7 @@ const TRACK_ICONS = { PIQ: Brain, AIQ: Hub, SQ: Globe2, BC: BritishCouncilIcon }
 const SectionHeading = ({ title }) => (
   <div className="flex min-w-0 flex-1 items-center gap-2.5">
     <span className="h-4 w-[3px] shrink-0 rounded-full bg-[#045C9A]" />
-    <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-[#072036] dark:text-slate-300">
+    <h2 className="text-xs font-bold uppercase tracking-wider text-[#072036] dark:text-slate-300">
       {title}
     </h2>
     <span className="ml-1 hidden h-px flex-1 bg-[#d7ebf5] dark:bg-white/10 sm:block" />
@@ -210,13 +210,13 @@ const PathwayCard = forwardRef(({
             <div className="min-w-0 flex-1">
               <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
                 <span
-                  className={`inline-flex items-center rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${CHIP_BRAND}`}
+                  className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${CHIP_BRAND}`}
                 >
                   {badgeLabel}
                 </span>
                 {!isUnlocked && (
                   <span
-                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${CHIP_LOCKED}`}
+                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_LOCKED}`}
                   >
                     <Lock className="w-3 h-3" />
                     {t("my_courses_page.locked", "Locked")}
@@ -224,30 +224,30 @@ const PathwayCard = forwardRef(({
                 )}
                 {isUnlocked && isComplete && (
                   <span
-                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${CHIP_DONE}`}
+                    className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_DONE}`}
                   >
                     <CheckCircle2 className="w-3 h-3" />
                     {t("my_courses_page.completed", "Completed")}
                   </span>
                 )}
               </div>
-              <h3 className="line-clamp-2 text-[13px] font-bold leading-snug tracking-tight text-[#072036] dark:text-white">
+              <h3 className="line-clamp-2 text-base font-bold leading-snug tracking-tight text-[#072036] dark:text-white">
                 {title}
               </h3>
-              <p className="mt-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+              <p className="mt-0.5 text-[13px] font-semibold text-slate-500 dark:text-slate-400">
                 {metaLabel}
               </p>
             </div>
           </div>
 
-          <p className="mt-3 line-clamp-2 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             {description}
           </p>
 
           <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <span className={LABEL}>{t("my_courses_page.progression", "Progression")}</span>
-              <span className="text-[11px] font-bold tabular-nums text-[#045C9A] dark:text-[#A6D7E8]">
+              <span className="text-[13px] font-bold tabular-nums text-[#045C9A] dark:text-[#A6D7E8]">
                 {completedCount} / {total} · <AnimatedPercent value={pct} reduced={reduced} />%
               </span>
             </div>
@@ -270,7 +270,7 @@ const PathwayCard = forwardRef(({
               e.stopPropagation();
               activate();
             }}
-            className={`group/btn mt-4 flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border text-[13px] font-semibold transition-colors ${
+            className={`group/btn mt-4 flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border text-sm font-semibold transition-colors ${
               isUnlocked
                 ? "border-[#045C9A]/25 bg-[#EAF7FD] text-[#045C9A] hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/15 dark:bg-white/[0.06] dark:text-[#A6D7E8] dark:hover:border-transparent dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
                 : "border-[#d7ebf5] bg-slate-50 text-slate-500 hover:bg-slate-100 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-400 dark:hover:bg-white/[0.07]"
@@ -310,12 +310,14 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
   const { t } = useTranslation();
   const reduced = useReducedMotion();
   const navigate = useNavigate();
-  const completedCount = (stage.courses || []).filter(c => isCompletedCourse(userProgress, c.id)).length;
-  const totalCoursesCount = stage.totalCourses || stage.courses?.length || 1;
+  // Count the same modules the list below shows (published ones), so this
+  // figure always matches the "n / total" on the pathway card.
+  const publishedStageCourses = filterPublishedCourses(stage.courses || [], publishedCourseCodes);
+  const completedCount = publishedStageCourses.filter(c => isCompletedCourse(userProgress, c.id)).length;
+  const totalCoursesCount = publishedStageCourses.length || stage.totalCourses || stage.courses?.length || 1;
   const pct = Math.round((completedCount / totalCoursesCount) * 100);
   const remaining = Math.max(0, totalCoursesCount - completedCount);
 
-  const publishedStageCourses = filterPublishedCourses(stage.courses || [], publishedCourseCodes);
   const isAssessmentUnlocked =
     publishedStageCourses.length > 0 &&
     publishedStageCourses.every(c => isCompletedCourse(userProgress, c.id));
@@ -384,7 +386,7 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
             </div>
             <div className="min-w-0 max-w-xl space-y-1.5">
               <span
-                className={`inline-flex items-center rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${CHIP_BRAND}`}
+                className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${CHIP_BRAND}`}
               >
                 {isStage
                   ? t("my_courses_page.stage_n", { n: stage.id })
@@ -392,12 +394,12 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
                     ? t("my_courses_page.certified_programme", "Certified Programme")
                     : t("my_courses_page.specialization_track", "Specialization Track")}
               </span>
-              <h1 className="text-xl font-extrabold tracking-tight text-[#072036] dark:text-white sm:text-2xl">
+              <h1 className="text-xl font-bold tracking-tight text-[#072036] dark:text-white sm:text-2xl">
                 {isStage
                   ? t(`my_courses_page.stages.${stage.id}.name`, stage.name)
                   : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
               </h1>
-              <p className="text-[13px] font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
+              <p className="text-sm font-medium leading-relaxed text-[#35566b] dark:text-slate-400">
                 {isStage
                   ? t(`my_courses_page.stages.${stage.id}.description`, stage.description)
                   : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
@@ -408,35 +410,35 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
             {/* Radial progress */}
             <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${PANEL}`}>
-              <div className="relative h-11 w-11 shrink-0">
+              <div className="relative h-14 w-14 shrink-0">
                 <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" className="stroke-[#A6D7E8]/50 dark:stroke-white/10" strokeWidth="10" fill="none" />
+                  <circle cx="50" cy="50" r="42" className="stroke-[#A6D7E8]/50 dark:stroke-white/10" strokeWidth="8" fill="none" />
                   <motion.circle
-                    cx="50" cy="50" r="40"
+                    cx="50" cy="50" r="42"
                     className="stroke-[#045C9A] dark:stroke-[#A6D7E8]"
-                    strokeWidth="10" strokeLinecap="round" fill="none"
-                    initial={{ strokeDasharray: "251.2", strokeDashoffset: "251.2" }}
-                    animate={{ strokeDashoffset: 251.2 - (251.2 * (pct || 0)) / 100 }}
+                    strokeWidth="8" strokeLinecap="round" fill="none"
+                    initial={{ strokeDasharray: "263.9", strokeDashoffset: "263.9" }}
+                    animate={{ strokeDashoffset: 263.9 - (263.9 * (pct || 0)) / 100 }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[11px] font-extrabold tabular-nums text-[#072036] dark:text-white">
+                  <span className={`font-bold tabular-nums leading-none text-[#072036] dark:text-white ${(pct || 0) >= 100 ? "text-[10px]" : "text-xs"}`}>
                     {pct || 0}%
                   </span>
                 </div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#072036] dark:text-[#A6D7E8]">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#072036] dark:text-[#A6D7E8]">
                   {t("my_courses_page.overall_progress", "Overall Progress")}
                 </div>
-                <div className="text-[13px] font-bold tabular-nums text-[#072036] dark:text-white">
+                <div className="text-[15px] font-bold tabular-nums text-[#072036] dark:text-white">
                   {completedCount} / {totalCoursesCount}{" "}
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
                     {t("my_courses_page.modules", "Modules")}
                   </span>
                 </div>
-                <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                <div className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
                   {t("my_courses_page.modules_remaining", "{{count}} remaining", { count: remaining })}
                 </div>
               </div>
@@ -485,14 +487,14 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
                   <div className={LABEL}>
                     {t("my_courses_page.assessment", "Assessment")} · {stage.assessmentGate}
                   </div>
-                  <div className="text-[13px] font-bold text-[#072036] dark:text-white">
+                  <div className="text-[15px] font-bold text-[#072036] dark:text-white">
                     {isAssessmentPassed
                       ? t("my_courses_page.passed_certified", "Passed & certified")
                       : isAssessmentUnlocked
                         ? t("my_courses_page.start_assessment", "Start assessment")
                         : t("my_courses_page.locked_assessment", "Locked assessment")}
                   </div>
-                  <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                  <div className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
                     {isAssessmentPassed
                       ? t("my_courses_page.assessment_complete", "Nothing left to do here")
                       : isAssessmentUnlocked
@@ -512,7 +514,7 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
       <motion.div variants={reduced ? STATIC : ITEM} className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <SectionHeading title={t("my_courses_page.module_directory", "Module Directory")} />
-          <span className="hidden shrink-0 text-[11px] font-medium text-slate-500 dark:text-slate-400 sm:inline">
+          <span className="hidden shrink-0 text-[13px] font-medium text-slate-500 dark:text-slate-400 sm:inline">
             {t("my_courses_page.click_module_hint", "Select a module to start learning")}
           </span>
         </div>
@@ -554,7 +556,7 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-[11px] font-bold tabular-nums ${
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-[13px] font-bold tabular-nums ${
                           isCompleted
                             ? "border-emerald-400 bg-emerald-500 text-white"
                             : isCurrent
@@ -580,13 +582,13 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
                           </span>
                           {isCurrent && (
                             <span
-                              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${CHIP_BRAND}`}
+                              className={`inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_BRAND}`}
                             >
                               {t("my_courses_page.current", "Current")}
                             </span>
                           )}
                         </div>
-                        <h4 className="line-clamp-1 text-[13px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
+                        <h4 className="line-clamp-1 text-[15px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
                           {course.title || t(`my_courses_page.courses.${course.id}.title`)}
                         </h4>
                       </div>
@@ -594,7 +596,7 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
 
                     {isCompleted ? (
                       <span
-                        className={`inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${CHIP_DONE}`}
+                        className={`inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${CHIP_DONE}`}
                       >
                         <CheckCircle2 className="w-3 h-3" />
                         {t("my_courses_page.passed", "Passed")}
@@ -605,7 +607,7 @@ const StageDetailView = ({ stage, userProgress, onBack, onCourseClick, published
                   </div>
 
                   {course.subtitle && (
-                    <p className="line-clamp-2 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p className="line-clamp-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                       {course.subtitle}
                     </p>
                   )}
@@ -933,7 +935,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                 <div className="min-w-0 max-w-2xl">
                   <motion.h1
                     variants={reduced ? STATIC : ITEM}
-                    className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                    className="text-xl font-bold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
                     style={{ letterSpacing: "-0.02em" }}
                   >
                     {t("my_courses_page.page_title", "Human Intelligence & Readiness Pathways")}
@@ -1004,7 +1006,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   placeholder={t("my_courses_page.search_placeholder", "Search modules, topics...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-9 w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-9 pr-9 text-[13px] font-medium text-[#072036] placeholder-slate-400 transition-colors focus:border-[#045C9A]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder-slate-500 dark:focus:bg-[#072036]"
+                  className="h-9 w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-9 pr-9 text-sm font-medium text-[#072036] placeholder-slate-400 transition-colors focus:border-[#045C9A]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder-slate-500 dark:focus:bg-[#072036]"
                 />
                 {searchQuery && (
                   <button
@@ -1178,10 +1180,10 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                     <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white dark:border-white/10 dark:bg-[#0d3a5f]">
                       <Search className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
                     </div>
-                    <p className="text-[13px] font-bold text-[#072036] dark:text-white">
+                    <p className="text-[15px] font-bold text-[#072036] dark:text-white">
                       {t("my_courses_page.no_results", "No pathways match your search")}
                     </p>
-                    <p className="mt-1 text-[13px] text-slate-600 dark:text-slate-400">
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                       {t("my_courses_page.no_results_hint", "Try a different keyword, or switch back to All Pathways.")}
                     </p>
                   </motion.div>

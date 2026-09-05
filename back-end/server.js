@@ -321,6 +321,9 @@ app.use('/api/ocr', require('./routes/ocrRoutes')); // OCR text extraction using
 
 // Contact Form Route
 app.use('/api/contact', require('./routes/contact'));
+// Employer self-registration — standalone from the separate admin project's
+// employer portal, so it works whether or not that app is running.
+app.use('/api/employer-registration', require('./routes/employerRegistration'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/upload', require('./routes/uploadRoutes')); // New upload route
 app.use('/api/badges', require('./routes/badges')); // Badges & Achievement System

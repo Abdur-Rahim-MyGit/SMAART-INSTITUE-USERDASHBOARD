@@ -37,6 +37,7 @@ import ProctoringOverlay from "@/components/proctoring/ProctoringOverlay";
 import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningModal";
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
 import NeuralBackground from "@/components/ui/NeuralBackground";
+import { stopAllMediaStreams } from "@/utils/mediaStreams";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -815,8 +816,12 @@ const BaseLineTest = () => {
   // Once the report is on screen the proctored session is over: clear any
   // scroll lock left behind by a modal, start the report at the top, and leave
   // browser fullscreen so the student gets a normal, scrollable results page.
+  // Whatever happens to this page, no camera or microphone outlives it.
+  useEffect(() => () => stopAllMediaStreams(), []);
+
   useEffect(() => {
     if (!submitted) return;
+    stopAllMediaStreams();
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });

@@ -1,12 +1,30 @@
 # SMAART Institute — Mobile App (React Native / Expo)
 
 Companion mobile app to the `front-end/` web dashboard, talking to the **same** `back-end/`
-API. Full requirements and phased roadmap: `../docs/04-React-Native-App-Requirements-and-Roadmap.docx`.
+API. Full requirements and phased roadmap: `../Documentation/07-Technical-Docs-and-Reports/04-React-Native-App-Requirements-and-Roadmap.docx`.
 
-This is the **Phase 0/1 scaffold** from that roadmap — project setup, navigation shell, and a
-real (not mocked) authentication flow — plus a working first cut of **Phase 3's core risk
-item: on-device face verification**. Assessments/Learning/Career/Community tabs are still
-placeholder screens ready to be built out phase-by-phase.
+The app is well past the Phase 0/1 scaffold this README originally described. No screen
+is a `ComingSoon` placeholder any more, and **45 of the SRS's 60 functional requirements
+are built** (3 partial, 12 not started).
+
+Assessments (Phase 2) are complete, and proctoring (Phase 3) is now genuinely wired into
+the assessment player rather than sitting as unused modules.
+
+What is left, largest first:
+
+- **Proctoring has never run on physical hardware.** The session, heartbeat, event
+  reporting and all four status surfaces are built and the player uses them, but the
+  on-device face loop (FR-PROC-02/03/04) needs a real phone before any of it can be
+  called proven.
+- **Four proctoring FRs are blocked on native modules that are not installed** —
+  kiosk mode, screenshot flagging, audio monitoring, liveness prompts.
+- **Push notifications** (FR-SUP-03) — `expo-notifications` is not installed.
+- Resume builder (FR-CAR-02), community posts feed (FR-COM-03), MindCare (FR-COM-02),
+  to-do tracker (FR-COM-05), interview prep (FR-CAR-04).
+
+`IMPLEMENTATION_MAP.md` §1 has the full requirement-by-requirement matrix, verified
+against the code. **Read it before assuming anything here is either built or unbuilt** —
+this file has been wrong in both directions before.
 
 ## Stack
 

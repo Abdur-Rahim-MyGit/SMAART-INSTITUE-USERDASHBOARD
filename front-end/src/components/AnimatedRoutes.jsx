@@ -66,6 +66,7 @@ const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 const Legal = lazy(() => import('@/pages/Legal'));
+const EmployerRegister = lazy(() => import('@/pages/EmployerRegister'));
 const AdminCourses = lazy(() => import('@/pages/AdminCourses'));
 const AdminCourseForm = lazy(() => import('@/pages/AdminCourseForm'));
 const AdminProctoringDashboard = lazy(() => import('@/pages/ProctoringDashboard'));
@@ -115,6 +116,7 @@ const AnimatedRoutes = () => {
                     <Route path="/verify-badge" element={<VerifyBadge />} />
                     <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
                     <Route path="/legal" element={<Legal />} />
+                    <Route path="/employer/register" element={<EmployerRegister />} />
 
                     {/* Signup Flow */}
                     <Route path="/signup-initial" element={<SignupInitial />} />

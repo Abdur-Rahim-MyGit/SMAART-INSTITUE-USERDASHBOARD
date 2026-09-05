@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { RiRefreshLine, RiTimeLine, RiArrowRightLine } from '@remixicon/react';
+import { stopAllMediaStreams } from '@/utils/mediaStreams';
 
 /**
  * End of an unverified attempt — the only proctoring outcome a candidate sees.
@@ -22,6 +23,22 @@ import { RiRefreshLine, RiTimeLine, RiArrowRightLine } from '@remixicon/react';
 export const AssessmentHeld = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+
+  // The exam is over. Whatever the engine or setup screen still holds open,
+  // the camera and microphone go off now, and the page leaves fullscreen.
+  useEffect(() => {
+    stopAllMediaStreams();
+    const fs = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fs) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        const result = exit?.call(document);
+        if (result && typeof result.catch === 'function') result.catch(() => {});
+      } catch {
+        /* best effort */
+      }
+    }
+  }, []);
 
   const outcome = state?.outcome || 'ticket';
   const canRetry = outcome === 'retry';

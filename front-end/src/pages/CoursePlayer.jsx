@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +29,7 @@ import {
   HelpCircle,
   Layers,
   Briefcase,
+  FitScreen,
 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 import NeuralBackground from "@/components/ui/NeuralBackground";
@@ -149,16 +150,11 @@ const COURSE_GUIDELINES = [
 ];
 
 /* Theater mode (YouTube style): the video takes the full content width and the
-   curriculum drops below it. Remembered per browser. */
-const THEATER_STORAGE_KEY = "smaart_course_player_theater";
-const readTheaterPreference = () => {
-  try {
-    return localStorage.getItem(THEATER_STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-};
-
+   curriculum drops below it. It is per visit: every course opens in the default
+   view. */
+/* One easing for every element that moves when theater mode toggles, so the
+   video, the lesson card and the curriculum all settle together. */
+const LAYOUT_TRANSITION = { layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } };
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -185,17 +181,20 @@ const CoursePlayer = () => {
   const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
   const [acknowledgedGuidelines, setAcknowledgedGuidelines] = useState({});
-  const [isTheater, setIsTheater] = useState(readTheaterPreference);
-  const toggleTheater = () =>
-    setIsTheater((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(THEATER_STORAGE_KEY, next ? "1" : "0");
-      } catch {
-        /* preference is a convenience; ignore storage failures */
-      }
-      return next;
-    });
+  const [isTheater, setIsTheater] = useState(false);
+  // This page is its own scroll container (h-screen overflow-y-auto), so
+  // window.scrollTo has no effect here; scroll the root element instead.
+  const pageRef = useRef(null);
+  const scrollPageToTop = (behavior = "smooth") => {
+    const el = pageRef.current;
+    if (el && typeof el.scrollTo === "function") {
+      el.scrollTo({ top: 0, left: 0, behavior });
+    } else if (el) {
+      el.scrollTop = 0;
+    }
+    window.scrollTo({ top: 0, left: 0, behavior });
+  };
+  const toggleTheater = () => setIsTheater((prev) => !prev);
   const acknowledgedCount = COURSE_GUIDELINES.filter((g) => acknowledgedGuidelines[g.id]).length;
   const allGuidelinesAcknowledged = acknowledgedCount === COURSE_GUIDELINES.length;
   const toggleGuideline = (id) =>
@@ -350,6 +349,15 @@ const CoursePlayer = () => {
 
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
+  // Theater widens every step to a single column with the curriculum below.
+  // Only steps with a video also get the YouTube-style black band; quizzes,
+  // flash cards and practice keep their card and simply use the full width.
+  const activeStepData = activeStep ? learningFlowData?.steps?.[activeStep] : null;
+  const activeStepHasVideo =
+    activeStepData?.contentType === 'video-text' ||
+    (activeStepData?.contentType === 'notes' && !!activeStepData?.videoUrl);
+  const theaterLayout = isTheater;
+  const theaterBand = isTheater && activeStepHasVideo;
 
   const isCompleted = useMemo(() => {
     if (!totalSteps) return false;
@@ -527,7 +535,7 @@ const CoursePlayer = () => {
     setCurrentVideoTime(0);
     setCurrentVideoDuration(0);
     setVideoWatched(false);
-    window.scrollTo(0, 0);
+    scrollPageToTop("auto");
 
     if (courseId) {
       const userId = currentUser?._id || currentUser?.id || 'anon';
@@ -636,7 +644,8 @@ const CoursePlayer = () => {
     setActiveStep(resumeStep);
     setVideoWatched(false);
     handleStartStep(resumeStep);
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+    // Wait one frame so the lesson view has replaced the intro before scrolling.
+    requestAnimationFrame(() => scrollPageToTop("auto"));
   };
 
   const handleStepClick = (stepNumber) => {
@@ -646,7 +655,7 @@ const CoursePlayer = () => {
       setVideoWatched(false);
       if (isActivating) {
         handleStartStep(stepNumber);
-        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+        requestAnimationFrame(() => scrollPageToTop("smooth"));
       }
     } else {
       toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
@@ -914,12 +923,14 @@ const CoursePlayer = () => {
         // dissolves (display: contents) so the video can be ordered above the
         // card header as a full-bleed dark band, without remounting the player.
         return (
-          <div className={isTheater ? "contents" : "space-y-4"}>
+          <div className={theaterLayout ? "contents" : "space-y-4"}>
             {playbackUrl && (
-              <div
+              <motion.div
+                layout
+                transition={LAYOUT_TRANSITION}
                 className={
-                  isTheater
-                    ? "order-first relative -mx-5 -mt-5 mb-6 overflow-hidden bg-[#061a2e] sm:-mx-7 sm:-mt-7"
+                  theaterLayout
+                    ? "order-first relative -mx-4 sm:-mx-6 lg:-mx-8 mb-5 bg-black h-[calc(100vh-4.75rem)] min-h-[360px]"
                     : "rounded-2xl overflow-hidden relative"
                 }
               >
@@ -929,9 +940,12 @@ const CoursePlayer = () => {
                     {t("course_player.placeholder_video_notice", "Course video coming soon — placeholder content")}
                   </div>
                 )}
-                <div
-                  className={isTheater ? "mx-auto w-full" : undefined}
-                  style={isTheater ? { maxWidth: "calc(76vh * 16 / 9)" } : undefined}
+                {/* Theater: the band is as tall as the viewport; the player takes
+                    that height and centres itself, leaving black on either side. */}
+                <motion.div
+                  layout
+                  transition={LAYOUT_TRANSITION}
+                  className={theaterLayout ? "mx-auto h-full max-w-full aspect-video" : "w-full"}
                 >
                   <CustomVideoPlayer
                     videoUrl={playbackUrl}
@@ -949,11 +963,11 @@ const CoursePlayer = () => {
                       setActiveStep(nextStep);
                       setVideoWatched(false);
                     } : null}
-                    isTheater={isTheater}
+                    isTheater={theaterLayout}
                     onToggleTheater={toggleTheater}
                   />
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
 
             {stepData.assessmentData && (videoWatched || isStepCompleted) && (
@@ -1017,21 +1031,29 @@ const CoursePlayer = () => {
         return (
           <div className="space-y-6 h-full overflow-y-auto pb-8">
             {playbackUrl && (
-              <div className={`rounded-2xl overflow-hidden mx-auto ${isTheater ? "max-w-none" : "max-w-4xl"}`}>
-                <CustomVideoPlayer
-                  isTheater={isTheater}
-                  onToggleTheater={toggleTheater}
-                  videoUrl={playbackUrl}
-                  title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
-                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
-                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
-                  onProgressUpdate={handleVideoProgressUpdate}
-                  onTimeUpdate={(time, dur) => {
-                    setCurrentVideoTime(time);
-                    if (dur) setCurrentVideoDuration(dur);
-                  }}
-                  onNext={null}
-                />
+              <div
+                className={
+                  theaterLayout
+                    ? "relative -mx-4 sm:-mx-6 lg:-mx-8 mb-5 bg-black h-[calc(100vh-4.75rem)] min-h-[360px]"
+                    : "rounded-2xl overflow-hidden relative mx-auto max-w-4xl"
+                }
+              >
+                <div className={theaterLayout ? "mx-auto h-full max-w-full aspect-video" : "w-full"}>
+                  <CustomVideoPlayer
+                    isTheater={isTheater}
+                    onToggleTheater={toggleTheater}
+                    videoUrl={playbackUrl}
+                    title={stepData.title || t("course_player.self_reflection_video", "Self-Reflection Video")}
+                    initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                    initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
+                    onProgressUpdate={handleVideoProgressUpdate}
+                    onTimeUpdate={(time, dur) => {
+                      setCurrentVideoTime(time);
+                      if (dur) setCurrentVideoDuration(dur);
+                    }}
+                    onNext={null}
+                  />
+                </div>
               </div>
             )}
             <Notes
@@ -1111,7 +1133,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-12">
+    <div ref={pageRef} className="flex flex-col bg-[#EAF7FD] dark:bg-[#072036] text-[#072036] dark:text-white h-screen overflow-y-auto transition-colors duration-500 relative pt-4 px-4 sm:px-6 lg:px-8 pb-28">
       {/* Ambient layer, matching the dashboard and courses pages. Fixed rather
           than absolute because this page's own root is the scroll container --
           an absolute layer would scroll away with the lesson content. */}
@@ -1141,7 +1163,7 @@ const CoursePlayer = () => {
                 </button>
                 <div className="hidden sm:block h-5 w-px bg-[#d7ebf5] dark:bg-[#045C9A]/30" />
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest shadow-none`}>
+                  <Badge variant="secondary" className={`${currentTheme.badgeBg} rounded px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider shadow-none`}>
                     {t(stageKey)}
                   </Badge>
                   <span className="text-base font-bold tracking-tight text-[#072036] dark:text-white">
@@ -1150,33 +1172,60 @@ const CoursePlayer = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                {/* Optional Header Right Content */}
+              <div className="flex items-center gap-2">
+                {!showIntro && (
+                  <button
+                    type="button"
+                    onClick={toggleTheater}
+                    aria-pressed={isTheater}
+                    title={isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}
+                    className={`hidden lg:inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                      isTheater
+                        ? 'bg-[#045C9A] border-[#045C9A] text-white shadow-md shadow-[#072036]/10'
+                        : 'bg-white dark:bg-[#0d3a5f] border-[#d7ebf5] dark:border-[#045C9A]/30 text-slate-700 dark:text-slate-200 hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/20 shadow-sm'
+                    }`}
+                  >
+                    <FitScreen weight={500} fill={isTheater ? 1 : 0} className="w-4 h-4" />
+                    <span>{isTheater ? t("course_player.default_view", "Default view") : t("course_player.theater_mode", "Theater mode")}</span>
+                  </button>
+                )}
+                <FloatingDictionary variant="docked" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <main className="pt-2 sm:pt-4 space-y-6">
+        <main className={theaterBand ? "space-y-6" : "pt-2 sm:pt-4 space-y-6"}>
           {/* Course Info Header */}
           {!showIntro && (
-            <div className="text-left mb-4 mt-1 space-y-1">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
-                {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
-              </span>
-              <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
-                {course.title}
-              </h1>
-              <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
-                {course.subtitle}
-              </p>
-            </div>
+            <AnimatePresence initial={false}>
+              {!theaterBand && (
+                <motion.div
+                  key="course-title-full"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-left mb-4 mt-1 space-y-1"
+                >
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    {dynamicFlow?.courseNumber || course?.courseNumber || course?.id}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight">
+                    {course.title}
+                  </h1>
+                  <p className="text-[15px] text-slate-600 dark:text-slate-300 font-medium max-w-2xl leading-relaxed">
+                    {course.subtitle}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
 
-          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${isTheater ? "" : "lg:grid-cols-3"}`}>
+          <div className={showIntro ? "flex justify-center" : `grid grid-cols-1 gap-6 items-start ${theaterLayout ? "" : "lg:grid-cols-3"}`}>
             {/* Left Column - Video and Content */}
-            <div className={showIntro ? "max-w-5xl w-full mx-auto" : (isTheater ? "w-full" : "lg:col-span-2")}>
+            <motion.div layout transition={LAYOUT_TRANSITION} className={showIntro ? "max-w-5xl w-full mx-auto" : (theaterLayout ? "w-full" : "lg:col-span-2")}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1194,10 +1243,10 @@ const CoursePlayer = () => {
                       {/* Top Meta Bar */}
                       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#d7ebf5] dark:border-[#045C9A]/25">
                         <div className="flex items-center gap-2">
-                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-bold uppercase tracking-widest`}>
+                          <span className={`rounded px-2.5 py-0.5 ${currentTheme.badgeBg} text-[11px] font-semibold uppercase tracking-wider`}>
                             {t(stageKey)}
                           </span>
-                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
+                          <span className="rounded border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300">
                             {t(stageNameKey)}
                           </span>
                         </div>
@@ -1221,7 +1270,7 @@ const CoursePlayer = () => {
                       {/* Header Info */}
                       <div className="space-y-2">
                         <h1
-                          className="text-xl sm:text-2xl font-extrabold text-[#072036] dark:text-white tracking-tight leading-tight"
+                          className="text-xl sm:text-2xl font-bold text-[#072036] dark:text-white tracking-tight leading-tight"
                           style={{ letterSpacing: "-0.02em" }}
                         >
                           {course.title}
@@ -1250,7 +1299,7 @@ const CoursePlayer = () => {
                               <ClipboardCheck className="w-4 h-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[11px] font-bold uppercase tracking-widest text-[#072036] dark:text-white">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#072036] dark:text-white">
                                 {t("course_player.important_guidelines", "Important Disclaimers & Guidelines")}
                               </p>
                               <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
@@ -1259,7 +1308,7 @@ const CoursePlayer = () => {
                             </div>
                           </div>
                           <span
-                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest tabular-nums transition-colors ${
+                            className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider tabular-nums transition-colors ${
                               allGuidelinesAcknowledged
                                 ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400"
                                 : "border-[#d7ebf5] bg-white text-slate-600 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300"
@@ -1363,34 +1412,55 @@ const CoursePlayer = () => {
                     <div className="space-y-6">
                       <motion.div
                         key="active-step"
+                        layout
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className={`p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left ${isTheater ? "flex flex-col" : ""}`}
+                        transition={LAYOUT_TRANSITION}
+                        className={
+                          theaterBand
+                            ? "flex flex-col mb-6 text-left text-[#072036] dark:text-white"
+                            : "p-5 sm:p-7 bg-white dark:bg-[#0d3a5f] text-[#072036] dark:text-white rounded-2xl border border-[#d7ebf5] dark:border-white/[0.04] mb-6 shadow-sm relative overflow-hidden text-left"
+                        }
                       >
-                        <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
+                        {!theaterBand && (
+                          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#045C9A]/20 to-transparent" style={{ filter: 'blur(0.5px)' }} />
+                        )}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#d7ebf5] dark:border-white/10">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-xl shadow-lg shrink-0">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="w-11 h-11 rounded-xl bg-[#045C9A] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#072036]/15 shrink-0 tabular-nums">
                               {activeStep}
                             </div>
-                            <div>
-                              <h3 className="font-bold text-xl sm:text-2xl text-[#072036] dark:text-white leading-tight tracking-tight">
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                {theaterBand && (
+                                  <>
+                                    <span>{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                    <span>{course.title}</span>
+                                    <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                                  </>
+                                )}
+                                {t("course_player.step_of", "Step {{step}} of {{total}}", { step: activeStep, total: totalSteps })}
+                              </p>
+                              <h3 className="mt-0.5 text-lg sm:text-xl font-bold text-[#072036] dark:text-white leading-tight tracking-tight truncate">
                                 {activeStep === '1' ? t("course_player.step_why", "Why") : activeStep === '2' ? t("course_player.step_story", "Story") : (learningFlowData?.steps?.[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`)}
                               </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="w-2 h-2 rounded-full bg-[#045C9A] animate-pulse" />
-                                <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] uppercase tracking-widest">{t("course_player.active_session", "ACTIVE SESSION")}</p>
-                              </div>
                             </div>
                           </div>
-                          {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
-                            !learningFlowData?.steps?.[activeStep]?.assessmentData && (
-                              <div className="px-4 py-2 bg-[#F1F5F9] dark:bg-[#072036]/60 rounded-xl text-sm font-bold text-slate-600 dark:text-[#A6D7E8] border border-[#d7ebf5] dark:border-white/[0.05] shadow-xs shrink-0 flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-[#045C9A]" />
-                                <span>{learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}</span>
-                              </div>
-                            )}
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#045C9A]/20 bg-[#045C9A]/10 px-2.5 py-1 text-xs font-semibold text-[#045C9A] dark:border-[#A6D7E8]/25 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                              {t("course_player.active_session_label", "Active session")}
+                            </span>
+                            {learningFlowData?.steps?.[activeStep]?.contentType !== 'quiz' &&
+                              !learningFlowData?.steps?.[activeStep]?.assessmentData && (
+                                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-1 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300 tabular-nums">
+                                  <Clock className="w-3.5 h-3.5 text-[#045C9A] dark:text-[#A6D7E8]" />
+                                  {learningFlowData?.steps?.[activeStep]?.duration || t("course_player.five_ten_min", "5 min")}
+                                </span>
+                              )}
+                          </div>
                         </div>
 
                         {learningFlowData?.steps?.[activeStep] ? (
@@ -1424,7 +1494,7 @@ const CoursePlayer = () => {
 
                       {/* Side-by-side Tab switcher buttons & Content below active-step card if contentType is video-text */}
                       {learningFlowData?.steps?.[activeStep]?.contentType === 'video-text' && (
-                        <div className="space-y-6">
+                        <motion.div layout transition={LAYOUT_TRANSITION} className="space-y-6">
                           <div className="flex flex-wrap items-center gap-3">
                             <button
                               onClick={() => setActiveTab('preview')}
@@ -1538,18 +1608,18 @@ const CoursePlayer = () => {
                               )}
                             </AnimatePresence>
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                     </div>
                   )}
                 </AnimatePresence>
               </motion.div>
-            </div>
+            </motion.div>
 
             {!showIntro && (
-              <div className={isTheater ? "w-full" : "lg:col-span-1"}>
+              <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "w-full" : "lg:col-span-1"}>
                 <motion.div
-                  initial={{ opacity: 0, x: isTheater ? 0 : 20, y: isTheater ? 20 : 0 }}
+                  initial={{ opacity: 0, x: theaterLayout ? 0 : 20, y: theaterLayout ? 20 : 0 }}
                   animate={{ opacity: 1, x: 0, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-left"
@@ -1577,12 +1647,9 @@ const CoursePlayer = () => {
                             </p>
                           </div>
                         </div>
-                        <span className="text-2xl font-extrabold tabular-nums tracking-tight text-[#045C9A] dark:text-[#A6D7E8] shrink-0">
-                          {overallContentProgress}%
-                        </span>
                       </div>
 
-                      <div className={`grid grid-cols-1 gap-4 ${isTheater ? "sm:grid-cols-2" : ""}`}>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={`grid grid-cols-1 gap-4 ${theaterLayout ? "sm:grid-cols-2" : ""}`}>
                         {/* Content Progress */}
                         <div className="space-y-1.5 text-left">
                           <div className="flex items-center justify-between text-sm font-bold text-slate-700 dark:text-slate-300">
@@ -1616,7 +1683,7 @@ const CoursePlayer = () => {
                             />
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* Curriculum */}
@@ -1633,18 +1700,22 @@ const CoursePlayer = () => {
                         </span>
                       </div>
 
-                      <div className={isTheater ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
+                      <motion.div layout transition={LAYOUT_TRANSITION} className={theaterLayout ? "grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4" : "space-y-2.5"}>
                         {stepNumbers.map((step) => {
                           const status = getStepStatus(step);
                           const stepData = learningFlowData?.steps?.[step];
                           const isActive = activeStep === step;
 
                           return (
-                            <button
+                            <motion.button
+                              layout
+                              transition={LAYOUT_TRANSITION}
+                              whileHover={status === 'locked' ? undefined : { y: -2 }}
+                              whileTap={status === 'locked' ? undefined : { scale: 0.99 }}
                               key={step}
                               disabled={status === 'locked'}
                               onClick={() => handleStepClick(step)}
-                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 border text-left cursor-pointer hover:-translate-y-0.5 hover:shadow-md ${isActive
+                              className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-colors duration-300 border text-left cursor-pointer hover:shadow-md ${isActive
                                 ? 'bg-[#045C9A] dark:bg-[#045C9A] border-[#045C9A] dark:border-[#045C9A] text-white shadow-md shadow-[#072036]/15'
                                 : status === 'completed'
                                   ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/70 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 hover:border-emerald-300'
@@ -1673,14 +1744,14 @@ const CoursePlayer = () => {
                               {status !== 'locked' && !isActive && (
                                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                               )}
-                            </button>
+                            </motion.button>
                           );
                         })}
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
-              </div>
+              </motion.div>
             )}
           </div>
         </main>
@@ -1744,7 +1815,7 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="mb-1 text-2xl font-extrabold tracking-tight text-[#072036] dark:text-white"
+                      className="mb-1 text-2xl font-bold tracking-tight text-[#072036] dark:text-white"
                     >
                       {t("course_player.congratulations_exclaim", "Congratulations!")}
                     </motion.h2>
@@ -1766,7 +1837,7 @@ const CoursePlayer = () => {
                     className="relative z-10 mb-6 w-full rounded-2xl border border-emerald-200/70 bg-emerald-50 p-4 dark:border-emerald-500/25 dark:bg-emerald-500/10"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">{t("course_player.your_progress")}</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">{t("course_player.your_progress")}</span>
                       <span className="text-[11px] font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
                         {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
                       </span>
@@ -1821,7 +1892,6 @@ const CoursePlayer = () => {
           document.body
         )}
       </div>
-      <FloatingDictionary />
       {/* FloatingNotes removed — Notes moved into the tab panel above */}
       <ActivityWarningModal
         isOpen={isWarningVisible}

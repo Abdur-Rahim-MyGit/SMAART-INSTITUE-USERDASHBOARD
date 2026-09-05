@@ -18,7 +18,7 @@
  * The 68-point face-api landmark model continues to be loaded for gaze only.
  */
 
-import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError, detectObjects as detectObjectsRaw, isObjectDetectorReady as isObjectDetectorReadyRaw } from './onnxPipeline';
+import { initPipeline, detectAndEmbed, detectOnly, cosineSimilarity, isReady as isOnnxReady, getInitError as getOnnxInitError, detectObjects as detectObjectsRaw, isObjectDetectorReady as isObjectDetectorReadyRaw, getLastObjectNearMisses as getLastObjectNearMissesRaw } from './onnxPipeline';
 import { evaluateFrameQuality, checkBrightness } from './faceQualityService';
 // NOTE: livenessService.evaluateLiveness is deliberately NOT wired. It was
 // imported here but never called, which read as spoof protection that does not
@@ -72,6 +72,14 @@ const ANTISPOOF_MIN_SCORE = 0.50;   // real person liveness threshold
 const REGISTRATION_FRAMES = 5;
 const REGISTRATION_MAX_ATTEMPTS = 14;     // Allow up to 14 tries to get 5 good frames
 const REGISTRATION_FRAME_DELAY_MS = 700;
+// Enrolment is the one moment the candidate is centred, still and looking at
+// the camera, so it can demand a confident detection. The 0.35 presence floor
+// is tuned to never miss a face during the exam; at enrolment it also admits
+// icons, logos and shadows that SCRFD scores as a weak face.
+const REGISTRATION_MIN_FACE_SCORE = 0.55;
+// Below this mean brightness the frame is black: lens covered, shutter closed,
+// or a virtual camera showing a "camera off" card. Nothing here is a face.
+const REGISTRATION_MIN_BRIGHTNESS = 20;
 
 // ─── loadModels ───────────────────────────────────────────────────────────────
 
@@ -119,6 +127,7 @@ export const getModelLoadError = () => getOnnxInitError();
  */
 export const detectObjects = (videoEl) => detectObjectsRaw(videoEl);
 export const isObjectDetectorReady = () => isObjectDetectorReadyRaw();
+export const getLastObjectNearMisses = () => getLastObjectNearMissesRaw();
 
 export const getLoadError = () => null;
 export const getBackendInfo = () => ({ backend: 'onnx-wasm+webgl', isWebGL: true, isCPU: false });
@@ -375,7 +384,16 @@ export const registerFace = async (videoEl, options = {}) => {
   while (acceptedEmbeddings.length < frameCount && attempts < REGISTRATION_MAX_ATTEMPTS) {
     attempts++;
 
-    const faces = await detectAndEmbedWithFallback(videoEl, 0.35);
+    // ── Covered / black frame gate ─────────────────────────────────────────
+    const bright = checkBrightness(videoEl);
+    if (bright.brightness < REGISTRATION_MIN_BRIGHTNESS) {
+      console.warn(`[FaceRegistration] Frame skipped: camera covered or black (brightness ${bright.brightness}).`);
+      onQualityIssue?.(['Camera appears covered or switched off — make sure it shows your face']);
+      await new Promise(r => setTimeout(r, 100));
+      continue;
+    }
+
+    const faces = await detectAndEmbedWithFallback(videoEl, REGISTRATION_MIN_FACE_SCORE);
 
     // Skip frame if no face or multiple faces, then retry next attempt
     if (faces.length === 0) {
@@ -395,8 +413,12 @@ export const registerFace = async (videoEl, options = {}) => {
     const face = faces[0];
 
     // ── Frame quality check ────────────────────────────────────────────────────
+    // `passed` already encodes the critical failures (too dark, face too small,
+    // turned away, eyes closed, weak detection). This used to accept a failed
+    // frame as long as its composite score reached 30, which let a black frame
+    // with a drawn-on icon enrol as a person.
     const quality = evaluateFrameQuality(videoEl, face);
-    if (!quality.passed && quality.overallScore < 30) {
+    if (!quality.passed) {
       onQualityIssue?.(quality.issues);
       await new Promise(r => setTimeout(r, 100));
       continue;
@@ -424,9 +446,11 @@ export const registerFace = async (videoEl, options = {}) => {
     await new Promise(r => setTimeout(r, intervalMs));
   }
 
-  if (acceptedEmbeddings.length < 2) {
+  // Every requested frame must be good. Accepting two of five meant the
+  // reference could be built from a couple of lucky frames.
+  if (acceptedEmbeddings.length < frameCount) {
     throw new Error(
-      `Face registration failed. Only captured ${acceptedEmbeddings.length} valid frames out of ${REGISTRATION_MAX_ATTEMPTS} attempts. Ensure good lighting and hold still.`
+      `Face registration failed. Only captured ${acceptedEmbeddings.length} of ${frameCount} valid frames in ${REGISTRATION_MAX_ATTEMPTS} attempts. Ensure good lighting, face the camera and hold still.`
     );
   }
 

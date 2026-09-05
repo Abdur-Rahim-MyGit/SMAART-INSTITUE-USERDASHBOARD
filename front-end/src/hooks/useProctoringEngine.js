@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
-import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady } from '@/services/faceVerificationService';
+import { verifyFace, detectFaces, detectFacesFast, VerificationStatus, loadModels, isReady, resetGazeCalibration, detectObjects, isObjectDetectorReady, getLastObjectNearMisses } from '@/services/faceVerificationService';
+import { initObjectDetectionWorker, isObjectWorkerReady, getObjectWorkerModel, detectObjectsInWorker } from '@/workers/objectDetectionClient';
 import { proctoringApi } from '@/services/proctoringApi';
 import { startAudioMonitoring, stopAudioMonitoring, getLastGates } from '@/services/audioMonitorService';
 import { getPipelineStatus } from '@/services/onnxPipeline';
@@ -137,7 +138,7 @@ const IDENTITY_MISMATCH_STREAK = 3;
 // needs consecutive detections to get there — so a phone held in plain view
 // could be missed indefinitely. At 1.5 s two ticks fit inside the grace window,
 // so brief occlusions no longer reset the timer.
-const OBJECT_CHECK_INTERVAL = 1000;
+const OBJECT_CHECK_INTERVAL = 700;
 
 // ── Liveness (presentation-attack detection) ────────────────────────────────
 // There is no anti-spoof model in the bundle — the shipped MN3-AntiSpoof file
@@ -173,6 +174,29 @@ const OBJECT_CONDITIONS = {
   book: 'book_detected',
   laptop: 'laptop_detected',
 };
+// An object has to be seen on OBJECT_CONFIRM_TICKS of the last
+// OBJECT_CONFIRM_WINDOW ticks before its condition opens, and be absent for a
+// whole window before it clears. One tick is a single frame: a book turned
+// edge-on or a hand passing the lens can read as a phone for one frame, and
+// the detector's alternating zoom passes can miss a real phone on the off tick.
+//
+// That protection costs several seconds even on a clean, obvious hold — a
+// held-up phone filling the frame scores nothing like a stray edge case (0.88
+// observed in the field, against a 0.25 accept bar). A score comfortably
+// above the accept bar is not the kind of thing one bad frame produces, so it
+// fires the condition on the spot; only a borderline score pays the
+// multi-tick toll.
+const OBJECT_CONFIRM_TICKS = 3;
+const OBJECT_CONFIRM_WINDOW = 5;
+// A flat 0.55 for every class left a wide dead zone: a detection that
+// legitimately cleared the accept bar (worker's CLASS_THRESHOLDS: phone 0.25,
+// book 0.30, laptop 0.28) but scored, say, 0.40 was already a real,
+// above-bar detection -- yet it still paid the full multi-second wait meant
+// for a borderline first frame. A margin over each class's own accept bar
+// keeps the guard against single-frame noise while letting most genuine,
+// already-accepted detections through immediately instead of only the
+// strongest ones.
+const OBJECT_INSTANT_SCORE = { phone: 0.40, book: 0.45, laptop: 0.43 };
 
 // Fallback only. The SERVER owns the real budget (config/proctoringPolicy.js)
 // and tells us the tier on every event; this is used purely to render a
@@ -378,6 +402,12 @@ export const useProctoringEngine = ({
   // reported once rather than every window that follows it.
   const livenessRef = useRef(null);
   const spoofReportedRef = useRef(false);
+  // Recent detection history per object label (see OBJECT_CONFIRM_TICKS).
+  const objectSeenTicksRef = useRef({});
+  // A detection pass can outlast the 1 s tick on a slow machine; never stack.
+  const objectPassInFlightRef = useRef(false);
+  // Last face box (video pixels) so the object detector can zoom on the hands.
+  const lastFaceBoxRef = useRef(null);
   // Consecutive ArcFace frames that disagreed with the registered face. One
   // bad frame is a blink or a turn; several in a row is a different person.
   const mismatchStreakRef = useRef(0);
@@ -453,6 +483,10 @@ export const useProctoringEngine = ({
   useEffect(() => {
     workerRef.current = null;
     if (!isReady()) loadModels().catch(() => { });
+    // The object detector runs in its own worker so a large model never
+    // blocks the face checks or the page. Falls back to the main thread only
+    // where workers are unavailable.
+    initObjectDetectionWorker().catch(() => { });
   }, []);
 
   // Sync reference embeddings with the shared worker whenever they change.
@@ -472,7 +506,10 @@ export const useProctoringEngine = ({
     try {
       console.log('[ProctoringEngine] Requesting media stream...');
       const constraints = {
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
+        // 720p where the camera allows it: the face pipeline resizes to its
+        // own 640 input regardless, but the object detector's zoomed passes
+        // get real pixels, which is what a small phone at arm's length needs.
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 15 } },
         audio: false // No audio processing needed to protect privacy
       };
       const stream = trackStream(await navigator.mediaDevices.getUserMedia(constraints));
@@ -931,10 +968,21 @@ export const useProctoringEngine = ({
     }
     verifyInFlightRef.current = true;
 
-    // Safety timeout to ensure verifyInFlightRef is never locked up permanently
-    setTimeout(() => {
+    // Safety net only — must NEVER fire while a real (if slow) identity check
+    // is still in flight. ArcFace runs single-threaded WASM (no
+    // crossOriginIsolated multi-threading — see onnxPipeline.js) and can
+    // genuinely take longer than a couple of seconds under load. Firing early
+    // reopens the gate mid-inference, letting the next 400ms tick start a
+    // SECOND overlapping ArcFace call on the same thread; those pile up and
+    // starve the whole main thread (including object detection's frame
+    // capture), which is what turned into the reported 12-20s lag across
+    // every check, not just identity. 8s is generous enough to never trip
+    // under a slow-but-working call, and finally{} below cancels it the
+    // moment the real call finishes so a stale timer can never clear the
+    // flag for a LATER, still-legitimately-running call.
+    const verifySafetyTimeoutId = setTimeout(() => {
       verifyInFlightRef.current = false;
-    }, 2500);
+    }, 8000);
 
     const descriptor = registeredFaceDescriptorRef.current;
 
@@ -958,6 +1006,7 @@ export const useProctoringEngine = ({
           // different person stays "mismatch" and never flips to "verified".
           const quick = await detectFacesFast(videoRef.current);
           if (!quick.error) {
+            lastFaceBoxRef.current = quick.faceCount === 1 ? (quick.faces?.[0]?.box || null) : null;
             setFaceCount(quick.faceCount); faceCountRef.current = quick.faceCount;
             if (quick.gaze?.gazeDirection) {
               setGazeDirection(quick.gaze.gazeDirection);
@@ -1119,6 +1168,7 @@ export const useProctoringEngine = ({
           return;
         }
 
+        lastFaceBoxRef.current = result.faceCount === 1 ? (result.faces?.[0]?.box || null) : null;
         setFaceCount(result.faceCount); faceCountRef.current = result.faceCount;
         if (result.gaze?.gazeDirection) {
           setGazeDirection(result.gaze.gazeDirection);
@@ -1154,6 +1204,7 @@ export const useProctoringEngine = ({
     } catch (err) {
       console.error('[ProctoringEngine] Face verification tick failed:', err);
     } finally {
+      clearTimeout(verifySafetyTimeoutId);
       verifyInFlightRef.current = false;
     }
   };
@@ -1253,24 +1304,57 @@ export const useProctoringEngine = ({
 
   const runObjectDetection = async () => {
     if (!isActiveRef.current || hasLockedOutRef.current) return;
-    if (!videoRef.current || !isObjectDetectorReady()) return;
+    if (!videoRef.current) return;
+    const useWorker = isObjectWorkerReady();
+    if (!useWorker && !isObjectDetectorReady()) return;
+    if (objectPassInFlightRef.current) return;
+    objectPassInFlightRef.current = true;
 
     try {
-      const found = await detectObjects(videoRef.current);
+      let found, near;
+      if (useWorker) {
+        const result = await detectObjectsInWorker(videoRef.current, { face: lastFaceBoxRef.current });
+        if (!result) return; // worker busy with the previous frame: skip this tick
+        found = result.found;
+        near = result.nearMisses;
+      } else {
+        found = await detectObjects(videoRef.current);
+        near = getLastObjectNearMisses();
+      }
       const labels = new Set((found || []).map((o) => o.label));
 
       if (found && found.length) {
         const summary = found.map((o) => `${o.label} ${o.score.toFixed(2)}`).join(', ');
         console.log(`[ProctoringEngine] Objects: ${summary}`);
-        setDiagnostics((d) => ({ ...d, objects: summary, objectsAt: Date.now() }));
+        setDiagnostics((d) => ({ ...d, objects: summary, objectsConfirmed: true, objectsAt: Date.now() }));
+      } else {
+        // Nothing cleared the bar. Show the model's best weak guess anyway,
+        // clearly marked as unconfirmed — "objects: none" carries no
+        // information for tuning; "below: book 0.14" says exactly what the
+        // model saw and by how much it missed.
+        if (near?.length) console.debug(`[ProctoringEngine] Object near-misses: ${near.join(', ')}`);
+        setDiagnostics((d) => ({
+          ...d,
+          objects: near?.length ? `below: ${near.join(', ')}` : '',
+          objectsConfirmed: false,
+          objectsAt: Date.now(),
+        }));
       }
 
       Object.entries(OBJECT_CONDITIONS).forEach(([label, condition]) => {
-        if (labels.has(label)) observeCondition(condition);
-        else clearCondition(condition);
+        const seen = labels.has(label);
+        const history = [...(objectSeenTicksRef.current[label] || []), seen].slice(-OBJECT_CONFIRM_WINDOW);
+        objectSeenTicksRef.current[label] = history;
+        const hits = history.filter(Boolean).length;
+        const hit = seen && (found || []).find((o) => o.label === label);
+        const highConfidence = hit && hit.score >= (OBJECT_INSTANT_SCORE[label] ?? Infinity);
+        if (highConfidence || hits >= OBJECT_CONFIRM_TICKS) observeCondition(condition);
+        else if (hits === 0) clearCondition(condition);
       });
     } catch (err) {
       console.warn('[ProctoringEngine] Object detection tick failed:', err);
+    } finally {
+      objectPassInFlightRef.current = false;
     }
   };
 
@@ -1718,7 +1802,12 @@ export const useProctoringEngine = ({
     const diagnosticsTimer = setInterval(() => {
       setDiagnostics((d) => ({
         ...d,
-        models: getPipelineStatus(),
+        models: {
+          ...getPipelineStatus(),
+          ...(isObjectWorkerReady()
+            ? { objectDetector: 'loaded', objectModel: `${getObjectWorkerModel()} · worker` }
+            : {}),
+        },
         audio: getLastGates(),
         // Objects go stale — a phone seen ten seconds ago is not in frame now.
         objects: Date.now() - d.objectsAt > 6000 ? '' : d.objects,

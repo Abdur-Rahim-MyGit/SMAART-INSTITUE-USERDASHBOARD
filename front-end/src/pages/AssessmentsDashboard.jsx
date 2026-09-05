@@ -544,7 +544,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                     <div className="mb-4 flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3">
                             <div
-                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[13px] font-bold border ${
+                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold border ${
                                     completed
                                         ? "bg-emerald-500 border-emerald-600 text-white shadow-sm"
                                         : stageData?.locked
@@ -556,10 +556,10 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             </div>
 
                             <div className="min-w-0 pt-0.5">
-                                <h3 className="text-[15px] font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
+                                <h3 className="text-base font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
                                     {t(`assessments_dashboard.stages.${stage.key}.title`, stage.title)}
                                 </h3>
-                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                                     {t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}
                                 </p>
                             </div>
@@ -589,7 +589,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         ) : null}
                     </div>
 
-                    <p className="mb-4 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                         {t(`assessments_dashboard.stages.${stage.key}.description`, stage.description)}
                     </p>
 

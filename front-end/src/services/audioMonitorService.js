@@ -636,7 +636,7 @@ export default { startAudioMonitoring, stopAudioMonitoring, isAudioMonitorActive
  * noisy the bar ends up above normal speech. recalibrate() in silence fixes it.
  */
 /** Latest gate readings without logging — for the on-screen diagnostics panel. */
-export const getLastGates = () => (lastGates ? { ...lastGates, calibrated: isCalibrated, micActive: isMicActive, micHealthy } : { calibrated: isCalibrated, micActive: isMicActive, micHealthy });
+export const getLastGates = () => (lastGates ? { ...lastGates, calibrated: isCalibrated, micActive: isMicActive, micHealthy, speechStreak, speechSecondsToReport: SPEECH_SECONDS_TO_REPORT } : { calibrated: isCalibrated, micActive: isMicActive, micHealthy, speechStreak, speechSecondsToReport: SPEECH_SECONDS_TO_REPORT });
 
 export const audioDiagnostics = {
   debug(on = true) {

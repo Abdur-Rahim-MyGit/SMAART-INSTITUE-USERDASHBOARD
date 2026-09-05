@@ -98,6 +98,7 @@ function AppNavigator() {
           options={{ headerShown: false, gestureEnabled: false }}
         />
 
+
         {/* Learning-tab satellites — each owns its own header. */}
         <Stack.Screen name="Certificates" component={CertificatesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Notes" component={NotesScreen} options={{ headerShown: false }} />

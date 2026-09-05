@@ -9,7 +9,9 @@ export const AttentionCheck = ({ onPass, onFail }) => {
   // Randomize button position safely within the designated target area
   useEffect(() => {
     const randomTop = Math.floor(Math.random() * 20) + 40; // 40% to 60% inside action container
-    const randomLeft = Math.floor(Math.random() * 50) + 25; // 25% to 75%
+    // 30% to 70%: the button is ~40% of the box wide, so this keeps it fully
+    // inside at either extreme.
+    const randomLeft = Math.floor(Math.random() * 40) + 30;
     setButtonPos({ top: `${randomTop}%`, left: `${randomLeft}%` });
   }, []);
 
@@ -86,17 +88,21 @@ export const AttentionCheck = ({ onPass, onFail }) => {
         <div className="relative w-full h-20 my-2 z-20 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden">
           <motion.button
             onClick={onPass}
+            // Centre with framer's own x/y rather than a CSS transform: the
+            // hover/tap scale animations replace `transform` wholesale, which
+            // dropped the translate and shoved the button off the right edge.
             style={{
               position: 'absolute',
               top: buttonPos.top,
               left: buttonPos.left,
-              transform: 'translate(-50%, -50%)',
+              x: '-50%',
+              y: '-50%',
             }}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-cyan-500/20 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 shrink-0 whitespace-nowrap"
+            className="px-5 py-2.5 bg-[#045C9A] hover:bg-[#034a7d] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#045C9A]/25 flex items-center gap-1.5 cursor-pointer transition-colors shrink-0 whitespace-nowrap"
           >
             <RiHandCoinLine size={15} /> Confirm Presence
           </motion.button>
