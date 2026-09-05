@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     IconFileDescription,
-    IconLock,
-    IconLockOpen,
     IconBriefcase,
     IconCopy,
     IconTrash,
@@ -236,114 +234,6 @@ const TemplateThumbnail = ({ type }) => {
 
 
 
-// --- SVG Circular Score Ring ---
-const CircularScoreRing = ({ score, size = 120, strokeWidth = 10, label = "ATS" }) => {
-    const radius = (size - strokeWidth) / 2;
-    const circumference = radius * 2 * Math.PI;
-    const offset = circumference - (score / 100) * circumference;
-
-    let colorClass = "text-emerald-500";
-    let glowColor = "rgba(16,185,129,0.45)";
-    let glowColorStrong = "rgba(16,185,129,0.8)";
-    if (score < 50) {
-        colorClass = "text-rose-500";
-        glowColor = "rgba(244,63,94,0.45)";
-        glowColorStrong = "rgba(244,63,94,0.8)";
-    } else if (score < 80) {
-        colorClass = "text-amber-500";
-        glowColor = "rgba(245,158,11,0.45)";
-        glowColorStrong = "rgba(245,158,11,0.8)";
-    }
-
-    const count = useMotionValue(0);
-    const rounded = useTransform(count, Math.round);
-    const [displayScore, setDisplayScore] = useState(0);
-    const [prevScore, setPrevScore] = useState(score);
-    const [flashing, setFlashing] = useState(false);
-
-    useEffect(() => {
-        // Trigger gold flash when score increases
-        if (score > prevScore && prevScore !== 0) {
-            setFlashing(true);
-            const t = setTimeout(() => setFlashing(false), 800);
-            return () => clearTimeout(t);
-        }
-        setPrevScore(score);
-    }, [score]);
-
-    useEffect(() => {
-        const controls = animate(count, score, {
-            duration: 1.5,
-            ease: "easeOut",
-        });
-        return controls.stop;
-    }, [score]);
-
-    useEffect(() => {
-        const unsubscribe = rounded.on("change", (v) => setDisplayScore(v));
-        return () => unsubscribe();
-    }, [rounded]);
-
-    return (
-        <div
-            className="relative flex items-center justify-center"
-            style={{ width: size, height: size }}
-        >
-            {/* Always-visible outer glow — flashes gold on score increase */}
-            <motion.div
-                className="absolute inset-0 rounded-full pointer-events-none"
-                animate={{
-                    boxShadow: flashing
-                        ? `0 0 ${size * 0.3}px ${size * 0.12}px rgba(251,191,36,0.9), 0 0 ${size * 0.12}px ${size * 0.05}px rgba(251,191,36,0.6)`
-                        : `0 0 ${size * 0.18}px ${size * 0.06}px ${glowColor}`,
-                }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-
-            {/* SVG Ring */}
-            <motion.svg className="transform -rotate-90 w-full h-full relative z-10">
-                {/* Background track */}
-                <circle
-                    cx={size / 2} cy={size / 2} r={radius}
-                    stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
-                    className="text-slate-100 dark:text-slate-800"
-                />
-                {/* Animated progress arc */}
-                <motion.circle
-                    cx={size / 2} cy={size / 2} r={radius}
-                    stroke="currentColor" strokeWidth={strokeWidth} fill="transparent"
-                    strokeDasharray={circumference}
-                    initial={{ strokeDashoffset: circumference }}
-                    animate={{ strokeDashoffset: offset }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    strokeLinecap="round"
-                    className={colorClass}
-                />
-            </motion.svg>
-
-            {/* Center number + optional label */}
-            <div className="absolute flex flex-col items-center justify-center text-center z-20">
-                <motion.span
-                    animate={flashing ? { color: "#fbbf24", scale: 1.15 } : { color: undefined, scale: 1 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="font-black text-slate-800 dark:text-white leading-none tracking-tighter"
-                    style={{ fontSize: `${Math.max(14, size * 0.28)}px` }}
-                >
-                    {displayScore}
-                </motion.span>
-                {label && (
-                    <span
-                        className="font-bold text-slate-400 uppercase tracking-widest mt-0.5"
-                        style={{ fontSize: `${Math.max(8, size * 0.08)}px` }}
-                    >
-                        {label}
-                    </span>
-                )}
-            </div>
-        </div>
-    );
-};
-
 const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, viewOnly = false, preloadedData = null }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -379,9 +269,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const [jobSkills, setJobSkills] = useState([]); // Skills from job posting
     const [verifiedCgpa, setVerifiedCgpa] = useState(null);
 
-    const [atsScore, setAtsScore] = useState(0);
-    const [atsBreakdown, setAtsBreakdown] = useState([]);
-    const [atsOpenCategory, setAtsOpenCategory] = useState(null);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     // ── Builder core state ───────────────────────────────────────────────
@@ -711,95 +598,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             fetchSkillChips(selectedCareerPath.roleName);
         }
     }, [selectedCareerPath, fetchSkillChips, dataLoaded]);
-
-    // ── ATS Score Engine (5 categories, 100 pts) ─────────────────────────
-    const calculateATSScore = useCallback((data, mastered = [], roleSkillsFromAPI = []) => {
-        const results = [];
-
-        // CAT 1 — Parseability & Format (25 pts)
-        const cat1 = { label: t('resume_builder.ats.cat_parseability', 'Parseability & Format'), max: 25, checks: [] };
-        cat1.checks.push({ label: t('resume_builder.ats.chk_ats_safe', 'ATS-safe template'), pts: 8, pass: true, step: null });
-        cat1.checks.push({ label: t('resume_builder.ats.chk_standard_headings', 'Standard section headings'), pts: 7, pass: true, step: null });
-        const hasDates = (data.education || []).every(e => e.year?.trim()) && (data.experience || []).every(e => e.duration?.trim());
-        cat1.checks.push({ label: t('resume_builder.ats.chk_dates', 'Dates in all entries'), pts: 5, pass: hasDates, step: hasDates ? null : 2 });
-        const badChars = /[^\w\s@.\-+()]/;
-        const noSpecial = !badChars.test(data.personalInfo?.fullName || '') && !badChars.test(data.personalInfo?.email || '') && !badChars.test(data.personalInfo?.mobile || '');
-        cat1.checks.push({ label: t('resume_builder.ats.chk_no_special', 'No special chars in contact'), pts: 5, pass: noSpecial, step: noSpecial ? null : 1 });
-        cat1.score = cat1.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
-        results.push(cat1);
-
-        // CAT 2 — Keyword & Role Match (30 pts)
-        const cat2 = { label: t('resume_builder.ats.cat_keyword', 'Keyword & Role Match'), max: 30, checks: [] };
-        const hasRole = !!data.personalInfo?.targetRole?.trim();
-        cat2.checks.push({ label: t('resume_builder.ats.chk_target_role', 'Target Role is set'), pts: 5, pass: hasRole, step: hasRole ? null : 1 });
-        const techSkillsArr = (data.skills?.technical || '').split(',').map(s => s.trim()).filter(Boolean);
-        const allSkillsArr = [data.skills?.technical, data.skills?.domain, data.skills?.ai].filter(Boolean).join(',').split(',').map(s => s.trim()).filter(Boolean);
-        const hasTech3 = techSkillsArr.length >= 3;
-        cat2.checks.push({ label: t('resume_builder.ats.chk_tech_3', 'Technical Skills (3+ skills)'), pts: 10, pass: hasTech3, step: hasTech3 ? null : 5 });
-        // Keyword match with mastered bonus
-        let kwScore = 0;
-        if (roleSkillsFromAPI.length > 0 && allSkillsArr.length > 0) {
-            let matched = 0;
-            allSkillsArr.forEach(skill => {
-                const isMatch = roleSkillsFromAPI.some(rs => rs.toLowerCase() === skill.toLowerCase());
-                if (isMatch) {
-                    const isMastered = mastered.some(m => m.toLowerCase() === skill.toLowerCase());
-                    matched += isMastered ? 1.2 : 1;
-                }
-            });
-            kwScore = Math.min(10, Math.round((matched / roleSkillsFromAPI.length) * 10));
-        }
-        cat2.checks.push({ label: t('resume_builder.ats.chk_skills_match', 'Skills match role keywords'), pts: 10, pass: kwScore >= 5, step: 5, earned: kwScore });
-        const hasDomainAi = !!data.skills?.domain?.trim() || !!data.skills?.ai?.trim();
-        cat2.checks.push({ label: t('resume_builder.ats.chk_domain_ai_filled', 'Domain / AI skills filled'), pts: 5, pass: hasDomainAi, step: hasDomainAi ? null : 5 });
-        cat2.score = cat2.checks.reduce((s, c) => s + (c.earned !== undefined ? c.earned : (c.pass ? c.pts : 0)), 0);
-        results.push(cat2);
-
-        // CAT 3 — Content Completeness (25 pts)
-        const cat3 = { label: t('resume_builder.ats.cat_completeness', 'Content Completeness'), max: 25, checks: [] };
-        const summaryOk = (data.summary || '').length >= 80;
-        cat3.checks.push({ label: t('resume_builder.ats.chk_summary', 'Summary (80+ chars)'), pts: 8, pass: summaryOk, step: summaryOk ? null : 1 });
-        const expOk = data.experience?.length > 0 && (data.experience[0]?.description || '').length > 30;
-        cat3.checks.push({ label: t('resume_builder.ats.chk_exp_desc', 'Work Experience with description'), pts: 7, pass: expOk, step: expOk ? null : 3 });
-        const eduOk = data.education?.length > 0 && data.education[0]?.institution?.trim() && data.education[0]?.year?.trim();
-        cat3.checks.push({ label: t('resume_builder.ats.chk_edu', 'Education (institution + year)'), pts: 5, pass: eduOk, step: eduOk ? null : 2 });
-        const projOk = data.projects?.length >= 2 && data.projects.every(p => (p.description || '').length > 20);
-        cat3.checks.push({ label: t('resume_builder.ats.chk_projects', '2+ Projects with descriptions'), pts: 5, pass: projOk, step: projOk ? null : 4 });
-        cat3.score = cat3.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
-        results.push(cat3);
-
-        // CAT 4 — Contact & Credibility (10 pts)
-        const cat4 = { label: t('resume_builder.ats.cat_contact', 'Contact & Credibility'), max: 10, checks: [] };
-        cat4.checks.push({ label: t('resume_builder.ats.chk_linkedin', 'LinkedIn URL'), pts: 3, pass: !!data.personalInfo?.linkedinUrl?.trim(), step: 1 });
-        cat4.checks.push({ label: t('resume_builder.ats.chk_github', 'GitHub URL'), pts: 3, pass: !!data.personalInfo?.githubUrl?.trim(), step: 1 });
-        cat4.checks.push({ label: t('resume_builder.ats.chk_location', 'Location'), pts: 2, pass: !!data.personalInfo?.location?.trim(), step: 1 });
-        cat4.checks.push({ label: t('resume_builder.ats.chk_portfolio', 'Portfolio / Website'), pts: 2, pass: !!data.personalInfo?.portfolioUrl?.trim(), step: 1 });
-        cat4.score = cat4.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
-        results.push(cat4);
-
-        // CAT 5 — Impact & Context (10 pts)
-        const cat5 = { label: t('resume_builder.ats.cat_impact', 'Impact & Context'), max: 10, checks: [] };
-        cat5.checks.push({ label: t('resume_builder.ats.chk_achievement', '1+ Achievement/Award'), pts: 3, pass: data.achievements?.length > 0, step: 6 });
-        const metricRegex = /\d+(%|K|\+| years| months| users| projects)/i;
-        const allDescriptions = [...(data.experience || []).map(e => e.description || ''), ...(data.projects || []).map(p => p.description || '')].join(' ');
-        const hasMetrics = metricRegex.test(allDescriptions);
-        cat5.checks.push({ label: t('resume_builder.ats.chk_metrics', 'Numbers/metrics in descriptions'), pts: 4, pass: hasMetrics, step: 3 });
-        const expSubstantive = (data.experience || []).every(e => (e.description || '').length >= 50);
-        cat5.checks.push({ label: t('resume_builder.ats.chk_substantive', 'Substantive experience descriptions'), pts: 3, pass: expSubstantive || data.experience?.length === 0, step: 3 });
-        cat5.score = cat5.checks.reduce((s, c) => s + (c.pass ? c.pts : 0), 0);
-        results.push(cat5);
-
-        const total = results.reduce((s, c) => s + c.score, 0);
-        return { total, breakdown: results };
-    }, [t]);
-
-    // Recalculate ATS score whenever resume data changes
-    useEffect(() => {
-        const roleSkillNames = [...masteredSkills, ...inProgressSkills, ...suggestedSkills];
-        const { total, breakdown } = calculateATSScore(resumeData, masteredSkills, roleSkillNames);
-        setAtsScore(total);
-        setAtsBreakdown(breakdown);
-    }, [resumeData, masteredSkills, inProgressSkills, suggestedSkills, calculateATSScore]);
 
 
 
@@ -1192,7 +990,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         try {
             const payload = {
                 ...resumeData,
-                atsScore,
                 versionName,
                 targetRole: resumeData.personalInfo?.targetRole || '',
                 template: selectedTemplate,
@@ -1221,7 +1018,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const handleCreateNew = async () => {
         setResumeId(null);
         setVersionName('New Resume');
-        setAtsScore(0);
         setSelectedCareerPath(careerPaths.primary ? { key: 'primary', roleName: careerPaths.primary } : null);
         setCurrentStep(0);
         setPageMode('builder');
@@ -1274,7 +1070,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
     const handleEditResume = (resume) => {
         setResumeId(resume._id);
         setVersionName(resume.versionName || 'My Resume');
-        setAtsScore(resume.atsScore || 0);
 
         if (resume.template) {
             setSelectedTemplate(resume.template);
@@ -1802,7 +1597,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     {t('resume_builder.list_title_1', 'My')} <span className="text-[#1a3884] dark:text-blue-300">{t('resume_builder.list_title_2', 'Resumes')}</span>
                                 </h1>
                                 <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-                                    {t('resume_builder.list_subtitle', 'Manage your tailored resumes and track your ATS optimization scores.')}
+                                    {t('resume_builder.list_subtitle', 'Manage your tailored resumes and keep them ready for every application.')}
                                 </p>
                             </div>
 
@@ -1828,7 +1623,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <IconFileDescription stroke={1.5} className="w-8 h-8 text-[#1a3884] dark:text-blue-400" />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">{t('resume_builder.no_resumes', 'No resumes found')}</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first ATS-optimized resume to get started on your career journey.')}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">{t('resume_builder.no_resumes_desc', 'Create your first resume to get started on your career journey.')}</p>
                                 <button onClick={handleCreateNew} className="px-6 py-2.5 bg-[#1a3884] text-white rounded-xl font-bold text-sm hover:bg-[#132c6b] transition-colors shadow-md">
                                     {t('resume_builder.create_first', 'Create First Resume')}
                                 </button>
@@ -1839,9 +1634,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     <div key={resume._id} className="bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-500/30 transition-all duration-300 overflow-hidden flex flex-col group">
 
                                         <div className="p-6 flex-1 flex flex-col items-center relative">
-                                            {/* Score Ring */}
-                                            <div className="mb-4 relative">
-                                                <CircularScoreRing score={resume.atsScore || 0} size={100} strokeWidth={8} />
+                                            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 dark:bg-[#1a3884]/20 border border-blue-100 dark:border-[#1a3884]/30">
+                                                <IconFileDescription stroke={1.5} className="h-9 w-9 text-[#1a3884] dark:text-blue-400" />
                                             </div>
 
                                             {renamingId === resume._id ? (
@@ -1914,11 +1708,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                         <IconArrowLeft stroke={2} className="w-3.5 h-3.5" /> {t('resume_builder.back', 'Back')}
                     </button>
                     <div className="flex items-center gap-2.5 min-w-0">
-                        {!embedded && (
-                            <div className="w-9 h-9 sm:w-10 sm:h-10 cursor-help shrink-0" title={t('resume_builder.ats_score_title', 'ATS Score: {{score}}/100', { score: atsScore })}>
-                                <CircularScoreRing score={atsScore} size={36} strokeWidth={4} label="" />
-                            </div>
-                        )}
                         <div className="min-w-0">
                             <div className="relative flex items-center group">
                                 <input
@@ -1929,9 +1718,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                 />
                                 <IconPencil stroke={2} className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                             </div>
-                            {!embedded && (
-                                <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate hidden sm:block">{t('resume_builder.ats_score_status', 'ATS Score Status')}</p>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -2035,64 +1821,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                             <div className="min-h-[400px]">
                                 {steps[currentStep].id === 'personal' && (
                                     <div className="space-y-6">
-                                        {/* Career Path Selection Banner/Cards */}
-                                        <div className="bg-white dark:bg-[#002147] p-5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm" style={{ display: (embedded && jobContext) ? 'none' : 'block' }}>
-                                            {careerLoading ? (
-                                                <div className="flex items-center gap-3 text-slate-500">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    <span className="text-sm font-medium">{t('resume_builder.checking_career', 'Checking career direction...')}</span>
-                                                </div>
-                                            ) : careerPaths?.primary ? (
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        {careerLocked ? (
-                                                            <IconLock stroke={2} className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-                                                        ) : (
-                                                            <IconLockOpen stroke={2} className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-                                                        )}
-                                                        <h3 className="text-xs font-bold text-slate-800 dark:text-white">{t('resume_builder.select_target_path', 'Select Target Career Path')}</h3>
-                                                    </div>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">{t('resume_builder.select_path_desc', 'Choose one of your career paths to automatically optimize this resume.')}</p>
-
-                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                                                        {['primary', 'secondary', 'tertiary'].map(key => {
-                                                            const roleName = careerPaths[key];
-                                                            if (!roleName) return null;
-                                                            const isSelected = selectedCareerPath?.key === key;
-                                                            return (
-                                                                <button
-                                                                    key={key}
-                                                                    onClick={() => {
-                                                                        setSelectedCareerPath({ key, roleName });
-                                                                        handleNestedChange('personalInfo', 'targetRole', roleName);
-                                                                    }}
-                                                                    className={`flex flex-col text-left py-2.5 px-3 rounded-xl border transition-all ${isSelected ? 'border-[#1a3884] bg-blue-50/50 dark:bg-[#1a3884]/20 ring-1 ring-[#1a3884]' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
-                                                                >
-                                                                    <span className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`}>{t('resume_builder.path_label', '{{tier}} Path', { tier: t(`resume_builder.tier_${key}`, key) })}</span>
-                                                                    <span className={`text-xs font-bold truncate w-full ${isSelected ? 'text-[#1a3884] dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>{roleName}</span>
-                                                                </button>
-                                                            );
-                                                        })}
-                                                    </div>
-
-                                                    {!careerLocked && (
-                                                        <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-900/50 flex gap-2 items-start">
-                                                            <IconLockOpen className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                                                            <p className="text-[10px] text-amber-700 dark:text-amber-500">{t('resume_builder.eval_note', 'Note: Your career direction is currently in evaluation mode. Your latest analysis will automatically lock as your permanent career path after 14 days or once you use all 5 attempts.')}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/50">
-                                                    <IconLockOpen className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                                                    <div>
-                                                        <h4 className="text-sm font-bold text-amber-800 dark:text-amber-500 mb-1">{t('resume_builder.no_career_path', 'No Career Path Found')}</h4>
-                                                        <p className="text-xs text-amber-700/80 dark:text-amber-500/80">{t('resume_builder.no_career_path_desc', 'Complete your AI Career Analysis in the Career Agent to automatically tailor your resume and skills.')}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
+                                        {/* Target role is set silently from the primary career path
+                                            (see handleCreateNew) — the picker card was removed. */}
                                         <div className="space-y-6 bg-white dark:bg-[#002147] p-4 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm">
 
                                             <div className="group">
@@ -2106,7 +1836,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.target_role', 'Target Role')}</label>
                                                 <div className="relative group/input">
                                                     <Briefcase className="absolute z-10 left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
-                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'Select a career path above')} value={(embedded && jobContext) ? (jobContext.displayTitle || jobContext.title || jobContext.jobTitle || resumeData.personalInfo.targetRole) : resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.target_role_title', 'Target Role is automatically set based on your selected Career Path or Job.')} />
+                                                    <input type="text" placeholder={t('resume_builder.target_role_placeholder', 'Set from your primary career path')} value={(embedded && jobContext) ? (jobContext.displayTitle || jobContext.title || jobContext.jobTitle || resumeData.personalInfo.targetRole) : resumeData.personalInfo.targetRole} readOnly className="w-full pl-9 pr-3 py-3 bg-[#F1F5F9] dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 rounded-2xl outline-none cursor-not-allowed text-slate-700 dark:text-slate-400 transition-all text-sm font-semibold shadow-sm" title={t('resume_builder.target_role_title', 'Target Role is automatically set based on your selected Career Path or Job.')} />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2501,59 +2231,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     </p>
                                 </div>
 
-                                {/* ATS Breakdown Panel */}
-                                <div className="w-full max-w-6xl bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm mb-10 overflow-hidden">
-                                    <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 shrink-0">
-                                                <CircularScoreRing score={atsScore} size={56} strokeWidth={6} label="" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">{t('resume_builder.ats_compliance_score', 'ATS Compliance Score')}</h3>
-                                                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('resume_builder.ats_compliance_desc', "Detailed breakdown of your resume's parser performance")}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        <AnimatePresence>
-                                            {atsBreakdown.map((item, index) => {
-                                                const feedback = item.checks.filter(c => !c.pass).map(c => c.label).join(', ') || t('resume_builder.perfect_score', 'Perfect score! All checks passed.');
-                                                return (
-                                                    <motion.div
-                                                        key={item.label}
-                                                        initial={{ opacity: 0, y: 20 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
-                                                        className="flex flex-col bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-white/5"
-                                                    >
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <span className="text-sm font-bold text-slate-800 dark:text-white">{item.label}</span>
-                                                            <span className={`text-xs font-bold px-2 py-1 rounded-lg ${item.score >= item.max * 0.8 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                                                                {item.score} / {item.max}
-                                                            </span>
-                                                        </div>
-                                                        <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mb-3 overflow-hidden relative">
-                                                            <motion.div
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: `${(item.score / item.max) * 100}%` }}
-                                                                transition={{ delay: 0.2 + (index * 0.1), duration: 1, ease: "easeOut" }}
-                                                                className={`absolute top-0 left-0 h-full rounded-full ${item.score >= item.max * 0.8 ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                                                            />
-                                                        </div>
-                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex-1">
-                                                            {item.score === item.max ? (
-                                                                <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> {feedback}</span>
-                                                            ) : (
-                                                                <span className="flex items-start gap-1"><span className="text-amber-500 mt-0.5 shrink-0">•</span> <span>{t('resume_builder.needs_improvement', 'Needs improvement:')} {feedback}</span></span>
-                                                            )}
-                                                        </p>
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </AnimatePresence>
-                                    </div>
-                                </div>
-
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
                                     {Object.values(ATS_TEMPLATES).map((tpl) => (
                                         <div
@@ -2608,19 +2285,6 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                     >
                                         <ArrowLeft className="w-3.5 h-3.5" /> {t('resume_builder.all_styles', 'All Styles')}
                                     </button>
-
-                                    <div className="h-8 w-px bg-slate-202 dark:bg-white/10 hidden sm:block"></div>
-
-                                    {/* ATS Score Compact View */}
-                                    {!embedded && (
-                                        <div className="flex items-center gap-3">
-                                            <CircularScoreRing score={atsScore} size={40} strokeWidth={4} label="" />
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">{t('resume_builder.ats_score', 'ATS Score')}</span>
-                                                <span className="text-[10px] text-slate-505 dark:text-slate-400">{t('resume_builder.score_updates', 'Score updates as you edit')}</span>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-white/5">
@@ -2686,10 +2350,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                         boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
                                     }}
                                 >
-                                    {(() => {
-                                        const T = (ATS_TEMPLATES[selectedTemplate] || ATS_TEMPLATES.classicBW).Component;
-                                        return <T data={adaptData(resumeData)} />;
-                                    })()}
+                                    {/* id is what handleDownloadPDF captures with html2canvas — it was
+                                        never set anywhere, so the standalone Download button silently
+                                        did nothing. Placed inside the scale() wrapper so the capture is
+                                        the unscaled 794px page. */}
+                                    <div id="resume-preview">
+                                        {(() => {
+                                            const T = (ATS_TEMPLATES[selectedTemplate] || ATS_TEMPLATES.classicBW).Component;
+                                            return <T data={adaptData(resumeData)} />;
+                                        })()}
+                                    </div>
                                 </div>
                             </div>
                         </div>
