@@ -2129,33 +2129,38 @@
     "tools": {
       "resume_builder": {
         "title": "SMAART AI Resume Builder",
-        "meta": "ATS + AI Writing",
+        "meta": "Templates + AI Writing",
         "cta": "Open Resume Builder",
-        "description": "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances."
+        "description": "Build a polished, recruiter-ready resume from five professional templates, with AI-assisted summaries and skill suggestions synced to your career path.",
+        "badge": "Professional"
       },
       "dictionary": {
         "title": "General Dictionary",
-        "meta": "Definitions",
+        "meta": "Definitions + Vocabulary",
         "cta": "Browse Dictionary",
-        "description": "Master professional terminology with our interactive dictionary. Features real-time definitions and daily vocabulary building tools."
+        "description": "Look up definitions, pronunciation, synonyms, antonyms and rhymes, then build your vocabulary with Word of the Day and flashcards.",
+        "badge": "Reference"
       },
       "interview_prep": {
         "title": "Interview Preparation",
         "meta": "Aptitude + Domain + HR",
         "cta": "Start Practicing",
-        "description": "Access role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path."
+        "description": "Practice role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
+        "badge": "Career"
       },
       "notes": {
         "title": "My Notes",
-        "meta": "Cloud Sync + Editor",
+        "meta": "Notes + Checklists + Tags",
         "cta": "Open My Notes",
-        "description": "Capture, organize, and sync your thoughts. Keep track of course insights and personal breakthroughs in one secure, cloud-synced space."
+        "description": "Capture notes or checklists, tag and pin what matters, color-code your workspace, and export or copy anytime — always in sync.",
+        "badge": "Productivity"
       },
       "cgpa_calculator": {
         "title": "CGPA Calculator",
         "meta": "Smart Paste + 3 Methods",
         "cta": "Open Calculator",
-        "description": "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results."
+        "description": "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results.",
+        "badge": "Academic"
       }
     }
   },

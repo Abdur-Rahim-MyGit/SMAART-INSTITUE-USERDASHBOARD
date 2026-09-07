@@ -1,23 +1,31 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+// Material Symbols barrel -- the icon set the dashboard, courses,
+// assessments, dictionary and notes pages use, so this page's glyphs
+// sit at the same weight instead of the heavier Tabler set it used before.
 import {
-  IconBriefcase as BookOpen,
-  IconBook2 as BookText,
+  FileText,
+  BookOpen,
+  Mic,
+  StickyNote,
+  Calculator,
+  Wrench,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
   IconArrowLeft as ArrowLeft,
-  IconArrowRight as ArrowRight,
-  IconFileDescription as FileText,
-  IconNotes as StickyNote,
-  IconListCheck as ListTodo,
-  IconTool as Wrench,
-  IconChevronDown as ChevronDown,
-  IconChevronUp as ChevronUp,
-  IconCalculator as Calculator,
-} from "@tabler/icons-react";
+} from "@/components/icons";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 
 /* ─────────────────────────────────────────────────────────
-   Tool definitions  (Career Agent removed as per request)
+   Tool definitions -- copy kept in sync with what each tool
+   actually does today (Resume Builder dropped its ATS score,
+   Dictionary gained synonyms/antonyms/rhymes, Notes gained
+   checklists/tags/pinning), so the card never promises
+   something the tool doesn't have.
 ───────────────────────────────────────────────────────── */
 const toolkitSections = [
   {
@@ -25,69 +33,48 @@ const toolkitSections = [
     slug: "resume_builder",
     title: "SMAART AI Resume Builder",
     description:
-      "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",
+      "Build a polished, recruiter-ready resume from five professional templates, with AI-assisted summaries and skill suggestions synced to your career path.",
     icon: FileText,
     path: "/dashboard/resume-builder",
     badge: "Professional",
-    badgeColor: "#1a3884",
     cta: "Open Resume Builder",
-    meta: "ATS + AI Writing",
-    detail: "Build polished, recruiter-ready resumes with guided AI support and instant ATS score feedback.",
+    meta: "Templates + AI Writing",
   },
   {
     id: 6,
     slug: "dictionary",
     title: "General Dictionary",
     description:
-      "Master professional terminology with our interactive dictionary. Features real-time definitions and daily vocabulary building tools.",
-    icon: BookText,
+      "Look up definitions, pronunciation, synonyms, antonyms and rhymes, then build your vocabulary with Word of the Day and flashcards.",
+    icon: BookOpen,
     path: "/dashboard/dictionary",
     badge: "Reference",
-    badgeColor: "#1a3884",
     cta: "Browse Dictionary",
-    meta: "Definitions",
-    detail: "Search meanings and vocabulary exercises to strengthen your professional language.",
+    meta: "Definitions + Vocabulary",
   },
   {
     id: 8,
     slug: "interview_prep",
     title: "Interview Preparation",
     description:
-      "Access role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
-    icon: BookOpen,
+      "Practice role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
+    icon: Mic,
     path: "/dashboard/interview-prep",
     badge: "Career",
-    badgeColor: "#1a3884",
     cta: "Start Practicing",
     meta: "Aptitude + Domain + HR",
-    detail: "Get fully equipped with Technical, Domain, and Behavioural questions synced to your Career Agent profile.",
   },
-  // {
-  //   id: 5,
-  //   title: "Library",
-  //   description:
-  //     "Unlock a curated repository of knowledge. Explore essential books, industry articles, and learning tracks tailored to accelerate your personal and professional growth.",
-  //   icon: BookOpen,
-  //   path: "/dashboard/library",
-  //   badge: "Resources",
-  //   badgeColor: "#059669",
-  //   cta: "Explore Library",
-  //   meta: "Books + Articles",
-  //   detail: "Access a hand-picked collection of reading material aligned to career tracks and industry standards.",
-  // },
   {
     id: 7,
     slug: "notes",
     title: "My Notes",
     description:
-      "Capture, organize, and sync your thoughts. Keep track of course insights and personal breakthroughs in one secure, cloud-synced space.",
+      "Capture notes or checklists, tag and pin what matters, color-code your workspace, and export or copy anytime -- always in sync.",
     icon: StickyNote,
     path: "/dashboard/notes",
     badge: "Productivity",
-    badgeColor: "#1a3884",
     cta: "Open My Notes",
-    meta: "Cloud Sync + Editor",
-    detail: "Rich text notes with tagging, categorization, and full-text search — always in sync across devices.",
+    meta: "Notes + Checklists + Tags",
   },
   {
     id: 10,
@@ -98,28 +85,10 @@ const toolkitSections = [
     icon: Calculator,
     path: "/dashboard/cgpa-calculator",
     badge: "Academic",
-    badgeColor: "#1a3884",
     cta: "Open Calculator",
     meta: "Smart Paste + 3 Methods",
-    detail: "Instantly compare multiple grading standards without manual math.",
   },
-  // {
-  //   id: 9,
-  //   title: "To-Do & Calendar",
-  //   description:
-  //     "Stay on top of your daily schedules and study deadlines. Add tasks, toggle active states, set automated reminders, and view everything dynamically inside an interactive monthly calendar sync.",
-  //   icon: ListTodo,
-  //   path: "/dashboard/todos",
-  //   badge: "Productivity",
-  //   badgeColor: "#d97706",
-  //   cta: "Launch Tracker",
-  //   meta: "Task List + Calendar Sync",
-  //   detail: "Manage due tasks, trigger alert notifications, and navigate date-by-date schedules with ease.",
-  // },
 ];
-
-
-
 
 /* ─────────────────────────────────────────────────────────
    Toolkit Card
@@ -135,6 +104,7 @@ const ToolkitCard = ({ section, index }) => {
   const title = t(`smaart_toolkit.tools.${section.slug}.title`, section.title);
   const meta = t(`smaart_toolkit.tools.${section.slug}.meta`, section.meta);
   const cta = t(`smaart_toolkit.tools.${section.slug}.cta`, section.cta);
+  const badge = t(`smaart_toolkit.tools.${section.slug}.badge`, section.badge);
   const description = t(`smaart_toolkit.tools.${section.slug}.description`, section.description);
 
   const isLong = description.length > TRUNCATE_LENGTH;
@@ -145,90 +115,80 @@ const ToolkitCard = ({ section, index }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28 }}
+      layout
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -5 }}
+      transition={{ delay: Math.min(index * 0.07, 0.35), duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.99 }}
       className="group h-full"
     >
       <div
         onClick={() => navigate(section.path)}
-        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-sm transition-all duration-300 hover:border-[#1a3884]/40 hover:shadow-md dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50"
+        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-all duration-300 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] dark:border-white/10 dark:bg-[#0d3a5f]"
       >
-
-        <div className="relative z-10 flex flex-1 flex-col p-5">
-          {/* Header row */}
-          <div className="mb-4 flex items-start justify-between gap-3">
-            {/* Icon */}
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884] text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
-              <Icon size={18} stroke={1.5} />
-            </div>
+        {/* Header row: icon + category badge */}
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm transition-transform duration-300 group-hover:scale-105 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+            <Icon className="h-5 w-5" />
           </div>
-
-          {/* Meta label */}
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1a3884]/60 dark:text-blue-400/60">
-            {meta}
-          </p>
-
-          {/* Title */}
-          <h3 className="mb-2.5 text-[15px] font-bold leading-snug tracking-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-300">
-            {title}
-          </h3>
-
-          {/* Description with Read More */}
-          <div className="mb-1">
-            <p className="text-[13px] leading-[1.7] text-slate-500 dark:text-slate-400">
-              {displayText}
-            </p>
-            {isLong && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpanded((p) => !p);
-                }}
-                className="mt-1 flex items-center gap-1 text-[11.5px] font-semibold text-[#1a3884] transition-opacity hover:opacity-70 dark:text-blue-400"
-              >
-                {expanded ? (
-                  <>
-                    {t("smaart_toolkit.show_less", "Show Less")} <ChevronUp size={13} stroke={1.5} />
-                  </>
-                ) : (
-                  <>
-                    {t("smaart_toolkit.read_more", "Read More")} <ChevronDown size={13} stroke={1.5} />
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-
-
-
-
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          <div className="mt-4 mb-5 border-t border-[#e4edfa] dark:border-[#1a3884]/20" />
-
-          {/* CTA Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(section.path);
-            }}
-            className="flex w-full items-center justify-between rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-3 text-left transition-all duration-300 group-hover:border-[#1a3884] group-hover:bg-[#1a3884] active:scale-[0.98] dark:border-[#1a3884]/25 dark:bg-[#002060]/40 dark:group-hover:bg-[#1a3884]"
-          >
-            <div>
-              <p className="text-[13px] font-semibold text-[#0d1f4e] transition-colors group-hover:text-white dark:text-slate-200 dark:group-hover:text-white">
-                {cta}
-              </p>
-              <p className="text-[11px] text-slate-400 transition-colors group-hover:text-blue-100 dark:text-slate-500 dark:group-hover:text-blue-200">
-                {t("smaart_toolkit.launch_from_toolkit", "Launch from your toolkit")}
-              </p>
-            </div>
-            <ArrowRight stroke={1.5} className="h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-white" />
-          </button>
+          <span className="rounded-full border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
+            {badge}
+          </span>
         </div>
+
+        {/* Meta label */}
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
+          {meta}
+        </p>
+
+        {/* Title */}
+        <h3 className="mb-2.5 text-[15px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
+          {title}
+        </h3>
+
+        {/* Description with Read More */}
+        <div className="mb-2">
+          <motion.p layout="position" className="text-[13px] leading-[1.7] text-[#35566b] dark:text-slate-400">
+            {displayText}
+          </motion.p>
+          {isLong && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((p) => !p);
+              }}
+              className="mt-1.5 flex items-center gap-1 text-[11.5px] font-bold text-[#045C9A] transition-all hover:gap-1.5 dark:text-[#A6D7E8]"
+            >
+              {expanded ? (
+                <>
+                  {t("smaart_toolkit.show_less", "Show Less")} <ChevronUp className="h-3.5 w-3.5" />
+                </>
+              ) : (
+                <>
+                  {t("smaart_toolkit.read_more", "Read More")} <ChevronDown className="h-3.5 w-3.5" />
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        <div className="mt-4 mb-4 border-t border-[#EAF7FD] dark:border-white/10" />
+
+        {/* CTA Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(section.path);
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-4 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-[#072036] active:scale-[0.98]"
+        >
+          {cta}
+          <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover:translate-x-1" />
+        </button>
       </div>
     </motion.div>
   );
@@ -242,61 +202,88 @@ const SMAArtToolkit = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-transparent pb-12 transition-colors duration-300">
-      <div className="mx-auto max-w-7xl p-8">
+    <PageTransition>
+    <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 transition-colors duration-300">
+      {/* Same ambient layer as the dashboard, courses, assessments,
+          dictionary and notes pages */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+        <NeuralBackground theme={typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light"} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pt-6">
 
         {/* Back Button - Mobile Only */}
         <div className="mb-4 md:hidden">
           <button
             onClick={() => navigate("/dashboard")}
-            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+            className="group flex items-center gap-3 w-fit"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-              <ArrowLeft stroke={1.5} className="h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5">
+              <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
             </div>
-            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </span>
           </button>
         </div>
 
-        {/* ── Hero Header ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
+        {/* Hero -- same structure, padding and type scale as the
+            courses/assessments/dictionary/notes hero. */}
+        <motion.section
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative mb-6 w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
         >
-          <div className="relative z-10">
-            {/* Title */}
-            <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-              {t("smaart_toolkit.title_1", "SMAART")} <span className="text-[#1a3884] dark:text-blue-300">{t("smaart_toolkit.title_2", "Toolkit")}</span>
-            </h1>
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-            {/* Subtitle */}
-            <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-              {t("smaart_toolkit.subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools.")}
-            </p>
+          <div className="relative z-10 flex items-center gap-4 px-6 py-5 sm:px-8 sm:py-6">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+              <Wrench className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1
+                className="text-base font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-lg"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                {t("smaart_toolkit.title_1", "SMAART")}{" "}
+                <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("smaart_toolkit.title_2", "Toolkit")}</span>
+              </h1>
+              <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400">
+                {t("smaart_toolkit.subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools.")}
+              </p>
+            </div>
           </div>
-        </motion.div>
+        </motion.section>
 
-        {/* ── Section label ── */}
-        <div className="mb-4 flex items-center gap-3">
-          <Wrench stroke={1.5} className="h-4 w-4 text-[#1a3884]/60 dark:text-blue-400/60" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/60 dark:text-blue-400/60">
+        {/* Section label */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+          className="mb-4 flex items-center gap-3"
+        >
+          <Wrench className="h-4 w-4 text-[#045C9A]/60 dark:text-[#A6D7E8]/60" />
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#045C9A]/60 dark:text-[#A6D7E8]/60">
             {t("smaart_toolkit.your_tools", "Your Tools")}
           </p>
-          <div className="h-px flex-1 bg-[#d8e6f7] dark:bg-[#1a3884]/20" />
-        </div>
+          <div className="h-px flex-1 bg-[#d7ebf5] dark:bg-white/10" />
+        </motion.div>
 
-        {/* ── Tool Cards Grid ── */}
+        {/* Tool Cards Grid */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {toolkitSections.map((section, index) => (
             <ToolkitCard key={section.id} section={section} index={index} />
           ))}
         </div>
 
-
       </div>
     </div>
+    </PageTransition>
   );
 };
 

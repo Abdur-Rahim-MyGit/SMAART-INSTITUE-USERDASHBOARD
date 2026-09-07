@@ -26,6 +26,7 @@ export const ICON_NAMES = Object.freeze([
   "badge",
   "bolt",
   "bug_report",
+  "calculate",
   "calendar_month",
   "call",
   "campaign",
@@ -176,6 +177,7 @@ export const Brain = /*#__PURE__*/ icon("Brain", "psychology");
 export const Briefcase = /*#__PURE__*/ icon("Briefcase", "work");
 export const BritishCouncilIcon = /*#__PURE__*/ icon("BritishCouncilIcon", "record_voice_over");
 export const Building = /*#__PURE__*/ icon("Building", "apartment");
+export const Calculator = /*#__PURE__*/ icon("Calculator", "calculate");
 export const Calendar = /*#__PURE__*/ icon("Calendar", "calendar_month");
 export const Camera = /*#__PURE__*/ icon("Camera", "photo_camera");
 export const Captions = /*#__PURE__*/ icon("Captions", "closed_caption");
