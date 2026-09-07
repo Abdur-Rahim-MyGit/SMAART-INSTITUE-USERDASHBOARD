@@ -2,22 +2,28 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-    IconPlus as Plus, 
-    IconTrash as Trash2, 
-    IconSearch as Search, 
-    IconDeviceFloppy as Save, 
-    IconX as X, 
-    IconClock as Clock, 
-    IconSparkles as Sparkles, 
-    IconArrowLeft as ArrowLeft, 
-    IconNote as StickyNote 
-} from "@tabler/icons-react";
+// Material Symbols barrel -- the icon set the dashboard, courses,
+// assessments and dictionary pages use, so this page's glyphs sit at
+// the same weight instead of the heavier Tabler set it used before.
+import {
+    Plus,
+    Trash2,
+    Search,
+    Save,
+    X,
+    Clock,
+    IconArrowLeft as ArrowLeft,
+    StickyNote,
+} from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { CardSkeleton } from "@/components/SkeletonPatterns";
 import { notesAPI } from "@/services/api";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 
-// Color palette — using responsive Tailwind classes for proper dark mode support
+// Color palette -- these are the student's own sticky-note tags, not
+// brand color, so the hues stay; only the text on top of them needs a
+// dark-mode pairing so a dark tint doesn't swallow dark navy text.
 const COLORS = [
   { id: "yellow",  label: "Yellow",  twClasses: "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700/50", hex: "#fde047" },
   { id: "blue",    label: "Blue",    twClasses: "bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700/50", hex: "#93c5fd" },
@@ -41,6 +47,20 @@ const MyNotes = () => {
     const [currentNote, setCurrentNote] = useState({ id: null, title: "", content: "", colorId: DEFAULT_COLOR.id });
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // The constellation canvas paints from a prop, not CSS, so it has to be
+    // told when the dark class flips -- same observer the dashboard uses.
+    const [isDarkTheme, setIsDarkTheme] = useState(
+        typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+    );
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDarkTheme(document.documentElement.classList.contains("dark"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const userData = sessionStorage.getItem("user");
@@ -148,59 +168,85 @@ const MyNotes = () => {
     const activeColor = getColorById(currentNote.colorId);
 
     return (
-        <div className="min-h-screen bg-transparent pb-12 pt-0 transition-colors duration-300">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <PageTransition>
+        <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 transition-colors duration-300">
+            {/* Same ambient layer as the dashboard, courses, assessments and
+                dictionary pages */}
+            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+                <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+            </div>
+            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+                <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+                <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+            </div>
+
+            <div className="relative z-10 mx-auto max-w-7xl px-4 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pt-6">
 
                 {/* Back button */}
                 <motion.button
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     onClick={() => navigate("/dashboard/smaart-toolkit")}
-                    className="group mt-4 mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
+                    className="group mb-5 flex items-center gap-3 w-fit selection:bg-transparent"
                 >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
-                        <ArrowLeft stroke={1.5} className="h-4 w-4" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5">
+                        <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
                     </div>
-                    {t("my_notes.back_to_toolkit", "Back to Toolkit")}
+                    <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                        {t("my_notes.back_to_toolkit", "Back to Toolkit")}
+                    </span>
                 </motion.button>
 
-                {/* Header Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
+                {/* Hero -- same structure, padding and type scale as the
+                    courses/assessments/dictionary hero, so they all read as
+                    one product. */}
+                <motion.section
+                    initial={{ opacity: 0, y: -16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
+                    transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="relative mb-6 w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
                 >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                                {t("my_notes.header.title_my", "My")} <span className="text-[#1a3884] dark:text-blue-300">{t("my_notes.header.title_notes", "Notes")}</span>
-                            </h1>
-                            <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-                                {t("my_notes.header.description", "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.")}
-                            </p>
+                    <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+
+                    <div className="relative z-10 flex flex-col gap-4 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex min-w-0 items-center gap-4">
+                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                                <StickyNote className="h-6 w-6" />
+                            </div>
+                            <div className="min-w-0">
+                                <h1
+                                    className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                                    style={{ letterSpacing: "-0.02em" }}
+                                >
+                                    {t("my_notes.header.title_my", "My")}{" "}
+                                    <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("my_notes.header.title_notes", "Notes")}</span>
+                                </h1>
+                                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                    {t("my_notes.header.description", "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.")}
+                                </p>
+                            </div>
                         </div>
 
                         {/* Search + New Note */}
                         <div className="flex shrink-0 items-center gap-2">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 pointer-events-none text-slate-400" />
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                                 <input
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder={t("my_notes.header.search_placeholder", "Search your library...")}
-                                    className="w-44 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] py-2 pl-9 pr-3 text-[12.5px] font-medium text-[#0d1f4e] outline-none transition-all focus:border-[#1a3884] focus:w-56 focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500"
+                                    className="w-44 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] py-2 pl-9 pr-3 text-[12.5px] font-medium text-[#072036] outline-none transition-all focus:w-56 focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
                                 />
                             </div>
                             <button
                                 onClick={openNewNote}
-                                className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
+                                className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] active:scale-95"
                             >
                                 <Plus className="h-4 w-4" /> {t("my_notes.header.new_note", "New Note")}
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                </motion.section>
 
                 {/* Notes Grid */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -212,12 +258,12 @@ const MyNotes = () => {
                             <motion.div
                                 layout
                                 onClick={openNewNote}
-                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#d8e6f7] transition-all hover:border-[#1a3884]/50 hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:hover:bg-[#1a3884]/10"
+                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#d7ebf5] transition-all hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:border-white/10 dark:hover:bg-[#045C9A]/10"
                             >
-                                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef4ff] transition-transform group-hover:scale-110 dark:bg-[#1a3884]/15">
-                                    <Plus className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF7FD] transition-transform group-hover:scale-110 dark:bg-[#045C9A]/20">
+                                    <Plus className="h-5 w-5 text-[#045C9A] dark:text-[#A6D7E8]" />
                                 </div>
-                                <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#1a3884] dark:text-slate-600 dark:group-hover:text-blue-400">{t("my_notes.grid.create_new", "Create New Note")}</p>
+                                <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#045C9A] dark:text-slate-500 dark:group-hover:text-[#A6D7E8]">{t("my_notes.grid.create_new", "Create New Note")}</p>
                             </motion.div>
 
                             {filteredNotes.map((note) => {
@@ -239,19 +285,19 @@ const MyNotes = () => {
                                                 </span>
                                             )}
                                         </div>
-                                        <h3 className="mb-1.5 line-clamp-1 text-[14px] font-bold text-[#0d1f4e] dark:text-white">
+                                        <h3 className="mb-1.5 line-clamp-1 text-[14px] font-bold text-[#072036] dark:text-white">
                                             {note.title}
                                         </h3>
-                                        <p className="mb-3 line-clamp-5 flex-1 whitespace-pre-wrap text-[12.5px] leading-relaxed text-slate-600">
+                                        <p className="mb-3 line-clamp-5 flex-1 whitespace-pre-wrap text-[12.5px] leading-relaxed text-slate-600 dark:text-slate-300">
                                             {note.content}
                                         </p>
-                                        <div className="mt-auto flex items-center justify-between border-t border-black/5 pt-3">
-                                            <span className="flex items-center gap-1 text-[10.5px] font-medium text-slate-400">
+                                        <div className="mt-auto flex items-center justify-between border-t border-black/5 pt-3 dark:border-white/10">
+                                            <span className="flex items-center gap-1 text-[10.5px] font-medium text-slate-500 dark:text-slate-400">
                                                 <Clock className="h-3 w-3" /> {formatDate(note.updatedAt)}
                                             </span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id, note.courseId); }}
-                                                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-100 hover:text-red-500"
+                                                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-100 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-500/15 dark:hover:text-rose-300"
                                                 title={t("my_notes.grid.delete_tooltip", "Delete note")}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
@@ -266,10 +312,10 @@ const MyNotes = () => {
 
                 {filteredNotes.length === 0 && !loading && searchQuery && (
                     <div className="py-16 text-center">
-                        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
-                            <StickyNote className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
+                        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20">
+                            <StickyNote className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
                         </div>
-                        <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                        <p className="text-[13px] font-semibold text-[#35566b] dark:text-slate-400">
                             {t("my_notes.grid.no_notes_matching", "No notes found matching \"{{query}}\"", { query: searchQuery })}
                         </p>
                     </div>
@@ -297,7 +343,7 @@ const MyNotes = () => {
                             {/* Modal top bar */}
                             <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 px-5 py-3.5">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">
+                                    <span className="text-[13px] font-bold text-[#072036] dark:text-white">
                                         {currentNote.id ? t("my_notes.editor.edit_title", "Edit Note") : t("my_notes.editor.new_title", "New Note")}
                                     </span>
                                     {/* Color picker swatches */}
@@ -310,8 +356,8 @@ const MyNotes = () => {
                                                 className="relative h-5 w-5 rounded-full border-2 transition-transform hover:scale-110"
                                                 style={{
                                                     backgroundColor: c.hex,
-                                                    borderColor: currentNote.colorId === c.id ? "#1a3884" : "transparent",
-                                                    boxShadow: currentNote.colorId === c.id ? "0 0 0 1.5px #1a3884" : "0 0 0 1px rgba(0,0,0,0.1)",
+                                                    borderColor: currentNote.colorId === c.id ? "#045C9A" : "transparent",
+                                                    boxShadow: currentNote.colorId === c.id ? "0 0 0 1.5px #045C9A" : "0 0 0 1px rgba(0,0,0,0.1)",
                                                 }}
                                             />
                                         ))}
@@ -319,7 +365,7 @@ const MyNotes = () => {
                                 </div>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-600"
+                                    className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-600 dark:hover:bg-white/10 dark:hover:text-slate-200"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>
@@ -328,13 +374,13 @@ const MyNotes = () => {
                             {/* Note content */}
                             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3" style={{ maxHeight: "60vh" }}>
                                 <input
-                                    className="w-full bg-transparent text-[18px] font-bold text-[#0d1f4e] placeholder:text-slate-300 outline-none"
+                                    className="w-full bg-transparent text-[18px] font-bold text-[#072036] placeholder:text-slate-400 outline-none dark:text-white dark:placeholder:text-slate-500"
                                     placeholder={t("my_notes.editor.placeholder_title", "Title")}
                                     value={currentNote.title}
                                     onChange={(e) => setCurrentNote(prev => ({ ...prev, title: e.target.value }))}
                                 />
                                 <textarea
-                                    className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-300 outline-none"
+                                    className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-400 outline-none dark:text-slate-200 dark:placeholder:text-slate-500"
                                     placeholder={t("my_notes.editor.placeholder_content", "Start typing...")}
                                     rows={10}
                                     value={currentNote.content}
@@ -349,7 +395,7 @@ const MyNotes = () => {
                                 </span>
                                 <button
                                     onClick={handleSaveNote}
-                                    className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
+                                    className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] active:scale-95"
                                 >
                                     <Save className="h-3.5 w-3.5" /> {t("my_notes.editor.save_note", "Save Note")}
                                 </button>
@@ -359,6 +405,7 @@ const MyNotes = () => {
                 )}
             </AnimatePresence>
         </div>
+        </PageTransition>
     );
 };
 
