@@ -336,19 +336,19 @@ const MyNotes = () => {
                     <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
                     <div className="relative z-10 flex flex-col gap-4 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
-                        <div className="flex min-w-0 items-center gap-4">
-                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-                                <StickyNote className="h-6 w-6" />
+                        <div className="flex min-w-0 items-center gap-3">
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                                <StickyNote className="h-5 w-5" />
                             </div>
                             <div className="min-w-0">
                                 <h1
-                                    className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                                    className="text-base font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-lg"
                                     style={{ letterSpacing: "-0.02em" }}
                                 >
                                     {t("my_notes.header.title_my", "My")}{" "}
                                     <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("my_notes.header.title_notes", "Notes")}</span>
                                 </h1>
-                                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400">
                                     {t("my_notes.header.description", "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.")}
                                 </p>
                             </div>
