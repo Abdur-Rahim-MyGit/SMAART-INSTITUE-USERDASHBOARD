@@ -375,12 +375,13 @@ const MyNotes = () => {
                                     className="w-44 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] py-2 pl-9 pr-3 text-[12.5px] font-medium text-[#072036] outline-none transition-all focus:w-56 focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-500"
                                 />
                             </div>
-                            <button
+                            <motion.button
+                                whileTap={{ scale: 0.95 }}
                                 onClick={openNewNote}
-                                className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] active:scale-95"
+                                className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-colors hover:bg-[#072036]"
                             >
                                 <Plus className="h-4 w-4" /> {t("my_notes.header.new_note", "New Note")}
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
                 </motion.section>
@@ -394,8 +395,9 @@ const MyNotes = () => {
                             {/* Create New tile */}
                             <motion.div
                                 layout
+                                whileTap={{ scale: 0.97 }}
                                 onClick={openNewNote}
-                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#d7ebf5] transition-all hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:border-white/10 dark:hover:bg-[#045C9A]/10"
+                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#d7ebf5] transition-colors hover:border-[#045C9A]/50 hover:bg-[#EAF7FD] dark:border-white/10 dark:hover:bg-[#045C9A]/10"
                             >
                                 <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF7FD] transition-transform group-hover:scale-110 dark:bg-[#045C9A]/20">
                                     <Plus className="h-5 w-5 text-[#045C9A] dark:text-[#A6D7E8]" />
@@ -403,17 +405,20 @@ const MyNotes = () => {
                                 <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#045C9A] dark:text-slate-500 dark:group-hover:text-[#A6D7E8]">{t("my_notes.grid.create_new", "Create New Note")}</p>
                             </motion.div>
 
-                            {sortedNotes.map((note) => {
+                            {sortedNotes.map((note, index) => {
                                 const nc = getColorById(note.colorId);
                                 return (
                                     <motion.div
                                         key={note.id}
                                         layout
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.92 }}
+                                        transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                                        whileHover={{ y: -3 }}
+                                        whileTap={{ scale: 0.98 }}
                                         onClick={() => openEditNote(note)}
-                                        className={`group relative flex min-h-[180px] cursor-pointer flex-col rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${nc.twClasses} ${note.pinned ? "ring-1 ring-amber-400/60" : ""}`}
+                                        className={`group relative flex min-h-[180px] cursor-pointer flex-col rounded-2xl border p-4 shadow-sm transition-shadow duration-300 hover:shadow-md ${nc.twClasses} ${note.pinned ? "ring-1 ring-amber-400/60" : ""}`}
                                     >
                                         <div className="mb-1.5 flex items-center gap-2">
                                             {note.isCourseNote && (
@@ -426,13 +431,22 @@ const MyNotes = () => {
                                                     <Checklist className="h-2.5 w-2.5" /> {t("my_notes.grid.checklist_badge", "Checklist")}
                                                 </span>
                                             )}
-                                            <button
+                                            <motion.button
+                                                whileTap={{ scale: 0.8 }}
                                                 onClick={(e) => handleTogglePin(e, note)}
                                                 title={note.pinned ? t("my_notes.grid.unpin_tooltip", "Unpin") : t("my_notes.grid.pin_tooltip", "Pin to top")}
                                                 className={`ml-auto flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg transition-colors ${note.pinned ? "text-amber-500" : "text-slate-300 hover:text-amber-500 dark:text-slate-500 dark:hover:text-amber-400"}`}
                                             >
-                                                <Pin className="h-3.5 w-3.5" style={note.pinned ? { fill: "currentColor" } : undefined} />
-                                            </button>
+                                                <motion.span
+                                                    key={note.pinned ? "on" : "off"}
+                                                    initial={{ scale: 0.5, rotate: -15 }}
+                                                    animate={{ scale: 1, rotate: 0 }}
+                                                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                                                    className="flex"
+                                                >
+                                                    <Pin className="h-3.5 w-3.5" style={note.pinned ? { fill: "currentColor" } : undefined} />
+                                                </motion.span>
+                                            </motion.button>
                                         </div>
                                         <h3 className="mb-1.5 line-clamp-1 text-[14px] font-bold text-[#072036] dark:text-white">
                                             {note.title}
@@ -484,13 +498,14 @@ const MyNotes = () => {
                                             <span className="flex items-center gap-1 text-[10.5px] font-medium text-slate-500 dark:text-slate-400">
                                                 <Clock className="h-3 w-3" /> {formatDate(note.updatedAt)}
                                             </span>
-                                            <button
+                                            <motion.button
+                                                whileTap={{ scale: 0.85 }}
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id, note.courseId); }}
                                                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-100 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-500/15 dark:hover:text-rose-300"
                                                 title={t("my_notes.grid.delete_tooltip", "Delete note")}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
-                                            </button>
+                                            </motion.button>
                                         </div>
                                     </motion.div>
                                 );
@@ -499,16 +514,24 @@ const MyNotes = () => {
                     )}
                 </div>
 
-                {sortedNotes.length === 0 && !loading && searchQuery && (
-                    <div className="py-16 text-center">
-                        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20">
-                            <StickyNote className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
-                        </div>
-                        <p className="text-[13px] font-semibold text-[#35566b] dark:text-slate-400">
-                            {t("my_notes.grid.no_notes_matching", "No notes found matching \"{{query}}\"", { query: searchQuery })}
-                        </p>
-                    </div>
-                )}
+                <AnimatePresence>
+                    {sortedNotes.length === 0 && !loading && searchQuery && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.25 }}
+                            className="py-16 text-center"
+                        >
+                            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20">
+                                <StickyNote className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
+                            </div>
+                            <p className="text-[13px] font-semibold text-[#35566b] dark:text-slate-400">
+                                {t("my_notes.grid.no_notes_matching", "No notes found matching \"{{query}}\"", { query: searchQuery })}
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Editor Modal */}
@@ -553,20 +576,30 @@ const MyNotes = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <button
+                                    <motion.button
                                         type="button"
+                                        whileTap={{ scale: 0.85 }}
                                         onClick={() => setCurrentNote(prev => ({ ...prev, pinned: !prev.pinned }))}
                                         title={currentNote.pinned ? t("my_notes.grid.unpin_tooltip", "Unpin") : t("my_notes.grid.pin_tooltip", "Pin to top")}
                                         className={`rounded-lg p-1.5 transition-colors ${currentNote.pinned ? "text-amber-500" : "text-slate-400 hover:bg-black/5 hover:text-amber-500 dark:hover:bg-white/10"}`}
                                     >
-                                        <Pin className="h-4 w-4" style={currentNote.pinned ? { fill: "currentColor" } : undefined} />
-                                    </button>
-                                    <button
+                                        <motion.span
+                                            key={currentNote.pinned ? "on" : "off"}
+                                            initial={{ scale: 0.5, rotate: -15 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                                            className="flex"
+                                        >
+                                            <Pin className="h-4 w-4" style={currentNote.pinned ? { fill: "currentColor" } : undefined} />
+                                        </motion.span>
+                                    </motion.button>
+                                    <motion.button
+                                        whileTap={{ scale: 0.9 }}
                                         onClick={() => setShowModal(false)}
                                         className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-600 dark:hover:bg-white/10 dark:hover:text-slate-200"
                                     >
                                         <X className="h-4 w-4" />
-                                    </button>
+                                    </motion.button>
                                 </div>
                             </div>
 
@@ -576,9 +609,18 @@ const MyNotes = () => {
                                     <button
                                         type="button"
                                         onClick={() => setCurrentNote(prev => ({ ...prev, type: "text" }))}
-                                        className={`flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold transition-colors ${currentNote.type === "text" ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#072036] dark:text-[#A6D7E8]" : "text-slate-500 dark:text-slate-400"}`}
+                                        className="relative flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold text-slate-500 transition-colors dark:text-slate-400"
                                     >
-                                        <StickyNote className="h-3 w-3" /> {t("my_notes.editor.type_note", "Note")}
+                                        {currentNote.type === "text" && (
+                                            <motion.span
+                                                layoutId="noteTypeActiveTab"
+                                                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                                                className="absolute inset-0 rounded-md bg-white shadow-sm dark:bg-[#072036]"
+                                            />
+                                        )}
+                                        <span className={`relative flex items-center gap-1 ${currentNote.type === "text" ? "text-[#045C9A] dark:text-[#A6D7E8]" : ""}`}>
+                                            <StickyNote className="h-3 w-3" /> {t("my_notes.editor.type_note", "Note")}
+                                        </span>
                                     </button>
                                     <button
                                         type="button"
@@ -587,21 +629,40 @@ const MyNotes = () => {
                                             type: "checklist",
                                             checklistItems: prev.checklistItems && prev.checklistItems.length > 0 ? prev.checklistItems : [{ text: "", done: false }],
                                         }))}
-                                        className={`flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold transition-colors ${currentNote.type === "checklist" ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#072036] dark:text-[#A6D7E8]" : "text-slate-500 dark:text-slate-400"}`}
+                                        className="relative flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold text-slate-500 transition-colors dark:text-slate-400"
                                     >
-                                        <Checklist className="h-3 w-3" /> {t("my_notes.editor.type_checklist", "Checklist")}
+                                        {currentNote.type === "checklist" && (
+                                            <motion.span
+                                                layoutId="noteTypeActiveTab"
+                                                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                                                className="absolute inset-0 rounded-md bg-white shadow-sm dark:bg-[#072036]"
+                                            />
+                                        )}
+                                        <span className={`relative flex items-center gap-1 ${currentNote.type === "checklist" ? "text-[#045C9A] dark:text-[#A6D7E8]" : ""}`}>
+                                            <Checklist className="h-3 w-3" /> {t("my_notes.editor.type_checklist", "Checklist")}
+                                        </span>
                                     </button>
                                 </div>
 
                                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-                                    {(currentNote.tags || []).map((tag) => (
-                                        <span key={tag} className="flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5 text-[10.5px] font-bold text-slate-600 dark:bg-white/10 dark:text-slate-300">
-                                            #{tag}
-                                            <button type="button" onClick={() => removeTag(tag)} className="text-slate-400 hover:text-rose-500">
-                                                <X className="h-2.5 w-2.5" />
-                                            </button>
-                                        </span>
-                                    ))}
+                                    <AnimatePresence initial={false}>
+                                        {(currentNote.tags || []).map((tag) => (
+                                            <motion.span
+                                                key={tag}
+                                                layout
+                                                initial={{ opacity: 0, scale: 0.7 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.7 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5 text-[10.5px] font-bold text-slate-600 dark:bg-white/10 dark:text-slate-300"
+                                            >
+                                                #{tag}
+                                                <button type="button" onClick={() => removeTag(tag)} className="text-slate-400 hover:text-rose-500">
+                                                    <X className="h-2.5 w-2.5" />
+                                                </button>
+                                            </motion.span>
+                                        ))}
+                                    </AnimatePresence>
                                     <input
                                         value={tagInput}
                                         onChange={(e) => setTagInput(e.target.value)}
@@ -622,49 +683,79 @@ const MyNotes = () => {
                                     onChange={(e) => setCurrentNote(prev => ({ ...prev, title: e.target.value }))}
                                 />
 
-                                {currentNote.type === "checklist" ? (
-                                    <div className="space-y-1.5">
-                                        {(currentNote.checklistItems || []).map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleChecklistItem(idx)}
-                                                    className={`flex h-[1.125rem] w-[1.125rem] flex-shrink-0 items-center justify-center rounded border transition-colors ${item.done ? "border-[#045C9A] bg-[#045C9A] text-white" : "border-slate-400 dark:border-slate-500"}`}
-                                                >
-                                                    {item.done && <Check className="h-3 w-3" />}
-                                                </button>
-                                                <input
-                                                    value={item.text}
-                                                    onChange={(e) => updateChecklistItem(idx, e.target.value)}
-                                                    placeholder={t("my_notes.editor.checklist_placeholder", "List item…")}
-                                                    className={`flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 ${item.done ? "text-slate-400 line-through" : "text-slate-700 dark:text-slate-200"}`}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeChecklistItem(idx)}
-                                                    className="flex-shrink-0 text-slate-300 transition-colors hover:text-rose-500 dark:text-slate-600"
-                                                >
-                                                    <X className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                        <button
-                                            type="button"
-                                            onClick={addChecklistItem}
-                                            className="flex items-center gap-1.5 text-xs font-bold text-[#045C9A] transition-opacity hover:opacity-75 dark:text-[#A6D7E8]"
+                                <AnimatePresence mode="wait">
+                                    {currentNote.type === "checklist" ? (
+                                        <motion.div
+                                            key="checklist"
+                                            initial={{ opacity: 0, y: 4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -4 }}
+                                            transition={{ duration: 0.18 }}
+                                            className="space-y-1.5"
                                         >
-                                            <Plus className="h-3.5 w-3.5" /> {t("my_notes.editor.add_item", "Add item")}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <textarea
-                                        className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-400 outline-none dark:text-slate-200 dark:placeholder:text-slate-500"
-                                        placeholder={t("my_notes.editor.placeholder_content", "Start typing...")}
-                                        rows={10}
-                                        value={currentNote.content}
-                                        onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
-                                    />
-                                )}
+                                            <AnimatePresence initial={false}>
+                                                {(currentNote.checklistItems || []).map((item, idx) => (
+                                                    <motion.div
+                                                        key={idx}
+                                                        layout
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: 1, height: "auto" }}
+                                                        exit={{ opacity: 0, height: 0 }}
+                                                        transition={{ duration: 0.18 }}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleChecklistItem(idx)}
+                                                            className={`flex h-[1.125rem] w-[1.125rem] flex-shrink-0 items-center justify-center rounded border transition-colors ${item.done ? "border-[#045C9A] bg-[#045C9A] text-white" : "border-slate-400 dark:border-slate-500"}`}
+                                                        >
+                                                            <AnimatePresence>
+                                                                {item.done && (
+                                                                    <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.15 }} className="flex">
+                                                                        <Check className="h-3 w-3" />
+                                                                    </motion.span>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </button>
+                                                        <input
+                                                            value={item.text}
+                                                            onChange={(e) => updateChecklistItem(idx, e.target.value)}
+                                                            placeholder={t("my_notes.editor.checklist_placeholder", "List item…")}
+                                                            className={`flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 ${item.done ? "text-slate-400 line-through" : "text-slate-700 dark:text-slate-200"}`}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeChecklistItem(idx)}
+                                                            className="flex-shrink-0 text-slate-300 transition-colors hover:text-rose-500 dark:text-slate-600"
+                                                        >
+                                                            <X className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
+                                            <button
+                                                type="button"
+                                                onClick={addChecklistItem}
+                                                className="flex items-center gap-1.5 text-xs font-bold text-[#045C9A] transition-opacity hover:opacity-75 dark:text-[#A6D7E8]"
+                                            >
+                                                <Plus className="h-3.5 w-3.5" /> {t("my_notes.editor.add_item", "Add item")}
+                                            </button>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.textarea
+                                            key="text"
+                                            initial={{ opacity: 0, y: 4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -4 }}
+                                            transition={{ duration: 0.18 }}
+                                            className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-400 outline-none dark:text-slate-200 dark:placeholder:text-slate-500"
+                                            placeholder={t("my_notes.editor.placeholder_content", "Start typing...")}
+                                            rows={10}
+                                            value={currentNote.content}
+                                            onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
+                                        />
+                                    )}
+                                </AnimatePresence>
                             </div>
 
                             {/* Modal footer */}
@@ -673,28 +764,31 @@ const MyNotes = () => {
                                     {currentNote.updatedAt && t("my_notes.editor.last_edited", "Last edited: {{date}}", { date: formatDate(currentNote.updatedAt) })}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                    <button
+                                    <motion.button
                                         type="button"
+                                        whileTap={{ scale: 0.9 }}
                                         onClick={() => handleCopyNote(currentNote)}
                                         title={t("my_notes.editor.copy_tooltip", "Copy to clipboard")}
                                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-black/10 text-slate-500 transition-colors hover:bg-black/5 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10"
                                     >
                                         <Copy className="h-3.5 w-3.5" />
-                                    </button>
-                                    <button
+                                    </motion.button>
+                                    <motion.button
                                         type="button"
+                                        whileTap={{ scale: 0.9 }}
                                         onClick={() => handleDownloadNote(currentNote)}
                                         title={t("my_notes.editor.download_tooltip", "Download as .txt")}
                                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-black/10 text-slate-500 transition-colors hover:bg-black/5 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10"
                                     >
                                         <Download className="h-3.5 w-3.5" />
-                                    </button>
-                                    <button
+                                    </motion.button>
+                                    <motion.button
+                                        whileTap={{ scale: 0.95 }}
                                         onClick={handleSaveNote}
-                                        className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-all hover:bg-[#072036] active:scale-95"
+                                        className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-colors hover:bg-[#072036]"
                                     >
                                         <Save className="h-3.5 w-3.5" /> {t("my_notes.editor.save_note", "Save Note")}
-                                    </button>
+                                    </motion.button>
                                 </div>
                             </div>
                         </motion.div>

@@ -475,11 +475,19 @@ const GeneralDictionary = () => {
           {/* LEFT: Results */}
           <div className="space-y-4 lg:col-span-2">
 
-            {/* Blocked word */}
+            {/* Every state below lives in one AnimatePresence so switching
+                between them (blocked -> error -> empty -> loading -> result)
+                cross-fades instead of instantly swapping. The guard
+                conditions are mutually exclusive, so exactly one key
+                mounts at a time. */}
+            <AnimatePresence mode="wait">
             {blocked && (
               <motion.div
+                key="blocked"
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="rounded-2xl border border-[#d7ebf5] bg-white p-6 text-center dark:border-white/10 dark:bg-[#0d3a5f]"
               >
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#EAF7FD] dark:bg-[#045C9A]/20">
@@ -498,11 +506,13 @@ const GeneralDictionary = () => {
               </motion.div>
             )}
 
-            {/* Error */}
             {error && !blocked && (
               <motion.div
+                key="error"
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="rounded-2xl border border-[#d7ebf5] bg-white p-6 text-center dark:border-white/10 dark:bg-[#0d3a5f]"
               >
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-500/10">
@@ -525,8 +535,11 @@ const GeneralDictionary = () => {
                 the panel never opens on nothing to click. */}
             {!definition && !loading && !error && !blocked && (
               <motion.div
+                key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
                 className="rounded-2xl border border-dashed border-[#d7ebf5] bg-white/60 p-8 text-center dark:border-white/10 dark:bg-[#0d3a5f]/60 sm:p-10"
               >
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20">
@@ -543,23 +556,33 @@ const GeneralDictionary = () => {
                     {t("general_dictionary.try_one", "Or try one of these")}
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
-                    {QUICK_SEARCH_SUGGESTIONS.map((word) => (
-                      <button
+                    {QUICK_SEARCH_SUGGESTIONS.map((word, i) => (
+                      <motion.button
                         key={word}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 * i, duration: 0.25 }}
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => { setSearchTerm(word); fetchData(word); }}
-                        className="rounded-lg border border-[#d7ebf5] bg-white px-3 py-1.5 text-xs font-semibold text-[#072036] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-[#045C9A] dark:hover:text-white"
+                        className="rounded-lg border border-[#d7ebf5] bg-white px-3 py-1.5 text-xs font-semibold text-[#072036] transition-colors hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-[#045C9A] dark:hover:text-white"
                       >
                         {word}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
               </motion.div>
             )}
 
-            {/* Loading skeleton */}
             {loading && (
-              <div className="animate-pulse space-y-4 rounded-2xl border border-[#d7ebf5] bg-white p-6 dark:border-white/10 dark:bg-[#0d3a5f]">
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="animate-pulse space-y-4 rounded-2xl border border-[#d7ebf5] bg-white p-6 dark:border-white/10 dark:bg-[#0d3a5f]"
+              >
                 <div className="h-7 w-1/3 rounded-lg bg-[#F1F5F9] dark:bg-white/5" />
                 <div className="h-4 w-1/4 rounded-lg bg-[#F1F5F9] dark:bg-white/5" />
                 <div className="space-y-2">
@@ -567,21 +590,20 @@ const GeneralDictionary = () => {
                   <div className="h-3.5 w-5/6 rounded bg-[#F1F5F9] dark:bg-white/5" />
                   <div className="h-3.5 w-4/6 rounded bg-[#F1F5F9] dark:bg-white/5" />
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            {/* Definition Result */}
-            <AnimatePresence mode="wait">
               {definition && !loading && (
                 <motion.div
                   key={definition.word}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="space-y-4"
                 >
                   {/* Word Card */}
-                  <div className="overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f] sm:p-6">
+                  <div className="overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f] sm:p-6">
                     {/* Word + phonetics row */}
                     <div className="mb-5 flex items-start justify-between gap-3">
                       <div>
@@ -597,41 +619,52 @@ const GeneralDictionary = () => {
                           {definition.phonetic && (
                             <span className="font-mono text-[13px] text-[#045C9A] dark:text-[#A6D7E8]">{definition.phonetic}</span>
                           )}
-                          <button
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => playAudio(definition.phonetics.find(p => p.audio)?.audio, definition.originalWord || definition.word)}
                             title={t("general_dictionary.play_pronunciation", "Play pronunciation")}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] transition-colors hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
                           >
                             <Volume2 className="h-3.5 w-3.5" />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                       <div className="flex flex-shrink-0 items-center gap-2">
-                        <button
+                        <motion.button
+                          whileTap={{ scale: 0.9 }}
                           onClick={handleSaveToNotes}
                           title={t("general_dictionary.save_to_notes", "Save to My Notes")}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-slate-400 transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-slate-400 transition-colors hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5"
                         >
                           <StickyNote className="h-4 w-4" />
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileTap={{ scale: 0.85 }}
                           onClick={toggleFavorite}
                           title={
                             isFavorited(definition.originalWord || definition.word)
                               ? t("general_dictionary.favorite_remove_tooltip", "Remove from Favorites")
                               : t("general_dictionary.favorite_add_tooltip", "Add to Favorites")
                           }
-                          className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${
+                          className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${
                             isFavorited(definition.originalWord || definition.word)
                               ? "border-amber-300 bg-amber-50 text-amber-500 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-400"
                               : "border-[#d7ebf5] bg-[#F1F5F9] text-slate-400 hover:border-amber-300 hover:text-amber-500 dark:border-white/10 dark:bg-white/5"
                           }`}
                         >
-                          <Star
-                            className="h-4 w-4"
-                            style={isFavorited(definition.originalWord || definition.word) ? { fill: "currentColor" } : undefined}
-                          />
-                        </button>
+                          <motion.span
+                            key={isFavorited(definition.originalWord || definition.word) ? "on" : "off"}
+                            initial={{ scale: 0.6 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                            className="flex"
+                          >
+                            <Star
+                              className="h-4 w-4"
+                              style={isFavorited(definition.originalWord || definition.word) ? { fill: "currentColor" } : undefined}
+                            />
+                          </motion.span>
+                        </motion.button>
                       </div>
                     </div>
 
@@ -666,7 +699,7 @@ const GeneralDictionary = () => {
                   </div>
 
                   {/* Word Tools: Synonyms / Antonyms / Rhymes */}
-                  <div className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f]">
+                  <div className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f]">
                     <div className="mb-3 flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />
                       <h3 className="text-sm font-bold text-[#072036] dark:text-white">{t("general_dictionary.word_tools_title", "Word Tools")}</h3>
@@ -676,31 +709,50 @@ const GeneralDictionary = () => {
                         <button
                           key={tab.key}
                           onClick={() => setActiveWordTab(tab.key)}
-                          className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-bold transition-all ${
-                            activeWordTab === tab.key
-                              ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#072036] dark:text-[#A6D7E8]"
-                              : "text-slate-500 hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-[#A6D7E8]"
-                          }`}
+                          className="relative flex-1 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-500 transition-colors hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-[#A6D7E8]"
                         >
-                          {tab.label} <span className="opacity-60">({tab.list.length})</span>
+                          {activeWordTab === tab.key && (
+                            <motion.span
+                              layoutId="wordToolActiveTab"
+                              transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                              className="absolute inset-0 rounded-lg bg-white shadow-sm dark:bg-[#072036]"
+                            />
+                          )}
+                          <span className={`relative ${activeWordTab === tab.key ? "text-[#045C9A] dark:text-[#A6D7E8]" : ""}`}>
+                            {tab.label} <span className="opacity-60">({tab.list.length})</span>
+                          </span>
                         </button>
                       ))}
                     </div>
-                    {activeTabData.list.length === 0 ? (
-                      <p className="text-xs text-slate-400 dark:text-slate-500">{activeTabData.empty}</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {activeTabData.list.map((w) => (
-                          <button
-                            key={w}
-                            onClick={() => { setSearchTerm(w); fetchData(w); }}
-                            className="rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-3 py-1.5 text-xs font-semibold capitalize text-[#072036] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-[#045C9A] dark:hover:text-white"
-                          >
-                            {w}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeWordTab}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.18 }}
+                      >
+                        {activeTabData.list.length === 0 ? (
+                          <p className="text-xs text-slate-400 dark:text-slate-500">{activeTabData.empty}</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-2">
+                            {activeTabData.list.map((w, i) => (
+                              <motion.button
+                                key={w}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: Math.min(i * 0.03, 0.3), duration: 0.2 }}
+                                whileTap={{ scale: 0.94 }}
+                                onClick={() => { setSearchTerm(w); fetchData(w); }}
+                                className="rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-3 py-1.5 text-xs font-semibold capitalize text-[#072036] transition-colors hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-[#045C9A] dark:hover:text-white"
+                              >
+                                {w}
+                              </motion.button>
+                            ))}
+                          </div>
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
                 </motion.div>
               )}
@@ -716,7 +768,7 @@ const GeneralDictionary = () => {
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15 }}
-                className="overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f]"
+                className="overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f]"
               >
                 <div className="mb-3 flex items-center gap-2">
                   <Star className="h-3.5 w-3.5 text-amber-400" style={{ fill: "currentColor" }} />
@@ -755,7 +807,7 @@ const GeneralDictionary = () => {
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.17 }}
-                className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f]"
+                className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f]"
               >
                 <div className="mb-3 flex items-center gap-2">
                   <Star className="h-4 w-4 text-amber-400" style={{ fill: "currentColor" }} />
@@ -804,7 +856,7 @@ const GeneralDictionary = () => {
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.18 }}
-                className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f]"
+                className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f]"
               >
                 <div className="mb-3 flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />
@@ -829,7 +881,7 @@ const GeneralDictionary = () => {
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0d3a5f]"
+              className="rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-transform duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-[#0d3a5f]"
             >
               <div className="mb-3 flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />
@@ -986,84 +1038,107 @@ const FlashcardModal = ({ favorites, onClose, t }) => {
             {mode === "quiz" && <span>{t("general_dictionary.score_label", "Score")}: {score.correct}/{score.total}</span>}
           </div>
 
-          {mode === "flip" ? (
-            <div className="relative h-56 w-full cursor-pointer" style={{ perspective: 1200 }} onClick={() => setFlipped((f) => !f)}>
+          <AnimatePresence mode="wait">
+            {mode === "flip" ? (
               <motion.div
-                className="absolute inset-0"
-                style={{ transformStyle: "preserve-3d" }}
-                animate={{ rotateY: flipped ? 180 : 0 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                key={`flip-${index}`}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.2 }}
+                className="relative h-56 w-full cursor-pointer"
+                style={{ perspective: 1200 }}
+                onClick={() => setFlipped((f) => !f)}
               >
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-6 text-center dark:border-white/10 dark:bg-[#0d3a5f]"
-                  style={{ backfaceVisibility: "hidden" }}
+                <motion.div
+                  className="absolute inset-0"
+                  style={{ transformStyle: "preserve-3d" }}
+                  animate={{ rotateY: flipped ? 180 : 0 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <h4 className="text-2xl font-extrabold capitalize text-[#072036] dark:text-white">{current.word}</h4>
-                  {current.phonetic && <p className="mt-1 font-mono text-sm text-[#045C9A] dark:text-[#A6D7E8]">{current.phonetic}</p>}
-                  <p className="mt-4 text-xs font-semibold text-slate-400">{t("general_dictionary.tap_to_reveal", "Tap to reveal definition")}</p>
-                </div>
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-[#d7ebf5] bg-white p-6 text-center dark:border-white/10 dark:bg-[#072036]"
-                  style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                >
-                  {current.partOfSpeech && (
-                    <span className="mb-2 rounded-full border border-[#045C9A]/20 bg-[#EAF7FD] px-2.5 py-0.5 text-[10.5px] font-bold italic text-[#045C9A] dark:border-[#A6D7E8]/20 dark:bg-white/5 dark:text-[#A6D7E8]">
-                      {current.partOfSpeech}
-                    </span>
-                  )}
-                  <p className="text-sm leading-relaxed text-[#35566b] dark:text-slate-300">{current.definition}</p>
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-6 text-center dark:border-white/10 dark:bg-[#0d3a5f]"
+                    style={{ backfaceVisibility: "hidden" }}
+                  >
+                    <h4 className="text-2xl font-extrabold capitalize text-[#072036] dark:text-white">{current.word}</h4>
+                    {current.phonetic && <p className="mt-1 font-mono text-sm text-[#045C9A] dark:text-[#A6D7E8]">{current.phonetic}</p>}
+                    <p className="mt-4 text-xs font-semibold text-slate-400">{t("general_dictionary.tap_to_reveal", "Tap to reveal definition")}</p>
+                  </div>
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-[#d7ebf5] bg-white p-6 text-center dark:border-white/10 dark:bg-[#072036]"
+                    style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                  >
+                    {current.partOfSpeech && (
+                      <span className="mb-2 rounded-full border border-[#045C9A]/20 bg-[#EAF7FD] px-2.5 py-0.5 text-[10.5px] font-bold italic text-[#045C9A] dark:border-[#A6D7E8]/20 dark:bg-white/5 dark:text-[#A6D7E8]">
+                        {current.partOfSpeech}
+                      </span>
+                    )}
+                    <p className="text-sm leading-relaxed text-[#35566b] dark:text-slate-300">{current.definition}</p>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`quiz-${index}`}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h4 className="mb-4 text-center text-sm font-semibold text-[#35566b] dark:text-slate-300">
+                  {t("general_dictionary.quiz_prompt", "Which definition matches")}{" "}
+                  <span className="font-extrabold capitalize text-[#072036] dark:text-white">&ldquo;{current.word}&rdquo;</span>?
+                </h4>
+                <div className="space-y-2">
+                  {choices.map((choice, i) => {
+                    const isThisCorrect = choice === current.definition;
+                    const isPicked = selectedChoice === choice;
+                    const showState = !!selectedChoice;
+                    return (
+                      <motion.button
+                        key={i}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.2 }}
+                        whileTap={!showState ? { scale: 0.98 } : undefined}
+                        onClick={() => handleChoice(choice)}
+                        disabled={showState}
+                        className={`flex w-full items-start gap-2 rounded-xl border p-3 text-left text-xs leading-relaxed transition-colors ${
+                          showState && isThisCorrect
+                            ? "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
+                            : showState && isPicked
+                            ? "border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+                            : "border-[#d7ebf5] bg-[#F1F5F9] text-[#35566b] hover:border-[#045C9A]/30 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                        }`}
+                      >
+                        {showState && isThisCorrect && <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />}
+                        {showState && isPicked && !isThisCorrect && <XCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-rose-500" />}
+                        <span>{choice}</span>
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </motion.div>
-            </div>
-          ) : (
-            <div>
-              <h4 className="mb-4 text-center text-sm font-semibold text-[#35566b] dark:text-slate-300">
-                {t("general_dictionary.quiz_prompt", "Which definition matches")}{" "}
-                <span className="font-extrabold capitalize text-[#072036] dark:text-white">&ldquo;{current.word}&rdquo;</span>?
-              </h4>
-              <div className="space-y-2">
-                {choices.map((choice, i) => {
-                  const isThisCorrect = choice === current.definition;
-                  const isPicked = selectedChoice === choice;
-                  const showState = !!selectedChoice;
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleChoice(choice)}
-                      disabled={showState}
-                      className={`flex w-full items-start gap-2 rounded-xl border p-3 text-left text-xs leading-relaxed transition-all ${
-                        showState && isThisCorrect
-                          ? "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
-                          : showState && isPicked
-                          ? "border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
-                          : "border-[#d7ebf5] bg-[#F1F5F9] text-[#35566b] hover:border-[#045C9A]/30 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                      }`}
-                    >
-                      {showState && isThisCorrect && <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />}
-                      {showState && isPicked && !isThisCorrect && <XCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-rose-500" />}
-                      <span>{choice}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Footer nav */}
         <div className="flex items-center justify-between border-t border-[#d7ebf5] px-5 py-4 dark:border-white/10">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => goTo(-1)}
-            className="flex items-center gap-1.5 rounded-xl border border-[#d7ebf5] px-4 py-2 text-xs font-bold text-[#072036] transition-all hover:bg-[#F1F5F9] dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
+            className="flex items-center gap-1.5 rounded-xl border border-[#d7ebf5] px-4 py-2 text-xs font-bold text-[#072036] transition-colors hover:bg-[#F1F5F9] dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5"
           >
             <ChevronLeft className="h-3.5 w-3.5" /> {t("general_dictionary.previous", "Previous")}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => goTo(1)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#072036]"
+            className="flex items-center gap-1.5 rounded-xl bg-[#045C9A] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#072036]"
           >
             {t("general_dictionary.next", "Next")} <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+          </motion.button>
         </div>
       </motion.div>
     </motion.div>
