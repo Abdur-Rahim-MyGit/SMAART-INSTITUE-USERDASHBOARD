@@ -1513,7 +1513,13 @@
       "green": "Green",
       "purple": "Purple",
       "rose": "Rose",
-      "indigo": "Indigo"
+      "indigo": "Indigo",
+      "orange": "Orange",
+      "fuchsia": "Fuchsia",
+      "cyan": "Cyan",
+      "teal": "Teal",
+      "lime": "Lime",
+      "slate": "Slate"
     },
     "header": {
       "badge": "Personal Productivity",
@@ -1551,7 +1557,8 @@
       "checklist_placeholder": "List item…",
       "add_item": "Add item",
       "copy_tooltip": "Copy to clipboard",
-      "download_tooltip": "Download as .txt"
+      "download_tooltip": "Download as .txt",
+      "color_label": "Color"
     },
     "back_to_toolkit": "Back to Toolkit"
   },

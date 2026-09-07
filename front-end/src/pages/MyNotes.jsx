@@ -31,11 +31,17 @@ import PageTransition from "@/components/PageTransition";
 // dark-mode pairing so a dark tint doesn't swallow dark navy text.
 const COLORS = [
   { id: "yellow",  label: "Yellow",  twClasses: "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700/50", hex: "#fde047" },
-  { id: "blue",    label: "Blue",    twClasses: "bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700/50", hex: "#93c5fd" },
-  { id: "green",   label: "Green",   twClasses: "bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700/50", hex: "#86efac" },
-  { id: "purple",  label: "Purple",  twClasses: "bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700/50", hex: "#d8b4fe" },
+  { id: "orange",  label: "Orange",  twClasses: "bg-orange-100 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700/50", hex: "#fdba74" },
   { id: "rose",    label: "Rose",    twClasses: "bg-rose-100 dark:bg-rose-900/30 border-rose-300 dark:border-rose-700/50", hex: "#fda4af" },
+  { id: "fuchsia", label: "Fuchsia", twClasses: "bg-fuchsia-100 dark:bg-fuchsia-900/30 border-fuchsia-300 dark:border-fuchsia-700/50", hex: "#f0abfc" },
+  { id: "purple",  label: "Purple",  twClasses: "bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700/50", hex: "#d8b4fe" },
   { id: "indigo",  label: "Indigo",  twClasses: "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700/50", hex: "#a5b4fc" },
+  { id: "blue",    label: "Blue",    twClasses: "bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700/50", hex: "#93c5fd" },
+  { id: "cyan",    label: "Cyan",    twClasses: "bg-cyan-100 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700/50", hex: "#67e8f9" },
+  { id: "teal",    label: "Teal",    twClasses: "bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700/50", hex: "#5eead4" },
+  { id: "green",   label: "Green",   twClasses: "bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700/50", hex: "#86efac" },
+  { id: "lime",    label: "Lime",    twClasses: "bg-lime-100 dark:bg-lime-900/30 border-lime-300 dark:border-lime-700/50", hex: "#bef264" },
+  { id: "slate",   label: "Slate",   twClasses: "bg-slate-100 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600/50", hex: "#cbd5e1" },
 ];
 
 const DEFAULT_COLOR = COLORS[0];
@@ -554,27 +560,9 @@ const MyNotes = () => {
                         >
                             {/* Modal top bar */}
                             <div className="flex items-center justify-between border-b border-black/10 dark:border-white/10 px-5 py-3.5">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[13px] font-bold text-[#072036] dark:text-white">
-                                        {currentNote.id ? t("my_notes.editor.edit_title", "Edit Note") : t("my_notes.editor.new_title", "New Note")}
-                                    </span>
-                                    {/* Color picker swatches */}
-                                    <div className="flex items-center gap-1.5">
-                                        {COLORS.map(c => (
-                                            <button
-                                                key={c.id}
-                                                onClick={() => setCurrentNote(prev => ({ ...prev, colorId: c.id }))}
-                                                title={t(`my_notes.colors.${c.id}`, c.label)}
-                                                className="relative h-5 w-5 rounded-full border-2 transition-transform hover:scale-110"
-                                                style={{
-                                                    backgroundColor: c.hex,
-                                                    borderColor: currentNote.colorId === c.id ? "#045C9A" : "transparent",
-                                                    boxShadow: currentNote.colorId === c.id ? "0 0 0 1.5px #045C9A" : "0 0 0 1px rgba(0,0,0,0.1)",
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
+                                <span className="text-[13px] font-bold text-[#072036] dark:text-white">
+                                    {currentNote.id ? t("my_notes.editor.edit_title", "Edit Note") : t("my_notes.editor.new_title", "New Note")}
+                                </span>
                                 <div className="flex items-center gap-1">
                                     <motion.button
                                         type="button"
@@ -600,6 +588,32 @@ const MyNotes = () => {
                                     >
                                         <X className="h-4 w-4" />
                                     </motion.button>
+                                </div>
+                            </div>
+
+                            {/* Color picker -- its own row now that there are
+                                12 swatches instead of 6, so it never crowds
+                                the title bar. */}
+                            <div className="flex flex-wrap items-center gap-2 border-b border-black/10 px-5 py-3 dark:border-white/10">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                    {t("my_notes.editor.color_label", "Color")}
+                                </span>
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    {COLORS.map(c => (
+                                        <motion.button
+                                            key={c.id}
+                                            type="button"
+                                            whileTap={{ scale: 0.85 }}
+                                            onClick={() => setCurrentNote(prev => ({ ...prev, colorId: c.id }))}
+                                            title={t(`my_notes.colors.${c.id}`, c.label)}
+                                            className="relative h-5 w-5 rounded-full border-2 transition-transform hover:scale-110"
+                                            style={{
+                                                backgroundColor: c.hex,
+                                                borderColor: currentNote.colorId === c.id ? "#045C9A" : "transparent",
+                                                boxShadow: currentNote.colorId === c.id ? "0 0 0 1.5px #045C9A" : "0 0 0 1px rgba(0,0,0,0.1)",
+                                            }}
+                                        />
+                                    ))}
                                 </div>
                             </div>
 
