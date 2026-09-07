@@ -373,7 +373,7 @@ const GeneralDictionary = () => {
 
   const wordToolTabs = [
     { key: "synonyms", label: t("general_dictionary.synonyms_tab", "Synonyms"), list: synonyms, empty: t("general_dictionary.no_synonyms", "No synonyms found for this word.") },
-    { key: "antonyms", label: t("general_dictionary.antonyms_tab", "Antonyms"), list: antonyms, empty: t("general_dictionary.no_antonyms", "No antonyms found for this word.") },
+    { key: "antonyms", label: t("general_dictionary.antonyms_tab", "Antonyms"), list: antonyms, empty: t("general_dictionary.no_antonyms", "This word doesn't have a common opposite.") },
     { key: "rhymes", label: t("general_dictionary.rhymes_tab", "Rhymes"), list: rhymes, empty: t("general_dictionary.no_rhymes", "No rhymes found for this word.") },
   ];
   const activeTabData = wordToolTabs.find((tb) => tb.key === activeWordTab) || wordToolTabs[0];
