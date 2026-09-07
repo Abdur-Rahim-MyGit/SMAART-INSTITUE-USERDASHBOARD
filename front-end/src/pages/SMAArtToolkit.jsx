@@ -30,7 +30,7 @@ const toolkitSections = [
     slug: "resume_builder",
     title: "SMAART AI Resume Builder",
     description:
-      "Build a polished, recruiter-ready resume from five professional templates, with AI-assisted summaries and skill suggestions synced to your career path.",
+      "Five professional templates with AI-written summaries and skill suggestions synced to your career path.",
     icon: FileText,
     path: "/dashboard/resume-builder",
     cta: "Open Resume Builder",
@@ -41,7 +41,7 @@ const toolkitSections = [
     slug: "dictionary",
     title: "General Dictionary",
     description:
-      "Look up definitions, pronunciation, synonyms, antonyms and rhymes, then build your vocabulary with Word of the Day and flashcards.",
+      "Definitions, pronunciation, synonyms and antonyms, plus Word of the Day and flashcards.",
     icon: BookOpen,
     path: "/dashboard/dictionary",
     cta: "Browse Dictionary",
@@ -52,7 +52,7 @@ const toolkitSections = [
     slug: "interview_prep",
     title: "Interview Preparation",
     description:
-      "Practice role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
+      "Interview questions, aptitude tests, and domain resources for your selected career path.",
     icon: Mic,
     path: "/dashboard/interview-prep",
     cta: "Start Practicing",
@@ -63,7 +63,7 @@ const toolkitSections = [
     slug: "notes",
     title: "My Notes",
     description:
-      "Capture notes or checklists, tag and pin what matters, color-code your workspace, and export or copy anytime -- always in sync.",
+      "Notes or checklists with tags, pinning, and color-coding -- always synced to the cloud.",
     icon: StickyNote,
     path: "/dashboard/notes",
     cta: "Open My Notes",
@@ -74,7 +74,7 @@ const toolkitSections = [
     slug: "cgpa_calculator",
     title: "CGPA Calculator",
     description:
-      "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results.",
+      "Paste your result table and instantly compute Slab-Based, Continuous, and Equal-Credit CGPA.",
     icon: Calculator,
     path: "/dashboard/cgpa-calculator",
     cta: "Open Calculator",
@@ -135,7 +135,7 @@ const ToolkitCard = ({ section, index }) => {
               e.stopPropagation();
               navigate(section.path);
             }}
-            className="group/btn mt-auto flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#045C9A] text-[13px] font-semibold text-white transition-colors hover:bg-[#072036]"
+            className="group/btn mt-auto flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] text-[13px] font-semibold text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
           >
             {cta}
             <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
