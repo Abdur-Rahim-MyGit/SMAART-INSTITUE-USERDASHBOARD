@@ -33,6 +33,7 @@ export const ICON_NAMES = Object.freeze([
   "card_membership",
   "check",
   "check_circle",
+  "checklist",
   "chevron_left",
   "chevron_right",
   "circle",
@@ -40,6 +41,7 @@ export const ICON_NAMES = Object.freeze([
   "closed_caption",
   "cloud",
   "code",
+  "content_copy",
   "dark_mode",
   "database",
   "delete",
@@ -47,6 +49,7 @@ export const ICON_NAMES = Object.freeze([
   "design_services",
   "directions_boat",
   "done_all",
+  "download",
   "edit",
   "engineering",
   "error",
@@ -102,6 +105,7 @@ export const ICON_NAMES = Object.freeze([
   "progress_activity",
   "psychology",
   "public",
+  "push_pin",
   "qr_code_2",
   "record_voice_over",
   "redeem",
@@ -201,6 +205,7 @@ export const Check = /*#__PURE__*/ icon("Check", "check");
 export const CheckCheck = /*#__PURE__*/ icon("CheckCheck", "done_all");
 export const CheckCircle = /*#__PURE__*/ icon("CheckCircle", "check_circle");
 export const CheckCircle2 = /*#__PURE__*/ icon("CheckCircle2", "check_circle");
+export const Checklist = /*#__PURE__*/ icon("Checklist", "checklist");
 export const ChevronDown = /*#__PURE__*/ icon("ChevronDown", "keyboard_arrow_down");
 export const ChevronLeft = /*#__PURE__*/ icon("ChevronLeft", "chevron_left");
 export const ChevronRight = /*#__PURE__*/ icon("ChevronRight", "chevron_right");
@@ -213,7 +218,9 @@ export const Cloud = /*#__PURE__*/ icon("Cloud", "cloud");
 export const Code = /*#__PURE__*/ icon("Code", "code");
 export const Coffee = /*#__PURE__*/ icon("Coffee", "local_cafe");
 export const Command = /*#__PURE__*/ icon("Command", "keyboard_command_key");
+export const Copy = /*#__PURE__*/ icon("Copy", "content_copy");
 export const Database = /*#__PURE__*/ icon("Database", "database");
+export const Download = /*#__PURE__*/ icon("Download", "download");
 export const Edit2 = /*#__PURE__*/ icon("Edit2", "edit");
 export const ExternalLink = /*#__PURE__*/ icon("ExternalLink", "open_in_new");
 export const Eye = /*#__PURE__*/ icon("Eye", "visibility");
@@ -277,6 +284,7 @@ export const MonitorPlay = /*#__PURE__*/ icon("MonitorPlay", "smart_display");
 export const Moon = /*#__PURE__*/ icon("Moon", "dark_mode");
 export const Music = /*#__PURE__*/ icon("Music", "music_note");
 export const Pause = /*#__PURE__*/ icon("Pause", "pause");
+export const Pin = /*#__PURE__*/ icon("Pin", "push_pin");
 export const PictureInPicture = /*#__PURE__*/ icon("PictureInPicture", "picture_in_picture_alt");
 export const Play = /*#__PURE__*/ icon("Play", "play_arrow");
 export const PlayCircle = /*#__PURE__*/ icon("PlayCircle", "play_circle");

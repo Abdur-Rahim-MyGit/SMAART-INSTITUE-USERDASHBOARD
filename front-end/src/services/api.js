@@ -482,11 +482,18 @@ export const notesAPI = {
     return apiCall(`/notes/${courseId}`);
   },
 
-  // Upsert notes for a course or personal note
-  upsert: async (courseId, content, title = "") => {
+  // Upsert notes for a course or personal note. `content`/`title` are only
+  // sent when actually passed (not defaulted to ""), so a partial update --
+  // e.g. toggling `extra.pinned` alone -- never blanks out existing text.
+  // `extra` carries the newer optional fields: type, checklistItems,
+  // colorId, pinned, tags.
+  upsert: async (courseId, content, title, extra = {}) => {
+    const body = { courseId, ...extra };
+    if (content !== undefined) body.content = content;
+    if (title !== undefined) body.title = title;
     return apiCall('/notes', {
       method: 'POST',
-      body: JSON.stringify({ courseId, content, title }),
+      body: JSON.stringify(body),
     });
   },
 

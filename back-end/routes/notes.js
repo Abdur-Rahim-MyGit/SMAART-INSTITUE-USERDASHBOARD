@@ -61,7 +61,7 @@ router.get('/:courseId', async (req, res) => {
 // @access  Private
 router.post('/', async (req, res) => {
   try {
-    const { courseId, title, content } = req.body;
+    const { courseId, title, content, type, checklistItems, colorId, pinned, tags } = req.body;
 
     if (!courseId) {
       return res.status(400).json({
@@ -76,9 +76,16 @@ router.post('/', async (req, res) => {
     });
 
     if (note) {
-      // Update existing note
+      // Update existing note -- each field is only touched when the
+      // caller actually sent it, so a pin/color-only save (e.g. toggling
+      // the pin from the notes grid) never clobbers the title/content.
       if (title !== undefined) note.title = title;
       if (content !== undefined) note.content = content;
+      if (type !== undefined) note.type = type;
+      if (checklistItems !== undefined) note.checklistItems = checklistItems;
+      if (colorId !== undefined) note.colorId = colorId;
+      if (pinned !== undefined) note.pinned = pinned;
+      if (tags !== undefined) note.tags = tags;
       note.lastUpdated = Date.now();
       await note.save();
     } else {
@@ -87,7 +94,12 @@ router.post('/', async (req, res) => {
         user: req.user._id,
         courseId,
         title: title || '',
-        content: content || ''
+        content: content || '',
+        type: type || 'text',
+        checklistItems: checklistItems || [],
+        colorId: colorId || 'yellow',
+        pinned: pinned || false,
+        tags: tags || []
       });
     }
 

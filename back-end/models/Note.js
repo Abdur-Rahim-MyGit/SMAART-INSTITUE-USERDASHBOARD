@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const checklistItemSchema = new mongoose.Schema({
+  text: {
+    type: String,
+    default: ''
+  },
+  done: {
+    type: Boolean,
+    default: false
+  }
+}, { _id: false });
+
 const noteSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,6 +28,27 @@ const noteSchema = new mongoose.Schema({
   content: {
     type: String,
     default: ''
+  },
+  type: {
+    type: String,
+    enum: ['text', 'checklist'],
+    default: 'text'
+  },
+  checklistItems: {
+    type: [checklistItemSchema],
+    default: []
+  },
+  colorId: {
+    type: String,
+    default: 'yellow'
+  },
+  pinned: {
+    type: Boolean,
+    default: false
+  },
+  tags: {
+    type: [String],
+    default: []
   },
   lastUpdated: {
     type: Date,

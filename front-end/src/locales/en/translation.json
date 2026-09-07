@@ -1495,7 +1495,11 @@
       "failed_save": "Failed to save note to database.",
       "deleted_title": "Note Deleted",
       "deleted_desc": "The note has been removed from your account.",
-      "failed_delete": "Could not delete the note."
+      "failed_delete": "Could not delete the note.",
+      "failed_pin": "Could not update pin.",
+      "copied_title": "Copied",
+      "copied_desc": "Note copied to clipboard.",
+      "copy_failed": "Could not copy note."
     },
     "note_types": {
       "untitled": "Untitled Note",
@@ -1517,13 +1521,22 @@
       "title_notes": "Notes",
       "description": "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.",
       "search_placeholder": "Search your library...",
-      "new_note": "New Note"
+      "new_note": "New Note",
+      "sort_label": "Sort by",
+      "sort_date": "Newest First",
+      "sort_title": "Title (A–Z)",
+      "sort_color": "Color"
     },
     "grid": {
       "create_new": "Create New Note",
       "delete_tooltip": "Delete note",
       "no_notes_matching": "No notes found matching \"{{query}}\"",
-      "course_note": "Course Note"
+      "course_note": "Course Note",
+      "pin_tooltip": "Pin to top",
+      "unpin_tooltip": "Unpin",
+      "checklist_badge": "Checklist",
+      "checklist_more": "+{{count}} more",
+      "checklist_empty": "No items yet"
     },
     "editor": {
       "edit_title": "Edit Note",
@@ -1531,7 +1544,14 @@
       "placeholder_title": "Title",
       "placeholder_content": "Start typing...",
       "last_edited": "Last edited: {{date}}",
-      "save_note": "Save Note"
+      "save_note": "Save Note",
+      "type_note": "Note",
+      "type_checklist": "Checklist",
+      "tags_placeholder": "Add tag…",
+      "checklist_placeholder": "List item…",
+      "add_item": "Add item",
+      "copy_tooltip": "Copy to clipboard",
+      "download_tooltip": "Download as .txt"
     },
     "back_to_toolkit": "Back to Toolkit"
   },
