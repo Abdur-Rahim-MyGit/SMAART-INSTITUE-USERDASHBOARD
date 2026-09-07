@@ -63,6 +63,28 @@ const translateDefinition = async (definitionData, targetLang) => {
   }
 };
 
+// A month-long pool so the daily pick barely repeats. Seeded off the
+// calendar date (not Math.random) so it's the same word all day for
+// everyone, and only rolls over at midnight -- an actual "day".
+const WORD_OF_DAY_POOL = [
+  "serendipity", "ephemeral", "resilience", "eloquent", "mellifluous",
+  "pragmatic", "innovate", "empathy", "diligent", "candid", "meticulous",
+  "tenacity", "versatile", "articulate", "cognizant", "collaborate",
+  "initiative", "integrity", "leverage", "proactive", "synergy",
+  "adaptability", "credible", "efficient", "insight", "rapport",
+  "aptitude", "benchmark", "cohesive", "discern", "facilitate",
+];
+
+const getWordOfTheDay = () => {
+  const now = new Date();
+  const dayNumber = Math.floor(now.getTime() / 86400000);
+  return WORD_OF_DAY_POOL[dayNumber % WORD_OF_DAY_POOL.length];
+};
+
+// Quick-start chips shown before anyone has searched anything, so the
+// results panel never opens on a blank card with nothing to click.
+const QUICK_SEARCH_SUGGESTIONS = ["Empathy", "Agile", "Resilience", "Cognitive", "Integrity", "Synergy"];
+
 const GeneralDictionary = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -90,8 +112,7 @@ const GeneralDictionary = () => {
   }, []);
 
   useEffect(() => {
-    const words = ["serendipity", "ephemeral", "resilience", "eloquent", "mellifluous", "pragmatic", "innovate"];
-    fetchData(words[Math.floor(Math.random() * words.length)], true);
+    fetchData(getWordOfTheDay(), true);
   }, []);
 
   useEffect(() => {
@@ -348,12 +369,13 @@ const GeneralDictionary = () => {
               </motion.div>
             )}
 
-            {/* Empty state */}
+            {/* Empty state -- a quick-start row instead of a bare card, so
+                the panel never opens on nothing to click. */}
             {!definition && !loading && !error && !blocked && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="rounded-2xl border border-dashed border-[#d7ebf5] bg-white/60 p-10 text-center dark:border-white/10 dark:bg-[#0d3a5f]/60"
+                className="rounded-2xl border border-dashed border-[#d7ebf5] bg-white/60 p-8 text-center dark:border-white/10 dark:bg-[#0d3a5f]/60 sm:p-10"
               >
                 <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20">
                   <BookOpen className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
@@ -363,6 +385,23 @@ const GeneralDictionary = () => {
                   <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("general_dictionary.search", "Search")}</span>{" "}
                   {t("general_dictionary.empty_after", "to see its definition")}
                 </p>
+
+                <div className="mx-auto mt-6 max-w-md border-t border-[#EAF7FD] pt-5 dark:border-white/10">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
+                    {t("general_dictionary.try_one", "Or try one of these")}
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    {QUICK_SEARCH_SUGGESTIONS.map((word) => (
+                      <button
+                        key={word}
+                        onClick={() => { setSearchTerm(word); fetchData(word); }}
+                        className="rounded-lg border border-[#d7ebf5] bg-white px-3 py-1.5 text-xs font-semibold text-[#072036] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-[#045C9A] dark:hover:text-white"
+                      >
+                        {word}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             )}
 
