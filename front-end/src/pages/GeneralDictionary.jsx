@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Loader2,
   Sparkles,
+  Shield,
   IconArrowLeft as ArrowLeft,
 } from "@/components/icons";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
+import { isBlockedWord } from "@/constants/dictionaryBlocklist";
 
 const translateText = async (text, targetLang) => {
   if (!text || targetLang === "en") return text;
@@ -69,6 +71,7 @@ const GeneralDictionary = () => {
   const [synonyms, setSynonyms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [blocked, setBlocked] = useState(false);
   const [wordOfDay, setWordOfDay] = useState(null);
   const selectedLang = i18n.language || "en";
 
@@ -98,9 +101,22 @@ const GeneralDictionary = () => {
 
   const fetchData = async (word, isDaily = false, lang = selectedLang) => {
     if (!word) return;
+    // Never sends profanity/slurs to the definition API or shows them --
+    // this is a student product, so those words are refused outright.
+    if (!isDaily && isBlockedWord(word)) {
+      setLoading(false);
+      setError(null);
+      setDefinition(null);
+      setSynonyms([]);
+      setBlocked(true);
+      return;
+    }
     setLoading(!isDaily);
     setError(null);
-    if (!isDaily) setSynonyms([]);
+    if (!isDaily) {
+      setSynonyms([]);
+      setBlocked(false);
+    }
     try {
       const defRes = await fetch(`https://freedictionaryapi.com/api/v1/entries/en/${word.toLowerCase()}`);
       if (!defRes.ok) throw new Error("Word not found");
@@ -286,8 +302,31 @@ const GeneralDictionary = () => {
           {/* LEFT: Results */}
           <div className="space-y-4 lg:col-span-2">
 
+            {/* Blocked word */}
+            {blocked && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="rounded-2xl border border-[#d7ebf5] bg-white p-6 text-center dark:border-white/10 dark:bg-[#0d3a5f]"
+              >
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#EAF7FD] dark:bg-[#045C9A]/20">
+                  <Shield className="h-5 w-5 text-[#045C9A] dark:text-[#A6D7E8]" />
+                </div>
+                <h3 className="text-sm font-bold text-[#072036] dark:text-white">{t("general_dictionary.blocked_title", "Word Not Available")}</h3>
+                <p className="mt-1 text-xs text-[#35566b] dark:text-slate-400">
+                  {t("general_dictionary.blocked_desc", "We keep this dictionary appropriate for everyone, so this word can't be looked up here. Try another word.")}
+                </p>
+                <button
+                  onClick={() => { setBlocked(false); setSearchTerm(""); }}
+                  className="mt-3 text-xs font-bold text-[#045C9A] hover:underline dark:text-[#A6D7E8]"
+                >
+                  {t("general_dictionary.clear_search", "Clear Search")}
+                </button>
+              </motion.div>
+            )}
+
             {/* Error */}
-            {error && (
+            {error && !blocked && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -310,7 +349,7 @@ const GeneralDictionary = () => {
             )}
 
             {/* Empty state */}
-            {!definition && !loading && !error && (
+            {!definition && !loading && !error && !blocked && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

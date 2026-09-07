@@ -2158,7 +2158,9 @@
     "trending_words": "Trending Words",
     "audio_error": "Audio playback error",
     "audio_unavailable": "Audio not available",
-    "play_pronunciation": "Play pronunciation"
+    "play_pronunciation": "Play pronunciation",
+    "blocked_title": "Word Not Available",
+    "blocked_desc": "We keep this dictionary appropriate for everyone, so this word can't be looked up here. Try another word."
   },
   "interview_prep_tool": {
     "back_to_toolkit": "Back to Toolkit",
