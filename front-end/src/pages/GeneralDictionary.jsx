@@ -165,11 +165,27 @@ const GeneralDictionary = () => {
     fetchData(englishSearchWord);
   };
 
-  const playAudio = (audioUrl) => {
-    if (audioUrl) {
-      new Audio(audioUrl).play().catch(() => toast.error(t("general_dictionary.audio_error", "Audio playback error")));
-    } else {
+  // Not every entry from the dictionary API ships a recorded clip, so a
+  // word without one falls back to the browser's built-in speech engine --
+  // every word gets a pronunciation, not just the ones the API recorded.
+  const speakWord = (word) => {
+    if (!word) return;
+    if (!("speechSynthesis" in window)) {
       toast.error(t("general_dictionary.audio_unavailable", "Audio not available"));
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const playAudio = (audioUrl, fallbackWord) => {
+    if (audioUrl) {
+      new Audio(audioUrl).play().catch(() => speakWord(fallbackWord));
+    } else {
+      speakWord(fallbackWord);
     }
   };
 
@@ -351,14 +367,13 @@ const GeneralDictionary = () => {
                           {definition.phonetic && (
                             <span className="font-mono text-[13px] text-[#045C9A] dark:text-[#A6D7E8]">{definition.phonetic}</span>
                           )}
-                          {definition.phonetics.find(p => p.audio) && (
-                            <button
-                              onClick={() => playAudio(definition.phonetics.find(p => p.audio).audio)}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
-                            >
-                              <Volume2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => playAudio(definition.phonetics.find(p => p.audio)?.audio, definition.originalWord || definition.word)}
+                            title={t("general_dictionary.play_pronunciation", "Play pronunciation")}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
+                          >
+                            <Volume2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
                       </div>
                       <button className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-slate-400 transition-all hover:border-amber-300 hover:text-amber-500 dark:border-white/10 dark:bg-white/5">
@@ -439,9 +454,18 @@ const GeneralDictionary = () => {
                 <h3 className="text-lg font-extrabold capitalize leading-tight text-[#072036] dark:text-white">
                   {wordOfDay.word}
                 </h3>
-                {wordOfDay.phonetic && (
-                  <p className="mt-0.5 font-mono text-xs text-[#045C9A] dark:text-[#A6D7E8]">{wordOfDay.phonetic}</p>
-                )}
+                <div className="mt-0.5 flex items-center gap-2">
+                  {wordOfDay.phonetic && (
+                    <p className="font-mono text-xs text-[#045C9A] dark:text-[#A6D7E8]">{wordOfDay.phonetic}</p>
+                  )}
+                  <button
+                    onClick={() => playAudio(wordOfDay.phonetics.find(p => p.audio)?.audio, wordOfDay.originalWord || wordOfDay.word)}
+                    title={t("general_dictionary.play_pronunciation", "Play pronunciation")}
+                    className="flex h-6 w-6 items-center justify-center rounded-md border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] transition-all hover:border-transparent hover:bg-[#045C9A] hover:text-white dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
+                  >
+                    <Volume2 className="h-3 w-3" />
+                  </button>
+                </div>
                 <p className="mt-3 line-clamp-3 text-[12.5px] leading-relaxed text-[#35566b] dark:text-slate-400">
                   {wordOfDay.meanings[0]?.definitions[0]?.definition}
                 </p>

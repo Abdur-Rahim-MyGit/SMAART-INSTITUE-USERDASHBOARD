@@ -2157,7 +2157,8 @@
     "learn_more": "Learn more",
     "trending_words": "Trending Words",
     "audio_error": "Audio playback error",
-    "audio_unavailable": "Audio not available"
+    "audio_unavailable": "Audio not available",
+    "play_pronunciation": "Play pronunciation"
   },
   "interview_prep_tool": {
     "back_to_toolkit": "Back to Toolkit",
