@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 // Material Symbols barrel -- the icon set the dashboard, courses,
 // assessments, dictionary and notes pages use, so this page's glyphs
@@ -11,8 +10,6 @@ import {
   Calculator,
   Wrench,
   ArrowRight,
-  ChevronDown,
-  ChevronUp,
   IconArrowLeft as ArrowLeft,
 } from "@/components/icons";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +33,6 @@ const toolkitSections = [
       "Build a polished, recruiter-ready resume from five professional templates, with AI-assisted summaries and skill suggestions synced to your career path.",
     icon: FileText,
     path: "/dashboard/resume-builder",
-    badge: "Professional",
     cta: "Open Resume Builder",
     meta: "Templates + AI Writing",
   },
@@ -48,7 +44,6 @@ const toolkitSections = [
       "Look up definitions, pronunciation, synonyms, antonyms and rhymes, then build your vocabulary with Word of the Day and flashcards.",
     icon: BookOpen,
     path: "/dashboard/dictionary",
-    badge: "Reference",
     cta: "Browse Dictionary",
     meta: "Definitions + Vocabulary",
   },
@@ -60,7 +55,6 @@ const toolkitSections = [
       "Practice role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
     icon: Mic,
     path: "/dashboard/interview-prep",
-    badge: "Career",
     cta: "Start Practicing",
     meta: "Aptitude + Domain + HR",
   },
@@ -72,7 +66,6 @@ const toolkitSections = [
       "Capture notes or checklists, tag and pin what matters, color-code your workspace, and export or copy anytime -- always in sync.",
     icon: StickyNote,
     path: "/dashboard/notes",
-    badge: "Productivity",
     cta: "Open My Notes",
     meta: "Notes + Checklists + Tags",
   },
@@ -84,111 +77,70 @@ const toolkitSections = [
       "Calculate your CGPA effortlessly. Paste your result table directly from your university portal, and instantly compute Slab-Based, Continuous, and Equal-Credit results.",
     icon: Calculator,
     path: "/dashboard/cgpa-calculator",
-    badge: "Academic",
     cta: "Open Calculator",
     meta: "Smart Paste + 3 Methods",
   },
 ];
 
 /* ─────────────────────────────────────────────────────────
-   Toolkit Card
+   Toolkit Card -- same anatomy as the Assessments stage card
+   (icon + title/meta row, full description, full-width footer
+   button): no truncation, no per-card badge, so it reads as
+   part of the same product instead of its own thing.
 ───────────────────────────────────────────────────────── */
-const TRUNCATE_LENGTH = 100;
-
 const ToolkitCard = ({ section, index }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const Icon = section.icon;
-  const [expanded, setExpanded] = useState(false);
 
   const title = t(`smaart_toolkit.tools.${section.slug}.title`, section.title);
   const meta = t(`smaart_toolkit.tools.${section.slug}.meta`, section.meta);
   const cta = t(`smaart_toolkit.tools.${section.slug}.cta`, section.cta);
-  const badge = t(`smaart_toolkit.tools.${section.slug}.badge`, section.badge);
   const description = t(`smaart_toolkit.tools.${section.slug}.description`, section.description);
-
-  const isLong = description.length > TRUNCATE_LENGTH;
-  const displayText =
-    expanded || !isLong
-      ? description
-      : description.slice(0, TRUNCATE_LENGTH).trimEnd() + "…";
 
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.07, 0.35), duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.99 }}
+      transition={{ delay: Math.min(index, 8) * 0.06, duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
       className="group h-full"
     >
       <div
         onClick={() => navigate(section.path)}
-        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-all duration-300 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] dark:border-white/10 dark:bg-[#0d3a5f]"
+        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-[0_2px_16px_rgba(4,92,154,0.05)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] motion-reduce:hover:translate-y-0 dark:border-white/10 dark:bg-[#0d3a5f]"
       >
-        {/* Header row: icon + category badge */}
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm transition-transform duration-300 group-hover:scale-105 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-            <Icon className="h-5 w-5" />
+        <div className="flex h-full flex-col p-5 sm:p-6">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+              <Icon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 pt-0.5">
+              <h3 className="text-base font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
+                {title}
+              </h3>
+              <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                {meta}
+              </p>
+            </div>
           </div>
-          <span className="rounded-full border border-[#d7ebf5] bg-[#F1F5F9] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
-            {badge}
-          </span>
+
+          <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {description}
+          </p>
+
+          <div className="flex-1" />
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(section.path);
+            }}
+            className="group/btn mt-auto flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#045C9A] text-[13px] font-semibold text-white transition-colors hover:bg-[#072036]"
+          >
+            {cta}
+            <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
+          </button>
         </div>
-
-        {/* Meta label */}
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
-          {meta}
-        </p>
-
-        {/* Title */}
-        <h3 className="mb-2.5 text-[15px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
-          {title}
-        </h3>
-
-        {/* Description with Read More */}
-        <div className="mb-2">
-          <motion.p layout="position" className="text-[13px] leading-[1.7] text-[#35566b] dark:text-slate-400">
-            {displayText}
-          </motion.p>
-          {isLong && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded((p) => !p);
-              }}
-              className="mt-1.5 flex items-center gap-1 text-[11.5px] font-bold text-[#045C9A] transition-all hover:gap-1.5 dark:text-[#A6D7E8]"
-            >
-              {expanded ? (
-                <>
-                  {t("smaart_toolkit.show_less", "Show Less")} <ChevronUp className="h-3.5 w-3.5" />
-                </>
-              ) : (
-                <>
-                  {t("smaart_toolkit.read_more", "Read More")} <ChevronDown className="h-3.5 w-3.5" />
-                </>
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        <div className="mt-4 mb-4 border-t border-[#EAF7FD] dark:border-white/10" />
-
-        {/* CTA Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(section.path);
-          }}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-4 py-2.5 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-[#072036] active:scale-[0.98]"
-        >
-          {cta}
-          <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover:translate-x-1" />
-        </button>
       </div>
     </motion.div>
   );
@@ -242,18 +194,18 @@ const SMAArtToolkit = () => {
           <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
           <div className="relative z-10 flex items-center gap-4 px-6 py-5 sm:px-8 sm:py-6">
-            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-              <Wrench className="h-5 w-5" />
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+              <Wrench className="h-6 w-6" />
             </div>
             <div className="min-w-0">
               <h1
-                className="text-base font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-lg"
+                className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
                 style={{ letterSpacing: "-0.02em" }}
               >
                 {t("smaart_toolkit.title_1", "SMAART")}{" "}
                 <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("smaart_toolkit.title_2", "Toolkit")}</span>
               </h1>
-              <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400">
+              <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
                 {t("smaart_toolkit.subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools.")}
               </p>
             </div>
