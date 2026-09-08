@@ -985,84 +985,6 @@ ${applicationForm.fullName || "Your Name"}`;
                 </div>
               )}
 
-              {/* ── SMAART Course Skills ──────────────────────────────── */}
-              {Array.isArray(job.courseSkills) && job.courseSkills.length > 0 && (
-                <div>
-                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
-                    <Book stroke={1.7} className="h-[18px] w-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
-                    {t("placement.course_skills", "Human Intelligence Courses")}
-                  </h2>
-                  <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
-                    {t("placement.course_skills_hint", "Courses from your Human Intelligence programme this role expects you to have completed.")}
-                  </p>
-                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {job.courseSkills.map((c, i) => {
-                        const isLastAlone = i === job.courseSkills.length - 1 && job.courseSkills.length % 2 === 1;
-                        return (
-                          <div
-                            key={c._id || i}
-                            className={`flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] ${isLastAlone ? "sm:col-span-2" : ""}`}
-                          >
-                            <div className="min-w-0">
-                              <p className="truncate text-[13px] font-semibold text-[#072036] dark:text-white">{c.title}</p>
-                              {c.category && <p className="text-[11px] text-slate-400">{c.category}</p>}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Skill Gap Section ─────────────────────────────────── */}
-              {hasSkillGap && (
-                <div>
-                  <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
-                    <span className="text-[#045C9A] dark:text-[#A6D7E8] text-[18px] leading-none">⚠️</span>
-                    {t("placement.skill_gap", "Skill Gap Detected")}
-                  </h3>
-                  <div className="mt-3 rounded-xl border border-[#045C9A]/20 bg-[#0d3a5f]/5 p-5 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]/40">
-                    <p className="mb-4 text-[13px] leading-relaxed text-[#034a7d] dark:text-[#A6D7E8] font-medium">
-                      The following must-have skills are missing or below the required level. Closing these gaps will boost your chances.
-                    </p>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {missedMustHaves.map((skill, idx) => {
-                        // Handle both old string format and new object format gracefully
-                        const isObj = typeof skill === 'object' && skill !== null;
-                        const name = isObj ? skill.name : skill;
-                        const reqLvl = isObj ? skill.requiredLevel : '?';
-                        const stdLvl = isObj ? skill.studentLevel : '?';
-
-                        const isLastAlone = idx === missedMustHaves.length - 1 && missedMustHaves.length % 2 === 1;
-                        return (
-                          <div key={`${name}-${idx}`} className={`flex flex-col rounded-xl border border-[#d7ebf5] bg-white p-3.5 shadow-sm dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] ${isLastAlone ? "sm:col-span-2" : ""}`}>
-                            <p className="truncate text-[13.5px] font-bold text-[#072036] dark:text-white">{name}</p>
-                            <div className="mt-2 flex items-center gap-3">
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Required</span>
-                                <span className="text-[12.5px] font-bold text-[#045C9A] dark:text-[#A6D7E8]">Level {reqLvl}</span>
-                              </div>
-                              <div className="h-6 w-px bg-slate-200 dark:bg-[#045C9A]/30" />
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">You have</span>
-                                <span className="text-[12.5px] font-bold text-slate-600 dark:text-slate-300">Level {stdLvl}</span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <p className="mt-4 text-[11px] italic text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
-                      *Reflects verified skills only. Your application will still be reviewed.
-                    </p>
-                  </div>
-                </div>
-              )}
-              {/* ──────────────────────────────────────────────────────── */}
-
-
             </section>
 
             <aside className="space-y-6">
@@ -1123,6 +1045,86 @@ ${applicationForm.fullName || "Your Name"}`;
               </div>
             </aside>
           </div>
+
+          {/* Full-width band: the long list sections live BELOW the two-column
+              area rather than inside the left column. The sidebar is short and
+              these lists are long, so keeping them side by side leaves a dead
+              empty column beside them for most of the scroll. */}
+          {((Array.isArray(job.courseSkills) && job.courseSkills.length > 0) || hasSkillGap) && (
+            <div className="space-y-7 border-t border-[#d7ebf5] px-6 pb-6 pt-6 dark:border-[#045C9A]/20">
+              {/* ── SMAART Course Skills ──────────────────────────────── */}
+              {Array.isArray(job.courseSkills) && job.courseSkills.length > 0 && (
+                <div>
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
+                    <Book stroke={1.7} className="h-[18px] w-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
+                    {t("placement.course_skills", "Human Intelligence Courses")}
+                  </h2>
+                  <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
+                    {t("placement.course_skills_hint", "Courses from your Human Intelligence programme this role expects you to have completed.")}
+                  </p>
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {job.courseSkills.map((c, i) => (
+                        <div
+                          key={c._id || i}
+                          className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-[13px] font-semibold text-[#072036] dark:text-white">{c.title}</p>
+                            {c.category && <p className="text-[11px] text-slate-400">{c.category}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Skill Gap Section ─────────────────────────────────── */}
+              {hasSkillGap && (
+                <div>
+                  <h3 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
+                    <span className="text-[#045C9A] dark:text-[#A6D7E8] text-[18px] leading-none">⚠️</span>
+                    {t("placement.skill_gap", "Skill Gap Detected")}
+                  </h3>
+                  <div className="mt-3 rounded-xl border border-[#045C9A]/20 bg-[#0d3a5f]/5 p-5 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]/40">
+                    <p className="mb-4 text-[13px] leading-relaxed text-[#034a7d] dark:text-[#A6D7E8] font-medium">
+                      The following must-have skills are missing or below the required level. Closing these gaps will boost your chances.
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {missedMustHaves.map((skill, idx) => {
+                        // Handle both old string format and new object format gracefully
+                        const isObj = typeof skill === 'object' && skill !== null;
+                        const name = isObj ? skill.name : skill;
+                        const reqLvl = isObj ? skill.requiredLevel : '?';
+                        const stdLvl = isObj ? skill.studentLevel : '?';
+
+                        return (
+                          <div key={`${name}-${idx}`} className="flex flex-col rounded-xl border border-[#d7ebf5] bg-white p-3.5 shadow-sm dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                            <p className="truncate text-[13.5px] font-bold text-[#072036] dark:text-white">{name}</p>
+                            <div className="mt-2 flex items-center gap-3">
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Required</span>
+                                <span className="text-[12.5px] font-bold text-[#045C9A] dark:text-[#A6D7E8]">Level {reqLvl}</span>
+                              </div>
+                              <div className="h-6 w-px bg-slate-200 dark:bg-[#045C9A]/30" />
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">You have</span>
+                                <span className="text-[12.5px] font-bold text-slate-600 dark:text-slate-300">Level {stdLvl}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-4 text-[11px] italic text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
+                      *Reflects verified skills only. Your application will still be reviewed.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
       </div>
 
