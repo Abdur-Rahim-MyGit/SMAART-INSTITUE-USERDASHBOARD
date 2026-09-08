@@ -24,13 +24,14 @@ import {
   IconCloudUpload
 } from '@tabler/icons-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import NeuralBackground from '@/components/ui/NeuralBackground';
+import PageTransition from '@/components/PageTransition';
 
 // --- CONFIG & CONSTANTS ---
 const GRADE_MAPPING = { O: 10, "A+": 9, A: 8, "B+": 7, B: 6, C: 5 };
 const FAIL_GRADES = ["RA", "SA", "AB", "W", "U", "F"];
 
 const METHODS = [
-  { id: "quick", name: "Quick Entry", badge: "Semester-wise Data" },
   { id: "slab", name: "Slab-Based Method", badge: "Anna University" },
   { id: "continuous", name: "Continuous Method", badge: "Madras University" },
   { id: "equal", name: "Equal-Credit Method", badge: "Autonomous Colleges" },
@@ -450,6 +451,20 @@ const applyMissingGradesBySequence = (text, grades) => {
 export default function CGPACalculator() {
   const navigate = useNavigate();
 
+  // The constellation canvas paints from a prop, not CSS, so it has to be
+  // told when the dark class flips -- same observer the dashboard uses.
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   // --- STATE ---
   const [activeMethod, setActiveMethod] = useState("slab");
   const [activeSemester, setActiveSemester] = useState(1);
@@ -476,56 +491,6 @@ export default function CGPACalculator() {
     targetCGPA: "",
     totalDegreeUnits: "",
   });
-
-  const [courseDurationYears, setCourseDurationYears] = useState(4);
-  const [quickSemesters, setQuickSemesters] = useState(
-    Array.from({ length: 8 }, (_, i) => ({ semesterNumber: i + 1, sgpa: '', cgpa: '', creditsEarned: '' }))
-  );
-  const [quickOverallCgpa, setQuickOverallCgpa] = useState(0);
-  const [activeBacklogs, setActiveBacklogs] = useState(0);
-  const [historyOfArrears, setHistoryOfArrears] = useState(0);
-
-  const handleDurationChange = (years) => {
-    setCourseDurationYears(years);
-    const targetSemesters = years * 2;
-    setQuickSemesters(prev => {
-      if (prev.length === targetSemesters) return prev;
-      if (prev.length > targetSemesters) return prev.slice(0, targetSemesters);
-      const next = [...prev];
-      for (let i = prev.length; i < targetSemesters; i++) {
-        next.push({ semesterNumber: i + 1, sgpa: '', cgpa: '', creditsEarned: '' });
-      }
-      return next;
-    });
-  };
-
-  const handleQuickChange = (index, field, value) => {
-    setQuickSemesters(prev => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  };
-
-  useEffect(() => {
-     if (activeMethod === 'quick') {
-        let totalC = 0;
-        let totalP = 0;
-        quickSemesters.forEach(s => {
-           const sg = parseFloat(s.sgpa);
-           const cr = parseFloat(s.creditsEarned) || 1;
-           if (!isNaN(sg) && sg > 0) {
-              totalP += (sg * cr);
-              totalC += cr;
-           }
-        });
-        if (totalC > 0) {
-           setQuickOverallCgpa(Math.round((totalP / totalC) * 100) / 100);
-        } else {
-           setQuickOverallCgpa(0);
-        }
-     }
-  }, [quickSemesters, activeMethod]);
 
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
@@ -677,46 +642,8 @@ export default function CGPACalculator() {
           if (response.data.semestersData && Object.keys(response.data.semestersData).length > 0) {
             setSemestersData(response.data.semestersData);
           }
-          if (response.data.activeMethod) {
+          if (response.data.activeMethod && METHODS.some((m) => m.id === response.data.activeMethod)) {
             setActiveMethod(response.data.activeMethod);
-          }
-        }
-        
-        const userStr = sessionStorage.getItem('user');
-        if (userStr) {
-          const userObj = JSON.parse(userStr);
-          const userId = userObj._id || userObj.id;
-          if (userId) {
-            const studentRes = await apiCall(`/students/${userId}`).catch(()=>null);
-            if (studentRes?.success && studentRes.data?.academic) {
-               const ac = studentRes.data.academic;
-               if (ac.semesterPerformances && ac.semesterPerformances.length > 0) {
-                 const maxSem = Math.max(...ac.semesterPerformances.map(sp => sp.semesterNumber));
-                 const calcYears = Math.max(2, Math.min(5, Math.ceil(maxSem / 2)));
-                 setCourseDurationYears(calcYears);
-                 
-                 setQuickSemesters(prev => {
-                    const targetLen = calcYears * 2;
-                    let next = prev.length > targetLen ? prev.slice(0, targetLen) : [...prev];
-                    while (next.length < targetLen) {
-                        next.push({ semesterNumber: next.length + 1, sgpa: '', cgpa: '', creditsEarned: '' });
-                    }
-                    
-                    ac.semesterPerformances.forEach(sp => {
-                       const idx = next.findIndex(n => n.semesterNumber === sp.semesterNumber);
-                       if (idx !== -1) {
-                          next[idx] = { ...next[idx], sgpa: sp.sgpa||'', cgpa: sp.cgpa||'', creditsEarned: sp.creditsEarned||'' };
-                       }
-                    });
-                    return next;
-                 });
-               }
-               if (ac.overallCgpa) {
-                 setQuickOverallCgpa(ac.overallCgpa);
-               }
-               if (ac.activeBacklogs !== undefined) setActiveBacklogs(ac.activeBacklogs);
-               if (ac.historyOfArrears !== undefined) setHistoryOfArrears(ac.historyOfArrears);
-            }
           }
         }
       } catch (error) {
@@ -1084,55 +1011,18 @@ export default function CGPACalculator() {
     // Auto-sync to profile
     setIsSyncing(true);
     try {
-      if (activeMethod === "quick") {
-        const userStr = sessionStorage.getItem('user');
-        if (userStr) {
-          const userObj = JSON.parse(userStr);
-          const userId = userObj._id || userObj.id;
-          if (userId) {
-             const validSemesters = quickSemesters.filter(s => parseFloat(s.sgpa) > 0);
-             await apiCall(`/students/${userId}/academic-performance`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                   overallCgpa: quickOverallCgpa,
-                   activeBacklogs: parseInt(activeBacklogs) || 0,
-                   historyOfArrears: parseInt(historyOfArrears) || 0,
-                   semesterPerformances: validSemesters.map((s, idx) => {
-                      // Calculate running cgpa
-                      let tP = 0, tC = 0;
-                      for (let i = 0; i <= idx; i++) {
-                          const sg = parseFloat(validSemesters[i].sgpa);
-                          const cr = parseFloat(validSemesters[i].creditsEarned) || 1;
-                          if (!isNaN(sg) && sg > 0) { tP += sg * cr; tC += cr; }
-                      }
-                      const rcgpa = tC > 0 ? parseFloat((tP / tC).toFixed(2)) : 0;
-                      
-                      return {
-                          semesterNumber: s.semesterNumber,
-                          sgpa: parseFloat(s.sgpa) || 0,
-                          cgpa: rcgpa,
-                          creditsEarned: parseFloat(s.creditsEarned) || 0
-                      };
-                   })
-                })
-             });
-             alert("Profile successfully synced with your Quick Entry data!");
-          }
-        }
-      } else {
-        await apiCall('/cgpa/save', {
-          method: 'POST',
-          body: JSON.stringify({
-            activeMethod,
-            semestersData,
-            cgpa: calculation.cgpa,
-            percentage: calculation.percentage,
-            totalPoints: calculation.totalPoints,
-            totalCredits: calculation.totalCredits,
-            totalSubjects: calculation.totalSubjects
-          })
-        });
-      }
+      await apiCall('/cgpa/save', {
+        method: 'POST',
+        body: JSON.stringify({
+          activeMethod,
+          semestersData,
+          cgpa: calculation.cgpa,
+          percentage: calculation.percentage,
+          totalPoints: calculation.totalPoints,
+          totalCredits: calculation.totalCredits,
+          totalSubjects: calculation.totalSubjects
+        })
+      });
     } catch (error) {
       console.error("Failed to auto-sync profile:", error);
     } finally {
@@ -1148,20 +1038,33 @@ export default function CGPACalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pb-12 font-sans transition-colors duration-300">
-      <div className="mx-auto max-w-6xl p-4 md:p-8">
+    <PageTransition>
+    <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 font-sans transition-colors duration-300">
+      {/* Same ambient layer as the dashboard, courses, assessments,
+          dictionary, notes and toolkit pages */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pt-6">
         {/* Header & Back Button */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <button
             onClick={() => navigate("/dashboard/smaart-toolkit")}
-            className="group flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[#112b6b] transition-all hover:text-[#1a3884] dark:text-slate-300"
+            className="group flex items-center gap-3 w-fit"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-              <IconArrowLeft stroke={1.5} className="h-4 w-4" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5">
+              <IconArrowLeft stroke={1.5} className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
             </div>
-            Back to Toolkit
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+              Back to Toolkit
+            </span>
           </button>
-          
+
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => {
@@ -1171,21 +1074,21 @@ export default function CGPACalculator() {
                   setPasteText("");
                 }
               }}
-              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 sm:px-4 py-2 text-[12px] font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="flex items-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-white px-3 sm:px-4 py-2 text-[12px] font-bold text-[#072036] shadow-sm transition-colors hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-200 dark:hover:bg-[#0d3a5f]/70"
             >
               <IconPlus size={16} stroke={2.5} />
               <span className="hidden sm:inline">New Calculation</span>
             </button>
             <button
               onClick={() => setShowGuideModal(true)}
-              className="flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 sm:px-4 py-2 text-[12px] font-bold text-blue-700 shadow-sm transition-all hover:bg-blue-100 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+              className="flex items-center gap-1.5 rounded-xl border border-[#045C9A]/25 bg-[#EAF7FD] px-3 sm:px-4 py-2 text-[12px] font-bold text-[#045C9A] shadow-sm transition-colors hover:bg-[#045C9A] hover:text-white dark:border-white/15 dark:bg-white/[0.06] dark:text-[#A6D7E8] dark:hover:bg-[#A6D7E8] dark:hover:text-[#072036]"
             >
               <IconInfoCircle size={16} />
               <span className="hidden sm:inline">How it works</span>
             </button>
             <button
               onClick={() => setShowHistory(true)}
-              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 sm:px-4 py-2 text-[12px] font-bold text-[#1a3884] shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-[#001a3d] dark:text-blue-300 dark:hover:bg-[#00204d]"
+              className="flex items-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-white px-3 sm:px-4 py-2 text-[12px] font-bold text-[#072036] shadow-sm transition-colors hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-200 dark:hover:bg-[#0d3a5f]/70"
             >
               <IconHistory size={16} />
               <span className="hidden sm:inline">View History</span>
@@ -1193,76 +1096,70 @@ export default function CGPACalculator() {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
+        <motion.section
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative mb-8 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-8 py-6 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]"
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative mb-6 w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+
+          <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 md:flex-row md:items-center md:justify-between">
             {/* Left Content */}
-            <div className="flex-1 pr-6">
-              <h1 className="text-[22px] font-extrabold text-[#0d1f4e] dark:text-white mb-1.5">
-                CGPA Calculator
-              </h1>
-              <p className="text-[14px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                Effortlessly calculate and compare your CGPA across different methods. Enter your grade points or paste your result table directly.
-              </p>
-            </div>
-
-            {/* Vertical Divider (Hidden on mobile) */}
-            <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-slate-700/50"></div>
-
-            {/* Right Content */}
-            <div className="flex flex-col md:flex-row md:items-center gap-5 pl-0 md:pl-2">
-              <div className="hidden md:block">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">
-                  QUICK IMPORT
-                </p>
-                <p className="text-[14px] font-bold text-[#0d1f4e] dark:text-white">
-                  Extract from Result
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                <IconCalculator stroke={1.75} className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <h1
+                  className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                  style={{ letterSpacing: "-0.02em" }}
+                >
+                  CGPA Calculator
+                </h1>
+                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                  Compare your CGPA across grading methods, or paste your result table to fill it in automatically.
                 </p>
               </div>
-
-              {/* Smart Paste Button */}
-              <button
-                onClick={() => setShowPasteModal(true)}
-                className="group flex items-center justify-center gap-1.5 rounded-xl bg-[#2c52b3] px-5 py-2.5 font-semibold text-white shadow-sm transition-all hover:bg-[#1a3884] active:scale-95"
-              >
-                <IconWand size={16} stroke={2} className="transition-transform group-hover:rotate-12" />
-                <span className="text-[14px]">Smart Paste Data</span>
-                <IconChevronRight size={16} stroke={2} className="opacity-70 transition-transform group-hover:translate-x-1" />
-              </button>
             </div>
-            
+
+            {/* Smart Paste */}
+            <button
+              onClick={() => setShowPasteModal(true)}
+              className="group flex flex-shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0E2136] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#1b3457] active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+            >
+              <IconWand size={16} stroke={2} className="transition-transform group-hover:rotate-12" />
+              Smart Paste Data
+              <IconChevronRight size={16} stroke={2} className="opacity-70 transition-transform group-hover:translate-x-1" />
+            </button>
           </div>
-        </motion.div>
+        </motion.section>
 
         {/* --- METHOD SELECTOR --- */}
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {METHODS.map((method) => {
             const isActive = activeMethod === method.id;
             return (
               <button
                 key={method.id}
                 onClick={() => setActiveMethod(method.id)}
-                className={`relative flex flex-col items-center justify-center rounded-2xl border p-4 transition-all duration-300 ${
+                className={`relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border p-4 transition-colors duration-300 ${
                   isActive
-                    ? "border-[#1a3884] bg-[#f5f8ff] shadow-md dark:border-blue-500/50 dark:bg-blue-900/20"
-                    : "border-slate-200 bg-white hover:border-[#1a3884]/30 hover:bg-slate-50 dark:border-slate-800 dark:bg-[#001024] dark:hover:border-slate-700"
+                    ? "border-[#045C9A] bg-[#EAF7FD] shadow-md dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20"
+                    : "border-[#d7ebf5] bg-white hover:border-[#045C9A]/30 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:hover:border-white/20"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="method-active"
-                    className="absolute inset-0 rounded-2xl border-2 border-[#1a3884] dark:border-blue-400"
+                    className="absolute inset-0 rounded-2xl border-2 border-[#045C9A] dark:border-[#A6D7E8]"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
-                <span className={`text-[15px] font-bold ${isActive ? "text-[#1a3884] dark:text-blue-300" : "text-slate-600 dark:text-slate-400"}`}>
+                <span className={`text-[15px] font-bold ${isActive ? "text-[#045C9A] dark:text-[#A6D7E8]" : "text-slate-600 dark:text-slate-400"}`}>
                   {method.name}
                 </span>
-                <span className={`mt-1 text-[11px] font-semibold uppercase tracking-wider ${isActive ? "text-blue-600/70 dark:text-blue-400/70" : "text-slate-400 dark:text-slate-500"}`}>
+                <span className={`mt-1 text-[11px] font-semibold uppercase tracking-wider ${isActive ? "text-[#045C9A]/70 dark:text-[#A6D7E8]/70" : "text-slate-400 dark:text-slate-500"}`}>
                   {method.badge}
                 </span>
               </button>
@@ -1273,107 +1170,30 @@ export default function CGPACalculator() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* --- INPUT PANEL --- */}
           <div className="lg:col-span-7">
-            <div className="rounded-3xl border border-[#d8e6f7] bg-white p-6 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
+            <div className="rounded-3xl border border-[#d7ebf5] bg-white p-6 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
               
-              {activeMethod === "quick" ? (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 border-b border-slate-100 pb-4 dark:border-[#1a3884]/20">
-                    <div>
-                      <h3 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Semester-wise Quick Entry</h3>
-                      <p className="text-[11px] text-slate-400">Enter your GPA for each semester to automatically calculate your overall CGPA and sync it to your resume.</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest whitespace-nowrap">Course Duration:</label>
-                       <div className="relative">
-                         <select 
-                            value={courseDurationYears}
-                            onChange={(e) => handleDurationChange(parseInt(e.target.value))}
-                            className="appearance-none rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-8 text-xs font-bold text-[#1a3884] outline-none focus:border-[#1a3884] focus:ring-1 focus:ring-[#1a3884] dark:border-slate-700 dark:bg-[#000a1a] dark:text-blue-400"
-                         >
-                            <option value={2}>2 Years (4 Sems)</option>
-                            <option value={3}>3 Years (6 Sems)</option>
-                            <option value={4}>4 Years (8 Sems)</option>
-                            <option value={5}>5 Years (10 Sems)</option>
-                         </select>
-                         <IconChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#1a3884] dark:text-blue-400" />
-                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-1 grid grid-cols-12 gap-2 rounded-lg bg-slate-100 px-3 py-2 dark:bg-[#000d20]">
-                    <div className="col-span-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Year & Semester</div>
-                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">SGPA</div>
-                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Cumul. CGPA</div>
-                    <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Credits</div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {quickSemesters.map((sem, idx) => {
-                      const yearNum = Math.ceil(sem.semesterNumber / 2);
-                      const calculateRunningCgpa = (semIndex) => {
-                          let totalP = 0;
-                          let totalC = 0;
-                          for (let i = 0; i <= semIndex; i++) {
-                              const s = quickSemesters[i];
-                              const sg = parseFloat(s.sgpa);
-                              const cr = parseFloat(s.creditsEarned) || 1;
-                              if (!isNaN(sg) && sg > 0) {
-                                  totalP += (sg * cr);
-                                  totalC += cr;
-                              }
-                          }
-                          return totalC > 0 ? (Math.round((totalP / totalC) * 100) / 100).toFixed(2) : "Auto";
-                      };
-                      const runningCgpa = calculateRunningCgpa(idx);
-                      
-                      return (
-                      <div key={idx} className="group grid grid-cols-12 gap-2 items-center rounded-xl border-l-4 border-l-[#1a3884] border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] dark:border-slate-700/60 dark:bg-[#000d20]">
-                         <div className="col-span-3 flex flex-col justify-center">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Year {yearNum}</span>
-                            <span className="text-sm font-bold text-[#0d1f4e] dark:text-white">Semester {sem.semesterNumber}</span>
-                         </div>
-                         <div className="col-span-3">
-                            <input type="number" min="0" max="10" step="0.01" value={sem.sgpa} onChange={(e) => handleQuickChange(idx, 'sgpa', e.target.value)} placeholder="e.g. 8.5" className="w-full text-center rounded-lg border-2 border-blue-100 bg-blue-50 px-2 py-1.5 text-[13px] font-bold text-[#1a3884] placeholder:font-semibold placeholder:text-blue-300 focus:border-[#1a3884] focus:bg-white focus:outline-none dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-300 dark:focus:border-blue-500" />
-                         </div>
-                         <div className="col-span-3">
-                            <div className="flex w-full items-center justify-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 dark:border-slate-700/60 dark:bg-[#001630]">
-                               <span className={`text-[13px] font-bold ${runningCgpa === "Auto" ? "text-slate-400" : "text-[#0d1f4e] dark:text-white"}`}>
-                                  {runningCgpa}
-                               </span>
-                            </div>
-                         </div>
-                         <div className="col-span-3">
-                            <input type="number" min="0" step="1" value={sem.creditsEarned} onChange={(e) => handleQuickChange(idx, 'creditsEarned', e.target.value)} placeholder="24" className="w-full text-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-bold text-[#0d1f4e] placeholder:font-semibold placeholder:text-slate-400 focus:border-[#1a3884] focus:bg-white focus:outline-none dark:border-slate-700/60 dark:bg-[#001630] dark:text-white" />
-                         </div>
-                      </div>
-                    )})}
-                  </div>
-                </div>
-              ) : (
-                <>
               {/* Semester Dropdown */}
-              <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4 dark:border-[#1a3884]/20">
+              <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4 dark:border-[#045C9A]/20">
                 <div>
-                  <h3 className="text-sm font-bold text-[#0d1f4e] dark:text-white">Semester Details</h3>
+                  <h3 className="text-sm font-bold text-[#072036] dark:text-white">Semester Details</h3>
                   <p className="text-[11px] text-slate-400">Switch semesters to add cumulative data</p>
                 </div>
                 <div className="relative">
                   <select
                     value={activeSemester}
                     onChange={(e) => setActiveSemester(parseInt(e.target.value))}
-                    className="appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-4 pr-10 text-sm font-bold text-[#1a3884] outline-none focus:border-[#1a3884] focus:ring-1 focus:ring-[#1a3884] dark:border-slate-700 dark:bg-[#000a1a] dark:text-blue-400"
+                    className="appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-4 pr-10 text-sm font-bold text-[#045C9A] outline-none focus:border-[#045C9A] focus:ring-1 focus:ring-[#045C9A] dark:border-slate-700 dark:bg-[#072036] dark:text-blue-400"
                   >
                     {SEMESTERS.map(sem => (
                       <option key={sem} value={sem}>Semester {sem}</option>
                     ))}
                   </select>
-                  <IconChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#1a3884] dark:text-blue-400" />
+                  <IconChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#045C9A] dark:text-blue-400" />
                 </div>
               </div>
 
               {/* Table Header */}
-              <div className="mb-1 grid grid-cols-12 gap-2 rounded-lg bg-slate-100 px-3 py-2 dark:bg-[#000d20]">
+              <div className="mb-1 grid grid-cols-12 gap-2 rounded-lg bg-slate-100 px-3 py-2 dark:bg-[#072036]">
                 <div className={`text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-3" : "col-span-2"}`}>Code</div>
                 <div className={`text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-5" : "col-span-4"}`}>Subject Name</div>
                 <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
@@ -1408,7 +1228,7 @@ export default function CGPACalculator() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="group grid grid-cols-12 gap-2 items-center rounded-xl border-l-4 border-l-[#1a3884] border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] dark:border-slate-700/60 dark:bg-[#000d20]"
+                      className="group grid grid-cols-12 gap-2 items-center rounded-xl border-l-4 border-l-[#045C9A] border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] dark:border-slate-700/60 dark:bg-[#072036]"
                     >
                       <div className={activeMethod === "equal" ? "col-span-3" : "col-span-2"}>
                         <input
@@ -1417,7 +1237,7 @@ export default function CGPACalculator() {
                           value={subject.code || ""}
                           onChange={(e) => handleSubjectChange(subject.id, "code", e.target.value.toUpperCase())}
                           placeholder={ph.code}
-                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[12px] font-extrabold tracking-wider text-[#1a3884] text-ellipsis placeholder:font-semibold placeholder:tracking-wide placeholder:text-slate-400 focus:border-[#1a3884] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 dark:border-slate-700/60 dark:bg-[#001630] dark:text-blue-400 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
+                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[12px] font-extrabold tracking-wider text-[#045C9A] text-ellipsis placeholder:font-semibold placeholder:tracking-wide placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-blue-400 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                         />
                       </div>
                       <div className={activeMethod === "equal" ? "col-span-5" : "col-span-4"}>
@@ -1427,7 +1247,7 @@ export default function CGPACalculator() {
                           value={subject.name}
                           onChange={(e) => handleSubjectChange(subject.id, "name", e.target.value)}
                           placeholder={ph.name}
-                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-medium text-[#0d1f4e] text-ellipsis placeholder:font-medium placeholder:text-slate-400 focus:border-[#1a3884] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 dark:border-slate-700/60 dark:bg-[#001630] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500"
+                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-medium text-[#072036] text-ellipsis placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500"
                         />
                       </div>
                       <div className="col-span-3">
@@ -1439,7 +1259,7 @@ export default function CGPACalculator() {
                             : (subject.inputNumeric !== undefined ? subject.inputNumeric : (subject.input || ""))}
                           onChange={(e) => handleSubjectChange(subject.id, activeMethod === "slab" ? "inputSlab" : "inputNumeric", e.target.value)}
                           placeholder={activeMethod === "slab" ? ph.grade : (ph.grade === "O" ? "95" : ph.grade === "A+" ? "85" : "75")}
-                          className="w-full text-center rounded-lg border-2 border-blue-100 bg-blue-50 px-2 py-1.5 text-[13px] font-bold text-[#1a3884] uppercase placeholder:font-semibold placeholder:text-blue-300 focus:border-[#1a3884] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-300 dark:placeholder:text-blue-700 dark:focus:border-blue-500"
+                          className="w-full text-center rounded-lg border-2 border-blue-100 bg-blue-50 px-2 py-1.5 text-[13px] font-bold text-[#045C9A] uppercase placeholder:font-semibold placeholder:text-blue-300 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-300 dark:placeholder:text-blue-700 dark:focus:border-blue-500"
                         />
                       </div>
                       {activeMethod !== "equal" && (
@@ -1461,7 +1281,7 @@ export default function CGPACalculator() {
                               }
                             }}
                             placeholder={ph.credits}
-                            className="w-full text-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-bold text-[#0d1f4e] placeholder:font-semibold placeholder:text-slate-400 focus:border-[#1a3884] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1a3884]/20 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700/60 dark:bg-[#001630] dark:text-white dark:placeholder:text-slate-500 dark:disabled:bg-slate-800"
+                            className="w-full text-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-bold text-[#072036] placeholder:font-semibold placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500 dark:disabled:bg-slate-800"
                           />
                         </div>
                       )}
@@ -1481,68 +1301,30 @@ export default function CGPACalculator() {
               <div className="mt-4 flex gap-3">
                 <button
                   onClick={handleAddSubject}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 py-4 text-sm font-semibold text-slate-500 transition-colors hover:border-[#1a3884] hover:bg-blue-50 hover:text-[#1a3884] dark:border-slate-700 dark:bg-[#001024]/50 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-[#001a3d] dark:hover:text-blue-400"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 py-4 text-sm font-semibold text-slate-500 transition-colors hover:border-[#045C9A] hover:bg-blue-50 hover:text-[#045C9A] dark:border-slate-700 dark:bg-[#072036]/50 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:bg-[#0d3a5f] dark:hover:text-blue-400"
                 >
                   <IconPlus size={16} /> Add Subject
                 </button>
                 <button
                   onClick={handleClearSemester}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-semibold text-red-500 transition-colors hover:border-red-200 hover:bg-red-50 dark:border-slate-700/60 dark:bg-[#001630] dark:text-red-400 dark:hover:border-red-900/50 dark:hover:bg-red-900/20"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-semibold text-red-500 transition-colors hover:border-red-200 hover:bg-red-50 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-red-400 dark:hover:border-red-900/50 dark:hover:bg-red-900/20"
                 >
                   <IconEraser size={16} /> Clear All
                 </button>
               </div>
-              </>
-              )}
             </div>
           </div>
 
           {/* --- RESULT PANEL --- */}
           <div className="lg:col-span-5">
-            <div id="cgpa-result-panel" className="sticky top-6 rounded-3xl border border-[#d8e6f7] bg-white p-6 shadow-xl shadow-[#1a3884]/5 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+            <div id="cgpa-result-panel" className="sticky top-6 rounded-3xl border border-[#d7ebf5] bg-white p-6 shadow-xl shadow-[#045C9A]/5 dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
               <h3 className="mb-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500" data-html2canvas-ignore>
                 Calculation Result
               </h3>
 
-              {activeMethod === "quick" ? (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center">
-                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Cumulative CGPA</p>
-                     <div className="relative mb-4 mt-2 flex items-baseline justify-center">
-                       <span className="bg-gradient-to-br from-[#0d1f4e] to-[#1a3884] bg-clip-text text-6xl font-extrabold tracking-tight text-transparent dark:from-white dark:to-blue-400">
-                         {quickOverallCgpa.toFixed(2)}
-                       </span>
-                       <span className="ml-2 text-lg font-bold text-slate-400/80">/ 10</span>
-                     </div>
-                     <div className="mb-6 rounded-full bg-blue-100/50 px-4 py-1.5 dark:bg-blue-900/20">
-                       <p className="text-[13px] font-bold text-[#1a3884] dark:text-blue-400">
-                         Ready to sync with Resume
-                       </p>
-                     </div>
-                     
-                     <div className="mb-6 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700/50 dark:bg-[#000a1a]">
-                       <h4 className="mb-3 text-center text-[11px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">Academic Standing</h4>
-                       <div className="grid grid-cols-2 gap-4">
-                         <div className="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm dark:bg-[#001630] border border-slate-100 dark:border-slate-700/60 transition-all hover:border-amber-200 dark:hover:border-amber-500/30">
-                           <span className="mb-1 text-[10px] font-bold uppercase tracking-wide text-amber-500">Active Backlogs</span>
-                           <input type="number" min="0" value={activeBacklogs} onChange={(e) => setActiveBacklogs(e.target.value)} className="w-16 text-center text-2xl font-black text-[#0d1f4e] outline-none dark:bg-transparent dark:text-white" />
-                         </div>
-                         <div className="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm dark:bg-[#001630] border border-slate-100 dark:border-slate-700/60 transition-all hover:border-rose-200 dark:hover:border-rose-500/30">
-                           <span className="mb-1 text-[10px] font-bold uppercase tracking-wide text-rose-500">History of Arrears</span>
-                           <input type="number" min="0" value={historyOfArrears} onChange={(e) => setHistoryOfArrears(e.target.value)} className="w-16 text-center text-2xl font-black text-[#0d1f4e] outline-none dark:bg-transparent dark:text-white" />
-                         </div>
-                       </div>
-                     </div>
-                     
-                     <div className="w-full space-y-2">
-                       <button onClick={handleSaveResult} disabled={isSyncing} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a3884] py-3.5 text-sm font-bold text-white shadow-md transition-transform hover:-translate-y-0.5 hover:bg-[#112b6b] active:translate-y-0 disabled:opacity-70 dark:bg-[#00204d] dark:hover:bg-[#00337a]">
-                         {isSyncing ? <IconLoader2 size={18} className="animate-spin" /> : <IconCheck size={18} />}
-                         {isSyncing ? "Syncing..." : "Save & Sync to Profile"}
-                       </button>
-                     </div>
-                  </motion.div>
-              ) : !calculation ? (
+              {!calculation ? (
                 <div className="flex h-48 flex-col items-center justify-center text-center">
-                  <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-[#00204d]">
+                  <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-[#072036]">
                     <IconCalculator size={32} className="text-slate-400" />
                   </div>
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -1592,7 +1374,7 @@ export default function CGPACalculator() {
 
                   {/* Refined CGPA Display */}
                   <div className="relative mb-4 mt-2 flex items-baseline justify-center">
-                    <span className="bg-gradient-to-br from-[#0d1f4e] to-[#1a3884] bg-clip-text text-6xl font-extrabold tracking-tight text-transparent dark:from-white dark:to-blue-400">
+                    <span className="bg-gradient-to-br from-[#072036] to-[#045C9A] bg-clip-text text-6xl font-extrabold tracking-tight text-transparent dark:from-white dark:to-blue-400">
                       {calculation.cgpa.toFixed(2)}
                     </span>
                     <span className="ml-2 text-lg font-bold text-slate-400/80">/ 10</span>
@@ -1654,7 +1436,7 @@ export default function CGPACalculator() {
                     <div className="mb-6 w-full" data-html2canvas-ignore>
                       <button
                         onClick={() => setShowTrend(!showTrend)}
-                        className="flex w-full items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-[#1a3884] transition-colors hover:bg-slate-100 dark:bg-[#00204d]/50 dark:text-blue-400 dark:hover:bg-[#00204d]"
+                        className="flex w-full items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-[#045C9A] transition-colors hover:bg-slate-100 dark:bg-[#072036]/50 dark:text-blue-400 dark:hover:bg-[#072036]"
                       >
                         <div className="flex items-center gap-2">
                           <IconChartLine size={18} />
@@ -1671,26 +1453,26 @@ export default function CGPACalculator() {
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden"
                           >
-                            <div className="mt-4 h-48 w-full rounded-2xl border border-slate-100 bg-white p-4 pt-6 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001024]">
+                            <div className="mt-4 h-48 w-full rounded-2xl border border-slate-100 bg-white p-4 pt-6 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#072036]">
                               <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={trendData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
                                   <defs>
                                     <linearGradient id="colorSgpa" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="5%" stopColor="#1a3884" stopOpacity={0.3} />
-                                      <stop offset="95%" stopColor="#1a3884" stopOpacity={0} />
+                                      <stop offset="5%" stopColor="#045C9A" stopOpacity={0.3} />
+                                      <stop offset="95%" stopColor="#045C9A" stopOpacity={0} />
                                     </linearGradient>
                                   </defs>
                                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.3} />
                                   <XAxis dataKey="semester" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
                                   <YAxis domain={['auto', 'auto']} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                   <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', background: '#001630', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', background: '#0d3a5f', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                                     itemStyle={{ color: '#60a5fa' }}
                                   />
                                   <Area 
                                     type="monotone" 
                                     dataKey="sgpa" 
-                                    stroke="#1a3884" 
+                                    stroke="#045C9A" 
                                     strokeWidth={3}
                                     fillOpacity={1} 
                                     fill="url(#colorSgpa)" 
@@ -1708,7 +1490,7 @@ export default function CGPACalculator() {
                     <button
                       onClick={handleSaveResult}
                       disabled={isSyncing}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a3884] py-3.5 text-sm font-bold text-white shadow-md transition-transform hover:-translate-y-0.5 hover:bg-[#112b6b] active:translate-y-0 disabled:opacity-70 dark:bg-[#00204d] dark:hover:bg-[#00337a]"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0E2136] py-3.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#1b3457] disabled:opacity-70 dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                     >
                       {isSyncing ? (
                         <IconLoader2 size={18} className="animate-spin" />
@@ -1720,7 +1502,7 @@ export default function CGPACalculator() {
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isGeneratingPDF}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-600 transition-all hover:border-[#1a3884] hover:text-[#1a3884] active:scale-[0.98] disabled:opacity-50 dark:border-slate-700 dark:bg-[#001630] dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-600 transition-all hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] disabled:opacity-50 dark:border-slate-700 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
                     >
                       {isGeneratingPDF ? (
                         <IconLoader2 size={18} className="animate-spin" />
@@ -1740,24 +1522,24 @@ export default function CGPACalculator() {
       {/* --- SMART PASTE MODAL --- */}
       <AnimatePresence>
         {showPasteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0d1f4e]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: "spring", bounce: 0.4, duration: 0.5 }}
-              className="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#1a3884]/30 dark:bg-[#001630]"
+              className="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#1a3884]/20">
+              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-2 text-white">
                     <IconWand size={20} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#0d1f4e] dark:text-white">Smart Paste</h2>
+                  <h2 className="text-xl font-bold text-[#072036] dark:text-white">Smart Paste</h2>
                 </div>
                 <button
                   onClick={() => setShowPasteModal(false)}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#00204d]"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]"
                 >
                   <IconX size={20} />
                 </button>
@@ -1798,14 +1580,14 @@ export default function CGPACalculator() {
                   value={pasteText}
                   onChange={(e) => setPasteText(e.target.value)}
                   placeholder="e.g. Data Structures 4 A+&#10;Computer Networks 3 8.9"
-                  className="h-32 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-[#0d1f4e] placeholder:text-slate-300 focus:border-[#1a3884] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1a3884] dark:border-slate-700 dark:bg-[#000a1a] dark:text-white dark:placeholder:text-slate-600"
+                  className="h-32 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-[#072036] placeholder:text-slate-300 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-slate-700 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600"
                 />
               </div>
-              <div className="border-t border-slate-100 bg-slate-50 p-4 dark:border-[#1a3884]/20 dark:bg-[#001024]">
+              <div className="border-t border-slate-100 bg-slate-50 p-4 dark:border-[#045C9A]/20 dark:bg-[#072036]">
                 <button
                   onClick={handleSmartPaste}
                   disabled={!pasteText.trim()}
-                  className="w-full rounded-xl bg-[#1a3884] py-3 text-sm font-bold text-white shadow-md disabled:opacity-50 dark:bg-blue-600"
+                  className="w-full rounded-xl bg-[#0E2136] py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#1b3457] disabled:opacity-50 dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                 >
                   Extract Data
                 </button>
@@ -1818,19 +1600,19 @@ export default function CGPACalculator() {
       {/* --- HISTORY DRAWER / MODAL --- */}
       <AnimatePresence>
         {showHistory && (
-          <div className="fixed inset-0 z-50 flex items-center justify-end bg-[#0d1f4e]/40 p-4 backdrop-blur-sm dark:bg-black/60">
+          <div className="fixed inset-0 z-50 flex items-center justify-end bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60">
             <motion.div
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="flex h-full w-full max-w-md flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-[#001630] dark:border dark:border-[#1a3884]/30"
+              className="flex h-full w-full max-w-md flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-[#0d3a5f] dark:border dark:border-[#045C9A]/30"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#1a3884]/20">
-                <h2 className="text-xl font-bold text-[#0d1f4e] dark:text-white">Saved Results</h2>
+              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
+                <h2 className="text-xl font-bold text-[#072036] dark:text-white">Saved Results</h2>
                 <button
                   onClick={() => setShowHistory(false)}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#00204d]"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]"
                 >
                   <IconX size={20} />
                 </button>
@@ -1862,7 +1644,7 @@ export default function CGPACalculator() {
                       return (
                         <div
                           key={item.id}
-                          className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#1a3884] hover:bg-slate-50 hover:shadow-md dark:border-slate-700 dark:bg-[#001024] dark:hover:border-blue-500 dark:hover:bg-[#001630]"
+                          className="group relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#045C9A] hover:bg-slate-50 hover:shadow-md dark:border-slate-700 dark:bg-[#072036] dark:hover:border-blue-500 dark:hover:bg-[#0d3a5f]"
                           onClick={() => loadHistoryItem(item)}
                         >
                           <div className="mb-2 flex items-center justify-between relative z-10">
@@ -1874,7 +1656,7 @@ export default function CGPACalculator() {
                             </div>
                           </div>
                           <div className="flex items-baseline gap-2 relative z-10">
-                            <span className="text-3xl font-black text-[#0d1f4e] dark:text-white">{item.cgpa.toFixed(2)}</span>
+                            <span className="text-3xl font-black text-[#072036] dark:text-white">{item.cgpa.toFixed(2)}</span>
                             <span className="text-sm font-semibold text-slate-400">CGPA</span>
                           </div>
                           <div className="mt-2 flex flex-wrap items-center gap-2 relative z-10">
@@ -1884,7 +1666,7 @@ export default function CGPACalculator() {
                             {semestersText && (
                               <>
                                 <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-                                <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400">
+                                <span className="text-[11px] font-bold text-[#045C9A] dark:text-blue-400">
                                   {semestersText}
                                 </span>
                               </>
@@ -1894,7 +1676,7 @@ export default function CGPACalculator() {
                           {/* Delete Button (Visible on Hover) */}
                           <button
                             onClick={(e) => deleteHistoryItem(item.id, e)}
-                            className="absolute right-3 bottom-3 z-20 flex translate-y-2 items-center justify-center rounded-lg border border-red-100 bg-white p-2 text-red-500 opacity-0 shadow-sm transition-all hover:bg-red-50 group-hover:translate-y-0 group-hover:opacity-100 dark:border-red-900/30 dark:bg-[#001024] dark:hover:bg-red-900/20"
+                            className="absolute right-3 bottom-3 z-20 flex translate-y-2 items-center justify-center rounded-lg border border-red-100 bg-white p-2 text-red-500 opacity-0 shadow-sm transition-all hover:bg-red-50 group-hover:translate-y-0 group-hover:opacity-100 dark:border-red-900/30 dark:bg-[#072036] dark:hover:bg-red-900/20"
                             title="Delete Saved Result"
                           >
                             <IconTrash size={16} />
@@ -1913,29 +1695,29 @@ export default function CGPACalculator() {
       {/* --- GUIDE MODAL --- */}
       <AnimatePresence>
         {showGuideModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0d1f4e]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: "spring", bounce: 0.4, duration: 0.5 }}
-              className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#1a3884]/30 dark:bg-[#001630]"
+              className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#1a3884]/20">
+              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                     <IconInfoCircle size={20} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#0d1f4e] dark:text-white">How Each Method Works</h2>
+                  <h2 className="text-xl font-bold text-[#072036] dark:text-white">How Each Method Works</h2>
                 </div>
-                <button onClick={() => setShowGuideModal(false)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#00204d]">
+                <button onClick={() => setShowGuideModal(false)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]">
                   <IconX size={20} />
                 </button>
               </div>
               
               <div className="max-h-[70vh] space-y-6 overflow-y-auto p-6">
                 <div className="rounded-2xl border border-slate-200 p-5 dark:border-slate-700">
-                  <h3 className="mb-2 text-lg font-bold text-[#1a3884] dark:text-blue-400">1. Slab-Based Method <span className="text-sm font-normal text-slate-500">(Anna University)</span></h3>
+                  <h3 className="mb-2 text-lg font-bold text-[#045C9A] dark:text-blue-400">1. Slab-Based Method <span className="text-sm font-normal text-slate-500">(Anna University)</span></h3>
                   <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Converts your Letter Grade into a predefined Grade Point, multiplies it by the subject's credits, and then divides the total points by your total credits.</p>
                   
                   <div className="mb-3 rounded-lg bg-blue-50/50 p-3 text-sm dark:bg-blue-900/10">
@@ -1950,7 +1732,7 @@ export default function CGPACalculator() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#000a1a] dark:text-slate-300">
+                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#072036] dark:text-slate-300">
                     <span className="font-bold text-slate-900 dark:text-white">Example:</span> You get an <span className="font-bold text-blue-600 dark:text-blue-400">A+</span> in a <span className="font-bold text-blue-600 dark:text-blue-400">4-credit</span> course.<br/>
                     A+ translates to 9 points.<br/>
                     <div className="mt-2 text-emerald-600 dark:text-emerald-400 font-bold">Calculation: (9 points × 4 credits) ÷ 4 total credits = 9.0 GPA</div>
@@ -1958,14 +1740,14 @@ export default function CGPACalculator() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 p-5 dark:border-slate-700">
-                  <h3 className="mb-2 text-lg font-bold text-[#1a3884] dark:text-blue-400">2. Continuous Method <span className="text-sm font-normal text-slate-500">(Madras University)</span></h3>
+                  <h3 className="mb-2 text-lg font-bold text-[#045C9A] dark:text-blue-400">2. Continuous Method <span className="text-sm font-normal text-slate-500">(Madras University)</span></h3>
                   <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Uses your exact marks divided by 10 to get a precise decimal grade point, then calculates the credit-weighted average.</p>
                   
                   <div className="mb-3 rounded-lg bg-blue-50/50 p-3 text-sm dark:bg-blue-900/10">
                     <span className="font-semibold text-blue-700 dark:text-blue-300">What you can enter:</span> Exact Decimal Points (e.g., <span className="font-bold dark:text-white">8.7</span>) or total Marks (e.g., <span className="font-bold dark:text-white">87</span>). The calculator automatically divides marks by 10.
                   </div>
 
-                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#000a1a] dark:text-slate-300">
+                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#072036] dark:text-slate-300">
                     <span className="font-bold text-slate-900 dark:text-white">Example:</span> You score <span className="font-bold text-blue-600 dark:text-blue-400">87 marks</span> in a <span className="font-bold text-blue-600 dark:text-blue-400">3-credit</span> course.<br/>
                     87 marks ÷ 10 = 8.7 Grade Points.<br/>
                     <div className="mt-2 text-emerald-600 dark:text-emerald-400 font-bold">Calculation: (8.7 points × 3 credits) ÷ 3 total credits = 8.7 GPA</div>
@@ -1973,14 +1755,14 @@ export default function CGPACalculator() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 p-5 dark:border-slate-700">
-                  <h3 className="mb-2 text-lg font-bold text-[#1a3884] dark:text-blue-400">3. Equal-Credit Method <span className="text-sm font-normal text-slate-500">(Autonomous)</span></h3>
+                  <h3 className="mb-2 text-lg font-bold text-[#045C9A] dark:text-blue-400">3. Equal-Credit Method <span className="text-sm font-normal text-slate-500">(Autonomous)</span></h3>
                   <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Treats every subject equally by completely ignoring the credits. It calculates a simple average of your grade points.</p>
 
                   <div className="mb-3 rounded-lg bg-blue-50/50 p-3 text-sm dark:bg-blue-900/10">
                     <span className="font-semibold text-blue-700 dark:text-blue-300">What you can enter:</span> Grade Points or Marks. Credits can be left blank or will be completely ignored.
                   </div>
 
-                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#000a1a] dark:text-slate-300">
+                  <div className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-700 dark:bg-[#072036] dark:text-slate-300">
                     <span className="font-bold text-slate-900 dark:text-white">Example:</span> You score <span className="font-bold text-blue-600 dark:text-blue-400">8.5</span> in Math (4 credits) and <span className="font-bold text-blue-600 dark:text-blue-400">9.5</span> in Lab (1 credit).<br/>
                     The credits are completely ignored.<br/>
                     <div className="mt-2 text-emerald-600 dark:text-emerald-400 font-bold">Calculation: (8.5 + 9.5) ÷ 2 = 9.0 CGPA</div>
@@ -1989,7 +1771,7 @@ export default function CGPACalculator() {
 
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/50 dark:bg-blue-900/10">
-                    <h3 className="mb-2 text-lg font-bold text-[#1a3884] dark:text-blue-400">How is GPA calculated?</h3>
+                    <h3 className="mb-2 text-lg font-bold text-[#045C9A] dark:text-blue-400">How is GPA calculated?</h3>
                     <ul className="list-inside list-disc space-y-2 text-sm text-slate-600 dark:text-slate-300">
                       <li><strong className="text-slate-900 dark:text-white">GPA (Semester):</strong> (Total Points) ÷ (Total Credits in semester).</li>
                       <li><strong className="text-slate-900 dark:text-white">CGPA (Cumulative):</strong> (Total Points across ALL semesters) ÷ (Total Credits across ALL semesters).</li>
@@ -2018,24 +1800,24 @@ export default function CGPACalculator() {
       {/* --- TARGET GOAL MODAL --- */}
       <AnimatePresence>
         {showTargetModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0d1f4e]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: "spring", bounce: 0.4, duration: 0.5 }}
-              className="w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#1a3884]/30 dark:bg-[#001630]"
+              className="w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#1a3884]/20">
+              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl bg-indigo-100 p-2 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                     <IconTarget size={20} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#0d1f4e] dark:text-white">Set Target Goal</h2>
+                  <h2 className="text-xl font-bold text-[#072036] dark:text-white">Set Target Goal</h2>
                 </div>
                 <button
                   onClick={() => setShowTargetModal(false)}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#00204d]"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]"
                 >
                   <IconX size={20} />
                 </button>
@@ -2053,7 +1835,7 @@ export default function CGPACalculator() {
                     placeholder="e.g., 8.5"
                     value={targetGoal.targetCGPA}
                     onChange={(e) => setTargetGoal(prev => ({ ...prev, targetCGPA: e.target.value }))}
-                    className="w-full rounded-xl border-2 border-slate-100 bg-slate-50 p-3 text-lg font-bold text-[#1a3884] placeholder:text-slate-300 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-slate-700/60 dark:bg-[#000a1a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-indigo-500"
+                    className="w-full rounded-xl border-2 border-slate-100 bg-slate-50 p-3 text-lg font-bold text-[#045C9A] placeholder:text-slate-300 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-slate-700/60 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-indigo-500"
                   />
                 </div>
                 <div>
@@ -2066,14 +1848,14 @@ export default function CGPACalculator() {
                     placeholder={activeMethod === "equal" ? "e.g., 40" : "e.g., 165"}
                     value={targetGoal.totalDegreeUnits}
                     onChange={(e) => setTargetGoal(prev => ({ ...prev, totalDegreeUnits: e.target.value }))}
-                    className="w-full rounded-xl border-2 border-slate-100 bg-slate-50 p-3 text-lg font-bold text-[#1a3884] placeholder:text-slate-300 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-slate-700/60 dark:bg-[#000a1a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-indigo-500"
+                    className="w-full rounded-xl border-2 border-slate-100 bg-slate-50 p-3 text-lg font-bold text-[#045C9A] placeholder:text-slate-300 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-slate-700/60 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-indigo-500"
                   />
                   <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
                     Enter the total number of {activeMethod === "equal" ? "subjects" : "credits"} required to complete your entire degree.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 border-t border-slate-100 bg-slate-50 p-4 dark:border-[#1a3884]/20 dark:bg-[#001024]">
+              <div className="flex items-center gap-3 border-t border-slate-100 bg-slate-50 p-4 dark:border-[#045C9A]/20 dark:bg-[#072036]">
                 {targetGoal.active && (
                   <button
                     onClick={() => {
@@ -2093,7 +1875,7 @@ export default function CGPACalculator() {
                     }
                   }}
                   disabled={!targetGoal.targetCGPA || !targetGoal.totalDegreeUnits}
-                  className="flex-[2] rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-400"
+                  className="flex-[2] rounded-xl bg-[#0E2136] py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#1b3457] disabled:opacity-50 dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                 >
                   Set Target
                 </button>
@@ -2104,5 +1886,6 @@ export default function CGPACalculator() {
       </AnimatePresence>
 
     </div>
+    </PageTransition>
   );
 }
