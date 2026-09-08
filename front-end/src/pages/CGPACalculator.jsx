@@ -822,7 +822,7 @@ export default function CGPACalculator() {
                           value={subject.name}
                           onChange={(e) => handleSubjectChange(subject.id, "name", e.target.value)}
                           placeholder={ph.name}
-                          className="w-full rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[13px] font-medium text-[#072036] text-ellipsis placeholder:font-normal placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-500"
+                          className="w-full rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[13px] font-semibold text-[#072036] text-ellipsis placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-500"
                         />
                       </div>
                       <div className="col-span-3">
@@ -893,7 +893,7 @@ export default function CGPACalculator() {
           {/* --- RESULT PANEL --- */}
           <div className="lg:col-span-5">
             <div id="cgpa-result-panel" className="sticky top-6 rounded-3xl border border-[#d7ebf5] bg-white p-6 shadow-xl shadow-[#045C9A]/5 dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
-              <h3 className="mb-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500" data-html2canvas-ignore>
+              <h3 className="mb-6 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" data-html2canvas-ignore>
                 Calculation Result
               </h3>
 
@@ -936,7 +936,7 @@ export default function CGPACalculator() {
                   className="flex flex-col items-center"
                 >
                   
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Cumulative CGPA</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cumulative CGPA</p>
 
                   {/* CGPA Display */}
                   <div className="relative mb-5 mt-2 flex items-baseline justify-center">
@@ -949,7 +949,7 @@ export default function CGPACalculator() {
                   {/* SGPA + Percentage stat strip */}
                   <div className="mb-6 grid w-full grid-cols-2 divide-x divide-[#d7ebf5] overflow-hidden rounded-2xl border border-[#d7ebf5] dark:divide-white/10 dark:border-white/10">
                     <div className="px-4 py-3 text-center">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                         Semester {activeSemester} SGPA
                       </p>
                       <p className="mt-1 text-lg font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
@@ -957,7 +957,7 @@ export default function CGPACalculator() {
                       </p>
                     </div>
                     <div className="px-4 py-3 text-center">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                         Est. Percentage
                       </p>
                       <p className="mt-1 text-lg font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
@@ -966,105 +966,108 @@ export default function CGPACalculator() {
                     </div>
                   </div>
 
-                  {/* Target Goal Tracker */}
-                  <div className="mb-8 w-full" data-html2canvas-ignore>
-                    {targetGoal.active ? (
-                      <div className="rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-4 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 relative group cursor-pointer transition-colors hover:bg-[#d7ebf5]/60 dark:hover:bg-[#045C9A]/20" onClick={() => setShowTargetModal(true)}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#045C9A] dark:text-[#A6D7E8]">Target Goal: {targetGoal.targetCGPA}</span>
-                          <IconTarget size={14} className="text-[#045C9A] dark:text-[#A6D7E8]" />
-                        </div>
-                        {(() => {
-                          const c1 = calculation.totalCredits || 0;
-                          const p1 = calculation.totalPoints || 0;
-                          const c2 = Math.max(0, parseFloat(targetGoal.totalDegreeUnits) - c1);
-                          const targetT = parseFloat(targetGoal.targetCGPA);
-
-                          if (c2 === 0) {
-                            return <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8]">You have completed all planned units!</p>;
-                          }
-
-                          const reqPoints = (targetT * (c1 + c2)) - p1;
-                          const reqAvg = reqPoints / c2;
-
-                          if (reqAvg > 10) {
-                            return <p className="text-xs font-semibold text-red-600 dark:text-red-400">Mathematically impossible with remaining units.</p>;
-                          } else if (reqAvg <= 0) {
-                            return <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Goal achieved securely!</p>;
-                          } else {
-                            return (
-                              <div>
-                                <p className="text-[13px] leading-tight text-[#072036] dark:text-slate-200">
-                                  Need an average of <strong className="text-[#045C9A] dark:text-[#A6D7E8]">{reqAvg.toFixed(2)}</strong> across your remaining {c2} {activeMethod === "equal" ? "subjects" : "credits"}.
-                                </p>
-                              </div>
-                            );
-                          }
-                        })()}
+                  {/* More Insights -- Target Goal + Performance Trend, collapsed by
+                      default so the panel's default view stays CGPA + stats + actions */}
+                  <div className="mb-6 w-full" data-html2canvas-ignore>
+                    <button
+                      onClick={() => setShowTrend(!showTrend)}
+                      className="flex w-full items-center justify-between rounded-xl bg-[#F1F5F9] px-4 py-3 text-sm font-bold text-[#045C9A] transition-colors hover:bg-[#d7ebf5]/60 dark:bg-[#072036]/50 dark:text-[#A6D7E8] dark:hover:bg-[#072036]"
+                    >
+                      <div className="flex items-center gap-2">
+                        <IconChartLine size={18} />
+                        More Insights
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowTargetModal(true)}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-500 transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-slate-700 dark:text-slate-400 dark:hover:border-[#A6D7E8]/40 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]"
-                      >
-                        <IconTarget size={16} /> Set Target CGPA
-                      </button>
-                    )}
-                  </div>
+                      <IconChevronDown size={16} className={`transition-transform duration-300 ${showTrend ? "rotate-180" : ""}`} />
+                    </button>
 
-                  {trendData.length > 1 && (
-                    <div className="mb-6 w-full" data-html2canvas-ignore>
-                      <button
-                        onClick={() => setShowTrend(!showTrend)}
-                        className="flex w-full items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-[#045C9A] transition-colors hover:bg-slate-100 dark:bg-[#072036]/50 dark:text-blue-400 dark:hover:bg-[#072036]"
-                      >
-                        <div className="flex items-center gap-2">
-                          <IconChartLine size={18} />
-                          Performance Trend Analytics
-                        </div>
-                        <IconChevronDown size={16} className={`transition-transform duration-300 ${showTrend ? "rotate-180" : ""}`} />
-                      </button>
-                      
-                      <AnimatePresence>
-                        {showTrend && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="mt-4 h-48 w-full rounded-2xl border border-slate-100 bg-white p-4 pt-6 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#072036]">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={trendData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
-                                  <defs>
-                                    <linearGradient id="colorSgpa" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="5%" stopColor="#045C9A" stopOpacity={0.3} />
-                                      <stop offset="95%" stopColor="#045C9A" stopOpacity={0} />
-                                    </linearGradient>
-                                  </defs>
-                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.3} />
-                                  <XAxis dataKey="semester" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
-                                  <YAxis domain={['auto', 'auto']} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                  <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', background: '#0d3a5f', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
-                                    itemStyle={{ color: '#60a5fa' }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="sgpa" 
-                                    stroke="#045C9A" 
-                                    strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorSgpa)" 
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  )}
+                    <AnimatePresence>
+                      {showTrend && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mt-4 space-y-4">
+                            {/* Target Goal Tracker */}
+                            {targetGoal.active ? (
+                              <div className="rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-4 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 relative group cursor-pointer transition-colors hover:bg-[#d7ebf5]/60 dark:hover:bg-[#045C9A]/20" onClick={() => setShowTargetModal(true)}>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#045C9A] dark:text-[#A6D7E8]">Target Goal: {targetGoal.targetCGPA}</span>
+                                  <IconTarget size={14} className="text-[#045C9A] dark:text-[#A6D7E8]" />
+                                </div>
+                                {(() => {
+                                  const c1 = calculation.totalCredits || 0;
+                                  const p1 = calculation.totalPoints || 0;
+                                  const c2 = Math.max(0, parseFloat(targetGoal.totalDegreeUnits) - c1);
+                                  const targetT = parseFloat(targetGoal.targetCGPA);
+
+                                  if (c2 === 0) {
+                                    return <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8]">You have completed all planned units!</p>;
+                                  }
+
+                                  const reqPoints = (targetT * (c1 + c2)) - p1;
+                                  const reqAvg = reqPoints / c2;
+
+                                  if (reqAvg > 10) {
+                                    return <p className="text-xs font-semibold text-red-600 dark:text-red-400">Mathematically impossible with remaining units.</p>;
+                                  } else if (reqAvg <= 0) {
+                                    return <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Goal achieved securely!</p>;
+                                  } else {
+                                    return (
+                                      <div>
+                                        <p className="text-[13px] leading-tight text-[#072036] dark:text-slate-200">
+                                          Need an average of <strong className="text-[#045C9A] dark:text-[#A6D7E8]">{reqAvg.toFixed(2)}</strong> across your remaining {c2} {activeMethod === "equal" ? "subjects" : "credits"}.
+                                        </p>
+                                      </div>
+                                    );
+                                  }
+                                })()}
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setShowTargetModal(true)}
+                                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-500 transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-slate-700 dark:text-slate-400 dark:hover:border-[#A6D7E8]/40 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]"
+                              >
+                                <IconTarget size={16} /> Set Target CGPA
+                              </button>
+                            )}
+
+                            {/* Performance Trend */}
+                            {trendData.length > 1 && (
+                              <div className="h-48 w-full rounded-2xl border border-slate-100 bg-white p-4 pt-6 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#072036]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <AreaChart data={trendData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                                    <defs>
+                                      <linearGradient id="colorSgpa" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#045C9A" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#045C9A" stopOpacity={0} />
+                                      </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.3} />
+                                    <XAxis dataKey="semester" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} dy={10} />
+                                    <YAxis domain={['auto', 'auto']} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                    <Tooltip
+                                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', background: '#0d3a5f', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
+                                      itemStyle={{ color: '#60a5fa' }}
+                                    />
+                                    <Area
+                                      type="monotone"
+                                      dataKey="sgpa"
+                                      stroke="#045C9A"
+                                      strokeWidth={3}
+                                      fillOpacity={1}
+                                      fill="url(#colorSgpa)"
+                                    />
+                                  </AreaChart>
+                                </ResponsiveContainer>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
                   <div className="w-full space-y-2" data-html2canvas-ignore>
                     <button
