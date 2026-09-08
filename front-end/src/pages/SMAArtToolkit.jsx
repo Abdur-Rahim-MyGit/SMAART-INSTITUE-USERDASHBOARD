@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 // Material Symbols barrel -- the icon set the dashboard, courses,
 // assessments, dictionary and notes pages use, so this page's glyphs
@@ -10,6 +11,8 @@ import {
   Calculator,
   Wrench,
   ArrowRight,
+  ChevronDown,
+  ChevronUp,
   IconArrowLeft as ArrowLeft,
 } from "@/components/icons";
 import { useNavigate } from "react-router-dom";
@@ -83,64 +86,96 @@ const toolkitSections = [
 ];
 
 /* ─────────────────────────────────────────────────────────
-   Toolkit Card -- same anatomy as the Assessments stage card
-   (icon + title/meta row, full description, full-width footer
-   button): no truncation, no per-card badge, so it reads as
-   part of the same product instead of its own thing.
+   Toolkit Card -- icon on its own row, small caption + title +
+   description stacked below, Read More for the longer ones, a
+   full-width footer button. No per-card badge (removed per
+   request) and a tighter, more restrained type scale than the
+   card ever had -- 13-14px, not 15-16px.
 ───────────────────────────────────────────────────────── */
+const TRUNCATE_LENGTH = 100;
+
 const ToolkitCard = ({ section, index }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const Icon = section.icon;
+  const [expanded, setExpanded] = useState(false);
 
   const title = t(`smaart_toolkit.tools.${section.slug}.title`, section.title);
   const meta = t(`smaart_toolkit.tools.${section.slug}.meta`, section.meta);
   const cta = t(`smaart_toolkit.tools.${section.slug}.cta`, section.cta);
   const description = t(`smaart_toolkit.tools.${section.slug}.description`, section.description);
 
+  const isLong = description.length > TRUNCATE_LENGTH;
+  const displayText =
+    expanded || !isLong
+      ? description
+      : description.slice(0, TRUNCATE_LENGTH).trimEnd() + "…";
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      layout
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index, 8) * 0.06, duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={{ delay: Math.min(index * 0.07, 0.35), duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.99 }}
       className="group h-full"
     >
       <div
         onClick={() => navigate(section.path)}
-        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-[0_2px_16px_rgba(4,92,154,0.05)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] motion-reduce:hover:translate-y-0 dark:border-white/10 dark:bg-[#0d3a5f]"
+        className="relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white p-5 shadow-sm transition-colors duration-300 hover:border-[#045C9A]/30 hover:shadow-[0_6px_20px_rgba(4,92,154,0.10)] dark:border-white/10 dark:bg-[#0d3a5f]"
       >
-        <div className="flex h-full flex-col p-5 sm:p-6">
-          <div className="mb-4 flex items-start gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-              <Icon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 pt-0.5">
-              <h3 className="text-base font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
-                {title}
-              </h3>
-              <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                {meta}
-              </p>
-            </div>
-          </div>
-
-          <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-            {description}
-          </p>
-
-          <div className="flex-1" />
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(section.path);
-            }}
-            className="group/btn mt-auto flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] text-[13px] font-semibold text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
-          >
-            {cta}
-            <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover/btn:translate-x-0.5" />
-          </button>
+        <div className="mb-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm transition-transform duration-300 group-hover:scale-105 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+          <Icon className="h-4 w-4" />
         </div>
+
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
+          {meta}
+        </p>
+
+        <h3 className="mb-1.5 text-[14px] font-bold leading-snug tracking-tight text-[#072036] transition-colors group-hover:text-[#045C9A] dark:text-white dark:group-hover:text-[#A6D7E8]">
+          {title}
+        </h3>
+
+        <div className="mb-1">
+          <motion.p layout="position" className="text-[12.5px] leading-[1.65] text-[#35566b] dark:text-slate-400">
+            {displayText}
+          </motion.p>
+          {isLong && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((p) => !p);
+              }}
+              className="mt-1 flex items-center gap-1 text-[11px] font-bold text-[#045C9A] transition-opacity hover:opacity-70 dark:text-[#A6D7E8]"
+            >
+              {expanded ? (
+                <>
+                  {t("smaart_toolkit.show_less", "Show Less")} <ChevronUp className="h-3 w-3" />
+                </>
+              ) : (
+                <>
+                  {t("smaart_toolkit.read_more", "Read More")} <ChevronDown className="h-3 w-3" />
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        <div className="flex-1" />
+
+        <div className="mt-3 mb-4 border-t border-[#EAF7FD] dark:border-white/10" />
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(section.path);
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0E2136] px-4 py-2.5 text-[12.5px] font-semibold text-white shadow-sm transition-colors hover:bg-[#1b3457] active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+        >
+          {cta}
+          <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover:translate-x-1" />
+        </button>
       </div>
     </motion.div>
   );
