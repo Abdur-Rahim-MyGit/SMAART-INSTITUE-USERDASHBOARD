@@ -987,7 +987,7 @@ ${applicationForm.fullName || "Your Name"}`;
 
             </section>
 
-            <aside className="space-y-6">
+            <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
               <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
                 <h2 className="mb-4 border-b border-slate-200 pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#045C9A] dark:border-[#045C9A]/25 dark:text-[#A6D7E8]">
                   {t("placement.job_information", "Job Information")}
@@ -1021,28 +1021,6 @@ ${applicationForm.fullName || "Your Name"}`;
                   </div>
                 </div>
               )}
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
-                <div className="mb-4 flex items-center justify-between border-b border-slate-200 pb-3 dark:border-[#045C9A]/25">
-                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#045C9A] dark:text-[#A6D7E8]">
-                    {t("placement.about_company", "About the Company")}
-                  </h2>
-                  {companyWebsite && (
-                    <a
-                      href={companyWebsite}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-medium text-[#045C9A] transition-colors hover:underline dark:text-[#A6D7E8]"
-                    >
-                      {t("placement.website", "Website")}
-                      <ExternalLink stroke={1.8} className="h-3 w-3" />
-                    </a>
-                  )}
-                </div>
-                <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
-                  {companyAbout || t("placement.no_company_info", "Company information has not been added yet.")}
-                </p>
-              </div>
             </aside>
           </div>
 
@@ -1050,8 +1028,36 @@ ${applicationForm.fullName || "Your Name"}`;
               area rather than inside the left column. The sidebar is short and
               these lists are long, so keeping them side by side leaves a dead
               empty column beside them for most of the scroll. */}
-          {((Array.isArray(job.courseSkills) && job.courseSkills.length > 0) || hasSkillGap) && (
-            <div className="space-y-7 border-t border-[#d7ebf5] px-6 pb-6 pt-6 dark:border-[#045C9A]/20">
+          <div className="space-y-7 border-t border-[#d7ebf5] px-6 pb-6 pt-6 dark:border-[#045C9A]/20">
+              {/* ── About the Company ─────────────────────────────────────
+                  Long-form text, so it lives here at full width rather than
+                  in the compact-facts sidebar where it made the sidebar
+                  taller than the main column. */}
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
+                    <Building stroke={1.7} className="h-[18px] w-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
+                    {t("placement.about_company", "About the Company")}
+                  </h2>
+                  {companyWebsite && (
+                    <a
+                      href={companyWebsite}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[12px] font-medium text-[#045C9A] transition-colors hover:underline dark:text-[#A6D7E8]"
+                    >
+                      {t("placement.website", "Website")}
+                      <ExternalLink stroke={1.8} className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
+                  <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+                    {companyAbout || t("placement.no_company_info", "Company information has not been added yet.")}
+                  </p>
+                </div>
+              </div>
+
               {/* ── SMAART Course Skills ──────────────────────────────── */}
               {Array.isArray(job.courseSkills) && job.courseSkills.length > 0 && (
                 <div>
@@ -1123,8 +1129,7 @@ ${applicationForm.fullName || "Your Name"}`;
                   </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
         </motion.div>
       </div>
 
