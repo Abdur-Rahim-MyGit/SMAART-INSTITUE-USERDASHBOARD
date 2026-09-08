@@ -642,9 +642,14 @@ ${applicationForm.fullName || "Your Name"}`;
 
   return (
     <PageTransition>
-    <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 transition-colors duration-300">
+    <div className="relative min-h-screen bg-transparent pb-12 transition-colors duration-300">
       {/* Same ambient layer as the dashboard, courses, assessments,
-          toolkit, CGPA calculator and placement list pages */}
+          toolkit, CGPA calculator and placement list pages.
+          NOTE: no overflow-hidden on this outer wrapper -- the job
+          info sidebar below is position:sticky, and an overflow-hidden
+          ancestor silently breaks sticky positioning. The background
+          layers below are already self-contained (each has its own
+          overflow-hidden), so nothing leaks without it here. */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
         <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
       </div>
