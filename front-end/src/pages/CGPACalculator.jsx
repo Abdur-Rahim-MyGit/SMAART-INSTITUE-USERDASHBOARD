@@ -19,6 +19,7 @@ import {
   IconClipboardList,
   IconLoader2,
   IconDownload,
+  IconFileSpreadsheet,
   IconTarget,
   IconChartLine
 } from '@tabler/icons-react';
@@ -227,6 +228,44 @@ export default function CGPACalculator() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (!calculation || calculation.isPending) return;
+
+    const escapeCsv = (value) => {
+      const str = String(value ?? "");
+      return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+    };
+    const row = (cells) => cells.map(escapeCsv).join(",");
+
+    const lines = [];
+    lines.push(row(["Semester", "Code", "Subject Name", "Grade", "Credits", "Grade Points"]));
+    semesterSummary.forEach((sem) => {
+      sem.subjects.forEach((sub) => {
+        lines.push(row([`Semester ${sem.semNum}`, sub.code, sub.name, sub.grade, sub.credits, sub.gp]));
+      });
+    });
+
+    lines.push("");
+    lines.push(row(["Semester", "SGPA", "Credits", "Subjects"]));
+    semesterSummary.forEach((sem) => {
+      lines.push(row([`Semester ${sem.semNum}`, sem.sgpa.toFixed(2), sem.credits, sem.subjectCount]));
+    });
+
+    lines.push("");
+    lines.push(row(["Cumulative CGPA", calculation.cgpa.toFixed(2)]));
+    lines.push(row(["Estimated Percentage", `${calculation.percentage}%`]));
+
+    const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `SMAART_CGPA_Result_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   // Load history on mount
   useEffect(() => {
     const saved = localStorage.getItem("smaart_cgpa_history");
@@ -372,53 +411,92 @@ export default function CGPACalculator() {
     };
   }, [semestersData, activeMethod, activeSemester, gradeMappingObj, failGrades]);
 
-  const trendData = useMemo(() => {
-    let trends = [];
+  // Per-semester breakdown -- SGPA, credits, every subject's grade points, and
+  // which subjects are currently arrears -- feeds the trend chart, the
+  // all-semesters summary table, the backlog tracker, and the CSV export.
+  const semesterSummary = useMemo(() => {
+    const summary = [];
+
     Object.entries(semestersData).forEach(([semString, subjects]) => {
       const valid = subjects.filter((s) => {
-        const activeInput = activeMethod === "slab" 
-          ? (s.inputSlab !== undefined ? s.inputSlab : s.input) 
+        const activeInput = activeMethod === "slab"
+          ? (s.inputSlab !== undefined ? s.inputSlab : s.input)
           : (s.inputNumeric !== undefined ? s.inputNumeric : s.input);
         return (activeInput || "").toString().trim() !== "";
       });
-      if (valid.length > 0) {
-        let totalPoints = 0;
-        let totalCredits = 0;
-        let count = valid.length;
-        
-        valid.forEach(subject => {
-          const activeInput = activeMethod === "slab" 
-            ? (subject.inputSlab !== undefined ? subject.inputSlab : subject.input) 
-            : (subject.inputNumeric !== undefined ? subject.inputNumeric : subject.input);
-          const rawInput = (activeInput || "").toString().toUpperCase().trim();
-          let gp = 0;
-          let credits = parseFloat(subject.credits) || 1;
+      if (valid.length === 0) return;
 
-          if (gradeMappingObj[rawInput] !== undefined) {
-             gp = activeMethod === "slab" ? gradeMappingObj[rawInput] : 0;
-          } else if (!failGrades.includes(rawInput) && parseFloat(rawInput) > 0) {
-             gp = parseFloat(rawInput);
-             if (gp > 10) gp = gp / 10;
-          }
+      let totalPoints = 0;
+      let totalCredits = 0;
+      const count = valid.length;
+      const subjectRows = [];
 
-          if (activeMethod === "equal") {
-            totalPoints += gp;
-            totalCredits = count;
+      valid.forEach((subject) => {
+        const activeInput = activeMethod === "slab"
+          ? (subject.inputSlab !== undefined ? subject.inputSlab : subject.input)
+          : (subject.inputNumeric !== undefined ? subject.inputNumeric : subject.input);
+        const rawInput = (activeInput || "").toString().toUpperCase().trim();
+        const credits = parseFloat(subject.credits) || 1;
+        let gp = 0;
+        let isArrear = false;
+        let name = subject.name || "Unnamed Subject";
+
+        if (gradeMappingObj[rawInput] !== undefined) {
+          if (activeMethod !== "slab") {
+            gp = 0;
+            isArrear = true;
+            name = `${name} (Requires Numbers)`;
           } else {
-            totalPoints += (gp * credits);
-            totalCredits += credits;
+            gp = gradeMappingObj[rawInput];
           }
+        } else if (failGrades.includes(rawInput) || parseFloat(rawInput) === 0) {
+          isArrear = true;
+        } else if (parseFloat(rawInput) > 0) {
+          gp = parseFloat(rawInput);
+          if (gp > 10) gp = gp / 10;
+          if (gp < 5) isArrear = true;
+        }
+
+        subjectRows.push({
+          code: subject.code || "--",
+          name,
+          grade: rawInput || "--",
+          credits,
+          gp: Math.round(gp * 100) / 100,
+          isArrear,
         });
-        
-        const sgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
-        trends.push({
-          semester: `Sem ${semString}`,
-          sgpa: Math.round(sgpa * 100) / 100,
-        });
-      }
+
+        if (activeMethod === "equal") {
+          totalPoints += gp;
+          totalCredits = count;
+        } else {
+          totalPoints += gp * credits;
+          totalCredits += credits;
+        }
+      });
+
+      const sgpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+      summary.push({
+        semNum: parseInt(semString, 10),
+        sgpa: Math.round(sgpa * 100) / 100,
+        credits: totalCredits,
+        subjectCount: count,
+        subjects: subjectRows,
+      });
     });
-    return trends.sort((a, b) => parseInt(a.semester.split(" ")[1]) - parseInt(b.semester.split(" ")[1]));
+
+    return summary.sort((a, b) => a.semNum - b.semNum);
   }, [semestersData, activeMethod, gradeMappingObj, failGrades]);
+
+  const trendData = useMemo(() => (
+    semesterSummary.map((s) => ({ semester: `Sem ${s.semNum}`, sgpa: s.sgpa }))
+  ), [semesterSummary]);
+
+  const allArrears = useMemo(() => (
+    semesterSummary.flatMap((s) => (
+      s.subjects.filter((sub) => sub.isArrear).map((sub) => ({ ...sub, semNum: s.semNum }))
+    ))
+  ), [semesterSummary]);
 
   // --- HANDLERS ---
   const handleAddSubject = () => {
@@ -919,13 +997,38 @@ export default function CGPACalculator() {
                   <p className="mb-3 text-[13px] leading-relaxed text-amber-800 dark:text-amber-200/80">
                     You must clear your outstanding courses before a CGPA can be officially computed.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {calculation.failedSubjects.map((name, i) => (
-                      <span key={i} className="rounded-lg bg-amber-200/50 px-2.5 py-1 text-[11px] font-bold text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
-                        {name}
-                      </span>
-                    ))}
-                  </div>
+
+                  {/* Backlog / Arrear Tracker -- every flagged subject, with which
+                      semester it's in, so it's visible without hunting through tabs */}
+                  {allArrears.length > 0 ? (
+                    <div className="overflow-hidden rounded-xl border border-amber-200 dark:border-amber-900/40">
+                      <div className="grid grid-cols-12 gap-2 bg-amber-100/60 px-3 py-2 dark:bg-amber-900/20">
+                        <div className="col-span-2 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Sem</div>
+                        <div className="col-span-3 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Code</div>
+                        <div className="col-span-5 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Subject</div>
+                        <div className="col-span-2 text-center text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Grade</div>
+                      </div>
+                      {allArrears.map((item, i) => (
+                        <div
+                          key={i}
+                          className={`grid grid-cols-12 gap-2 px-3 py-2 ${i !== allArrears.length - 1 ? "border-b border-amber-200/70 dark:border-amber-900/30" : ""}`}
+                        >
+                          <div className="col-span-2 text-[12px] font-bold text-amber-700 dark:text-amber-400">{item.semNum}</div>
+                          <div className="col-span-3 truncate text-[12px] font-semibold text-amber-800 dark:text-amber-300">{item.code}</div>
+                          <div className="col-span-5 truncate text-[12px] text-amber-800 dark:text-amber-200">{item.name}</div>
+                          <div className="col-span-2 text-center text-[12px] font-bold text-amber-700 dark:text-amber-400">{item.grade}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {calculation.failedSubjects.map((name, i) => (
+                        <span key={i} className="rounded-lg bg-amber-200/50 px-2.5 py-1 text-[11px] font-bold text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div
@@ -989,6 +1092,27 @@ export default function CGPACalculator() {
                           className="overflow-hidden"
                         >
                           <div className="mt-4 space-y-4">
+                            {/* All-Semesters Summary */}
+                            {semesterSummary.length > 0 && (
+                              <div className="overflow-hidden rounded-xl border border-[#d7ebf5] dark:border-white/10">
+                                <div className="grid grid-cols-12 gap-2 bg-[#F1F5F9] px-3 py-2 dark:bg-[#072036]">
+                                  <div className="col-span-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Semester</div>
+                                  <div className="col-span-4 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">SGPA</div>
+                                  <div className="col-span-4 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Credits</div>
+                                </div>
+                                {semesterSummary.map((sem, i) => (
+                                  <div
+                                    key={sem.semNum}
+                                    className={`grid grid-cols-12 gap-2 px-3 py-2 ${i !== semesterSummary.length - 1 ? "border-b border-[#d7ebf5] dark:border-white/10" : ""}`}
+                                  >
+                                    <div className="col-span-4 text-[12px] font-semibold text-[#072036] dark:text-slate-200">Semester {sem.semNum}</div>
+                                    <div className="col-span-4 text-center text-[12px] font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">{sem.sgpa.toFixed(2)}</div>
+                                    <div className="col-span-4 text-center text-[12px] font-semibold text-slate-500 dark:text-slate-400">{sem.credits}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
                             {/* Target Goal Tracker */}
                             {targetGoal.active ? (
                               <div className="rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-4 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 relative group cursor-pointer transition-colors hover:bg-[#d7ebf5]/60 dark:hover:bg-[#045C9A]/20" onClick={() => setShowTargetModal(true)}>
@@ -1082,18 +1206,27 @@ export default function CGPACalculator() {
                       )}
                       {isSyncing ? "Saving Result..." : "Save This Result"}
                     </button>
-                    <button
-                      onClick={handleDownloadPDF}
-                      disabled={isGeneratingPDF}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white py-3.5 text-sm font-bold text-slate-600 transition-colors hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] disabled:opacity-50 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-[#A6D7E8] dark:hover:text-[#A6D7E8]"
-                    >
-                      {isGeneratingPDF ? (
-                        <IconLoader2 size={18} className="animate-spin" />
-                      ) : (
-                        <IconDownload size={18} />
-                      )}
-                      {isGeneratingPDF ? "Generating PDF..." : "Download as PDF"}
-                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleDownloadPDF}
+                        disabled={isGeneratingPDF}
+                        className="flex items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white py-3 text-sm font-bold text-slate-600 transition-colors hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] disabled:opacity-50 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-[#A6D7E8] dark:hover:text-[#A6D7E8]"
+                      >
+                        {isGeneratingPDF ? (
+                          <IconLoader2 size={16} className="animate-spin" />
+                        ) : (
+                          <IconDownload size={16} />
+                        )}
+                        PDF
+                      </button>
+                      <button
+                        onClick={handleExportCSV}
+                        className="flex items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white py-3 text-sm font-bold text-slate-600 transition-colors hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-[#A6D7E8] dark:hover:text-[#A6D7E8]"
+                      >
+                        <IconFileSpreadsheet size={16} />
+                        CSV
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               )}
