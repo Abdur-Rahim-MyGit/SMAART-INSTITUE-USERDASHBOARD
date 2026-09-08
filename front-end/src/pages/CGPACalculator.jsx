@@ -1143,24 +1143,28 @@ export default function CGPACalculator() {
               <button
                 key={method.id}
                 onClick={() => setActiveMethod(method.id)}
-                className={`relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border p-4 transition-colors duration-300 ${
+                className={`flex items-center justify-between gap-3 rounded-xl border p-4 text-left transition-colors duration-300 ${
                   isActive
-                    ? "border-[#045C9A] bg-[#EAF7FD] shadow-md dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20"
+                    ? "border-[#045C9A] bg-[#EAF7FD] dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20"
                     : "border-[#d7ebf5] bg-white hover:border-[#045C9A]/30 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:hover:border-white/20"
                 }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="method-active"
-                    className="absolute inset-0 rounded-2xl border-2 border-[#045C9A] dark:border-[#A6D7E8]"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <span className={`text-[15px] font-bold ${isActive ? "text-[#045C9A] dark:text-[#A6D7E8]" : "text-slate-600 dark:text-slate-400"}`}>
-                  {method.name}
-                </span>
-                <span className={`mt-1 text-[11px] font-semibold uppercase tracking-wider ${isActive ? "text-[#045C9A]/70 dark:text-[#A6D7E8]/70" : "text-slate-400 dark:text-slate-500"}`}>
-                  {method.badge}
+                <div className="min-w-0">
+                  <p className={`truncate text-sm font-bold ${isActive ? "text-[#045C9A] dark:text-[#A6D7E8]" : "text-[#072036] dark:text-slate-200"}`}>
+                    {method.name}
+                  </p>
+                  <p className={`mt-0.5 text-[11px] font-semibold uppercase tracking-wider ${isActive ? "text-[#045C9A]/70 dark:text-[#A6D7E8]/70" : "text-slate-400 dark:text-slate-500"}`}>
+                    {method.badge}
+                  </p>
+                </div>
+                <span
+                  className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-300 ${
+                    isActive
+                      ? "border-[#045C9A] bg-[#045C9A] dark:border-[#A6D7E8] dark:bg-[#A6D7E8]"
+                      : "border-slate-300 dark:border-white/20"
+                  }`}
+                >
+                  {isActive && <IconCheck size={12} stroke={3} className="text-white dark:text-[#072036]" />}
                 </span>
               </button>
             );
