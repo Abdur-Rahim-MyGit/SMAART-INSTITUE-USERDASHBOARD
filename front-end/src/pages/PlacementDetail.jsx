@@ -903,7 +903,7 @@ ${applicationForm.fullName || "Your Name"}`;
             </div>
           )}
 
-          <div className="grid gap-6 p-6 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
+          <div className="grid gap-6 p-6 lg:grid-cols-[1.3fr_0.7fr]">
             <section className="space-y-7">
               <div>
                 <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
@@ -1060,7 +1060,7 @@ ${applicationForm.fullName || "Your Name"}`;
 
             </section>
 
-            <aside className="space-y-6 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
+            <aside className="space-y-6 lg:sticky lg:top-6">
               <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-5 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]">
                 <h2 className="mb-4 border-b border-slate-200 pb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#045C9A] dark:border-[#045C9A]/25 dark:text-[#A6D7E8]">
                   {t("placement.job_information", "Job Information")}
