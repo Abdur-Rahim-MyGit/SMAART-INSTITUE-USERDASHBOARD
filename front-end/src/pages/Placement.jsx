@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from "react";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
@@ -94,7 +96,7 @@ const getStatusTextColor = (status) => {
   const norm = String(status || '').toLowerCase().replace(/[-_]/g, ' ').trim();
   switch (norm) {
     case 'applied':
-      return "text-blue-600 dark:text-blue-400";
+      return "text-blue-600 dark:text-[#A6D7E8]";
     case 'under review':
       return "text-amber-600 dark:text-amber-400";
     case 'declined':
@@ -143,6 +145,20 @@ const Placement = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const hasLoadedRef = useRef(false);
+
+  // The constellation canvas paints from a prop, not CSS, so it has to be
+  // told when the dark class flips -- same observer the dashboard uses.
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('jobs');
@@ -450,11 +466,11 @@ const Placement = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: Math.min(origIdx * 0.03, 0.3) }}
-          className="relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60"
+          className="relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
         >
           {/* Header: logo + title + company */}
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
               {companyLogo ? (
                 <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1.5" />
               ) : (
@@ -462,14 +478,14 @@ const Placement = () => {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 title={title} className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{title}</h2>
+              <h2 title={title} className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white">{title}</h2>
               <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">{companyName}</p>
             </div>
             {sourceLabel && (
               <span className={`mt-0.5 shrink-0 rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
                 isSmaartApp
-                  ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
-                  : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+                  ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
+                  : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
               }`}>
                 {sourceLabel}
               </span>
@@ -494,7 +510,7 @@ const Placement = () => {
             )}
           </div>
           {app.status === 'Offer' && app.offeredPackage ? (
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#1a3884]/20">
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-emerald-600 dark:text-emerald-400">{t("placement.offer_received", "Offer Received 🎉")}</span>
                 <span className="truncate text-[13.5px] font-semibold text-emerald-700 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</span>
@@ -507,7 +523,7 @@ const Placement = () => {
               </button>
             </div>
           ) : (
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-[#1a3884]/20">
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-[#045C9A]/20">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
                 <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
@@ -515,7 +531,7 @@ const Placement = () => {
               {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
                 <button
                   onClick={() => openConfirm(app._id || app.id, title)}
-                  className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                  className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                 >
                   {t("placement.withdraw", "Withdraw")}
                 </button>
@@ -533,72 +549,93 @@ const Placement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pb-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <PageTransition>
+    <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 transition-colors duration-300">
+      {/* Same ambient layer as the dashboard, courses, assessments,
+          toolkit and CGPA calculator pages */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+        <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pt-4 sm:px-5 sm:pt-5 lg:px-6 lg:pt-6">
         {/* Back Button (Mobile Mode Only) */}
-        <div className="flex items-center sm:hidden mt-6">
+        <div className="mb-4 flex items-center md:hidden">
           <button
             onClick={() => navigate("/dashboard")}
             className="group flex items-center gap-3 w-fit selection:bg-transparent"
           >
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
-              <ArrowLeft stroke={2.5} className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5">
+              <ArrowLeft stroke={2} className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
             </div>
-            <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
               {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
             </span>
           </button>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
+        {/* Hero -- same structure, padding and type scale as the
+            courses/assessments/toolkit/CGPA calculator hero. */}
+        <motion.section
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative mb-6 mt-6 flex flex-col justify-between gap-4 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] md:flex-row md:items-center"
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative mb-6 w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]"
         >
-          <div className="flex-1">
-            <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-              {t("placement.title", "Placement")}
-            </h1>
-            <p className="mt-1 max-w-2xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-              {t("placement.subtitle", "Explore active jobs from college placement postings and SMAART job postings.")}
-            </p>
-          </div>
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
 
-          <div className="flex w-full flex-shrink-0 justify-start border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20 md:w-auto md:justify-end md:border-l md:border-t-0 md:pl-6 md:pt-0">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="relative z-10 flex flex-col gap-4 px-6 py-5 sm:px-8 sm:py-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] shadow-sm dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                <Briefcase className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <h1
+                  className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                  style={{ letterSpacing: "-0.02em" }}
+                >
+                  {t("placement.title", "Placement")}
+                </h1>
+                <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                  {t("placement.subtitle", "Explore active jobs from college placement postings and SMAART job postings.")}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-shrink-0 items-center gap-3 border-t border-[#d7ebf5] pt-4 dark:border-[#045C9A]/20 md:border-l md:border-t-0 md:pl-6 md:pt-0">
               <div className="flex flex-col text-left">
-                <span className="mb-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                <span className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                   {t("placement.open_roles", "Open Roles")}
                 </span>
                 <span
-                  className="max-w-[200px] truncate text-[13px] font-bold text-[#0d1f4e] dark:text-white md:max-w-[250px]"
+                  className="max-w-[200px] truncate text-[13px] font-bold text-[#072036] dark:text-white md:max-w-[250px]"
                   title={rolesSummary}
                 >
                   {rolesSummary}
                 </span>
               </div>
 
-              <div className="flex flex-shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={fetchJobs}
-                  disabled={loading}
-                  title={t("placement.refresh", "Refresh")}
-                  aria-label={t("placement.refresh", "Refresh")}
-                  className="flex h-[42px] w-[42px] items-center justify-center rounded-xl border border-[#d8e6f7] bg-white text-[#1a3884] transition-all hover:border-[#1a3884]/40 hover:bg-[#f5f8ff] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300 dark:hover:bg-[#002050]"
-                >
-                  <Refresh className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} stroke={2} />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={fetchJobs}
+                disabled={loading}
+                title={t("placement.refresh", "Refresh")}
+                aria-label={t("placement.refresh", "Refresh")}
+                className="flex h-[42px] w-[42px] flex-shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white text-[#045C9A] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/30"
+              >
+                <Refresh className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} stroke={2} />
+              </button>
             </div>
           </div>
-        </motion.div>
+        </motion.section>
 
         {/* Unified toolbar: tabs + search + filters on one surface */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_16px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-[0_2px_16px_rgba(26,56,132,0.05)] dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
           {/* Tabs: Jobs | Job Status | Job Fair | Partners */}
-          <div className={`overflow-x-auto px-2 ${activeTab === 'jobs' ? 'border-b border-slate-200 dark:border-[#1a3884]/20' : ''}`}>
+          <div className={`overflow-x-auto px-2 ${activeTab === 'jobs' ? 'border-b border-slate-200 dark:border-[#045C9A]/20' : ''}`}>
             <div className="flex min-w-max gap-1">
               {[
                 { id: 'jobs', label: t("placement.jobs", "Jobs") },
@@ -611,8 +648,8 @@ const Placement = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`relative h-11 whitespace-nowrap px-4 text-[13px] font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:rounded-t-full after:transition-colors ${
                     activeTab === tab.id
-                      ? 'text-[#0d1f4e] after:bg-[#0d1f4e] dark:text-white dark:after:bg-blue-400'
-                      : 'text-slate-500 after:bg-transparent hover:text-[#0d1f4e] dark:text-slate-400 dark:hover:text-white'
+                      ? 'text-[#072036] after:bg-[#072036] dark:text-white dark:after:bg-[#A6D7E8]'
+                      : 'text-slate-500 after:bg-transparent hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   {tab.label}
@@ -630,14 +667,14 @@ const Placement = () => {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder={t("placement.search_placeholder", "Search roles, companies, skills")}
-                  className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50/70 pl-10 pr-9 text-[13.5px] text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-[#1a3884] focus:bg-white dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-[#001a3d]"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50/70 pl-10 pr-9 text-[13.5px] text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-[#045C9A] focus:bg-white dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-[#0d3a5f]"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
                     aria-label={t("placement.clear_search", "Clear search")}
-                    className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-[#1a3884]/30"
+                    className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-[#045C9A]/30"
                   >
                     <X className="h-3.5 w-3.5" stroke={2} />
                   </button>
@@ -651,10 +688,10 @@ const Placement = () => {
                     <select
                       value={workMode}
                       onChange={(e) => setWorkMode(e.target.value)}
-                      className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#1a3884] sm:w-[154px] ${
+                      className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#045C9A] sm:w-[154px] ${
                         workMode !== 'all'
-                          ? 'border-[#1a3884]/50 bg-[#f1f5fd] text-[#1a3884] dark:border-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300'
-                          : 'border-slate-200 bg-slate-50/70 text-[#0d1f4e] hover:border-slate-300 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white'
+                          ? 'border-[#045C9A]/50 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A] dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                          : 'border-slate-200 bg-slate-50/70 text-[#072036] hover:border-slate-300 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white'
                       }`}
                     >
                       <option value="all">{t("placement.all_work_modes", "All work modes")}</option>
@@ -662,7 +699,7 @@ const Placement = () => {
                         <option key={value} value={value}>{label}</option>
                       ))}
                     </select>
-                    <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${workMode !== 'all' ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`} />
+                    <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${workMode !== 'all' ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-slate-400'}`} />
                   </div>
                 )}
 
@@ -670,27 +707,27 @@ const Placement = () => {
                   <select
                     value={sourceFilter}
                     onChange={(e) => setSourceFilter(e.target.value)}
-                    className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#1a3884] sm:w-[154px] ${
+                    className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#045C9A] sm:w-[154px] ${
                       sourceFilter !== 'all'
-                        ? 'border-[#1a3884]/50 bg-[#f1f5fd] text-[#1a3884] dark:border-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300'
-                        : 'border-slate-200 bg-slate-50/70 text-[#0d1f4e] hover:border-slate-300 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white'
+                        ? 'border-[#045C9A]/50 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A] dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                        : 'border-slate-200 bg-slate-50/70 text-[#072036] hover:border-slate-300 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white'
                     }`}
                   >
                     <option value="all">{t("placement.all_jobs", { count: jobs.length, defaultValue: "All jobs ({{count}})" })}</option>
                     <option value="smaartjobpostings">{t("placement.smaart_jobs", { count: sourceCounts.smaartjobpostings || 0, defaultValue: "SMAART ({{count}})" })}</option>
                     <option value="jobpostings">{t("placement.college_jobs", { count: sourceCounts.jobpostings || 0, defaultValue: "College ({{count}})" })}</option>
                   </select>
-                  <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${sourceFilter !== 'all' ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`} />
+                  <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${sourceFilter !== 'all' ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-slate-400'}`} />
                 </div>
 
                 <div className="relative">
                   <select
                     value={jobType}
                     onChange={(e) => setJobType(e.target.value)}
-                    className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#1a3884] sm:w-[136px] ${
+                    className={`h-10 w-full cursor-pointer appearance-none rounded-lg border pl-3.5 pr-9 text-[13px] font-medium outline-none transition-colors focus:border-[#045C9A] sm:w-[136px] ${
                       jobType !== 'all'
-                        ? 'border-[#1a3884]/50 bg-[#f1f5fd] text-[#1a3884] dark:border-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300'
-                        : 'border-slate-200 bg-slate-50/70 text-[#0d1f4e] hover:border-slate-300 dark:border-[#1a3884]/30 dark:bg-[#001a3d] dark:text-white'
+                        ? 'border-[#045C9A]/50 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A] dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                        : 'border-slate-200 bg-slate-50/70 text-[#072036] hover:border-slate-300 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white'
                     }`}
                   >
                     <option value="all">{t("placement.all_types", "All types")}</option>
@@ -698,7 +735,7 @@ const Placement = () => {
                     <option value="part-time">{t("placement.part_time", "Part-Time")}</option>
                     <option value="internship">{t("placement.internship", "Internship")}</option>
                   </select>
-                  <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${jobType !== 'all' ? 'text-[#1a3884] dark:text-blue-300' : 'text-slate-400'}`} />
+                  <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${jobType !== 'all' ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-slate-400'}`} />
                 </div>
               </div>
             </div>
@@ -711,15 +748,15 @@ const Placement = () => {
             {loading ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-[268px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#1a3884]/25 dark:bg-[#001630]" />
+                  <div key={index} className="h-[268px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]" />
                 ))}
               </div>
             ) : filteredJobs.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#1a3884]/30 dark:bg-[#001630]">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f5f8ff] dark:bg-[#1a3884]/15">
-                  <Briefcase className="h-6 w-6 text-[#1a3884] dark:text-blue-300" />
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF7FD] dark:bg-[#045C9A]/15">
+                  <Briefcase className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
                 </div>
-                <h2 className="text-base font-semibold text-[#0d1f4e] dark:text-white">{t("placement.no_jobs_found", "No placement jobs found")}</h2>
+                <h2 className="text-base font-semibold text-[#072036] dark:text-white">{t("placement.no_jobs_found", "No placement jobs found")}</h2>
                 <p className="mt-1 max-w-md text-[13px] text-slate-500 dark:text-slate-400">
                   {t("placement.no_jobs_desc", "Try changing the filter or check back when new opportunities are posted.")}
                 </p>
@@ -770,11 +807,11 @@ const Placement = () => {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60 ${isClosed ? 'opacity-60' : ''}`}
+                      className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
                     >
                       {/* Header: logo + title + company */}
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
                           {companyLogo ? (
                             <img
                               src={companyLogo}
@@ -789,7 +826,7 @@ const Placement = () => {
                         <div className="min-w-0 flex-1">
                           <h2
                             title={job.displayTitle}
-                            className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#0d1f4e] dark:text-white"
+                            className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white"
                           >
                             {job.displayTitle}
                           </h2>
@@ -803,17 +840,17 @@ const Placement = () => {
                             className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-[3px] text-[10.5px] font-medium tracking-[0.02em] ${
                               isClosed
                                 ? 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'
-                                : 'border-[#1a3884]/20 bg-white text-[#1a3884] dark:border-[#1a3884]/50 dark:bg-transparent dark:text-blue-300'
+                                : 'border-[#045C9A]/20 bg-white text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-transparent dark:text-[#A6D7E8]'
                             }`}
                           >
-                            <span className={`h-1.5 w-1.5 rounded-full ${isClosed ? 'bg-slate-400' : 'bg-[#1a3884] dark:bg-blue-400'}`} />
+                            <span className={`h-1.5 w-1.5 rounded-full ${isClosed ? 'bg-slate-400' : 'bg-[#045C9A] dark:bg-[#A6D7E8]'}`} />
                             {statusLabel}
                           </span>
                           <span
                             className={`rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
                               isSmaartPost
-                                ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
-                                : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+                                ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
+                                : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
                             }`}
                           >
                             {sourceLabel}
@@ -856,7 +893,7 @@ const Placement = () => {
                       {skills.length > 0 && (
                         <div className="mt-3.5 flex flex-wrap gap-1.5">
                           {skills.slice(0, 3).map((skill) => (
-                            <span key={skill} className="rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#001a3d] dark:text-slate-300">
+                            <span key={skill} className="rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#0d3a5f] dark:text-slate-300">
                               {skill}
                             </span>
                           ))}
@@ -881,7 +918,7 @@ const Placement = () => {
                       )}
 
                       {/* Footer */}
-                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#1a3884]/20">
+                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
                         <div className="flex min-w-0 flex-col gap-0.5">
                           <span className="truncate text-[11.5px] font-medium text-slate-500 dark:text-slate-400">
                             {job.displayType}
@@ -896,7 +933,7 @@ const Placement = () => {
                           className={
                             isClosed
                               ? "flex h-9 shrink-0 cursor-not-allowed items-center justify-center rounded-lg bg-slate-100 px-4 text-[13px] font-medium text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                              : "group/btn flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0d1f4e] pl-4 pr-3.5 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1a3884] focus-visible:ring-2 focus-visible:ring-[#1a3884]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#1a3884] dark:hover:bg-[#24499e] dark:focus-visible:ring-offset-[#001630]"
+                              : "group/btn flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white dark:focus-visible:ring-offset-[#0d3a5f]"
                           }
                         >
                           <span>{applyLabel}</span>
@@ -922,19 +959,19 @@ const Placement = () => {
             {loadingApplied ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-[236px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#1a3884]/25 dark:bg-[#001630]" />
+                  <div key={i} className="h-[236px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]" />
                 ))}
               </div>
             ) : appliedJobs.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#1a3884]/30 dark:bg-[#001630]">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f5f8ff] dark:bg-[#1a3884]/15">
-                  <Briefcase className="h-6 w-6 text-[#1a3884] dark:text-blue-300" />
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF7FD] dark:bg-[#045C9A]/15">
+                  <Briefcase className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
                 </div>
-                <h2 className="text-base font-semibold text-[#0d1f4e] dark:text-white">{t("placement.no_applications_found", "No applications found")}</h2>
+                <h2 className="text-base font-semibold text-[#072036] dark:text-white">{t("placement.no_applications_found", "No applications found")}</h2>
                 <p className="mt-1 max-w-md text-[13px] text-slate-500 dark:text-slate-400">{t("placement.no_applications_desc", "You haven't applied to any jobs yet.")}</p>
                 <button
                   onClick={() => setActiveTab('jobs')}
-                  className="mt-5 h-9 rounded-lg bg-[#0d1f4e] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1a3884]"
+                  className="mt-5 h-9 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                 >
                   {t("placement.browse_jobs", "Browse Jobs")}
                 </button>
@@ -955,14 +992,14 @@ const Placement = () => {
                   value={companySearch}
                   onChange={(e) => setCompanySearch(e.target.value)}
                   placeholder={t("placement.search_company_placeholder", "Search by company name")}
-                  className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-[13.5px] text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-white dark:placeholder:text-slate-500"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-3 text-[13.5px] text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#045C9A] focus:ring-[3px] focus:ring-[#045C9A]/10 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500"
                 />
               </div>
               <div className="relative sm:w-[180px]">
                 <select
                   value={companyTypeFilter}
                   onChange={(e) => setCompanyTypeFilter(e.target.value)}
-                  className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white pl-3.5 pr-9 text-[13px] font-medium text-[#0d1f4e] outline-none transition-colors hover:border-[#1a3884]/40 focus:border-[#1a3884] focus:ring-[3px] focus:ring-[#1a3884]/10 dark:border-[#1a3884]/30 dark:bg-[#001630] dark:text-white"
+                  className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white pl-3.5 pr-9 text-[13px] font-medium text-[#072036] outline-none transition-colors hover:border-[#045C9A]/40 focus:border-[#045C9A] focus:ring-[3px] focus:ring-[#045C9A]/10 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white"
                 >
                   <option value="all">{t("placement.all_partners", "All Partners")}</option>
                   <option value="smaart">{t("placement.smaart_partners", "SMAART Partners")}</option>
@@ -975,20 +1012,20 @@ const Placement = () => {
             {loadingCompanies ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="h-[232px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#1a3884]/25 dark:bg-[#001630]" />
+                  <div key={i} className="h-[232px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]" />
                 ))}
               </div>
             ) : filteredCompanies.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#1a3884]/30 dark:bg-[#001630]">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f5f8ff] dark:bg-[#1a3884]/15">
-                  <Building className="h-6 w-6 text-[#1a3884] dark:text-blue-300" stroke={1.6} />
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF7FD] dark:bg-[#045C9A]/15">
+                  <Building className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" stroke={1.6} />
                 </div>
-                <h2 className="text-base font-semibold text-[#0d1f4e] dark:text-white">{t("placement.no_partners_found", "No partners found")}</h2>
+                <h2 className="text-base font-semibold text-[#072036] dark:text-white">{t("placement.no_partners_found", "No partners found")}</h2>
                 <p className="mt-1 max-w-md text-[13px] text-slate-500 dark:text-slate-400">{t("placement.no_partners_desc", "Try adjusting your filters or search query.")}</p>
                 {(companySearch || companyTypeFilter !== 'all') && (
                   <button
                     onClick={() => { setCompanySearch(""); setCompanyTypeFilter("all"); }}
-                    className="mt-5 h-9 rounded-lg bg-[#0d1f4e] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1a3884]"
+                    className="mt-5 h-9 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                   >
                     {t("placement.clear_filters", "Clear Filters")}
                   </button>
@@ -1003,10 +1040,10 @@ const Placement = () => {
                   return (
                     <div
                       key={partner._id}
-                      className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60"
+                      className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-sm font-semibold text-[#1a3884] dark:border-[#1a3884]/25 dark:bg-[#001a3d] dark:text-blue-300">
+                        <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-sm font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
                           {partner.logo && (
                             <img
                               src={partner.logo.startsWith('http') || partner.logo.startsWith('data:') ? partner.logo : `${getBackendUrl()}/${partner.logo.replace(/^\/+/, '')}`}
@@ -1019,13 +1056,13 @@ const Placement = () => {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <h3 className="truncate text-[15px] font-semibold leading-tight tracking-[-0.01em] text-[#0d1f4e] dark:text-white" title={partner.name}>
+                          <h3 className="truncate text-[15px] font-semibold leading-tight tracking-[-0.01em] text-[#072036] dark:text-white" title={partner.name}>
                             {partner.name}
                           </h3>
                           <span className={`mt-1.5 inline-flex rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
                             isSmaart
-                              ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
-                              : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+                              ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
+                              : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
                           }`}>
                             {isSmaart ? t("placement.smaart_partner", "SMAART Partner") : t("placement.college_partner", "College Partner")}
                           </span>
@@ -1037,7 +1074,7 @@ const Placement = () => {
                           href={partner.website.startsWith('http') ? partner.website : `https://${partner.website}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-3.5 flex items-center gap-1.5 text-[12.5px] font-medium text-[#1a3884] transition-colors hover:underline dark:text-blue-400"
+                          className="mt-3.5 flex items-center gap-1.5 text-[12.5px] font-medium text-[#045C9A] transition-colors hover:underline dark:text-[#A6D7E8]"
                         >
                           <ExternalLink className="h-3.5 w-3.5 shrink-0" stroke={1.8} />
                           <span className="truncate">{partner.website.replace(/^https?:\/\//i, '')}</span>
@@ -1056,7 +1093,7 @@ const Placement = () => {
                             setSearchQuery(partner.name);
                             setActiveTab('jobs');
                           }}
-                          className="flex h-9 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 text-[13px] font-medium text-[#0d1f4e] transition-colors hover:border-[#1a3884]/40 hover:bg-[#f5f8ff] dark:border-[#1a3884]/30 dark:text-slate-200 dark:hover:bg-[#001a3d]"
+                          className="flex h-9 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
                         >
                           {t("placement.view_jobs", "View Jobs")}
                           <ChevronRight className="h-3.5 w-3.5" stroke={2} />
@@ -1076,15 +1113,15 @@ const Placement = () => {
             {loadingFairs ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="h-[268px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#1a3884]/25 dark:bg-[#001630]" />
+                  <div key={index} className="h-[268px] animate-pulse rounded-xl border border-slate-200 bg-slate-50 dark:border-[#045C9A]/25 dark:bg-[#0d3a5f]" />
                 ))}
               </div>
             ) : jobFairs.length === 0 ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#1a3884]/30 dark:bg-[#001630]">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#f5f8ff] dark:bg-[#1a3884]/15">
-                  <Briefcase className="h-6 w-6 text-[#1a3884] dark:text-blue-300" />
+              <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EAF7FD] dark:bg-[#045C9A]/15">
+                  <Briefcase className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
                 </div>
-                <h2 className="text-base font-semibold text-[#0d1f4e] dark:text-white">{t("placement.no_fairs_found", "No Job Fairs found")}</h2>
+                <h2 className="text-base font-semibold text-[#072036] dark:text-white">{t("placement.no_fairs_found", "No Job Fairs found")}</h2>
                 <p className="mt-1 max-w-md text-[13px] text-slate-500 dark:text-slate-400">
                   {t("placement.no_fairs_desc", "There are no active or upcoming job fairs at this moment.")}
                 </p>
@@ -1108,10 +1145,10 @@ const Placement = () => {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:border-[#1a3884]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#1a3884]/25 dark:bg-[#001630] dark:hover:border-[#1a3884]/60"
+                      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
                     >
                       {bannerImageUrl && (
-                        <div className="h-32 w-full overflow-hidden border-b border-slate-100 dark:border-[#1a3884]/20">
+                        <div className="h-32 w-full overflow-hidden border-b border-slate-100 dark:border-[#045C9A]/20">
                           <img src={bannerImageUrl} alt={fair.title} className="h-full w-full object-cover" />
                         </div>
                       )}
@@ -1120,22 +1157,22 @@ const Placement = () => {
                         <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
                           <span className={`rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
                             fair.label === 'smaart job fair'
-                              ? 'bg-[#0d1f4e] text-white dark:bg-blue-500/90 dark:text-white'
-                              : 'bg-[#eef2fb] text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-300'
+                              ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
+                              : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
                           }`}>
                             {fair.label === 'smaart job fair' ? t("placement.source_smaart_job_fair", "SMAART Job Fair") : t("placement.source_college_job_fair", "College Job Fair")}
                           </span>
                           <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-[3px] text-[10.5px] font-medium ${
                             fair.status === 'active'
-                              ? 'border-[#1a3884]/20 bg-white text-[#1a3884] dark:border-[#1a3884]/50 dark:bg-transparent dark:text-blue-300'
+                              ? 'border-[#045C9A]/20 bg-white text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-transparent dark:text-[#A6D7E8]'
                               : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'
                           }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${fair.status === 'active' ? 'bg-[#1a3884] dark:bg-blue-400' : 'bg-slate-400'}`} />
+                            <span className={`h-1.5 w-1.5 rounded-full ${fair.status === 'active' ? 'bg-[#045C9A] dark:bg-[#A6D7E8]' : 'bg-slate-400'}`} />
                             {formatStatus(fair.status, t)}
                           </span>
                         </div>
 
-                        <h2 className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{fair.title}</h2>
+                        <h2 className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white">{fair.title}</h2>
                         {fair.description && (
                           <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-slate-500 dark:text-slate-400">{fair.description}</p>
                         )}
@@ -1160,7 +1197,7 @@ const Placement = () => {
                         </div>
 
                         {fairJobs.length > 0 && (
-                          <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 text-[12.5px] text-slate-500 dark:border-[#1a3884]/20 dark:text-slate-400">
+                          <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 text-[12.5px] text-slate-500 dark:border-[#045C9A]/20 dark:text-slate-400">
                             <Briefcase className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
                             <span>
                               {t("placement.fair_jobs_count", { count: fairJobs.length, defaultValue: `${fairJobs.length} ${fairJobs.length === 1 ? 'role' : 'roles'} posted` })}
@@ -1171,14 +1208,14 @@ const Placement = () => {
                             card carries a single action rather than competing buttons. */}
                         <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                           {isRegistered && (
-                            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#1a3884]/20 bg-[#eef2fb] px-2 py-1 text-[10.5px] font-medium text-[#1a3884] dark:border-[#1a3884]/50 dark:bg-[#1a3884]/25 dark:text-blue-300">
-                              <span className="h-1.5 w-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#045C9A]/20 bg-[#EAF7FD] px-2 py-1 text-[10.5px] font-medium text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]">
+                              <span className="h-1.5 w-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                               {t("placement.registered", "Registered")}
                             </span>
                           )}
                           <button
                             onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
-                            className="group/btn ml-auto flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0d1f4e] pl-4 pr-3.5 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1a3884] focus-visible:ring-2 focus-visible:ring-[#1a3884]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#1a3884] dark:hover:bg-[#24499e]"
+                            className="group/btn ml-auto flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                           >
                             <span>{t("placement.view_fair", "View Fair")}</span>
                             <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" stroke={2.2} />
@@ -1196,13 +1233,13 @@ const Placement = () => {
         {confirmOpen &&
           createPortal(
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-[#1a3884]/30 dark:bg-[#001630]">
-                <h2 className="mb-2 text-[16px] font-semibold tracking-[-0.01em] text-[#0d1f4e] dark:text-white">{t("placement.confirm_withdraw_title", "Withdraw Application?")}</h2>
+              <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                <h2 className="mb-2 text-[16px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">{t("placement.confirm_withdraw_title", "Withdraw Application?")}</h2>
                 <p className="mb-6 text-[13.5px] leading-relaxed text-slate-500 dark:text-slate-400">
                   {t("placement.confirm_withdraw_desc", "Are you sure you want to withdraw your application for")} <span className="font-medium text-slate-700 dark:text-slate-200">{confirmAppTitle}</span>? {t("placement.confirm_withdraw_warning", "This action cannot be undone.")}
                 </p>
                 <div className="flex justify-end gap-2.5">
-                  <button onClick={closeConfirm} className="h-9 rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-[#1a3884]/30 dark:text-slate-300 dark:hover:bg-[#001a3d]">
+                  <button onClick={closeConfirm} className="h-9 rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:bg-[#0d3a5f]">
                     {t("placement.cancel", "Cancel")}
                   </button>
                   <button onClick={confirmWithdraw} className="h-9 rounded-lg bg-red-600 px-4 text-[13px] font-medium text-white transition-colors hover:bg-red-700">
@@ -1226,6 +1263,7 @@ const Placement = () => {
         />
       </div>
     </div>
+    </PageTransition>
   );
 };
 
