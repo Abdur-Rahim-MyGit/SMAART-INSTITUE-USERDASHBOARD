@@ -221,6 +221,10 @@
     user-select: none;
   }
 
+  /* Two-font pairing demo: Outfit for headings (geometric, a bit more
+     character), Inter stays for body copy below. Scoped to raw h1-h6
+     tags -- components already opting into the `font-heading` utility
+     (landing page) keep Inter untouched. */
   h1,
   h2,
   h3,
@@ -229,6 +233,7 @@
   h6 {
     @apply font-bold tracking-tight text-[#1a3884] dark:text-white;
     font-family:
+      "Outfit",
       "Inter",
       system-ui,
       -apple-system,
