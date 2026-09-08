@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { apiCall } from '@/services/api';
 import {
   IconCalculator,
-  IconWand,
   IconTrash,
   IconHistory,
   IconPlus,
@@ -16,12 +15,12 @@ import {
   IconChevronRight,
   IconEraser,
   IconInfoCircle,
-  IconScan,
+  IconSettings,
+  IconClipboardList,
   IconLoader2,
   IconDownload,
   IconTarget,
-  IconChartLine,
-  IconCloudUpload
+  IconChartLine
 } from '@tabler/icons-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import NeuralBackground from '@/components/ui/NeuralBackground';
@@ -45,408 +44,6 @@ const getEmptySubjects = () => [
   { id: Date.now() + 3, code: "", name: "", input: "", credits: "" },
   { id: Date.now() + 4, code: "", name: "", input: "", credits: "" },
 ];
-
-const SUBJECT_CODE_REGEX = /^(?:(?=.*[A-Z])(?=.*\d)[A-Z0-9]{3,15}|\d{5,10})$/;
-const HEADER_WORDS = new Set([
-  "SIT", "COE", "REG", "NO", "NAME", "DEPARTMENT", "DOB", "TECHNOLOGY",
-  "SEM", "SUBJECT", "CODE", "GRADE", "PRINT", "RESULT", "B", "TECH",
-  "INFORMATION", "STUDENT"
-]);
-const KNOWN_SUBJECTS = {
-  R21CSV505: "Digital Marketing",
-  R21UIT508: "Mining and Analysis of Big Data Laboratory",
-  R21UIT507: "Creative Thinking and Innovation",
-  R21UIT506: "Internet and Web Technology Laboratory",
-  R21UIT503: "Mining and Analysis of Big Data",
-  R21UIT501: "Internet and Web Technology",
-  R21UGS532: "Soft Skills Laboratory",
-  R21UGS531: "Reasoning and Aptitude",
-  R21UGM535: "Universal Human Values - II",
-  R21UCS509: "Mobile Applications Design and Development Laboratory",
-  R21UCS502: "Mobile Applications Design and Development",
-  R21UCE971: "Development of Smart Cities",
-  R21UIT861: "Generative AI"
-};
-const KNOWN_SUBJECT_ORDER = Object.keys(KNOWN_SUBJECTS);
-const KNOWN_SUBJECT_ALIASES = {
-  R21UIT508: ["MININGANDANALYSISOFBIGDATALABORATORY", "MININGANDANALYSISOFBIGDATALAB"],
-  R21UIT507: ["CREATIVETHINKINGANDINNOVATION", "CREATIVETHINKING"],
-  R21UIT506: ["INTERNETANDWEBTECHNOLOGYLABORATORY", "INTERNETANDWEBTECHNOLOGYLAB"],
-  R21UIT503: ["MININGANDANALYSISOFBIGDATA"],
-  R21UIT501: ["INTERNETANDWEBTECHNOLOGY"],
-  R21UGS532: ["SOFTSKILLS"],
-  R21UGS531: ["REASONINGANDAPTITUDE", "REASONINGANDOSAPTITUDE", "REASONINGAPTITUDE"],
-  R21UGM535: ["UNIVERSALHUMANVALUESII", "UNIVERSALHUMANVALUES", "UGM535", "UGMS35"],
-  R21UCS509: ["MOBILEAPPLICATIONSDESIGNANDDEVELOPMENTLABORATORY", "MOBILEAPPLICATIONSDESIGNANDDEVELOPMENTLAB"],
-  R21UCS502: ["MOBILEAPPLICATIONSDESIGNANDDEVELOPMENT"],
-  R21UCE971: ["DEVELOPMENTOFSMARTCITIES"],
-  R21UIT861: ["GENERATIVEAI", "GENERATIVEAL"]
-};
-
-const normalizeSubjectCode = (value) => {
-  let code = value
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .replace(/^RI/, "R1")
-    .replace(/^R2I/, "R21")
-    .replace(/^R2T/, "R21")
-    .replace(/^RZ1/, "R21");
-
-  if (/^21[A-Z]/.test(code)) code = `R${code}`;
-  if (/^R1U/.test(code)) code = code.replace(/^R1U/, "R21U");
-  code = code
-    .replace(/^R21UITS/, "R21UIT5")
-    .replace(/^R21UCES/, "R21UCE5");
-
-  return code;
-};
-
-const normalizeGrade = (value) => {
-  const token = value.toUpperCase().replace(/[^A-Z0-9+]/g, "");
-  const numericToken = value.trim().replace(/[^0-9.]/g, "");
-  if (/^\d{1,2}\.\d+$/.test(numericToken) || numericToken === "10") {
-    const numericGrade = parseFloat(numericToken);
-    if (numericGrade >= 0 && numericGrade <= 10) return numericToken;
-  }
-
-  const gradeMap = {
-    "0": "O",
-    "Q": "O",
-    "D": "O",
-    "O": "O",
-    "A+": "A+",
-    "AT": "A+",
-    "A1": "A+",
-    "A": "A",
-    "B+": "B+",
-    "BT": "B+",
-    "B": "B",
-    "C": "C",
-    "RA": "RA",
-    "SA": "SA",
-    "AB": "AB",
-    "W": "W",
-    "U": "U",
-    "F": "F"
-  };
-
-  return gradeMap[token] || "";
-};
-
-const isLikelySubjectCode = (value) => SUBJECT_CODE_REGEX.test(normalizeSubjectCode(value));
-
-const cleanSubjectName = (tokens) => {
-  const ignored = new Set(["S", "5", "|", ":", "-", "II"]);
-  const words = tokens
-    .map((token) => token.replace(/^[|:;,.]+|[|:;,.]+$/g, ""))
-    .filter(Boolean)
-    .filter((token) => !ignored.has(token.toUpperCase()))
-    .filter((token) => !HEADER_WORDS.has(token.toUpperCase()))
-    .filter((token) => !/^\d{1,2}[-/]\d{1,2}[-/]\d{2,4}$/.test(token))
-    .filter((token) => !/^\d+$/.test(token))
-    .map((token) => token.replace(/[^a-zA-Z0-9\s&.+-]/g, ""));
-
-  return words
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .replace(/\bAl\b/g, "AI")
-    .replace(/\bli\b/g, "II")
-    .trim();
-};
-
-const compactText = (value) => value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-
-const getKnownSubjectAliases = (code) => [
-  compactText(KNOWN_SUBJECTS[code] || ""),
-  ...(KNOWN_SUBJECT_ALIASES[code] || [])
-];
-
-const subjectNameMatchesKnownCode = (name, code) => {
-  const compactName = compactText(name);
-  if (compactName.length < 6) return false;
-
-  return getKnownSubjectAliases(code).some((alias) => (
-    alias.includes(compactName) || compactName.includes(alias)
-  ));
-};
-
-const inferKnownSubjectCode = (rawCode, rawName, usedCodes = new Set()) => {
-  const code = normalizeSubjectCode(rawCode || "");
-  const name = rawName || "";
-
-  if (KNOWN_SUBJECTS[code] && !usedCodes.has(code)) return code;
-
-  const prefixMatches = KNOWN_SUBJECT_ORDER.filter((knownCode) => (
-    code.length >= 6
-    && knownCode.startsWith(code)
-    && !usedCodes.has(knownCode)
-  ));
-
-  const nameMatches = KNOWN_SUBJECT_ORDER.filter((knownCode) => (
-    !usedCodes.has(knownCode) && subjectNameMatchesKnownCode(name, knownCode)
-  ));
-
-  if (prefixMatches.length === 1) return prefixMatches[0];
-
-  const prefixAndNameMatch = prefixMatches.find((knownCode) => (
-    subjectNameMatchesKnownCode(name, knownCode)
-  ));
-  if (prefixAndNameMatch) return prefixAndNameMatch;
-
-  if (nameMatches.length === 1) return nameMatches[0];
-
-  if (nameMatches.length > 1) {
-    const laboratoryMatch = nameMatches.find((knownCode) => (
-      /LAB|LABORATORY/i.test(name) && /LABORATORY/i.test(KNOWN_SUBJECTS[knownCode])
-    ));
-    if (laboratoryMatch) return laboratoryMatch;
-
-    const nonLaboratoryMatch = nameMatches.find((knownCode) => (
-      !/LAB|LABORATORY/i.test(name) && !/LABORATORY/i.test(KNOWN_SUBJECTS[knownCode])
-    ));
-    if (nonLaboratoryMatch) return nonLaboratoryMatch;
-  }
-
-  return prefixMatches[0] || code;
-};
-
-const applyKnownSubjectFallbacks = (subjects, sourceText = "") => {
-  const usedCodes = new Set();
-  const sourceCompact = compactText(sourceText);
-  const corrected = [];
-
-  subjects.forEach((subject) => {
-    const inferredCode = inferKnownSubjectCode(subject.code, subject.name, usedCodes);
-    const knownName = KNOWN_SUBJECTS[inferredCode];
-
-    if (usedCodes.has(inferredCode)) {
-      const existing = corrected.find((item) => item.code === inferredCode);
-      if (existing && !existing.input && subject.input) {
-        existing.input = subject.input;
-      }
-      return;
-    }
-
-    usedCodes.add(inferredCode);
-    corrected.push({
-      ...subject,
-      code: inferredCode,
-      name: knownName || subject.name
-    });
-  });
-
-  Object.entries(KNOWN_SUBJECTS).forEach(([code, name]) => {
-    if (usedCodes.has(code)) return;
-    const aliases = getKnownSubjectAliases(code);
-    if (!aliases.some((alias) => sourceCompact.includes(alias))) return;
-
-    corrected.push({
-      id: Date.now() + Math.random(),
-      code,
-      name,
-      input: "",
-      credits: ""
-    });
-    usedCodes.add(code);
-  });
-
-  return corrected.sort((a, b) => {
-    const aIndex = KNOWN_SUBJECT_ORDER.indexOf(a.code);
-    const bIndex = KNOWN_SUBJECT_ORDER.indexOf(b.code);
-    if (aIndex === -1 && bIndex === -1) return 0;
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
-    return aIndex - bIndex;
-  });
-};
-
-const splitNameAndGrade = (tokens) => {
-  let grade = "";
-  let credits = "";
-  const nameTokens = [];
-
-  for (let i = tokens.length - 1; i >= 0; i--) {
-    const token = tokens[i];
-    const possibleGrade = normalizeGrade(token);
-    
-    if (possibleGrade && !grade) {
-      grade = possibleGrade;
-    } else if (/^[1-9](\.0)?$/.test(token) && !credits) {
-      credits = token.replace(".0", "");
-    } else {
-      nameTokens.unshift(token);
-    }
-  }
-
-  return { nameTokens, grade, credits };
-};
-
-const parseResultTableText = (text) => {
-  const normalizedText = text
-    .replace(/[|]/g, " ")
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201c\u201d]/g, '"');
-
-  const rows = [];
-  let currentRow = null;
-
-  normalizedText.split(/\n+/).forEach((line) => {
-    const tokens = line.match(/[A-Za-z0-9+.-]+/g) || [];
-    if (tokens.length === 0) return;
-
-    const codeIndex = tokens.findIndex((token) => isLikelySubjectCode(token));
-
-    if (codeIndex >= 0) {
-      if (currentRow) rows.push(currentRow);
-
-      const beforeCode = tokens.slice(0, codeIndex);
-      const afterCode = tokens.slice(codeIndex + 1);
-      const { nameTokens, grade, credits } = splitNameAndGrade([...beforeCode, ...afterCode]);
-
-      currentRow = {
-        code: normalizeSubjectCode(tokens[codeIndex]),
-        nameTokens,
-        grade,
-        credits
-      };
-      return;
-    }
-
-    if (!currentRow) return;
-
-    const { nameTokens, grade, credits } = splitNameAndGrade(tokens);
-    currentRow.nameTokens.push(...nameTokens);
-    if (grade) currentRow.grade = grade;
-    if (credits) currentRow.credits = credits;
-  });
-
-  if (currentRow) rows.push(currentRow);
-
-  const subjects = rows.map((row) => {
-    return {
-      id: Date.now() + Math.random(),
-      code: row.code,
-      name: KNOWN_SUBJECTS[row.code] || cleanSubjectName(row.nameTokens),
-      input: row.grade,
-      credits: row.credits || "",
-    };
-  }).filter((subject) => subject.code && (subject.name || subject.input));
-
-  return applyKnownSubjectFallbacks(subjects, normalizedText);
-};
-
-const extractResultRowsFromOcrWords = (words) => {
-  if (!words || !Array.isArray(words) || words.length === 0) return [];
-
-  const lines = [];
-  const wordHeights = words
-    .filter((word) => word.bbox)
-    .map((word) => Math.max(1, word.bbox.y1 - word.bbox.y0));
-  const averageWordHeight = wordHeights.length
-    ? wordHeights.reduce((sum, height) => sum + height, 0) / wordHeights.length
-    : 18;
-  const rowTolerance = Math.max(12, averageWordHeight * 0.7);
-
-  words.forEach((word) => {
-    if (!word.bbox || !word.text?.trim()) return;
-
-    const centerY = (word.bbox.y0 + word.bbox.y1) / 2;
-    const existingLine = lines.find((line) => Math.abs(line.centerY - centerY) < rowTolerance);
-
-    if (existingLine) {
-      existingLine.words.push(word);
-      existingLine.centerY = ((existingLine.centerY * (existingLine.words.length - 1)) + centerY) / existingLine.words.length;
-    } else {
-      lines.push({ centerY, words: [word] });
-    }
-  });
-
-  const sortedLines = lines
-    .sort((a, b) => a.centerY - b.centerY)
-    .map((line) => {
-      line.words.sort((a, b) => a.bbox.x0 - b.bbox.x0);
-      return line.words.map((w) => w.text).join(" ");
-    })
-    .filter(line => line.trim().length > 0);
-
-  return sortedLines;
-};
-
-const createImageCropBlob = (file, crop) => new Promise((resolve, reject) => {
-  const image = new Image();
-  const objectUrl = URL.createObjectURL(file);
-
-  image.onload = () => {
-    const canvas = document.createElement("canvas");
-    const sourceX = Math.floor(image.naturalWidth * crop.x);
-    const sourceY = Math.floor(image.naturalHeight * crop.y);
-    const sourceWidth = Math.floor(image.naturalWidth * crop.width);
-    const sourceHeight = Math.floor(image.naturalHeight * crop.height);
-
-    canvas.width = sourceWidth;
-    canvas.height = sourceHeight;
-    canvas.getContext("2d").drawImage(
-      image,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      0,
-      0,
-      sourceWidth,
-      sourceHeight
-    );
-
-    canvas.toBlob((blob) => {
-      URL.revokeObjectURL(objectUrl);
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("Unable to crop grade column"));
-      }
-    }, "image/png");
-  };
-
-  image.onerror = () => {
-    URL.revokeObjectURL(objectUrl);
-    reject(new Error("Unable to load screenshot"));
-  };
-
-  image.src = objectUrl;
-});
-
-const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.onload = () => resolve(reader.result);
-  reader.onerror = () => reject(new Error("Unable to read screenshot"));
-  reader.readAsDataURL(file);
-});
-
-const extractTextFromOcrPayload = (payload) => {
-  const wordRows = extractResultRowsFromOcrWords(payload?.words);
-  if (wordRows.length > 0) return wordRows.join("\n");
-  return payload?.text || "";
-};
-
-const extractGradesFromOcrText = (text) => {
-  const tokens = text.match(/[A-Za-z0-9+]+/g) || [];
-  return tokens.map(normalizeGrade).filter(Boolean);
-};
-
-const applyMissingGradesBySequence = (text, grades) => {
-  if (!grades.length) return text;
-
-  let gradeIndex = 0;
-  const subjects = parseResultTableText(text);
-  if (grades.length < Math.ceil(subjects.length * 0.6) || grades.length > subjects.length + 3) {
-    return text;
-  }
-
-  return subjects.map((subject) => {
-    const grade = subject.input || grades[gradeIndex++] || "";
-    return `${subject.code} ${subject.name} ${grade}`.trim();
-  }).join("\n");
-};
 
 export default function CGPACalculator() {
   const navigate = useNavigate();
@@ -479,10 +76,16 @@ export default function CGPACalculator() {
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [pasteText, setPasteText] = useState("");
-  const [isOcrLoading, setIsOcrLoading] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState(0);
-  const [ocrStatus, setOcrStatus] = useState("Scanning Image");
+  const [pasteError, setPasteError] = useState("");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Configure Points (Slab-Based / Anna University method) -- session-only,
+  // resets to these defaults on reload.
+  const [showGradeConfigModal, setShowGradeConfigModal] = useState(false);
+  const [gradeMapping, setGradeMapping] = useState(
+    Object.entries(GRADE_MAPPING).map(([grade, points], i) => ({ id: i, grade, points }))
+  );
+  const [failGrades, setFailGrades] = useState([...FAIL_GRADES]);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [showTrend, setShowTrend] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -663,6 +266,15 @@ export default function CGPACalculator() {
 
   const currentSubjects = semestersData[activeSemester] || [];
 
+  // Live grade->points lookup built from the (editable) Configure Points rows
+  const gradeMappingObj = useMemo(() => (
+    Object.fromEntries(
+      gradeMapping
+        .filter((row) => row.grade.trim())
+        .map((row) => [row.grade.trim().toUpperCase(), parseFloat(row.points) || 0])
+    )
+  ), [gradeMapping]);
+
   // --- CALCULATION ENGINE ---
   const calculation = useMemo(() => {
     let allValidSubjects = [];
@@ -697,15 +309,15 @@ export default function CGPACalculator() {
         let gp = 0;
         let credits = parseFloat(subject.credits) || 1;
 
-        if (GRADE_MAPPING[rawInput] !== undefined) {
+        if (gradeMappingObj[rawInput] !== undefined) {
           if (activeMethod !== "slab") {
             gp = 0;
             isPending = true;
             failedSet.add(`${subject.name || "Subject"} (Requires Numbers)`);
           } else {
-            gp = GRADE_MAPPING[rawInput];
+            gp = gradeMappingObj[rawInput];
           }
-        } else if (FAIL_GRADES.includes(rawInput) || parseFloat(rawInput) === 0) {
+        } else if (failGrades.includes(rawInput) || parseFloat(rawInput) === 0) {
           gp = 0;
           isPending = true;
           failedSet.add(subject.name || "Unnamed Subject");
@@ -758,7 +370,7 @@ export default function CGPACalculator() {
       totalSubjects: statsAll.count,
       rows: processedCurrent,
     };
-  }, [semestersData, activeMethod, activeSemester]);
+  }, [semestersData, activeMethod, activeSemester, gradeMappingObj, failGrades]);
 
   const trendData = useMemo(() => {
     let trends = [];
@@ -782,9 +394,9 @@ export default function CGPACalculator() {
           let gp = 0;
           let credits = parseFloat(subject.credits) || 1;
 
-          if (GRADE_MAPPING[rawInput] !== undefined) {
-             gp = activeMethod === "slab" ? GRADE_MAPPING[rawInput] : 0;
-          } else if (!FAIL_GRADES.includes(rawInput) && parseFloat(rawInput) > 0) {
+          if (gradeMappingObj[rawInput] !== undefined) {
+             gp = activeMethod === "slab" ? gradeMappingObj[rawInput] : 0;
+          } else if (!failGrades.includes(rawInput) && parseFloat(rawInput) > 0) {
              gp = parseFloat(rawInput);
              if (gp > 10) gp = gp / 10;
           }
@@ -806,7 +418,7 @@ export default function CGPACalculator() {
       }
     });
     return trends.sort((a, b) => parseInt(a.semester.split(" ")[1]) - parseInt(b.semester.split(" ")[1]));
-  }, [semestersData, activeMethod]);
+  }, [semestersData, activeMethod, gradeMappingObj, failGrades]);
 
   // --- HANDLERS ---
   const handleAddSubject = () => {
@@ -837,153 +449,97 @@ export default function CGPACalculator() {
     }));
   };
 
-  const handleSmartPaste = () => {
-    const newSubjects = parseResultTableText(pasteText);
+  // Deterministic paste parser -- every line must be "Code | Name | Credits | Grade",
+  // so a malformed line is reported and nothing is applied, rather than guessing.
+  const handleParseSubjects = () => {
+    const lines = pasteText.split("\n").map((line) => line.trim()).filter(Boolean);
 
-    if (newSubjects.length > 0) {
-      const mappedSubjects = newSubjects.map(s => ({
-        ...s,
-        inputSlab: s.input,
-        inputNumeric: s.input
-      }));
-
-      while (mappedSubjects.length < 4) {
-        mappedSubjects.push({ id: Date.now() + Math.random(), code: "", name: "", input: "", inputSlab: "", inputNumeric: "", credits: "" });
-      }
-      setSemestersData(prev => ({
-        ...prev,
-        [activeSemester]: mappedSubjects
-      }));
-      setShowPasteModal(false);
-      setPasteText("");
-    } else {
-      alert("Could not extract any valid subject data. Please make sure the text contains subject codes (e.g. CS8391) and grades.");
+    if (lines.length === 0) {
+      setPasteError("Paste at least one subject line first.");
+      return;
     }
+
+    const errors = [];
+    const parsedSubjects = [];
+
+    lines.forEach((line, index) => {
+      const parts = line.split("|").map((part) => part.trim());
+      if (parts.length !== 4) {
+        errors.push(`Line ${index + 1}: expected 4 columns (Code | Name | Credits | Grade), found ${parts.length}.`);
+        return;
+      }
+
+      const [code, name, creditsRaw, gradeRaw] = parts;
+      const credits = parseFloat(creditsRaw);
+
+      if (!code) {
+        errors.push(`Line ${index + 1}: subject code is missing.`);
+      } else if (!name) {
+        errors.push(`Line ${index + 1}: subject name is missing.`);
+      } else if (isNaN(credits) || credits <= 0) {
+        errors.push(`Line ${index + 1}: credits must be a number greater than 0.`);
+      } else if (!gradeRaw) {
+        errors.push(`Line ${index + 1}: grade is missing.`);
+      } else {
+        const grade = gradeRaw.toUpperCase();
+        parsedSubjects.push({
+          id: Date.now() + Math.random(),
+          code: code.toUpperCase(),
+          name,
+          credits: creditsRaw,
+          input: grade,
+          inputSlab: grade,
+          inputNumeric: grade,
+        });
+      }
+    });
+
+    if (errors.length > 0) {
+      setPasteError(errors.slice(0, 4).join("  "));
+      return;
+    }
+
+    while (parsedSubjects.length < 4) {
+      parsedSubjects.push({ id: Date.now() + Math.random(), code: "", name: "", input: "", inputSlab: "", inputNumeric: "", credits: "" });
+    }
+
+    setSemestersData((prev) => ({
+      ...prev,
+      [activeSemester]: parsedSubjects,
+    }));
+    setShowPasteModal(false);
+    setPasteText("");
+    setPasteError("");
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // --- CONFIGURE POINTS (Grade Mapping) HANDLERS ---
+  const updateGradeRow = (id, field, value) => {
+    setGradeMapping((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+  };
 
-    setIsOcrLoading(true);
-    setOcrProgress(0);
-    setOcrStatus("Preparing image");
+  const addGradeRow = () => {
+    setGradeMapping((prev) => [...prev, { id: Date.now(), grade: "", points: 0 }]);
+  };
 
-    try {
-      try {
-        setOcrProgress(5);
-        setOcrStatus("Trying PaddleOCR");
-        const imageData = await readFileAsDataUrl(file);
-        const paddleResult = await apiCall('/ocr/paddle', {
-          method: 'POST',
-          body: JSON.stringify({ imageData }),
-          timeout: 200000,
-        });
+  const removeGradeRow = (id) => {
+    setGradeMapping((prev) => prev.filter((row) => row.id !== id));
+  };
 
-        const paddleText = extractTextFromOcrPayload(paddleResult);
-        if (paddleText.trim()) {
-          setOcrProgress(100);
-          setPasteText(prev => prev ? prev + "\n" + paddleText : paddleText);
-          return;
-        }
-      } catch (paddleErr) {
-        console.warn("PaddleOCR unavailable, falling back to browser OCR.", paddleErr);
-      }
+  const updateFailGrade = (index, value) => {
+    setFailGrades((prev) => prev.map((g, i) => (i === index ? value : g)));
+  };
 
-      setOcrStatus("Using browser OCR");
-      setOcrProgress(10);
-      const Tesseract = (await import('tesseract.js')).default || await import('tesseract.js');
-      
-      const worker = await Tesseract.createWorker('eng', 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setOcrStatus("Reading screenshot");
-            setOcrProgress(Math.max(10, Math.round(m.progress * 100)));
-          }
-        }
-      });
-      
-      const result = await worker.recognize(file);
-      let gradeText = "";
+  const addFailGrade = () => {
+    setFailGrades((prev) => [...prev, ""]);
+  };
 
-      try {
-        await worker.setParameters({
-          tessedit_char_whitelist: "O0A+BCRSUFW",
-          tessedit_pageseg_mode: "6"
-        });
+  const removeFailGrade = (index) => {
+    setFailGrades((prev) => prev.filter((_, i) => i !== index));
+  };
 
-        const gradeCrops = await Promise.all([
-          createImageCropBlob(file, { x: 0.44, y: 0.1, width: 0.14, height: 0.78 }),
-          createImageCropBlob(file, { x: 0.76, y: 0.1, width: 0.22, height: 0.78 })
-        ]);
-
-        const gradeResults = [];
-        for (const crop of gradeCrops) {
-          const cropResult = await worker.recognize(crop);
-          gradeResults.push(cropResult.data.text || "");
-        }
-        gradeText = gradeResults.join("\n");
-      } catch (gradeErr) {
-        console.warn("Grade-column OCR failed, continuing with full OCR text.", gradeErr);
-      } finally {
-        await worker.terminate();
-      }
-      
-      let newText = result.data.text || "";
-
-      // MATHEMATICAL BOUNDING BOX CLUSTERING (Safely Wrapped)
-      try {
-        const words = result.data.words;
-        if (words && Array.isArray(words) && words.length > 0) {
-          const extractedRows = extractResultRowsFromOcrWords(words);
-          const rows = [];
-          const rowTolerance = 15; // vertical pixel variance allowed
-
-          words.forEach(word => {
-            if (!word.bbox) return; // safety check
-            
-            const centerY = (word.bbox.y0 + word.bbox.y1) / 2;
-            let foundRow = rows.find(r => Math.abs(r.centerY - centerY) < rowTolerance);
-            
-            if (foundRow) {
-              foundRow.words.push(word);
-              foundRow.centerY = ((foundRow.centerY * (foundRow.words.length - 1)) + centerY) / foundRow.words.length;
-            } else {
-              rows.push({ centerY: centerY, words: [word] });
-            }
-          });
-
-          rows.sort((a, b) => a.centerY - b.centerY);
-
-          const reconstructedLines = rows.map(row => {
-            row.words.sort((a, b) => a.bbox.x0 - b.bbox.x0);
-            return row.words.map(w => w.text).join(" ");
-          });
-          
-          if (extractedRows.length > 0) {
-            newText = extractedRows.join("\n");
-          } else if (reconstructedLines.length > 0) {
-            newText = reconstructedLines.join("\n");
-          }
-        }
-      } catch (err) {
-        console.warn("Bounding box clustering failed, falling back to default text extraction.", err);
-      }
-
-      if (!newText.trim()) throw new Error("No text found in image");
-
-      newText = applyMissingGradesBySequence(newText, extractGradesFromOcrText(gradeText));
-
-      setPasteText(prev => prev ? prev + "\n" + newText : newText);
-    } catch (error) {
-      console.error("OCR Error:", error);
-      alert("Failed to extract text from the image.");
-    } finally {
-      setIsOcrLoading(false);
-      setOcrProgress(0);
-      setOcrStatus("Scanning Image");
-      e.target.value = null; // Reset input
-    }
+  const resetGradeMapping = () => {
+    setGradeMapping(Object.entries(GRADE_MAPPING).map(([grade, points], i) => ({ id: i, grade, points })));
+    setFailGrades([...FAIL_GRADES]);
   };
 
   const deleteHistoryItem = (id, e) => {
@@ -1123,19 +679,33 @@ export default function CGPACalculator() {
               </div>
             </div>
 
-            {/* Smart Paste */}
+            {/* Paste Results */}
             <button
               onClick={() => setShowPasteModal(true)}
               className="group flex flex-shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0E2136] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#1b3457] active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
             >
-              <IconWand size={16} stroke={2} className="transition-transform group-hover:rotate-12" />
-              Smart Paste Data
+              <IconClipboardList size={16} stroke={2} />
+              Paste Results
               <IconChevronRight size={16} stroke={2} className="opacity-70 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </motion.section>
 
         {/* --- METHOD SELECTOR --- */}
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+            Calculation Method
+          </p>
+          {activeMethod === "slab" && (
+            <button
+              onClick={() => setShowGradeConfigModal(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-3 py-1.5 text-xs font-semibold text-[#045C9A] shadow-sm transition-colors hover:bg-[#EAF7FD] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-[#A6D7E8] dark:hover:bg-white/5"
+            >
+              <IconSettings size={14} />
+              Configure Points
+            </button>
+          )}
+        </div>
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {METHODS.map((method) => {
             const isActive = activeMethod === method.id;
@@ -1523,7 +1093,7 @@ export default function CGPACalculator() {
         </div>
       </div>
 
-      {/* --- SMART PASTE MODAL --- */}
+      {/* --- PASTE RESULTS MODAL --- */}
       <AnimatePresence>
         {showPasteModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
@@ -1536,13 +1106,13 @@ export default function CGPACalculator() {
             >
               <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-2 text-white">
-                    <IconWand size={20} />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                    <IconClipboardList size={20} />
                   </div>
-                  <h2 className="text-xl font-bold text-[#072036] dark:text-white">Smart Paste</h2>
+                  <h2 className="text-lg font-bold text-[#072036] dark:text-white">Paste Results</h2>
                 </div>
                 <button
-                  onClick={() => setShowPasteModal(false)}
+                  onClick={() => { setShowPasteModal(false); setPasteError(""); }}
                   className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]"
                 >
                   <IconX size={20} />
@@ -1550,50 +1120,154 @@ export default function CGPACalculator() {
               </div>
               <div className="p-6">
                 <p className="mb-4 text-[13px] text-slate-500 dark:text-slate-400">
-                  Paste the result table directly, or <strong>upload a screenshot</strong> of your results!
+                  Copy a table of results (Code | Name | Credits | Grade) from your marksheet, Excel, or a PDF, and paste it below.
                 </p>
-
-                {/* OCR Upload Area */}
-                <div className="relative mb-4">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    id="ocr-upload"
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="ocr-upload"
-                    className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-blue-50 py-3 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 ${isOcrLoading ? "opacity-60 pointer-events-none" : ""}`}
-                  >
-                    {isOcrLoading ? (
-                      <>
-                        <IconLoader2 className="animate-spin" size={18} />
-                        {ocrStatus} ({ocrProgress}%)...
-                      </>
-                    ) : (
-                      <>
-                        <IconScan size={18} />
-                        Upload Screenshot for Auto-Fill
-                      </>
-                    )}
-                  </label>
-                </div>
 
                 <textarea
                   value={pasteText}
-                  onChange={(e) => setPasteText(e.target.value)}
-                  placeholder="e.g. Data Structures 4 A+&#10;Computer Networks 3 8.9"
-                  className="h-32 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-[#072036] placeholder:text-slate-300 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-slate-700 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600"
+                  onChange={(e) => { setPasteText(e.target.value); setPasteError(""); }}
+                  placeholder={"Example:\nR21UCE971 | Development of Smart Cities | 3.0 | A+\nR21UGS531 | Reasoning and Aptitude | 1.0 | O"}
+                  className="h-36 w-full resize-none rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-4 font-mono text-[13px] text-[#072036] placeholder:font-mono placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600"
                 />
+
+                {pasteError && (
+                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-[12.5px] text-rose-600 dark:border-rose-900/40 dark:bg-rose-900/20 dark:text-rose-300">
+                    <IconAlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+                    <span>{pasteError}</span>
+                  </div>
+                )}
               </div>
               <div className="border-t border-slate-100 bg-slate-50 p-4 dark:border-[#045C9A]/20 dark:bg-[#072036]">
                 <button
-                  onClick={handleSmartPaste}
+                  onClick={handleParseSubjects}
                   disabled={!pasteText.trim()}
                   className="w-full rounded-xl bg-[#0E2136] py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-[#1b3457] disabled:opacity-50 dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
                 >
-                  Extract Data
+                  Parse & Add Subjects
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- GRADE MAPPING MODAL (Configure Points) --- */}
+      <AnimatePresence>
+        {showGradeConfigModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/40 p-4 backdrop-blur-sm dark:bg-black/60 lg:pl-72">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ type: "spring", bounce: 0.4, duration: 0.5 }}
+              className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:border dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-[#045C9A]/20">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                    <IconSettings size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#072036] dark:text-white">Grade Mapping</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Define points & arrears for the Slab-Based method.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGradeConfigModal(false)}
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]"
+                >
+                  <IconX size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="mb-5 flex items-start gap-2 rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] p-3 text-[12.5px] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 dark:text-[#A6D7E8]">
+                  <IconInfoCircle size={16} className="mt-0.5 flex-shrink-0" />
+                  <span>Customize point multipliers for standard grades. Define arrear grades explicitly below.</span>
+                </div>
+
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Standard Passing Grades
+                </p>
+                <div className="mb-3 grid grid-cols-2 gap-2">
+                  {gradeMapping.map((row) => (
+                    <div
+                      key={row.id}
+                      className="flex items-center gap-2 rounded-xl border border-[#d7ebf5] bg-white p-2 dark:border-white/10 dark:bg-[#072036]"
+                    >
+                      <input
+                        value={row.grade}
+                        onChange={(e) => updateGradeRow(row.id, "grade", e.target.value.toUpperCase())}
+                        maxLength={3}
+                        className="w-14 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2 py-1.5 text-center text-sm font-bold text-[#072036] focus:border-[#045C9A] focus:outline-none dark:border-white/10 dark:bg-[#0d3a5f] dark:text-white"
+                      />
+                      <input
+                        type="number"
+                        step="0.5"
+                        value={row.points}
+                        onChange={(e) => updateGradeRow(row.id, "points", e.target.value)}
+                        className="w-16 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-2 py-1.5 text-center text-sm font-semibold text-[#072036] focus:border-[#045C9A] focus:outline-none dark:border-white/10 dark:bg-[#0d3a5f] dark:text-white"
+                      />
+                      <button
+                        onClick={() => removeGradeRow(row.id)}
+                        className="ml-auto rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                      >
+                        <IconTrash size={15} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={addGradeRow}
+                  className="mb-6 flex items-center gap-1.5 rounded-xl border border-dashed border-[#d7ebf5] px-3 py-2 text-xs font-semibold text-[#045C9A] hover:bg-[#EAF7FD] dark:border-white/20 dark:text-[#A6D7E8] dark:hover:bg-white/5"
+                >
+                  <IconPlus size={14} /> Add Passing Grade
+                </button>
+
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-rose-500">
+                  Arrear / Special (0 pts)
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  {failGrades.map((grade, index) => (
+                    <span
+                      key={index}
+                      className="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 py-1 pl-3 pr-1.5 dark:border-rose-900/40 dark:bg-rose-900/20"
+                    >
+                      <input
+                        value={grade}
+                        onChange={(e) => updateFailGrade(index, e.target.value.toUpperCase())}
+                        maxLength={3}
+                        className="w-10 bg-transparent text-center text-xs font-bold text-rose-600 focus:outline-none dark:text-rose-300"
+                      />
+                      <button
+                        onClick={() => removeFailGrade(index)}
+                        className="rounded-full p-0.5 text-rose-400 hover:bg-rose-100 hover:text-rose-600 dark:hover:bg-rose-900/40"
+                      >
+                        <IconX size={12} />
+                      </button>
+                    </span>
+                  ))}
+                  <button
+                    onClick={addFailGrade}
+                    className="flex items-center gap-1 rounded-full border border-dashed border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:border-[#045C9A] hover:text-[#045C9A] dark:border-white/20 dark:text-slate-400"
+                  >
+                    <IconPlus size={13} /> Add
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 p-4 dark:border-[#045C9A]/20 dark:bg-[#072036]">
+                <button
+                  onClick={resetGradeMapping}
+                  className="text-xs font-semibold text-slate-400 hover:text-[#045C9A] dark:hover:text-[#A6D7E8]"
+                >
+                  Reset to defaults
+                </button>
+                <button
+                  onClick={() => setShowGradeConfigModal(false)}
+                  className="rounded-xl bg-[#0E2136] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                >
+                  Save & Close
                 </button>
               </div>
             </motion.div>
@@ -1725,14 +1399,13 @@ export default function CGPACalculator() {
                   <p className="mb-3 text-sm text-slate-600 dark:text-slate-300">Converts your Letter Grade into a predefined Grade Point, multiplies it by the subject's credits, and then divides the total points by your total credits.</p>
                   
                   <div className="mb-3 rounded-lg bg-blue-50/50 p-3 text-sm dark:bg-blue-900/10">
-                    <span className="font-semibold text-blue-700 dark:text-blue-300">What you can enter:</span> Letter Grades or exact Points.
+                    <span className="font-semibold text-blue-700 dark:text-blue-300">What you can enter:</span> Letter Grades or exact Points -- customize these anytime with <strong>Configure Points</strong> above the method selector.
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">O = 10</span>
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">A+ = 9</span>
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">A = 8</span>
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">B+ = 7</span>
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">B = 6</span>
-                      <span className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">C = 5</span>
+                      {gradeMapping.filter((row) => row.grade.trim()).map((row) => (
+                        <span key={row.id} className="rounded border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-bold text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                          {row.grade} = {row.points}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
