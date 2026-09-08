@@ -936,52 +936,57 @@ export default function CGPACalculator() {
                   className="flex flex-col items-center"
                 >
                   
-                  {/* Semester GPA (SGPA) Badge */}
-                  {calculation.sgpa > 0 && (
-                    <div className="mb-4 rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 dark:border-blue-900/50 dark:bg-blue-900/20">
-                      <p className="text-[12px] font-bold text-blue-700 dark:text-blue-400">
-                        Semester {activeSemester} GPA (SGPA): {calculation.sgpa.toFixed(2)}
-                      </p>
-                    </div>
-                  )}
-
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Cumulative CGPA</p>
 
-                  {/* Refined CGPA Display */}
-                  <div className="relative mb-4 mt-2 flex items-baseline justify-center">
-                    <span className="bg-gradient-to-br from-[#072036] to-[#045C9A] bg-clip-text text-6xl font-extrabold tracking-tight text-transparent dark:from-white dark:to-blue-400">
+                  {/* CGPA Display */}
+                  <div className="relative mb-5 mt-2 flex items-baseline justify-center">
+                    <span className="text-6xl font-extrabold tracking-tight text-[#072036] dark:text-white">
                       {calculation.cgpa.toFixed(2)}
                     </span>
                     <span className="ml-2 text-lg font-bold text-slate-400/80">/ 10</span>
                   </div>
 
-                  <div className="mb-6 rounded-full bg-green-100/50 px-4 py-1.5 dark:bg-green-900/20">
-                    <p className="text-[13px] font-bold text-green-700 dark:text-green-400">
-                      Estimated Percentage: {calculation.percentage}%
-                    </p>
+                  {/* SGPA + Percentage stat strip */}
+                  <div className="mb-6 grid w-full grid-cols-2 divide-x divide-[#d7ebf5] overflow-hidden rounded-2xl border border-[#d7ebf5] dark:divide-white/10 dark:border-white/10">
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                        Semester {activeSemester} SGPA
+                      </p>
+                      <p className="mt-1 text-lg font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
+                        {calculation.sgpa > 0 ? calculation.sgpa.toFixed(2) : "--"}
+                      </p>
+                    </div>
+                    <div className="px-4 py-3 text-center">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                        Est. Percentage
+                      </p>
+                      <p className="mt-1 text-lg font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
+                        {calculation.percentage}%
+                      </p>
+                    </div>
                   </div>
 
                   {/* Target Goal Tracker */}
                   <div className="mb-8 w-full" data-html2canvas-ignore>
                     {targetGoal.active ? (
-                      <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900/50 dark:bg-indigo-900/10 relative group cursor-pointer transition-all hover:bg-indigo-100/50 dark:hover:bg-indigo-900/20" onClick={() => setShowTargetModal(true)}>
+                      <div className="rounded-2xl border border-[#d7ebf5] bg-[#EAF7FD] p-4 dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 relative group cursor-pointer transition-colors hover:bg-[#d7ebf5]/60 dark:hover:bg-[#045C9A]/20" onClick={() => setShowTargetModal(true)}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-500">Target Goal: {targetGoal.targetCGPA}</span>
-                          <IconTarget size={14} className="text-indigo-400" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#045C9A] dark:text-[#A6D7E8]">Target Goal: {targetGoal.targetCGPA}</span>
+                          <IconTarget size={14} className="text-[#045C9A] dark:text-[#A6D7E8]" />
                         </div>
                         {(() => {
                           const c1 = calculation.totalCredits || 0;
                           const p1 = calculation.totalPoints || 0;
                           const c2 = Math.max(0, parseFloat(targetGoal.totalDegreeUnits) - c1);
                           const targetT = parseFloat(targetGoal.targetCGPA);
-                          
+
                           if (c2 === 0) {
-                            return <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300">You have completed all planned units!</p>;
+                            return <p className="text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8]">You have completed all planned units!</p>;
                           }
-                          
+
                           const reqPoints = (targetT * (c1 + c2)) - p1;
                           const reqAvg = reqPoints / c2;
-                          
+
                           if (reqAvg > 10) {
                             return <p className="text-xs font-semibold text-red-600 dark:text-red-400">Mathematically impossible with remaining units.</p>;
                           } else if (reqAvg <= 0) {
@@ -989,8 +994,8 @@ export default function CGPACalculator() {
                           } else {
                             return (
                               <div>
-                                <p className="text-[13px] leading-tight text-indigo-800 dark:text-indigo-200">
-                                  Need an average of <strong className="text-indigo-600 dark:text-indigo-300">{reqAvg.toFixed(2)}</strong> across your remaining {c2} {activeMethod === "equal" ? "subjects" : "credits"}.
+                                <p className="text-[13px] leading-tight text-[#072036] dark:text-slate-200">
+                                  Need an average of <strong className="text-[#045C9A] dark:text-[#A6D7E8]">{reqAvg.toFixed(2)}</strong> across your remaining {c2} {activeMethod === "equal" ? "subjects" : "credits"}.
                                 </p>
                               </div>
                             );
@@ -1000,7 +1005,7 @@ export default function CGPACalculator() {
                     ) : (
                       <button
                         onClick={() => setShowTargetModal(true)}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-500 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-3 text-sm font-semibold text-slate-500 transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-slate-700 dark:text-slate-400 dark:hover:border-[#A6D7E8]/40 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]"
                       >
                         <IconTarget size={16} /> Set Target CGPA
                       </button>
@@ -1077,7 +1082,7 @@ export default function CGPACalculator() {
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isGeneratingPDF}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-600 transition-all hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] disabled:opacity-50 dark:border-slate-700 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white py-3.5 text-sm font-bold text-slate-600 transition-colors hover:border-[#045C9A] hover:text-[#045C9A] active:scale-[0.98] disabled:opacity-50 dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-[#A6D7E8] dark:hover:text-[#A6D7E8]"
                     >
                       {isGeneratingPDF ? (
                         <IconLoader2 size={18} className="animate-spin" />
