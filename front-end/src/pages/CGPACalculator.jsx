@@ -766,22 +766,22 @@ export default function CGPACalculator() {
                 </div>
               </div>
 
-              {/* Table Header */}
-              <div className="mb-1 grid grid-cols-12 gap-2 rounded-lg bg-slate-100 px-3 py-2 dark:bg-[#072036]">
-                <div className={`text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-3" : "col-span-2"}`}>Code</div>
-                <div className={`text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-5" : "col-span-4"}`}>Subject Name</div>
-                <div className="col-span-3 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                  {activeMethod === "slab" ? "Grade / GP" : "Marks / GP"}
-                </div>
-                {activeMethod !== "equal" && (
-                  <div className="col-span-2 text-center text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                    Credits
+              {/* Subject Table */}
+              <div className="overflow-hidden rounded-2xl border border-[#d7ebf5] dark:border-white/10">
+                <div className="grid grid-cols-12 gap-2 bg-[#F1F5F9] px-3 py-2.5 dark:bg-[#072036]">
+                  <div className={`text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-3" : "col-span-2"}`}>Code</div>
+                  <div className={`text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 ${activeMethod === "equal" ? "col-span-5" : "col-span-4"}`}>Subject Name</div>
+                  <div className="col-span-3 text-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                    {activeMethod === "slab" ? "Grade / GP" : "Marks / GP"}
                   </div>
-                )}
-                <div className="col-span-1"></div>
-              </div>
+                  {activeMethod !== "equal" && (
+                    <div className="col-span-2 text-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      Credits
+                    </div>
+                  )}
+                  <div className="col-span-1"></div>
+                </div>
 
-              <div className="space-y-2">
                 <AnimatePresence mode="popLayout">
                   {currentSubjects.map((subject, idx) => {
                     const subjectPlaceholders = [
@@ -795,14 +795,15 @@ export default function CGPACalculator() {
                       { code: "CS8493", name: "Operating Systems",      grade: "A+",  credits: "4" },
                     ];
                     const ph = subjectPlaceholders[idx % subjectPlaceholders.length];
+                    const isLast = idx === currentSubjects.length - 1;
                     return (
                     <motion.div
                       key={subject.id}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="group grid grid-cols-12 gap-2 items-center rounded-xl border-l-4 border-l-[#045C9A] border border-slate-200 bg-white px-3 py-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] dark:border-slate-700/60 dark:bg-[#072036]"
+                      className={`group grid grid-cols-12 gap-2 items-center px-3 py-2 transition-colors hover:bg-[#F1F5F9] dark:hover:bg-white/5 ${isLast ? "" : "border-b border-[#d7ebf5] dark:border-white/10"}`}
                     >
                       <div className={activeMethod === "equal" ? "col-span-3" : "col-span-2"}>
                         <input
@@ -811,7 +812,7 @@ export default function CGPACalculator() {
                           value={subject.code || ""}
                           onChange={(e) => handleSubjectChange(subject.id, "code", e.target.value.toUpperCase())}
                           placeholder={ph.code}
-                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[12px] font-extrabold tracking-wider text-[#045C9A] text-ellipsis placeholder:font-semibold placeholder:tracking-wide placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-blue-400 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
+                          className="w-full rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[12px] font-bold tracking-wide text-[#045C9A] text-ellipsis placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-[#A6D7E8] dark:placeholder:text-slate-500"
                         />
                       </div>
                       <div className={activeMethod === "equal" ? "col-span-5" : "col-span-4"}>
@@ -821,19 +822,19 @@ export default function CGPACalculator() {
                           value={subject.name}
                           onChange={(e) => handleSubjectChange(subject.id, "name", e.target.value)}
                           placeholder={ph.name}
-                          className="w-full rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-medium text-[#072036] text-ellipsis placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500"
+                          className="w-full rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[13px] font-medium text-[#072036] text-ellipsis placeholder:font-normal placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-500"
                         />
                       </div>
                       <div className="col-span-3">
                         <input
                           type="text"
                           inputMode={activeMethod === "slab" ? "text" : "numeric"}
-                          value={activeMethod === "slab" 
-                            ? (subject.inputSlab !== undefined ? subject.inputSlab : (subject.input || "")) 
+                          value={activeMethod === "slab"
+                            ? (subject.inputSlab !== undefined ? subject.inputSlab : (subject.input || ""))
                             : (subject.inputNumeric !== undefined ? subject.inputNumeric : (subject.input || ""))}
                           onChange={(e) => handleSubjectChange(subject.id, activeMethod === "slab" ? "inputSlab" : "inputNumeric", e.target.value)}
                           placeholder={activeMethod === "slab" ? ph.grade : (ph.grade === "O" ? "95" : ph.grade === "A+" ? "85" : "75")}
-                          className="w-full text-center rounded-lg border-2 border-blue-100 bg-blue-50 px-2 py-1.5 text-[13px] font-bold text-[#045C9A] uppercase placeholder:font-semibold placeholder:text-blue-300 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-300 dark:placeholder:text-blue-700 dark:focus:border-blue-500"
+                          className="w-full text-center rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[13px] font-bold text-[#045C9A] uppercase placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-[#A6D7E8] dark:placeholder:text-slate-500"
                         />
                       </div>
                       {activeMethod !== "equal" && (
@@ -855,7 +856,7 @@ export default function CGPACalculator() {
                               }
                             }}
                             placeholder={ph.credits}
-                            className="w-full text-center rounded-lg border-2 border-slate-100 bg-slate-50 px-2 py-1.5 text-[13px] font-bold text-[#072036] placeholder:font-semibold placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#045C9A]/20 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700/60 dark:bg-[#0d3a5f] dark:text-white dark:placeholder:text-slate-500 dark:disabled:bg-slate-800"
+                            className="w-full text-center rounded-lg border border-[#d7ebf5] bg-white px-2 py-1.5 text-[13px] font-bold text-[#072036] placeholder:font-medium placeholder:text-slate-400 focus:border-[#045C9A] focus:outline-none focus:ring-1 focus:ring-[#045C9A] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-500 dark:disabled:bg-white/5"
                           />
                         </div>
                       )}
