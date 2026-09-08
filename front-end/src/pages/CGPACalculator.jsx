@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { apiCall } from '@/services/api';
 import {
   IconCalculator,
@@ -657,8 +658,10 @@ export default function CGPACalculator() {
           totalSubjects: calculation.totalSubjects
         })
       });
+      toast.success("Result saved to your profile.");
     } catch (error) {
       console.error("Failed to auto-sync profile:", error);
+      toast.error("Saved locally, but couldn't sync to your profile. Check your connection and try again.");
     } finally {
       setIsSyncing(false);
     }
