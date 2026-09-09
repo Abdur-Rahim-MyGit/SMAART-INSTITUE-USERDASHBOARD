@@ -475,6 +475,9 @@ const Placement = () => {
 
   const isJobSaved = (job) =>
     savedJobs.some((s) => String(s.jobId) === String(job._id) && s.source === job.sourceCollection);
+  // Only bookmarks that still point at a listed job count. Stale entries
+  // (a posting deleted after it was saved) must not inflate the badge.
+  const savedCount = useMemo(() => jobs.filter((job) => isJobSaved(job)).length, [jobs, savedJobs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredJobs = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -943,7 +946,7 @@ const Placement = () => {
                   className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
                   style={{ letterSpacing: "-0.02em" }}
                 >
-                  {t("placement.title", "Placement")}
+                  {t("placement.title", "SMAART Placement")}
                 </h1>
                 <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
                   {t("placement.subtitle", "Explore active jobs from college placement postings and SMAART job postings.")}
@@ -1112,8 +1115,8 @@ const Placement = () => {
                 >
                   {showSavedOnly ? <BookmarkFilled className="h-4 w-4" stroke={1.8} /> : <Bookmark className="h-4 w-4" stroke={1.8} />}
                   <span>{t("placement.saved", "Saved")}</span>
-                  {savedJobs.length > 0 && (
-                    <span className="rounded-md bg-[#045C9A]/10 px-1.5 text-[11px] font-semibold text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">{savedJobs.length}</span>
+                  {savedCount > 0 && (
+                    <span className="rounded-md bg-[#045C9A]/10 px-1.5 text-[11px] font-semibold text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">{savedCount}</span>
                   )}
                 </button>
               </div>
