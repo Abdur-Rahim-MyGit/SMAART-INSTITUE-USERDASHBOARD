@@ -776,10 +776,10 @@ const Placement = () => {
       : appliedJobs.filter((a) => statusBucket(a.status || a.applicationStatus) === statusFilter);
 
     const tiles = [
-      [t("placement.stat_applied", "Applied"), counts.total, "text-[#072036] dark:text-white"],
-      [t("placement.stat_interviews", "Interviews"), counts.interview, "text-amber-600 dark:text-amber-400"],
-      [t("placement.stat_offers", "Offers"), counts.offer, "text-emerald-600 dark:text-emerald-400"],
-      [t("placement.stat_response", "Response rate"), `${responseRate}%`, "text-[#045C9A] dark:text-[#A6D7E8]"],
+      [t("placement.stat_applied", "Applied"), counts.total],
+      [t("placement.stat_interviews", "Interviews"), counts.interview],
+      [t("placement.stat_offers", "Offers"), counts.offer],
+      [t("placement.stat_response", "Response rate"), `${responseRate}%`],
     ];
     const chips = [
       ["all", t("placement.filter_all", "All"), counts.total],
@@ -793,10 +793,10 @@ const Placement = () => {
       <>
         {/* Summary strip -- same bordered stat-strip pattern as the CGPA result panel */}
         <div className="mb-4 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-[#d7ebf5] bg-[#d7ebf5] dark:border-white/10 dark:bg-white/10 sm:grid-cols-4">
-          {tiles.map(([label, value, cls]) => (
+          {tiles.map(([label, value]) => (
             <div key={label} className="bg-white px-4 py-3 dark:bg-[#0d3a5f]">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
-              <p className={`mt-1 text-lg font-extrabold ${cls}`}>{value}</p>
+              <p className="mt-1 text-lg font-extrabold text-[#072036] dark:text-white">{value}</p>
             </div>
           ))}
         </div>
