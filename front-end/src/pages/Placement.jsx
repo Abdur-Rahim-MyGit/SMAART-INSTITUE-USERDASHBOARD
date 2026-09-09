@@ -678,6 +678,11 @@ const Placement = () => {
       const bucket = statusBucket(app.status || app.applicationStatus);
       const canWithdraw = !['Accepted', 'Declined', 'Hired'].includes(app.status);
       const hasOfferLetter = app.status === 'Offer' && !!app.offeredPackage;
+      const locationLabel = jobObj.displayLocation || app.jobLocation || null;
+      const lastEntry = Array.isArray(app.statusHistory) && app.statusHistory.length
+        ? app.statusHistory[app.statusHistory.length - 1]
+        : null;
+      const lastUpdated = lastEntry?.changedAt || app.updatedAt || appliedAt;
       const ghostBtn = "inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20";
       const primaryBtn = "inline-flex h-8 items-center gap-1.5 rounded-md bg-[#0E2136] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white";
       return (
@@ -686,7 +691,7 @@ const Placement = () => {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: Math.min(origIdx * 0.03, 0.3) }}
-          className="relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
+          className="relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
         >
           {/* Eyebrow: source on the left, stage pill on the right */}
           <div className="flex items-center justify-between gap-2">
@@ -718,7 +723,7 @@ const Placement = () => {
               <h2
                 title={title}
                 onClick={() => openApplicationJob(app)}
-                className={`line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white ${jobRemoved ? '' : 'cursor-pointer transition-colors hover:text-[#045C9A] dark:hover:text-[#A6D7E8]'}`}
+                className={`line-clamp-2 min-h-[40px] text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white ${jobRemoved ? '' : 'cursor-pointer transition-colors hover:text-[#045C9A] dark:hover:text-[#A6D7E8]'}`}
               >
                 {title}
               </h2>
@@ -726,47 +731,59 @@ const Placement = () => {
             </div>
           </div>
 
-          {/* One-line meta */}
-          <p className="mt-3 flex min-w-0 items-center gap-1.5 text-[12.5px] text-slate-500 dark:text-slate-400">
-            <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-            <span className="truncate">
-              {displayType && <span className="font-medium text-slate-600 dark:text-slate-300">{displayType}</span>}
-              {displayType && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
-              {t("placement.applied", "Applied")} {formatDate(appliedAt, t)}
-            </span>
-          </p>
-          {jobRemoved && (
-            <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-500">
-              <Building className="h-[15px] w-[15px] shrink-0" stroke={1.6} />
-              <span className="truncate">{t("placement.posting_removed", "Posting no longer listed")}</span>
-            </p>
-          )}
-
-          {/* Recruiter note / offer banner */}
-          {hasOfferLetter ? (
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/30 dark:bg-emerald-500/10">
-              <div className="min-w-0">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-emerald-600 dark:text-emerald-400">{t("placement.offer_received", "Offer received")}</p>
-                <p className="truncate text-[13px] font-semibold text-emerald-800 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</p>
-              </div>
-              <button
-                onClick={() => setOfferModalApp(app)}
-                className="h-8 shrink-0 rounded-md bg-emerald-600 px-3 text-[12px] font-medium text-white transition-colors hover:bg-emerald-700"
-              >
-                {t("placement.view_offer_letter", "View offer letter")}
-              </button>
+          {/* Meta -- always two rows so every card lines up */}
+          <div className="mt-4 space-y-2 text-[13px] leading-tight text-slate-600 dark:text-slate-300">
+            <div className="flex items-center gap-2">
+              <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+              <span className="truncate">
+                {displayType && <span className="font-medium">{displayType}</span>}
+                {displayType && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
+                {t("placement.applied", "Applied")} {formatDate(appliedAt, t)}
+              </span>
             </div>
-          ) : recruiterNote ? (
-            <p
-              title={recruiterNote}
-              className="mt-3 line-clamp-2 rounded-lg border border-[#d7ebf5] bg-[#F8FBFD] px-3 py-2 text-[12px] leading-snug text-slate-600 dark:border-[#045C9A]/25 dark:bg-[#072036]/40 dark:text-slate-300"
-            >
-              {recruiterNote}
-            </p>
-          ) : null}
+            <div className="flex items-center gap-2">
+              {jobRemoved ? (
+                <>
+                  <Building className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+                  <span className="truncate text-slate-400 dark:text-slate-500">{t("placement.posting_removed", "Posting no longer listed")}</span>
+                </>
+              ) : (
+                <>
+                  <MapPin className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+                  <span className={`truncate ${locationLabel ? '' : 'text-slate-400 dark:text-slate-500'}`} title={locationLabel || undefined}>
+                    {locationLabel || t("placement.location_unset", "Location not specified")}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Latest update -- one fixed-height line: offer, recruiter note, or last change */}
+          <div className="mt-3.5 flex h-[34px] items-center overflow-hidden rounded-lg border border-[#d7ebf5] bg-[#F8FBFD] px-3 dark:border-[#045C9A]/25 dark:bg-[#072036]/40">
+            {hasOfferLetter ? (
+              <button
+                type="button"
+                onClick={() => setOfferModalApp(app)}
+                className="flex min-w-0 w-full items-center justify-between gap-2 text-[12px] font-semibold text-emerald-700 dark:text-emerald-400"
+              >
+                <span className="truncate">{t("placement.offer_received", "Offer received")}</span>
+                <span className="shrink-0 underline-offset-2 hover:underline">{t("placement.view_offer_letter", "View offer letter")}</span>
+              </button>
+            ) : recruiterNote ? (
+              <p className="min-w-0 truncate text-[12px] text-slate-600 dark:text-slate-300" title={recruiterNote}>
+                <span className="font-semibold text-[#045C9A] dark:text-[#A6D7E8]">{t("placement.note_label", "Note")}:</span> {recruiterNote}
+              </p>
+            ) : (
+              <p className="min-w-0 truncate text-[12px] text-slate-500 dark:text-slate-400">
+                {t("placement.last_updated", "Last updated")} {formatDate(lastUpdated, t)}
+              </p>
+            )}
+          </div>
+
+          <div className="min-h-[16px] flex-1" />
 
           {/* Actions */}
-          <div className="mt-4 flex items-center gap-1.5 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
+          <div className="flex items-center gap-1.5 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
             {isInterviewStage ? (
               <button type="button" onClick={() => navigate('/dashboard/interview-prep')} className={primaryBtn}>
                 <Microphone className="h-3.5 w-3.5" stroke={1.8} />
@@ -869,7 +886,7 @@ const Placement = () => {
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("placement.no_apps_in_filter", "No applications in this stage yet.")}</p>
           </div>
         ) : (
-          <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {visible.map((app, origIdx) => renderCard(app, origIdx))}
           </div>
         )}
