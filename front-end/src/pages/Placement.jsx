@@ -25,7 +25,6 @@ import {
   IconCircleCheck as CircleCheck,
   IconAlertCircle as AlertCircle,
   IconHistory as History,
-  IconDownload as Download,
   IconMicrophone as Microphone,
   IconCalendarPlus as CalendarPlus,
   IconTicket as Ticket,
@@ -218,52 +217,6 @@ const buildStatusTimeline = (app) => {
   return points;
 };
 
-// Proof-of-application PDF. jsPDF is already a dependency (CGPA report).
-const downloadApplicationReceipt = async (app) => {
-  const { jsPDF } = await import("jspdf");
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const title = app.jobTitle || app.job?.displayTitle || "Role";
-  const company = app.companyName || app.job?.displayCompany || "Company";
-  const appliedAt = app.appliedAt || app.createdAt;
-
-  doc.setFillColor(7, 32, 54);
-  doc.rect(0, 0, 595, 96, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("SMAART Institute", 40, 44);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text("Application Receipt", 40, 66);
-
-  const rows = [
-    ["Application ID", String(app._id || app.id || "—")],
-    ["Role", title],
-    ["Company", company],
-    ["Applied on", appliedAt ? new Date(appliedAt).toLocaleString() : "—"],
-    ["Current status", String(app.status || "applied")],
-    ["Applicant", app.studentName || "—"],
-    ["Email", app.studentEmail || "—"],
-  ];
-  let y = 136;
-  rows.forEach(([k, v]) => {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(100, 116, 139);
-    doc.text(k.toUpperCase(), 40, y);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.setTextColor(7, 32, 54);
-    doc.text(String(v), 190, y, { maxWidth: 360 });
-    y += 30;
-  });
-  doc.setDrawColor(215, 235, 245);
-  doc.line(40, y, 555, y);
-  doc.setFontSize(9);
-  doc.setTextColor(148, 163, 184);
-  doc.text(`Generated ${new Date().toLocaleString()}. This receipt confirms the application was submitted through SMAART Institute.`, 40, y + 22, { maxWidth: 515 });
-  doc.save(`application-receipt-${String(title).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`);
-};
 
 const getPostedAgo = (createdAt, t) => {
   if (!createdAt) return null;
@@ -639,14 +592,6 @@ const Placement = () => {
     navigate(`/dashboard/placement/${app.jobSource || "jobpostings"}/${jobId}`, state);
   };
 
-  const handleDownloadReceipt = async (app) => {
-    try {
-      await downloadApplicationReceipt(app);
-    } catch (err) {
-      toast({ title: t("placement.error_receipt", "Could not generate receipt"), description: err.message, variant: "destructive" });
-    }
-  };
-
   const renderStatusCards = () => {
     const renderCard = (app, origIdx) => {
       const jobRef = app.job || app.jobId || app.jobPosting || {};
@@ -803,15 +748,6 @@ const Placement = () => {
                 {t("placement.view_role", "View role")}
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => handleDownloadReceipt(app)}
-              title={t("placement.receipt", "Download application receipt")}
-              aria-label={t("placement.receipt", "Download application receipt")}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#d7ebf5] bg-white text-slate-500 transition-colors hover:border-[#045C9A]/40 hover:text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300 dark:hover:text-[#A6D7E8]"
-            >
-              <Download className="h-3.5 w-3.5" stroke={1.8} />
-            </button>
             {canWithdraw && (
               <button
                 type="button"
@@ -1812,14 +1748,6 @@ const Placement = () => {
                       </div>
 
                       <div className="flex items-center gap-2 border-t border-[#d7ebf5] p-4 dark:border-[#045C9A]/20">
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadReceipt(app)}
-                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-3.5 text-[13px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
-                        >
-                          <Download className="h-4 w-4" stroke={1.8} />
-                          {t("placement.receipt_short", "Receipt")}
-                        </button>
                         {!app.jobRemoved && (
                           <button
                             type="button"
