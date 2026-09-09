@@ -1174,7 +1174,7 @@ const Placement = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {filteredJobs.map((job, index) => {
                   const skills = getSkills(job);
                   const companyLogo = getCompanyLogo(job);
@@ -1205,12 +1205,6 @@ const Placement = () => {
                     sourceLabel = t("placement.source_smaart", "SMAART");
                   }
 
-                  // The named publisher. Recruiter accounts are frequently registered under the
-                  // company name itself, and some seeded college refs no longer resolve — in both
-                  // cases the badge already says everything, so skip the row instead of repeating it.
-                  const postedBy = job.displayPostedBy;
-                  const posterIsCompany = postedBy && postedBy.trim().toLowerCase() === (job.displayCompany || '').trim().toLowerCase();
-                  const postedByLabel = postedBy && !posterIsCompany ? postedBy : null;
                   const deadlineLabel = job.displayDeadline ? formatDate(job.displayDeadline, t) : null;
                   const daysLeft = daysUntil(job.displayDeadline);
                   const closingSoon = !isClosed && daysLeft != null && daysLeft >= 0 && daysLeft <= 3;
@@ -1218,13 +1212,61 @@ const Placement = () => {
                   const eligibility = evaluateEligibility(job, studentProfile);
                   const saved = isJobSaved(job);
 
+                  // Signal chips in priority order, capped at two so the row never wraps.
+                  const signalChips = [];
+                  if (closingSoon) {
+                    signalChips.push({
+                      key: 'closing', Icon: Clock,
+                      cls: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400',
+                      label: daysLeft === 0 ? t("placement.closes_today", "Closes today") : t("placement.closes_in_days", { count: daysLeft, defaultValue: `Closes in ${daysLeft}d` }),
+                    });
+                  }
+                  if (eligibility) {
+                    signalChips.push({
+                      key: 'eligibility',
+                      Icon: eligibility.status === "yes" ? CircleCheck : AlertCircle,
+                      title: eligibility.checks.map((c) => `${c.label}: ${c.detail}`).join(" · "),
+                      cls: eligibility.status === "yes"
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
+                        : eligibility.status === "no"
+                          ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400'
+                          : 'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-300',
+                      label: eligibility.status === "yes"
+                        ? t("placement.eligible", "You're eligible")
+                        : eligibility.status === "no"
+                          ? t("placement.not_eligible", { label: eligibility.failed[0].label, defaultValue: `Below: ${eligibility.failed[0].label}` })
+                          : t("placement.eligibility_unknown", "Complete profile to check eligibility"),
+                    });
+                  } else {
+                    signalChips.push({
+                      key: 'open', Icon: CircleCheck,
+                      cls: 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400',
+                      label: t("placement.no_criteria", "No eligibility criteria listed"),
+                    });
+                  }
+                  if (pathMatch) {
+                    signalChips.push({
+                      key: 'path', Icon: TrendingUp, title: pathMatch,
+                      cls: 'border-[#045C9A]/20 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/40 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]',
+                      label: t("placement.path_match_short", "Matches your path"),
+                    });
+                  }
+                  if (skillsMatched) {
+                    signalChips.push({
+                      key: 'skills', Icon: CircleCheck,
+                      cls: 'border-emerald-200/70 bg-emerald-50/70 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400',
+                      label: t("placement.skills_matched", "Skills matched"),
+                    });
+                  }
+                  signalChips.splice(2);
+
                   return (
                     <motion.article
                       key={`${job.sourceCollection}-${job._id}`}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className={`group relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
+                      className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
                     >
                       {/* Eyebrow: source + status on the left, bookmark on the right */}
                       <div className="flex items-center justify-between gap-2">
@@ -1274,7 +1316,7 @@ const Placement = () => {
                         <div className="min-w-0 flex-1">
                           <h2
                             title={job.displayTitle}
-                            className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white"
+                            className="line-clamp-2 min-h-[40px] text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white"
                           >
                             {job.displayTitle}
                           </h2>
@@ -1284,18 +1326,12 @@ const Placement = () => {
                         </div>
                       </div>
 
-                      {/* Meta */}
+                      {/* Meta -- always exactly two rows so every card lines up */}
                       <div className="mt-4 space-y-2 text-[13px] leading-tight text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
                           <MapPin className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                          <span className="truncate">{job.displayLocation || t("placement.remote", "Remote")}</span>
+                          <span className="truncate" title={job.displayLocation || undefined}>{job.displayLocation || t("placement.remote", "Remote")}</span>
                         </div>
-                        {postedByLabel && (
-                          <div className="flex items-center gap-2">
-                            <Building className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                            <span className="truncate" title={postedByLabel}>{postedByLabel}</span>
-                          </div>
-                        )}
                         <div className="flex items-center gap-2">
                           <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
                           {deadlineLabel ? (
@@ -1308,78 +1344,41 @@ const Placement = () => {
                             </span>
                           )}
                         </div>
-                        {job.displaySalary && (
-                          <div className="flex items-center gap-2">
-                            <Tag className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                            <span className="truncate">{job.displaySalary}</span>
-                          </div>
-                        )}
                       </div>
 
-                      {(closingSoon || eligibility || pathMatch) && (
-                        <div className="mt-3.5 flex flex-wrap gap-1.5">
-                          {closingSoon && (
-                            <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-[3px] text-[10.5px] font-semibold text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
-                              <Clock className="h-3 w-3" stroke={2} />
-                              {daysLeft === 0
-                                ? t("placement.closes_today", "Closes today")
-                                : t("placement.closes_in_days", { count: daysLeft, defaultValue: `Closes in ${daysLeft}d` })}
-                            </span>
-                          )}
-                          {eligibility && (
-                            <span
-                              title={eligibility.checks.map((c) => `${c.label}: ${c.detail}`).join(" · ")}
-                              className={`inline-flex items-center gap-1 rounded-md border px-2 py-[3px] text-[10.5px] font-semibold ${
-                                eligibility.status === "yes"
-                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                  : eligibility.status === "no"
-                                    ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400'
-                                    : 'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-300'
-                              }`}
-                            >
-                              {eligibility.status === "yes" ? <CircleCheck className="h-3 w-3" stroke={2} /> : <AlertCircle className="h-3 w-3" stroke={2} />}
-                              {eligibility.status === "yes"
-                                ? t("placement.eligible", "You're eligible")
-                                : eligibility.status === "no"
-                                  ? t("placement.not_eligible", { label: eligibility.failed[0].label, defaultValue: `Below: ${eligibility.failed[0].label}` })
-                                  : t("placement.eligibility_unknown", "Eligibility: complete your profile")}
-                            </span>
-                          )}
-                          {pathMatch && (
-                            <span className="inline-flex items-center gap-1 rounded-md border border-[#045C9A]/20 bg-[#EAF7FD] px-2 py-[3px] text-[10.5px] font-semibold text-[#045C9A] dark:border-[#045C9A]/40 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
-                              <TrendingUp className="h-3 w-3" stroke={2} />
-                              {t("placement.path_match", { role: pathMatch, defaultValue: `Matches your path: ${pathMatch}` })}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {skills.length > 0 && (
-                        <div className="mt-3.5 flex flex-wrap gap-1.5">
-                          {skills.slice(0, 3).map((skill) => (
-                            <span key={skill} className="rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#0d3a5f] dark:text-slate-300">
-                              {skill}
-                            </span>
-                          ))}
-                          {skills.length > 3 && (
-                            <span className="rounded-md px-1 py-[3px] text-[11.5px] font-medium text-slate-400">
-                              +{skills.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Skills matched — a quiet positive signal. Skill gaps are
-                          deliberately NOT flagged on the card; the detail page
-                          breaks them down for the student instead. */}
-                      {skillsMatched && (
-                        <div className="mt-3.5">
-                          <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200/70 bg-emerald-50/70 px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.06em] text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/[0.07] dark:text-emerald-400">
-                            <CircleCheck className="h-3.5 w-3.5" stroke={2} />
-                            {t("placement.skills_matched", "Skills matched")}
+                      {/* Signals -- one fixed-height row, at most two chips, never wraps */}
+                      <div className="mt-3.5 flex h-[26px] items-center gap-1.5 overflow-hidden">
+                        {signalChips.map((chip) => (
+                          <span
+                            key={chip.key}
+                            title={chip.title}
+                            className={`inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-md border px-2 py-[3px] text-[10.5px] font-semibold ${chip.cls}`}
+                          >
+                            <chip.Icon className="h-3 w-3 shrink-0" stroke={2} />
+                            <span className="truncate">{chip.label}</span>
                           </span>
-                        </div>
-                      )}
+                        ))}
+                      </div>
+
+                      {/* Skills -- one fixed-height row */}
+                      <div className="mt-2.5 flex h-[26px] items-center gap-1.5 overflow-hidden">
+                        {skills.length > 0 ? (
+                          <>
+                            {skills.slice(0, 3).map((skill) => (
+                              <span key={skill} className="min-w-0 truncate whitespace-nowrap rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#072036]/60 dark:text-slate-300">
+                                {skill}
+                              </span>
+                            ))}
+                            {skills.length > 3 && (
+                              <span className="shrink-0 whitespace-nowrap rounded-md px-1 py-[3px] text-[11.5px] font-medium text-slate-400">
+                                +{skills.length - 3}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-[11.5px] text-slate-400 dark:text-slate-500">{t("placement.no_skills_listed", "Skills not listed")}</span>
+                        )}
+                      </div>
 
                       {/* Footer */}
                       <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
