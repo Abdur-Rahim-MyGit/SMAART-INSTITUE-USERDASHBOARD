@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import {
   IconBriefcase as Briefcase,
   IconBuilding as Building,
@@ -28,7 +28,9 @@ import {
   IconMicrophone as Microphone,
   IconCalendarPlus as CalendarPlus,
   IconTicket as Ticket,
-  IconArrowUpRight as ArrowUpRight
+  IconArrowUpRight as ArrowUpRight,
+  IconLayoutGrid as LayoutGrid,
+  IconLayoutList as LayoutList
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { getBackendUrl, placementsAPI, usersAPI, apiCall } from "@/services/api";
@@ -152,6 +154,26 @@ const getFairCountdown = (startDate, endDate, t) => {
 const toIcsDate = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 
 // Build a one-event .ics so the fair lands in Google/Apple/Outlook calendars.
+// ── Motion ────────────────────────────────────────────────────────────
+// One easing and one set of variants for the whole page so every list,
+// tab panel and card moves the same way.
+const EASE = [0.25, 0.1, 0.25, 1];
+const staggerList = { hidden: {}, show: { transition: { staggerChildren: 0.045, delayChildren: 0.04 } } };
+const staggerItem = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: EASE } },
+  exit: { opacity: 0, scale: 0.97, transition: { duration: 0.16, ease: EASE } },
+};
+const tabPanel = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: EASE } },
+  exit: { opacity: 0, y: -6, transition: { duration: 0.14, ease: EASE } },
+};
+const VIEW_MODE_KEY = "placement:view";
+const readViewMode = () => {
+  try { return localStorage.getItem(VIEW_MODE_KEY) === "list" ? "list" : "grid"; } catch { return "grid"; }
+};
+
 const downloadFairIcs = (fair) => {
   if (!fair?.startDate) return;
   const start = new Date(fair.startDate);
@@ -284,6 +306,10 @@ const Placement = () => {
   const [studentProfile, setStudentProfile] = useState(null);  // { cgpa, backlogs, branch } for eligibility badges
   const [sortBy, setSortBy] = useState("newest");              // newest | deadline | match
   const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [viewMode, setViewMode] = useState(readViewMode);          // 'grid' | 'list'
+  useEffect(() => {
+    try { localStorage.setItem(VIEW_MODE_KEY, viewMode); } catch { /* private mode */ }
+  }, [viewMode]);
   const [statusFilter, setStatusFilter] = useState("all");     // all | applied | interview | offer | rejected
   const [timelineApp, setTimelineApp] = useState(null);        // application open in the timeline drawer
   const [selectedPartner, setSelectedPartner] = useState(null); // company open in the partner drawer
@@ -638,8 +664,9 @@ const Placement = () => {
           key={cardId}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: Math.min(origIdx * 0.03, 0.3) }}
-          className="relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
+          transition={{ delay: Math.min(origIdx * 0.03, 0.3), duration: 0.32, ease: EASE }}
+          whileHover={{ y: -3 }}
+          className="relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-[border-color,box-shadow] duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
         >
           {/* Eyebrow: source on the left, stage pill on the right */}
           <div className="flex items-center justify-between gap-2">
@@ -834,6 +861,7 @@ const Placement = () => {
   };
 
   return (
+    <MotionConfig reducedMotion="user">
     <PageTransition>
     <div className="relative min-h-screen overflow-hidden bg-transparent pb-12 transition-colors duration-300">
       {/* Same ambient layer as the dashboard, courses, assessments,
@@ -931,13 +959,20 @@ const Placement = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative h-11 whitespace-nowrap px-4 text-[13px] font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:rounded-t-full after:transition-colors ${
+                  className={`relative h-11 whitespace-nowrap px-4 text-[13px] font-medium transition-colors ${
                     activeTab === tab.id
-                      ? 'text-[#072036] after:bg-[#072036] dark:text-white dark:after:bg-[#A6D7E8]'
-                      : 'text-slate-500 after:bg-transparent hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'
+                      ? 'text-[#072036] dark:text-white'
+                      : 'text-slate-500 hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   {tab.label}
+                  {activeTab === tab.id && (
+                    <motion.span
+                      layoutId="placement-tab-underline"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+                      className="absolute inset-x-3 bottom-0 h-[2px] rounded-t-full bg-[#072036] dark:bg-[#A6D7E8]"
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -1055,12 +1090,44 @@ const Placement = () => {
                     <span className="rounded-md bg-[#045C9A]/10 px-1.5 text-[11px] font-semibold text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">{savedCount}</span>
                   )}
                 </button>
+
+                {/* Grid / list view */}
+                <div role="radiogroup" aria-label={t("placement.view_mode", "View")} className="flex h-10 shrink-0 items-center rounded-lg border border-slate-200 bg-slate-50/70 p-1 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+                  {[
+                    { id: 'grid', Icon: LayoutGrid, label: t("placement.view_grid", "Grid view") },
+                    { id: 'list', Icon: LayoutList, label: t("placement.view_list", "List view") },
+                  ].map(({ id, Icon, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="radio"
+                      aria-checked={viewMode === id}
+                      title={label}
+                      aria-label={label}
+                      onClick={() => setViewMode(id)}
+                      className={`relative flex h-8 w-9 items-center justify-center rounded-md transition-colors ${
+                        viewMode === id ? 'text-[#072036] dark:text-[#072036]' : 'text-slate-400 hover:text-[#072036] dark:text-slate-500 dark:hover:text-white'
+                      }`}
+                    >
+                      {viewMode === id && (
+                        <motion.span
+                          layoutId="placement-view-thumb"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
+                          className="absolute inset-0 rounded-md bg-white shadow-sm ring-1 ring-slate-200 dark:bg-[#A6D7E8] dark:ring-transparent"
+                        />
+                      )}
+                      <Icon className="relative h-4 w-4" stroke={1.9} />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
         </div>
 
+        <AnimatePresence mode="wait" initial={false}>
+        <motion.div key={activeTab} variants={tabPanel} initial="hidden" animate="show" exit="exit">
         {activeTab === 'jobs' && (
           <>
             {!loading && recommendedJobs.length > 0 && !searchQuery && sourceFilter === 'all' && jobType === 'all' && workMode === 'all' && !showSavedOnly && (
@@ -1074,17 +1141,20 @@ const Placement = () => {
                     {t("placement.recommended_hint", "based on your skills and career path")}
                   </span>
                 </div>
-                <div className="grid gap-3 md:grid-cols-3">
+                <motion.div variants={staggerList} initial="hidden" animate="show" className="grid gap-3 md:grid-cols-3">
                   {recommendedJobs.map(({ job, match }) => {
                     const logo = getCompanyLogo(job);
                     const initial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
                     const pathHit = careerRoles.find((r) => roleMatchesTitle(r, job.displayTitle));
                     return (
-                      <button
+                      <motion.button
                         key={`rec-${job.sourceCollection}-${job._id}`}
+                        variants={staggerItem}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.99 }}
                         type="button"
                         onClick={() => navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } })}
-                        className="group flex items-center gap-3 rounded-xl border border-[#d7ebf5] bg-gradient-to-br from-[#EAF7FD] to-white p-3.5 text-left transition-colors hover:border-[#045C9A]/40 dark:border-[#045C9A]/30 dark:from-[#045C9A]/15 dark:to-[#0d3a5f]"
+                        className="group flex items-center gap-3 rounded-xl border border-[#d7ebf5] bg-gradient-to-br from-[#EAF7FD] to-white p-3.5 text-left transition-[border-color,box-shadow] hover:border-[#045C9A]/40 hover:shadow-[0_4px_16px_-6px_rgba(13,31,78,0.18)] dark:border-[#045C9A]/30 dark:from-[#045C9A]/15 dark:to-[#0d3a5f]"
                       >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#d7ebf5] bg-white text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
                           {logo ? <img src={logo} alt="" className="h-full w-full object-contain p-1.5" /> : <span>{initial}</span>}
@@ -1106,10 +1176,10 @@ const Placement = () => {
                           </div>
                         </div>
                         <ChevronRight className="h-4 w-4 shrink-0 text-[#045C9A] transition-transform group-hover:translate-x-0.5 dark:text-[#A6D7E8]" stroke={2} />
-                      </button>
+                      </motion.button>
                     );
                   })}
-                </div>
+                </motion.div>
               </section>
             )}
             {loading ? (
@@ -1129,8 +1199,16 @@ const Placement = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {filteredJobs.map((job, index) => {
+              <motion.div
+                key={viewMode}
+                layout
+                variants={staggerList}
+                initial="hidden"
+                animate="show"
+                className={viewMode === 'list' ? 'flex flex-col gap-3' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}
+              >
+                <AnimatePresence initial={false}>
+                {filteredJobs.map((job) => {
                   const skills = getSkills(job);
                   const companyLogo = getCompanyLogo(job);
                   const companyInitial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
@@ -1215,24 +1293,110 @@ const Placement = () => {
                   }
                   signalChips.splice(2);
 
+                  const cardKey = `${job.sourceCollection}-${job._id}`;
+                  const goToJob = () => !isClosed && navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } });
+                  const cardShell = "group relative rounded-xl border border-slate-200 bg-white transition-[border-color,box-shadow] duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60";
+                  const sourceTagCls = isSmaartPost
+                    ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                    : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]';
+                  const bookmarkBtn = (size) => (
+                    <button
+                      type="button"
+                      onClick={(e) => toggleSaveJob(e, job)}
+                      aria-pressed={saved}
+                      title={saved ? t("placement.unsave", "Remove from saved") : t("placement.save", "Save job")}
+                      className={`flex ${size} shrink-0 items-center justify-center rounded-md transition-colors ${
+                        saved
+                          ? 'text-[#045C9A] dark:text-[#A6D7E8]'
+                          : 'text-slate-300 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-500 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]'
+                      }`}
+                    >
+                      {saved ? <BookmarkFilled className="h-[17px] w-[17px]" stroke={1.8} /> : <Bookmark className="h-[17px] w-[17px]" stroke={1.8} />}
+                    </button>
+                  );
+                  const viewBtn = (
+                    <button
+                      onClick={goToJob}
+                      disabled={isClosed}
+                      className={
+                        isClosed
+                          ? "flex h-8 shrink-0 cursor-not-allowed items-center justify-center rounded-md bg-slate-100 px-3.5 text-[12.5px] font-medium text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                          : "group/btn flex h-8 shrink-0 items-center justify-center gap-1 rounded-md bg-[#0E2136] pl-3.5 pr-2.5 text-[12.5px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white dark:focus-visible:ring-offset-[#0d3a5f]"
+                      }
+                    >
+                      <span>{applyLabel}</span>
+                      {!isClosed && <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5" stroke={2.2} />}
+                    </button>
+                  );
+
+                  if (viewMode === 'list') {
+                    return (
+                      <motion.article
+                        key={cardKey}
+                        layout="position"
+                        variants={staggerItem}
+                        exit="exit"
+                        whileHover={isClosed ? undefined : { y: -2 }}
+                        className={`${cardShell} flex items-center gap-4 px-4 py-3.5 ${isClosed ? 'opacity-60' : ''}`}
+                      >
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-[14px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#072036] dark:text-[#A6D7E8]">
+                          {companyLogo ? <img src={companyLogo} alt={`${job.displayCompany} logo`} className="h-full w-full object-contain p-1.5" /> : <span>{companyInitial}</span>}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <h2 title={job.displayTitle} onClick={goToJob} className={`truncate text-[14.5px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white ${isClosed ? '' : 'cursor-pointer hover:text-[#045C9A] dark:hover:text-[#A6D7E8]'}`}>
+                              {job.displayTitle}
+                            </h2>
+                            <span className={`hidden shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] sm:inline-flex ${sourceTagCls}`}>{sourceLabel}</span>
+                            <span className="hidden shrink-0 items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 md:inline-flex">
+                              <span className={`h-1.5 w-1.5 rounded-full ${isClosed ? 'bg-slate-400' : 'bg-emerald-500'}`} />
+                              {statusLabel}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 truncate text-[12.5px] text-slate-500 dark:text-slate-400">
+                            <span className="font-medium text-slate-600 dark:text-slate-300">{job.displayCompany}</span>
+                            <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                            {job.displayLocation || t("placement.remote", "Remote")}
+                            <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                            {deadlineLabel ? `${t("placement.apply_by", "Apply by")} ${deadlineLabel}` : t("placement.no_deadline_short", "No closing date set")}
+                          </p>
+                          <div className="mt-1.5 hidden h-[24px] items-center gap-1.5 overflow-hidden sm:flex">
+                            {signalChips.map((chip) => (
+                              <span key={chip.key} title={chip.title} className={`inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-md border px-2 py-[2px] text-[10.5px] font-semibold ${chip.cls}`}>
+                                <chip.Icon className="h-3 w-3 shrink-0" stroke={2} />
+                                <span className="truncate">{chip.label}</span>
+                              </span>
+                            ))}
+                            {skills.slice(0, 3).map((skill) => (
+                              <span key={skill} className="hidden min-w-0 truncate whitespace-nowrap rounded-md bg-slate-100 px-2 py-[2px] text-[11px] font-medium text-slate-600 dark:bg-[#072036]/60 dark:text-slate-300 lg:inline-block">{skill}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="hidden w-[132px] shrink-0 flex-col items-end text-right lg:flex">
+                          <span className="truncate text-[12px] font-medium text-slate-600 dark:text-slate-300">{job.displayType || "—"}</span>
+                          {postedLabel && <span className="truncate text-[11.5px] text-slate-400 dark:text-slate-500">{postedLabel}</span>}
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          {bookmarkBtn("h-8 w-8")}
+                          {viewBtn}
+                        </div>
+                      </motion.article>
+                    );
+                  }
+
                   return (
                     <motion.article
-                      key={`${job.sourceCollection}-${job._id}`}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
+                      key={cardKey}
+                      layout="position"
+                      variants={staggerItem}
+                      exit="exit"
+                      whileHover={isClosed ? undefined : { y: -3 }}
+                      className={`${cardShell} flex h-full flex-col p-5 ${isClosed ? 'opacity-60' : ''}`}
                     >
                       {/* Eyebrow: source + status on the left, bookmark on the right */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-2">
-                          <span
-                            className={`inline-flex shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] ${
-                              isSmaartPost
-                                ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
-                                : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
-                            }`}
-                          >
+                          <span className={`inline-flex shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] ${sourceTagCls}`}>
                             {sourceLabel}
                           </span>
                           <span className="inline-flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
@@ -1240,19 +1404,7 @@ const Placement = () => {
                             <span className="truncate">{statusLabel}</span>
                           </span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={(e) => toggleSaveJob(e, job)}
-                          aria-pressed={saved}
-                          title={saved ? t("placement.unsave", "Remove from saved") : t("placement.save", "Save job")}
-                          className={`-mr-1.5 -mt-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
-                            saved
-                              ? 'text-[#045C9A] dark:text-[#A6D7E8]'
-                              : 'text-slate-300 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-500 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]'
-                          }`}
-                        >
-                          {saved ? <BookmarkFilled className="h-[17px] w-[17px]" stroke={1.8} /> : <Bookmark className="h-[17px] w-[17px]" stroke={1.8} />}
-                        </button>
+                        {bookmarkBtn("-mr-1.5 -mt-1.5 h-8 w-8")}
                       </div>
 
                       {/* Header: logo + title + company */}
@@ -1342,28 +1494,13 @@ const Placement = () => {
                           {job.displayType && postedLabel && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
                           {postedLabel && <span>{postedLabel}</span>}
                         </p>
-                        <button
-                          onClick={() => !isClosed && navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } })}
-                          disabled={isClosed}
-                          className={
-                            isClosed
-                              ? "flex h-8 shrink-0 cursor-not-allowed items-center justify-center rounded-md bg-slate-100 px-3.5 text-[12.5px] font-medium text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                              : "group/btn flex h-8 shrink-0 items-center justify-center gap-1 rounded-md bg-[#0E2136] pl-3.5 pr-2.5 text-[12.5px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white dark:focus-visible:ring-offset-[#0d3a5f]"
-                          }
-                        >
-                          <span>{applyLabel}</span>
-                          {!isClosed && (
-                            <ChevronRight
-                              className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5"
-                              stroke={2.2}
-                            />
-                          )}
-                        </button>
+                        {viewBtn}
                       </div>
                     </motion.article>
                   );
                 })}
-              </div>
+                </AnimatePresence>
+              </motion.div>
             )}
           </>
         )}
@@ -1448,14 +1585,18 @@ const Placement = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredCompanies.map((partner) => {
+                {filteredCompanies.map((partner, index) => {
                   const companyInitial = (partner.name || "C").trim().charAt(0).toUpperCase();
                   const isSmaart = partner.partnerType === 'smaart';
 
                   return (
-                    <div
+                    <motion.div
                       key={partner._id}
-                      className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.32, ease: EASE }}
+                      whileHover={{ y: -3 }}
+                      className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-[border-color,box-shadow] duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
                     >
                       <div className="flex items-start gap-3">
                         <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-sm font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
@@ -1511,7 +1652,7 @@ const Placement = () => {
                           <ChevronRight className="h-3.5 w-3.5" stroke={2} />
                         </button>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -1557,8 +1698,9 @@ const Placement = () => {
                       key={fair._id}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
+                      transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.32, ease: EASE }}
+                      whileHover={{ y: -3 }}
+                      className="relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-[border-color,box-shadow] duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
                     >
                       {bannerImageUrl && (
                         <div className="h-32 w-full overflow-hidden border-b border-slate-100 dark:border-[#045C9A]/20">
@@ -1681,6 +1823,8 @@ const Placement = () => {
             )}
           </div>
         )}
+        </motion.div>
+        </AnimatePresence>
 
         {/* ── Application timeline drawer ─────────────────────────────── */}
         {timelineApp &&
@@ -1895,6 +2039,7 @@ const Placement = () => {
       </div>
     </div>
     </PageTransition>
+    </MotionConfig>
   );
 };
 
