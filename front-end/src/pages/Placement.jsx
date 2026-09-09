@@ -659,6 +659,108 @@ const Placement = () => {
       const lastUpdated = lastEntry?.changedAt || app.updatedAt || appliedAt;
       const ghostBtn = "inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20";
       const primaryBtn = "inline-flex h-8 items-center gap-1.5 rounded-md bg-[#0E2136] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white";
+      const sourceTag = sourceLabel ? (
+        <span className={`inline-flex shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] ${
+          isSmaartApp
+            ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+            : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+        }`}>
+          {sourceLabel}
+        </span>
+      ) : null;
+      const stagePill = (
+        <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-[3px] text-[11px] font-semibold ${STATUS_CHIP_CLASS[bucket]}`}>
+          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT_CLASS[bucket]}`} />
+          <span className="truncate">{statusLabel}</span>
+        </span>
+      );
+      const logoBox = (
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-[14px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#072036] dark:text-[#A6D7E8]">
+          {companyLogo ? (
+            <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1.5" />
+          ) : (
+            <span>{companyInitial}</span>
+          )}
+        </div>
+      );
+      const actionButtons = (
+        <>
+          {isInterviewStage && (
+            <button type="button" onClick={() => navigate('/dashboard/interview-prep')} className={primaryBtn}>
+              <Microphone className="h-3.5 w-3.5" stroke={1.8} />
+              {t("placement.prepare_interview", "Prepare")}
+            </button>
+          )}
+          <button type="button" onClick={() => setTimelineApp(app)} className={ghostBtn}>
+            <History className="h-3.5 w-3.5" stroke={1.8} />
+            {t("placement.timeline", "Timeline")}
+          </button>
+          {!jobRemoved && !isInterviewStage && (
+            <button type="button" onClick={() => openApplicationJob(app)} className={ghostBtn}>
+              <ArrowUpRight className="h-3.5 w-3.5" stroke={1.8} />
+              {t("placement.view_role", "View role")}
+            </button>
+          )}
+        </>
+      );
+      const withdrawBtn = canWithdraw ? (
+        <button
+          type="button"
+          onClick={() => openConfirm(app._id || app.id, title)}
+          className="inline-flex h-8 items-center whitespace-nowrap rounded-md px-2 text-[12px] font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+        >
+          {t("placement.withdraw", "Withdraw")}
+        </button>
+      ) : null;
+
+      if (isList) {
+        return (
+          <motion.article
+            key={cardId}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(origIdx * 0.03, 0.3), duration: 0.32, ease: EASE }}
+            whileHover={{ y: -2 }}
+            className={rowShell}
+          >
+            {logoBox}
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-2">
+                <h2
+                  title={title}
+                  onClick={() => openApplicationJob(app)}
+                  className={`truncate text-[14.5px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white ${jobRemoved ? '' : 'cursor-pointer hover:text-[#045C9A] dark:hover:text-[#A6D7E8]'}`}
+                >
+                  {title}
+                </h2>
+                <span className="hidden sm:inline-flex">{sourceTag}</span>
+              </div>
+              <p className="mt-0.5 truncate text-[12.5px] text-slate-500 dark:text-slate-400">
+                <span className="font-medium text-slate-600 dark:text-slate-300">{companyName}</span>
+                {displayType && <><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>{displayType}</>}
+                <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                {t("placement.applied", "Applied")} {formatDate(appliedAt, t)}
+                {jobRemoved
+                  ? <><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>{t("placement.posting_removed", "Posting no longer listed")}</>
+                  : locationLabel && <><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>{locationLabel}</>}
+              </p>
+              <p className="mt-1 hidden truncate text-[12px] text-slate-500 dark:text-slate-400 lg:block" title={recruiterNote || undefined}>
+                {hasOfferLetter
+                  ? <button type="button" onClick={() => setOfferModalApp(app)} className="font-semibold text-emerald-700 hover:underline dark:text-emerald-400">{t("placement.offer_received", "Offer received")} · {t("placement.view_offer_letter", "View offer letter")}</button>
+                  : recruiterNote
+                    ? <><span className="font-semibold text-[#045C9A] dark:text-[#A6D7E8]">{t("placement.note_label", "Note")}:</span> {recruiterNote}</>
+                    : <>{t("placement.last_updated", "Last updated")} {formatDate(lastUpdated, t)}</>}
+              </p>
+            </div>
+            <div className="hidden shrink-0 md:block">{stagePill}</div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <div className="hidden items-center gap-1.5 sm:flex">{actionButtons}</div>
+              {withdrawBtn}
+            </div>
+          </motion.article>
+        );
+      }
+
       return (
         <motion.article
           key={cardId}
@@ -852,13 +954,46 @@ const Placement = () => {
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("placement.no_apps_in_filter", "No applications in this stage yet.")}</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div key={viewMode} className={isList ? 'flex flex-col gap-3' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}>
             {visible.map((app, origIdx) => renderCard(app, origIdx))}
           </div>
         )}
       </>
     );
   };
+
+  const viewToggle = (
+    <div role="radiogroup" aria-label={t("placement.view_mode", "View")} className="flex h-9 shrink-0 items-center rounded-lg border border-slate-200 bg-slate-50/70 p-1 dark:border-[#045C9A]/30 dark:bg-[#072036]/40">
+      {[
+        { id: 'grid', Icon: LayoutGrid, label: t("placement.view_grid", "Grid view") },
+        { id: 'list', Icon: LayoutList, label: t("placement.view_list", "List view") },
+      ].map(({ id, Icon, label }) => (
+        <button
+          key={id}
+          type="button"
+          role="radio"
+          aria-checked={viewMode === id}
+          title={label}
+          aria-label={label}
+          onClick={() => setViewMode(id)}
+          className={`relative flex h-7 w-8 items-center justify-center rounded-md transition-colors ${
+            viewMode === id ? 'text-[#072036] dark:text-[#072036]' : 'text-slate-400 hover:text-[#072036] dark:text-slate-500 dark:hover:text-white'
+          }`}
+        >
+          {viewMode === id && (
+            <motion.span
+              layoutId="placement-view-thumb"
+              transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
+              className="absolute inset-0 rounded-md bg-white shadow-sm ring-1 ring-slate-200 dark:bg-[#A6D7E8] dark:ring-transparent"
+            />
+          )}
+          <Icon className="relative h-4 w-4" stroke={1.9} />
+        </button>
+      ))}
+    </div>
+  );
+  const isList = viewMode === 'list';
+  const rowShell = "group relative flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3.5 transition-[border-color,box-shadow] duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60";
 
   return (
     <MotionConfig reducedMotion="user">
@@ -948,8 +1083,8 @@ const Placement = () => {
         {/* Unified toolbar: tabs + search + filters on one surface */}
         <div className="mb-6 overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white shadow-[0_2px_16px_rgba(26,56,132,0.05)] dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
           {/* Tabs: Jobs | Job Status | Job Fair | Partners */}
-          <div className={`overflow-x-auto px-2 ${activeTab === 'jobs' ? 'border-b border-slate-200 dark:border-[#045C9A]/20' : ''}`}>
-            <div className="flex min-w-max gap-1">
+          <div className={`flex items-center justify-between gap-3 pl-2 pr-3 ${activeTab === 'jobs' ? 'border-b border-slate-200 dark:border-[#045C9A]/20' : ''}`}>
+            <div className="flex min-w-0 gap-1 overflow-x-auto">
               {[
                 { id: 'jobs', label: t("placement.jobs", "Jobs") },
                 { id: 'status', label: t("placement.job_status", "Job Status") },
@@ -976,6 +1111,7 @@ const Placement = () => {
                 </button>
               ))}
             </div>
+            {viewToggle}
           </div>
 
           {activeTab === 'jobs' && (
@@ -1091,35 +1227,6 @@ const Placement = () => {
                   )}
                 </button>
 
-                {/* Grid / list view */}
-                <div role="radiogroup" aria-label={t("placement.view_mode", "View")} className="flex h-10 shrink-0 items-center rounded-lg border border-slate-200 bg-slate-50/70 p-1 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
-                  {[
-                    { id: 'grid', Icon: LayoutGrid, label: t("placement.view_grid", "Grid view") },
-                    { id: 'list', Icon: LayoutList, label: t("placement.view_list", "List view") },
-                  ].map(({ id, Icon, label }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      role="radio"
-                      aria-checked={viewMode === id}
-                      title={label}
-                      aria-label={label}
-                      onClick={() => setViewMode(id)}
-                      className={`relative flex h-8 w-9 items-center justify-center rounded-md transition-colors ${
-                        viewMode === id ? 'text-[#072036] dark:text-[#072036]' : 'text-slate-400 hover:text-[#072036] dark:text-slate-500 dark:hover:text-white'
-                      }`}
-                    >
-                      {viewMode === id && (
-                        <motion.span
-                          layoutId="placement-view-thumb"
-                          transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
-                          className="absolute inset-0 rounded-md bg-white shadow-sm ring-1 ring-slate-200 dark:bg-[#A6D7E8] dark:ring-transparent"
-                        />
-                      )}
-                      <Icon className="relative h-4 w-4" stroke={1.9} />
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
           )}
@@ -1568,10 +1675,65 @@ const Placement = () => {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div key={viewMode} className={isList ? 'flex flex-col gap-3' : 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
                 {filteredCompanies.map((partner, index) => {
                   const companyInitial = (partner.name || "C").trim().charAt(0).toUpperCase();
                   const isSmaart = partner.partnerType === 'smaart';
+                  const partnerLogo = partner.logo
+                    ? (partner.logo.startsWith('http') || partner.logo.startsWith('data:') ? partner.logo : `${getBackendUrl()}/${partner.logo.replace(/^\/+/, '')}`)
+                    : null;
+                  const partnerTag = (
+                    <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
+                      isSmaart
+                        ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                        : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+                    }`}>
+                      {isSmaart ? t("placement.smaart_partner", "SMAART Partner") : t("placement.college_partner", "College Partner")}
+                    </span>
+                  );
+
+                  if (isList) {
+                    return (
+                      <motion.div
+                        key={partner._id}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.32, ease: EASE }}
+                        whileHover={{ y: -2 }}
+                        className={rowShell}
+                      >
+                        <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-sm font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#072036] dark:text-[#A6D7E8]">
+                          {partnerLogo && (
+                            <img src={partnerLogo} alt="" className="absolute inset-0 h-full w-full object-contain p-1.5" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                          )}
+                          <span style={{ display: partnerLogo ? 'none' : 'flex' }} className="h-full w-full items-center justify-center">{companyInitial}</span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <h3 className="truncate text-[14.5px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white" title={partner.name}>{partner.name}</h3>
+                            <span className="hidden sm:inline-flex">{partnerTag}</span>
+                          </div>
+                          <p className="mt-0.5 truncate text-[12.5px] text-slate-500 dark:text-slate-400">
+                            {partner.website ? (
+                              <a href={partner.website.startsWith('http') ? partner.website : `https://${partner.website}`} target="_blank" rel="noopener noreferrer" className="font-medium text-[#045C9A] hover:underline dark:text-[#A6D7E8]">
+                                {partner.website.replace(/^https?:\/\//i, '')}
+                              </a>
+                            ) : (
+                              <span className="text-slate-400 dark:text-slate-500">{t("placement.no_website", "No website listed")}</span>
+                            )}
+                            {partner.description && <><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span><span className="hidden lg:inline">{partner.description}</span></>}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setSelectedPartner(partner)}
+                          className="flex h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-3 text-[12.5px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
+                        >
+                          {t("placement.view_profile", "View profile")}
+                          <ChevronRight className="h-3.5 w-3.5" stroke={2} />
+                        </button>
+                      </motion.div>
+                    );
+                  }
 
                   return (
                     <motion.div
@@ -1664,7 +1826,7 @@ const Placement = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div key={viewMode} className={isList ? 'flex flex-col gap-3' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}>
                 {jobFairs.map((fair, index) => {
                   const isRegistered = fair.registeredStudents?.some(student => {
                     const studentId = typeof student === 'object' ? (student._id || student.id) : student;
@@ -1676,6 +1838,101 @@ const Placement = () => {
                     null;
                   const fairJobs = Array.isArray(fair.jobs) ? fair.jobs : [];
                   const countdown = getFairCountdown(fair.startDate, fair.endDate, t);
+                  const isSmaartFair = fair.label === 'smaart job fair';
+                  const fairTag = (
+                    <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
+                      isSmaartFair
+                        ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                        : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+                    }`}>
+                      {isSmaartFair ? t("placement.source_smaart_job_fair", "SMAART Job Fair") : t("placement.source_college_job_fair", "College Job Fair")}
+                    </span>
+                  );
+                  const countdownChip = countdown ? (
+                    <span className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-1 text-[10.5px] font-semibold ${
+                      countdown.tone === "live"
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
+                        : countdown.tone === "soon"
+                          ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400'
+                          : countdown.tone === "past"
+                            ? 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'
+                            : 'border-[#045C9A]/20 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/40 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                    }`}>
+                      <Clock className="h-3 w-3" stroke={2} />
+                      {countdown.label}
+                    </span>
+                  ) : null;
+                  const fairActions = (
+                    <>
+                      {countdown?.tone !== "past" && (
+                        <button
+                          type="button"
+                          onClick={() => downloadFairIcs(fair)}
+                          title={t("placement.add_to_calendar", "Add to calendar")}
+                          aria-label={t("placement.add_to_calendar", "Add to calendar")}
+                          className="flex h-8 w-8 items-center justify-center rounded-md border border-[#d7ebf5] bg-white text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                        >
+                          <CalendarPlus className="h-4 w-4" stroke={1.8} />
+                        </button>
+                      )}
+                      {isRegistered && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
+                          title={t("placement.view_pass", "View digital fair pass")}
+                          aria-label={t("placement.view_pass", "View digital fair pass")}
+                          className="flex h-8 w-8 items-center justify-center rounded-md border border-[#d7ebf5] bg-white text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                        >
+                          <Ticket className="h-4 w-4" stroke={1.8} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
+                        className="group/btn flex h-8 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-md bg-[#0E2136] pl-3.5 pr-2.5 text-[12.5px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                      >
+                        <span>{t("placement.view_fair", "View Fair")}</span>
+                        <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5" stroke={2.2} />
+                      </button>
+                    </>
+                  );
+
+                  if (isList) {
+                    return (
+                      <motion.article
+                        key={fair._id}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.32, ease: EASE }}
+                        whileHover={{ y: -2 }}
+                        className={rowShell}
+                      >
+                        <div className="flex h-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                          {bannerImageUrl ? <img src={bannerImageUrl} alt="" className="h-full w-full object-cover" /> : <Briefcase className="h-5 w-5" stroke={1.6} />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <h2 className="truncate text-[14.5px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white" title={fair.title}>{fair.title}</h2>
+                            <span className="hidden sm:inline-flex">{fairTag}</span>
+                            {isRegistered && (
+                              <span className="hidden shrink-0 items-center gap-1.5 text-[11px] font-medium text-[#045C9A] dark:text-[#A6D7E8] md:inline-flex">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
+                                {t("placement.registered", "Registered")}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-[12.5px] text-slate-500 dark:text-slate-400">
+                            {fair.location && <><span className="font-medium text-slate-600 dark:text-slate-300">{fair.location}</span><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span></>}
+                            {formatDate(fair.startDate, t)} – {formatDate(fair.endDate, t)}
+                            <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>
+                            {t("placement.registered_count", { count: totalRegistered, defaultValue: `${totalRegistered} students registered` })}
+                            {fairJobs.length > 0 && <><span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>{t("placement.fair_jobs_count", { count: fairJobs.length, defaultValue: `${fairJobs.length} ${fairJobs.length === 1 ? 'role' : 'roles'} posted` })}</>}
+                          </p>
+                        </div>
+                        <div className="hidden shrink-0 lg:block">{countdownChip}</div>
+                        <div className="flex shrink-0 items-center gap-1.5">{fairActions}</div>
+                      </motion.article>
+                    );
+                  }
 
                   return (
                     <motion.article
