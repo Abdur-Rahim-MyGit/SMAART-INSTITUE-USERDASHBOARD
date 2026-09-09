@@ -60,6 +60,81 @@ import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { apiCall } from '@/services/api';
 import { ATS_TEMPLATES, adaptData } from './ResumeTemplates';
+
+// ── Resume shape ─────────────────────────────────────────────────────────
+// One place that knows every field, so loading an older saved resume (or a
+// profile sync) always yields the full structure the form and templates expect.
+export const EXPERIENCE_TYPES = [
+    { id: 'internship', label: 'Internship' },
+    { id: 'full-time', label: 'Full-time' },
+    { id: 'part-time', label: 'Part-time' },
+    { id: 'freelance', label: 'Freelance' },
+    { id: 'volunteer', label: 'Volunteer' },
+];
+export const EDUCATION_LEVELS = [
+    { id: 'degree', label: 'Degree / Post-graduate' },
+    { id: 'diploma', label: 'Diploma' },
+    { id: '12th', label: '12th / HSC' },
+    { id: '10th', label: '10th / SSLC' },
+    { id: 'other', label: 'Other' },
+];
+export const SKILL_LEVELS = [
+    { id: '', label: 'Not set' },
+    { id: 'beginner', label: 'Beginner' },
+    { id: 'intermediate', label: 'Intermediate' },
+    { id: 'advanced', label: 'Advanced' },
+];
+const emptyEducation = () => ({ level: 'degree', institution: '', degree: '', specialisation: '', board: '', startYear: '', year: '', pursuing: false, grade: '', location: '' });
+const emptyExperience = () => ({ type: 'internship', company: '', role: '', duration: '', location: '', description: '' });
+const emptyProject = () => ({ title: '', techStack: '', role: '', duration: '', outcome: '', link: '', description: '' });
+const emptyCertification = () => ({ name: '', issuer: '', year: '', credentialId: '', link: '' });
+const emptyResume = () => ({
+    personalInfo: { fullName: '', email: '', mobile: '', location: '', targetRole: '', linkedinUrl: '', githubUrl: '', portfolioUrl: '', profileImage: '' },
+    summary: '',
+    experience: [],
+    education: [],
+    skills: { technical: '', domain: '', ai: '', soft: '', languages: '', levels: [] },
+    projects: [],
+    certifications: [],
+    achievements: [],
+    personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' },
+});
+const guessEducationLevel = (degree = '') => {
+    const d = String(degree).toLowerCase();
+    if (/12th|hsc|higher secondary|intermediate|\+2/.test(d)) return '12th';
+    if (/10th|sslc|ssc|matric/.test(d)) return '10th';
+    if (/diploma|polytechnic/.test(d)) return 'diploma';
+    return 'degree';
+};
+const normalizeResume = (r = {}) => {
+    const base = emptyResume();
+    const str = (v) => (typeof v === 'string' ? v : v == null ? '' : String(v));
+    return {
+        ...base,
+        personalInfo: { ...base.personalInfo, ...(r.personalInfo || {}) },
+        summary: str(r.summary),
+        education: (r.education || []).map((e) => ({
+            ...emptyEducation(),
+            ...e,
+            level: e.level || guessEducationLevel(e.degree),
+            pursuing: !!e.pursuing,
+        })),
+        experience: (r.experience || []).map((e) => ({ ...emptyExperience(), ...e, type: e.type || '' })),
+        projects: (r.projects || []).map((x) => ({ ...emptyProject(), ...x })),
+        certifications: (r.certifications || []).map((c) => ({ ...emptyCertification(), ...c })),
+        achievements: (r.achievements || []).map((a) => ({ title: '', link: '', description: '', ...a })),
+        skills: {
+            technical: str(r.skills?.technical),
+            domain: str(r.skills?.domain),
+            ai: str(r.skills?.ai),
+            soft: str(r.skills?.soft),
+            languages: str(r.skills?.languages),
+            levels: Array.isArray(r.skills?.levels) ? r.skills.levels.filter((l) => l && l.name).map((l) => ({ name: l.name, level: l.level || '' })) : [],
+        },
+        personalDetails: { ...base.personalDetails, ...(r.personalDetails || {}) },
+    };
+};
+const splitCsv = (csv) => String(csv || '').split(',').map((x) => x.trim()).filter(Boolean);
 import NeuralBackground from '@/components/ui/NeuralBackground';
 // Same role -> icon matcher the dashboard's career-direction cards use, so a
 // resume badge for "Software Engineer" and a career-direction card for the
@@ -338,44 +413,16 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         { id: 'experience', label: t('resume_builder.steps.experience', 'Experience'), icon: Briefcase },
         { id: 'projects', label: t('resume_builder.steps.projects', 'Projects'), icon: FileText },
         { id: 'skills', label: t('resume_builder.steps.skills', 'Skills'), icon: Sparkles },
+        { id: 'certifications', label: t('resume_builder.steps.certifications', 'Certifications'), icon: Award },
         { id: 'achievements', label: t('resume_builder.steps.awards', 'Awards'), icon: Trophy },
         { id: 'preview', label: embedded ? t('resume_builder.steps.review_save', 'Review & Save') : t('resume_builder.steps.review_download', 'Review & Download'), icon: FileText }
     ];
 
-    const [resumeData, setResumeData] = useState({
-        personalInfo: {
-            fullName: '',
-            email: '',
-            mobile: '',
-            location: '',
-            targetRole: '',
-            linkedinUrl: '',
-            githubUrl: '',
-            portfolioUrl: '',
-            profileImage: ''
-        },
-        summary: '',
-        experience: [],
-        education: [],
-        skills: {
-            technical: '',
-            domain: '',
-            ai: '',
-            languages: ''
-        },
-        projects: [],
-        achievements: [],
-        personalDetails: {
-            fatherName: '',
-            motherName: '',
-            dob: '',
-            nationality: ''
-        }
-    });
+    const [resumeData, setResumeData] = useState(emptyResume);
 
     useEffect(() => {
         if (preloadedData) {
-            setResumeData(preloadedData);
+            setResumeData(normalizeResume(preloadedData));
             if (preloadedData.template) {
                 setSelectedTemplate(preloadedData.template);
             }
@@ -465,16 +512,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     loadedEdu[0] = { ...loadedEdu[0], grade: fetchedCgpa };
                 }
                 
-                setResumeData({
-                    personalInfo: r.personalInfo || {},
-                    summary: r.summary || '',
-                    experience: r.experience || [],
-                    education: loadedEdu,
-                    skills: { technical: r.skills?.technical || '', domain: r.skills?.domain || '', ai: r.skills?.ai || '', languages: r.skills?.languages || '' },
-                    projects: r.projects || [],
-                    achievements: r.achievements || [],
-                    personalDetails: r.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
-                });
+                setResumeData(normalizeResume({ ...r, education: loadedEdu }));
             } else if (hydratedProfileRes.success) {
                 const data = hydratedProfileRes.richProfile || {};
                 const reg = hydratedProfileRes.registration || {};
@@ -854,6 +892,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         if (listFrom(reg.higherEducation).length > 0) {
             listFrom(reg.higherEducation).forEach((edu, idx) => {
                 eduList.push({
+                    level: 'degree',
+                    specialisation: firstCleanValue(edu.specialization, edu.specialisation, edu.branch, edu.stream),
+                    board: firstCleanValue(edu.university, edu.board),
+                    startYear: firstCleanValue(edu.startYear, edu.yearOfJoining),
                     degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
                     institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
                     year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
@@ -874,6 +916,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
         if (reg.twelfthDetails?.schoolName) {
             eduList.push({
+                level: '12th',
+                board: cleanProfileValue(reg.twelfthDetails.board),
                 degree: `12th Standard${cleanProfileValue(reg.twelfthDetails.stream) ? ` (${cleanProfileValue(reg.twelfthDetails.stream)})` : ''}`,
                 institution: cleanProfileValue(reg.twelfthDetails.schoolName),
                 year: cleanProfileValue(reg.twelfthDetails.yearOfPassing),
@@ -883,6 +927,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
         if (reg.tenthDetails?.schoolName) {
             eduList.push({
+                level: '10th',
+                board: cleanProfileValue(reg.tenthDetails.board),
                 degree: '10th Standard',
                 institution: cleanProfileValue(reg.tenthDetails.schoolName),
                 year: cleanProfileValue(reg.tenthDetails.yearOfPassing),
@@ -895,6 +941,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         let experience = base?.experience || [];
         if (listFrom(reg.workExperience).length > 0) {
             experience = listFrom(reg.workExperience).map(exp => ({
+                type: /intern/i.test(String(exp.experienceType || exp.type || '')) ? 'internship' : '',
                 role: firstCleanValue(exp.jobTitle, exp.role, exp.designation, exp.experienceType),
                 company: firstCleanValue(exp.organizationName, exp.companyName, exp.company),
                 duration: firstCleanValue(
@@ -931,22 +978,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             projects = [{ title: 'Key Project', description: cleanProfileValue(data.projects), link: '' }];
         }
 
+        // Certifications come from the registration's certificate list.
+        const certificationList = listFrom(reg.certificates)
+            .filter(c => cleanProfileValue(c.title))
+            .map(c => ({
+                name: cleanProfileValue(c.title),
+                issuer: firstCleanValue(c.issuingOrg, c.issuer),
+                year: firstCleanValue(c.yearOfCompletion, formatResumeDate(c.issueDate)),
+                credentialId: firstCleanValue(c.credentialId, c.certificateId),
+                link: firstCleanValue(c.link, c.verificationUrl),
+            }));
+
         // Achievements
         const achievementList = [];
-        if (listFrom(reg.certificates).length > 0) {
-            listFrom(reg.certificates).forEach(c => {
-                const issuer = firstCleanValue(c.issuingOrg, c.issuer);
-                const completion = firstCleanValue(c.yearOfCompletion, formatResumeDate(c.issueDate));
-                achievementList.push({
-                    title: cleanProfileValue(c.title),
-                    description: joinClean(
-                        issuer ? `Issued by ${issuer}` : '',
-                        completion ? `Completed ${completion}` : ''
-                    ),
-                    link: firstCleanValue(c.link, c.verificationUrl)
-                });
-            });
-        }
         if (listFrom(reg.extracurricular).length > 0) {
             listFrom(reg.extracurricular).forEach(e => achievementList.push({
                 title: firstCleanValue(e.customActivityType, e.activityType, 'Extracurricular Activity'),
@@ -998,9 +1042,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 technical: technicalSkills,
                 domain: base?.skills?.domain || '',
                 ai: base?.skills?.ai || '',
-                languages: base?.skills?.languages || ''
+                soft: base?.skills?.soft || '',
+                languages: base?.skills?.languages || '',
+                levels: base?.skills?.levels || []
             },
             projects,
+            certifications: certificationList.length > 0 ? certificationList : (base?.certifications || []),
             achievements: achievementList.length > 0 ? achievementList : (base?.achievements || []),
             personalDetails: base?.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
         };
@@ -1083,30 +1130,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                 setResumeData(newResumeData);
             } else {
                 // Fallback to blank slate if profile fetch fails
-                setResumeData({
-                    personalInfo: { fullName: '', email: '', mobile: '', location: '', targetRole: '', linkedinUrl: '', githubUrl: '', portfolioUrl: '', profileImage: '' },
-                    summary: '',
-                    experience: [],
-                    education: [],
-                    skills: { technical: '', domain: '', ai: '', languages: '' },
-                    projects: [],
-                    achievements: [],
-                    personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
-                });
+                setResumeData(emptyResume());
             }
         } catch (error) {
             console.error('Failed to load profile for new resume:', error);
             // Fallback to blank slate
-            setResumeData({
-                personalInfo: { fullName: '', email: '', mobile: '', location: '', targetRole: '', linkedinUrl: '', githubUrl: '', portfolioUrl: '', profileImage: '' },
-                summary: '',
-                experience: [],
-                education: [],
-                skills: { technical: '', domain: '', ai: '', languages: '' },
-                projects: [],
-                achievements: [],
-                personalDetails: { fatherName: '', motherName: '', dob: '', nationality: '' }
-            });
+            setResumeData(emptyResume());
         } finally {
             setIsSyncing(false);
         }
@@ -1135,16 +1164,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             loadedEdu[0] = { ...loadedEdu[0], grade: verifiedCgpa };
         }
 
-        setResumeData({
-            personalInfo: resume.personalInfo || {},
-            summary: resume.summary || '',
-            experience: resume.experience || [],
-            education: loadedEdu,
-            skills: { technical: resume.skills?.technical || '', domain: resume.skills?.domain || '', ai: resume.skills?.ai || '', languages: resume.skills?.languages || '' },
-            projects: resume.projects || [],
-            achievements: resume.achievements || [],
-            personalDetails: resume.personalDetails || { fatherName: '', motherName: '', dob: '', nationality: '' }
-        });
+        setResumeData(normalizeResume({ ...resume, education: loadedEdu }));
 
         setCurrentStep(0);
         setPageMode('builder');
@@ -1320,6 +1340,22 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             const newArray = [...prev[key]];
             newArray[index] = { ...newArray[index], [field]: value };
             return { ...prev, [key]: newArray };
+        });
+    };
+
+    // Proficiency map is derived from the technical/domain/AI comma lists.
+    const skillNames = [...new Set([
+        ...splitCsv(resumeData.skills?.technical),
+        ...splitCsv(resumeData.skills?.domain),
+        ...splitCsv(resumeData.skills?.ai),
+    ])];
+    const getSkillLevel = (name) =>
+        (resumeData.skills?.levels || []).find((l) => l.name.toLowerCase() === name.toLowerCase())?.level || '';
+    const setSkillLevel = (name, level) => {
+        setResumeData(prev => {
+            const rest = (prev.skills?.levels || []).filter((l) => l.name.toLowerCase() !== name.toLowerCase());
+            const levels = level ? [...rest, { name, level }] : rest;
+            return { ...prev, skills: { ...prev.skills, levels } };
         });
     };
 
@@ -2070,13 +2106,32 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
                                                         <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
                                                             <Briefcase className="w-4 h-4 text-[#045C9A] shrink-0" />
-                                                            <span className="truncate">{exp.company || t('resume_builder.work_experience', 'Work Experience')}</span>
+                                                            <span className="truncate">{exp.company || (exp.type === 'internship' ? t('resume_builder.internship', 'Internship') : t('resume_builder.work_experience', 'Work Experience'))}</span>
                                                         </h4>
                                                         <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
                                                     <div className="p-4 sm:p-6 space-y-4">
+                                                        <div>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.experience_type', 'Type')}</label>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {EXPERIENCE_TYPES.map((opt) => (
+                                                                    <button
+                                                                        key={opt.id}
+                                                                        type="button"
+                                                                        onClick={() => handleArrayChange('experience', idx, 'type', opt.id)}
+                                                                        className={`h-8 rounded-lg border px-3 text-[12px] font-semibold transition-colors ${
+                                                                            (exp.type || '') === opt.id
+                                                                                ? 'border-[#045C9A] bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                                                                                : 'border-[#d7ebf5] bg-white text-slate-600 hover:border-[#045C9A]/40 dark:border-white/10 dark:bg-[#072036] dark:text-slate-300'
+                                                                        }`}
+                                                                    >
+                                                                        {t(`resume_builder.experience_types.${opt.id}`, opt.label)}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.company', 'Company')}</label>
@@ -2105,8 +2160,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
-                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_experience', 'Add Experience')}
+                                        <button onClick={() => addArrayItem('experience', emptyExperience())} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_experience', 'Add Internship / Experience')}
                                         </button>
                                     </div>
                                 )}
@@ -2127,6 +2182,25 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                     </div>
                                                     <div className="p-4 sm:p-6 space-y-4">
                                                         <div>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.education_level', 'Level')}</label>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {EDUCATION_LEVELS.map((opt) => (
+                                                                    <button
+                                                                        key={opt.id}
+                                                                        type="button"
+                                                                        onClick={() => handleArrayChange('education', idx, 'level', opt.id)}
+                                                                        className={`h-8 rounded-lg border px-3 text-[12px] font-semibold transition-colors ${
+                                                                            (edu.level || 'degree') === opt.id
+                                                                                ? 'border-[#045C9A] bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                                                                                : 'border-[#d7ebf5] bg-white text-slate-600 hover:border-[#045C9A]/40 dark:border-white/10 dark:bg-[#072036] dark:text-slate-300'
+                                                                        }`}
+                                                                    >
+                                                                        {t(`resume_builder.education_levels.${opt.id}`, opt.label)}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.institution_name', 'Institution Name')}</label>
                                                             <input type="text" placeholder={t('resume_builder.institution_placeholder', 'College / University Name')} value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                         </div>
@@ -2136,10 +2210,33 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                 <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.year_of_passing', 'Year of Passing')}</label>
-                                                                <input type="text" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.specialisation', 'Specialisation / Branch')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.specialisation_placeholder', 'e.g. Computer Science, Commerce')} value={edu.specialisation || ''} onChange={(e) => handleArrayChange('education', idx, 'specialisation', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.board_university', 'Board / University')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.board_placeholder', 'e.g. Anna University, CBSE')} value={edu.board || ''} onChange={(e) => handleArrayChange('education', idx, 'board', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.start_year', 'Start Year')}</label>
+                                                                <input type="text" inputMode="numeric" placeholder={t('resume_builder.start_year_placeholder', 'e.g. 2022')} value={edu.startYear || ''} onChange={(e) => handleArrayChange('education', idx, 'startYear', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{edu.pursuing ? t('resume_builder.expected_year', 'Expected Year') : t('resume_builder.year_of_passing', 'Year of Passing')}</label>
+                                                                <input type="text" inputMode="numeric" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                        </div>
+                                                        <label className="inline-flex cursor-pointer items-center gap-2.5 text-[12.5px] font-semibold text-slate-600 dark:text-slate-300">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!edu.pursuing}
+                                                                onChange={(e) => handleArrayChange('education', idx, 'pursuing', e.target.checked)}
+                                                                className="h-4 w-4 rounded border-[#d7ebf5] text-[#045C9A] focus:ring-[#045C9A]/30 dark:border-white/20 dark:bg-[#072036]"
+                                                            />
+                                                            {t('resume_builder.currently_pursuing', 'Currently pursuing')}
+                                                        </label>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
@@ -2159,7 +2256,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
+                                        <button onClick={() => addArrayItem('education', emptyEducation())} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_education', 'Add Education')}
                                         </button>
                                     </div>
@@ -2191,14 +2288,39 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                             </div>
                                                         </div>
                                                         <div>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.tech_stack', 'Tech Stack')}</label>
+                                                            <input type="text" placeholder={t('resume_builder.tech_stack_placeholder', 'e.g. React, Node.js, MongoDB (comma separated)')} value={proj.techStack || ''} onChange={(e) => handleArrayChange('projects', idx, 'techStack', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            {splitCsv(proj.techStack).length > 0 && (
+                                                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                                                    {splitCsv(proj.techStack).map((tech) => (
+                                                                        <span key={tech} className="rounded-md bg-[#EAF7FD] px-2 py-[3px] text-[11px] font-semibold text-[#045C9A] dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">{tech}</span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.your_role', 'Your Role')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.your_role_placeholder', 'e.g. Team lead, Backend developer')} value={proj.role || ''} onChange={(e) => handleArrayChange('projects', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.duration', 'Duration')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.project_duration_placeholder', 'e.g. Jan 2025 – Mar 2025')} value={proj.duration || ''} onChange={(e) => handleArrayChange('projects', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
                                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.description', 'Description')}</label>
                                                             <textarea placeholder={t('resume_builder.proj_desc_placeholder', 'Describe the technology and your contribution...')} value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 min-h-[80px] resize-none" rows={3}></textarea>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.outcome', 'Outcome / Impact')}</label>
+                                                            <input type="text" placeholder={t('resume_builder.outcome_placeholder', 'e.g. Cut report time by 40%, used by 200 students')} value={proj.outcome || ''} onChange={(e) => handleArrayChange('projects', idx, 'outcome', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                         </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
-                                        <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
+                                        <button onClick={() => addArrayItem('projects', emptyProject())} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
                                             <Plus className="w-5 h-5" /> {t('resume_builder.add_project', 'Add Project')}
                                         </button>
                                     </div>
@@ -2333,10 +2455,104 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                             </div>
 
                                             <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.soft_skills', 'Soft Skills')}</label>
+                                                <textarea value={resumeData.skills.soft || ''} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.soft_placeholder', 'e.g. Communication, Teamwork, Problem solving, Leadership...')}></textarea>
+                                            </div>
+
+                                            <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.languages', 'Languages')}</label>
                                                 <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-[#045C9A]/20 focus:border-[#045C9A] outline-none dark:text-white transition-all text-sm font-semibold resize-none shadow-sm" placeholder={t('resume_builder.languages_placeholder', 'e.g. English (Fluent), Urdu (Native), Tamil...')}></textarea>
                                             </div>
                                         </div>
+
+                                        {/* Proficiency per skill -- reads the comma lists above, stores skills.levels */}
+                                        {skillNames.length > 0 && (
+                                            <div className="bg-white dark:bg-[#0d3a5f] p-4 sm:p-6 rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm animate-fade-in">
+                                                <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                                    <div>
+                                                        <h3 className="text-sm font-bold text-[#072036] dark:text-white">{t('resume_builder.skill_levels', 'Proficiency levels')}</h3>
+                                                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{t('resume_builder.skill_levels_desc', 'Optional. Levels print next to the skill, e.g. "React (Advanced)", and feed the placement match.')}</p>
+                                                    </div>
+                                                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{skillNames.length} {t('resume_builder.skills_count', 'skills')}</span>
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                    {skillNames.map((name) => {
+                                                        const current = getSkillLevel(name);
+                                                        return (
+                                                            <div key={name} className="flex items-center justify-between gap-3 rounded-xl border border-[#d7ebf5] bg-[#F8FBFD] px-3 py-2 dark:border-white/10 dark:bg-[#072036]/60">
+                                                                <span className="min-w-0 truncate text-[12.5px] font-semibold text-[#072036] dark:text-white" title={name}>{name}</span>
+                                                                <div className="flex shrink-0 items-center rounded-lg border border-[#d7ebf5] bg-white p-0.5 dark:border-white/10 dark:bg-[#0d3a5f]">
+                                                                    {SKILL_LEVELS.filter((l) => l.id).map((l) => (
+                                                                        <button
+                                                                            key={l.id}
+                                                                            type="button"
+                                                                            onClick={() => setSkillLevel(name, current === l.id ? '' : l.id)}
+                                                                            title={t(`resume_builder.skill_level.${l.id}`, l.label)}
+                                                                            className={`h-7 rounded-md px-2 text-[11px] font-semibold transition-colors ${
+                                                                                current === l.id
+                                                                                    ? 'bg-[#0E2136] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                                                                                    : 'text-slate-500 hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'
+                                                                            }`}
+                                                                        >
+                                                                            {t(`resume_builder.skill_level_short.${l.id}`, l.label.slice(0, 3))}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {steps[currentStep].id === 'certifications' && (
+                                    <div className="space-y-4 animate-fade-in">
+                                        <AnimatePresence>
+                                            {resumeData.certifications.map((cert, idx) => (
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5] dark:border-white/10 shadow-sm overflow-hidden">
+                                                    <div className="bg-[#F1F5F9]/70 dark:bg-white/[0.04] px-4 sm:px-6 py-4 border-b border-[#d7ebf5] dark:border-white/10 flex justify-between items-center gap-4 min-w-0">
+                                                        <h4 className="font-bold text-[#072036] dark:text-white text-sm flex items-center gap-2 truncate">
+                                                            <Award className="w-4 h-4 text-[#045C9A] shrink-0" />
+                                                            <span className="truncate">{cert.name || t('resume_builder.certification_details', 'Certification')}</span>
+                                                        </h4>
+                                                        <button onClick={() => removeArrayItem('certifications', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all shrink-0">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="p-4 sm:p-6 space-y-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.certification_name', 'Certification Name')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.certification_name_placeholder', 'e.g. AWS Certified Cloud Practitioner')} value={cert.name} onChange={(e) => handleArrayChange('certifications', idx, 'name', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.issuer', 'Issuing Organisation')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.issuer_placeholder', 'e.g. Amazon Web Services, Coursera')} value={cert.issuer} onChange={(e) => handleArrayChange('certifications', idx, 'issuer', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.year', 'Year')}</label>
+                                                                <input type="text" inputMode="numeric" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={cert.year} onChange={(e) => handleArrayChange('certifications', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.credential_id', 'Credential ID')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.credential_id_placeholder', 'Optional')} value={cert.credentialId} onChange={(e) => handleArrayChange('certifications', idx, 'credentialId', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.credential_link', 'Credential Link')}</label>
+                                                                <input type="text" placeholder={t('resume_builder.credential_link_placeholder', 'https://...')} value={cert.link} onChange={(e) => handleArrayChange('certifications', idx, 'link', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('certifications', emptyCertification())} className="w-full py-6 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-[#045C9A] hover:text-[#045C9A] transition-all">
+                                            <Plus className="w-5 h-5" /> {t('resume_builder.add_certification', 'Add Certification')}
+                                        </button>
                                     </div>
                                 )}
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Resume = require('../models/Resume');
+const { computeAtsScore } = require('../utils/atsScore');
 const ResumeVerification = require('../models/ResumeVerification');
 const { protect } = require('../middleware/auth');
 const { resumeExportLimiter } = require('../middleware/rateLimiter');
@@ -219,9 +220,11 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private
 router.post('/', protect, async (req, res) => {
   try {
+    const { userId: _ignoredUser, _id: _ignoredId, atsScore: _ignoredScore, ...body } = req.body || {};
     const newResume = await Resume.create({
-      ...req.body,
+      ...body,
       userId: req.user._id,
+      atsScore: computeAtsScore(body),
     });
     res.status(201).json({ success: true, data: newResume });
   } catch (error) {
@@ -242,7 +245,9 @@ router.put('/:id', protect, async (req, res) => {
     // SECURITY: never let the body reassign ownership or the document id. Without
     // this, a user could PUT {"userId":"<victim>"} and hand their resume to (or
     // overwrite under) another account.
-    const { userId, _id, ...updatable } = req.body || {};
+    const { userId, _id, atsScore: _clientScore, ...updatable } = req.body || {};
+    // Score is always derived server-side from the saved content.
+    updatable.atsScore = computeAtsScore({ ...resume.toObject(), ...updatable });
     resume = await Resume.findByIdAndUpdate(req.params.id, updatable, {
       new: true,
       runValidators: true,
@@ -288,7 +293,7 @@ router.post('/:id/duplicate', protect, async (req, res) => {
     delete copy.verification; // fresh copy has no export history
 
     copy.versionName = `${original.versionName || 'My Resume'} (Copy)`;
-    copy.atsScore    = original.atsScore || 0;
+    copy.atsScore    = computeAtsScore(original);
     copy.targetRole  = original.targetRole || '';
     copy.userId      = req.user._id;
 

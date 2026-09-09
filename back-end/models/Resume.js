@@ -54,6 +54,9 @@ const resumeSchema = new mongoose.Schema(
         summary: String,
         experience: [
             {
+                // internship | full-time | part-time | freelance | volunteer.
+                // Legacy rows have no type and render under "Experience".
+                type:        { type: String, default: '' },
                 company:     String,
                 role:        String,
                 duration:    String,
@@ -63,11 +66,17 @@ const resumeSchema = new mongoose.Schema(
         ],
         education: [
             {
-                institution: String,
-                degree:      String,
-                grade:       String,
-                year:        String,
-                location:    String,
+                // degree | diploma | 12th | 10th | other — drives ordering and labels.
+                level:          { type: String, default: '' },
+                institution:    String,
+                degree:         String,
+                specialisation: String,
+                board:          String,       // board / university
+                startYear:      String,
+                year:           String,       // year of passing (or expected)
+                pursuing:       { type: Boolean, default: false },
+                grade:          String,
+                location:       String,
             },
         ],
         skills: {
@@ -76,12 +85,33 @@ const resumeSchema = new mongoose.Schema(
             domain:    String,
             ai:        String,
             languages: String,
+            // Proficiency per skill name, keyed off the comma lists above.
+            levels: [
+                {
+                    name:  String,
+                    level: { type: String, enum: ['beginner', 'intermediate', 'advanced', ''], default: '' },
+                    _id:   false,
+                },
+            ],
         },
         projects: [
             {
                 title:       String,
+                techStack:   String,
+                role:        String,
+                duration:    String,
+                outcome:     String,
                 description: String,
                 link:        String,
+            },
+        ],
+        certifications: [
+            {
+                name:         String,
+                issuer:       String,
+                year:         String,
+                credentialId: String,
+                link:         String,
             },
         ],
         achievements: [

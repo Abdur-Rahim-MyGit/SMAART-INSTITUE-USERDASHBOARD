@@ -32,12 +32,25 @@ const BulletLines = ({ text, style }) => {
     );
 };
 
-/** Skills section — three labeled lines, no badges, no tables. */
+const csvList = (val) => String(val || '').split(',').map(x => x.trim()).filter(Boolean);
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
+
+/** "React, Node" + levels → "React (Advanced), Node" — plain text, ATS-safe. */
+const withLevels = (csv, levels) => {
+    const map = new Map((levels || []).filter(l => l?.name && l?.level).map(l => [l.name.toLowerCase(), l.level]));
+    return csvList(csv).map(x => (map.get(x.toLowerCase()) ? `${x} (${cap(map.get(x.toLowerCase()))})` : x)).join(', ');
+};
+
+export const hasSkills = (skills) =>
+    !!(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.soft) || clean(skills?.languages));
+
+/** Skills section — labeled lines, no badges, no tables. */
 const SkillsLines = ({ skills, labelStyle, textStyle }) => {
     const rows = [
-        { label: 'Technical Skills', val: clean(skills?.technical) },
-        { label: 'Domain Skills', val: clean(skills?.domain) },
-        { label: 'AI Skills', val: clean(skills?.ai) },
+        { label: 'Technical Skills', val: clean(withLevels(skills?.technical, skills?.levels)) },
+        { label: 'Domain Skills', val: clean(withLevels(skills?.domain, skills?.levels)) },
+        { label: 'AI Skills', val: clean(withLevels(skills?.ai, skills?.levels)) },
+        { label: 'Soft Skills', val: clean(skills?.soft) },
         { label: 'Languages', val: clean(skills?.languages) },
     ].filter(r => r.val);
     if (rows.length === 0) return null;
@@ -65,13 +78,29 @@ export const adaptData = (resumeData) => ({
         professionalSummary: resumeData?.summary || '',
     },
     education: (resumeData?.education || []).map(e => ({
+        level: e.level || '',
         institutionName: e.institution || '',
         degree: e.degree || '',
+        specialisation: e.specialisation || '',
+        board: e.board || '',
+        startYear: e.startYear || '',
         yearOfPassing: e.year || '',
+        pursuing: !!e.pursuing,
         grade: e.grade || '',
         location: e.location || '',
     })),
-    experience: (resumeData?.experience || []).map(e => ({
+    // Internships print as their own section; anything else (including
+    // untyped rows from older resumes) stays under Experience.
+    experience: (resumeData?.experience || []).filter(e => (e.type || '') !== 'internship').map(e => ({
+        type: e.type || '',
+        company: e.company || '',
+        jobRole: e.role || '',
+        duration: e.duration || '',
+        location: e.location || '',
+        description: e.description || '',
+    })),
+    internships: (resumeData?.experience || []).filter(e => e.type === 'internship').map(e => ({
+        type: 'internship',
         company: e.company || '',
         jobRole: e.role || '',
         duration: e.duration || '',
@@ -81,7 +110,18 @@ export const adaptData = (resumeData) => ({
     projects: (resumeData?.projects || []).map(p => ({
         projectTitle: p.title || '',
         projectLink: p.link || '',
+        techStack: p.techStack || '',
+        role: p.role || '',
+        duration: p.duration || '',
+        outcome: p.outcome || '',
         description: p.description || '',
+    })),
+    certifications: (resumeData?.certifications || []).map(c => ({
+        name: c.name || '',
+        issuer: c.issuer || '',
+        year: c.year || '',
+        credentialId: c.credentialId || '',
+        link: c.link || '',
     })),
     skills: {
         technical: Array.isArray(resumeData?.skills?.technical)
@@ -96,6 +136,10 @@ export const adaptData = (resumeData) => ({
         languages: Array.isArray(resumeData?.skills?.languages)
             ? resumeData.skills.languages.join(', ')
             : resumeData?.skills?.languages || '',
+        soft: Array.isArray(resumeData?.skills?.soft)
+            ? resumeData.skills.soft.join(', ')
+            : resumeData?.skills?.soft || '',
+        levels: Array.isArray(resumeData?.skills?.levels) ? resumeData.skills.levels : [],
     },
     awards: (resumeData?.achievements || []).map(a => ({
         achievementTitle: a.title || '',
@@ -131,19 +175,49 @@ const PageWrapper = ({ children, fontFamily, watermark, footer }) => (
 
 // ─── Shared section body ──────────────────────────────────────────────────────
 
-const ExperienceSection = ({ experience, sectionHeader, bodyStyle }) => {
+const EXPERIENCE_TYPE_LABEL = { 'full-time': 'Full-time', 'part-time': 'Part-time', freelance: 'Freelance', volunteer: 'Volunteer' };
+
+const ExperienceSection = ({ experience, sectionHeader, bodyStyle, title = 'EXPERIENCE' }) => {
     if (!experience || experience.length === 0) return null;
     return (
         <section style={{ marginBottom: '12px' }}>
-            {sectionHeader('EXPERIENCE / INTERNSHIP')}
-            {experience.map((exp, i) => (
-                <div key={i} style={{ marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <strong style={{ fontSize: '11px' }}>{exp.jobRole}{exp.company ? ` — ${exp.company}` : ''}</strong>
-                        <span style={{ fontSize: '10px', ...bodyStyle }}>{exp.duration}</span>
+            {sectionHeader(title)}
+            {experience.map((exp, i) => {
+                const meta = [clean(exp.location) && `Location: ${exp.location}`, EXPERIENCE_TYPE_LABEL[exp.type]].filter(Boolean).join(' | ');
+                return (
+                    <div key={i} style={{ marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <strong style={{ fontSize: '11px' }}>{exp.jobRole}{exp.company ? ` — ${exp.company}` : ''}</strong>
+                            <span style={{ fontSize: '10px', ...bodyStyle }}>{exp.duration}</span>
+                        </div>
+                        {meta && <div style={{ fontSize: '10px', ...bodyStyle }}>{meta}</div>}
+                        <BulletLines text={exp.description} style={{ fontSize: '10.5px', ...bodyStyle }} />
                     </div>
-                    {clean(exp.location) && <div style={{ fontSize: '10px', ...bodyStyle }}>Location: {exp.location}</div>}
-                    <BulletLines text={exp.description} style={{ fontSize: '10.5px', ...bodyStyle }} />
+                );
+            })}
+        </section>
+    );
+};
+
+const InternshipsSection = (props) => <ExperienceSection {...props} experience={props.internships} title="INTERNSHIPS" />;
+
+const CertificationsSection = ({ certifications, sectionHeader, bodyStyle }) => {
+    const rows = (certifications || []).filter(c => clean(c.name));
+    if (rows.length === 0) return null;
+    return (
+        <section style={{ marginBottom: '12px' }}>
+            {sectionHeader('CERTIFICATIONS')}
+            {rows.map((c, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
+                    <div style={{ minWidth: 0 }}>
+                        <strong style={{ fontSize: '11px' }}>{c.name}</strong>
+                        {(clean(c.issuer) || clean(c.credentialId) || clean(c.link)) && (
+                            <div style={{ fontSize: '10px', ...bodyStyle }}>
+                                {[clean(c.issuer), clean(c.credentialId) && `ID: ${c.credentialId}`, clean(c.link)].filter(Boolean).join(' | ')}
+                            </div>
+                        )}
+                    </div>
+                    {clean(c.year) && <span style={{ fontSize: '10px', whiteSpace: 'nowrap', marginLeft: '8px', ...bodyStyle }}>{c.year}</span>}
                 </div>
             ))}
         </section>
@@ -155,15 +229,20 @@ const ProjectsSection = ({ projects, sectionHeader, bodyStyle }) => {
     return (
         <section style={{ marginBottom: '12px' }}>
             {sectionHeader('PROJECTS')}
-            {projects.map((p, i) => (
-                <div key={i} style={{ marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <strong style={{ fontSize: '11px' }}>{p.projectTitle}</strong>
-                        {clean(p.projectLink) && <span style={{ fontSize: '10px', ...bodyStyle }}>{p.projectLink}</span>}
+            {projects.map((p, i) => {
+                const meta = [clean(p.role), clean(p.duration), clean(p.projectLink)].filter(Boolean).join(' | ');
+                return (
+                    <div key={i} style={{ marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <strong style={{ fontSize: '11px' }}>{p.projectTitle}</strong>
+                            {meta && <span style={{ fontSize: '10px', textAlign: 'right', marginLeft: '8px', ...bodyStyle }}>{meta}</span>}
+                        </div>
+                        {clean(p.techStack) && <div style={{ fontSize: '10px', ...bodyStyle }}><strong>Tech Stack:</strong> {p.techStack}</div>}
+                        <BulletLines text={p.description} style={{ fontSize: '10.5px', ...bodyStyle }} />
+                        {clean(p.outcome) && <div style={{ fontSize: '10.5px', marginTop: '2px', ...bodyStyle }}><strong>Outcome:</strong> {p.outcome}</div>}
                     </div>
-                    <BulletLines text={p.description} style={{ fontSize: '10.5px', ...bodyStyle }} />
-                </div>
-            ))}
+                );
+            })}
         </section>
     );
 };
@@ -173,17 +252,25 @@ const EducationSection = ({ education, sectionHeader, bodyStyle }) => {
     return (
         <section style={{ marginBottom: '12px' }}>
             {sectionHeader('EDUCATION')}
-            {education.map((edu, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <div>
-                        <strong style={{ fontSize: '11px' }}>{edu.degree}{edu.institutionName ? ` — ${edu.institutionName}` : ''}</strong>
-                        <div style={{ fontSize: '10.5px', ...bodyStyle }}>
-                            {[clean(edu.grade) && `Grade/CGPA: ${edu.grade}`, clean(edu.location) && `Location: ${edu.location}`].filter(Boolean).join(' | ')}
+            {education.map((edu, i) => {
+                const title = [clean(edu.degree), clean(edu.specialisation)].filter(Boolean).join(' in ');
+                const years = [clean(edu.startYear), clean(edu.yearOfPassing)].filter(Boolean).join(' – ');
+                const when = edu.pursuing ? (years ? `${years} (Pursuing)` : 'Pursuing') : years;
+                const meta = [
+                    clean(edu.board),
+                    clean(edu.grade) && `Grade/CGPA: ${edu.grade}`,
+                    clean(edu.location) && `Location: ${edu.location}`,
+                ].filter(Boolean).join(' | ');
+                return (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <div style={{ minWidth: 0 }}>
+                            <strong style={{ fontSize: '11px' }}>{title}{edu.institutionName ? ` — ${edu.institutionName}` : ''}</strong>
+                            {meta && <div style={{ fontSize: '10.5px', ...bodyStyle }}>{meta}</div>}
                         </div>
+                        <div style={{ fontSize: '10.5px', textAlign: 'right', whiteSpace: 'nowrap', marginLeft: '8px', ...bodyStyle }}>{when}</div>
                     </div>
-                    <div style={{ fontSize: '10.5px', textAlign: 'right', ...bodyStyle }}>{edu.yearOfPassing}</div>
-                </div>
-            ))}
+                );
+            })}
         </section>
     );
 };
@@ -216,7 +303,7 @@ const AwardsSection = ({ awards, extracurricular, sectionHeader, bodyStyle }) =>
 // Calibri, pure black, left-aligned header, thin grey rules under section headers
 // ══════════════════════════════════════════════════════════════════════════════
 export const ClassicBW = ({ data, watermark, footer }) => {
-    const { profile, education, experience, projects, skills, awards, extracurricular } = data;
+    const { profile, education, experience, internships, projects, skills, certifications, awards, extracurricular } = data;
     const accent = '#111111';
     const body = { color: '#222222' };
 
@@ -260,17 +347,19 @@ export const ClassicBW = ({ data, watermark, footer }) => {
             )}
 
             <EducationSection education={education} sectionHeader={sectionHeader} bodyStyle={body} />
+            <InternshipsSection internships={internships} sectionHeader={sectionHeader} bodyStyle={body} />
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
             {/* Skills */}
-            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
+            {hasSkills(skills) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />
                 </section>
             )}
 
+            <CertificationsSection certifications={certifications} sectionHeader={sectionHeader} bodyStyle={body} />
             <AwardsSection awards={awards} extracurricular={extracurricular} sectionHeader={sectionHeader} bodyStyle={body} />
         </PageWrapper>
     );
@@ -281,7 +370,7 @@ export const ClassicBW = ({ data, watermark, footer }) => {
 // Georgia, navy #1F4E79 headings & name, left-aligned, wider letter-spacing
 // ══════════════════════════════════════════════════════════════════════════════
 export const NavySerif = ({ data, watermark, footer }) => {
-    const { profile, education, experience, projects, skills, awards, extracurricular } = data;
+    const { profile, education, experience, internships, projects, skills, certifications, awards, extracurricular } = data;
     const navy = '#1F4E79';
     const body = { color: '#1a1a1a' };
 
@@ -323,16 +412,18 @@ export const NavySerif = ({ data, watermark, footer }) => {
             )}
 
             <EducationSection education={education} sectionHeader={sectionHeader} bodyStyle={body} />
+            <InternshipsSection internships={internships} sectionHeader={sectionHeader} bodyStyle={body} />
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
+            {hasSkills(skills) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold', color: navy }} textStyle={{ fontSize: '10.5px', ...body }} />
                 </section>
             )}
 
+            <CertificationsSection certifications={certifications} sectionHeader={sectionHeader} bodyStyle={body} />
             <AwardsSection awards={awards} extracurricular={extracurricular} sectionHeader={sectionHeader} bodyStyle={body} />
         </PageWrapper>
     );
@@ -343,7 +434,7 @@ export const NavySerif = ({ data, watermark, footer }) => {
 // Arial, centered header, charcoal #3A3A3A accent, wide-tracked uppercase headings
 // ══════════════════════════════════════════════════════════════════════════════
 export const CharcoalCentered = ({ data, watermark, footer }) => {
-    const { profile, education, experience, projects, skills, awards, extracurricular } = data;
+    const { profile, education, experience, internships, projects, skills, certifications, awards, extracurricular } = data;
     const charcoal = '#3A3A3A';
     const body = { color: '#222222' };
 
@@ -390,16 +481,18 @@ export const CharcoalCentered = ({ data, watermark, footer }) => {
             )}
 
             <EducationSection education={education} sectionHeader={sectionHeader} bodyStyle={body} />
+            <InternshipsSection internships={internships} sectionHeader={sectionHeader} bodyStyle={body} />
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
+            {hasSkills(skills) && (
                 <section style={{ marginBottom: '12px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />
                 </section>
             )}
 
+            <CertificationsSection certifications={certifications} sectionHeader={sectionHeader} bodyStyle={body} />
             <AwardsSection awards={awards} extracurricular={extracurricular} sectionHeader={sectionHeader} bodyStyle={body} />
         </PageWrapper>
     );
@@ -410,7 +503,7 @@ export const CharcoalCentered = ({ data, watermark, footer }) => {
 // Cambria, deep green #2E5339 accent, left-aligned, traditional/academic, tighter spacing
 // ══════════════════════════════════════════════════════════════════════════════
 export const ForestFormal = ({ data, watermark, footer }) => {
-    const { profile, education, experience, projects, skills, awards, extracurricular } = data;
+    const { profile, education, experience, internships, projects, skills, certifications, awards, extracurricular } = data;
     const green = '#2E5339';
     const body = { color: '#1a1a1a', lineHeight: '1.4' };
 
@@ -452,16 +545,18 @@ export const ForestFormal = ({ data, watermark, footer }) => {
             )}
 
             <EducationSection education={education} sectionHeader={sectionHeader} bodyStyle={body} />
+            <InternshipsSection internships={internships} sectionHeader={sectionHeader} bodyStyle={body} />
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
+            {hasSkills(skills) && (
                 <section style={{ marginBottom: '10px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold', color: green }} textStyle={{ fontSize: '10.5px', ...body }} />
                 </section>
             )}
 
+            <CertificationsSection certifications={certifications} sectionHeader={sectionHeader} bodyStyle={body} />
             <AwardsSection awards={awards} extracurricular={extracurricular} sectionHeader={sectionHeader} bodyStyle={body} />
         </PageWrapper>
     );
@@ -472,7 +567,7 @@ export const ForestFormal = ({ data, watermark, footer }) => {
 // Calibri, thin accent-colored rule per section (no color on heading text), most whitespace
 // ══════════════════════════════════════════════════════════════════════════════
 export const MinimalModern = ({ data, watermark, footer }) => {
-    const { profile, education, experience, projects, skills, awards, extracurricular } = data;
+    const { profile, education, experience, internships, projects, skills, certifications, awards, extracurricular } = data;
     const ruleColor = '#4A90D9';
     const body = { color: '#1a1a1a', lineHeight: '1.5' };
 
@@ -514,16 +609,18 @@ export const MinimalModern = ({ data, watermark, footer }) => {
             )}
 
             <EducationSection education={education} sectionHeader={sectionHeader} bodyStyle={body} />
+            <InternshipsSection internships={internships} sectionHeader={sectionHeader} bodyStyle={body} />
             <ExperienceSection experience={experience} sectionHeader={sectionHeader} bodyStyle={body} />
             <ProjectsSection projects={projects} sectionHeader={sectionHeader} bodyStyle={body} />
 
-            {(clean(skills?.technical) || clean(skills?.domain) || clean(skills?.ai) || clean(skills?.languages)) && (
+            {hasSkills(skills) && (
                 <section style={{ marginBottom: '14px' }}>
                     {sectionHeader('SKILLS')}
                     <SkillsLines skills={skills} labelStyle={{ fontWeight: 'bold' }} textStyle={{ fontSize: '10.5px', ...body }} />
                 </section>
             )}
 
+            <CertificationsSection certifications={certifications} sectionHeader={sectionHeader} bodyStyle={body} />
             <AwardsSection awards={awards} extracurricular={extracurricular} sectionHeader={sectionHeader} bodyStyle={body} />
         </PageWrapper>
     );
