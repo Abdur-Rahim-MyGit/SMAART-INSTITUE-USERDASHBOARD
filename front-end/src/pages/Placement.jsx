@@ -11,7 +11,6 @@ import {
   IconMapPin as MapPin,
   IconRefresh as Refresh,
   IconSearch as Search,
-  IconTag as Tag,
   IconArrowLeft as ArrowLeft,
   IconFilter as Filter,
   IconX as X,
