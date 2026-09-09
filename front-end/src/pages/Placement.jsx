@@ -1270,12 +1270,6 @@ const Placement = () => {
                           ? t("placement.not_eligible", { label: eligibility.failed[0].label, defaultValue: `Below: ${eligibility.failed[0].label}` })
                           : t("placement.eligibility_unknown", "Complete profile to check eligibility"),
                     });
-                  } else {
-                    signalChips.push({
-                      key: 'open', Icon: CircleCheck,
-                      cls: 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-400',
-                      label: t("placement.no_criteria", "No eligibility criteria listed"),
-                    });
                   }
                   if (pathMatch) {
                     signalChips.push({
@@ -1453,37 +1447,27 @@ const Placement = () => {
                         </div>
                       </div>
 
-                      {/* Signals -- one fixed-height row, at most two chips, never wraps */}
+                      {/* Signals + skills -- one fixed-height row, never wraps */}
                       <div className="mt-3.5 flex h-[26px] items-center gap-1.5 overflow-hidden">
                         {signalChips.map((chip) => (
                           <span
                             key={chip.key}
                             title={chip.title}
-                            className={`inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-md border px-2 py-[3px] text-[10.5px] font-semibold ${chip.cls}`}
+                            className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border px-2 py-[3px] text-[10.5px] font-semibold ${chip.cls}`}
                           >
                             <chip.Icon className="h-3 w-3 shrink-0" stroke={2} />
-                            <span className="truncate">{chip.label}</span>
+                            <span>{chip.label}</span>
                           </span>
                         ))}
-                      </div>
-
-                      {/* Skills -- one fixed-height row */}
-                      <div className="mt-2.5 flex h-[26px] items-center gap-1.5 overflow-hidden">
-                        {skills.length > 0 ? (
-                          <>
-                            {skills.slice(0, 3).map((skill) => (
-                              <span key={skill} className="min-w-0 truncate whitespace-nowrap rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#072036]/60 dark:text-slate-300">
-                                {skill}
-                              </span>
-                            ))}
-                            {skills.length > 3 && (
-                              <span className="shrink-0 whitespace-nowrap rounded-md px-1 py-[3px] text-[11.5px] font-medium text-slate-400">
-                                +{skills.length - 3}
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-[11.5px] text-slate-400 dark:text-slate-500">{t("placement.no_skills_listed", "Skills not listed")}</span>
+                        {skills.slice(0, 3).map((skill) => (
+                          <span key={skill} className="min-w-0 truncate whitespace-nowrap rounded-md bg-slate-100 px-2 py-[3px] text-[11.5px] font-medium text-slate-600 dark:bg-[#072036]/60 dark:text-slate-300">
+                            {skill}
+                          </span>
+                        ))}
+                        {skills.length > 3 && (
+                          <span className="shrink-0 whitespace-nowrap rounded-md px-1 py-[3px] text-[11.5px] font-medium text-slate-400">
+                            +{skills.length - 3}
+                          </span>
                         )}
                       </div>
 
