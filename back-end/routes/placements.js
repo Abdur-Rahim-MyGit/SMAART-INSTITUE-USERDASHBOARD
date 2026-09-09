@@ -4,6 +4,7 @@ const { protect } = require('../middleware/auth');
 const { FinalCareerPathwayModel, SkillProgressModel } = require('../models/careerAgentModels');
 const { runModeration, FLAG_SEVERITY } = require('../utils/jobModerationEngine');
 const { createNotification } = require('../services/notificationService');
+const PlacementApplication = require('../models/PlacementApplication');
 
 const router = express.Router();
 
@@ -702,12 +703,11 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       return res.status(404).json({ success: false, error: 'Job not found' });
     }
 
-    const applicationCollection = mongoose.connection.db.collection('placementapplications');
-    const existing = await applicationCollection.findOne({
+    const existing = await PlacementApplication.findOne({
       student: req.user._id,
       $or: [ { job: jobObjectId }, { jobPosting: jobObjectId } ],
       jobSource: source,
-    });
+    }).lean();
 
     if (existing) {
       return res.status(409).json({
@@ -806,13 +806,10 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       });
     }
 
-    const result = await applicationCollection.insertOne(application);
+    const created = await PlacementApplication.create(application);
     res.status(201).json({
       success: true,
-      data: {
-        ...application,
-        _id: result.insertedId,
-      },
+      data: created.toObject(),
       message: 'Application submitted successfully',
     });
   } catch (err) {
@@ -829,16 +826,9 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
 // List placement applications for current user (or admins) filtered by job/jobSource
 // Applications written before statusHistory existed get a synthesised
 // two-point history (applied at / current status) so the client can always
-// render a timeline. Entries are flagged so the UI can say so.
-const withStatusHistory = (app) => {
-  if (Array.isArray(app.statusHistory) && app.statusHistory.length > 0) return app;
-  const history = [{ status: 'applied', changedAt: app.appliedAt || app.createdAt || null, note: null, synthesized: true }];
-  const current = app.status || 'applied';
-  if (String(current).toLowerCase() !== 'applied') {
-    history.push({ status: current, changedAt: app.updatedAt || null, note: app.declineReason || null, synthesized: true });
-  }
-  return { ...app, statusHistory: history };
-};
+// render a timeline. Entries are flagged so the UI can say so. Run
+// scripts/backfill-placement-status-history.js to persist it for old rows.
+const withStatusHistory = (app) => PlacementApplication.withStatusHistory(app);
 
 router.get('/applications', protect, async (req, res) => {
   try {
@@ -858,8 +848,7 @@ router.get('/applications', protect, async (req, res) => {
     }
 
     if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] final query:', query);
-    const applicationCollection = mongoose.connection.db.collection('placementapplications');
-    const docs = await applicationCollection.find(query).sort({ createdAt: -1 }).limit(200).toArray();
+    const docs = await PlacementApplication.find(query).sort({ createdAt: -1 }).limit(200).lean();
     if (process.env.NODE_ENV === 'development') console.log('[DEBUG /applications] found docs count:', docs.length);
 
     // Attach the referenced posting so the client does not have to fetch each one
@@ -951,9 +940,7 @@ router.patch('/applications/:id/status', protect, async (req, res) => {
       return res.status(400).json({ success: false, error: 'A status (max 60 characters) is required' });
     }
 
-    const applicationCollection = mongoose.connection.db.collection('placementapplications');
-    const appId = new mongoose.Types.ObjectId(id);
-    const existing = await applicationCollection.findOne({ _id: appId });
+    const existing = await PlacementApplication.findById(id).lean();
     if (!existing) return res.status(404).json({ success: false, error: 'Application not found' });
 
     // College-scoped staff may only touch their own college's applications.
@@ -967,7 +954,7 @@ router.patch('/applications/:id/status', protect, async (req, res) => {
     const statusHistory = [...withStatusHistory(existing).statusHistory, entry];
     const $set = { status, updatedAt: now, statusHistory };
     if (note) $set.recruiterNote = note;
-    await applicationCollection.updateOne({ _id: appId }, { $set });
+    await PlacementApplication.updateOne({ _id: existing._id }, { $set }, { runValidators: true });
 
     // Notify the student -- best-effort, never fails the request.
     try {
@@ -998,8 +985,7 @@ router.delete('/applications/:applicationId', protect, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid application id' });
     }
 
-    const applicationCollection = mongoose.connection.db.collection('placementapplications');
-    const existing = await applicationCollection.findOne({ _id: new mongoose.Types.ObjectId(applicationId) });
+    const existing = await PlacementApplication.findById(applicationId).lean();
     if (!existing) return res.status(404).json({ success: false, error: 'Application not found' });
 
     // Only the student who applied or an admin can delete
@@ -1007,7 +993,7 @@ router.delete('/applications/:applicationId', protect, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Not authorized to delete this application' });
     }
 
-    await applicationCollection.deleteOne({ _id: new mongoose.Types.ObjectId(applicationId) });
+    await PlacementApplication.deleteOne({ _id: existing._id });
     res.json({ success: true, message: 'Application withdrawn' });
   } catch (err) {
     console.error('[Placements] withdraw application error:', err);
@@ -1442,8 +1428,7 @@ router.post('/applications/:id/respond-offer', protect, async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid application id' });
     }
 
-    const applicationCollection = mongoose.connection.db.collection('placementapplications');
-    const existing = await applicationCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+    const existing = await PlacementApplication.findById(id).lean();
     if (!existing) return res.status(404).json({ success: false, error: 'Application not found' });
 
     // Verify ownership
@@ -1471,10 +1456,7 @@ router.post('/applications/:id/respond-offer', protect, async (req, res) => {
       { status, changedAt: updateData.updatedAt, note: updateData.declineReason || null, changedBy: 'student' },
     ];
 
-    await applicationCollection.updateOne(
-        { _id: new mongoose.Types.ObjectId(id) },
-        { $set: updateData }
-    );
+    await PlacementApplication.updateOne({ _id: existing._id }, { $set: updateData }, { runValidators: true });
 
     res.json({
       success: true,
