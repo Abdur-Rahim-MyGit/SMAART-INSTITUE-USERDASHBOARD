@@ -23,10 +23,25 @@ import {
   IconChevronRight as ChevronRight,
   IconBookmark as Bookmark,
   IconBookmarkFilled as BookmarkFilled,
-  IconCircleCheck as CircleCheck
+  IconCircleCheck as CircleCheck,
+  IconAlertCircle as AlertCircle,
+  IconHistory as History,
+  IconDownload as Download,
+  IconMicrophone as Microphone,
+  IconCalendarPlus as CalendarPlus,
+  IconTicket as Ticket,
+  IconArrowUpRight as ArrowUpRight
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
-import { getBackendUrl, placementsAPI } from "@/services/api";
+import { getBackendUrl, placementsAPI, usersAPI, apiCall } from "@/services/api";
+import {
+  evaluateEligibility,
+  extractStudentProfile,
+  daysUntil,
+  getMatchScore,
+  roleMatchesTitle,
+  normalizeText,
+} from "@/services/placementEligibility";
 import { useToast } from "@/hooks/use-toast";
 import { createPortal } from "react-dom";
 import useUser from "@/hooks/useUser";
@@ -121,6 +136,122 @@ const getStatusTextColor = (status) => {
  * Returns a LinkedIn-style "Posted X ago" label.
  * Calculation is purely client-side from the existing createdAt timestamp.
  */
+// ── Job fair helpers ─────────────────────────────────────────────────────────
+const getFairCountdown = (startDate, endDate, t) => {
+  if (!startDate) return null;
+  const start = new Date(startDate);
+  if (Number.isNaN(start.getTime())) return null;
+  const now = new Date();
+  const end = endDate ? new Date(endDate) : null;
+  if (end && !Number.isNaN(end.getTime()) && now > end) return { tone: "past", label: t("placement.fair_ended", "Ended") };
+  if (now >= start) return { tone: "live", label: t("placement.fair_live", "Happening now") };
+  const days = Math.ceil((start - now) / 86400000);
+  if (days <= 0) return { tone: "live", label: t("placement.fair_today", "Starts today") };
+  if (days === 1) return { tone: "soon", label: t("placement.fair_tomorrow", "Starts tomorrow") };
+  return { tone: days <= 7 ? "soon" : "later", label: t("placement.fair_in_days", { count: days, defaultValue: `Starts in ${days} days` }) };
+};
+
+const toIcsDate = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+
+// Build a one-event .ics so the fair lands in Google/Apple/Outlook calendars.
+const downloadFairIcs = (fair) => {
+  if (!fair?.startDate) return;
+  const start = new Date(fair.startDate);
+  const end = fair.endDate ? new Date(fair.endDate) : new Date(start.getTime() + 3 * 3600000);
+  const esc = (s) => String(s || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/[,;]/g, (m) => `\\${m}`);
+  const lines = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//SMAART Institute//Placement//EN", "BEGIN:VEVENT",
+    `UID:${fair._id || Date.now()}@smaart-institute`, `DTSTAMP:${toIcsDate(new Date())}`,
+    `DTSTART:${toIcsDate(start)}`, `DTEND:${toIcsDate(end)}`,
+    `SUMMARY:${esc(fair.title)}`, `DESCRIPTION:${esc(fair.description)}`, `LOCATION:${esc(fair.location)}`,
+    "END:VEVENT", "END:VCALENDAR",
+  ];
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${String(fair.title || "job-fair").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// ── Application status helpers ───────────────────────────────────────────────
+const INTERVIEW_STATUS_RE = /interview|shortlist/i;
+const OFFER_STATUS_RE = /offer|accepted|hired|selected/i;
+const REJECTED_STATUS_RE = /reject|declined/i;
+
+const statusBucket = (status) => {
+  const s = String(status || "applied");
+  if (INTERVIEW_STATUS_RE.test(s)) return "interview";
+  if (OFFER_STATUS_RE.test(s)) return "offer";
+  if (REJECTED_STATUS_RE.test(s)) return "rejected";
+  return "applied";
+};
+
+// Prefer the server's statusHistory; otherwise synthesise the two points we
+// can prove from existing fields so older applications still get a timeline.
+const buildStatusTimeline = (app) => {
+  const history = Array.isArray(app.statusHistory) ? app.statusHistory.filter((h) => h && h.status) : [];
+  if (history.length > 0) {
+    return [...history].sort((a, b) => new Date(a.changedAt || 0) - new Date(b.changedAt || 0));
+  }
+  const current = app.status || app.applicationStatus || "applied";
+  const points = [{ status: "applied", changedAt: app.appliedAt || app.createdAt || null, note: null }];
+  if (String(current).toLowerCase() !== "applied") {
+    points.push({ status: current, changedAt: app.updatedAt || null, note: app.declineReason || app.note || app.recruiterNote || null });
+  }
+  return points;
+};
+
+// Proof-of-application PDF. jsPDF is already a dependency (CGPA report).
+const downloadApplicationReceipt = async (app) => {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const title = app.jobTitle || app.job?.displayTitle || "Role";
+  const company = app.companyName || app.job?.displayCompany || "Company";
+  const appliedAt = app.appliedAt || app.createdAt;
+
+  doc.setFillColor(7, 32, 54);
+  doc.rect(0, 0, 595, 96, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("SMAART Institute", 40, 44);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text("Application Receipt", 40, 66);
+
+  const rows = [
+    ["Application ID", String(app._id || app.id || "—")],
+    ["Role", title],
+    ["Company", company],
+    ["Applied on", appliedAt ? new Date(appliedAt).toLocaleString() : "—"],
+    ["Current status", String(app.status || "applied")],
+    ["Applicant", app.studentName || "—"],
+    ["Email", app.studentEmail || "—"],
+  ];
+  let y = 136;
+  rows.forEach(([k, v]) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(k.toUpperCase(), 40, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(7, 32, 54);
+    doc.text(String(v), 190, y, { maxWidth: 360 });
+    y += 30;
+  });
+  doc.setDrawColor(215, 235, 245);
+  doc.line(40, y, 555, y);
+  doc.setFontSize(9);
+  doc.setTextColor(148, 163, 184);
+  doc.text(`Generated ${new Date().toLocaleString()}. This receipt confirms the application was submitted through SMAART Institute.`, 40, y + 22, { maxWidth: 515 });
+  doc.save(`application-receipt-${String(title).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`);
+};
+
 const getPostedAgo = (createdAt, t) => {
   if (!createdAt) return null;
   const posted = new Date(createdAt);
@@ -180,6 +311,16 @@ const Placement = () => {
   
   // Master-Detail State
   const [selectedJob, setSelectedJob] = useState(null);
+
+  // Feature state
+  const [savedJobs, setSavedJobs] = useState([]);              // [{ jobId, source }]
+  const [careerRoles, setCareerRoles] = useState([]);          // locked career-path roles from /placements/jobs
+  const [studentProfile, setStudentProfile] = useState(null);  // { cgpa, backlogs, branch } for eligibility badges
+  const [sortBy, setSortBy] = useState("newest");              // newest | deadline | match
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");     // all | applied | interview | offer | rejected
+  const [timelineApp, setTimelineApp] = useState(null);        // application open in the timeline drawer
+  const [selectedPartner, setSelectedPartner] = useState(null); // company open in the partner drawer
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmAppId, setConfirmAppId] = useState(null);
   const [confirmAppTitle, setConfirmAppTitle] = useState('');
@@ -192,6 +333,7 @@ const Placement = () => {
     try {
       const response = await placementsAPI.getJobs({ limit: 150 });
       setJobs(response?.data || []);
+      setCareerRoles(Array.isArray(response?.careerRoles) ? response.careerRoles.filter(Boolean) : []);
     } catch (error) {
       console.error("Failed to load placement jobs:", error);
       toast({
@@ -206,6 +348,13 @@ const Placement = () => {
 
   useEffect(() => {
     fetchJobs();
+    placementsAPI.getSavedJobs().then((r) => setSavedJobs(r?.data || [])).catch(() => {});
+    // Eligibility badges need the student's CGPA (saved from the calculator)
+    // and backlogs/branch (profile). Best-effort: if either fails the badges
+    // simply stay hidden rather than guessing.
+    Promise.all([usersAPI.getProfile().catch(() => null), apiCall("/cgpa").catch(() => null)])
+      .then(([me, cg]) => setStudentProfile(extractStudentProfile(me, cg)))
+      .catch(() => {});
   }, []);
 
   const fetchApplied = async () => {
@@ -311,9 +460,12 @@ const Placement = () => {
     return [...seen.entries()].sort((a, b) => a[1].localeCompare(b[1]));
   }, [jobs]);
 
+  const isJobSaved = (job) =>
+    savedJobs.some((s) => String(s.jobId) === String(job._id) && s.source === job.sourceCollection);
+
   const filteredJobs = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return jobs.filter((job) => {
+    const list = jobs.filter((job) => {
       const sourceMatch = sourceFilter === "all" || job.sourceCollection === sourceFilter;
       if (!sourceMatch) return false;
 
@@ -325,6 +477,8 @@ const Placement = () => {
       }
 
       if (workMode !== 'all' && (job.workMode || "").trim().toLowerCase() !== workMode) return false;
+
+      if (showSavedOnly && !savedJobs.some((s) => String(s.jobId) === String(job._id) && s.source === job.sourceCollection)) return false;
 
       if (!query) return true;
 
@@ -339,7 +493,18 @@ const Placement = () => {
 
       return haystack.includes(query);
     });
-  }, [jobs, searchQuery, sourceFilter, jobType, workMode, t]);
+
+    const createdTs = (job) => new Date(job.displayCreatedAt || job.createdAt || 0).getTime() || 0;
+    const deadlineTs = (job) => {
+      const d = job.displayDeadline ? new Date(job.displayDeadline).getTime() : NaN;
+      return Number.isNaN(d) ? Infinity : d;
+    };
+    const sorted = [...list];
+    if (sortBy === "deadline") sorted.sort((a, b) => deadlineTs(a) - deadlineTs(b));
+    else if (sortBy === "match") sorted.sort((a, b) => (getMatchScore(b, getSkills(b).length) ?? -1) - (getMatchScore(a, getSkills(a).length) ?? -1));
+    else sorted.sort((a, b) => createdTs(b) - createdTs(a));
+    return sorted;
+  }, [jobs, searchQuery, sourceFilter, jobType, workMode, sortBy, showSavedOnly, savedJobs, t]);
 
   const filteredCompanies = useMemo(() => {
     return companies.filter(c => {
@@ -349,25 +514,26 @@ const Placement = () => {
     });
   }, [companies, companySearch, companyTypeFilter]);
 
-  // Derived Collections (for home view)
+  // Recommended: backend skill-match evaluation + the student's locked career
+  // path, with a nudge for roles closing this week. Only shown on the
+  // unfiltered list; each entry is { job, score, match }.
   const recommendedJobs = useMemo(() => {
     if (!jobs.length) return [];
-    
-    // Create a scoring system for jobs based on skills and career roles
-    const scoredJobs = jobs.map(job => {
-      let score = 0;
-      const jobSkills = getSkills(job).map(s => s.toLowerCase());
-      const jobTitle = (job.displayTitle || '').toLowerCase();
-      
-      return { job, score };
-    });
-    
-    // Sort by score, keep only those with a score > 0, fallback to recent if none match
-    const matches = scoredJobs.filter(j => j.score > 0).sort((a, b) => b.score - a.score).map(j => j.job);
-    return matches.length > 0 ? matches.slice(0, 6) : jobs.slice(0, 6);
-  }, [jobs]);
-
-  const newJobs = useMemo(() => jobs.slice(0, 6), [jobs]);
+    return jobs
+      .filter((job) => !String(job.displayStatus || "").toLowerCase().includes("closed"))
+      .map((job) => {
+        let score = 0;
+        const match = getMatchScore(job, getSkills(job).length);
+        if (match != null) score += match / 25;
+        if (careerRoles.some((r) => roleMatchesTitle(r, job.displayTitle))) score += 3;
+        const d = daysUntil(job.displayDeadline);
+        if (d != null && d >= 0 && d <= 7) score += 1;
+        return { job, score, match };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  }, [jobs, careerRoles]);
 
   // Header summary: unique companies across all loaded postings
   const companyCount = useMemo(() => {
@@ -431,6 +597,40 @@ const Placement = () => {
     closeConfirm();
   };
 
+  // Optimistic bookmark toggle; the server's savedJobs array wins on response.
+  const toggleSaveJob = async (e, job) => {
+    e.stopPropagation();
+    const entry = { jobId: job._id, source: job.sourceCollection };
+    const same = (s) => String(s.jobId) === String(job._id) && s.source === job.sourceCollection;
+    const wasSaved = savedJobs.some(same);
+    setSavedJobs((prev) => (wasSaved ? prev.filter((s) => !same(s)) : [...prev, entry]));
+    try {
+      const res = await placementsAPI.toggleSavedJob(job.sourceCollection, job._id);
+      if (Array.isArray(res?.data)) setSavedJobs(res.data);
+      toast({ title: res?.isSaved ? t("placement.saved_toast", "Job saved") : t("placement.unsaved_toast", "Removed from saved jobs") });
+    } catch (err) {
+      setSavedJobs((prev) => (wasSaved ? [...prev, entry] : prev.filter((s) => !same(s))));
+      toast({ title: t("placement.error_save", "Could not update saved jobs"), description: err.message, variant: "destructive" });
+    }
+  };
+
+  // Status cards link back to the posting they were made against.
+  const openApplicationJob = (app) => {
+    if (app.jobRemoved) return;
+    const jobId = app.job && typeof app.job === "object" ? app.job._id : app.job;
+    if (!jobId) return;
+    const state = app.job && typeof app.job === "object" ? { state: { job: app.job } } : undefined;
+    navigate(`/dashboard/placement/${app.jobSource || "jobpostings"}/${jobId}`, state);
+  };
+
+  const handleDownloadReceipt = async (app) => {
+    try {
+      await downloadApplicationReceipt(app);
+    } catch (err) {
+      toast({ title: t("placement.error_receipt", "Could not generate receipt"), description: err.message, variant: "destructive" });
+    }
+  };
+
   const renderStatusCards = () => {
     const renderCard = (app, origIdx) => {
       const jobRef = app.job || app.jobId || app.jobPosting || {};
@@ -443,6 +643,8 @@ const Placement = () => {
       const appliedAt = app.appliedAt || app.createdAt;
       const statusLabel = formatStatus(app.status || app.applicationStatus || 'applied', t);
       const jobRemoved = app.jobRemoved === true;
+      const recruiterNote = app.recruiterNote || app.note || app.declineReason || null;
+      const isInterviewStage = statusBucket(app.status || app.applicationStatus) === "interview";
       const appSource = app.jobSource || jobObj.sourceCollection || '';
       const isSmaartApp = jobObj.displaySource
         ? jobObj.displaySource === 'smaart'
@@ -478,7 +680,13 @@ const Placement = () => {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 title={title} className="line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white">{title}</h2>
+              <h2
+                title={title}
+                onClick={() => openApplicationJob(app)}
+                className={`line-clamp-2 text-[15px] font-semibold leading-[1.35] tracking-[-0.01em] text-[#072036] dark:text-white ${jobRemoved ? '' : 'cursor-pointer transition-colors hover:text-[#045C9A] dark:hover:text-[#A6D7E8]'}`}
+              >
+                {title}
+              </h2>
               <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">{companyName}</p>
             </div>
             {sourceLabel && (
@@ -523,28 +731,141 @@ const Placement = () => {
               </button>
             </div>
           ) : (
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-[#045C9A]/20">
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
-                <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
+            <div className="mt-5 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
+                  <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
+                  {recruiterNote && (
+                    <span className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-slate-500 dark:text-slate-400" title={recruiterNote}>
+                      {recruiterNote}
+                    </span>
+                  )}
+                </div>
+                {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
+                  <button
+                    onClick={() => openConfirm(app._id || app.id, title)}
+                    className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                  >
+                    {t("placement.withdraw", "Withdraw")}
+                  </button>
+                )}
               </div>
-              {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
+
+              {/* Secondary actions: timeline, open the posting, interview prep, receipt */}
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 <button
-                  onClick={() => openConfirm(app._id || app.id, title)}
-                  className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                  type="button"
+                  onClick={() => setTimelineApp(app)}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
                 >
-                  {t("placement.withdraw", "Withdraw")}
+                  <History className="h-3.5 w-3.5" stroke={1.8} />
+                  {t("placement.timeline", "Timeline")}
                 </button>
-              )}
+                {!jobRemoved && (
+                  <button
+                    type="button"
+                    onClick={() => openApplicationJob(app)}
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                  >
+                    <ArrowUpRight className="h-3.5 w-3.5" stroke={1.8} />
+                    {t("placement.view_role", "View role")}
+                  </button>
+                )}
+                {isInterviewStage && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/dashboard/interview-prep')}
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#0E2136] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                  >
+                    <Microphone className="h-3.5 w-3.5" stroke={1.8} />
+                    {t("placement.prepare_interview", "Prepare for interview")}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleDownloadReceipt(app)}
+                  title={t("placement.receipt", "Download application receipt")}
+                  className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-slate-600 transition-colors hover:border-[#045C9A]/40 hover:text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300 dark:hover:text-[#A6D7E8]"
+                >
+                  <Download className="h-3.5 w-3.5" stroke={1.8} />
+                  {t("placement.receipt_short", "Receipt")}
+                </button>
+              </div>
             </div>
           )}
         </motion.article>
       );
     };
+    const counts = appliedJobs.reduce(
+      (acc, a) => {
+        acc.total += 1;
+        acc[statusBucket(a.status || a.applicationStatus)] += 1;
+        return acc;
+      },
+      { total: 0, applied: 0, interview: 0, offer: 0, rejected: 0 }
+    );
+    const responded = counts.interview + counts.offer + counts.rejected;
+    const responseRate = counts.total ? Math.round((responded / counts.total) * 100) : 0;
+    const visible = statusFilter === "all"
+      ? appliedJobs
+      : appliedJobs.filter((a) => statusBucket(a.status || a.applicationStatus) === statusFilter);
+
+    const tiles = [
+      [t("placement.stat_applied", "Applied"), counts.total, "text-[#072036] dark:text-white"],
+      [t("placement.stat_interviews", "Interviews"), counts.interview, "text-amber-600 dark:text-amber-400"],
+      [t("placement.stat_offers", "Offers"), counts.offer, "text-emerald-600 dark:text-emerald-400"],
+      [t("placement.stat_response", "Response rate"), `${responseRate}%`, "text-[#045C9A] dark:text-[#A6D7E8]"],
+    ];
+    const chips = [
+      ["all", t("placement.filter_all", "All"), counts.total],
+      ["applied", t("placement.filter_applied", "Applied"), counts.applied],
+      ["interview", t("placement.filter_interview", "Interview"), counts.interview],
+      ["offer", t("placement.filter_offer", "Offer"), counts.offer],
+      ["rejected", t("placement.filter_rejected", "Rejected"), counts.rejected],
+    ];
+
     return (
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {appliedJobs.map((app, origIdx) => renderCard(app, origIdx))}
-      </div>
+      <>
+        {/* Summary strip -- same bordered stat-strip pattern as the CGPA result panel */}
+        <div className="mb-4 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-[#d7ebf5] bg-[#d7ebf5] dark:border-white/10 dark:bg-white/10 sm:grid-cols-4">
+          {tiles.map(([label, value, cls]) => (
+            <div key={label} className="bg-white px-4 py-3 dark:bg-[#0d3a5f]">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
+              <p className={`mt-1 text-lg font-extrabold ${cls}`}>{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Stage filter chips */}
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {chips.map(([key, label, n]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setStatusFilter(key)}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[12.5px] font-medium transition-colors ${
+                statusFilter === key
+                  ? 'border-[#045C9A] bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                  : 'border-[#d7ebf5] bg-white text-slate-600 hover:border-[#045C9A]/30 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-300 dark:hover:border-white/20'
+              }`}
+            >
+              {label}
+              <span className={`rounded-md px-1.5 text-[11px] font-semibold ${statusFilter === key ? 'bg-[#045C9A]/10 dark:bg-[#A6D7E8]/15' : 'bg-slate-100 dark:bg-white/10'}`}>{n}</span>
+            </button>
+          ))}
+        </div>
+
+        {visible.length === 0 ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("placement.no_apps_in_filter", "No applications in this stage yet.")}</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {visible.map((app, origIdx) => renderCard(app, origIdx))}
+          </div>
+        )}
+      </>
     );
   };
 
@@ -737,6 +1058,39 @@ const Placement = () => {
                   </select>
                   <ChevronRight className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 ${jobType !== 'all' ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-slate-400'}`} />
                 </div>
+
+                {/* Sort */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="h-10 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-slate-50/70 pl-3.5 pr-9 text-[13px] font-medium text-[#072036] outline-none transition-colors hover:border-slate-300 focus:border-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white sm:w-[158px]"
+                  >
+                    <option value="newest">{t("placement.sort_newest", "Newest first")}</option>
+                    <option value="deadline">{t("placement.sort_deadline", "Deadline soonest")}</option>
+                    <option value="match">{t("placement.sort_match", "Best match")}</option>
+                  </select>
+                  <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
+                </div>
+
+                {/* Saved only */}
+                <button
+                  type="button"
+                  onClick={() => setShowSavedOnly((v) => !v)}
+                  aria-pressed={showSavedOnly}
+                  title={t("placement.saved_only", "Show saved jobs only")}
+                  className={`flex h-10 items-center justify-center gap-1.5 rounded-lg border px-3.5 text-[13px] font-medium transition-colors ${
+                    showSavedOnly
+                      ? 'border-[#045C9A]/50 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A] dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                      : 'border-slate-200 bg-slate-50/70 text-[#072036] hover:border-slate-300 dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-white'
+                  }`}
+                >
+                  {showSavedOnly ? <BookmarkFilled className="h-4 w-4" stroke={1.8} /> : <Bookmark className="h-4 w-4" stroke={1.8} />}
+                  <span>{t("placement.saved", "Saved")}</span>
+                  {savedJobs.length > 0 && (
+                    <span className="rounded-md bg-[#045C9A]/10 px-1.5 text-[11px] font-semibold text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">{savedJobs.length}</span>
+                  )}
+                </button>
               </div>
             </div>
           )}
@@ -745,6 +1099,55 @@ const Placement = () => {
 
         {activeTab === 'jobs' && (
           <>
+            {!loading && recommendedJobs.length > 0 && !searchQuery && sourceFilter === 'all' && jobType === 'all' && workMode === 'all' && !showSavedOnly && (
+              <section className="mb-6">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" stroke={1.8} />
+                  <h2 className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#045C9A] dark:text-[#A6D7E8]">
+                    {t("placement.recommended", "Recommended for you")}
+                  </h2>
+                  <span className="text-[12px] text-slate-400 dark:text-slate-500">
+                    {t("placement.recommended_hint", "based on your skills and career path")}
+                  </span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {recommendedJobs.map(({ job, match }) => {
+                    const logo = getCompanyLogo(job);
+                    const initial = (job.displayCompany || "C").trim().charAt(0).toUpperCase();
+                    const pathHit = careerRoles.find((r) => roleMatchesTitle(r, job.displayTitle));
+                    return (
+                      <button
+                        key={`rec-${job.sourceCollection}-${job._id}`}
+                        type="button"
+                        onClick={() => navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } })}
+                        className="group flex items-center gap-3 rounded-xl border border-[#d7ebf5] bg-gradient-to-br from-[#EAF7FD] to-white p-3.5 text-left transition-colors hover:border-[#045C9A]/40 dark:border-[#045C9A]/30 dark:from-[#045C9A]/15 dark:to-[#0d3a5f]"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#d7ebf5] bg-white text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+                          {logo ? <img src={logo} alt="" className="h-full w-full object-contain p-1.5" /> : <span>{initial}</span>}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13.5px] font-semibold text-[#072036] dark:text-white">{job.displayTitle}</p>
+                          <p className="truncate text-[12px] text-slate-500 dark:text-slate-400">{job.displayCompany}</p>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {match != null && (
+                              <span className="rounded-md bg-white px-1.5 py-[2px] text-[10.5px] font-semibold text-[#045C9A] dark:bg-[#072036] dark:text-[#A6D7E8]">
+                                {match}% {t("placement.match", "match")}
+                              </span>
+                            )}
+                            {pathHit && (
+                              <span className="max-w-[160px] truncate rounded-md bg-white px-1.5 py-[2px] text-[10.5px] font-semibold text-[#045C9A] dark:bg-[#072036] dark:text-[#A6D7E8]">
+                                {pathHit}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-[#045C9A] transition-transform group-hover:translate-x-0.5 dark:text-[#A6D7E8]" stroke={2} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
             {loading ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
@@ -800,6 +1203,11 @@ const Placement = () => {
                   const posterIsCompany = postedBy && postedBy.trim().toLowerCase() === (job.displayCompany || '').trim().toLowerCase();
                   const postedByLabel = postedBy && !posterIsCompany ? postedBy : null;
                   const deadlineLabel = job.displayDeadline ? formatDate(job.displayDeadline, t) : null;
+                  const daysLeft = daysUntil(job.displayDeadline);
+                  const closingSoon = !isClosed && daysLeft != null && daysLeft >= 0 && daysLeft <= 3;
+                  const pathMatch = careerRoles.find((r) => roleMatchesTitle(r, job.displayTitle)) || null;
+                  const eligibility = evaluateEligibility(job, studentProfile);
+                  const saved = isJobSaved(job);
 
                   return (
                     <motion.article
@@ -836,6 +1244,19 @@ const Placement = () => {
                         </div>
 
                         <div className="mt-0.5 flex shrink-0 flex-col items-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => toggleSaveJob(e, job)}
+                            aria-pressed={saved}
+                            title={saved ? t("placement.unsave", "Remove from saved") : t("placement.save", "Save job")}
+                            className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
+                              saved
+                                ? 'text-[#045C9A] dark:text-[#A6D7E8]'
+                                : 'text-slate-300 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-500 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]'
+                            }`}
+                          >
+                            {saved ? <BookmarkFilled className="h-4 w-4" stroke={1.8} /> : <Bookmark className="h-4 w-4" stroke={1.8} />}
+                          </button>
                           <span
                             className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-[3px] text-[10.5px] font-medium tracking-[0.02em] ${
                               isClosed
@@ -889,6 +1310,44 @@ const Placement = () => {
                           </div>
                         )}
                       </div>
+
+                      {(closingSoon || eligibility || pathMatch) && (
+                        <div className="mt-3.5 flex flex-wrap gap-1.5">
+                          {closingSoon && (
+                            <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-[3px] text-[10.5px] font-semibold text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
+                              <Clock className="h-3 w-3" stroke={2} />
+                              {daysLeft === 0
+                                ? t("placement.closes_today", "Closes today")
+                                : t("placement.closes_in_days", { count: daysLeft, defaultValue: `Closes in ${daysLeft}d` })}
+                            </span>
+                          )}
+                          {eligibility && (
+                            <span
+                              title={eligibility.checks.map((c) => `${c.label}: ${c.detail}`).join(" · ")}
+                              className={`inline-flex items-center gap-1 rounded-md border px-2 py-[3px] text-[10.5px] font-semibold ${
+                                eligibility.status === "yes"
+                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                  : eligibility.status === "no"
+                                    ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400'
+                                    : 'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-300'
+                              }`}
+                            >
+                              {eligibility.status === "yes" ? <CircleCheck className="h-3 w-3" stroke={2} /> : <AlertCircle className="h-3 w-3" stroke={2} />}
+                              {eligibility.status === "yes"
+                                ? t("placement.eligible", "You're eligible")
+                                : eligibility.status === "no"
+                                  ? t("placement.not_eligible", { label: eligibility.failed[0].label, defaultValue: `Below: ${eligibility.failed[0].label}` })
+                                  : t("placement.eligibility_unknown", "Eligibility: complete your profile")}
+                            </span>
+                          )}
+                          {pathMatch && (
+                            <span className="inline-flex items-center gap-1 rounded-md border border-[#045C9A]/20 bg-[#EAF7FD] px-2 py-[3px] text-[10.5px] font-semibold text-[#045C9A] dark:border-[#045C9A]/40 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                              <TrendingUp className="h-3 w-3" stroke={2} />
+                              {t("placement.path_match", { role: pathMatch, defaultValue: `Matches your path: ${pathMatch}` })}
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {skills.length > 0 && (
                         <div className="mt-3.5 flex flex-wrap gap-1.5">
@@ -1089,13 +1548,10 @@ const Placement = () => {
 
                       <div className="mt-auto pt-4">
                         <button
-                          onClick={() => {
-                            setSearchQuery(partner.name);
-                            setActiveTab('jobs');
-                          }}
+                          onClick={() => setSelectedPartner(partner)}
                           className="flex h-9 w-full items-center justify-center gap-1 rounded-lg border border-slate-200 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
                         >
-                          {t("placement.view_jobs", "View Jobs")}
+                          {t("placement.view_profile", "View profile")}
                           <ChevronRight className="h-3.5 w-3.5" stroke={2} />
                         </button>
                       </div>
@@ -1138,6 +1594,7 @@ const Placement = () => {
                     (fair.bannerImage.startsWith('http') ? fair.bannerImage : `${getBackendUrl()}/${fair.bannerImage.replace(/^\/+/, "")}`) :
                     null;
                   const fairJobs = Array.isArray(fair.jobs) ? fair.jobs : [];
+                  const countdown = getFairCountdown(fair.startDate, fair.endDate, t);
 
                   return (
                     <motion.article
@@ -1204,22 +1661,61 @@ const Placement = () => {
                             </span>
                           </div>
                         )}
-                        {/* Roles and registration both live on the fair page, so the
-                            card carries a single action rather than competing buttons. */}
-                        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+                        {/* Countdown + registration state on the left; calendar,
+                            fair pass and the primary action on the right. Roles and
+                            registration themselves live on the fair page. */}
+                        <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
+                          {countdown && (
+                            <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10.5px] font-semibold ${
+                              countdown.tone === "live"
+                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                : countdown.tone === "soon"
+                                  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400'
+                                  : countdown.tone === "past"
+                                    ? 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'
+                                    : 'border-[#045C9A]/20 bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/40 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
+                            }`}>
+                              <Clock className="h-3 w-3" stroke={2} />
+                              {countdown.label}
+                            </span>
+                          )}
                           {isRegistered && (
                             <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#045C9A]/20 bg-[#EAF7FD] px-2 py-1 text-[10.5px] font-medium text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]">
                               <span className="h-1.5 w-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                               {t("placement.registered", "Registered")}
                             </span>
                           )}
-                          <button
-                            onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
-                            className="group/btn ml-auto flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
-                          >
-                            <span>{t("placement.view_fair", "View Fair")}</span>
-                            <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" stroke={2.2} />
-                          </button>
+                          <div className="ml-auto flex items-center gap-1.5">
+                            {countdown?.tone !== "past" && (
+                              <button
+                                type="button"
+                                onClick={() => downloadFairIcs(fair)}
+                                title={t("placement.add_to_calendar", "Add to calendar")}
+                                aria-label={t("placement.add_to_calendar", "Add to calendar")}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#d7ebf5] bg-white text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                              >
+                                <CalendarPlus className="h-4 w-4" stroke={1.8} />
+                              </button>
+                            )}
+                            {isRegistered && (
+                              <button
+                                type="button"
+                                onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
+                                title={t("placement.view_pass", "View digital fair pass")}
+                                aria-label={t("placement.view_pass", "View digital fair pass")}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#d7ebf5] bg-white text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                              >
+                                <Ticket className="h-4 w-4" stroke={1.8} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => navigate(`/dashboard/placement/job-fair/${fair._id}`)}
+                              className="group/btn flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                            >
+                              <span>{t("placement.view_fair", "View Fair")}</span>
+                              <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" stroke={2.2} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </motion.article>
@@ -1229,6 +1725,193 @@ const Placement = () => {
             )}
           </div>
         )}
+
+        {/* ── Application timeline drawer ─────────────────────────────── */}
+        {timelineApp &&
+          createPortal(
+            <div className="fixed inset-0 z-[100] flex justify-end bg-[#072036]/40 backdrop-blur-sm" onClick={() => setTimelineApp(null)}>
+              <motion.aside
+                initial={{ x: 40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+                onClick={(e) => e.stopPropagation()}
+                className="flex h-full w-full max-w-md flex-col overflow-hidden border-l border-[#d7ebf5] bg-white shadow-2xl dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
+              >
+                {(() => {
+                  const app = timelineApp;
+                  const title = app.jobTitle || app.job?.displayTitle || t("placement.role", "Role");
+                  const company = app.companyName || app.job?.displayCompany || t("placement.company", "Company");
+                  const points = buildStatusTimeline(app);
+                  const usingFallback = !(Array.isArray(app.statusHistory) && app.statusHistory.length > 0);
+                  return (
+                    <>
+                      <div className="flex items-start justify-between gap-3 border-b border-[#d7ebf5] p-5 dark:border-[#045C9A]/20">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                            <History className="h-5 w-5" stroke={1.8} />
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="text-[15px] font-bold text-[#072036] dark:text-white">{t("placement.application_timeline", "Application timeline")}</h2>
+                            <p className="truncate text-[12.5px] text-slate-500 dark:text-slate-400">{title} · {company}</p>
+                          </div>
+                        </div>
+                        <button onClick={() => setTimelineApp(null)} aria-label={t("placement.close", "Close")} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]">
+                          <X className="h-5 w-5" stroke={2} />
+                        </button>
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto p-5">
+                        <ol className="relative ml-2 border-l-2 border-[#d7ebf5] dark:border-[#045C9A]/30">
+                          {points.map((p, i) => {
+                            const isLast = i === points.length - 1;
+                            const bucket = statusBucket(p.status);
+                            const dot = bucket === "offer" ? 'bg-emerald-500' : bucket === "rejected" ? 'bg-rose-500' : bucket === "interview" ? 'bg-amber-500' : 'bg-[#045C9A] dark:bg-[#A6D7E8]';
+                            return (
+                              <li key={`${p.status}-${i}`} className="relative mb-6 pl-6 last:mb-0">
+                                <span className={`absolute -left-[9px] top-1 flex h-4 w-4 items-center justify-center rounded-full ring-4 ring-white dark:ring-[#0d3a5f] ${dot}`}>
+                                  {isLast && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                                </span>
+                                <p className={`text-[13.5px] font-semibold ${isLast ? getStatusTextColor(p.status) : 'text-[#072036] dark:text-white'}`}>{formatStatus(p.status, t)}</p>
+                                <p className="text-[12px] text-slate-500 dark:text-slate-400">
+                                  {p.changedAt
+                                    ? new Date(p.changedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+                                    : t("placement.date_unknown", "Date not recorded")}
+                                </p>
+                                {p.note && (
+                                  <p className="mt-1.5 rounded-lg border border-[#d7ebf5] bg-[#F1F5F9] px-3 py-2 text-[12.5px] leading-relaxed text-slate-600 dark:border-white/10 dark:bg-[#072036] dark:text-slate-300">{p.note}</p>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ol>
+                        {usingFallback && (
+                          <p className="mt-6 rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] p-3 text-[12px] leading-relaxed text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10 dark:text-[#A6D7E8]">
+                            {t("placement.timeline_fallback", "Stage-by-stage history is recorded from your next status change onward. Until then this shows when you applied and the current stage.")}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 border-t border-[#d7ebf5] p-4 dark:border-[#045C9A]/20">
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadReceipt(app)}
+                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-3.5 text-[13px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                        >
+                          <Download className="h-4 w-4" stroke={1.8} />
+                          {t("placement.receipt_short", "Receipt")}
+                        </button>
+                        {!app.jobRemoved && (
+                          <button
+                            type="button"
+                            onClick={() => { setTimelineApp(null); openApplicationJob(app); }}
+                            className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                          >
+                            {t("placement.view_role", "View role")}
+                            <ChevronRight className="h-4 w-4" stroke={2} />
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </motion.aside>
+            </div>,
+            document.body
+          )}
+
+        {/* ── Partner profile drawer ─────────────────────────────────── */}
+        {selectedPartner &&
+          createPortal(
+            <div className="fixed inset-0 z-[100] flex justify-end bg-[#072036]/40 backdrop-blur-sm" onClick={() => setSelectedPartner(null)}>
+              <motion.aside
+                initial={{ x: 40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+                onClick={(e) => e.stopPropagation()}
+                className="flex h-full w-full max-w-md flex-col overflow-hidden border-l border-[#d7ebf5] bg-white shadow-2xl dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
+              >
+                {(() => {
+                  const partner = selectedPartner;
+                  const isSmaart = partner.partnerType === 'smaart';
+                  const initial = (partner.name || "C").trim().charAt(0).toUpperCase();
+                  const logo = partner.logo
+                    ? (partner.logo.startsWith('http') || partner.logo.startsWith('data:') ? partner.logo : `${getBackendUrl()}/${partner.logo.replace(/^\/+/, '')}`)
+                    : null;
+                  const website = partner.website ? (partner.website.startsWith('http') ? partner.website : `https://${partner.website}`) : null;
+                  const key = normalizeText(partner.name);
+                  const openRoles = jobs.filter((j) => key && normalizeText(j.displayCompany) === key && !String(j.displayStatus || '').toLowerCase().includes('closed'));
+                  return (
+                    <>
+                      <div className="flex items-start justify-between gap-3 border-b border-[#d7ebf5] p-5 dark:border-[#045C9A]/20">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#d7ebf5] bg-[#EAF7FD] text-base font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
+                            {logo ? <img src={logo} alt="" className="h-full w-full object-contain p-2" /> : <span>{initial}</span>}
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="truncate text-[16px] font-bold text-[#072036] dark:text-white">{partner.name}</h2>
+                            <span className={`mt-1 inline-flex rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${isSmaart ? 'bg-[#072036] text-white dark:bg-[#045C9A]' : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'}`}>
+                              {isSmaart ? t("placement.smaart_partner", "SMAART Partner") : t("placement.college_partner", "College Partner")}
+                            </span>
+                          </div>
+                        </div>
+                        <button onClick={() => setSelectedPartner(null)} aria-label={t("placement.close", "Close")} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#072036]">
+                          <X className="h-5 w-5" stroke={2} />
+                        </button>
+                      </div>
+
+                      <div className="flex-1 space-y-5 overflow-y-auto p-5">
+                        {website && (
+                          <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#045C9A] hover:underline dark:text-[#A6D7E8]">
+                            <ExternalLink className="h-4 w-4" stroke={1.8} />
+                            {website.replace(/^https?:\/\//i, '')}
+                          </a>
+                        )}
+
+                        <div>
+                          <p className="mb-2 text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("placement.about_company", "About the Company")}</p>
+                          <p className="rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-3.5 text-[13px] leading-relaxed text-slate-600 dark:border-white/10 dark:bg-[#072036] dark:text-slate-300">
+                            {partner.description || t("placement.no_company_info", "Company information has not been added yet.")}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="mb-2 text-[10.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            {t("placement.open_roles_count", { count: openRoles.length, defaultValue: `Open roles (${openRoles.length})` })}
+                          </p>
+                          {openRoles.length === 0 ? (
+                            <p className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-[12.5px] text-slate-500 dark:border-[#045C9A]/30 dark:text-slate-400">
+                              {t("placement.no_open_roles", "No open roles from this company right now.")}
+                            </p>
+                          ) : (
+                            <ul className="overflow-hidden rounded-xl border border-[#d7ebf5] dark:border-white/10">
+                              {openRoles.map((job, i) => (
+                                <li key={`${job.sourceCollection}-${job._id}`}>
+                                  <button
+                                    type="button"
+                                    onClick={() => { setSelectedPartner(null); navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } }); }}
+                                    className={`group flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-[#F1F5F9] dark:hover:bg-white/5 ${i !== openRoles.length - 1 ? 'border-b border-[#d7ebf5] dark:border-white/10' : ''}`}
+                                  >
+                                    <div className="min-w-0 flex-1">
+                                      <p className="truncate text-[13.5px] font-semibold text-[#072036] dark:text-white">{job.displayTitle}</p>
+                                      <p className="truncate text-[12px] text-slate-500 dark:text-slate-400">
+                                        {job.displayType}{job.displayLocation ? ` · ${job.displayLocation}` : ''}{job.displayDeadline ? ` · ${t("placement.apply_by", "Apply by")} ${formatDate(job.displayDeadline, t)}` : ''}
+                                      </p>
+                                    </div>
+                                    <ChevronRight className="h-4 w-4 shrink-0 text-[#045C9A] transition-transform group-hover:translate-x-0.5 dark:text-[#A6D7E8]" stroke={2} />
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </motion.aside>
+            </div>,
+            document.body
+          )}
 
         {confirmOpen &&
           createPortal(
