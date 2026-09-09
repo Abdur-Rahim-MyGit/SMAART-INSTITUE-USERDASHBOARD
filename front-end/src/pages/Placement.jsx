@@ -1742,7 +1742,7 @@ const Placement = () => {
                   const title = app.jobTitle || app.job?.displayTitle || t("placement.role", "Role");
                   const company = app.companyName || app.job?.displayCompany || t("placement.company", "Company");
                   const points = buildStatusTimeline(app);
-                  const usingFallback = !(Array.isArray(app.statusHistory) && app.statusHistory.length > 0);
+                  const usingFallback = points.some((p) => p.synthesized) || !(Array.isArray(app.statusHistory) && app.statusHistory.length > 0);
                   return (
                     <>
                       <div className="flex items-start justify-between gap-3 border-b border-[#d7ebf5] p-5 dark:border-[#045C9A]/20">

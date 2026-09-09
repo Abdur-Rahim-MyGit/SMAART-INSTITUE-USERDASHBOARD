@@ -25,10 +25,22 @@ import {
   IconWand as Wand,
   IconX as X,
   IconGift as Gift,
-  IconFileDescription as FileDescription
+  IconFileDescription as FileDescription,
+  IconShare as Share,
+  IconAlertCircle as AlertCircle,
+  IconCircleCheck as CircleCheck,
+  IconSparkles as Sparkles,
+  IconArrowUpRight as ArrowUpRight
 } from "@tabler/icons-react";
 import { getBackendUrl, placementsAPI } from "@/services/api";
-import { usersAPI } from "@/services/api";
+import { usersAPI, apiCall } from "@/services/api";
+import {
+  evaluateEligibility,
+  extractStudentProfile,
+  daysUntil,
+  getMatchScore,
+  normalizeText,
+} from "@/services/placementEligibility";
 import ResumeBuilder from '@/pages/AICareerCoach/ResumeBuilder';
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -186,6 +198,22 @@ const PlacementDetail = () => {
   const [withdrewConfirmOpen, setWithdrewConfirmOpen] = useState(false);
   const [withdrewPending, setWithdrewPending] = useState(false);
   const [isBacklogReadOnly, setIsBacklogReadOnly] = useState(false);
+
+  // Eligibility auto-check needs the student's saved CGPA + profile
+  // backlogs/branch; "Similar roles" needs the open postings. Both are
+  // best-effort -- if either fails, those sections simply don't render.
+  const [studentProfile, setStudentProfile] = useState(null);
+  const [allJobs, setAllJobs] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    Promise.all([usersAPI.getProfile().catch(() => null), apiCall("/cgpa").catch(() => null)])
+      .then(([me, cg]) => { if (alive) setStudentProfile(extractStudentProfile(me, cg)); })
+      .catch(() => {});
+    placementsAPI.getJobs({ limit: 150 })
+      .then((r) => { if (alive) setAllJobs(Array.isArray(r?.data) ? r.data : []); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
   
   const [eSignature, setESignature] = useState('');
   const [offerPending, setOfferPending] = useState(false);
@@ -400,6 +428,48 @@ const PlacementDetail = () => {
     
     return list.length > 0 ? list : null;
   }, [job, t]);
+
+  const eligibilityCheck = useMemo(() => evaluateEligibility(job, studentProfile), [job, studentProfile]);
+  const closingIn = useMemo(() => daysUntil(job?.displayDeadline), [job]);
+
+  // Similar roles: shared skills weigh most, then same company, then same type.
+  const similarJobs = useMemo(() => {
+    if (!job || !allJobs.length) return [];
+    const mySkills = new Set(getSkills(job).map((s) => normalizeText(s)));
+    const myCompany = normalizeText(job.displayCompany);
+    const myType = normalizeText(job.displayType);
+    return allJobs
+      .filter((j) => String(j._id) !== String(job._id) && !String(j.displayStatus || "").toLowerCase().includes("closed"))
+      .map((j) => {
+        let score = 0;
+        getSkills(j).forEach((s) => { if (mySkills.has(normalizeText(s))) score += 2; });
+        if (myCompany && normalizeText(j.displayCompany) === myCompany) score += 1.5;
+        if (myType && normalizeText(j.displayType) === myType) score += 0.5;
+        return { j, score };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map((x) => x.j);
+  }, [job, allJobs]);
+
+  // Native share sheet where available (mobile), clipboard everywhere else.
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = job?.displayTitle ? `${job.displayTitle} · ${job.displayCompany}` : "Job posting";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast({ title: t("placement.link_copied", "Link copied"), description: t("placement.link_copied_desc", "Share it with a friend who'd be a good fit.") });
+    } catch (err) {
+      if (err?.name !== "AbortError") {
+        toast({ title: t("placement.share_failed", "Could not share"), description: err.message, variant: "destructive" });
+      }
+    }
+  };
 
   const updateApplicationField = (field, value) => {
     setApplicationForm((prev) => ({ ...prev, [field]: value }));
@@ -720,6 +790,14 @@ ${applicationForm.fullName || "Your Name"}`;
                     <span className="h-1.5 w-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                     {statusLabel}
                   </span>
+                  {closingIn != null && closingIn >= 0 && closingIn <= 3 && (
+                    <span className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[11.5px] font-semibold text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
+                      <Clock className="h-3.5 w-3.5" stroke={2} />
+                      {closingIn === 0
+                        ? t("placement.closes_today", "Closes today")
+                        : t("placement.closes_in_days", { count: closingIn, defaultValue: `Closes in ${closingIn}d` })}
+                    </span>
+                  )}
                   <span className={`flex h-9 items-center justify-center rounded-lg px-3 text-[11.5px] font-semibold uppercase tracking-[0.05em] ${
                     isSmaartSource
                       ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
@@ -728,6 +806,14 @@ ${applicationForm.fullName || "Your Name"}`;
                     {isSmaartSource ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College")}
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f] sm:w-auto"
+                >
+                  <Share className="h-3.5 w-3.5" stroke={1.8} />
+                  {t("placement.share", "Share")}
+                </button>
                 {documentUrl && (
                   <a
                     href={documentUrl}
@@ -910,6 +996,58 @@ ${applicationForm.fullName || "Your Name"}`;
 
           <div className="grid gap-6 p-6 lg:grid-cols-[1.3fr_0.7fr]">
             <section className="space-y-7">
+              {/* ── Eligibility auto-check ─────────────────────────────── */}
+              {eligibilityCheck && (
+                <div className={`rounded-xl border p-4 ${
+                  eligibilityCheck.status === "yes"
+                    ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-500/30 dark:bg-emerald-500/10'
+                    : eligibilityCheck.status === "no"
+                      ? 'border-rose-200 bg-rose-50/60 dark:border-rose-500/30 dark:bg-rose-500/10'
+                      : 'border-[#d7ebf5] bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/10'
+                }`}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className={`flex items-center gap-2 text-[14px] font-semibold ${
+                      eligibilityCheck.status === "yes"
+                        ? 'text-emerald-800 dark:text-emerald-300'
+                        : eligibilityCheck.status === "no"
+                          ? 'text-rose-800 dark:text-rose-300'
+                          : 'text-[#045C9A] dark:text-[#A6D7E8]'
+                    }`}>
+                      {eligibilityCheck.status === "yes"
+                        ? <ShieldCheck stroke={1.8} className="h-[18px] w-[18px]" />
+                        : <AlertCircle stroke={1.8} className="h-[18px] w-[18px]" />}
+                      {eligibilityCheck.status === "yes"
+                        ? t("placement.eligible_full", "You meet the eligibility criteria")
+                        : eligibilityCheck.status === "no"
+                          ? t("placement.not_eligible_full", "You don't meet all the criteria yet")
+                          : t("placement.eligibility_unknown_full", "Complete your profile to verify eligibility")}
+                    </h2>
+                    {eligibilityCheck.unknown.some((c) => c.key === "cgpa") && (
+                      <button
+                        type="button"
+                        onClick={() => navigate('/dashboard/cgpa-calculator')}
+                        className="text-[12px] font-semibold text-[#045C9A] hover:underline dark:text-[#A6D7E8]"
+                      >
+                        {t("placement.update_cgpa", "Save your CGPA →")}
+                      </button>
+                    )}
+                  </div>
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {eligibilityCheck.checks.map((c) => (
+                      <li key={c.key} className="flex items-start gap-2 rounded-lg border border-white/70 bg-white/70 px-3 py-2 text-[12.5px] dark:border-white/10 dark:bg-[#0d3a5f]/60">
+                        {c.ok === true
+                          ? <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" stroke={2} />
+                          : <AlertCircle className={`mt-0.5 h-4 w-4 shrink-0 ${c.ok === false ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'}`} stroke={2} />}
+                        <div className="min-w-0">
+                          <p className="font-semibold text-[#072036] dark:text-white">{c.label}</p>
+                          <p className="text-slate-500 dark:text-slate-400">{c.detail}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div>
                 <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
                   <FileDescription stroke={1.7} className="h-[18px] w-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
@@ -1005,6 +1143,20 @@ ${applicationForm.fullName || "Your Name"}`;
                     </div>
                   ))}
                 </div>
+                {/* Postings carry no recruiter email/phone in the data model;
+                    the external application page is the only contact-style
+                    link available, so surface it when present. */}
+                {job.displayApplyUrl && (
+                  <a
+                    href={job.displayApplyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-3 py-2 text-[12.5px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" stroke={1.8} />
+                    {t("placement.external_apply", "Company application page")}
+                  </a>
+                )}
               </div>
 
               {skills.length > 0 && (
@@ -1119,6 +1271,14 @@ ${applicationForm.fullName || "Your Name"}`;
                                 <span className="text-[12.5px] font-bold text-slate-600 dark:text-slate-300">Level {stdLvl}</span>
                               </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => navigate('/dashboard/skills-vault')}
+                              className="mt-3 inline-flex h-8 w-fit items-center gap-1.5 rounded-lg bg-[#0E2136] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+                            >
+                              <ArrowUpRight className="h-3.5 w-3.5" stroke={2} />
+                              {t("placement.start_learning", "Start learning")}
+                            </button>
                           </div>
                         );
                       })}
@@ -1126,6 +1286,50 @@ ${applicationForm.fullName || "Your Name"}`;
                     <p className="mt-4 text-[11px] italic text-[#045C9A]/70 dark:text-[#A6D7E8]/70">
                       *Reflects verified skills only. Your application will still be reviewed.
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Similar roles ────────────────────────────────────── */}
+              {similarJobs.length > 0 && (
+                <div>
+                  <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-[-0.01em] text-[#072036] dark:text-white">
+                    <Sparkles stroke={1.7} className="h-[18px] w-[18px] text-[#045C9A] dark:text-[#A6D7E8]" />
+                    {t("placement.similar_roles", "Similar roles")}
+                  </h2>
+                  <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">
+                    {t("placement.similar_roles_hint", "Other open postings that overlap with this one.")}
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {similarJobs.map((j) => {
+                      const logo = getCompanyLogo(j);
+                      const initial = (j.displayCompany || "C").trim().charAt(0).toUpperCase();
+                      const match = getMatchScore(j, getSkills(j).length);
+                      return (
+                        <button
+                          key={`${j.sourceCollection}-${j._id}`}
+                          type="button"
+                          onClick={() => navigate(`/dashboard/placement/${j.sourceCollection}/${j._id}`, { state: { job: j } })}
+                          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
+                        >
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+                            {logo ? <img src={logo} alt="" className="h-full w-full object-contain p-1.5" /> : <span>{initial}</span>}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13.5px] font-semibold text-[#072036] dark:text-white">{j.displayTitle}</p>
+                            <p className="truncate text-[12px] text-slate-500 dark:text-slate-400">
+                              {j.displayCompany}{j.displayLocation ? ` · ${j.displayLocation}` : ''}
+                            </p>
+                            {match != null && (
+                              <span className="mt-1 inline-block rounded-md bg-white px-1.5 py-[2px] text-[10.5px] font-semibold text-[#045C9A] dark:bg-[#072036] dark:text-[#A6D7E8]">
+                                {match}% {t("placement.match", "match")}
+                              </span>
+                            )}
+                          </div>
+                          <ArrowUpRight className="h-4 w-4 shrink-0 text-[#045C9A] transition-transform group-hover:translate-x-0.5 dark:text-[#A6D7E8]" stroke={2} />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

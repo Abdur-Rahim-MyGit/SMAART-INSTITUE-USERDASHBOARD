@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { FinalCareerPathwayModel, SkillProgressModel } = require('../models/careerAgentModels');
 const { runModeration, FLAG_SEVERITY } = require('../utils/jobModerationEngine');
+const { createNotification } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -793,6 +794,9 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
       appliedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      // Stage-by-stage history; every status change appends here so the
+      // student's timeline has a dated entry per stage.
+      statusHistory: [{ status: 'applied', changedAt: new Date(), note: null, changedBy: 'student' }],
     };
 
     if (!application.studentName || !application.studentEmail || !application.studentMobile || application.activeBacklog === null || application.activeBacklog === undefined) {
@@ -823,6 +827,19 @@ router.post('/jobs/:source/:id/apply', protect, uploadRegistration.single('resum
 });
 
 // List placement applications for current user (or admins) filtered by job/jobSource
+// Applications written before statusHistory existed get a synthesised
+// two-point history (applied at / current status) so the client can always
+// render a timeline. Entries are flagged so the UI can say so.
+const withStatusHistory = (app) => {
+  if (Array.isArray(app.statusHistory) && app.statusHistory.length > 0) return app;
+  const history = [{ status: 'applied', changedAt: app.appliedAt || app.createdAt || null, note: null, synthesized: true }];
+  const current = app.status || 'applied';
+  if (String(current).toLowerCase() !== 'applied') {
+    history.push({ status: current, changedAt: app.updatedAt || null, note: app.declineReason || null, synthesized: true });
+  }
+  return { ...app, statusHistory: history };
+};
+
 router.get('/applications', protect, async (req, res) => {
   try {
     const { job, jobSource } = req.query;
@@ -893,7 +910,8 @@ router.get('/applications', protect, async (req, res) => {
       });
     }
 
-    const data = docs.map((app) => {
+    const data = docs.map((rawApp) => {
+      const app = withStatusHistory(rawApp);
       const src = app.jobSource || 'jobpostings';
       const resolved = jobsBySource.get(src)?.get(getId(app.job)) || null;
       if (resolved) return { ...app, job: resolved, jobRemoved: false };
@@ -914,6 +932,65 @@ router.get('/applications', protect, async (req, res) => {
 });
 
 // Delete (withdraw) a placement application
+// Recruiter / college / admin: move an application to a new stage.
+// Appends to statusHistory (the source for the student's timeline) and
+// notifies the student. Students cannot call this -- they respond to offers
+// via /applications/:id/respond-offer.
+router.patch('/applications/:id/status', protect, async (req, res) => {
+  try {
+    if (!req.user || req.user.role === 'student') {
+      return res.status(403).json({ success: false, error: 'Students cannot change application status' });
+    }
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid application id' });
+    }
+    const status = String(req.body?.status || '').trim();
+    const note = req.body?.note != null ? String(req.body.note).trim().slice(0, 500) : '';
+    if (!status || status.length > 60) {
+      return res.status(400).json({ success: false, error: 'A status (max 60 characters) is required' });
+    }
+
+    const applicationCollection = mongoose.connection.db.collection('placementapplications');
+    const appId = new mongoose.Types.ObjectId(id);
+    const existing = await applicationCollection.findOne({ _id: appId });
+    if (!existing) return res.status(404).json({ success: false, error: 'Application not found' });
+
+    // College-scoped staff may only touch their own college's applications.
+    const userCollege = req.user.college?._id || req.user.college;
+    if (req.user.role !== 'admin' && userCollege && existing.college && String(existing.college) !== String(userCollege)) {
+      return res.status(403).json({ success: false, error: 'Not authorized to modify this application' });
+    }
+
+    const now = new Date();
+    const entry = { status, changedAt: now, note: note || null, changedBy: req.user.role || 'staff', changedById: req.user._id };
+    const statusHistory = [...withStatusHistory(existing).statusHistory, entry];
+    const $set = { status, updatedAt: now, statusHistory };
+    if (note) $set.recruiterNote = note;
+    await applicationCollection.updateOne({ _id: appId }, { $set });
+
+    // Notify the student -- best-effort, never fails the request.
+    try {
+      const s = status.toLowerCase();
+      const type = /offer|accept|hired|select/.test(s) ? 'success' : /reject|declin/.test(s) ? 'warning' : 'info';
+      await createNotification({
+        userId: existing.student,
+        type,
+        title: `Application update: ${existing.jobTitle || 'your application'}`.slice(0, 100),
+        message: `${existing.companyName ? `${existing.companyName} — ` : ''}status changed to "${status}".${note ? ` ${note}` : ''}`.slice(0, 500),
+        link: '/dashboard/placement',
+      });
+    } catch (notifyErr) {
+      console.warn('[Placements] status notification failed:', notifyErr.message);
+    }
+
+    res.json({ success: true, data: { status, statusHistoryEntry: entry } });
+  } catch (err) {
+    console.error('[Placements] status update error:', err);
+    res.status(500).json({ success: false, error: 'Failed to update application status' });
+  }
+});
+
 router.delete('/applications/:applicationId', protect, async (req, res) => {
   try {
     const { applicationId } = req.params;
@@ -1386,6 +1463,13 @@ router.post('/applications/:id/respond-offer', protect, async (req, res) => {
     } else if (status === 'Declined' && declineReason) {
         updateData.declineReason = declineReason.trim();
     }
+
+    // Append to the stage history (seeding it first for pre-history docs)
+    // so the student's timeline shows the offer response as its own step.
+    updateData.statusHistory = [
+      ...withStatusHistory(existing).statusHistory,
+      { status, changedAt: updateData.updatedAt, note: updateData.declineReason || null, changedBy: 'student' },
+    ];
 
     await applicationCollection.updateOne(
         { _id: new mongoose.Types.ObjectId(id) },
