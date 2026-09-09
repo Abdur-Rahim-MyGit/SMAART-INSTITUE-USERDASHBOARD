@@ -190,6 +190,20 @@ const statusBucket = (status) => {
   return "applied";
 };
 
+// Pill colours per stage bucket -- the one place the status tab reads colour from.
+const STATUS_CHIP_CLASS = {
+  applied: "border-[#045C9A]/20 bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/30 dark:bg-[#045C9A]/25 dark:text-[#A6D7E8]",
+  interview: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400",
+  offer: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400",
+  rejected: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400",
+};
+const STATUS_DOT_CLASS = {
+  applied: "bg-[#045C9A] dark:bg-[#A6D7E8]",
+  interview: "bg-amber-500",
+  offer: "bg-emerald-500",
+  rejected: "bg-rose-500",
+};
+
 // Prefer the server's statusHistory; otherwise synthesise the two points we
 // can prove from existing fields so older applications still get a timeline.
 const buildStatusTimeline = (app) => {
@@ -662,6 +676,11 @@ const Placement = () => {
 
       // card key
       const cardId = app._id || app.id || origIdx;
+      const bucket = statusBucket(app.status || app.applicationStatus);
+      const canWithdraw = !['Accepted', 'Declined', 'Hired'].includes(app.status);
+      const hasOfferLetter = app.status === 'Offer' && !!app.offeredPackage;
+      const ghostBtn = "inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20";
+      const primaryBtn = "inline-flex h-8 items-center gap-1.5 rounded-md bg-[#0E2136] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white";
       return (
         <motion.article
           key={cardId}
@@ -670,9 +689,26 @@ const Placement = () => {
           transition={{ delay: Math.min(origIdx * 0.03, 0.3) }}
           className="relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60"
         >
+          {/* Eyebrow: source on the left, stage pill on the right */}
+          <div className="flex items-center justify-between gap-2">
+            {sourceLabel ? (
+              <span className={`inline-flex shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                isSmaartApp
+                  ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                  : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+              }`}>
+                {sourceLabel}
+              </span>
+            ) : <span />}
+            <span className={`inline-flex max-w-[60%] items-center gap-1.5 rounded-md border px-2 py-[3px] text-[11px] font-semibold ${STATUS_CHIP_CLASS[bucket]}`}>
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT_CLASS[bucket]}`} />
+              <span className="truncate">{statusLabel}</span>
+            </span>
+          </div>
+
           {/* Header: logo + title + company */}
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+          <div className="mt-3 flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-[14px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#072036] dark:text-[#A6D7E8]">
               {companyLogo ? (
                 <img src={companyLogo} alt={`${companyName} logo`} className="h-full w-full object-contain p-1.5" />
               ) : (
@@ -687,113 +723,86 @@ const Placement = () => {
               >
                 {title}
               </h2>
-              <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">{companyName}</p>
+              <p className="mt-0.5 truncate text-[13px] leading-snug text-slate-500 dark:text-slate-400">{companyName}</p>
             </div>
-            {sourceLabel && (
-              <span className={`mt-0.5 shrink-0 rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
-                isSmaartApp
-                  ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
-                  : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
-              }`}>
-                {sourceLabel}
-              </span>
-            )}
           </div>
-          <div className="mt-4 grow space-y-[7px] text-[13px] leading-tight text-slate-600 dark:text-slate-300">
-            {displayType && (
-              <div className="flex items-center gap-2">
-                <Briefcase className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-                <span className="truncate">{displayType}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
-              <span className="truncate">{t("placement.applied", "Applied")} {formatDate(appliedAt, t)}</span>
-            </div>
-            {jobRemoved && (
-              <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                <Building className="h-[15px] w-[15px] shrink-0" stroke={1.6} />
-                <span className="truncate">{t("placement.posting_removed", "Posting no longer listed")}</span>
-              </div>
-            )}
-          </div>
-          {app.status === 'Offer' && app.offeredPackage ? (
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-emerald-600 dark:text-emerald-400">{t("placement.offer_received", "Offer Received 🎉")}</span>
-                <span className="truncate text-[13.5px] font-semibold text-emerald-700 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</span>
+
+          {/* One-line meta */}
+          <p className="mt-3 flex min-w-0 items-center gap-1.5 text-[12.5px] text-slate-500 dark:text-slate-400">
+            <CalendarDue className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
+            <span className="truncate">
+              {displayType && <span className="font-medium text-slate-600 dark:text-slate-300">{displayType}</span>}
+              {displayType && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
+              {t("placement.applied", "Applied")} {formatDate(appliedAt, t)}
+            </span>
+          </p>
+          {jobRemoved && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-500">
+              <Building className="h-[15px] w-[15px] shrink-0" stroke={1.6} />
+              <span className="truncate">{t("placement.posting_removed", "Posting no longer listed")}</span>
+            </p>
+          )}
+
+          {/* Recruiter note / offer banner */}
+          {hasOfferLetter ? (
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/30 dark:bg-emerald-500/10">
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-semibold uppercase tracking-[0.07em] text-emerald-600 dark:text-emerald-400">{t("placement.offer_received", "Offer received")}</p>
+                <p className="truncate text-[13px] font-semibold text-emerald-800 dark:text-emerald-300">{t("placement.congratulations", "Congratulations!")}</p>
               </div>
               <button
                 onClick={() => setOfferModalApp(app)}
-                className="h-8 shrink-0 rounded-lg bg-emerald-600 px-3.5 text-[12.5px] font-medium text-white transition-colors hover:bg-emerald-700"
+                className="h-8 shrink-0 rounded-md bg-emerald-600 px-3 text-[12px] font-medium text-white transition-colors hover:bg-emerald-700"
               >
-                {t("placement.view_offer_letter", "View Offer Letter")}
+                {t("placement.view_offer_letter", "View offer letter")}
               </button>
             </div>
-          ) : (
-            <div className="mt-5 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-slate-400">{t("placement.status_label", "Status")}</span>
-                  <span className={`truncate text-[13.5px] font-semibold ${getStatusTextColor(app.status || app.applicationStatus || 'applied')}`}>{statusLabel}</span>
-                  {recruiterNote && (
-                    <span className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-slate-500 dark:text-slate-400" title={recruiterNote}>
-                      {recruiterNote}
-                    </span>
-                  )}
-                </div>
-                {!['Accepted', 'Declined', 'Hired'].includes(app.status) && (
-                  <button
-                    onClick={() => openConfirm(app._id || app.id, title)}
-                    className="h-9 shrink-0 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-                  >
-                    {t("placement.withdraw", "Withdraw")}
-                  </button>
-                )}
-              </div>
+          ) : recruiterNote ? (
+            <p
+              title={recruiterNote}
+              className="mt-3 line-clamp-2 rounded-lg border border-[#d7ebf5] bg-[#F8FBFD] px-3 py-2 text-[12px] leading-snug text-slate-600 dark:border-[#045C9A]/25 dark:bg-[#072036]/40 dark:text-slate-300"
+            >
+              {recruiterNote}
+            </p>
+          ) : null}
 
-              {/* Secondary actions: timeline, open the posting, interview prep, receipt */}
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setTimelineApp(app)}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
-                >
-                  <History className="h-3.5 w-3.5" stroke={1.8} />
-                  {t("placement.timeline", "Timeline")}
-                </button>
-                {!jobRemoved && (
-                  <button
-                    type="button"
-                    onClick={() => openApplicationJob(app)}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-[#045C9A] transition-colors hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-[#A6D7E8] dark:hover:bg-[#045C9A]/20"
-                  >
-                    <ArrowUpRight className="h-3.5 w-3.5" stroke={1.8} />
-                    {t("placement.view_role", "View role")}
-                  </button>
-                )}
-                {isInterviewStage && (
-                  <button
-                    type="button"
-                    onClick={() => navigate('/dashboard/interview-prep')}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#0E2136] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
-                  >
-                    <Microphone className="h-3.5 w-3.5" stroke={1.8} />
-                    {t("placement.prepare_interview", "Prepare for interview")}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleDownloadReceipt(app)}
-                  title={t("placement.receipt", "Download application receipt")}
-                  className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#d7ebf5] bg-white px-2.5 text-[12px] font-medium text-slate-600 transition-colors hover:border-[#045C9A]/40 hover:text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300 dark:hover:text-[#A6D7E8]"
-                >
-                  <Download className="h-3.5 w-3.5" stroke={1.8} />
-                  {t("placement.receipt_short", "Receipt")}
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Actions */}
+          <div className="mt-4 flex items-center gap-1.5 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
+            {isInterviewStage ? (
+              <button type="button" onClick={() => navigate('/dashboard/interview-prep')} className={primaryBtn}>
+                <Microphone className="h-3.5 w-3.5" stroke={1.8} />
+                {t("placement.prepare_interview", "Prepare")}
+              </button>
+            ) : null}
+            <button type="button" onClick={() => setTimelineApp(app)} className={ghostBtn}>
+              <History className="h-3.5 w-3.5" stroke={1.8} />
+              {t("placement.timeline", "Timeline")}
+            </button>
+            {!jobRemoved && !isInterviewStage && (
+              <button type="button" onClick={() => openApplicationJob(app)} className={ghostBtn}>
+                <ArrowUpRight className="h-3.5 w-3.5" stroke={1.8} />
+                {t("placement.view_role", "View role")}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => handleDownloadReceipt(app)}
+              title={t("placement.receipt", "Download application receipt")}
+              aria-label={t("placement.receipt", "Download application receipt")}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#d7ebf5] bg-white text-slate-500 transition-colors hover:border-[#045C9A]/40 hover:text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300 dark:hover:text-[#A6D7E8]"
+            >
+              <Download className="h-3.5 w-3.5" stroke={1.8} />
+            </button>
+            {canWithdraw && (
+              <button
+                type="button"
+                onClick={() => openConfirm(app._id || app.id, title)}
+                className="ml-auto inline-flex h-8 items-center rounded-md px-2 text-[12px] font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              >
+                {t("placement.withdraw", "Withdraw")}
+              </button>
+            )}
+          </div>
         </motion.article>
       );
     };
@@ -861,7 +870,7 @@ const Placement = () => {
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("placement.no_apps_in_filter", "No applications in this stage yet.")}</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             {visible.map((app, origIdx) => renderCard(app, origIdx))}
           </div>
         )}
@@ -1165,7 +1174,7 @@ const Placement = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {filteredJobs.map((job, index) => {
                   const skills = getSkills(job);
                   const companyLogo = getCompanyLogo(job);
@@ -1215,7 +1224,7 @@ const Placement = () => {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                      className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
+                      className={`group relative flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
                     >
                       {/* Eyebrow: source + status on the left, bookmark on the right */}
                       <div className="flex items-center justify-between gap-2">
@@ -1373,7 +1382,7 @@ const Placement = () => {
                       )}
 
                       {/* Footer */}
-                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
+                      <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
                         <p className="min-w-0 truncate text-[12px] text-slate-500 dark:text-slate-400">
                           {job.displayType && <span className="font-medium text-slate-600 dark:text-slate-300">{job.displayType}</span>}
                           {job.displayType && postedLabel && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
