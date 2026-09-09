@@ -26,7 +26,6 @@ import {
   IconX as X,
   IconGift as Gift,
   IconFileDescription as FileDescription,
-  IconShare as Share,
   IconAlertCircle as AlertCircle,
   IconCircleCheck as CircleCheck,
   IconSparkles as Sparkles,
@@ -37,7 +36,6 @@ import { usersAPI, apiCall } from "@/services/api";
 import {
   evaluateEligibility,
   extractStudentProfile,
-  daysUntil,
   getMatchScore,
   normalizeText,
 } from "@/services/placementEligibility";
@@ -430,7 +428,6 @@ const PlacementDetail = () => {
   }, [job, t]);
 
   const eligibilityCheck = useMemo(() => evaluateEligibility(job, studentProfile), [job, studentProfile]);
-  const closingIn = useMemo(() => daysUntil(job?.displayDeadline), [job]);
 
   // Similar roles: shared skills weigh most, then same company, then same type.
   const similarJobs = useMemo(() => {
@@ -452,24 +449,6 @@ const PlacementDetail = () => {
       .slice(0, 3)
       .map((x) => x.j);
   }, [job, allJobs]);
-
-  // Native share sheet where available (mobile), clipboard everywhere else.
-  const handleShare = async () => {
-    const url = window.location.href;
-    const title = job?.displayTitle ? `${job.displayTitle} · ${job.displayCompany}` : "Job posting";
-    try {
-      if (navigator.share) {
-        await navigator.share({ title, url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      toast({ title: t("placement.link_copied", "Link copied"), description: t("placement.link_copied_desc", "Share it with a friend who'd be a good fit.") });
-    } catch (err) {
-      if (err?.name !== "AbortError") {
-        toast({ title: t("placement.share_failed", "Could not share"), description: err.message, variant: "destructive" });
-      }
-    }
-  };
 
   const updateApplicationField = (field, value) => {
     setApplicationForm((prev) => ({ ...prev, [field]: value }));
@@ -784,52 +763,35 @@ ${applicationForm.fullName || "Your Name"}`;
                 </div>
               </div>
 
-              <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:w-auto">
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#045C9A]/20 bg-white px-3 text-[11.5px] font-medium text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-transparent dark:text-[#A6D7E8]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
-                    {statusLabel}
-                  </span>
-                  {closingIn != null && closingIn >= 0 && closingIn <= 3 && (
-                    <span className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[11.5px] font-semibold text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400">
-                      <Clock className="h-3.5 w-3.5" stroke={2} />
-                      {closingIn === 0
-                        ? t("placement.closes_today", "Closes today")
-                        : t("placement.closes_in_days", { count: closingIn, defaultValue: `Closes in ${closingIn}d` })}
-                    </span>
-                  )}
-                  <span className={`flex h-9 items-center justify-center rounded-lg px-3 text-[11.5px] font-semibold uppercase tracking-[0.05em] ${
-                    isSmaartSource
-                      ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
-                      : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
-                  }`}>
-                    {isSmaartSource ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College")}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f] sm:w-auto"
-                >
-                  <Share className="h-3.5 w-3.5" stroke={1.8} />
-                  {t("placement.share", "Share")}
-                </button>
+              <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
+                <span className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[12px] font-medium text-slate-600 dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  {statusLabel}
+                </span>
+                <span className={`inline-flex h-9 items-center whitespace-nowrap rounded-lg px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+                  isSmaartSource
+                    ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                    : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+                }`}>
+                  {isSmaartSource ? t("placement.source_smaart", "SMAART") : t("placement.source_college", "College")}
+                </span>
+                <span className="hidden h-6 w-px bg-slate-200 dark:bg-[#045C9A]/30 sm:block" />
                 {documentUrl && (
                   <a
                     href={documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3.5 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f] sm:w-auto"
+                    className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3.5 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
                   >
                     {t("placement.view_jd", "View JD")}
                     <ExternalLink className="h-3.5 w-3.5" stroke={1.8} />
                   </a>
                 )}
-                <div className="flex w-full items-center gap-2 sm:w-auto">
+                <div className="flex items-center gap-2">
                   {!hasApplied && (
                       <button
                         onClick={() => setBuildResumeOpen(true)}
-                        className="flex h-9 w-full items-center justify-center rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:text-slate-200 dark:hover:bg-[#0d3a5f] sm:w-auto"
+                        className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 text-[13px] font-medium text-[#072036] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
                       >
                         {t("placement.generate_resume", "Build Resume")}
                       </button>
@@ -848,7 +810,7 @@ ${applicationForm.fullName || "Your Name"}`;
                       }
                     }}
                     disabled={hasApplied}
-                    className={`flex h-9 w-full flex-1 items-center justify-center rounded-lg px-5 text-[13px] font-medium transition-colors sm:w-auto sm:flex-initial ${hasApplied ? 'cursor-not-allowed bg-slate-300 text-white dark:bg-slate-700' : 'bg-[#0E2136] text-white hover:bg-[#1b3457] active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white'}`}
+                    className={`inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg px-5 text-[13px] font-medium transition-colors ${hasApplied ? 'cursor-not-allowed bg-slate-300 text-white dark:bg-slate-700' : 'bg-[#0E2136] text-white hover:bg-[#1b3457] active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white'}`}
                   >
                     {hasApplied ? t("placement.applied", "Applied") : t("placement.apply", "Apply")}
                   </button>
@@ -856,7 +818,7 @@ ${applicationForm.fullName || "Your Name"}`;
                     <>
                       <button
                         onClick={() => setWithdrewConfirmOpen(true)}
-                        className="flex h-9 w-full flex-1 items-center justify-center rounded-lg border border-slate-200 px-4 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400 sm:w-auto sm:flex-initial"
+                        className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#045C9A]/30 dark:bg-transparent dark:text-slate-300 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                       >
                         {t("placement.withdraw", "Withdraw")}
                       </button>
@@ -1271,14 +1233,6 @@ ${applicationForm.fullName || "Your Name"}`;
                                 <span className="text-[12.5px] font-bold text-slate-600 dark:text-slate-300">Level {stdLvl}</span>
                               </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => navigate('/dashboard/skills-vault')}
-                              className="mt-3 inline-flex h-8 w-fit items-center gap-1.5 rounded-lg bg-[#0E2136] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#1b3457] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
-                            >
-                              <ArrowUpRight className="h-3.5 w-3.5" stroke={2} />
-                              {t("placement.start_learning", "Start learning")}
-                            </button>
                           </div>
                         );
                       })}
