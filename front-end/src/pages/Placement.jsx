@@ -1217,9 +1217,41 @@ const Placement = () => {
                       transition={{ delay: Math.min(index * 0.03, 0.3) }}
                       className={`group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-[#045C9A]/35 hover:shadow-[0_4px_20px_-4px_rgba(13,31,78,0.14)] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:hover:border-[#045C9A]/60 ${isClosed ? 'opacity-60' : ''}`}
                     >
+                      {/* Eyebrow: source + status on the left, bookmark on the right */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span
+                            className={`inline-flex shrink-0 items-center rounded px-1.5 py-[2px] text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                              isSmaartPost
+                                ? 'bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]'
+                                : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
+                            }`}
+                          >
+                            {sourceLabel}
+                          </span>
+                          <span className="inline-flex min-w-0 items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${isClosed ? 'bg-slate-400' : 'bg-emerald-500'}`} />
+                            <span className="truncate">{statusLabel}</span>
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => toggleSaveJob(e, job)}
+                          aria-pressed={saved}
+                          title={saved ? t("placement.unsave", "Remove from saved") : t("placement.save", "Save job")}
+                          className={`-mr-1.5 -mt-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors ${
+                            saved
+                              ? 'text-[#045C9A] dark:text-[#A6D7E8]'
+                              : 'text-slate-300 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-500 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]'
+                          }`}
+                        >
+                          {saved ? <BookmarkFilled className="h-[17px] w-[17px]" stroke={1.8} /> : <Bookmark className="h-[17px] w-[17px]" stroke={1.8} />}
+                        </button>
+                      </div>
+
                       {/* Header: logo + title + company */}
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-[13px] font-semibold text-[#045C9A] dark:border-[#045C9A]/25 dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+                      <div className="mt-3 flex items-start gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white text-[14px] font-semibold text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#072036] dark:text-[#A6D7E8]">
                           {companyLogo ? (
                             <img
                               src={companyLogo}
@@ -1230,7 +1262,6 @@ const Placement = () => {
                             <span>{companyInitial}</span>
                           )}
                         </div>
-
                         <div className="min-w-0 flex-1">
                           <h2
                             title={job.displayTitle}
@@ -1238,49 +1269,14 @@ const Placement = () => {
                           >
                             {job.displayTitle}
                           </h2>
-                          <p className="mt-1 truncate text-[13px] leading-tight text-slate-500 dark:text-slate-400">
+                          <p className="mt-0.5 truncate text-[13px] leading-snug text-slate-500 dark:text-slate-400">
                             {job.displayCompany}
                           </p>
-                        </div>
-
-                        <div className="mt-0.5 flex shrink-0 flex-col items-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={(e) => toggleSaveJob(e, job)}
-                            aria-pressed={saved}
-                            title={saved ? t("placement.unsave", "Remove from saved") : t("placement.save", "Save job")}
-                            className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
-                              saved
-                                ? 'text-[#045C9A] dark:text-[#A6D7E8]'
-                                : 'text-slate-300 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-500 dark:hover:bg-[#045C9A]/20 dark:hover:text-[#A6D7E8]'
-                            }`}
-                          >
-                            {saved ? <BookmarkFilled className="h-4 w-4" stroke={1.8} /> : <Bookmark className="h-4 w-4" stroke={1.8} />}
-                          </button>
-                          <span
-                            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-[3px] text-[10.5px] font-medium tracking-[0.02em] ${
-                              isClosed
-                                ? 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400'
-                                : 'border-[#045C9A]/20 bg-white text-[#045C9A] dark:border-[#045C9A]/50 dark:bg-transparent dark:text-[#A6D7E8]'
-                            }`}
-                          >
-                            <span className={`h-1.5 w-1.5 rounded-full ${isClosed ? 'bg-slate-400' : 'bg-[#045C9A] dark:bg-[#A6D7E8]'}`} />
-                            {statusLabel}
-                          </span>
-                          <span
-                            className={`rounded-md px-2 py-[3px] text-[10.5px] font-semibold uppercase tracking-[0.05em] ${
-                              isSmaartPost
-                                ? 'bg-[#072036] text-white dark:bg-[#045C9A] dark:text-white'
-                                : 'bg-[#EAF7FD] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]'
-                            }`}
-                          >
-                            {sourceLabel}
-                          </span>
                         </div>
                       </div>
 
                       {/* Meta */}
-                      <div className="mt-4 space-y-[7px] text-[13px] leading-tight text-slate-600 dark:text-slate-300">
+                      <div className="mt-4 space-y-2 text-[13px] leading-tight text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
                           <MapPin className="h-[15px] w-[15px] shrink-0 text-slate-400" stroke={1.6} />
                           <span className="truncate">{job.displayLocation || t("placement.remote", "Remote")}</span>
@@ -1377,28 +1373,25 @@ const Placement = () => {
                       )}
 
                       {/* Footer */}
-                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-[#045C9A]/20">
-                        <div className="flex min-w-0 flex-col gap-0.5">
-                          <span className="truncate text-[11.5px] font-medium text-slate-500 dark:text-slate-400">
-                            {job.displayType}
-                          </span>
-                          {postedLabel && (
-                            <span className="truncate text-[11px] text-slate-400 dark:text-slate-500">{postedLabel}</span>
-                          )}
-                        </div>
+                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-3.5 dark:border-[#045C9A]/20">
+                        <p className="min-w-0 truncate text-[12px] text-slate-500 dark:text-slate-400">
+                          {job.displayType && <span className="font-medium text-slate-600 dark:text-slate-300">{job.displayType}</span>}
+                          {job.displayType && postedLabel && <span className="mx-1.5 text-slate-300 dark:text-slate-600">·</span>}
+                          {postedLabel && <span>{postedLabel}</span>}
+                        </p>
                         <button
                           onClick={() => !isClosed && navigate(`/dashboard/placement/${job.sourceCollection}/${job._id}`, { state: { job } })}
                           disabled={isClosed}
                           className={
                             isClosed
-                              ? "flex h-9 shrink-0 cursor-not-allowed items-center justify-center rounded-lg bg-slate-100 px-4 text-[13px] font-medium text-slate-400 dark:bg-slate-800 dark:text-slate-500"
-                              : "group/btn flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#0E2136] px-4 text-[13px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white dark:focus-visible:ring-offset-[#0d3a5f]"
+                              ? "flex h-8 shrink-0 cursor-not-allowed items-center justify-center rounded-md bg-slate-100 px-3.5 text-[12.5px] font-medium text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                              : "group/btn flex h-8 shrink-0 items-center justify-center gap-1 rounded-md bg-[#0E2136] pl-3.5 pr-2.5 text-[12.5px] font-medium text-white outline-none transition-colors hover:bg-[#1b3457] focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 focus-visible:ring-offset-2 active:scale-[0.98] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white dark:focus-visible:ring-offset-[#0d3a5f]"
                           }
                         >
                           <span>{applyLabel}</span>
                           {!isClosed && (
                             <ChevronRight
-                              className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5"
+                              className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5"
                               stroke={2.2}
                             />
                           )}
