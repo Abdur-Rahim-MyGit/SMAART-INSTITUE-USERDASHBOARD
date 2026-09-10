@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useDrawer } from '../../context/DrawerContext';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
+import Banner from '../../components/Banner';
 import CourseVideoPlayer from '../../components/CourseVideoPlayer';
 import {
   getPublishedCourses,
@@ -154,6 +155,8 @@ export default function LearningScreen({ navigation }) {
   const [stageStatus, setStageStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  // NFR-07 — an outage used to render as an empty catalogue with no hint.
+  const [loadError, setLoadError] = useState(null);
   
   // Modal States
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -190,11 +193,14 @@ export default function LearningScreen({ navigation }) {
     if (!userId) return;
     try {
       setLoading(true);
+      // The catalogue is mandatory; enrollments and stage status degrade
+      // gracefully (they only affect progress/lock decoration).
       const [coursesData, enrollmentsData, stageData] = await Promise.all([
-        getPublishedCourses().catch(() => ({ data: [] })),
+        getPublishedCourses(),
         getEnrollments(userId).catch(() => []),
         getStageStatus(userId).catch(() => ({ success: false, data: null })),
       ]);
+      setLoadError(null);
 
       const coursesArray = Array.isArray(coursesData?.data) 
         ? coursesData.data 
@@ -211,6 +217,7 @@ export default function LearningScreen({ navigation }) {
       }
     } catch (err) {
       console.warn('LearningScreen fetch failed:', err);
+      setLoadError(err?.message || 'Could not load courses.');
     } finally {
       setLoading(false);
     }
@@ -684,6 +691,15 @@ export default function LearningScreen({ navigation }) {
           />
         }
       >
+        {loadError && !loading && (
+          <Pressable onPress={fetchData} accessibilityRole="button" accessibilityLabel="Retry loading courses">
+            <Banner
+              variant="error"
+              message={`${loadError} Tap to retry, or pull down to refresh.`}
+              style={{ marginHorizontal: 20, marginTop: 12 }}
+            />
+          </Pressable>
+        )}
 
         {/* ── Header — same furniture as HomeScreen (drawer, bell, theme
             toggle, avatar) so moving between tabs doesn't change the chrome.

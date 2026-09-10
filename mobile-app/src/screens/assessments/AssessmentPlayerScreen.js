@@ -31,6 +31,7 @@ import {
   ActivityIndicator,
   Alert,
   BackHandler,
+  Modal,
   Pressable,
   ScrollView,
   StatusBar as RNStatusBar,
@@ -81,6 +82,11 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
   const [remaining, setRemaining] = useState(config.durationMinutes * 60);
   const [submitting, setSubmitting] = useState(false);
+  // PROC-06 — server tiers: ok | warn | pause | held. `warn` shows a banner,
+  // `pause` blocks until the student resumes (same as the web engine's
+  // acknowledgeWarning). Keyed on the warning count so a *new* violation after
+  // resuming re-blocks, while the same pause is not shown twice.
+  const [acknowledgedWarnings, setAcknowledgedWarnings] = useState(-1);
   const [report, setReport] = useState(null);
 
   // Server's attempt start, in epoch ms. The single source of truth for the
@@ -244,7 +250,13 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           // everything is already answered.
           completeMissingAnswers: reason === 'timeout' || reason === 'violation',
         });
-        if (res?.success) {
+        if (res?.held) {
+          // Submit-time hold: answers are saved, score withheld. The held
+          // effect below must not re-submit a pending_review attempt.
+          heldSubmitRef.current = true;
+          proctoring.complete();
+          proctoring.markHeld(res);
+        } else if (res?.success) {
           setReport(res.data);
           proctoring.complete();
         } else {
@@ -417,10 +429,21 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
           {info.reason}
         </Text>
-        <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
-          Your answers were saved. A support ticket has been raised and your score will be released once
-          it's reviewed.
-        </Text>
+        {info.outcome === 'retry' ? (
+          <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+            Your answers were saved. You can take this assessment again from the assessments screen.
+          </Text>
+        ) : (
+          <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+            Your answers were saved. A support ticket has been raised and your score will be released once
+            it's reviewed.
+          </Text>
+        )}
+        {info.reference ? (
+          <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 10 }]}>
+            Reference: {info.reference}
+          </Text>
+        ) : null}
         <Pressable
           style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 26 }]}
           onPress={() => navigation.goBack()}
@@ -469,6 +492,9 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   const progress = questions.length ? (index + 1) / questions.length : 0;
   const low = remaining <= WARN_AT_SECONDS;
 
+  const decision = proctoring.decision || { tier: 'ok', warnings: 0, maxWarnings: 0, reason: '' };
+  const isPaused = decision.tier === 'pause' && (decision.warnings ?? 0) > acknowledgedWarnings;
+
   return shell(
     <>
       <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
@@ -490,6 +516,40 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
       <View style={[styles.progressTrack, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#EEF2F7' }]}>
         <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
       </View>
+
+      {(decision.tier === 'warn' || decision.tier === 'pause') && (
+        <View style={styles.warnBanner}>
+          <Feather name="alert-triangle" size={14} color="#B45309" />
+          <Text style={styles.warnText} numberOfLines={2}>
+            Proctoring warning {decision.warnings}/{decision.maxWarnings}
+            {decision.reason ? ` · ${decision.reason}` : ''}
+          </Text>
+        </View>
+      )}
+
+      <Modal visible={isPaused} transparent animationType="fade" onRequestClose={() => {}}>
+        <View style={styles.pauseBackdrop}>
+          <View style={[styles.pauseCard, { backgroundColor: themeColors.card }]}>
+            <View style={[styles.reportBadge, { backgroundColor: '#64748B22', alignSelf: 'center' }]}>
+              <Feather name="pause-circle" size={34} color="#475569" />
+            </View>
+            <Text style={[styles.reportTitle, { color: themeColors.text, fontSize: 19 }]}>Assessment paused</Text>
+            <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 8 }]}>
+              {decision.reason || 'Proctoring detected repeated issues with this attempt.'}
+            </Text>
+            <Text style={[styles.centeredText, { color: themeColors.textMuted, marginTop: 8 }]}>
+              Warnings used: {decision.warnings}/{decision.maxWarnings}. Further issues can place this attempt under
+              review. Your time continues to count.
+            </Text>
+            <Pressable
+              style={[styles.primaryBtn, { backgroundColor: accent, marginTop: 20 }]}
+              onPress={() => setAcknowledgedWarnings(decision.warnings ?? 0)}
+            >
+              <Text style={styles.primaryBtnText}>Resume assessment</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <Text style={[styles.question, { color: themeColors.text }]}>
@@ -607,6 +667,26 @@ const styles = StyleSheet.create({
   },
   optionText: { flex: 1, fontSize: 14.5, fontWeight: '600', lineHeight: 20 },
   savingHint: { fontSize: 11, fontWeight: '600', marginTop: 12, textAlign: 'right' },
+  warnBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 18,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: '#FEF3C7',
+  },
+  warnText: { flex: 1, fontSize: 12.5, fontWeight: '600', color: '#92400E' },
+  pauseBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  pauseCard: { width: '100%', maxWidth: 420, borderRadius: 18, padding: 22 },
 
   footer: {
     flexDirection: 'row',

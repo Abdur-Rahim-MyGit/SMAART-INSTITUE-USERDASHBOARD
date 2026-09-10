@@ -1,36 +1,104 @@
 import { Platform } from 'react-native';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { isRunningInExpoGo, requireOptionalNativeModule } from 'expo';
 import { notificationsAPI } from '../api/notifications';
 
-// Foreground display behavior — required once, app-wide. Lives here rather
-// than App.js since it's push-specific config, called from App.js at module
-// scope alongside SplashScreen.preventAutoHideAsync().
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+/**
+ * expo-notifications is loaded lazily and only after we have confirmed the
+ * native side is actually present in the running binary.
+ *
+ * Importing it runs `requireNativeModule('ExpoPushTokenManager')` at module
+ * scope, which throws "Cannot find native module 'ExpoPushTokenManager'"
+ * anywhere that module isn't compiled in:
+ *   - Expo Go on Android (push was removed from Expo Go in SDK 53 — a
+ *     development build is required for it), and
+ *   - any dev-client APK built before expo-notifications was installed.
+ *
+ * A plain try/catch around `require()` is NOT enough. Metro's runtime loader
+ * (metro-runtime/src/polyfills/require.js, guardedLoadModule) catches a module
+ * initialisation error itself and hands it to ErrorUtils.reportFatalError —
+ * a red-box ERROR in dev, a hard crash in release — and then returns
+ * undefined to the caller, so our catch never runs. The only safe approach is
+ * to ask Expo whether the module exists *before* requiring the package.
+ * `requireOptionalNativeModule` returns null instead of throwing.
+ */
+const PUSH_NATIVE_MODULE = 'ExpoPushTokenManager';
+
+let notificationsModule; // undefined = not probed yet, null = unavailable
+
+function isPushNativeAvailable() {
+  try {
+    return requireOptionalNativeModule(PUSH_NATIVE_MODULE) != null;
+  } catch {
+    return false;
+  }
+}
+
+function loadNotifications() {
+  if (notificationsModule !== undefined) return notificationsModule;
+
+  if (!isPushNativeAvailable()) {
+    notificationsModule = null;
+    const why = isRunningInExpoGo()
+      ? 'Expo Go does not include push notifications (SDK 53+). Open the app in the development build instead.'
+      : 'This build was compiled without expo-notifications. Rebuild it: npx expo run:android (or eas build --profile development).';
+    console.log(`[push] disabled — native module "${PUSH_NATIVE_MODULE}" not found. ${why}`);
+    return null;
+  }
+
+  try {
+    notificationsModule = require('expo-notifications');
+  } catch {
+    notificationsModule = null;
+  }
+  return notificationsModule;
+}
+
+function loadDevice() {
+  try {
+    return require('expo-device');
+  } catch {
+    return null;
+  }
+}
+
+/** Foreground display behavior. Safe to call anywhere — no-ops without the module. */
+export function setupNotificationHandler() {
+  const Notifications = loadNotifications();
+  if (!Notifications) return;
+
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
+  } catch (err) {
+    console.warn('[push] notification handler unavailable:', err.message);
+  }
+}
 
 let cachedToken = null;
 
 /**
- * Fetches (or reuses) this device's Expo push token and registers it with
- * the backend against the signed-in user. Only meaningful once real push
- * delivery is wired up server-side (FCM V1 credentials uploaded to EAS for
- * Android — see docs.expo.dev/push-notifications/fcm-credentials); until
- * then this still runs safely, it just registers a token nothing sends to
- * yet.
+ * Fetches (or reuses) this device's Expo push token and registers it with the
+ * backend against the signed-in user. Returns null — without throwing — when
+ * push isn't available (Expo Go, emulator, permission denied, or no FCM
+ * credentials yet).
  *
- * Never throws — push registration must not be able to block sign-in.
+ * Actual delivery additionally needs FCM V1 credentials uploaded to EAS for
+ * Android; see docs.expo.dev/push-notifications/fcm-credentials.
  */
 export async function registerForPushNotifications() {
+  const Notifications = loadNotifications();
+  if (!Notifications) return null;
+
   try {
-    if (!Device.isDevice) return null; // simulators/emulators have no real token
+    const Device = loadDevice();
+    if (Device && !Device.isDevice) return null; // emulators have no real token
 
     const { status: existing } = await Notifications.getPermissionsAsync();
     let finalStatus = existing;
@@ -54,7 +122,7 @@ export async function registerForPushNotifications() {
     await notificationsAPI.registerDevice(token);
     return token;
   } catch (err) {
-    console.warn('[push] registration failed:', err.message);
+    console.warn('[push] registration skipped:', err.message);
     return null;
   }
 }

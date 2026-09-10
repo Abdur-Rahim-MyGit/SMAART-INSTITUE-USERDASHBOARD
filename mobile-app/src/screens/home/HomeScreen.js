@@ -41,6 +41,7 @@ import { getEnrollments } from '../../api/courses';
 import { getStageStatus } from '../../api/assessments';
 import { getCollegeBanners } from '../../api/colleges';
 import { notificationsAPI } from '../../api/notifications';
+import { getStreakStatus, recordActivity } from '../../api/streaks';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_ROTATE_MS = 6000;
@@ -252,6 +253,7 @@ export default function HomeScreen({ navigation }) {
   const [activeEnrollment, setActiveEnrollment] = useState(null);
   const [stageStatus, setStageStatus] = useState(null);
   const [banners, setBanners] = useState([]);
+  const [streak, setStreak] = useState(null); // null until /streaks/status answers
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -314,11 +316,17 @@ export default function HomeScreen({ navigation }) {
   const collegeId = user?.college?._id || user?.college?.id || user?.college || user?.collegeId;
 
   const fetchData = useCallback(async () => {
-    const [enrollRes, stageRes, bannerRes] = await Promise.allSettled([
+    const [enrollRes, stageRes, bannerRes, streakRes] = await Promise.allSettled([
       userId ? getEnrollments(userId) : Promise.resolve(null),
       userId ? getStageStatus(userId) : Promise.resolve(null),
       collegeId ? getCollegeBanners(collegeId) : Promise.resolve(null),
+      // Same as the web dashboard: today counts as activity, then read the streak.
+      recordActivity().catch(() => null).then(() => getStreakStatus()),
     ]);
+
+    if (streakRes.status === 'fulfilled' && streakRes.value?.data) {
+      setStreak(streakRes.value.data.currentStreak ?? 0);
+    }
 
     if (enrollRes.status === 'fulfilled' && enrollRes.value?.data) {
       const list = enrollRes.value.data;
@@ -364,23 +372,9 @@ export default function HomeScreen({ navigation }) {
   const completedCount = countCompletedStages(stageStatus);
   const pendingAssessment = derivePendingAssessment(stageStatus);
 
-  // Fallback announcement banners if web college banners aren't configured yet
-  const defaultBanners = [
-    {
-      _id: 'b1',
-      title: 'Placement Drive 2026',
-      message: 'Exclusive Campus Placement & AI Skill Assessments now open for all students.',
-      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop',
-    },
-    {
-      _id: 'b2',
-      title: 'AI Career Coach',
-      message: 'Get personalized career roadmaps and 1-on-1 AI mock interview feedback.',
-      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop',
-    },
-  ];
-
-  const activeAnnouncementBanners = banners.length > 0 ? banners : defaultBanners;
+  // Only real college banners — placeholder announcements would read as
+  // genuine notices to students, so the row simply disappears when none exist.
+  const activeAnnouncementBanners = banners;
 
   // Derive Essential Hero Data
   const courseTitle = activeEnrollment?.course?.title || 'Capacity: Foundations';
@@ -787,7 +781,7 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="fire" size={22} color="#F97316" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                {user?.streak || 7} Days
+                {streak == null ? '—' : `${streak} ${streak === 1 ? 'Day' : 'Days'}`}
               </Text>
               <Text style={[styles.statLabel, { color: colors.textMuted }]}>Daily Streak</Text>
             </View>

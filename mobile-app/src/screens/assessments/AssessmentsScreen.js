@@ -26,6 +26,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
+import Banner from '../../components/Banner';
 import { assessmentApi } from '../../api/assessments';
 import {
   STAGE_ACCENT,
@@ -81,16 +82,20 @@ export default function AssessmentsScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [status, setStatus] = useState(null);
   const [attempts, setAttempts] = useState({});
+  // NFR-05 — a dead network must not render as "0 / 4 stages, everything
+  // locked". Failures surface here with pull-to-refresh / retry.
+  const [loadError, setLoadError] = useState(null);
 
   const load = useCallback(async () => {
     if (!userId) return;
     try {
-      const statusRes = await assessmentApi.getStageStatus(userId).catch(() => null);
+      const statusRes = await assessmentApi.getStageStatus(userId);
       const statusData = statusRes?.data || statusRes || null;
       setStatus(statusData);
 
       // Attempt history per stage — drives "2 of 3 attempts used" and the
-      // server-side lock after the cap is hit.
+      // server-side lock after the cap is hit. A single stage failing is
+      // tolerated (its counter just shows as unknown); the status call is not.
       const entries = await Promise.all(
         STAGE_KEYS.map((key) =>
           assessmentApi
@@ -100,6 +105,9 @@ export default function AssessmentsScreen({ navigation }) {
         )
       );
       setAttempts(Object.fromEntries(entries));
+      setLoadError(null);
+    } catch (err) {
+      setLoadError(err?.message || 'Could not load your assessment stages.');
     } finally {
       setLoading(false);
     }
@@ -175,6 +183,12 @@ export default function AssessmentsScreen({ navigation }) {
             <Text style={[styles.title, { color: themeColors.text }]}>Your Stages</Text>
           </View>
         </View>
+
+        {loadError && !loading && (
+          <Pressable onPress={load} accessibilityRole="button" accessibilityLabel="Retry loading stages">
+            <Banner variant="error" message={`${loadError} Tap to retry, or pull down to refresh.`} />
+          </Pressable>
+        )}
 
         <AnimatedSection delay={0}>
           <View style={[styles.summary, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>

@@ -55,6 +55,24 @@ export function useProctoringSession({ resultId, assessmentId }) {
     }
   }, []);
 
+  /**
+   * The server can also hold an attempt at submit time (services/proctoringGate
+   * buildHeldResponse: `{ success, held, outcome, reference, message, … }` with no
+   * `data`). Land it on the same held screen as a mid-exam decision.
+   */
+  const markHeld = useCallback((held) => {
+    if (!held || heldRef.current) return;
+    heldRef.current = true;
+    setHeldInfo({
+      reason: held.message || held.reason || 'This attempt could not be verified.',
+      ticketId: held.ticketId || null,
+      reference: held.reference || null,
+      outcome: held.outcome || 'ticket',
+      retriesRemaining: held.retriesRemaining ?? 0,
+    });
+    setPhase('held');
+  }, []);
+
   const reportEvent = useCallback(async (eventType, details, severity = 'medium') => {
     if (!sessionIdRef.current || heldRef.current) return;
     try {
@@ -162,5 +180,6 @@ export function useProctoringSession({ resultId, assessmentId }) {
     error,
     start,
     complete,
+    markHeld,
   };
 }

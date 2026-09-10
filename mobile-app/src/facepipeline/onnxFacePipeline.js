@@ -31,10 +31,12 @@ import { evaluateFrameQuality } from './faceQuality';
 
 const ARCFACE_INPUT_SIZE = 112;
 
-// Same thresholds as faceVerificationService.js — do not drift from these
-// without re-validating against the web app's calibration.
-export const VERIFICATION_COSINE_THRESHOLD = 0.58;
-export const REGISTRATION_COSINE_THRESHOLD = 0.38; // matches web's per-frame consistency check
+// Same thresholds as front-end/src/services/faceVerificationService.js — do
+// not drift from these without re-validating against the web calibration.
+// Web found 0.58 rejected genuine candidates; 0.40 accepts the real person
+// while impostors (ArcFace cosine typically < 0.25) are still rejected.
+export const VERIFICATION_COSINE_THRESHOLD = 0.40; // 512-d ArcFace cosine; same person >= 0.40
+export const REGISTRATION_COSINE_THRESHOLD = 0.48; // consistency check across frames
 const REGISTRATION_FRAMES = 5;
 const REGISTRATION_MAX_ATTEMPTS = 14;
 
