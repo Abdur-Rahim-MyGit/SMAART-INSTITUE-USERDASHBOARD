@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Resume = require('../models/Resume');
 const { computeAtsScore } = require('../utils/atsScore');
+const { normalizeLayout } = require('../utils/resumeLayout');
 const ResumeVerification = require('../models/ResumeVerification');
 const { protect } = require('../middleware/auth');
 const { resumeExportLimiter } = require('../middleware/rateLimiter');
@@ -221,6 +222,7 @@ router.get('/:id', protect, async (req, res) => {
 router.post('/', protect, async (req, res) => {
   try {
     const { userId: _ignoredUser, _id: _ignoredId, atsScore: _ignoredScore, ...body } = req.body || {};
+    if (body.layout !== undefined) body.layout = normalizeLayout(body.layout);
     const newResume = await Resume.create({
       ...body,
       userId: req.user._id,
@@ -246,6 +248,7 @@ router.put('/:id', protect, async (req, res) => {
     // this, a user could PUT {"userId":"<victim>"} and hand their resume to (or
     // overwrite under) another account.
     const { userId, _id, atsScore: _clientScore, ...updatable } = req.body || {};
+    if (updatable.layout !== undefined) updatable.layout = normalizeLayout(updatable.layout);
     // Score is always derived server-side from the saved content.
     updatable.atsScore = computeAtsScore({ ...resume.toObject(), ...updatable });
     resume = await Resume.findByIdAndUpdate(req.params.id, updatable, {

@@ -52,6 +52,10 @@ const resumeSchema = new mongoose.Schema(
             profileImage: String,
         },
         summary: String,
+        // Freshers often prefer an objective; the builder prints whichever
+        // summaryMode selects and keeps both texts.
+        objective: { type: String, default: '' },
+        summaryMode: { type: String, enum: ['summary', 'objective'], default: 'summary' },
         experience: [
             {
                 // internship | full-time | part-time | freelance | volunteer.
@@ -121,6 +125,34 @@ const resumeSchema = new mongoose.Schema(
                 link:        String,
             },
         ],
+        // Positions of responsibility and extracurricular activities.
+        positions: [
+            {
+                type:         { type: String, enum: ['position', 'activity', ''], default: 'position' },
+                title:        String,
+                organisation: String,
+                duration:     String,
+                description:  String,
+            },
+        ],
+        publications: [
+            {
+                type:        { type: String, enum: ['publication', 'patent', ''], default: 'publication' },
+                title:       String,
+                venue:       String,       // journal / conference / patent office
+                year:        String,
+                link:        String,
+                description: String,
+            },
+        ],
+        // Presentation settings chosen on the Review step; see utils/resumeLayout.js.
+        layout: {
+            fontSize:       { type: Number, default: 10 },
+            spacing:        { type: String, enum: ['compact', 'normal', 'relaxed'], default: 'normal' },
+            sectionOrder:   { type: [String], default: [] },
+            hiddenSections: { type: [String], default: [] },
+            sectionSpacing: { type: Map, of: Number, default: {} },
+        },
         personalDetails: {
             fatherName:  String,
             motherName:  String,

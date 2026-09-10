@@ -1881,8 +1881,10 @@
       "experience": "Experience",
       "projects": "Projects",
       "skills": "Skills",
-      "awards": "Awards",
-      "review_download": "Review & Download"
+      "awards": "Activities",
+      "review_download": "Review",
+      "certifications": "Certificates",
+      "review_save": "Review"
     },
     "toast": {
       "sync_success": "Profile data synced successfully!",

@@ -35,6 +35,10 @@ export const buildResumeFingerprint = (resumePayload = {}) =>
       projects: resumePayload.projects,
       achievements: resumePayload.achievements,
       certifications: resumePayload.certifications,
+      positions: resumePayload.positions,
+      publications: resumePayload.publications,
+      objective: resumePayload.objective,
+      summaryMode: resumePayload.summaryMode,
       personalDetails: resumePayload.personalDetails,
     })
   );

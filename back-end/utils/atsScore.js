@@ -25,7 +25,8 @@ function computeAtsScore(resume) {
 
   // Target role + summary — 10
   score += has(p.targetRole) ? 4 : 0;
-  const summaryWords = has(r.summary) ? r.summary.trim().split(/\s+/).length : 0;
+  const summaryText = r.summaryMode === 'objective' ? r.objective : r.summary;
+  const summaryWords = has(summaryText) ? summaryText.trim().split(/\s+/).length : 0;
   score += summaryWords >= 30 ? 6 : summaryWords >= 12 ? 4 : summaryWords > 0 ? 2 : 0;
 
   // Education — 15
@@ -72,9 +73,11 @@ function computeAtsScore(resume) {
     score += certs.some((c) => has(c.link) || has(c.credentialId)) ? 1 : 0;
   }
 
-  // Achievements — 7
+  // Achievements + positions of responsibility — 7
   const ach = filled(r.achievements, 'title');
-  score += ach.length ? clamp(3 + ach.length * 2, 7) : 0;
+  const pos = filled(r.positions, 'title');
+  score += ach.length ? clamp(2 + ach.length * 2, 4) : 0;
+  score += pos.length ? clamp(1 + pos.length * 2, 3) : 0;
 
   return clamp(Math.round(score), 100);
 }

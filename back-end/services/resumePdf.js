@@ -8,6 +8,7 @@
  * machine-readable export.
  */
 const PDFDocument = require('pdfkit');
+const { normalizeLayout } = require('../utils/resumeLayout');
 
 const INK = '#111827';
 const MUTED = '#6B7280';
@@ -69,35 +70,10 @@ function renderResumePdf(resume, verification = null) {
     const links = [clean(p.linkedinUrl), clean(p.githubUrl), clean(p.portfolioUrl)].filter(Boolean).join('  ·  ');
     if (links) doc.fillColor(MUTED).fontSize(9).text(links);
 
-    // ── Summary ──
-    if (clean(r.summary)) {
-      sectionHeading(doc, 'Summary');
-      doc.fillColor(INK).font('Helvetica').fontSize(9.5).text(clean(r.summary), { lineGap: 1.5 });
-    }
-
-    // ── Education ──
-    const education = (r.education || []).filter((e) => clean(e.degree) || clean(e.institution));
-    if (education.length) {
-      sectionHeading(doc, 'Education');
-      education.forEach((e) => {
-        const title = [clean(e.degree), clean(e.specialisation)].filter(Boolean).join(' in ') || clean(e.institution);
-        const years = [clean(e.startYear), clean(e.year)].filter(Boolean).join(' – ');
-        const meta = e.pursuing ? `${years ? years + ' · ' : ''}Pursuing` : years;
-        entry(
-          doc,
-          title,
-          [clean(e.institution), clean(e.board), clean(e.location), clean(e.grade) && `Grade: ${clean(e.grade)}`]
-            .filter(Boolean)
-            .join(' — '),
-          meta,
-          ''
-        );
-      });
-    }
-
-    // ── Internships / Experience (split by type; untyped legacy rows count as experience) ──
-    const allExp = (r.experience || []).filter((e) => clean(e.role) || clean(e.company));
+    const layout = normalizeLayout(r.layout);
+    const hidden = new Set(layout.hiddenSections);
     const typeLabel = { 'full-time': 'Full-time', 'part-time': 'Part-time', freelance: 'Freelance', volunteer: 'Volunteer', internship: 'Internship' };
+    const allExp = (r.experience || []).filter((e) => clean(e.role) || clean(e.company));
     const renderExp = (title, rows) => {
       if (!rows.length) return;
       sectionHeading(doc, title);
@@ -111,14 +87,11 @@ function renderResumePdf(resume, verification = null) {
         )
       );
     };
-    renderExp('Internships', allExp.filter((e) => clean(e.type) === 'internship'));
-    renderExp('Experience', allExp.filter((e) => clean(e.type) !== 'internship'));
 
-    // ── Skills ──
-    const s = r.skills || {};
     // Annotate proficiency where the student set one: "React (Advanced)".
+    const sk = r.skills || {};
     const levelByName = new Map(
-      (Array.isArray(s.levels) ? s.levels : [])
+      (Array.isArray(sk.levels) ? sk.levels : [])
         .filter((l) => l && clean(l.name) && clean(l.level))
         .map((l) => [clean(l.name).toLowerCase(), clean(l.level)])
     );
@@ -132,58 +105,119 @@ function renderResumePdf(resume, verification = null) {
           return lv ? `${x} (${lv.charAt(0).toUpperCase() + lv.slice(1)})` : x;
         })
         .join(', ');
-    const skillRows = [
-      ['Technical', withLevels(s.technical)],
-      ['Domain', withLevels(s.domain)],
-      ['AI Tools', withLevels(s.ai)],
-      ['Soft Skills', s.soft],
-      ['Languages', s.languages],
-    ].filter(([, v]) => clean(v));
-    if (skillRows.length) {
-      sectionHeading(doc, 'Skills');
-      skillRows.forEach(([label, v]) => {
-        doc.fillColor(INK).font('Helvetica-Bold').fontSize(9.5).text(`${label}: `, { continued: true });
-        doc.font('Helvetica').text(clean(v), { lineGap: 1.5 });
-        doc.moveDown(0.15);
-      });
-    }
 
-    // ── Projects ──
-    const projects = (r.projects || []).filter((x) => clean(x.title));
-    if (projects.length) {
-      sectionHeading(doc, 'Projects');
-      projects.forEach((x) => {
-        const secondary = [
-          clean(x.role),
-          clean(x.techStack) && `Tech: ${clean(x.techStack)}`,
-          clean(x.link),
-        ].filter(Boolean).join(' — ');
-        const body = [clean(x.description), clean(x.outcome) && `Outcome: ${clean(x.outcome)}`].filter(Boolean).join('\n');
-        entry(doc, clean(x.title), secondary, clean(x.duration), body);
-      });
-    }
+    // One renderer per section key; the saved layout decides order and visibility.
+    const sections = {
+      summary: () => {
+        const isObjective = r.summaryMode === 'objective';
+        const text = clean(isObjective ? r.objective : r.summary);
+        if (!text) return;
+        sectionHeading(doc, isObjective ? 'Career Objective' : 'Summary');
+        doc.fillColor(INK).font('Helvetica').fontSize(9.5).text(text, { lineGap: 1.5 });
+      },
+      education: () => {
+        const education = (r.education || []).filter((e) => clean(e.degree) || clean(e.institution));
+        if (!education.length) return;
+        sectionHeading(doc, 'Education');
+        education.forEach((e) => {
+          const title = [clean(e.degree), clean(e.specialisation)].filter(Boolean).join(' in ') || clean(e.institution);
+          const years = [clean(e.startYear), clean(e.year)].filter(Boolean).join(' – ');
+          const meta = e.pursuing ? `${years ? years + ' · ' : ''}Pursuing` : years;
+          entry(
+            doc,
+            title,
+            [clean(e.institution), clean(e.board), clean(e.location), clean(e.grade) && `Grade: ${clean(e.grade)}`]
+              .filter(Boolean)
+              .join(' — '),
+            meta,
+            ''
+          );
+        });
+      },
+      internships: () => renderExp('Internships', allExp.filter((e) => clean(e.type) === 'internship')),
+      experience: () => renderExp('Experience', allExp.filter((e) => clean(e.type) !== 'internship')),
+      projects: () => {
+        const projects = (r.projects || []).filter((x) => clean(x.title));
+        if (!projects.length) return;
+        sectionHeading(doc, 'Projects');
+        projects.forEach((x) => {
+          const secondary = [clean(x.role), clean(x.techStack) && `Tech: ${clean(x.techStack)}`, clean(x.link)].filter(Boolean).join(' — ');
+          const text = [clean(x.description), clean(x.outcome) && `Outcome: ${clean(x.outcome)}`].filter(Boolean).join('\n');
+          entry(doc, clean(x.title), secondary, clean(x.duration), text);
+        });
+      },
+      skills: () => {
+        const skillRows = [
+          ['Technical', withLevels(sk.technical)],
+          ['Domain', withLevels(sk.domain)],
+          ['AI Tools', withLevels(sk.ai)],
+          ['Soft Skills', sk.soft],
+          ['Languages', sk.languages],
+        ].filter(([, v]) => clean(v));
+        if (!skillRows.length) return;
+        sectionHeading(doc, 'Skills');
+        skillRows.forEach(([label, v]) => {
+          doc.fillColor(INK).font('Helvetica-Bold').fontSize(9.5).text(`${label}: `, { continued: true });
+          doc.font('Helvetica').text(clean(v), { lineGap: 1.5 });
+          doc.moveDown(0.15);
+        });
+      },
+      certifications: () => {
+        const certifications = (r.certifications || []).filter((c) => clean(c.name));
+        if (!certifications.length) return;
+        sectionHeading(doc, 'Certifications');
+        certifications.forEach((c) =>
+          entry(
+            doc,
+            clean(c.name),
+            [clean(c.issuer), clean(c.credentialId) && `ID: ${clean(c.credentialId)}`, clean(c.link)].filter(Boolean).join(' — '),
+            clean(c.year),
+            ''
+          )
+        );
+      },
+      positions: () => {
+        const rows = (r.positions || []).filter((x) => clean(x.title));
+        if (!rows.length) return;
+        sectionHeading(doc, 'Positions of Responsibility & Activities');
+        rows.forEach((x) =>
+          entry(
+            doc,
+            clean(x.title),
+            [clean(x.organisation), clean(x.type) === 'activity' ? 'Extracurricular' : ''].filter(Boolean).join(' — '),
+            clean(x.duration),
+            clean(x.description)
+          )
+        );
+      },
+      publications: () => {
+        const rows = (r.publications || []).filter((x) => clean(x.title));
+        if (!rows.length) return;
+        sectionHeading(doc, 'Publications & Patents');
+        rows.forEach((x) =>
+          entry(
+            doc,
+            clean(x.title),
+            [clean(x.type) === 'patent' ? 'Patent' : '', clean(x.venue), clean(x.link)].filter(Boolean).join(' — '),
+            clean(x.year),
+            clean(x.description)
+          )
+        );
+      },
+      awards: () => {
+        const achievements = (r.achievements || []).filter((x) => clean(x.title));
+        if (!achievements.length) return;
+        sectionHeading(doc, 'Achievements');
+        achievements.forEach((x) => entry(doc, clean(x.title), clean(x.link), '', clean(x.description)));
+      },
+    };
 
-    // ── Certifications ──
-    const certifications = (r.certifications || []).filter((c) => clean(c.name));
-    if (certifications.length) {
-      sectionHeading(doc, 'Certifications');
-      certifications.forEach((c) =>
-        entry(
-          doc,
-          clean(c.name),
-          [clean(c.issuer), clean(c.credentialId) && `ID: ${clean(c.credentialId)}`, clean(c.link)].filter(Boolean).join(' — '),
-          clean(c.year),
-          ''
-        )
-      );
-    }
-
-    // ── Achievements ──
-    const achievements = (r.achievements || []).filter((x) => clean(x.title));
-    if (achievements.length) {
-      sectionHeading(doc, 'Achievements');
-      achievements.forEach((x) => entry(doc, clean(x.title), clean(x.link), '', clean(x.description)));
-    }
+    layout.sectionOrder.forEach((key) => {
+      if (hidden.has(key)) return;
+      const extra = layout.sectionSpacing[key] || 0;
+      if (extra) doc.moveDown(extra * 0.6);
+      sections[key]?.();
+    });
 
     // ── Verification footer ──
     if (verification?.resumePublicId) {
