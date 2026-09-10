@@ -941,7 +941,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         if (listFrom(reg.higherEducation).length > 0) {
             listFrom(reg.higherEducation).forEach((edu, idx) => {
                 eduList.push({
-                    level: 'degree',
+                    // Registration stores qualificationLevel + degreeStatus; the
+                    // resume needs the level chip and the "pursuing" flag.
+                    level: /diploma|polytechnic/i.test(String(edu.qualificationLevel || edu.degreeFullName || '')) ? 'diploma' : 'degree',
+                    pursuing: /pursu|ongoing|current|in progress/i.test(String(edu.degreeStatus || edu.status || '')),
                     specialisation: firstCleanValue(edu.specialization, edu.specialisation, edu.branch, edu.stream),
                     board: firstCleanValue(edu.university, edu.board),
                     startYear: firstCleanValue(edu.startYear, edu.yearOfJoining),
