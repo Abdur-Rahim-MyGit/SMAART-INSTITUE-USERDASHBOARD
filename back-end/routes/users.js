@@ -8,6 +8,7 @@ const College = require('../models/College');
 const CollegeDegree = require('../models/CollegeDegree');
 const upload = require('../middleware/upload');
 const { protect } = require('../middleware/auth');
+const { registrationIdentity } = require('../middleware/registrationIdentity');
 const { createDefaultUserSettings } = require('../models/schemas/userSettings');
 
 const router = express.Router();
@@ -113,9 +114,9 @@ router.post('/register-details', upload.fields([
   { name: 'workExpCertificate_3', maxCount: 1 }, { name: 'workExpCertificate_4', maxCount: 1 }, { name: 'workExpCertificate_5', maxCount: 1 },
   { name: 'techCertificate_0', maxCount: 1 }, { name: 'techCertificate_1', maxCount: 1 }, { name: 'techCertificate_2', maxCount: 1 },
   { name: 'techCertificate_3', maxCount: 1 }, { name: 'techCertificate_4', maxCount: 1 }, { name: 'techCertificate_5', maxCount: 1 }
-]), async (req, res) => {
+]), registrationIdentity((req) => req.body?.email), async (req, res) => {
   try {
-    const { email, fullName, mobileNumber, password, personalDetails, academicDetails, ...registrationData } = req.body;
+    const { email, fullName, mobileNumber, password, personalDetails, academicDetails, signupToken, ...registrationData } = req.body;
 
     // Normalize email
     const normalizedEmail = (email || '').trim().toLowerCase();
@@ -422,7 +423,7 @@ router.post('/register-details', upload.fields([
 });
 
 // Save individual registration section (for progressive saving)
-router.patch('/register-section', async (req, res) => {
+router.patch('/register-section', registrationIdentity((req) => req.body?.email), async (req, res) => {
   try {
     const { email, section, data } = req.body;
 
@@ -794,7 +795,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Get Registration Details
-router.get('/register-details/:email', async (req, res) => {
+router.get('/register-details/:email', registrationIdentity((req) => req.params.email), async (req, res) => {
   try {
     const { email } = req.params;
     const Student = require('../models/Student');
@@ -826,17 +827,9 @@ router.get('/register-details/:email', async (req, res) => {
       if (user) userSource = 'User';
     }
 
-    // If still not found, check Registration collection by email
-    if (!user) {
-      const regByEmail = await Registration.findOne({ email: normalizedEmail });
-      if (regByEmail) {
-        return res.json({
-          ...stripSensitive(regByEmail.toObject()),
-          fullName: regByEmail.fullName,
-          gender: regByEmail.gender
-        });
-      }
-    }
+    // The legacy standalone Registration collection was merged into Student;
+    // registration data now lives only on the student document, so an unknown
+    // email falls straight through to the generic response below.
 
     // If no user found anywhere, return generic response
     if (!user) {

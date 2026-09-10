@@ -99,6 +99,8 @@ const VerifyOTP = () => {
       // Store verification status
       sessionStorage.setItem("otpVerified", "true");
       sessionStorage.removeItem("signupTempToken");
+      // Short-lived proof of email ownership for /users/register-* before login.
+      if (data.signupToken) sessionStorage.setItem("signupToken", data.signupToken);
       
       // Redirect to comprehensive signup
       navigate("/signup");

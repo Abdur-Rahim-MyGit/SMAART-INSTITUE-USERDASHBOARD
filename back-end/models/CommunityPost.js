@@ -8,7 +8,10 @@ const reactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['like', 'heart', 'insightful', 'support', 'smile'],
+    // Named types are what POST /discussions/:id/react accepts; the emoji set
+    // is what the notices/feed UI already stored on 14 of 22 posts. Without
+    // the emoji here every save() on those posts failed validation.
+    enum: ['like', 'heart', 'insightful', 'support', 'smile', '👍', '❤️', '🔥', '💡', '🙌', '😄'],
     required: true
   },
   createdAt: {
@@ -21,7 +24,8 @@ const replySchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    // Not `required`: older/system replies have no author and a required
+    // rule here made the parent post unsaveable. Route handlers always set it.
   },
   content: {
     type: String,
@@ -44,6 +48,8 @@ const replySchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+const COMMUNITY_CATEGORIES = ['general', 'career', 'study', 'exams', 'skills', 'motivation', 'other'];
 
 const communityPostSchema = new mongoose.Schema({
   title: {
@@ -73,8 +79,17 @@ const communityPostSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['general', 'career', 'study', 'exams', 'skills', 'motivation', 'other'],
-    default: 'general'
+    lowercase: true,
+    trim: true,
+    default: 'general',
+    // Case-insensitive check rather than `enum`: 13 stored posts carry
+    // "General" (setters do not run on documents loaded from the DB), and an
+    // exact-case enum made every one of them unsaveable — so reply/react/
+    // bookmark/report and even the view counter 500ed on those threads.
+    validate: {
+      validator: (v) => !v || COMMUNITY_CATEGORIES.includes(String(v).toLowerCase()),
+      message: (props) => `\x60${props.value}\x60 is not a valid category`,
+    },
   },
   college: {
     type: mongoose.Schema.Types.ObjectId,
@@ -92,7 +107,7 @@ const communityPostSchema = new mongoose.Schema({
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      // Not `required` — see replySchema.author.
     },
     vote: {
       type: String,

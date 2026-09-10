@@ -246,11 +246,20 @@ router.post('/verify-signup-otp', otpLimiter, async (req, res) => {
     otpRecord.isUsed = true;
     await otpRecord.save();
 
+    // Proves ownership of the address to /users/register-details and
+    // /users/register-section before an account/session exists (web signup).
+    const signupToken = jwt.sign(
+      { purpose: 'signup', email: String(otpRecord.userData.email || '').toLowerCase() },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
     res.json({
       success: true,
       message: 'Email verified successfully',
       email: otpRecord.userData.email,
       fullName: otpRecord.userData.fullName,
+      signupToken,
     });
   } catch (err) {
     console.error('[Verify Signup OTP] Error:', err.message);
@@ -1745,7 +1754,16 @@ router.post('/renew-token', protect, async (req, res) => {
       email: user.email,
     };
     if (user.role) payload.role = user.role;
-    if (user.userType) payload.userType = user.userType;
+    // Student/Teacher documents have no `userType` field, so copying it from
+    // `user` silently dropped the claim and `protect` then resolved the renewed
+    // token against the User collection ("User account not found" on every
+    // request after the first renewal). Carry the claim over from the token
+    // being renewed, falling back to the model it resolved to.
+    const incomingToken = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+    const incomingClaims = (incomingToken && jwt.decode(incomingToken)) || {};
+    const MODEL_USER_TYPES = { Student: 'student', Teacher: 'teacher' };
+    const userType = user.userType || incomingClaims.userType || MODEL_USER_TYPES[user.constructor?.modelName];
+    if (userType) payload.userType = userType;
     // CRITICAL: Preserve sessionId for single-session enforcement
     if (user.currentSessionId) payload.sessionId = user.currentSessionId;
 

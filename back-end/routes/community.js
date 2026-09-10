@@ -743,10 +743,11 @@ router.get("/discussions", async (req, res) => {
         }
       }
 
+      // `targetDegree` is an ObjectId path — an empty-string clause makes
+      // Mongoose throw a CastError, which 500ed the feed for every student.
       const degreeConditions = [
         { targetDegree: { $exists: false } },
-        { targetDegree: null },
-        { targetDegree: "" }
+        { targetDegree: null }
       ];
 
       if (targetDegreeIds.length > 0) {
@@ -1180,8 +1181,12 @@ router.get("/discussions/:id", async (req, res) => {
         .json({ success: false, error: "Discussion not found" });
     }
 
+    // Atomic increment, not `save()`: a full save re-validates the whole
+    // document and older posts (legacy category names, emoji reaction types,
+    // replies without an author) fail the current schema, which 500ed the
+    // detail view for every such thread.
     discussion.views = (discussion.views || 0) + 1;
-    await discussion.save();
+    await CommunityPost.updateOne({ _id: discussion._id }, { $inc: { views: 1 } });
 
     const populatedDiscussion = await CommunityPost.findById(
       req.params.id,
@@ -1208,8 +1213,12 @@ router.post("/discussions/:id/view", async (req, res) => {
         .json({ success: false, error: "Discussion not found" });
     }
 
+    // Atomic increment, not `save()`: a full save re-validates the whole
+    // document and older posts (legacy category names, emoji reaction types,
+    // replies without an author) fail the current schema, which 500ed the
+    // detail view for every such thread.
     discussion.views = (discussion.views || 0) + 1;
-    await discussion.save();
+    await CommunityPost.updateOne({ _id: discussion._id }, { $inc: { views: 1 } });
 
     res.json({ success: true, data: { views: discussion.views } });
   } catch (error) {
@@ -2012,7 +2021,7 @@ router.get("/contributors", async (req, res) => {
               $group: {
                 _id: "$author",
                 postCount: { $sum: 1 },
-                likesReceived: { $sum: { $size: "$likes" } },
+                likesReceived: { $sum: { $size: { $ifNull: ["$likes", []] } } },
               },
             },
           ],

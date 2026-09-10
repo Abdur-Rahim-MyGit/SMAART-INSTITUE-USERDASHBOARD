@@ -20,7 +20,10 @@ const ProfileDropdown = () => {
       if (!user?.email) return;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
+        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`, {
+            credentials: "include",
+            headers: sessionStorage.getItem("token") ? { Authorization: `Bearer ${sessionStorage.getItem("token")}` } : {},
+          });
         if (response.ok) {
           const data = await response.json();
           // Check for profilePhoto at root level first (new structure), then fallback to otherDetails

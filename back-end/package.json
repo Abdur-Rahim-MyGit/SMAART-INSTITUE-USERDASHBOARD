@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "find:console": "node scripts/find-console-logs.js",
-    "test": "jest --coverage",
+    "test": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
     "audit:security": "npm audit --audit-level=moderate"
   },

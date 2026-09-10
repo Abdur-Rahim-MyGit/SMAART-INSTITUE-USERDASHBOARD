@@ -186,7 +186,10 @@ const ComprehensiveSignup = () => {
     const fetchLatestDetails = async () => {
       if (email) {
         try {
-          const regData = await apiCall(`/users/register-details/${email}`);
+          const signupToken = sessionStorage.getItem("signupToken");
+          const regData = await apiCall(`/users/register-details/${email}`, {
+            headers: signupToken ? { "X-Signup-Token": signupToken } : {},
+          });
           const studentRes = await apiCall(`/students/by-email/${email}`).catch(() => null);
           let currentStudent = null;
           if (studentRes?.success && studentRes?.data) {
@@ -666,6 +669,7 @@ const ComprehensiveSignup = () => {
           email: personalDetails.email,
           section: sectionName,
           data: sectionData,
+          signupToken: sessionStorage.getItem("signupToken") || undefined,
         }),
       });
       console.log(`[ComprehensiveSignup] Section '${sectionName}' saved successfully`);
@@ -805,8 +809,11 @@ const ComprehensiveSignup = () => {
       const certData = certificates.isApplicable ? certificates.items.map(c => ({ ...c, certificateFile: c.certificateFile?.publicId || c.certificateFile })) : [];
       formData.append("certificates", JSON.stringify(certData));
       formData.append("submissionDate", new Date().toISOString());
+      const signupToken = sessionStorage.getItem("signupToken");
+      if (signupToken) formData.append("signupToken", signupToken);
 
       await apiCall('/users/register-details', { method: "POST", body: formData });
+      sessionStorage.removeItem("signupToken");
 
       // Success State Trigger
       setIsLoading(false);
