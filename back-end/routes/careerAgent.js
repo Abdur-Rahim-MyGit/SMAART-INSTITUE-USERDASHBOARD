@@ -19,7 +19,6 @@ const {
   CareerRoleModel,
   RoleProfileModel,
   RoleSkillModel,
-  CareerDirectionModel,
   FinalCareerPathwayModel
 } = require('../models/careerAgentModels');
 
@@ -698,32 +697,45 @@ router.get('/all-directions', async (req, res) => {
  */
 router.post('/career-direction', async (req, res) => {
   try {
-    const { degree, specialisation, roleName } = req.body;
-    if (!degree || typeof degree !== 'string') {
-      return res.status(400).json({ error: 'degree is required' });
+    const { degree, roleName } = req.body;
+    if (!roleName || typeof roleName !== 'string') {
+      return res.status(400).json({ error: 'roleName is required' });
     }
     // SECURITY: escape regex metacharacters and cap length so an attacker cannot
     // send a catastrophic-backtracking pattern (e.g. "(a+)+$") to hang the query
     // (ReDoS). Escaping keeps the original case-insensitive substring match for
-    // legitimate degree names while neutralising metacharacters.
-    const escapedDegree = degree.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const degreeDoc = await CareerDirectionModel.findOne({
-      degree_name: { $regex: new RegExp(escapedDegree, 'i') }
+    // legitimate role names while neutralising metacharacters.
+    const escapedRole = roleName.slice(0, 150).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const roleRegex = new RegExp(escapedRole, 'i');
+
+    // Real career-direction data lives in the `careerdirections` collection
+    // (CareerAgentDataModel), keyed by 'Career Direction' and 'Job Role 1'..
+    // 'Job Role 10' — not the separate, unpopulated CareerDirectionModel
+    // this route previously queried.
+    const directionDoc = await CareerAgentDataModel.findOne({
+      $or: [
+        { 'Career Direction': roleRegex },
+        ...[1,2,3,4,5,6,7,8,9,10].map(n => ({ [`Job Role ${n}`]: roleRegex }))
+      ]
     }).lean();
 
-    if (!degreeDoc) {
-      return res.status(404).json({ error: 'Degree mapping not found' });
-    }
-
-    const foundDirection = degreeDoc.directions.find(dir =>
-      dir.roles.some(r => r.toLowerCase() === roleName.toLowerCase() || roleName.toLowerCase().includes(r.toLowerCase()))
-    );
-
-    if (!foundDirection) {
+    if (!directionDoc) {
       return res.status(404).json({ error: 'No matching direction for this role' });
     }
 
-    res.json({ degree_name: degreeDoc.degree_name, direction: foundDirection });
+    const roles = [1,2,3,4,5,6,7,8,9,10]
+      .map(n => directionDoc[`Job Role ${n}`])
+      .filter(r => r && typeof r === 'string' && r.trim() !== '');
+
+    res.json({
+      degree_name: degree || directionDoc['Spec ID'] || null,
+      direction: {
+        directionId: directionDoc['Direction ID'],
+        name: directionDoc['Career Direction'],
+        description: directionDoc['Overview / Description'] || null,
+        roles
+      }
+    });
   } catch (error) {
     console.error('[career-agent] Error fetching career direction:', error);
     res.status(500).json({ error: 'Internal server error' });

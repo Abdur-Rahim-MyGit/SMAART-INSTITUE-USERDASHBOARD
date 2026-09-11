@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Compass, ChevronRight, AlertCircle, TrendingUp, UserRound, Zap, ListChecks } from '@/components/icons';
+import { Compass, ListChecks } from '@/components/icons';
 
 const CareerDirectionCard = ({ roleName, mongoRoleData }) => {
     const [data, setData] = useState({
@@ -23,12 +23,12 @@ const CareerDirectionCard = ({ roleName, mongoRoleData }) => {
                 // 2. FETCH ROLE DATA (if not in props)
                 let roleDoc = mongoRoleData;
                 if (!roleDoc) {
-                    const rRes = await fetch(`/api/career-role/${encodeURIComponent(roleName)}`);
+                    const rRes = await fetch(`/api/career-agent/career-role/${encodeURIComponent(roleName)}`);
                     if (rRes.ok) roleDoc = await rRes.json();
                 }
 
                 // 3. FETCH DIRECTION MAPPING FROM MONGODB
-                const dRes = await fetch('/api/career-direction', {
+                const dRes = await fetch('/api/career-agent/career-direction', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ degree, specialisation: spec, roleName })
@@ -135,23 +135,28 @@ const CareerDirectionCard = ({ roleName, mongoRoleData }) => {
                 <div style={S.card}>
                     <div style={S.header}>
                         <div style={S.title}><Compass size={18} className="icon-accent" /> Audited Career Direction</div>
-                        <span style={S.badge(data.direction.direction_type)}>{data.direction.direction_type} Fit</span>
+                        {data.direction.degree && (
+                            <span style={S.badge('Primary')}>{data.direction.degree}</span>
+                        )}
                     </div>
                     <div style={S.content}>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--muted)', fontWeight: 600, marginBottom: '0.4rem' }}>PATHWAY VIA: <span style={{ color: 'var(--accent)' }}>{data.direction.degree}</span></div>
-                        <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '1.15rem', color: 'var(--text1)' }}>{data.direction.direction_name}</h4>
-                        <p style={{ fontSize: '0.88rem', color: 'var(--text2)', lineHeight: 1.6, margin: 0 }}>{data.direction.direction_description}</p>
-                        
-                        <div style={S.grid}>
-                            <div style={{ background: 'var(--accent-tint)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--accent-border)' }}>
-                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.4rem' }}><TrendingUp size={12} /> STRATEGIC FIT</div>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text2)', margin: 0, lineHeight: 1.5 }}>{data.direction.why_primary || data.direction.realistic_note}</p>
-                            </div>
-                            <div style={{ background: 'rgba(245,158,11,0.04)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.4rem' }}><Target size={12} /> TRANSITION EFFORT</div>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text2)', margin: 0, lineHeight: 1.5 }}>{data.direction.estimated_additional_effort || "Minimal (Direct pathway)"}</p>
-                            </div>
-                        </div>
+                        <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '1.15rem', color: 'var(--text1)' }}>{data.direction.name}</h4>
+                        {data.direction.description && (
+                            <p style={{ fontSize: '0.88rem', color: 'var(--text2)', lineHeight: 1.6, margin: 0 }}>{data.direction.description}</p>
+                        )}
+
+                        {data.direction.roles?.length > 0 && (
+                            <>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '1rem', marginBottom: '0.5rem' }}>
+                                    <ListChecks size={12} /> ROLES IN THIS DIRECTION
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                    {data.direction.roles.map(r => (
+                                        <span key={r} style={S.tag}>{r}</span>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

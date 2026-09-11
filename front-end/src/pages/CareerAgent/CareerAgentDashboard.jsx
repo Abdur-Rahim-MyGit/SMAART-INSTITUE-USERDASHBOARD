@@ -289,11 +289,19 @@ const CareerAgentDashboard = () => {
         skill_gap: { current_skills: [], missing_skills: [] }
     };
 
+    // Matches the backend's own Green/Amber/Red cutoffs exactly (careerEngine.js
+    // determineZone: score >= 0.6 -> Green, >= 0.3 -> Amber, else Red) so the
+    // color shown here can never disagree with the zone the engine computed.
     const getScoreClass = (score) => {
-        if (score >= 80) return 'green-clr';
-        if (score >= 50) return 'amber-clr';
+        if (score >= 60) return 'green-clr';
+        if (score >= 30) return 'amber-clr';
         return 'red-clr';
     };
+
+    // Real zone from the engine (Green/Amber/Red), not the tab position —
+    // a Secondary or Tertiary pick can legitimately be Green too.
+    const zoneDot = currentData?.zone === 'Green' ? 'green' : currentData?.zone === 'Amber' ? 'amber' : currentData?.zone === 'Red' ? 'red' : (activeRole === 1 ? 'green' : activeRole === 2 ? 'amber' : 'red');
+    const zoneCardClass = currentData?.zone === 'Green' ? 'zone-green-card' : currentData?.zone === 'Amber' ? 'zone-primary' : currentData?.zone === 'Red' ? 'zone-red-card' : (activeRole === 1 ? 'zone-green-card' : activeRole === 2 ? 'zone-primary' : 'zone-red-card');
 
     const panels = [
         { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} stroke={1.5} /> },
@@ -476,7 +484,7 @@ const CareerAgentDashboard = () => {
                             Active Direction
                         </div>
                         <div className="sb-role-indicator">
-                            <div className={`sb-role-dot ${activeRole === 1 ? 'green' : activeRole === 2 ? 'amber' : 'red'}`}></div>
+                            <div className={`sb-role-dot ${zoneDot}`}></div>
                             <div className="sb-role-name" title={currentData?.tab1?.role_name || 'Loading...'}>
                                 {currentData?.tab1?.role_name || 'Loading...'}
                             </div>
@@ -507,10 +515,13 @@ const CareerAgentDashboard = () => {
                     {activePanel === 'overview' && (
                         <div className="panel animate-fade-in">
                             <div className="overview-hero">
-                                <div className={`oh-card ${activeRole === 1 ? 'zone-green-card' : activeRole === 2 ? 'zone-primary' : 'zone-red-card'}`}>
+                                <div className={`oh-card ${zoneCardClass}`}>
                                     <div className="oh-card-label">{t('career_agent.overview.overall_match', 'Overall Match')}</div>
                                     <div className={`oh-pct ${getScoreClass(matchScore)}`}>{matchScore}%</div>
                                     <div style={{ fontSize: '0.7rem', fontWeight: 600 }}>{t('career_agent.overview.alignment_prob', 'Alignment Probability')}</div>
+                                    {currentData?.zone_message && (
+                                        <div style={{ fontSize: '0.68rem', fontWeight: 500, opacity: 0.85, marginTop: '0.2rem' }}>{currentData.zone_message}</div>
+                                    )}
                                 </div>
                                 <div className="oh-card" style={{ background: 'var(--navy3)', border: '1px solid var(--border)' }}>
                                     <div className="oh-card-label">{t('career_agent.overview.prep_time', 'Preparation Time')}</div>
