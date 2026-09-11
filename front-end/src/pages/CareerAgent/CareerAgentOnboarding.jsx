@@ -338,45 +338,81 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [], disabl
   );
 }
 
-// CitySearchInput
+// CitySearchInput — browsable + searchable, mirrors RoleSearchInput's UX:
+// clicking the field (or the chevron) reveals the full city list immediately,
+// typing narrows it. Previously this only showed suggestions after typing,
+// which made the field look empty/non-functional even though it was already
+// backed by a real ~100-city dataset.
 function CitySearchInput({ selected = [], onChange, max = 3 }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
+  const [show, setShow] = useState(false);
+  const ref = useRef(null);
   const cities = Array.isArray(indianCities) ? indianCities : (indianCities.cities || []);
-  const filtered = query.length > 0
-    ? cities.filter(c => c && typeof c === 'string' && c.toLowerCase().includes(query.toLowerCase())).slice(0, 10)
-    : [];
+
+  const available = useMemo(() => cities.filter(c => c && typeof c === 'string' && !selected.includes(c)), [cities, selected]);
+  const filtered = useMemo(() => {
+    if (!query.trim()) return available.slice(0, 60);
+    const q = query.toLowerCase().trim();
+    return available.filter(c => c.toLowerCase().includes(q)).slice(0, 60);
+  }, [available, query]);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setShow(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const atLimit = selected.length >= max;
 
   const add = (city) => {
     if (!selected.includes(city) && selected.length < max) {
       onChange([...selected, city]);
     }
     setQuery('');
+    if (selected.length + 1 >= max) setShow(false);
   };
   const remove = (city) => onChange(selected.filter(c => c !== city));
 
   return (
-    <div>
+    <div ref={ref}>
       <div className="tags" style={{ marginBottom: '0.4rem' }}>
         {selected.map(c => (
           <span key={c} className="tag">{c} <button type="button" onClick={() => remove(c)}>x</button></span>
         ))}
       </div>
-      <div style={{ position: 'relative' }}>
-        <input type="text" placeholder={t('career_agent.onboarding.search_city_placeholder', 'Search city...')} value={query}
-          onChange={e => setQuery(e.target.value)}
-          disabled={selected.length >= max}
-          style={{ opacity: selected.length >= max ? 0.5 : 1 }}
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <input type="text" placeholder={atLimit ? t('career_agent.onboarding.location_limit_reached', 'Limit reached — remove a city to add another') : t('career_agent.onboarding.search_city_placeholder', 'Search city...')} value={query}
+          onChange={e => { setQuery(e.target.value); setShow(true); }}
+          onFocus={() => { if (!atLimit) setShow(true); }}
+          disabled={atLimit}
+          style={{ width: '100%', paddingRight: '2.5rem', opacity: atLimit ? 0.5 : 1 }}
         />
-        {filtered.length > 0 && (
-          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '160px', overflowY: 'auto', marginTop: '6px' }}>
-            {filtered.map(c => (
+        <button
+          type="button"
+          disabled={atLimit}
+          onClick={() => { if (!atLimit) setShow(prev => !prev); }}
+          style={{
+            position: 'absolute', right: '0.75rem', background: 'none', border: 'none',
+            color: 'var(--muted)', cursor: atLimit ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
+            padding: '0.3rem', opacity: atLimit ? 0.5 : 1
+          }}
+        >
+          <ChevronDown size={16} style={{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        </button>
+        {show && !atLimit && (
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '220px', overflowY: 'auto', marginTop: '6px' }}>
+            {filtered.length > 0 ? filtered.map(c => (
               <div key={c} onClick={() => add(c)}
                 style={{ padding: '0.7rem 1.1rem', cursor: 'pointer', fontSize: '0.85rem', color: '#334155', transition: 'background 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >{c}</div>
-            ))}
+            )) : (
+              <div style={{ padding: '0.8rem 1.1rem', fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center' }}>
+                {t('career_agent.onboarding.no_matching_cities', 'No matching cities found.')}
+              </div>
+            )}
           </div>
         )}
       </div>
