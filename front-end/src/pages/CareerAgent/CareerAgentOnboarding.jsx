@@ -339,10 +339,10 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [], disabl
 }
 
 // CitySearchInput — browsable + searchable, mirrors RoleSearchInput's UX:
-// clicking the field (or the chevron) reveals the full city list immediately,
-// typing narrows it. Previously this only showed suggestions after typing,
-// which made the field look empty/non-functional even though it was already
-// backed by a real ~100-city dataset.
+// clicking the field (or the chevron) reveals the list immediately, typing
+// narrows it. Backed by every district across all 36 Indian states/UTs
+// (derived from the same postal dataset used in Profile/Signup), not just a
+// curated metro shortlist — see data/indianCities.json.
 function CitySearchInput({ selected = [], onChange, max = 3 }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
