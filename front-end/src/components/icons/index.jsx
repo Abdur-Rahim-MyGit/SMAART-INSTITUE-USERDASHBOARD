@@ -4,7 +4,7 @@
 // component it replaced, so existing JSX such as <Search className="w-4 h-4" />
 // keeps working untouched.
 //
-// The font is subsetted: index.html requests exactly the 116 ligature names
+// The font is subsetted: index.html requests exactly the 144 ligature names
 // listed in ICON_NAMES below (79 KB instead of the full 3.8 MB face). If you add
 // an icon here you MUST add its name to the icon_names list in index.html, or it
 // will render as literal text. In development the console warns when that happens.
@@ -24,6 +24,7 @@ export const ICON_NAMES = Object.freeze([
   "article",
   "assignment",
   "badge",
+  "bar_chart",
   "bolt",
   "bug_report",
   "calculate",
@@ -42,18 +43,24 @@ export const ICON_NAMES = Object.freeze([
   "closed_caption",
   "cloud",
   "code",
+  "construction",
   "content_copy",
+  "corporate_fare",
+  "credit_card",
+  "dangerous",
   "dark_mode",
   "database",
   "delete",
   "description",
   "design_services",
+  "desktop_windows",
   "directions_boat",
   "done_all",
   "download",
   "edit",
   "engineering",
   "error",
+  "explore",
   "fact_check",
   "fit_screen",
   "flag",
@@ -62,12 +69,14 @@ export const ICON_NAMES = Object.freeze([
   "fullscreen",
   "fullscreen_exit",
   "gavel",
+  "genetics",
   "gpp_maybe",
   "groups",
   "handshake",
   "handyman",
   "help",
   "home_pin",
+  "how_to_reg",
   "hub",
   "id_card",
   "info",
@@ -85,16 +94,21 @@ export const ICON_NAMES = Object.freeze([
   "local_fire_department",
   "location_on",
   "lock",
+  "lock_open",
   "logout",
   "mail",
   "map",
   "medical_services",
+  "memory",
   "menu",
   "menu_book",
   "mic",
+  "military_tech",
   "monitor_heart",
   "music_note",
   "my_location",
+  "navigation",
+  "neurology",
   "notifications",
   "open_in_new",
   "pause",
@@ -168,6 +182,28 @@ export { default as MaterialIcon } from "./MaterialIcon";
 
 // --- identifiers that previously came from lucide-react / @tabler/icons-react ---
 export const AlertCircle = /*#__PURE__*/ icon("AlertCircle", "error");
+export const AlertOctagon = /*#__PURE__*/ icon("AlertOctagon", "dangerous");
+export const AlertTriangle = /*#__PURE__*/ icon("AlertTriangle", "warning");
+export const BarChart3 = /*#__PURE__*/ icon("BarChart3", "bar_chart");
+export const BrainCircuit = /*#__PURE__*/ icon("BrainCircuit", "neurology");
+export const Building2 = /*#__PURE__*/ icon("Building2", "corporate_fare");
+export const Code2 = /*#__PURE__*/ icon("Code2", "code");
+export const Compass = /*#__PURE__*/ icon("Compass", "explore");
+export const CreditCard = /*#__PURE__*/ icon("CreditCard", "credit_card");
+export const Cpu = /*#__PURE__*/ icon("Cpu", "memory");
+export const Globe = /*#__PURE__*/ icon("Globe", "public");
+export const Hammer = /*#__PURE__*/ icon("Hammer", "construction");
+export const ListChecks = /*#__PURE__*/ icon("ListChecks", "checklist");
+export const Navigation = /*#__PURE__*/ icon("Navigation", "navigation");
+export const Network = /*#__PURE__*/ icon("Network", "hub");
+export const UserCheck = /*#__PURE__*/ icon("UserCheck", "how_to_reg");
+export const UserRound = /*#__PURE__*/ icon("UserRound", "person");
+export const Unlock = /*#__PURE__*/ icon("Unlock", "lock_open");
+export const Bot = /*#__PURE__*/ icon("Bot", "smart_toy");
+export const Dna = /*#__PURE__*/ icon("Dna", "genetics");
+export const MapPin = /*#__PURE__*/ icon("MapPin", "location_on");
+export const Medal = /*#__PURE__*/ icon("Medal", "military_tech");
+export const Monitor = /*#__PURE__*/ icon("Monitor", "desktop_windows");
 export const AlignLeft = /*#__PURE__*/ icon("AlignLeft", "format_align_left");
 export const ArrowRight = /*#__PURE__*/ icon("ArrowRight", "arrow_forward");
 export const Award = /*#__PURE__*/ icon("Award", "workspace_premium");

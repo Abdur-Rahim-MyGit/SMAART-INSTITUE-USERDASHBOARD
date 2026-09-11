@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, RefreshCw, AlertTriangle, AlertOctagon, Lock, CheckCircle, Target, ShieldCheck } from 'lucide-react';
+import { Clock, RefreshCw, AlertTriangle, AlertOctagon, Lock, CheckCircle, Target, ShieldCheck } from '@/components/icons';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const CareerLockBanner = ({ lockStatus }) => {

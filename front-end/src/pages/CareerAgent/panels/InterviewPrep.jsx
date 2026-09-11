@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IconBrain as Brain, IconTarget as Target, IconCode as Code2, IconMicrophone as Mic } from '@tabler/icons-react';
+import { Brain, Target, Code2, Mic } from '@/components/icons';
 
 const PROFILE_FILES = [
     '/Tech_Role_Profiles_AUDITED_FINAL.json',

@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Clock, RefreshCw, Lock, Sparkles, ArrowRight } from 'lucide-react';
+import { Target, Clock, RefreshCw, Lock, Sparkles, ArrowRight } from '@/components/icons';
 import { markModalShown } from '@/services/CareerLockService';
 
 const CareerFirstVisitModal = ({ isOpen, onStartAnalysis, onRemindLater, lockStatus }) => {

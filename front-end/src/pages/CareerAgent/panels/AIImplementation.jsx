@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrainCircuit, Sparkles, Clock, Network } from 'lucide-react';
+import { BrainCircuit, Sparkles, Clock, Network } from '@/components/icons';
 
 const AIImplementation = () => {
     return (

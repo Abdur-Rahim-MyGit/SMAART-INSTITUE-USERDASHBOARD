@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Unlock, Clock, RefreshCw, Target, CheckCircle } from 'lucide-react';
+import { Lock, Unlock, Clock, RefreshCw, Target, CheckCircle } from '@/components/icons';
 
 const CareerLockStatusCard = ({ lockStatus }) => {
     if (!lockStatus || !lockStatus.found) return null;

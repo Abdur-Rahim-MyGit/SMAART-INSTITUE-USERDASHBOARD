@@ -19,32 +19,32 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import {
-    IconCompass as Compass,
-    IconClipboardList as ClipboardList,
-    IconChartBar as BarChart3,
-    IconDna as Dna,
-    IconMap2 as Map,
-    IconAward as Award,
-    IconRocket as Rocket,
-    IconRobot as Bot,
-    IconMicrophone as Mic,
-    IconFileText as FileText,
-    IconCode as Code,
-    IconLock as Lock,
-    IconLockOpen as Unlock,
-    IconCircleCheck as CheckCircle,
-    IconTrophy as Trophy,
-    IconMedal as Medal,
-    IconTarget as Target,
-    IconSparkles as Sparkles,
-    IconSun as Sun,
-    IconMoon as Moon,
-    IconDeviceDesktop as Monitor,
-    IconChevronDown as ChevronDown,
-    IconX as X,
-    IconMenu2 as Menu,
-    IconRefresh as RefreshCw
-} from '@tabler/icons-react';
+    Compass,
+    ClipboardList,
+    BarChart3,
+    Dna,
+    Map,
+    Award,
+    Rocket,
+    Bot,
+    Mic,
+    FileText,
+    Code,
+    Lock,
+    Unlock,
+    CheckCircle,
+    Trophy,
+    Medal,
+    Target,
+    Sparkles,
+    Sun,
+    Moon,
+    Monitor,
+    ChevronDown,
+    X,
+    Menu,
+    RefreshCw
+} from '@/components/icons';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();

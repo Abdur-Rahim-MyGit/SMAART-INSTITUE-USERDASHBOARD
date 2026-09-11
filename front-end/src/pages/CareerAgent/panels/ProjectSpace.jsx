@@ -1,5 +1,5 @@
 import React from 'react';
-import { Rocket, Hammer, Code2, Layers, CheckCircle2, Lock } from 'lucide-react';
+import { Rocket, Hammer, Code2, Layers, CheckCircle2, Lock } from '@/components/icons';
 
 const ProjectSpace = ({ projects, locked, onUnlockClick, roleName }) => {
     

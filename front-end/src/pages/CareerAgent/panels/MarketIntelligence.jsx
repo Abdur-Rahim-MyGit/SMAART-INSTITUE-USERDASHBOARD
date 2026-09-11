@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { TrendingUp, Globe, Zap, UserCheck, BarChart3, ChevronRight, Info } from 'lucide-react';
+import { TrendingUp, Globe, Zap, UserCheck, BarChart3, ChevronRight, Info } from '@/components/icons';
 
 /**
  * MarketIntelligence

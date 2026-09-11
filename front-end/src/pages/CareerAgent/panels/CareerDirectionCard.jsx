@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Compass, ChevronRight, AlertCircle, TrendingUp, UserRound, Zap, ListChecks } from 'lucide-react';
+import { Target, Compass, ChevronRight, AlertCircle, TrendingUp, UserRound, Zap, ListChecks } from '@/components/icons';
 
 const CareerDirectionCard = ({ roleName, mongoRoleData }) => {
     const [data, setData] = useState({

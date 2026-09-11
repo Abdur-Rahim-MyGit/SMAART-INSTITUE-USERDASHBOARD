@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Sparkles, Clock, Rocket } from 'lucide-react';
+import { Compass, Sparkles, Clock, Rocket } from '@/components/icons';
 
 const FutureScope = () => {
     return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight } from '@/components/icons';
 
 const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
     const [selectedRole, setSelectedRole] = useState(roleName);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Info, Map } from 'lucide-react';
+import { Compass, Info, Map } from '@/components/icons';
 
 /* ─────────────────────────────────────────────
    DirectionOverview

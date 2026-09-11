@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, CheckCircle, Target, Sparkles } from 'lucide-react';
+import { Lock, CheckCircle, Target, Sparkles } from '@/components/icons';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {

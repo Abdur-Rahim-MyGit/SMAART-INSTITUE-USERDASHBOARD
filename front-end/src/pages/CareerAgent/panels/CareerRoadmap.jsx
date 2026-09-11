@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from 'lucide-react';
+import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from '@/components/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 

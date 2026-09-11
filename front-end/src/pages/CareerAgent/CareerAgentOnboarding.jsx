@@ -5,24 +5,24 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  IconSchool as GraduationCap,
-  IconTarget as Target,
-  IconBriefcase as Briefcase,
-  IconShieldCheck as ShieldCheck,
-  IconCircleCheck as CheckCircle,
-  IconMapPin as MapPin,
-  IconCreditCard as CreditCard,
-  IconClock as Clock,
-  IconCompass as Compass,
-  IconSearch as Search,
-  IconNavigation as Navigation,
-  IconBolt as Zap,
-  IconTrophy as Trophy,
-  IconSparkles as Sparkles,
-  IconLock as Lock,
-  IconChevronDown as ChevronDown,
-  IconCheck as Check
-} from '@tabler/icons-react';
+  GraduationCap,
+  Target,
+  Briefcase,
+  ShieldCheck,
+  CheckCircle,
+  MapPin,
+  CreditCard,
+  Clock,
+  Compass,
+  Search,
+  Navigation,
+  Zap,
+  Trophy,
+  Sparkles,
+  Lock,
+  ChevronDown,
+  Check
+} from '@/components/icons';
 import dropdownData from './data/dropdownData.json';
 import jobRolesData from './data/jobRolesData.json';
 import indianCities from './data/indianCities.json';

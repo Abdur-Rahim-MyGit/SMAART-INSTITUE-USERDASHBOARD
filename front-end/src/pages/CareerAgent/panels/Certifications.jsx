@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Award, BookOpen, Star, AlertCircle, RefreshCw, Cpu, BrainCircuit, Building2 } from 'lucide-react';
+import { Award, BookOpen, Star, AlertCircle, RefreshCw, Cpu, BrainCircuit, Building2 } from '@/components/icons';
 
 // ─── Category config ───────────────────────────────────────────────────────────
 const CATS = [
