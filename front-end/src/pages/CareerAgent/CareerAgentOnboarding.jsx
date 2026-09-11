@@ -1,9 +1,11 @@
 import './careerAgent.css';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import PageTransition from '@/components/PageTransition';
+import NeuralBackground from '@/components/ui/NeuralBackground';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '@/contexts/ThemeContext';
 import {
   GraduationCap,
   Target,
@@ -923,6 +925,7 @@ const CareerAgentOnboarding = () => {
   const location = useLocation();
   const { user } = useUser();
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   // If coming from "Not Interested" flow, we jump to a specific step to edit just that preference
   const editState = location.state || {};
@@ -1807,6 +1810,17 @@ const CareerAgentOnboarding = () => {
   return (
     <PageTransition>
       <div className="career-agent-page screen-onboard">
+        {/* Same background treatment as Dashboard Home / My Courses: a quiet
+            animated constellation texture plus two soft ambient glows,
+            instead of the plain grid pattern used elsewhere in the app. */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-25">
+          <NeuralBackground theme={theme === 'dark' ? 'dark' : 'light'} />
+        </div>
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+          <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+        </div>
+
         {/* ── EDIT MODE BANNER ── shown when user came via "Not Interested" */}
         {isEditMode && (
           <div style={{ maxWidth: '680px', margin: '0 auto 1.5rem', padding: '0 1rem' }}>

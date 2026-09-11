@@ -89,30 +89,20 @@
    DASHBOARD LAYOUT
    ─────────────────────────────────────────────────────────────── */
 
-/* Outer page shell — flex column filling the content area */
+/* Outer page shell — flex column filling the content area. position:
+   relative + z-index: 0 anchors the NeuralBackground + ambient-glow layers
+   (rendered as the first JSX children in CareerAgentOnboarding.jsx /
+   CareerAgentDashboard.jsx, matching the Dashboard Home / My Courses
+   background treatment) AND establishes a real stacking context, so those
+   layers' negative z-index keeps them strictly behind this page's own
+   content without leaking out to affect anything outside this box. */
 .career-agent-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
   position: relative;
-}
-
-/* Subtle geo grid background — same low-opacity texture used elsewhere in
-   the app (landing sections, verification pages), for visual consistency.
-   No z-index set deliberately: an unpositioned pseudo-element paints below
-   normal content by default, so this can't interfere with any modal/overlay
-   child's own stacking. pointer-events: none keeps it fully non-interactive. */
-.career-agent-page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url('/grid-pattern.svg');
-  opacity: 0.03;
-  pointer-events: none;
-}
-:is(.dark) .career-agent-page::before {
-  opacity: 0.08;
+  z-index: 0;
 }
 
 /* ── Header ── */

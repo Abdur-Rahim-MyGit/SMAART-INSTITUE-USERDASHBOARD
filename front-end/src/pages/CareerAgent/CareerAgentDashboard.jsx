@@ -1,5 +1,6 @@
 import './careerAgent.css';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import NeuralBackground from '@/components/ui/NeuralBackground';
 import RoleDetailedView from './panels/RoleDetailedView';
 import DirectionOverview from './panels/DirectionOverview';
 import MarketIntelligence from './panels/MarketIntelligence';
@@ -310,6 +311,16 @@ const CareerAgentDashboard = () => {
 
     return (
         <div className="career-agent-page">
+            {/* Same background treatment as Dashboard Home / My Courses: a
+                quiet animated constellation texture plus two soft ambient
+                glows, instead of the plain grid pattern used elsewhere. */}
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-25">
+                <NeuralBackground theme={theme === 'dark' ? 'dark' : 'light'} />
+            </div>
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+                <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+            </div>
 
             {/* ── Career Direction Lock: First Visit Modal ── */}
             <CareerFirstVisitModal
