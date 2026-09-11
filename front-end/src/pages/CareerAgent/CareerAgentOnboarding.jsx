@@ -64,10 +64,9 @@ const getRoles = (sector, family) => {
 // All roles flattened for free-text search
 const ALL_ROLES = jobRolesData.roles.map(r => r.role);
 
-// Education cascading: Level -> Domain -> DegreeGroup -> Specialisation
-// Education cascading dynamic helpers
-const getDomains = (eduData, level) => level && eduData[level] ? Object.keys(eduData[level] || {}) : [];
-const getDegreeGroups = (eduData, level, domain) => level && domain && eduData[level]?.[domain] ? Object.keys(eduData[level]?.[domain] || {}) : [];
+// Education cascading: Level -> Domain -> DegreeGroup -> Specialisation.
+// Level/Domain/DegreeGroup are locked, auto-filled-only fields (see
+// LockedField), so only the Specialisation lookup is still needed here.
 const getSpecialisations = (eduData, level, domain, degree) => level && domain && degree ? eduData[level]?.[domain]?.[degree] || [] : [];
 
 const STEPS = ['Overview', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
@@ -132,12 +131,21 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, d
         </div>
       )}
 
-      {/* All options as chips */}
-      {options.length > 0 ? (
+      {/* All options as chips — hidden once locked/disabled, since there is
+          nothing left to pick: showing every unselectable option as a big
+          grey list looks editable even though it isn't. A locked field
+          should just show what was auto-filled, not a browsing list. */}
+      {disabled ? (
+        selected.length === 0 && (
+          <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+            {t('career_agent.onboarding.no_specialisation_on_file', 'No specialisation on file.')}
+          </p>
+        )
+      ) : options.length > 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {options.map(opt => {
             const isSel = selected.includes(opt);
-            const isDisabled = disabled || (!isSel && selected.length >= max);
+            const isDisabled = !isSel && selected.length >= max;
             return (
               <button
                 key={opt} type="button"
@@ -165,6 +173,27 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, d
           {t('career_agent.onboarding.select_degree_first', 'Select a degree group to view available specialisations.')}
         </p>
       )}
+    </div>
+  );
+}
+
+// LockedField — read-only display for auto-filled, non-editable values.
+// Deliberately NOT a disabled <select>/<input>: a disabled native control
+// still renders its dropdown arrow / input chrome, which looks editable even
+// though it isn't. This renders as plain locked text instead, with a small
+// lock icon, so it's visually unambiguous that nothing here can be changed.
+function LockedField({ value, placeholder }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '0.6rem',
+      padding: '0.75rem 1rem', borderRadius: '10px',
+      background: 'var(--navy3)', border: '1px solid var(--border)',
+      fontSize: '0.85rem', fontWeight: value ? 600 : 400,
+      color: value ? 'var(--text1)' : 'var(--muted)',
+      fontFamily: 'var(--font)',
+    }}>
+      <Lock size={14} style={{ flexShrink: 0, opacity: 0.5 }} />
+      <span>{value || placeholder}</span>
     </div>
   );
 }
@@ -1447,8 +1476,6 @@ const CareerAgentOnboarding = () => {
     if (field === 'degreeGroup') { edu[i].specialisation = []; }
     return { ...f, education: edu };
   });
-  const addEdu = () => setFormData(f => ({ ...f, education: [...f.education, { ...blankEdu }] }));
-  const removeEdu = (i) => setFormData(f => ({ ...f, education: f.education.filter((_, idx) => idx !== i) }));
   const updatePref = (tier, data) => setFormData(f => ({ ...f, preferences: { ...f.preferences, [tier]: data } }));
   const updateExp = (i, field, val) => setFormData(f => {
     const exp = [...f.experience]; exp[i] = { ...exp[i], [field]: val };
@@ -2010,34 +2037,25 @@ const CareerAgentOnboarding = () => {
                       {/* Level */}
                       <div className="fg">
                         <label className="fl">Degree Level <span className="req">*</span></label>
-                        <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)} disabled>
-                          <option value="">Select Level...</option>
-                          {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
-                        </select>
+                        <LockedField value={edu.level} placeholder="Not on file" />
                       </div>
 
                       {/* Domain */}
                       <div className="fg">
                         <label className="fl">Domain <span className="req">*</span></label>
-                        <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled>
-                          <option value="">Select Domain...</option>
-                          {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
-                        </select>
+                        <LockedField value={edu.domain} placeholder="Not on file" />
                       </div>
 
                       {/* Degree Group */}
                       <div className="fg">
                         <label className="fl">Degree Group <span className="req">*</span></label>
-                        <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled>
-                          <option value="">Select Degree...</option>
-                          {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
-                        </select>
+                        <LockedField value={edu.degreeGroup} placeholder="Not on file" />
                       </div>
 
                       {/* Graduation Year */}
                       <div className="fg">
                         <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
-                        <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} disabled />
+                        <LockedField value={edu.graduationYear} placeholder="Not on file" />
                       </div>
 
                       {/* Specialisation (Multi) */}
@@ -2065,16 +2083,13 @@ const CareerAgentOnboarding = () => {
                     </div>
                   </div>
                 ))}
-
-                {formData.education.length < 3 && (
-                  <button type="button" onClick={addEdu}
-                    style={{ background: 'rgba(var(--accent-rgb), 0.04)', border: '1.5px dashed rgba(var(--accent-rgb), 0.25)', color: 'var(--accent)', borderRadius: '16px', padding: '1.2rem', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font)', fontWeight: 700, width: '100%', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.08)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.04)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.25)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                  >
-                    <span style={{ fontSize: '1.2rem', fontWeight: 400, lineHeight: 1 }}>+</span> Add Another Academic Qualification
-                  </button>
-                )}
+                {/* No manual "Add Another Academic Qualification" button —
+                    every field here is auto-filled and locked, so a
+                    manually-added entry could never actually be filled in.
+                    A genuine second concurrent degree is already picked up
+                    automatically from the student's profile (any entry
+                    marked "currently pursuing" produces its own block
+                    above), so there is nothing left for a manual add to do. */}
               </div>
             </div>
           )}
