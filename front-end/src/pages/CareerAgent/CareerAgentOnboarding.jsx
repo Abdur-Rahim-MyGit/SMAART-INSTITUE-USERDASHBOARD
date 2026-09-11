@@ -64,11 +64,6 @@ const getRoles = (sector, family) => {
 // All roles flattened for free-text search
 const ALL_ROLES = jobRolesData.roles.map(r => r.role);
 
-// Education cascading: Level -> Domain -> DegreeGroup -> Specialisation.
-// Level/Domain/DegreeGroup are locked, auto-filled-only fields (see
-// LockedField), so only the Specialisation lookup is still needed here.
-const getSpecialisations = (eduData, level, domain, degree) => level && domain && degree ? eduData[level]?.[domain]?.[degree] || [] : [];
-
 const STEPS = ['Overview', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
 const STEP_DISPLAY_LABELS = ['Personal', 'Education', 'Primary', 'Secondary', 'Tertiary', 'Review'];
 
@@ -2058,27 +2053,19 @@ const CareerAgentOnboarding = () => {
                         <LockedField value={edu.graduationYear} placeholder="Not on file" />
                       </div>
 
-                      {/* Specialisation (Multi) */}
+                      {/* Specialisation(s) */}
                       <div className="fg">
                         <label className="fl">Specialisation(s) <span className="req">*</span></label>
-                        <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
-                          <MultiSelect
-                            options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
-                            selected={edu.specialisation || []}
-                            onChange={v => updateEdu(i, 'specialisation', v)}
-                            max={2}
-                            placeholder="Select specialisation(s)..."
-                            disabled
-                          />
-                        </div>
+                        <LockedField
+                          value={(edu.specialisation || []).join(', ')}
+                          placeholder="Not on file"
+                        />
                       </div>
 
                       {/* Currently Pursuing */}
-                      <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'not-allowed', opacity: 0.8, fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
-                          <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} disabled style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'not-allowed' }} />
-                          Currently Pursuing this degree
-                        </label>
+                      <div className="fg">
+                        <label className="fl">Currently Pursuing</label>
+                        <LockedField value={edu.currentlyPursuing ? 'Yes' : 'No'} />
                       </div>
                     </div>
                   </div>
