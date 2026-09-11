@@ -1,0 +1,1442 @@
+[
+  {
+    "role_id": "JF41-024",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Secretary Support Executive"
+  },
+  {
+    "role_id": "JF41-025",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "PACS Office Assistant"
+  },
+  {
+    "role_id": "JF41-026",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Accounts Clerk"
+  },
+  {
+    "role_id": "JF41-027",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Compliance Executive"
+  },
+  {
+    "role_id": "JF41-028",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Development Officer"
+  },
+  {
+    "role_id": "JF41-029",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Housing Cooperative Society Executive"
+  },
+  {
+    "role_id": "JF41-030",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Membership Executive"
+  },
+  {
+    "role_id": "JF41-031",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Governance Support Executive"
+  },
+  {
+    "role_id": "JF41-032",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Field Executive"
+  },
+  {
+    "role_id": "JF41-033",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Society Data Entry Executive"
+  },
+  {
+    "role_id": "JF41-034",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Dairy Cooperative Marketing Executive"
+  },
+  {
+    "role_id": "JF41-035",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Milk Procurement Executive"
+  },
+  {
+    "role_id": "JF41-036",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Farmer Relationship Executive"
+  },
+  {
+    "role_id": "JF41-037",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Sugar Cooperative Executive"
+  },
+  {
+    "role_id": "JF41-038",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Cooperative Distribution Executive"
+  },
+  {
+    "role_id": "JF41-039",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "SHG Linkage Executive"
+  },
+  {
+    "role_id": "JF41-040",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Financial Literacy Trainer - Rural"
+  },
+  {
+    "role_id": "JF41-041",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Rural Banking Correspondent"
+  },
+  {
+    "role_id": "JF41-042",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Rural Livelihood Executive"
+  },
+  {
+    "role_id": "JF41-043",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Financial Inclusion Executive"
+  },
+  {
+    "role_id": "JF41-044",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Digital Financial Inclusion Executive"
+  },
+  {
+    "role_id": "JF41-045",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "NABARD Scheme Support Executive"
+  },
+  {
+    "role_id": "JF41-046",
+    "job_family": "Agriculture & Agri-Tech",
+    "role_name": "Rural Credit Officer"
+  },
+  {
+    "role_id": "JF10-014",
+    "job_family": "Banking Operations",
+    "role_name": "CASA Sales Officer"
+  },
+  {
+    "role_id": "JF10-015",
+    "job_family": "Banking Operations",
+    "role_name": "Bank Teller"
+  },
+  {
+    "role_id": "JF10-016",
+    "job_family": "Banking Operations",
+    "role_name": "Branch Operations Executive"
+  },
+  {
+    "role_id": "JF10-017",
+    "job_family": "Banking Operations",
+    "role_name": "Bank Sales Officer"
+  },
+  {
+    "role_id": "JF10-025",
+    "job_family": "Banking Operations",
+    "role_name": "Auto Loan Executive"
+  },
+  {
+    "role_id": "JF10-026",
+    "job_family": "Banking Operations",
+    "role_name": "Forex Sales Executive"
+  },
+  {
+    "role_id": "JF10-027",
+    "job_family": "Banking Operations",
+    "role_name": "Currency Exchange Executive"
+  },
+  {
+    "role_id": "JF10-028",
+    "job_family": "Banking Operations",
+    "role_name": "Remittance Processing Executive"
+  },
+  {
+    "role_id": "JF10-029",
+    "job_family": "Banking Operations",
+    "role_name": "Export Documentation Executive"
+  },
+  {
+    "role_id": "JF10-030",
+    "job_family": "Banking Operations",
+    "role_name": "Bank Guarantee Processing Executive"
+  },
+  {
+    "role_id": "JF10-031",
+    "job_family": "Banking Operations",
+    "role_name": "Trade Finance Sales Executive"
+  },
+  {
+    "role_id": "JF10-032",
+    "job_family": "Banking Operations",
+    "role_name": "Personal Loan Executive"
+  },
+  {
+    "role_id": "JF10-033",
+    "job_family": "Banking Operations",
+    "role_name": "Consumer Durable Loan Executive"
+  },
+  {
+    "role_id": "JF10-034",
+    "job_family": "Banking Operations",
+    "role_name": "Two-Wheeler Loan Executive"
+  },
+  {
+    "role_id": "JF10-035",
+    "job_family": "Banking Operations",
+    "role_name": "Gold Loan Executive"
+  },
+  {
+    "role_id": "JF10-036",
+    "job_family": "Banking Operations",
+    "role_name": "Microfinance Executive"
+  },
+  {
+    "role_id": "JF10-037",
+    "job_family": "Banking Operations",
+    "role_name": "NBFC Credit Executive"
+  },
+  {
+    "role_id": "JF10-038",
+    "job_family": "Banking Operations",
+    "role_name": "Loan Against Property Executive"
+  },
+  {
+    "role_id": "JF10-039",
+    "job_family": "Banking Operations",
+    "role_name": "Field Credit Executive"
+  },
+  {
+    "role_id": "JF10-040",
+    "job_family": "Banking Operations",
+    "role_name": "NBFC Relationship Executive"
+  },
+  {
+    "role_id": "JF10-041",
+    "job_family": "Banking Operations",
+    "role_name": "PACS Credit Executive"
+  },
+  {
+    "role_id": "JF10-042",
+    "job_family": "Banking Operations",
+    "role_name": "Crop Loan Disbursement Executive"
+  },
+  {
+    "role_id": "JF10-043",
+    "job_family": "Banking Operations",
+    "role_name": "Cooperative Recovery Executive"
+  },
+  {
+    "role_id": "JF10-044",
+    "job_family": "Banking Operations",
+    "role_name": "Farm Credit Executive"
+  },
+  {
+    "role_id": "JF10-045",
+    "job_family": "Banking Operations",
+    "role_name": "Cooperative Loan Documentation Executive"
+  },
+  {
+    "role_id": "JF10-046",
+    "job_family": "Banking Operations",
+    "role_name": "Agricultural Credit Analyst"
+  },
+  {
+    "role_id": "JF10-047",
+    "job_family": "Banking Operations",
+    "role_name": "Cooperative Society Loan Verification Executive"
+  },
+  {
+    "role_id": "JF10-048",
+    "job_family": "Banking Operations",
+    "role_name": "Kisan Credit Card Executive"
+  },
+  {
+    "role_id": "JF10-049",
+    "job_family": "Banking Operations",
+    "role_name": "Rural Credit Support Executive"
+  },
+  {
+    "role_id": "JF11-015",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Financial Planning Executive"
+  },
+  {
+    "role_id": "JF11-016",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Retail Wealth Advisory Executive"
+  },
+  {
+    "role_id": "JF11-017",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Personal Finance Advisor"
+  },
+  {
+    "role_id": "JF11-018",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Retirement Planning Executive"
+  },
+  {
+    "role_id": "JF11-019",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "SIP Advisory Executive"
+  },
+  {
+    "role_id": "JF11-020",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Financial Wellness Executive"
+  },
+  {
+    "role_id": "JF11-021",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Robo-Advisory Support Executive"
+  },
+  {
+    "role_id": "JF11-022",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Client Onboarding Executive - Wealth"
+  },
+  {
+    "role_id": "JF11-023",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Portfolio Review Executive"
+  },
+  {
+    "role_id": "JF11-024",
+    "job_family": "Capital Markets & Investments",
+    "role_name": "Financial Products Distribution Executive"
+  },
+  {
+    "role_id": "JF07-018",
+    "job_family": "Cybersecurity",
+    "role_name": "Data Privacy Compliance Executive"
+  },
+  {
+    "role_id": "JF07-019",
+    "job_family": "Cybersecurity",
+    "role_name": "IT Policy Compliance Executive"
+  },
+  {
+    "role_id": "JF07-020",
+    "job_family": "Cybersecurity",
+    "role_name": "Third-Party Risk Analyst"
+  },
+  {
+    "role_id": "JF07-021",
+    "job_family": "Cybersecurity",
+    "role_name": "IT Controls Testing Executive"
+  },
+  {
+    "role_id": "JF05-018",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Business Intelligence Executive"
+  },
+  {
+    "role_id": "JF05-019",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Reporting Executive"
+  },
+  {
+    "role_id": "JF05-020",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Excel Dashboard Analyst"
+  },
+  {
+    "role_id": "JF05-021",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Dashboard and Visualization Executive"
+  },
+  {
+    "role_id": "JF05-022",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Junior BI Analyst"
+  },
+  {
+    "role_id": "JF05-023",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Data Cleaning Analyst"
+  },
+  {
+    "role_id": "JF05-024",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Statistical Analyst"
+  },
+  {
+    "role_id": "JF05-025",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Data Research Analyst"
+  },
+  {
+    "role_id": "JF05-026",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Analytics Trainee"
+  },
+  {
+    "role_id": "JF05-027",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Junior Data Analyst"
+  },
+  {
+    "role_id": "JF05-028",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Business Analytics Associate"
+  },
+  {
+    "role_id": "JF05-029",
+    "job_family": "Data Engineering & Analytics",
+    "role_name": "Analytics Support Executive"
+  },
+  {
+    "role_id": "JF06-015",
+    "job_family": "Data Science & Machine Learning",
+    "role_name": "Data Annotation Specialist"
+  },
+  {
+    "role_id": "JF06-016",
+    "job_family": "Data Science & Machine Learning",
+    "role_name": "AI Operations Executive"
+  },
+  {
+    "role_id": "JF03-022",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Junior Database Administrator"
+  },
+  {
+    "role_id": "JF03-023",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Database Support Executive"
+  },
+  {
+    "role_id": "JF03-024",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Database Operations Executive"
+  },
+  {
+    "role_id": "JF03-025",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Data Backup and Recovery Executive"
+  },
+  {
+    "role_id": "JF03-026",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Database Monitoring Executive"
+  },
+  {
+    "role_id": "JF03-027",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Database Migration Support Executive"
+  },
+  {
+    "role_id": "JF03-028",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "SQL Database Executive"
+  },
+  {
+    "role_id": "JF03-029",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Oracle Database Support Executive"
+  },
+  {
+    "role_id": "JF03-030",
+    "job_family": "DevOps & Cloud Engineering",
+    "role_name": "Cloud Support Associate"
+  },
+  {
+    "role_id": "JF09-033",
+    "job_family": "Finance & Accounting",
+    "role_name": "US Tax Analyst"
+  },
+  {
+    "role_id": "JF09-034",
+    "job_family": "Finance & Accounting",
+    "role_name": "Transfer Pricing Analyst"
+  },
+  {
+    "role_id": "JF09-035",
+    "job_family": "Finance & Accounting",
+    "role_name": "Customs Duty Analyst"
+  },
+  {
+    "role_id": "JF09-036",
+    "job_family": "Finance & Accounting",
+    "role_name": "Payroll Tax Analyst"
+  },
+  {
+    "role_id": "JF09-037",
+    "job_family": "Finance & Accounting",
+    "role_name": "Revenue Assurance Analyst"
+  },
+  {
+    "role_id": "JF09-038",
+    "job_family": "Finance & Accounting",
+    "role_name": "Treasury Analyst"
+  },
+  {
+    "role_id": "JF09-039",
+    "job_family": "Finance & Accounting",
+    "role_name": "Business Finance Analyst"
+  },
+  {
+    "role_id": "JF09-040",
+    "job_family": "Finance & Accounting",
+    "role_name": "Tally Operator"
+  },
+  {
+    "role_id": "JF09-041",
+    "job_family": "Finance & Accounting",
+    "role_name": "Computer Operator - Accounts"
+  },
+  {
+    "role_id": "JF09-042",
+    "job_family": "Finance & Accounting",
+    "role_name": "Data Entry Operator - Accounts"
+  },
+  {
+    "role_id": "JF09-043",
+    "job_family": "Finance & Accounting",
+    "role_name": "ERP Data Entry Executive"
+  },
+  {
+    "role_id": "JF09-044",
+    "job_family": "Finance & Accounting",
+    "role_name": "MS Office Application Executive"
+  },
+  {
+    "role_id": "JF09-045",
+    "job_family": "Finance & Accounting",
+    "role_name": "DTP Executive"
+  },
+  {
+    "role_id": "JF09-046",
+    "job_family": "Finance & Accounting",
+    "role_name": "Computer Operator"
+  },
+  {
+    "role_id": "JF09-047",
+    "job_family": "Finance & Accounting",
+    "role_name": "Data Processing Executive"
+  },
+  {
+    "role_id": "JF09-048",
+    "job_family": "Finance & Accounting",
+    "role_name": "Back Office Executive - Computer Applications"
+  },
+  {
+    "role_id": "JF09-049",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Society Auditor Support Executive"
+  },
+  {
+    "role_id": "JF09-050",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Accounts Executive"
+  },
+  {
+    "role_id": "JF09-051",
+    "job_family": "Finance & Accounting",
+    "role_name": "Statutory Audit Support Executive - Cooperative"
+  },
+  {
+    "role_id": "JF09-052",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Society Bookkeeper"
+  },
+  {
+    "role_id": "JF09-053",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Compliance and Returns Executive"
+  },
+  {
+    "role_id": "JF09-054",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Society Taxation Executive"
+  },
+  {
+    "role_id": "JF09-055",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Financial Reporting Executive"
+  },
+  {
+    "role_id": "JF09-056",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Audit Documentation Executive"
+  },
+  {
+    "role_id": "JF09-057",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cooperative Society Ledger Executive"
+  },
+  {
+    "role_id": "JF09-058",
+    "job_family": "Finance & Accounting",
+    "role_name": "IFRS Reporting Executive"
+  },
+  {
+    "role_id": "JF09-059",
+    "job_family": "Finance & Accounting",
+    "role_name": "US GAAP Accounting Executive"
+  },
+  {
+    "role_id": "JF09-060",
+    "job_family": "Finance & Accounting",
+    "role_name": "International Accounting Executive"
+  },
+  {
+    "role_id": "JF09-061",
+    "job_family": "Finance & Accounting",
+    "role_name": "GAAP Reconciliation Executive"
+  },
+  {
+    "role_id": "JF09-062",
+    "job_family": "Finance & Accounting",
+    "role_name": "Global Accounting Standards Executive"
+  },
+  {
+    "role_id": "JF09-063",
+    "job_family": "Finance & Accounting",
+    "role_name": "Audit Support Executive - GCC"
+  },
+  {
+    "role_id": "JF09-064",
+    "job_family": "Finance & Accounting",
+    "role_name": "Audit Documentation Executive"
+  },
+  {
+    "role_id": "JF09-065",
+    "job_family": "Finance & Accounting",
+    "role_name": "Internal Audit Executive"
+  },
+  {
+    "role_id": "JF09-066",
+    "job_family": "Finance & Accounting",
+    "role_name": "Audit Testing Executive"
+  },
+  {
+    "role_id": "JF09-067",
+    "job_family": "Finance & Accounting",
+    "role_name": "Statutory Audit Support Executive"
+  },
+  {
+    "role_id": "JF09-068",
+    "job_family": "Finance & Accounting",
+    "role_name": "Audit Analytics Executive"
+  },
+  {
+    "role_id": "JF09-069",
+    "job_family": "Finance & Accounting",
+    "role_name": "Financial Statement Review Executive"
+  },
+  {
+    "role_id": "JF09-070",
+    "job_family": "Finance & Accounting",
+    "role_name": "Transfer Pricing Documentation Executive"
+  },
+  {
+    "role_id": "JF09-071",
+    "job_family": "Finance & Accounting",
+    "role_name": "Cross-Border Accounting Executive"
+  },
+  {
+    "role_id": "JF09-072",
+    "job_family": "Finance & Accounting",
+    "role_name": "Financial Modeling Analyst"
+  },
+  {
+    "role_id": "JF09-073",
+    "job_family": "Finance & Accounting",
+    "role_name": "Valuation Analyst"
+  },
+  {
+    "role_id": "JF09-074",
+    "job_family": "Finance & Accounting",
+    "role_name": "M&A Support Analyst"
+  },
+  {
+    "role_id": "JF09-075",
+    "job_family": "Finance & Accounting",
+    "role_name": "Deal Support Analyst"
+  },
+  {
+    "role_id": "JF09-076",
+    "job_family": "Finance & Accounting",
+    "role_name": "Corporate Finance Analyst"
+  },
+  {
+    "role_id": "JF09-077",
+    "job_family": "Finance & Accounting",
+    "role_name": "Business Valuation Support Executive"
+  },
+  {
+    "role_id": "JF09-078",
+    "job_family": "Finance & Accounting",
+    "role_name": "Financial Forecasting Analyst"
+  },
+  {
+    "role_id": "JF09-079",
+    "job_family": "Finance & Accounting",
+    "role_name": "Scenario Planning Analyst"
+  },
+  {
+    "role_id": "JF09-080",
+    "job_family": "Finance & Accounting",
+    "role_name": "Business Performance Analyst"
+  },
+  {
+    "role_id": "JF09-081",
+    "job_family": "Finance & Accounting",
+    "role_name": "Strategic Cost Analyst"
+  },
+  {
+    "role_id": "JF09-082",
+    "job_family": "Finance & Accounting",
+    "role_name": "Profitability Analysis Executive"
+  },
+  {
+    "role_id": "JF09-083",
+    "job_family": "Finance & Accounting",
+    "role_name": "Competitive Benchmarking Analyst"
+  },
+  {
+    "role_id": "JF09-084",
+    "job_family": "Finance & Accounting",
+    "role_name": "KPI and Performance Reporting Analyst"
+  },
+  {
+    "role_id": "JF09-085",
+    "job_family": "Finance & Accounting",
+    "role_name": "Business Performance Management Executive"
+  },
+  {
+    "role_id": "JF09-086",
+    "job_family": "Finance & Accounting",
+    "role_name": "Strategic Planning Support Analyst"
+  },
+  {
+    "role_id": "JF09-087",
+    "job_family": "Finance & Accounting",
+    "role_name": "Corporate Performance Analyst"
+  },
+  {
+    "role_id": "JF09-088",
+    "job_family": "Finance & Accounting",
+    "role_name": "Zero-Based Budgeting Analyst"
+  },
+  {
+    "role_id": "JF09-089",
+    "job_family": "Finance & Accounting",
+    "role_name": "Business Case Analyst"
+  },
+  {
+    "role_id": "JF09-090",
+    "job_family": "Finance & Accounting",
+    "role_name": "Investment Memo Analyst"
+  },
+  {
+    "role_id": "JF09-091",
+    "job_family": "Finance & Accounting",
+    "role_name": "Capital Structure Analyst"
+  },
+  {
+    "role_id": "JF13-014",
+    "job_family": "Fintech & Digital Finance",
+    "role_name": "Digital KYC Executive"
+  },
+  {
+    "role_id": "JF13-015",
+    "job_family": "Fintech & Digital Finance",
+    "role_name": "Payments Reconciliation Executive"
+  },
+  {
+    "role_id": "JF13-016",
+    "job_family": "Fintech & Digital Finance",
+    "role_name": "Mobile Banking Support Executive"
+  },
+  {
+    "role_id": "JF13-017",
+    "job_family": "Fintech & Digital Finance",
+    "role_name": "Card Operations Executive"
+  },
+  {
+    "role_id": "JF04-017",
+    "job_family": "IT Support & Management",
+    "role_name": "Business Systems Analyst"
+  },
+  {
+    "role_id": "JF04-018",
+    "job_family": "IT Support & Management",
+    "role_name": "ERP Support Analyst"
+  },
+  {
+    "role_id": "JF04-019",
+    "job_family": "IT Support & Management",
+    "role_name": "SAP Support Consultant"
+  },
+  {
+    "role_id": "JF04-020",
+    "job_family": "IT Support & Management",
+    "role_name": "CRM Systems Analyst"
+  },
+  {
+    "role_id": "JF04-021",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Systems Analyst"
+  },
+  {
+    "role_id": "JF04-022",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Asset Management Executive"
+  },
+  {
+    "role_id": "JF04-023",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Support Coordinator"
+  },
+  {
+    "role_id": "JF04-024",
+    "job_family": "IT Support & Management",
+    "role_name": "Network Support Executive"
+  },
+  {
+    "role_id": "JF04-025",
+    "job_family": "IT Support & Management",
+    "role_name": "Software License Administrator"
+  },
+  {
+    "role_id": "JF04-026",
+    "job_family": "IT Support & Management",
+    "role_name": "End User Computing Executive"
+  },
+  {
+    "role_id": "JF04-027",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Onboarding Executive"
+  },
+  {
+    "role_id": "JF04-028",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Auditor"
+  },
+  {
+    "role_id": "JF04-029",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Governance Analyst"
+  },
+  {
+    "role_id": "JF04-030",
+    "job_family": "IT Support & Management",
+    "role_name": "ERP Access Control Analyst"
+  },
+  {
+    "role_id": "JF04-031",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Project Coordinator"
+  },
+  {
+    "role_id": "JF04-032",
+    "job_family": "IT Support & Management",
+    "role_name": "Agile Delivery Analyst"
+  },
+  {
+    "role_id": "JF04-033",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Change Management Coordinator"
+  },
+  {
+    "role_id": "JF04-034",
+    "job_family": "IT Support & Management",
+    "role_name": "Release Management Executive"
+  },
+  {
+    "role_id": "JF04-035",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Project Support Executive"
+  },
+  {
+    "role_id": "JF04-036",
+    "job_family": "IT Support & Management",
+    "role_name": "IT Documentation Executive"
+  },
+  {
+    "role_id": "JF04-037",
+    "job_family": "IT Support & Management",
+    "role_name": "Vendor Coordination Executive - IT"
+  },
+  {
+    "role_id": "JF04-038",
+    "job_family": "IT Support & Management",
+    "role_name": "UAT Coordinator"
+  },
+  {
+    "role_id": "JF04-039",
+    "job_family": "IT Support & Management",
+    "role_name": "Business Requirements Analyst"
+  },
+  {
+    "role_id": "JF12-016",
+    "job_family": "Insurance & Risk",
+    "role_name": "Sanctions Screening Analyst"
+  },
+  {
+    "role_id": "JF12-017",
+    "job_family": "Insurance & Risk",
+    "role_name": "Compliance Testing Analyst"
+  },
+  {
+    "role_id": "JF12-018",
+    "job_family": "Insurance & Risk",
+    "role_name": "Loan Review Analyst"
+  },
+  {
+    "role_id": "JF12-019",
+    "job_family": "Insurance & Risk",
+    "role_name": "KYC Remediation Executive"
+  },
+  {
+    "role_id": "JF12-020",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Sales Executive"
+  },
+  {
+    "role_id": "JF12-021",
+    "job_family": "Insurance & Risk",
+    "role_name": "Direct Sales Executive - Insurance"
+  },
+  {
+    "role_id": "JF12-022",
+    "job_family": "Insurance & Risk",
+    "role_name": "Group Insurance Executive"
+  },
+  {
+    "role_id": "JF12-023",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Telemarketing Executive"
+  },
+  {
+    "role_id": "JF12-024",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Customer Service Executive"
+  },
+  {
+    "role_id": "JF12-025",
+    "job_family": "Insurance & Risk",
+    "role_name": "Policy Renewal Executive"
+  },
+  {
+    "role_id": "JF12-026",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Marketing Executive"
+  },
+  {
+    "role_id": "JF12-027",
+    "job_family": "Insurance & Risk",
+    "role_name": "Corporate Agency Executive"
+  },
+  {
+    "role_id": "JF12-028",
+    "job_family": "Insurance & Risk",
+    "role_name": "Claims Processing Executive"
+  },
+  {
+    "role_id": "JF12-029",
+    "job_family": "Insurance & Risk",
+    "role_name": "Policy Issuance Executive"
+  },
+  {
+    "role_id": "JF12-030",
+    "job_family": "Insurance & Risk",
+    "role_name": "Underwriting Support Executive"
+  },
+  {
+    "role_id": "JF12-031",
+    "job_family": "Insurance & Risk",
+    "role_name": "Health Claims Executive"
+  },
+  {
+    "role_id": "JF12-032",
+    "job_family": "Insurance & Risk",
+    "role_name": "Motor Claims Executive"
+  },
+  {
+    "role_id": "JF12-033",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Operations Executive"
+  },
+  {
+    "role_id": "JF12-034",
+    "job_family": "Insurance & Risk",
+    "role_name": "Endorsement Executive"
+  },
+  {
+    "role_id": "JF12-035",
+    "job_family": "Insurance & Risk",
+    "role_name": "Bancassurance Executive"
+  },
+  {
+    "role_id": "JF12-036",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Product Specialist - Bank Channel"
+  },
+  {
+    "role_id": "JF12-037",
+    "job_family": "Insurance & Risk",
+    "role_name": "Bancassurance Relationship Manager"
+  },
+  {
+    "role_id": "JF12-038",
+    "job_family": "Insurance & Risk",
+    "role_name": "Cross-Sell Executive - Banking and Insurance"
+  },
+  {
+    "role_id": "JF12-039",
+    "job_family": "Insurance & Risk",
+    "role_name": "Insurance Desk Executive - Bank Branch"
+  },
+  {
+    "role_id": "JF12-040",
+    "job_family": "Insurance & Risk",
+    "role_name": "NRI Insurance and Investment Executive"
+  },
+  {
+    "role_id": "JF12-041",
+    "job_family": "Insurance & Risk",
+    "role_name": "Bancassurance Operations Executive"
+  },
+  {
+    "role_id": "JF12-042",
+    "job_family": "Insurance & Risk",
+    "role_name": "IRDAI Compliance Executive"
+  },
+  {
+    "role_id": "JF12-043",
+    "job_family": "Insurance & Risk",
+    "role_name": "Claims Fraud Investigator"
+  },
+  {
+    "role_id": "JF12-044",
+    "job_family": "Insurance & Risk",
+    "role_name": "Underwriting Compliance Executive"
+  },
+  {
+    "role_id": "JF12-045",
+    "job_family": "Insurance & Risk",
+    "role_name": "FEMA Compliance Executive"
+  },
+  {
+    "role_id": "JF12-046",
+    "job_family": "Insurance & Risk",
+    "role_name": "DGFT Compliance Executive"
+  },
+  {
+    "role_id": "JF12-047",
+    "job_family": "Insurance & Risk",
+    "role_name": "Trade Compliance Analyst"
+  },
+  {
+    "role_id": "JF12-048",
+    "job_family": "Insurance & Risk",
+    "role_name": "Export Incentive Executive"
+  },
+  {
+    "role_id": "JF12-049",
+    "job_family": "Insurance & Risk",
+    "role_name": "Import Licensing Executive"
+  },
+  {
+    "role_id": "JF12-050",
+    "job_family": "Insurance & Risk",
+    "role_name": "FTA Compliance Executive"
+  },
+  {
+    "role_id": "JF12-051",
+    "job_family": "Insurance & Risk",
+    "role_name": "Customs Valuation Executive"
+  },
+  {
+    "role_id": "JF12-052",
+    "job_family": "Insurance & Risk",
+    "role_name": "Trade Sanctions Compliance Executive"
+  },
+  {
+    "role_id": "JF12-053",
+    "job_family": "Insurance & Risk",
+    "role_name": "Regulatory Filing Executive - International Trade"
+  },
+  {
+    "role_id": "JF24-033",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "ROC Filing Executive"
+  },
+  {
+    "role_id": "JF24-034",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Secretarial Compliance Executive"
+  },
+  {
+    "role_id": "JF24-035",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Compliance Executive"
+  },
+  {
+    "role_id": "JF24-036",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Statutory Registers Executive"
+  },
+  {
+    "role_id": "JF24-037",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Board Meeting Support Executive"
+  },
+  {
+    "role_id": "JF24-038",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Company Secretary Assistant"
+  },
+  {
+    "role_id": "JF24-039",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "XBRL Filing Executive"
+  },
+  {
+    "role_id": "JF24-040",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Records Executive"
+  },
+  {
+    "role_id": "JF24-041",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Annual Filing Executive"
+  },
+  {
+    "role_id": "JF24-042",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Compliance Documentation Executive"
+  },
+  {
+    "role_id": "JF24-043",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "SEBI LODR Compliance Executive"
+  },
+  {
+    "role_id": "JF24-044",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Governance Analyst"
+  },
+  {
+    "role_id": "JF24-045",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Related Party Transactions Executive"
+  },
+  {
+    "role_id": "JF24-046",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Listing Compliance Executive"
+  },
+  {
+    "role_id": "JF24-047",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Insider Trading Compliance Executive"
+  },
+  {
+    "role_id": "JF24-048",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Actions Executive"
+  },
+  {
+    "role_id": "JF24-049",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Shareholder Services Executive"
+  },
+  {
+    "role_id": "JF24-050",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Investor Relations Support Executive"
+  },
+  {
+    "role_id": "JF24-051",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Paralegal"
+  },
+  {
+    "role_id": "JF24-052",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Legal Documentation Executive"
+  },
+  {
+    "role_id": "JF24-053",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Documentation Executive"
+  },
+  {
+    "role_id": "JF24-054",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Legal Compliance Assistant"
+  },
+  {
+    "role_id": "JF24-055",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Corporate Legal Assistant"
+  },
+  {
+    "role_id": "JF24-056",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Legal Research Executive"
+  },
+  {
+    "role_id": "JF24-057",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Litigation Support Executive"
+  },
+  {
+    "role_id": "JF24-058",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Administration Executive"
+  },
+  {
+    "role_id": "JF24-059",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Vendor Contract Executive"
+  },
+  {
+    "role_id": "JF24-060",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "NDA and Agreement Management Executive"
+  },
+  {
+    "role_id": "JF24-061",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Compliance Executive"
+  },
+  {
+    "role_id": "JF24-062",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Agreement Drafting Assistant"
+  },
+  {
+    "role_id": "JF24-063",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Renewal Executive"
+  },
+  {
+    "role_id": "JF24-064",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Database Executive"
+  },
+  {
+    "role_id": "JF24-065",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Procurement Contract Support Executive"
+  },
+  {
+    "role_id": "JF24-066",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Contract Lifecycle Management Executive"
+  },
+  {
+    "role_id": "JF24-067",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Legal Agreement Coordinator"
+  },
+  {
+    "role_id": "JF24-068",
+    "job_family": "Legal Practice & Corporate Law",
+    "role_name": "Secretarial Audit Support Executive"
+  },
+  {
+    "role_id": "JF26-017",
+    "job_family": "Logistics & Warehouse",
+    "role_name": "Import Documentation Executive"
+  },
+  {
+    "role_id": "JF26-018",
+    "job_family": "Logistics & Warehouse",
+    "role_name": "Letter of Credit Executive"
+  },
+  {
+    "role_id": "JF26-019",
+    "job_family": "Logistics & Warehouse",
+    "role_name": "Freight Forwarding Executive"
+  },
+  {
+    "role_id": "JF15-019",
+    "job_family": "Marketing & Growth",
+    "role_name": "Digital Analytics Executive"
+  },
+  {
+    "role_id": "JF15-020",
+    "job_family": "Marketing & Growth",
+    "role_name": "E-commerce Analytics Executive"
+  },
+  {
+    "role_id": "JF15-021",
+    "job_family": "Marketing & Growth",
+    "role_name": "Marketing MIS Executive"
+  },
+  {
+    "role_id": "JF15-022",
+    "job_family": "Marketing & Growth",
+    "role_name": "International Marketing Executive"
+  },
+  {
+    "role_id": "JF15-023",
+    "job_family": "Marketing & Growth",
+    "role_name": "Market Entry Analyst"
+  },
+  {
+    "role_id": "JF21-020",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Website Administration Executive"
+  },
+  {
+    "role_id": "JF21-021",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Digital Systems Support Executive"
+  },
+  {
+    "role_id": "JF21-022",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Content Management Systems Executive"
+  },
+  {
+    "role_id": "JF21-023",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Order Management Systems Executive"
+  },
+  {
+    "role_id": "JF21-024",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Payment Gateway Operations Executive"
+  },
+  {
+    "role_id": "JF21-025",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Seller Support Executive - Marketplace"
+  },
+  {
+    "role_id": "JF21-026",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Online Order Fulfilment Executive"
+  },
+  {
+    "role_id": "JF21-027",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Marketplace Growth Executive"
+  },
+  {
+    "role_id": "JF21-028",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Category Executive"
+  },
+  {
+    "role_id": "JF21-029",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Pricing and Promotions Executive - E-Commerce"
+  },
+  {
+    "role_id": "JF21-030",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Product Listing Executive"
+  },
+  {
+    "role_id": "JF21-031",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "E-Commerce Platform Support Executive"
+  },
+  {
+    "role_id": "JF21-032",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Mobile App Support Executive - E-Commerce"
+  },
+  {
+    "role_id": "JF21-033",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Inventory Management Systems Executive"
+  },
+  {
+    "role_id": "JF21-034",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "Checkout and Payments QA Executive"
+  },
+  {
+    "role_id": "JF21-035",
+    "job_family": "Retail & E-Commerce",
+    "role_name": "E-Commerce Integration Executive"
+  },
+  {
+    "role_id": "JF14-019",
+    "job_family": "Sales & Business Development",
+    "role_name": "International Business Development Executive"
+  },
+  {
+    "role_id": "JF14-020",
+    "job_family": "Sales & Business Development",
+    "role_name": "Export Marketing Executive"
+  },
+  {
+    "role_id": "JF14-021",
+    "job_family": "Sales & Business Development",
+    "role_name": "International Sales Executive"
+  },
+  {
+    "role_id": "JF14-022",
+    "job_family": "Sales & Business Development",
+    "role_name": "Global Account Executive"
+  },
+  {
+    "role_id": "JF14-023",
+    "job_family": "Sales & Business Development",
+    "role_name": "Cross-Border E-Commerce Executive"
+  },
+  {
+    "role_id": "JF14-024",
+    "job_family": "Sales & Business Development",
+    "role_name": "Export Promotion Executive"
+  },
+  {
+    "role_id": "JF14-025",
+    "job_family": "Sales & Business Development",
+    "role_name": "International Business Analyst"
+  },
+  {
+    "role_id": "JF14-026",
+    "job_family": "Sales & Business Development",
+    "role_name": "International Client Servicing Executive"
+  },
+  {
+    "role_id": "JF01-023",
+    "job_family": "Software Engineering",
+    "role_name": "Junior Web Developer"
+  },
+  {
+    "role_id": "JF01-024",
+    "job_family": "Software Engineering",
+    "role_name": "WordPress Developer"
+  },
+  {
+    "role_id": "JF01-025",
+    "job_family": "Software Engineering",
+    "role_name": "Web Development Trainee"
+  },
+  {
+    "role_id": "JF01-026",
+    "job_family": "Software Engineering",
+    "role_name": "Junior Software Developer"
+  },
+  {
+    "role_id": "JF01-027",
+    "job_family": "Software Engineering",
+    "role_name": "Junior Full Stack Developer"
+  },
+  {
+    "role_id": "JF25-017",
+    "job_family": "Supply Chain & Procurement",
+    "role_name": "Export Executive"
+  },
+  {
+    "role_id": "JF25-018",
+    "job_family": "Supply Chain & Procurement",
+    "role_name": "Export Sales Coordinator"
+  }
+]
