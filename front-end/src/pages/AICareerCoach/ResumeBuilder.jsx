@@ -2390,6 +2390,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                         onClick={() => {
                                                                             handleArrayChange('education', idx, 'level', opt.id);
                                                                             if (opt.id === '12th' || opt.id === '10th') handleArrayChange('education', idx, 'pursuing', false);
+                                                                            if (opt.id === '10th') handleArrayChange('education', idx, 'specialisation', '');
                                                                         }}
                                                                         className={`h-8 rounded-lg border px-3 text-[12px] font-semibold transition-colors ${
                                                                             (edu.level || 'degree') === opt.id
@@ -2411,10 +2412,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.degree', 'Degree')}</label>
                                                                 <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
+                                                            {edu.level !== '10th' && (
                                                             <div>
-                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{['12th', '10th'].includes(edu.level) ? t('resume_builder.stream', 'Stream / Group') : t('resume_builder.specialisation', 'Specialisation / Branch')}</label>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{edu.level === '12th' ? t('resume_builder.stream', 'Stream / Group') : t('resume_builder.specialisation', 'Specialisation / Branch')}</label>
                                                                 <input type="text" placeholder={t('resume_builder.specialisation_placeholder', 'e.g. Computer Science, Commerce')} value={edu.specialisation || ''} onChange={(e) => handleArrayChange('education', idx, 'specialisation', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
+                                                            )}
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                             <div>
