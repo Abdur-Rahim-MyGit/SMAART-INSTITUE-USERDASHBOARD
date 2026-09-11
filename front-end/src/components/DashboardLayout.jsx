@@ -35,7 +35,7 @@ import useUser from "@/hooks/useUser";
 import useAvatar from "@/hooks/useAvatar";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { formatDistanceToNow } from 'date-fns';
-import { API_BASE_URL, getBackendUrl } from "@/services/api";
+import { getBackendUrl } from "@/services/api";
 import useSessionGuard from "@/hooks/useSessionGuard";
 import SessionExpiryWarning from "@/components/SessionExpiryWarning";
 import { STAGES, TRACKS, ASSESSMENT_GATES } from "@/data/courseStructureData";
@@ -459,7 +459,7 @@ const DashboardLayout = () => {
 
   const fetchStreak = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/streaks/status`, {
+      const response = await fetch('/api/streaks/status', {
         headers: {
           "Authorization": `Bearer ${sessionStorage.getItem("token")}`
         }
@@ -477,7 +477,7 @@ const DashboardLayout = () => {
 
   const recordActivityAndFetch = async () => {
     try {
-      await fetch(`${API_BASE_URL}/streaks/activity`, {
+      await fetch('/api/streaks/activity', {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${sessionStorage.getItem("token")}`
@@ -574,7 +574,7 @@ const DashboardLayout = () => {
     const checkCareerLockStatus = async () => {
       if (!user) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/career-agent/final-pathway`, { credentials: 'include' });
+        const res = await fetch('/api/career-agent/final-pathway', { credentials: 'include' });
         let isLocked = false;
         if (res.ok) {
           const payload = await res.json();
@@ -704,7 +704,7 @@ const DashboardLayout = () => {
       const fetchProfilePhoto = async () => {
         if (!user?.email) return;
         try {
-          const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
+          const response = await fetch(`/api/users/register-details/${user.email}`);
           if (response.ok) {
             const data = await response.json();
             const fetchedPhotoUrl = data.profilePhoto || data.otherDetails?.profilePhoto;
