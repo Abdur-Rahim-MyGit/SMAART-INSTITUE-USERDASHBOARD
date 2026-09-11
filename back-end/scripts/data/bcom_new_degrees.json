@@ -1,0 +1,138 @@
+[
+  {
+    "uniqueId": "UG-BCOM-001",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Accounting and Finance"
+  },
+  {
+    "uniqueId": "UG-BCOM-002",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Business Process Services"
+  },
+  {
+    "uniqueId": "UG-BCOM-003",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Banking Management"
+  },
+  {
+    "uniqueId": "UG-BCOM-004",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Banking and Insurance"
+  },
+  {
+    "uniqueId": "UG-BCOM-005",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Business Analytics"
+  },
+  {
+    "uniqueId": "UG-BCOM-007",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Co-operation"
+  },
+  {
+    "uniqueId": "UG-BCOM-008",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "General"
+  },
+  {
+    "uniqueId": "UG-BCOM-009",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Computer Application"
+  },
+  {
+    "uniqueId": "UG-BCOM-011",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Corporate Secretaryship"
+  },
+  {
+    "uniqueId": "UG-BCOM-012",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "E-Commerce"
+  },
+  {
+    "uniqueId": "UG-BCOM-013",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Financial Services"
+  },
+  {
+    "uniqueId": "UG-BCOM-014",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Honours/General"
+  },
+  {
+    "uniqueId": "UG-BCOM-015",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Information Systems Management"
+  },
+  {
+    "uniqueId": "UG-BCOM-016",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Information Technology"
+  },
+  {
+    "uniqueId": "UG-BCOM-017",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "International Business"
+  },
+  {
+    "uniqueId": "UG-BCOM-018",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Professional Accounting"
+  },
+  {
+    "uniqueId": "UG-BCOM-019",
+    "level": "Undergraduate (UG)",
+    "domain": "Commerce & Management",
+    "fullName": "Bachelor of Commerce",
+    "abbreviation": "B.Com.",
+    "specialization": "Strategic Finance"
+  }
+]
