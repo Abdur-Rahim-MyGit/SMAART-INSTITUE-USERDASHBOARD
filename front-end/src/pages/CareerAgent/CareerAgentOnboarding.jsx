@@ -1025,9 +1025,28 @@ const CareerAgentOnboarding = () => {
     const fillEduFromHigherEdArray = (higherEdList, defaultUniv, defaultYear) => {
       if (!Array.isArray(higherEdList) || higherEdList.length === 0) return null;
 
+      // Registration's higherEducation array is a full academic HISTORY (can
+      // include 10th/12th/diploma entries alongside the actual degree) —
+      // Career Agent only cares about the degree(s) the student is CURRENTLY
+      // pursuing, not their whole history. Auto-fill should never surface an
+      // old/unrelated qualification as if it were a second active degree;
+      // the student can always add a genuine second one manually via
+      // "Add Another Academic Qualification".
+      const isCurrent = (item) => {
+        if (typeof item.currentlyPursuing === 'boolean') return item.currentlyPursuing;
+        if (item.degreeStatus) {
+          const s = item.degreeStatus.toLowerCase();
+          return s.includes('pursu') || s.includes('ongoi');
+        }
+        return true; // no status info at all — don't silently drop it
+      };
+      const currentEntries = higherEdList.filter(isCurrent);
+      const relevantList = currentEntries.length > 0 ? currentEntries : higherEdList;
+      if (relevantList.length === 0) return null;
+
       const availableLevels = Object.keys(eduData || {});
 
-      return higherEdList.map(item => {
+      return relevantList.map(item => {
         let rawLevel = item.qualificationLevel || item.level || item.degreeLevel || '';
         let level = rawLevel;
 
