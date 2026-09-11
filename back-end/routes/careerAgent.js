@@ -676,7 +676,8 @@ router.get('/all-directions', async (req, res) => {
     const directions = docs.map(doc => ({
       directionId: doc['Direction ID'],
       directionName: doc['Career Direction'],
-      directionOverview: doc['Overview / Description'] || null,
+      directionDescription: doc['Overview / Description'] || null,
+      directionOverview: doc['Overview / Description'] || null, // alias, matches /directions/:uniqueId shape
       specId: doc['Spec ID'] || null,
       domain: domainBySpecId[doc['Spec ID']] || null,
       roles: [1,2,3,4,5,6,7,8,9,10]
