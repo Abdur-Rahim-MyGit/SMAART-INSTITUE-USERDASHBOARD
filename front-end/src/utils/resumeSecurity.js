@@ -7,7 +7,12 @@ export const stableStringify = (value) => {
     return `[${value.map(stableStringify).join(',')}]`;
   }
   if (value && typeof value === 'object') {
+    // Mongo-only noise (subdocument _id, document __v) must never affect the
+    // fingerprint: the client computes it from a plain payload with neither,
+    // the server from a hydrated Mongoose document with both, so leaving
+    // them in makes every export a false content-tamper mismatch.
     return `{${Object.keys(value)
+      .filter((key) => key !== '_id' && key !== '__v')
       .sort()
       .map((key) => `${key}:${stableStringify(value[key])}`)
       .join(',')}}`;

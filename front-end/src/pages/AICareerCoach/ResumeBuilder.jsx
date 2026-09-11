@@ -177,6 +177,20 @@ import {
 } from '@/utils/resumeSecurity';
 
 /** Footer on each PDF page (body watermark is rendered once in the resume preview) */
+// Single source for the verification QR image so the live preview and the
+// export path always render the same code from the same options.
+const generateVerificationQr = (url) =>
+    QRCode.toDataURL(url, {
+        margin: 1,
+        width: 180,
+        color: { dark: '#0f172a', light: '#ffffff' },
+    });
+
+// Two rAFs guarantee at least one paint has landed the just-set state (a
+// fixed setTimeout is a guess; this waits for the actual commit+paint).
+const waitForPaint = () =>
+    new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
 const applyPdfWatermarks = (pdf, pdfWidth, pdfHeight, resumePublicId, studentId) => {
     const pageCount = pdf.getNumberOfPages();
     const stuPart = studentId ? ` · STU ID: ${studentId}` : '';
@@ -503,14 +517,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
         }
         setVerificationUrl(nextVerificationUrl);
 
-        QRCode.toDataURL(nextVerificationUrl, {
-            margin: 1,
-            width: 180,
-            color: {
-                dark: '#0f172a',
-                light: '#ffffff'
-            }
-        })
+        generateVerificationQr(nextVerificationUrl)
             .then(setVerificationQr)
             .catch(error => {
                 console.error('Failed to generate resume verification QR:', error);
@@ -1331,11 +1338,19 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             }
 
             const issued = exportRes.data;
+            const issuedUrl = buildVerificationUrl(issued.resumePublicId, issued.fingerprint);
             setResumePublicId(issued.resumePublicId);
             setResumeFingerprint(issued.fingerprint);
-            setVerificationUrl(buildVerificationUrl(issued.resumePublicId, issued.fingerprint));
+            setVerificationUrl(issuedUrl);
+            try {
+                setVerificationQr(await generateVerificationQr(issuedUrl));
+            } catch (qrError) {
+                console.error('Failed to generate resume verification QR:', qrError);
+            }
 
-            await new Promise((resolve) => setTimeout(resolve, 150));
+            // Wait for the QR <img> to actually be painted with the value we
+            // just set -- not a fixed delay -- before the DOM is captured.
+            await waitForPaint();
 
             const canvas = await html2canvas(element, {
                 scale: 2,

@@ -66,6 +66,7 @@ const resumeSchema = new mongoose.Schema(
                 duration:    String,
                 location:    String,
                 description: String,
+                _id:         false,
             },
         ],
         education: [
@@ -81,6 +82,7 @@ const resumeSchema = new mongoose.Schema(
                 pursuing:       { type: Boolean, default: false },
                 grade:          String,
                 location:       String,
+                _id:            false,
             },
         ],
         skills: {
@@ -107,6 +109,7 @@ const resumeSchema = new mongoose.Schema(
                 outcome:     String,
                 description: String,
                 link:        String,
+                _id:         false,
             },
         ],
         certifications: [
@@ -116,6 +119,7 @@ const resumeSchema = new mongoose.Schema(
                 year:         String,
                 credentialId: String,
                 link:         String,
+                _id:          false,
             },
         ],
         achievements: [
@@ -123,6 +127,7 @@ const resumeSchema = new mongoose.Schema(
                 title:       String,
                 description: String,
                 link:        String,
+                _id:         false,
             },
         ],
         // Positions of responsibility and extracurricular activities.
@@ -133,6 +138,7 @@ const resumeSchema = new mongoose.Schema(
                 organisation: String,
                 duration:     String,
                 description:  String,
+                _id:          false,
             },
         ],
         publications: [
@@ -143,6 +149,7 @@ const resumeSchema = new mongoose.Schema(
                 year:        String,
                 link:        String,
                 description: String,
+                _id:         false,
             },
         ],
         // Presentation settings chosen on the Review step; see utils/resumeLayout.js.
