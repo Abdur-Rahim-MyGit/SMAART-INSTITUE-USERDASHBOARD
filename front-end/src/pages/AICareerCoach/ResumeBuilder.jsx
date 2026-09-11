@@ -936,6 +936,24 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
 
         const formattedCgpa = extractCgpa(student, user, reg, data) || verifiedCgpa;
 
+        // Admin-side student record: batch years live on department.batch
+        // (or a "2022-2026" batch string) and the affiliated university on
+        // the college. Registration wins when the student filled it in.
+        const adminBatch = student.department?.batch && typeof student.department.batch === 'object' ? student.department.batch : {};
+        const batchText = String(adminBatch.batch || student.batch || data.batch || '');
+        const batchYears = batchText.match(/(20\d{2})\D+(20\d{2})/);
+        const adminStartYear = firstCleanValue(adminBatch.startYear, batchYears?.[1]);
+        const adminEndYear = firstCleanValue(adminBatch.endYear, batchYears?.[2]);
+        const college = student.college && typeof student.college === 'object' ? student.college : {};
+        const collegeUniversity = firstCleanValue(
+            college.affiliatedUniversity,
+            /university/i.test(String(college.type || college.institutionType || '')) ? college.name : null
+        );
+        const adminSpecialisation = firstCleanValue(
+            typeof student.department?.specialization === 'string' ? student.department.specialization : null,
+            student.academic?.specialisation
+        );
+
         // Education
         const eduList = [];
         if (listFrom(reg.higherEducation).length > 0) {
@@ -945,12 +963,12 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                     // resume needs the level chip and the "pursuing" flag.
                     level: /diploma|polytechnic/i.test(String(edu.qualificationLevel || edu.degreeFullName || '')) ? 'diploma' : 'degree',
                     pursuing: /pursu|ongoing|current|in progress/i.test(String(edu.degreeStatus || edu.status || '')),
-                    specialisation: firstCleanValue(edu.specialization, edu.specialisation, edu.branch, edu.stream),
-                    board: firstCleanValue(edu.university, edu.board),
-                    startYear: firstCleanValue(edu.startYear, edu.yearOfJoining),
+                    specialisation: firstCleanValue(edu.specialization, edu.specialisation, edu.branch, edu.stream, idx === 0 ? adminSpecialisation : null),
+                    board: firstCleanValue(edu.university, edu.board, idx === 0 ? collegeUniversity : null),
+                    startYear: firstCleanValue(edu.startYear, edu.yearOfJoining, idx === 0 ? adminStartYear : null),
                     degree: firstCleanValue(edu.degreeFullName, edu.degree, edu.qualificationLevel),
                     institution: firstCleanValue(edu.institutionName, edu.university, reg.institution, data.college),
-                    year: firstCleanValue(edu.yearOfPassing, edu.graduationYear),
+                    year: firstCleanValue(edu.yearOfPassing, edu.graduationYear, idx === 0 ? adminEndYear : null),
                     grade: idx === 0
                         ? firstCleanValue(formattedCgpa, edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade)
                         : firstCleanValue(edu.cgpaPercentage ? `${edu.cgpaPercentage}` : null, edu.percentage, edu.grade),
@@ -959,9 +977,14 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             });
         } else if (reg.institution || data.college || formattedCgpa) {
             eduList.push({
-                degree: firstCleanValue(reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
-                institution: firstCleanValue(reg.institution, data.college, 'SMAART Institute'),
-                year: firstCleanValue(reg.yearOfPassing, data.batch),
+                level: 'degree',
+                pursuing: /pursu|ongoing|current/i.test(String(student.academicStatus || '')),
+                degree: firstCleanValue(student.department?.fullName, reg.educationLevel, reg.academic?.degreeLevel, data.department, 'Student'),
+                specialisation: adminSpecialisation,
+                board: collegeUniversity,
+                startYear: adminStartYear,
+                institution: firstCleanValue(reg.institution, data.college, college.name, 'SMAART Institute'),
+                year: firstCleanValue(reg.yearOfPassing, adminEndYear, data.batch),
                 grade: firstCleanValue(formattedCgpa, data.academic?.overallCgpa ? `${data.academic.overallCgpa} CGPA` : ''),
                 location: defaultLoc
             });
@@ -970,7 +993,8 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
             eduList.push({
                 level: '12th',
                 board: cleanProfileValue(reg.twelfthDetails.board),
-                degree: `12th Standard${cleanProfileValue(reg.twelfthDetails.stream) ? ` (${cleanProfileValue(reg.twelfthDetails.stream)})` : ''}`,
+                specialisation: cleanProfileValue(reg.twelfthDetails.stream),
+                degree: '12th Standard',
                 institution: cleanProfileValue(reg.twelfthDetails.schoolName),
                 year: cleanProfileValue(reg.twelfthDetails.yearOfPassing),
                 grade: cleanProfileValue(reg.twelfthDetails.percentage),
@@ -2363,7 +2387,10 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                     <button
                                                                         key={opt.id}
                                                                         type="button"
-                                                                        onClick={() => handleArrayChange('education', idx, 'level', opt.id)}
+                                                                        onClick={() => {
+                                                                            handleArrayChange('education', idx, 'level', opt.id);
+                                                                            if (opt.id === '12th' || opt.id === '10th') handleArrayChange('education', idx, 'pursuing', false);
+                                                                        }}
                                                                         className={`h-8 rounded-lg border px-3 text-[12px] font-semibold transition-colors ${
                                                                             (edu.level || 'degree') === opt.id
                                                                                 ? 'border-[#045C9A] bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/50 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]'
@@ -2385,7 +2412,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                 <input type="text" placeholder={t('resume_builder.degree_placeholder', 'e.g. MCA or B.Tech')} value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.specialisation', 'Specialisation / Branch')}</label>
+                                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{['12th', '10th'].includes(edu.level) ? t('resume_builder.stream', 'Stream / Group') : t('resume_builder.specialisation', 'Specialisation / Branch')}</label>
                                                                 <input type="text" placeholder={t('resume_builder.specialisation_placeholder', 'e.g. Computer Science, Commerce')} value={edu.specialisation || ''} onChange={(e) => handleArrayChange('education', idx, 'specialisation', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
@@ -2403,6 +2430,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                                 <input type="text" inputMode="numeric" placeholder={t('resume_builder.year_placeholder', 'e.g. 2025')} value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F1F5F9] dark:bg-[#072036] border border-[#d7ebf5] dark:border-white/10 rounded-2xl text-sm font-semibold dark:text-white outline-none transition-all focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10" />
                                                             </div>
                                                         </div>
+                                                        {!['12th', '10th'].includes(edu.level) && (
                                                         <label className="inline-flex cursor-pointer items-center gap-2.5 text-[12.5px] font-semibold text-slate-600 dark:text-slate-300">
                                                             <input
                                                                 type="checkbox"
@@ -2412,6 +2440,7 @@ const ResumeBuilder = ({ embedded = false, jobContext = null, onClose = null, vi
                                                             />
                                                             {t('resume_builder.currently_pursuing', 'Currently pursuing')}
                                                         </label>
+                                                        )}
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">{t('resume_builder.grade_cgpa', 'Grade / CGPA')}</label>
