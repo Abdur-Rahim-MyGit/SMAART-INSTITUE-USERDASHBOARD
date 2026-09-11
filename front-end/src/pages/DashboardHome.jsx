@@ -8,6 +8,7 @@ import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
 import CareerPathsWidget from "@/components/dashboard/CareerPathsWidget";
 import ActiveSkillsWidget from "@/components/dashboard/ActiveSkillsWidget";
+import WordOfTheDay from "@/components/dashboard/WordOfTheDay";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
@@ -284,6 +285,7 @@ const DashboardHome = () => {
                   </h2>
                 </div>
                 <LearningProgress />
+                <WordOfTheDay />
               </motion.div>
             </div>
           </div>
