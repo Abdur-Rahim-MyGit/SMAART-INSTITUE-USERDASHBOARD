@@ -730,8 +730,8 @@
 }
 
 .btn-back {
-  background: #ffffff;
-  border: 1px solid #dbe4f0;
+  background: var(--card);
+  border: 1px solid var(--accent-border);
   color: transparent;
   padding: 0.82rem 1.25rem;
   border-radius: 999px;
@@ -747,19 +747,19 @@
 }
 .btn-back:hover {
   transform: translateY(-1px);
-  border-color: rgba(26,56,132,0.24);
+  border-color: rgba(var(--accent-rgb), 0.24);
   box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
 }
 .btn-back::before {
   content: '\2190';
-  color: #1a3884;
+  color: var(--accent);
   font-size: 1rem;
   font-weight: 800;
   line-height: 1;
 }
 .btn-back::after {
   content: 'Previous Step';
-  color: #35507b;
+  color: var(--text2);
   font-size: 0.84rem;
   font-weight: 700;
   line-height: 1;
@@ -833,7 +833,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #dc2626;
+  color: var(--red);
   background: rgba(239,68,68,0.1);
 }
 
@@ -842,10 +842,15 @@
 }
 
 .validation-banner-title {
-  color: #7f1d1d;
+  color: var(--red);
   font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.45;
+}
+
+:is(.dark) .career-agent-page .validation-banner-inner {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));
+  border-color: rgba(239,68,68,0.3);
 }
 
 /* ───────────────────────────────────────────────────────────────

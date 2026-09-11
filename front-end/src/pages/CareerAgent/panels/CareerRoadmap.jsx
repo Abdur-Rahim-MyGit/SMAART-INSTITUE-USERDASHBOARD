@@ -263,7 +263,7 @@ const SkillCard = ({ item, color, status, onStatusChange, onInProgress, totalRol
 
     const getStatusStyle = (s) => {
         switch (s) {
-            case 'Completed': return { background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.2)' };
+            case 'Completed': return { background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' };
             case 'In Progress': return { background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' };
             default: return { background: 'rgba(148, 163, 184, 0.1)', color: '#64748b', border: '1px solid rgba(148, 163, 184, 0.2)' };
         }
@@ -333,7 +333,7 @@ const SkillCard = ({ item, color, status, onStatusChange, onInProgress, totalRol
                     )}
                     <button
                         onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Completed'); }}
-                        style={{ ...styles.actionBtn, background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.3)' }}
+                        style={{ ...styles.actionBtn, background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}
                     >
                         Mark Done
                     </button>
@@ -583,8 +583,8 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                         width: '28px', height: '28px', borderRadius: '50%',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         transition: 'all 0.25s',
-                                        background: isDone ? '#22c55e' : isActive ? 'var(--accent)' : C.btnBg,
-                                        border: isDone ? '2px solid #22c55e' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
+                                        background: isDone ? '#10b981' : isActive ? 'var(--accent)' : C.btnBg,
+                                        border: isDone ? '2px solid #10b981' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
                                         boxShadow: isActive ? '0 0 0 4px rgba(79,142,247,0.18)' : 'none',
                                     }}>
                                         {isDone
@@ -594,7 +594,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     </div>
                                     <span style={{
                                         fontSize: '0.65rem', fontWeight: 700,
-                                        color: isDone ? '#22c55e' : isActive ? C.text1 : C.muted,
+                                        color: isDone ? '#10b981' : isActive ? C.text1 : C.muted,
                                         transition: 'color 0.2s',
                                     }}>
                                         {s}
@@ -605,7 +605,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                         width: '48px', height: '2px',
                                         margin: '0 0.4rem',
                                         marginBottom: '1.1rem',
-                                        background: step > i + 1 ? '#22c55e' : C.border,
+                                        background: step > i + 1 ? '#10b981' : C.border,
                                         transition: 'background 0.3s',
                                         borderRadius: '2px',
                                     }} />
@@ -621,7 +621,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                     {/* Drop Zone */}
                     <div
                         style={{
-                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#22c55e' : file ? 'rgba(34,197,94,0.5)' : C.border}`,
+                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#10b981' : file ? 'rgba(16,185,129,0.5)' : C.border}`,
                             borderRadius: '16px',
                             padding: '2.2rem 1.5rem',
                             textAlign: 'center', cursor: verified ? 'default' : 'pointer',
@@ -629,7 +629,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
                             userSelect: 'none',
                             background: verified
-                                ? 'rgba(34,197,94,0.06)'
+                                ? 'rgba(16,185,129,0.06)'
                                 : dragOver
                                     ? C.accentBg
                                     : C.dropBg,
@@ -645,25 +645,25 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                             <>
                                 <div style={{
                                     width: '52px', height: '52px', borderRadius: '50%',
-                                    background: 'rgba(34,197,94,0.12)',
-                                    border: '2px solid rgba(34,197,94,0.35)',
+                                    background: 'rgba(16,185,129,0.12)',
+                                    border: '2px solid rgba(16,185,129,0.35)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
-                                    <CheckCircle size={26} color="#22c55e" />
+                                    <CheckCircle size={26} color="#10b981" />
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#22c55e' }}>Certificate Verified ✓</div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981' }}>Certificate Verified ✓</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
                             </>
                         ) : file ? (
                             <>
                                 <div style={{
                                     width: '52px', height: '52px', borderRadius: '14px',
-                                    background: 'rgba(34,197,94,0.1)',
-                                    border: '1px solid rgba(34,197,94,0.3)',
+                                    background: 'rgba(16,185,129,0.1)',
+                                    border: '1px solid rgba(16,185,129,0.3)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: '1.5rem',
                                 }}>📄</div>
-                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#22c55e' }}>{file.name}</div>
+                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#10b981' }}>{file.name}</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
                             </>
                         ) : (
