@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  IconUser as User,
   IconSchool as GraduationCap,
   IconTarget as Target,
   IconBriefcase as Briefcase,
@@ -71,7 +70,7 @@ const getDomains = (eduData, level) => level && eduData[level] ? Object.keys(edu
 const getDegreeGroups = (eduData, level, domain) => level && domain && eduData[level]?.[domain] ? Object.keys(eduData[level]?.[domain] || {}) : [];
 const getSpecialisations = (eduData, level, domain, degree) => level && domain && degree ? eduData[level]?.[domain]?.[degree] || [] : [];
 
-const STEPS = ['Personal Details', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
+const STEPS = ['Overview', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
 const STEP_DISPLAY_LABELS = ['Personal', 'Education', 'Primary', 'Secondary', 'Tertiary', 'Review'];
 
 const createEmptyValidationState = () => ({ messages: [], fields: {} });
@@ -1715,85 +1714,87 @@ const CareerAgentOnboarding = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* STEP 1: PERSONAL DETAILS */}
+          {/* STEP 1: OVERVIEW — how Career Agent works, before diving into the form */}
           {step === 1 && (
             <div className="form-card">
               <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
                 <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <User size={24} color="#ffffff" stroke={1.5} />
+                  <Compass size={24} color="#ffffff" stroke={1.5} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.personal_details', 'Personal Details')}</span>
+                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.overview_title', 'How Career Agent Works')}</span>
                     <span className="step-tag">{t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 1, total: 6 })}</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>{t('career_agent.onboarding.personal_details_subtitle', 'Your basic information to personalise your career report.')}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>
+                    {t('career_agent.onboarding.overview_subtitle', "A quick look at the rules before we build your career pathway. Your profile details are already linked — no need to re-enter them.")}
+                  </p>
                 </div>
               </div>
 
+              <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <GraduationCap size={16} />
+                    </div>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card1_title', 'Recommended for your degree')}</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
+                    {t('career_agent.onboarding.overview_card1_body', 'Once you enter your education, we show the 5 career directions that best match your degree and specialisation (10 if you have two degrees on file).')}
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Target size={16} />
+                    </div>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card2_title', 'Pick a Primary, Secondary & Tertiary path')}</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
+                    {t('career_agent.onboarding.overview_card2_body', "You'll choose 3 career directions in total. Pick from your recommendations, or browse and choose any other direction within your own field of study.")}
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <ShieldCheck size={16} />
+                    </div>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card3_title', 'Stay within your own field')}</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
+                    {t('career_agent.onboarding.overview_card3_body', "You're free to explore any direction inside your field of study — but a direction from a completely different field (e.g. an IT student picking a Medicine path) can't be selected.")}
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Lock size={16} />
+                    </div>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card4_title', 'Your 3 paths get locked')}</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
+                    {t('career_agent.onboarding.overview_card4_body', 'Once submitted, your chosen directions lock in after 14 days or 5 attempts — whichever comes first. You can still explore your recommended directions anytime after locking.')}
+                  </p>
+                </div>
+              </div>
 
               {user && (
                 <div
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-6"
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mt-6"
                   style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px' }}
                 >
                   <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <ShieldCheck size={16} />
+                    <CheckCircle size={16} />
                   </div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
-                    Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
+                    {t('career_agent.onboarding.profile_linked_label', 'Profile Linked:')} <span style={{ color: 'var(--text2)', fontWeight: 500 }}>{t('career_agent.onboarding.profile_linked_body', "We've auto-filled your name, email, phone and registration number from your SMAART profile.")}</span>
                   </div>
                 </div>
               )}
-
-              <div className="fgrid">
-                {/* Full Name */}
-                <div className="fg">
-                  <label className="fl">{t('career_agent.onboarding.full_name', 'Full Name')} <span className="req">*</span></label>
-                  <input className={getFieldErrorClass('personal.name')} type="text" required placeholder="e.g. Priya Sharma"
-                    value={formData.personalDetails.name}
-                    onChange={e => updatePersonal('name', e.target.value)}
-                    disabled
-                  />
-                </div>
-
-                {/* Email Address */}
-                <div className="fg">
-                  <label className="fl">{t('career_agent.onboarding.email_address', 'Email Address')} <span className="req">*</span></label>
-                  <input className={getFieldErrorClass('personal.email')} type="email" required placeholder="example@email.com"
-                    value={formData.personalDetails.email}
-                    onChange={e => updatePersonal('email', e.target.value)}
-                    disabled
-                  />
-                </div>
-
-                {/* Phone Number */}
-                <div className="fg">
-                  <label className="fl">{t('career_agent.onboarding.phone_number', 'Phone Number')} <span className="req">*</span></label>
-                  <input className={getFieldErrorClass('personal.phone')} type="tel" placeholder="10-digit mobile number"
-                    value={formData.personalDetails.phone}
-                    onChange={e => updatePersonal('phone', e.target.value)}
-                    maxLength={10}
-                    disabled
-                  />
-                </div>
-
-                {/* Registration Number */}
-                <div className="fg">
-                  <label className="fl">{t('career_agent.onboarding.reg_num', 'Registration Number')} <span className="req">*</span></label>
-                  <input className={getFieldErrorClass('personal.registrationNumber')} type="text" placeholder="e.g. REG-12345"
-                    value={formData.personalDetails.registrationNumber}
-                    onChange={e => updatePersonal('registrationNumber', e.target.value)}
-                    disabled
-                  />
-                </div>
-
-
-              </div>
-
-              <div style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--muted)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                Your information is securely stored and used only for your report.
-              </div>
             </div>
           )}
 
