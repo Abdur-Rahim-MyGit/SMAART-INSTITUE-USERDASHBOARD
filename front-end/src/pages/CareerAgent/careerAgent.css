@@ -95,6 +95,24 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  position: relative;
+}
+
+/* Subtle geo grid background — same low-opacity texture used elsewhere in
+   the app (landing sections, verification pages), for visual consistency.
+   No z-index set deliberately: an unpositioned pseudo-element paints below
+   normal content by default, so this can't interfere with any modal/overlay
+   child's own stacking. pointer-events: none keeps it fully non-interactive. */
+.career-agent-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/grid-pattern.svg');
+  opacity: 0.03;
+  pointer-events: none;
+}
+:is(.dark) .career-agent-page::before {
+  opacity: 0.08;
 }
 
 /* ── Header ── */
