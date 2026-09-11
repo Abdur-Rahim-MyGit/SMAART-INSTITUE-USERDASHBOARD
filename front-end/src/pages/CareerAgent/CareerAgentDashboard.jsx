@@ -13,7 +13,7 @@ import CareerDirectionCard from './panels/CareerDirectionCard';
 import Certifications from './panels/Certifications';
 import CareerFirstVisitModal from './components/CareerFirstVisitModal';
 import CareerLockBanner from './components/CareerLockBanner';
-
+import CareerLockStatusCard from './components/CareerLockStatusCard';
 import CareerLockedModal from './components/CareerLockedModal';
 import { fetchLockStatus } from '@/services/CareerLockService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -491,7 +491,7 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
 
-
+                    <CareerLockStatusCard lockStatus={lockStatus} />
 
                     <div className="sidebar-nav">
                         {panels.map(p => (
