@@ -44,6 +44,60 @@ function makeProfileHash(studentData) {
   return crypto.createHash('sha256').update(key).digest('hex');
 }
 
+// ─── Domain-mismatch guard ────────────────────────────────────────────────────
+// A student may freely pick any career direction within their OWN broad field
+// (e.g. a Commerce student picking any Commerce direction, even outside their
+// own specific specialisation's recommended 5) — but never a direction from a
+// completely different field (e.g. a Commerce student picking a Medicine
+// direction). This is enforced here, server-side, so it cannot be bypassed by
+// calling the API directly. Only structured picks (careerDirectionId set) are
+// checked — a free-text "type your own role" entry has no direction/domain to
+// check against and is left alone.
+async function findDirectionDomain(directionId) {
+  if (!directionId) return null;
+  const dirDoc = await CareerAgentDataModel.findOne({ 'Direction ID': directionId }).lean();
+  const specId = dirDoc && dirDoc['Spec ID'];
+  if (!specId) return null;
+  const degreeDoc = await Degree.findOne({ uniqueId: specId }).lean();
+  return degreeDoc ? degreeDoc.domain : null;
+}
+
+async function validateDirectionDomains(studentData) {
+  const studentDomains = new Set(
+    (studentData.education || [])
+      .map(e => e && e.domain)
+      .filter(Boolean)
+  );
+
+  // No education domain on file yet — nothing to validate against.
+  if (studentDomains.size === 0) return { ok: true };
+
+  const tiers = ['primary', 'secondary', 'tertiary'];
+  const mismatches = [];
+
+  for (const tier of tiers) {
+    const pref = studentData.preferences && studentData.preferences[tier];
+    const directionId = pref && pref.careerDirectionId;
+    if (!directionId) continue; // free-text role pick — nothing to check
+
+    const directionDomain = await findDirectionDomain(directionId);
+    if (directionDomain && !studentDomains.has(directionDomain)) {
+      mismatches.push({
+        tier,
+        directionId,
+        directionName: pref.careerDirectionName || directionId,
+        directionDomain,
+        studentDomains: Array.from(studentDomains)
+      });
+    }
+  }
+
+  if (mismatches.length > 0) {
+    return { ok: false, mismatches };
+  }
+  return { ok: true };
+}
+
 function findCachedRecord(hash) {
   try {
     const files = fs.readdirSync(RECORDS_DIR).filter(f => f.endsWith('.json'));
@@ -602,6 +656,42 @@ router.get('/directions/:uniqueId', async (req, res) => {
 });
 
 /**
+ * GET /api/career-agent/all-directions
+ * Returns EVERY career direction across every degree, each tagged with its
+ * broad field/domain (Commerce & Management, Engineering & Technology, etc.),
+ * so the frontend can show "Recommended for you" (matching the student's own
+ * degree) alongside a full "Browse other directions" list grouped by domain,
+ * with out-of-domain ones flagged for the client-side mirror of the
+ * server-side domain-mismatch guard used on submit.
+ */
+router.get('/all-directions', async (req, res) => {
+  try {
+    const docs = await CareerAgentDataModel.find({}).lean();
+
+    const specIds = [...new Set(docs.map(d => d['Spec ID']).filter(Boolean))];
+    const degrees = await Degree.find({ uniqueId: { $in: specIds } }).lean();
+    const domainBySpecId = {};
+    degrees.forEach(d => { domainBySpecId[d.uniqueId] = d.domain; });
+
+    const directions = docs.map(doc => ({
+      directionId: doc['Direction ID'],
+      directionName: doc['Career Direction'],
+      directionOverview: doc['Overview / Description'] || null,
+      specId: doc['Spec ID'] || null,
+      domain: domainBySpecId[doc['Spec ID']] || null,
+      roles: [1,2,3,4,5,6,7,8,9,10]
+        .map(n => ({ role: doc[`Job Role ${n}`], id: doc[`Role ID ${n}`] }))
+        .filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== '')
+    })).filter(d => d.directionId && d.directionName);
+
+    res.json({ directions, total: directions.length, found: directions.length > 0 });
+  } catch (err) {
+    console.error('[career-agent/all-directions] Error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch all career directions', details: err.message });
+  }
+});
+
+/**
  * POST /api/career-agent/career-direction
  * Fetches the career direction mapping for a specific degree/specialisation and role.
  */
@@ -783,6 +873,19 @@ router.post('/onboarding', aiLimiter, optionalAuth, async (req, res) => {
       studentData.personalDetails = studentData.personalDetails || {};
       studentData.personalDetails.email = loggedInUser.email;
       studentData.personalDetails.name = studentData.personalDetails.name || loggedInUser.name;
+    }
+
+    // ── DOMAIN-MISMATCH GUARD (server-side, cannot be bypassed) ──────────────
+    // A picked direction must belong to the student's own broad field
+    // (e.g. Commerce, Engineering, Medicine). Cross-field picks are rejected
+    // outright — see validateDirectionDomains() above for the exact rule.
+    const domainCheck = await validateDirectionDomains(studentData);
+    if (!domainCheck.ok) {
+      return res.status(400).json({
+        error: 'One or more selected career directions do not match your field of education.',
+        domainMismatch: true,
+        mismatches: domainCheck.mismatches
+      });
     }
 
     // ── LOCK ENFORCEMENT (server-side, cannot be bypassed) ───────────────────
