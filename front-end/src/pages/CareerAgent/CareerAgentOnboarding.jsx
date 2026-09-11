@@ -547,6 +547,10 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
     .map(g => ({ ...g, directions: g.directions.filter(d => !excludeDirections.includes(d.directionId)) }))
     .filter(g => g.directions.length > 0);
   const hasAnyDirectionOptions = filteredDirections.length > 0 || filteredBrowseGroups.length > 0;
+  // Recommended, or at least something selectable within the student's own
+  // field — as opposed to hasAnyDirectionOptions, which is also true when
+  // every available option is a blocked, different-field one.
+  const hasUsableOwnFieldOptions = filteredDirections.length > 0 || filteredBrowseGroups.some(g => g.inDomain);
 
   // Priority branding
   const theme = {
@@ -579,7 +583,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
         {/* SECTION A: TARGET ROLE */}
         <div style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
           <div style={sectionLabelStyle}><span style={{ color: theme.accent }}>01</span> {t('career_agent.onboarding.career_targeting', 'Career Targeting')}</div>
-          {hasAnyDirectionOptions ? (
+          {hasUsableOwnFieldOptions ? (
             <div className="fgrid">
               <div className="fg full">
                 <label className="fl" style={{ marginBottom: '0.6rem', display: 'block' }}>{t('career_agent.onboarding.career_directions', 'Career Directions')}</label>
@@ -631,6 +635,18 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
                     onChange={v => up('role', v)}
                     dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
                   />
+                </div>
+              </div>
+            </div>
+          ) : hasAnyDirectionOptions ? (
+            <div className="fgrid">
+              <div className="fg full">
+                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.06)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.15)' }}>
+                  {t('career_agent.onboarding.no_directions_for_field', "Career direction data for your field isn't available yet — check back soon. In the meantime, type your desired job role below.")}
+                </div>
+                <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
+                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
                 </div>
               </div>
             </div>
