@@ -1115,41 +1115,84 @@ const CareerAgentOnboarding = () => {
 
         let updatedEdu = prev.education;
         const firstEdu = prev.education[0];
-        const isBlank = !firstEdu || (!firstEdu.level && !firstEdu.domain && !firstEdu.degreeGroup && (!firstEdu.specialisation || firstEdu.specialisation.length === 0));
+        // Blank per-field, not all-or-nothing — this runs twice (once with
+        // just the user context, once with the fuller register-details
+        // response), and a field the first pass couldn't resolve should
+        // still get filled by the second pass rather than being permanently
+        // skipped because some OTHER field already got set.
+        const hasGaps = !firstEdu || !firstEdu.level || !firstEdu.domain || !firstEdu.degreeGroup || !firstEdu.specialisation || firstEdu.specialisation.length === 0;
 
         const mappedHigherEd = fillEduFromHigherEdArray(higherEdList, defaultUniv, defaultYear);
         if (mappedHigherEd && mappedHigherEd.length > 0) {
           updatedEdu = mappedHigherEd;
-        } else if (isBlank) {
-          if (user.academic && (user.academic.degreeLevel || user.academic.domain || user.academic.degreeGroup || user.academic.specialisation)) {
+        } else if (hasGaps) {
+          // Resolve each field independently, checking every known source in
+          // priority order, instead of picking one all-or-nothing source.
+          // A student's real Level/Domain/Degree/Specialisation most often
+          // live on `department` (level/domain/fullName/specialization),
+          // not `academic` (degreeLevel/domain/degreeGroup/specialisation),
+          // which defaults to empty strings unless explicitly set — so
+          // `academic` alone being present is not enough to trust it fully.
+          const sources = [
+            regDetails?.academic,
+            regDetails?.department && {
+              degreeLevel: regDetails.department.level,
+              domain: regDetails.department.domain,
+              degreeGroup: regDetails.department.fullName || regDetails.department.abbreviation,
+              specialisation: regDetails.department.specialization
+            },
+            regDetails?.degree && {
+              degreeLevel: regDetails.degree.level,
+              domain: regDetails.degree.domain,
+              degreeGroup: regDetails.degree.fullName || regDetails.degree.abbreviation,
+              specialisation: regDetails.degree.specialization
+            },
+            user.academic,
+            user.department && typeof user.department === 'object' && {
+              degreeLevel: user.department.level,
+              domain: user.department.domain,
+              degreeGroup: user.department.fullName || user.department.name,
+              specialisation: user.department.specialization
+            },
+            user.degree && {
+              degreeLevel: user.degree.level,
+              domain: user.degree.domain,
+              degreeGroup: user.degree.fullName,
+              specialisation: user.degree.specialization
+            },
+            (user.qualification || user.specialization) && {
+              degreeGroup: user.qualification,
+              specialisation: user.specialization
+            }
+          ].filter(Boolean);
+
+          const resolveField = (key) => {
+            for (const src of sources) {
+              if (src[key]) return src[key];
+            }
+            return '';
+          };
+
+          // Fill gaps only — keep whatever the first pass (or a prior run)
+          // already resolved correctly, rather than overwriting it with an
+          // empty value just because this pass's sources don't have it.
+          const level = firstEdu?.level || resolveField('degreeLevel');
+          const domain = firstEdu?.domain || resolveField('domain');
+          const degreeGroup = firstEdu?.degreeGroup || resolveField('degreeGroup');
+          const specialisation = (firstEdu?.specialisation && firstEdu.specialisation.length > 0)
+            ? firstEdu.specialisation
+            : (resolveField('specialisation') ? [resolveField('specialisation')] : []);
+
+          if (level || domain || degreeGroup || specialisation.length > 0) {
             updatedEdu = [{
-              level: user.academic.degreeLevel || '',
-              domain: user.academic.domain || '',
-              degreeGroup: user.academic.degreeGroup || '',
-              specialisation: user.academic.specialisation ? [user.academic.specialisation] : [],
-              university: defaultUniv,
-              graduationYear: defaultYear,
-              currentlyPursuing: true
-            }];
-          } else if (user.degree) {
-            updatedEdu = [{
-              level: user.degree.level || '',
-              domain: user.degree.domain || '',
-              degreeGroup: user.degree.fullName || '',
-              specialisation: user.degree.specialization ? [user.degree.specialization] : [],
-              university: defaultUniv,
-              graduationYear: defaultYear,
-              currentlyPursuing: true
-            }];
-          } else if (user.qualification || user.specialization || user.department) {
-            updatedEdu = [{
-              level: '',
-              domain: '',
-              degreeGroup: user.qualification || (typeof user.department === 'object' ? (user.department.fullName || user.department.name || '') : user.department) || '',
-              specialisation: user.specialization ? [user.specialization] : [],
-              university: defaultUniv,
-              graduationYear: defaultYear,
-              currentlyPursuing: true
+              ...firstEdu,
+              level,
+              domain,
+              degreeGroup,
+              specialisation,
+              university: firstEdu?.university || defaultUniv,
+              graduationYear: firstEdu?.graduationYear || defaultYear,
+              currentlyPursuing: firstEdu?.currentlyPursuing ?? true
             }];
           }
         }

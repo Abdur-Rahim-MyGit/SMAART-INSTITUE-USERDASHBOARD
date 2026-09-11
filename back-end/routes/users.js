@@ -891,6 +891,7 @@ router.get('/register-details/:email', async (req, res) => {
       studentForDetails = await Student.findOne({ email: normalizedEmail }).populate('degree');
     }
     const populatedDegree = studentForDetails?.degree || null;
+    const studentDept = studentForDetails?.department || null;
     let academic = studentForDetails?.academic || {};
 
     // Per-semester results, normalised from academicRecords (what the college
@@ -925,35 +926,24 @@ router.get('/register-details/:email', async (req, res) => {
         credits: a?.credits == null ? null : Number(a.credits),
         failedInSemester: a?.failedInSemester == null ? null : Number(a.failedInSemester),
       }));
-    if (studentForDetails && populatedDegree) {
-      const dept = populatedDegree;
-      academic = {
-        degreeLevel: academic?.degreeLevel || dept.level || '',
-        domain: academic?.domain || dept.domain || '',
-        degreeGroup: academic?.degreeGroup || dept.fullName || dept.abbreviation || '',
-        specialisation: academic?.specialisation || dept.specialization || '',
-        cgpa: academic?.cgpa || '',
-        semesterPerformances: semesterRows,
-        activeBacklogs: backlogCount,
-        latestSemester: latestSem ? latestSem.semesterNumber : null,
-        overallCgpa: latestSem && latestSem.cgpa != null ? latestSem.cgpa : (academic?.overallCgpa ?? null),
-      };
-    } else {
-      academic = {
-        degreeLevel: academic?.degreeLevel || '',
-        domain: academic?.domain || '',
-        degreeGroup: academic?.degreeGroup || '',
-        specialisation: academic?.specialisation || '',
-        cgpa: academic?.cgpa || '',
-        semesterPerformances: semesterRows,
-        activeBacklogs: backlogCount,
-        latestSemester: latestSem ? latestSem.semesterNumber : null,
-        overallCgpa: latestSem && latestSem.cgpa != null ? latestSem.cgpa : (academic?.overallCgpa ?? null),
-      };
-    }
+    // Resolve each academic field independently, falling back in priority
+    // order: explicit academic.* override -> the populated `degree` ref (if
+    // set) -> the `department` sub-object, which is the real, authoritative
+    // source of Level/Domain/Degree/Specialisation for most provisioned
+    // students (mirrors the same fallback Profile.jsx already uses).
+    academic = {
+      degreeLevel: academic?.degreeLevel || populatedDegree?.level || studentDept?.level || '',
+      domain: academic?.domain || populatedDegree?.domain || studentDept?.domain || '',
+      degreeGroup: academic?.degreeGroup || populatedDegree?.fullName || populatedDegree?.abbreviation || studentDept?.fullName || studentDept?.abbreviation || '',
+      specialisation: academic?.specialisation || populatedDegree?.specialization || studentDept?.specialization || '',
+      cgpa: academic?.cgpa || '',
+      semesterPerformances: semesterRows,
+      activeBacklogs: backlogCount,
+      latestSemester: latestSem ? latestSem.semesterNumber : null,
+      overallCgpa: latestSem && latestSem.cgpa != null ? latestSem.cgpa : (academic?.overallCgpa ?? null),
+    };
 
     const studentBatch = studentForDetails?.batch || '';
-    const studentDept = studentForDetails?.department || null;
 
     if (registration) {
       return res.json({
