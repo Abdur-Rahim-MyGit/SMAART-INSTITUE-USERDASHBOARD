@@ -35,6 +35,21 @@
   --card-hover: rgba(26, 56, 132, 0.04);
   --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+  /* ── Onboarding (corporate) tokens — lifted from My Courses / Dashboard Home ── */
+  --ob-ink:   #072036;
+  --ob-brand: #045C9A;
+  --ob-sub:   #35566b;
+  --ob-label: #475569;
+  --ob-muted: #64748b;
+  --ob-faint: #94a3b8;
+  --ob-tint:  #EAF7FD;
+  --ob-panel: #F1F5F9;
+  --ob-panel-soft: rgba(241,245,249,0.6);
+  --ob-hair:  #d7ebf5;
+  --ob-soft:  #F8FAFC;
+  --ob-card:  #ffffff;
+  --ob-foot:  #F8FAFC;
+
   font-family: var(--font);
   color: var(--text);
 }
@@ -70,6 +85,20 @@
   --green:  #34d399;
   --amber:  #fbbf24;
   --red:    #f87171;
+
+  --ob-ink:   #f8fafc;
+  --ob-brand: #A6D7E8;
+  --ob-sub:   #cbd5e1;
+  --ob-label: #94a3b8;
+  --ob-muted: #94a3b8;
+  --ob-faint: #64748b;
+  --ob-tint:  rgba(4,92,154,0.22);
+  --ob-panel: #002A5C;
+  --ob-panel-soft: rgba(0,42,92,0.5);
+  --ob-hair:  rgba(255,255,255,0.10);
+  --ob-soft:  #002147;
+  --ob-card:  #001b3a;
+  --ob-foot:  #00152E;
 }
 
 /* ───────── Base Resets ───────── */
@@ -624,15 +653,14 @@
 
 /* Form card */
 .career-agent-page .form-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 2.5rem;
-  max-width: 820px;
-  margin: 0 auto;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  background: var(--ob-card);
+  border: 1px solid var(--ob-hair);
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   position: relative;
-  animation: ca-fadeIn 0.5s ease both;
+  overflow: hidden;
+  animation: ca-fadeIn 0.4s ease both;
 }
 
 .career-agent-page .step-title {
@@ -643,46 +671,54 @@
   color: var(--text1);
 }
 .career-agent-page .step-tag {
-  background: var(--accent-tint);
-  border: 1px solid var(--accent-border);
-  color: var(--accent-text);
-  font-size: 0.58rem; font-weight: 700;
-  padding: 0.18rem 0.48rem;
-  border-radius: 5px;
-  letter-spacing: 0.06em;
+  display: inline-flex; align-items: center;
+  height: 20px; padding: 0 8px;
+  border-radius: 4px;
+  background: rgba(4,92,154,0.10);
+  color: var(--ob-brand);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Form grid */
-.career-agent-page .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-.career-agent-page .fg { display: flex; flex-direction: column; gap: 0.32rem; }
+.career-agent-page .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.career-agent-page .fg { display: flex; flex-direction: column; gap: 6px; }
 .career-agent-page .fg.full { grid-column: 1 / -1; }
 .career-agent-page .fl {
-  font-size: 0.7rem; font-weight: 600;
-  color: var(--muted);
+  font-size: 11px; font-weight: 600;
+  color: var(--ob-label);
   letter-spacing: 0.05em; text-transform: uppercase; display: block;
 }
-.career-agent-page .req { color: var(--red); margin-left: 2px; }
+.career-agent-page .req { color: #dc2626; margin-left: 2px; }
 
-/* Inputs */
+/* Inputs — 40px controls, 10px radius, hairline border (same as the rest of the dashboard) */
 .career-agent-page input,
 .career-agent-page select,
 .career-agent-page select option,
 .career-agent-page textarea {
-  background: var(--navy2) !important;
-  border: 1.5px solid var(--border2) !important;
-  border-radius: 12px !important;
-  padding: 0.75rem 1rem !important;
-  font-size: 0.88rem !important;
-  color: var(--text1) !important;
+  background: var(--ob-card) !important;
+  border: 1px solid var(--ob-hair) !important;
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  color: var(--ob-ink) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  transition: all 0.2s ease !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
+.career-agent-page input,
+.career-agent-page select {
+  height: 40px !important;
+  padding: 0 12px !important;
+}
+.career-agent-page input::placeholder,
+.career-agent-page textarea::placeholder { color: var(--ob-faint); }
 .career-agent-page input:focus,
 .career-agent-page select:focus,
 .career-agent-page textarea:focus {
-  border-color: var(--accent) !important;
-  background: var(--card) !important;
-  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12) !important;
+  border-color: var(--ob-brand) !important;
+  background: var(--ob-card) !important;
+  box-shadow: 0 0 0 3px rgba(4,92,154,0.12) !important;
   outline: none !important;
 }
 
@@ -710,87 +746,67 @@
 }
 
 /* Tags */
-.career-agent-page .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.career-agent-page .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .career-agent-page .tag {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  background: var(--accent-tint);
-  border: 1px solid var(--accent-border);
-  color: var(--accent-text);
-  border-radius: 100px;
-  font-size: 0.72rem; font-weight: 600;
-  padding: 0.2rem 0.65rem;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  background: var(--ob-ink);
+  border: 1px solid var(--ob-ink);
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap;
 }
 .career-agent-page .tag button {
   background: none; border: none; cursor: pointer;
-  color: inherit; font-size: 0.85rem; padding: 0; line-height: 1;
+  color: inherit; font-size: 14px; padding: 0; line-height: 1;
   opacity: 0.7;
 }
 .career-agent-page .tag button:hover { opacity: 1; }
 
-/* Nav buttons */
+/* Card footer — Back / Reset on the left, status + primary action on the right */
 .form-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  border-top: 1px solid var(--ob-hair);
+  background: var(--ob-foot);
 }
 
 .btn-back {
-  background: var(--card);
-  border: 1px solid var(--accent-border);
-  color: transparent;
-  padding: 0.82rem 1.25rem;
-  border-radius: 999px;
-  font-weight: 700; font-size: 0;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 16px;
+  background: var(--ob-card);
+  border: 1px solid var(--ob-hair);
+  color: var(--ob-ink);
+  border-radius: 12px;
+  font-size: 13px; font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-family: var(--font);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 .btn-back:hover {
-  transform: translateY(-1px);
-  border-color: rgba(var(--accent-rgb), 0.24);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
-}
-.btn-back::before {
-  content: '\2190';
-  color: var(--accent);
-  font-size: 1rem;
-  font-weight: 800;
-  line-height: 1;
-}
-.btn-back::after {
-  content: 'Previous Step';
-  color: var(--text2);
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1;
+  border-color: rgba(4,92,154,0.4);
+  background: var(--ob-tint);
 }
 
 .btn-primary-onboard {
-  background: var(--accent);
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 18px;
+  background: var(--ob-ink);
   color: #ffffff;
   border: none;
-  padding: 0.8rem 2.2rem;
-  border-radius: 100px;
-  font-weight: 700; font-size: 0.85rem;
-  box-shadow: 0 10px 25px -5px rgba(37,99,235,0.3);
-  transition: all 0.2s;
-  display: flex; align-items: center; gap: 0.6rem;
+  border-radius: 12px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 1px 2px rgba(7,32,54,0.2);
   cursor: pointer;
   font-family: var(--font);
+  transition: background 0.15s ease;
 }
-.btn-primary-onboard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px -5px rgba(37,99,235,0.4);
-  opacity: 0.92;
-}
+.btn-primary-onboard:hover { background: #0d3a5f; }
+:is(.dark) .career-agent-page .btn-primary-onboard { background: var(--ob-brand); color: #072036; }
+:is(.dark) .career-agent-page .btn-primary-onboard:hover { background: #ffffff; }
 
 .btn-primary-onboard.shake {
   animation: onboarding-shake 0.35s ease-in-out;
@@ -805,44 +821,37 @@
 }
 
 .btn-reset {
-  background: rgba(239,68,68,0.05);
-  color: var(--red);
-  border: 1px solid rgba(239,68,68,0.15);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.72rem; font-weight: 700;
+  display: inline-flex; align-items: center;
+  height: 40px; padding: 0 6px;
+  background: transparent;
+  color: #dc2626;
+  border: none;
+  font-size: 13px; font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
   font-family: var(--font);
+  transition: opacity 0.15s;
 }
-.btn-reset:hover { background: rgba(239,68,68,0.1); }
+.btn-reset:hover { opacity: 0.75; }
 
 .validation-banner {
-  max-width: 820px;
-  margin: 1.1rem auto 0;
+  margin: 0 24px 20px;
 }
 
 .validation-banner-inner {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 1rem 1.1rem;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,245,245,0.98), rgba(255,250,250,0.98));
-  border: 1px solid rgba(239,68,68,0.16);
-  box-shadow: 0 12px 28px rgba(239,68,68,0.08);
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
 }
 
 .validation-banner-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  color: var(--red);
-  background: rgba(239,68,68,0.1);
+  color: #dc2626;
+  margin-top: 1px;
 }
 
 .validation-banner-content {
@@ -850,16 +859,17 @@
 }
 
 .validation-banner-title {
-  color: var(--red);
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.45;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 :is(.dark) .career-agent-page .validation-banner-inner {
-  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));
+  background: rgba(239,68,68,0.12);
   border-color: rgba(239,68,68,0.3);
 }
+:is(.dark) .career-agent-page .validation-banner-title { color: #fca5a5; }
 
 /* ───────────────────────────────────────────────────────────────
    PREF CARDS (dark override)
@@ -1342,86 +1352,40 @@
   color: var(--text1);
 }
 
-/* Onboarding Step Progress Indicator */
+/* Onboarding Step Progress Indicator — one slim strip (desktop) */
 .onboard-progress-container {
-  margin: 0 auto 2rem;
-  max-width: 680px;
-  padding: 0 1rem;
+  margin: 0;
 }
 
 .onboard-progress-desktop {
   display: block;
 }
 
-.onboard-progress-steps-row {
+.career-agent-page .ob-stepper {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--ob-card);
+  border: 1px solid var(--ob-hair);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-
-.onboard-progress-step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  min-width: 90px;
+.career-agent-page .ob-step { display: flex; align-items: center; gap: 8px; }
+.career-agent-page .ob-step-circle {
+  width: 24px; height: 24px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  background: var(--ob-soft); border: 1px solid var(--ob-hair); color: var(--ob-faint);
+  flex-shrink: 0; transition: all 0.2s;
 }
-
-.onboard-progress-step-bubble {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 800;
-  background: var(--navy2);
-  color: var(--text2);
-  border: 2px solid var(--border2);
-  transition: all 0.3s;
-}
-
-.onboard-progress-step-item.active .onboard-progress-step-bubble {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.12);
-  transform: scale(1.08);
-}
-
-.onboard-progress-step-item.done .onboard-progress-step-bubble {
-  background: #10b981;
-  color: #fff;
-  border-color: #10b981;
-}
-
-.onboard-progress-step-label {
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--muted);
-  line-height: 1.2;
-}
-
-.onboard-progress-step-item.active .onboard-progress-step-label,
-.onboard-progress-step-item.done .onboard-progress-step-label {
-  color: var(--text1);
-}
-
-.onboard-progress-step-line {
-  flex: 1;
-  min-width: 18px;
-  height: 2px;
-  background: var(--border2);
-  border-radius: 2px;
-  margin-top: -1.2rem;
-  transition: background 0.3s;
-}
-
-.onboard-progress-step-line.done {
-  background: #10b981;
-}
+.career-agent-page .ob-step-label { font-size: 12px; font-weight: 500; color: var(--ob-muted); white-space: nowrap; }
+.career-agent-page .ob-step.active .ob-step-circle { background: var(--ob-tint); border: 2px solid var(--ob-brand); color: var(--ob-brand); font-weight: 700; }
+.career-agent-page .ob-step.active .ob-step-label { color: var(--ob-brand); font-weight: 700; }
+.career-agent-page .ob-step.done .ob-step-circle { background: var(--ob-brand); border-color: var(--ob-brand); color: #fff; }
+:is(.dark) .career-agent-page .ob-step.done .ob-step-circle { color: #072036; }
+.career-agent-page .ob-step.done .ob-step-label { color: var(--ob-ink); font-weight: 600; }
+.career-agent-page .ob-step-line { flex: 1; height: 1px; background: var(--ob-hair); margin: 0 12px; transition: background 0.2s; }
+.career-agent-page .ob-step-line.done { background: var(--ob-brand); }
 
 .onboard-progress-mobile {
   display: none;
@@ -1435,49 +1399,45 @@
 }
 
 .onboard-progress-mobile-step {
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ob-brand);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .onboard-progress-mobile-label {
-  font-size: 0.85rem;
-  font-weight: 750;
-  color: var(--text1);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ob-ink);
 }
 
 .onboard-progress-mobile-bar-wrap {
   width: 100%;
-  height: 6px;
-  background: var(--border2);
-  border-radius: 10px;
+  height: 4px;
+  background: var(--ob-hair);
+  border-radius: 999px;
   overflow: hidden;
 }
 
 .onboard-progress-mobile-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  background: var(--ob-brand);
   transition: width 0.3s ease;
 }
 
 /* PrefBlock & Skill Styling Overrides */
+/* PrefBlock lives inside the step card now — no card-in-card. */
 .career-agent-page .pref-block-card {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 28px;
-  padding: 2.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  box-shadow: 0 15px 40px -10px rgba(0,0,0,0.04);
+  gap: 20px;
+  box-shadow: none;
   position: relative;
-}
-
-:is(.dark) .career-agent-page .pref-block-card {
-  background: #002147 !important;
-  border-color: rgba(255,255,255,0.07) !important;
 }
 
 .career-agent-page .onboard-skill-section {
@@ -1532,7 +1492,7 @@
   height: auto !important;
   min-height: 100vh;
   overflow: visible !important;
-  padding: 2.5rem 1rem;
+  padding: 28px 32px 48px;
 }
 
 /* Onboarding Media Queries Integration */
@@ -1545,15 +1505,16 @@
   }
   
   .career-agent-page .form-card {
-    padding: 1.2rem !important;
-    border-radius: 20px !important;
+    border-radius: 12px !important;
   }
-  
-  .career-agent-page .pref-block-card {
-    padding: 1.2rem !important;
-    gap: 1.5rem !important;
-    border-radius: 20px !important;
-  }
+
+  .career-agent-page .ob-body { padding: 16px !important; gap: 16px !important; }
+  .career-agent-page .ob-card-head { padding: 16px !important; }
+  .career-agent-page .ob-rule-grid { grid-template-columns: 1fr !important; }
+  .career-agent-page .ob-stats { flex-direction: column !important; }
+  .career-agent-page .ob-review-row { flex-wrap: wrap !important; }
+  .career-agent-page .validation-banner { margin: 0 16px 16px !important; }
+  .form-nav { padding: 12px 16px !important; }
   
   .career-agent-page .direction-select-btn {
     padding: 1rem !important;
@@ -1603,4 +1564,160 @@
   .career-agent-page.screen-onboard {
     padding: 1rem !important;
   }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   ONBOARDING — corporate layout primitives (shared by all six steps)
+   Card = header / body / footer. Everything reads from the --ob-* tokens
+   so dark mode follows automatically.
+   ─────────────────────────────────────────────────────────────── */
+.career-agent-page .ob-container {
+  max-width: 960px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 16px;
+  position: relative; z-index: 1;
+}
+.career-agent-page .ob-page-head { display: flex; flex-direction: column; gap: 6px; }
+.career-agent-page .ob-page-head h1 {
+  font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--ob-ink);
+}
+.career-agent-page .ob-page-head p { margin: 0; font-size: 14px; font-weight: 500; color: var(--ob-sub); }
+
+.career-agent-page .ob-eyebrow { display: flex; align-items: center; gap: 8px; }
+.career-agent-page .ob-eyebrow::before {
+  content: ''; width: 3px; height: 16px; border-radius: 999px; background: var(--ob-brand); flex-shrink: 0;
+}
+.career-agent-page .ob-eyebrow-text {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ob-ink); white-space: nowrap;
+}
+.career-agent-page .ob-eyebrow-rule { flex: 1; height: 1px; background: var(--ob-hair); margin-left: 4px; }
+
+.career-agent-page .ob-card-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 20px 24px; border-bottom: 1px solid var(--ob-hair);
+}
+.career-agent-page .ob-card-head-l { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.career-agent-page .ob-card-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--ob-ink); }
+.career-agent-page .ob-card-sub { font-size: 13px; color: var(--ob-sub); margin: 2px 0 0; }
+.career-agent-page .ob-tile {
+  width: 40px; height: 40px; border-radius: 12px;
+  border: 1px solid var(--ob-hair); background: var(--ob-panel);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ob-brand);
+}
+.career-agent-page .ob-tile.sm { width: 36px; height: 36px; border-radius: 10px; background: var(--ob-card); }
+.career-agent-page .ob-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.career-agent-page .ob-chip {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  background: rgba(4,92,154,0.10); color: var(--ob-brand);
+}
+.career-agent-page .ob-chip.neutral { background: var(--ob-panel); color: var(--ob-label); border: 1px solid var(--ob-hair); }
+.career-agent-page .ob-chip.done { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.career-agent-page .ob-chip.warn { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+:is(.dark) .career-agent-page .ob-chip.done { background: rgba(16,185,129,0.15); color: #6ee7b7; border-color: rgba(16,185,129,0.3); }
+:is(.dark) .career-agent-page .ob-chip.warn { background: rgba(245,158,11,0.15); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
+
+.career-agent-page .ob-rule-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.career-agent-page .ob-rule {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  border-radius: 12px; border: 1px solid var(--ob-hair); background: var(--ob-panel-soft);
+}
+.career-agent-page .ob-rule-top { display: flex; align-items: center; justify-content: space-between; }
+.career-agent-page .ob-rule-num { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--ob-faint); }
+.career-agent-page .ob-rule h4 { font-size: 14px; font-weight: 700; color: var(--ob-ink); margin: 0 0 4px; }
+.career-agent-page .ob-rule p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--ob-sub); }
+
+.career-agent-page .ob-strip {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 10px;
+  background: var(--ob-tint); border: 1px solid rgba(4,92,154,0.25); color: var(--ob-brand);
+}
+.career-agent-page .ob-strip > svg, .career-agent-page .ob-strip > span { flex-shrink: 0; margin-top: 1px; }
+.career-agent-page .ob-strip p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ob-sub); }
+.career-agent-page .ob-strip p strong { color: var(--ob-ink); font-weight: 600; }
+.career-agent-page .ob-strip.warn { background: #fffbeb; border-color: #fde68a; color: #b45309; }
+:is(.dark) .career-agent-page .ob-strip.warn { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3); color: #fcd34d; }
+
+.career-agent-page .ob-locked {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  height: 40px; padding: 0 12px; border: 1px solid var(--ob-hair); border-radius: 10px;
+  background: var(--ob-soft); font-size: 14px; font-weight: 500; color: var(--ob-ink);
+}
+.career-agent-page .ob-locked.empty { color: var(--ob-faint); font-weight: 400; }
+.career-agent-page .ob-locked .ob-lock-ic { color: var(--ob-faint); display: flex; }
+
+.career-agent-page .ob-section { display: flex; flex-direction: column; gap: 16px; }
+.career-agent-page .ob-divider { height: 1px; background: var(--ob-hair); }
+.career-agent-page .ob-help { font-size: 12px; color: var(--ob-muted); margin: 0; line-height: 1.5; }
+.career-agent-page .ob-label-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.career-agent-page .ob-label-right { font-size: 11px; font-weight: 600; color: var(--ob-muted); white-space: nowrap; }
+
+.career-agent-page .ob-panel {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px;
+  border: 1px solid var(--ob-hair); border-radius: 12px; background: var(--ob-panel-soft);
+}
+.career-agent-page .ob-panel p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--ob-sub); }
+
+.career-agent-page .ob-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.career-agent-page .ob-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; white-space: nowrap; font-family: var(--font);
+  background: var(--ob-card); color: var(--ob-ink); border: 1px solid var(--ob-hair);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.career-agent-page .ob-pill:hover { border-color: rgba(4,92,154,0.4); }
+.career-agent-page .ob-pill.selected { background: var(--ob-ink); color: #fff; border-color: var(--ob-ink); }
+:is(.dark) .career-agent-page .ob-pill.selected { background: var(--ob-brand); color: #072036; border-color: var(--ob-brand); }
+.career-agent-page .ob-pill:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.career-agent-page .ob-or { display: flex; align-items: center; gap: 12px; }
+.career-agent-page .ob-or::before, .career-agent-page .ob-or::after { content: ''; flex: 1; height: 1px; background: var(--ob-hair); }
+
+.career-agent-page .ob-select-wrap { position: relative; }
+.career-agent-page .ob-select-wrap .ob-caret {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; color: var(--ob-muted); display: flex;
+}
+
+.career-agent-page .ob-review-row {
+  display: flex; align-items: center; gap: 14px; padding: 12px 14px;
+  border: 1px solid var(--ob-hair); border-radius: 10px; background: var(--ob-card);
+}
+.career-agent-page .ob-review-chip { width: 88px; flex-shrink: 0; }
+.career-agent-page .ob-review-title { font-size: 14px; font-weight: 600; color: var(--ob-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.career-agent-page .ob-review-sub { font-size: 12px; color: var(--ob-muted); margin-top: 2px; }
+.career-agent-page .ob-review-right { font-size: 12px; font-weight: 500; color: var(--ob-muted); white-space: nowrap; }
+.career-agent-page .ob-edu-badge {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--ob-panel); border: 1px solid var(--ob-hair);
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--ob-brand); flex-shrink: 0;
+}
+.career-agent-page .ob-stats { display: flex; gap: 12px; }
+.career-agent-page .ob-stat {
+  flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px;
+  border: 1px solid var(--ob-hair); border-radius: 10px; background: var(--ob-card);
+}
+.career-agent-page .ob-stat-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ob-label); }
+.career-agent-page .ob-stat-v { font-size: 15px; font-weight: 700; color: var(--ob-ink); }
+
+.career-agent-page .ob-submit {
+  width: 100%; height: 44px; border: none; border-radius: 12px;
+  background: var(--ob-ink); color: #fff; font-size: 14px; font-weight: 600; font-family: var(--font);
+  display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(7,32,54,0.2); transition: background 0.15s;
+}
+.career-agent-page .ob-submit:hover { background: #0d3a5f; }
+.career-agent-page .ob-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+:is(.dark) .career-agent-page .ob-submit { background: var(--ob-brand); color: #072036; }
+
+.career-agent-page .ob-nav-l, .career-agent-page .ob-nav-r { display: flex; align-items: center; gap: 8px; }
+.career-agent-page .ob-nav-r { gap: 16px; }
+.career-agent-page .ob-status { font-size: 12px; font-weight: 600; color: var(--ob-muted); }
+.career-agent-page .ob-status.ok { color: #059669; }
+:is(.dark) .career-agent-page .ob-status.ok { color: #6ee7b7; }
+
+@media (max-width: 768px) {
+  .career-agent-page.screen-onboard { padding: 16px !important; }
+  .career-agent-page .ob-page-head h1 { font-size: 20px; }
+  .career-agent-page .ob-card-head { flex-direction: column; align-items: flex-start; }
+  .career-agent-page .ob-nav-l, .career-agent-page .ob-nav-r { width: 100%; justify-content: space-between; }
+  .career-agent-page .ob-nav-r { flex-direction: row-reverse; }
 }

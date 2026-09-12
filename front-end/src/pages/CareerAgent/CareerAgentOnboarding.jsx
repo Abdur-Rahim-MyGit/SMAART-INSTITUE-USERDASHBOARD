@@ -9,21 +9,18 @@ import { useTheme } from '@/contexts/ThemeContext';
 import {
   GraduationCap,
   Target,
-  Briefcase,
   ShieldCheck,
   CheckCircle,
-  MapPin,
-  CreditCard,
-  Clock,
   Compass,
   Search,
-  Navigation,
-  Zap,
   Trophy,
   Sparkles,
   Lock,
   ChevronDown,
-  Check
+  Check,
+  Info,
+  ArrowRight,
+  IconArrowLeft as ArrowLeft
 } from '@/components/icons';
 import dropdownData from './data/dropdownData.json';
 import jobRolesData from './data/jobRolesData.json';
@@ -67,7 +64,7 @@ const getRoles = (sector, family) => {
 const ALL_ROLES = jobRolesData.roles.map(r => r.role);
 
 const STEPS = ['Overview', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
-const STEP_DISPLAY_LABELS = ['Personal', 'Education', 'Primary', 'Secondary', 'Tertiary', 'Review'];
+const STEP_DISPLAY_LABELS = ['Overview', 'Education', 'Primary', 'Secondary', 'Tertiary', 'Review'];
 
 const createEmptyValidationState = () => ({ messages: [], fields: {} });
 
@@ -86,60 +83,31 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, d
   };
 
   return (
-    <div>
-      {/* Counter + hint */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-        <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div className="ob-label-row">
+        <span className="ob-help">
           {selected.length === 0
             ? (placeholder || t('career_agent.onboarding.select_placeholder', 'Select...'))
             : t('career_agent.onboarding.select_up_to', 'Select up to {{count}}.', { count: max })}
         </span>
-        <span style={{
-          fontSize: '0.65rem', fontWeight: 700,
-          padding: '0.15rem 0.55rem', borderRadius: '100px',
-          background: selected.length >= max ? 'rgba(var(--accent-rgb),0.15)' : 'rgba(255,255,255,0.05)',
-          color: selected.length >= max ? 'var(--accent)' : 'var(--muted)',
-          border: '1px solid', borderColor: selected.length >= max ? 'var(--accent)' : 'var(--border)'
-        }}>
-          {selected.length} / {max}
-        </span>
+        <span className="ob-label-right">{selected.length} / {max} {t('career_agent.onboarding.selected', 'selected')}</span>
       </div>
 
-      {/* Selected tags row */}
-      {selected.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
-          {selected.map(s => (
-            <span key={s} style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-              padding: '0.3rem 0.75rem', fontSize: '0.72rem', fontWeight: 600,
-              borderRadius: '100px', background: 'var(--accent)',
-              color: '#fff', border: '1px solid var(--accent)'
-            }}>
-              {s}
-              {!disabled && (
-                <button type="button" onClick={() => toggle(s)} style={{
-                  background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%',
-                  width: '14px', height: '14px', cursor: 'pointer', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.6rem', fontWeight: 900, lineHeight: 1
-                }}>×</button>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* All options as chips — hidden once locked/disabled, since there is
-          nothing left to pick: showing every unselectable option as a big
-          grey list looks editable even though it isn't. A locked field
-          should just show what was auto-filled, not a browsing list. */}
+      {/* Selected options stay highlighted in place; once locked/disabled only
+          the selected ones are shown — a locked field should read as what was
+          auto-filled, not as a browsable list. */}
       {disabled ? (
-        selected.length === 0 && (
-          <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+        selected.length === 0 ? (
+          <p className="ob-help" style={{ fontStyle: 'italic' }}>
             {t('career_agent.onboarding.no_specialisation_on_file', 'No specialisation on file.')}
           </p>
+        ) : (
+          <div className="ob-pills">
+            {selected.map(s => <span key={s} className="ob-pill selected">{s}</span>)}
+          </div>
         )
       ) : options.length > 0 ? (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+        <div className="ob-pills">
           {options.map(opt => {
             const isSel = selected.includes(opt);
             const isDisabled = !isSel && selected.length >= max;
@@ -148,25 +116,16 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, d
                 key={opt} type="button"
                 onClick={() => toggle(opt)}
                 disabled={isDisabled}
-                style={{
-                  padding: '0.3rem 0.85rem', fontSize: '0.72rem', fontWeight: 600,
-                  borderRadius: '100px', cursor: isDisabled ? 'not-allowed' : 'pointer',
-                  fontFamily: 'var(--font)', border: '1.5px solid',
-                  background: isSel ? 'rgba(var(--accent-rgb),0.12)' : 'transparent',
-                  borderColor: isSel ? 'var(--accent)' : 'var(--border2)',
-                  color: isSel ? 'var(--accent)' : isDisabled ? 'rgba(var(--text2-rgb),0.35)' : 'var(--text2)',
-                  opacity: isDisabled ? 0.45 : 1,
-                  transition: 'all 0.15s ease',
-                }}
+                className={`ob-pill${isSel ? ' selected' : ''}`}
               >
-                {isSel && <span style={{ marginRight: '0.3rem', fontSize: '0.65rem' }}>✓</span>}
+                {isSel && <Check size={14} />}
                 {opt}
               </button>
             );
           })}
         </div>
       ) : (
-        <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic' }}>
+        <p className="ob-help" style={{ fontStyle: 'italic' }}>
           {t('career_agent.onboarding.select_degree_first', 'Select a degree group to view available specialisations.')}
         </p>
       )}
@@ -181,16 +140,36 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, d
 // lock icon, so it's visually unambiguous that nothing here can be changed.
 function LockedField({ value, placeholder }) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: '0.6rem',
-      padding: '0.75rem 1rem', borderRadius: '10px',
-      background: 'var(--navy3)', border: '1px solid var(--border)',
-      fontSize: '0.85rem', fontWeight: value ? 600 : 400,
-      color: value ? 'var(--text1)' : 'var(--muted)',
-      fontFamily: 'var(--font)',
-    }}>
-      <Lock size={14} style={{ flexShrink: 0, opacity: 0.5 }} />
+    <div className={`ob-locked${value ? '' : ' empty'}`}>
       <span>{value || placeholder}</span>
+      <span className="ob-lock-ic"><Lock size={14} /></span>
+    </div>
+  );
+}
+
+// CardHead — the header strip of every step card: icon tile, title, subtitle, step chip.
+function CardHead({ icon, title, subtitle, step }) {
+  return (
+    <div className="ob-card-head">
+      <div className="ob-card-head-l">
+        <div className="ob-tile">{icon}</div>
+        <div style={{ minWidth: 0 }}>
+          <div className="ob-card-title">{title}</div>
+          <p className="ob-card-sub">{subtitle}</p>
+        </div>
+      </div>
+      <span className="step-tag">{step}</span>
+    </div>
+  );
+}
+
+// Eyebrow — section heading: accent bar, micro-caps label, hairline, optional right slot.
+function Eyebrow({ children, right = null }) {
+  return (
+    <div className="ob-eyebrow">
+      <span className="ob-eyebrow-text">{children}</span>
+      <span className="ob-eyebrow-rule" />
+      {right}
     </div>
   );
 }
@@ -281,8 +260,8 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [], disabl
       </div>
 
       {disabled && (
-        <p style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '0.35rem', fontWeight: 500 }}>
-          💡 Desired Job Role input is disabled because a Career Direction is selected. Clear direction above to type a role.
+        <p className="ob-help" style={{ marginTop: '6px' }}>
+          {t('career_agent.onboarding.role_disabled_help', 'Clear the career direction above to type a role instead.')}
         </p>
       )}
 
@@ -290,8 +269,8 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [], disabl
         <div
           style={{
             position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 90,
-            background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px',
-            boxShadow: '0 12px 40px rgba(15,23,42,0.15)', maxHeight: '240px', overflowY: 'auto',
+            background: '#ffffff', border: '1px solid #d7ebf5', borderRadius: '10px',
+            boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '240px', overflowY: 'auto',
             marginTop: '6px', padding: '0.35rem 0'
           }}
         >
@@ -401,7 +380,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
           <ChevronDown size={16} style={{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
         </button>
         {show && !atLimit && (
-          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '220px', overflowY: 'auto', marginTop: '6px' }}>
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50, background: '#ffffff', border: '1px solid #d7ebf5', borderRadius: '10px', boxShadow: '0 12px 40px rgba(15,23,42,0.12)', maxHeight: '220px', overflowY: 'auto', marginTop: '6px' }}>
             {filtered.length > 0 ? filtered.map(c => (
               <div key={c} onClick={() => add(c)}
                 style={{ padding: '0.7rem 1.1rem', cursor: 'pointer', fontSize: '0.85rem', color: '#334155', transition: 'background 0.2s' }}
@@ -416,7 +395,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
           </div>
         )}
       </div>
-      <p style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: '0.3rem' }}>{t('career_agent.onboarding.select_locations_limit', 'Select up to {{count}} locations', { count: max })}</p>
+      <p className="ob-help" style={{ marginTop: '6px' }}>{t('career_agent.onboarding.select_locations_limit', 'Select up to {{count}} locations', { count: max })} · {selected.length} / {max} {t('career_agent.onboarding.selected', 'selected')}</p>
     </div>
   );
 }
@@ -444,9 +423,8 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
   const availableRoles = selectedDir ? (selectedDir.roles || []).filter(r => !excludeRoles.includes(r.role)) : [];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      {/* Clean Dropdown */}
-      <div style={{ position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="ob-select-wrap">
         <select
           value={selected?.directionId || ''}
           disabled={disabled}
@@ -461,18 +439,10 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
             width: '100%',
             appearance: 'none',
             WebkitAppearance: 'none',
-            padding: '0.75rem 2.5rem 0.75rem 1rem',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: selected ? 'var(--text1)' : 'var(--muted)',
-            background: disabled ? 'rgba(0,0,0,0.04)' : 'var(--navy2)',
-            border: selected ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
-            borderRadius: '12px',
+            paddingRight: '2.5rem',
+            fontWeight: selected ? 500 : 400,
             cursor: disabled ? 'not-allowed' : 'pointer',
             opacity: disabled ? 0.6 : 1,
-            outline: 'none',
-            transition: 'border-color 0.2s ease',
-            fontFamily: 'var(--font)',
           }}
         >
           <option value="">
@@ -504,15 +474,12 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
             </optgroup>
           ))}
         </select>
-        {/* Dropdown arrow */}
-        <div style={{ position: 'absolute', right: '0.9rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: selected ? 'var(--accent)' : 'var(--muted)', opacity: disabled ? 0.5 : 1 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
-        </div>
+        <span className="ob-caret"><ChevronDown size={18} /></span>
       </div>
 
       {disabled && (
-        <p style={{ fontSize: '0.68rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
-          💡 Career Directions dropdown is disabled because a Desired Job Role is typed/selected below. Clear the job role to select a direction.
+        <p className="ob-help">
+          {t('career_agent.onboarding.direction_disabled_help', 'Disabled because a job role is typed below — clear it to pick a direction instead.')}
         </p>
       )}
 
@@ -523,44 +490,34 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
-          style={{
-            padding: '1rem 1.2rem',
-            background: 'rgba(var(--accent-rgb), 0.04)',
-            border: '1.5px solid var(--accent)',
-            borderRadius: '12px',
-          }}
+          className="ob-panel"
         >
-          {/* Header row */}
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <CheckCircle size={13} color="#fff" strokeWidth={2.5} />
-              </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)' }}>{selectedDir.directionName}</span>
+          <div className="ob-label-row">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+              <CheckCircle size={16} style={{ color: 'var(--ob-brand)', flexShrink: 0 }} />
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ob-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedDir.directionName}</span>
             </div>
             <button
               type="button"
               onClick={() => onChange(null)}
-              style={{ fontSize: '0.65rem', color: 'var(--muted)', background: 'transparent', border: '1px solid var(--border)', cursor: 'pointer', padding: '0.2rem 0.6rem', borderRadius: '6px', transition: 'all 0.15s' }}
+              className="btn-reset"
+              style={{ height: 'auto', fontSize: '12px', color: 'var(--ob-muted)' }}
             >
-              ✕ Clear
+              {t('career_agent.onboarding.clear', 'Clear')}
             </button>
           </div>
 
-          {/* Description */}
           {selectedDir.directionDescription && (
-            <p style={{ fontSize: '0.72rem', color: 'var(--text2)', lineHeight: 1.65, marginBottom: availableRoles.length > 0 ? '0.75rem' : 0 }}>
-              {selectedDir.directionDescription}
-            </p>
+            <p>{selectedDir.directionDescription}</p>
           )}
 
-          {/* Role chips */}
           {availableRoles.length > 0 && (
             <>
-              <div style={{ fontSize: '0.6rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-                {t('career_agent.onboarding.core_entry_roles', 'Core Entry Roles')}
+              <div className="ob-label-row">
+                <span className="fl">{t('career_agent.onboarding.core_entry_roles', 'Core entry roles')}</span>
+                <span className="ob-label-right">{t('career_agent.onboarding.pick_target_role', 'Pick the role you are targeting')}</span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+              <div className="ob-pills">
                 {availableRoles.map((r, ri) => {
                   const isRoleSel = selected?.role === r.role;
                   return (
@@ -568,17 +525,7 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
                       key={ri}
                       type="button"
                       onClick={e => { e.stopPropagation(); onChange({ ...selectedDir, role: r.role }); }}
-                      style={{
-                        fontSize: '0.65rem',
-                        padding: '0.25rem 0.7rem',
-                        background: isRoleSel ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
-                        border: isRoleSel ? '1px solid var(--accent)' : '1px solid var(--border2)',
-                        borderRadius: '100px',
-                        color: isRoleSel ? '#fff' : 'var(--text2)',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
+                      className={`ob-pill${isRoleSel ? ' selected' : ''}`}
                     >
                       {r.role}
                     </button>
@@ -614,41 +561,18 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
   // every available option is a blocked, different-field one.
   const hasUsableOwnFieldOptions = filteredDirections.length > 0 || filteredBrowseGroups.some(g => g.inDomain);
 
-  // Priority branding
-  const theme = {
-    primary: { glow: 'rgba(26,56,132, 0.08)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Trophy size={18} stroke={1.5} />, label: 'Primary Goal' },
-    secondary: { glow: 'rgba(26,56,132, 0.06)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Compass size={18} stroke={1.5} />, label: 'Secondary Path' },
-    tertiary: { glow: 'rgba(26,56,132, 0.06)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Target size={18} stroke={1.5} />, label: 'Tertiary Option' }
-  }[colorClass] || { glow: 'rgba(26,56,132, 0.08)', bg: 'rgba(26,56,132, 0.05)', accent: '#1a3884', icon: <Trophy size={18} stroke={1.5} />, label: 'Primary Goal' };
-
-  const sectionLabelStyle = {
-    fontSize: '0.7rem',
-    fontWeight: 900,
-    color: 'var(--text1)',
-    letterSpacing: '0.15em',
-    marginBottom: '1.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.8rem',
-    textTransform: 'uppercase'
-  };
-
   const fieldErrorClass = (key) => fieldErrors[key] ? 'field-error' : '';
 
   return (
     <div className="pref-block-card">
-      {/* Accent Line */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: theme.accent }}></div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
 
         {/* SECTION A: TARGET ROLE */}
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '1.5rem' }}>
-          <div style={sectionLabelStyle}><span style={{ color: theme.accent }}>01</span> {t('career_agent.onboarding.career_targeting', 'Career Targeting')}</div>
+        <div className="ob-section">
+          <Eyebrow>01 &nbsp;{t('career_agent.onboarding.career_targeting', 'Career targeting')}</Eyebrow>
           {hasUsableOwnFieldOptions ? (
             <div className="fgrid">
               <div className="fg full">
-                <label className="fl" style={{ marginBottom: '0.6rem', display: 'block' }}>{t('career_agent.onboarding.career_directions', 'Career Directions')}</label>
+                <label className="fl">{t('career_agent.onboarding.career_directions', 'Career direction')}</label>
                 <CareerDirectionSelector
                   directions={filteredDirections}
                   browseGroups={filteredBrowseGroups}
@@ -677,15 +601,14 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
                     }
                   }}
                 />
+                {!hasDirectionSelected && !hasCustomRoleEntered && (
+                  <p className="ob-help">{t('career_agent.onboarding.direction_help', 'Recommended directions are listed first; other directions within your own field follow below them.')}</p>
+                )}
               </div>
 
               {/* OR Divider */}
-              <div className="fg full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.3rem 0' }}>
-                <div style={{ flex: 1, height: '1px', background: 'var(--border, rgba(226, 232, 240, 0.6))' }} />
-                <span style={{ padding: '0.2rem 0.9rem', fontSize: '0.72rem', fontWeight: 800, color: 'var(--accent)', background: 'rgba(var(--accent-rgb), 0.08)', borderRadius: '100px', border: '1px solid rgba(var(--accent-rgb), 0.15)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  {t('career_agent.onboarding.or', 'OR')}
-                </span>
-                <div style={{ flex: 1, height: '1px', background: 'var(--border, rgba(226, 232, 240, 0.6))' }} />
+              <div className="fg full ob-or">
+                <span className="ob-chip neutral">{t('career_agent.onboarding.or', 'OR')}</span>
               </div>
 
               <div className="fg full">
@@ -703,8 +626,9 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           ) : hasAnyDirectionOptions ? (
             <div className="fgrid">
               <div className="fg full">
-                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.06)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.15)' }}>
-                  {t('career_agent.onboarding.no_directions_for_field', "Career direction data for your field isn't available yet — check back soon. In the meantime, type your desired job role below.")}
+                <div className="ob-strip warn" style={{ marginBottom: '4px' }}>
+                  <Info size={18} />
+                  <p>{t('career_agent.onboarding.no_directions_for_field', "Career direction data for your field isn't available yet — check back soon. In the meantime, type your desired job role below.")}</p>
                 </div>
                 <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
@@ -715,8 +639,9 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           ) : directions.length > 0 || browseGroups.length > 0 ? (
             <div className="fgrid">
               <div className="fg full">
-                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(56,189,248,0.05)', borderRadius: '8px', border: '1px solid rgba(56,189,248,0.1)' }}>
-                  {t('career_agent.onboarding.directions_mapped_selected', 'Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.')}
+                <div className="ob-strip" style={{ marginBottom: '4px' }}>
+                  <Info size={18} />
+                  <p>{t('career_agent.onboarding.directions_mapped_selected', 'Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.')}</p>
                 </div>
                 <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
@@ -727,10 +652,11 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           ) : (
             <div className="fgrid">
               <div className="fg full">
-                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.05)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                  {directionsLoading
+                <div className="ob-strip" style={{ marginBottom: '4px' }}>
+                  <Info size={18} />
+                  <p>{directionsLoading
                     ? t('career_agent.onboarding.loading_directions', 'Loading career directions for your education...')
-                    : t('career_agent.onboarding.type_role_below', 'Type or search for your desired job role below.')}
+                    : t('career_agent.onboarding.type_role_below', 'Type or search for your desired job role below.')}</p>
                 </div>
                 <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
@@ -741,57 +667,47 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           )}
         </div>
 
+        <div className="ob-divider" />
+
         {/* SECTION B: MARKET PREFERENCES */}
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-          <div style={sectionLabelStyle}><span style={{ color: '#1a3884', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><MapPin size={16} stroke={2} /> 02</span> {t('career_agent.onboarding.market_preferences', 'Market Preferences')}</div>
+        <div className="ob-section">
+          <Eyebrow>02 &nbsp;{t('career_agent.onboarding.market_preferences', 'Market preferences')}</Eyebrow>
           <div className="fgrid">
             {/* Assignment Type */}
             <div className="fg">
-              <label className="fl">{t('career_agent.onboarding.assignment_type', 'Assignment Type')}</label>
-              <div style={{ position: 'relative' }}>
+              <label className="fl">{t('career_agent.onboarding.assignment_type', 'Assignment type')}</label>
+              <div className="ob-select-wrap">
                 <select
                   value={data.type || 'Full-Time'}
                   onChange={e => up('type', e.target.value)}
-                  style={{
-                    width: '100%', appearance: 'none', WebkitAppearance: 'none',
-                    paddingRight: '2.2rem', fontFamily: 'var(--font)',
-                    fontWeight: 600, fontSize: '0.85rem'
-                  }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', paddingRight: '2.5rem', fontWeight: 500 }}
                 >
                   {JOB_TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
                 </select>
-                <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--muted)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
-                </div>
+                <span className="ob-caret"><ChevronDown size={18} /></span>
               </div>
             </div>
 
             {/* Expected CTC */}
             <div className="fg">
-              <label className="fl">{t('career_agent.onboarding.expected_ctc', 'Expected CTC (Range)')} <span className="req">*</span></label>
-              <div style={{ position: 'relative' }}>
+              <label className="fl">{t('career_agent.onboarding.expected_ctc', 'Expected CTC (range)')} <span className="req">*</span></label>
+              <div className="ob-select-wrap">
                 <select
                   className={fieldErrorClass(`preferences.${colorClass}.salary`)}
                   value={data.salary || ''}
                   onChange={e => up('salary', e.target.value)}
-                  style={{
-                    width: '100%', appearance: 'none', WebkitAppearance: 'none',
-                    paddingRight: '2.2rem', fontFamily: 'var(--font)',
-                    fontWeight: data.salary ? 600 : 400, fontSize: '0.85rem'
-                  }}
+                  style={{ width: '100%', appearance: 'none', WebkitAppearance: 'none', paddingRight: '2.5rem', fontWeight: data.salary ? 500 : 400, color: data.salary ? undefined : 'var(--ob-faint)' }}
                 >
                   <option value="">{t('career_agent.onboarding.select_range', 'Select range...')}</option>
                   {SALARY_OPTIONS.map(s => <option key={s}>{s}</option>)}
                 </select>
-                <div style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: data.salary ? 'var(--accent)' : 'var(--muted)' }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
-                </div>
+                <span className="ob-caret"><ChevronDown size={18} /></span>
               </div>
             </div>
 
             {/* Location */}
             <div className="fg full">
-              <label className="fl">{t('career_agent.onboarding.location_preferences', 'Location Preferences (Max 3)')} <span className="req">*</span></label>
+              <label className="fl">{t('career_agent.onboarding.location_preferences', 'Location preferences')} <span className="req">*</span></label>
               <div className={fieldErrorClass(`preferences.${colorClass}.locations`)}>
                 <CitySearchInput
                   selected={Array.isArray(data.locations) ? data.locations : (data.location ? [data.location] : [])}
@@ -803,11 +719,13 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           </div>
         </div>
 
+        <div className="ob-divider" />
+
         {/* SECTION C: ORGANIZATION FIT */}
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-          <div style={sectionLabelStyle}><span style={{ color: '#1a3884', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Briefcase size={16} stroke={2} /> 03</span> {t('career_agent.onboarding.organization_fit', 'Organization Fit')}</div>
+        <div className="ob-section">
+          <Eyebrow>03 &nbsp;{t('career_agent.onboarding.organization_fit', 'Organisation fit')}</Eyebrow>
           <div className="fg full">
-            <label className="fl">{t('career_agent.onboarding.target_cultures', 'Target Cultures (Multi)')} <span className="req">*</span></label>
+            <label className="fl">{t('career_agent.onboarding.target_cultures', 'Target cultures')} <span className="req">*</span></label>
             <div className={fieldErrorClass(`preferences.${colorClass}.orgTypes`)}>
               <MultiSelect
                 options={ORG_TYPE_OPTIONS}
@@ -819,7 +737,6 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -991,10 +908,9 @@ const CareerAgentOnboarding = () => {
 
   useEffect(() => {
     fetchLockStatus().then(status => {
-      if (status && status.isLocked) {
-        setIsLocked(true);
-        setLockDetails(status);
-      }
+      if (!status) return;
+      setLockDetails(status);
+      if (status.isLocked) setIsLocked(true);
     });
   }, []);
 
@@ -1857,50 +1773,35 @@ const CareerAgentOnboarding = () => {
           <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
         </div>
 
+        <div className="ob-container">
+
+        {/* ── PAGE HEADER ── */}
+        <div className="ob-page-head">
+          <Eyebrow>{t('career_agent.onboarding.page_eyebrow', 'Career Directions · Onboarding')}</Eyebrow>
+          <h1>{t('career_agent.onboarding.page_title', 'Set up your career pathway')}</h1>
+          <p>{t('career_agent.onboarding.page_subtitle', 'Six short steps. Your profile and education are already linked.')}</p>
+        </div>
+
         {/* ── EDIT MODE BANNER ── shown when user came via "Not Interested" */}
         {isEditMode && (
-          <div style={{ maxWidth: '680px', margin: '0 auto 1.5rem', padding: '0 1rem' }}>
-            <div
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 sm:p-5"
-              style={{
-                background: 'rgba(245,158,11,0.08)', border: '1.5px solid rgba(245,158,11,0.35)',
-                borderRadius: '16px',
-              }}
-            >
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
-                background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1.2rem'
-              }}>✏️</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {t('career_agent.onboarding.reselecting_preference', 'Re-selecting {{tier}} Preference', { tier: editTier ? (editTier.charAt(0).toUpperCase() + editTier.slice(1)) : '' })}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text2)', marginTop: '0.15rem' }}>
-                  {t('career_agent.onboarding.edit_mode_not_interested_desc', 'You marked this as "Not Interested". Pick a new direction and re-submit — only this preference will be updated.')}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => navigate('/dashboard/career-agent/dashboard')}
-                style={{
-                  padding: '0.5rem 1rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700,
-                  background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
-                  color: '#d97706', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap'
-                }}
-              >
-                {t('common.back', '← Back')}
-              </button>
-            </div>
+          <div className="ob-strip warn" style={{ alignItems: 'center' }}>
+            <Info size={18} />
+            <p style={{ flex: 1 }}>
+              <strong>{t('career_agent.onboarding.reselecting_preference', 'Re-selecting {{tier}} preference.', { tier: editTier ? (editTier.charAt(0).toUpperCase() + editTier.slice(1)) : '' })}</strong>{' '}
+              {t('career_agent.onboarding.edit_mode_not_interested_desc', 'You marked this as "Not Interested". Pick a new direction and re-submit — only this preference will be updated.')}
+            </p>
+            <button type="button" className="btn-back" onClick={() => navigate('/dashboard/career-agent/dashboard')} style={{ height: '32px', padding: '0 12px', fontSize: '12px' }}>
+              <ArrowLeft size={14} />Back
+            </button>
           </div>
         )}
 
         {/* ── STEP PROGRESS INDICATOR (hidden in edit mode) ── */}
         {!isEditMode && (
           <div className="onboard-progress-container">
-            {/* Desktop progress bar (hidden on mobile) */}
+            {/* Desktop: one slim strip — 24px circles, 12px labels, 1px connectors */}
             <div className="onboard-progress-desktop hide-mobile">
-              <div className="onboard-progress-steps-row">
+              <div className="ob-stepper">
                 {STEPS.map((label, idx) => {
                   const sn = idx + 1;
                   const isDone = step > sn;
@@ -1908,16 +1809,14 @@ const CareerAgentOnboarding = () => {
                   const displayLabel = STEP_DISPLAY_LABELS[idx] || label;
                   return (
                     <React.Fragment key={sn}>
-                      <div className={`onboard-progress-step-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}`}>
-                        <div className="onboard-progress-step-bubble">
-                          {isDone ? 'OK' : sn}
+                      <div className={`ob-step${isActive ? ' active' : ''}${isDone ? ' done' : ''}`}>
+                        <div className="ob-step-circle">
+                          {isDone ? <Check size={14} /> : sn}
                         </div>
-                        <div className="onboard-progress-step-label">
-                          {displayLabel}
-                        </div>
+                        <div className="ob-step-label">{displayLabel}</div>
                       </div>
                       {idx < STEPS.length - 1 && (
-                        <div className={`onboard-progress-step-line ${step > sn ? 'done' : ''}`} />
+                        <div className={`ob-step-line${step > sn ? ' done' : ''}`} />
                       )}
                     </React.Fragment>
                   );
@@ -1946,137 +1845,74 @@ const CareerAgentOnboarding = () => {
         )}
 
         <form onSubmit={handleSubmit}>
+          <div className="form-card">
           {/* STEP 1: OVERVIEW — how Career Agent works, before diving into the form */}
           {step === 1 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <Compass size={24} color="#ffffff" stroke={1.5} />
+            <>
+              <CardHead
+                icon={<Compass size={20} />}
+                title={t('career_agent.onboarding.overview_title', 'How Career Agent works')}
+                subtitle={t('career_agent.onboarding.overview_subtitle', 'The rules we follow before building your pathway.')}
+                step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 1, total: 6 })}
+              />
+              <div className="ob-body">
+                <div className="ob-rule-grid">
+                  {[
+                    { num: '01', icon: <GraduationCap size={18} />, title: t('career_agent.onboarding.overview_card1_title', 'Recommended for your degree'), body: t('career_agent.onboarding.overview_card1_body', 'We show the 5 career directions that best match your degree and specialisation — 10 if you have two degrees on file.') },
+                    { num: '02', icon: <Target size={18} />, title: t('career_agent.onboarding.overview_card2_title', 'Pick a Primary, Secondary & Tertiary path'), body: t('career_agent.onboarding.overview_card2_body', 'Choose 3 directions in total. Pick from your recommendations, or browse any other direction within your own field of study.') },
+                    { num: '03', icon: <ShieldCheck size={18} />, title: t('career_agent.onboarding.overview_card3_title', 'Stay within your own field'), body: t('career_agent.onboarding.overview_card3_body', "Explore any direction inside your field freely. A direction from a different field (e.g. an IT student choosing Medicine) can't be selected.") },
+                    { num: '04', icon: <Lock size={18} />, title: t('career_agent.onboarding.overview_card4_title', 'Your 3 paths get locked'), body: t('career_agent.onboarding.overview_card4_body', 'After submitting, directions lock in after 14 days or 5 attempts — whichever comes first. Recommendations stay viewable afterwards.') },
+                  ].map(r => (
+                    <div key={r.num} className="ob-rule">
+                      <div className="ob-rule-top">
+                        <div className="ob-tile sm">{r.icon}</div>
+                        <span className="ob-rule-num">{r.num}</span>
+                      </div>
+                      <div>
+                        <h4>{r.title}</h4>
+                        <p>{r.body}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.overview_title', 'How Career Agent Works')}</span>
-                    <span className="step-tag">{t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 1, total: 6 })}</span>
+
+                {user && (
+                  <div className="ob-strip">
+                    <CheckCircle size={18} />
+                    <p>
+                      <strong>{t('career_agent.onboarding.profile_linked_label', 'Profile linked.')}</strong>{' '}
+                      {t('career_agent.onboarding.profile_linked_body', 'Your name, email, phone and registration number are auto-filled from your SMAART profile — nothing to re-enter.')}
+                    </p>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>
-                    {t('career_agent.onboarding.overview_subtitle', "A quick look at the rules before we build your career pathway. Your profile details are already linked — no need to re-enter them.")}
-                  </p>
-                </div>
+                )}
               </div>
-
-              <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <GraduationCap size={16} />
-                    </div>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card1_title', 'Recommended for your degree')}</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
-                    {t('career_agent.onboarding.overview_card1_body', 'Once you enter your education, we show the 5 career directions that best match your degree and specialisation (10 if you have two degrees on file).')}
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Target size={16} />
-                    </div>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card2_title', 'Pick a Primary, Secondary & Tertiary path')}</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
-                    {t('career_agent.onboarding.overview_card2_body', "You'll choose 3 career directions in total. Pick from your recommendations, or browse and choose any other direction within your own field of study.")}
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <ShieldCheck size={16} />
-                    </div>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card3_title', 'Stay within your own field')}</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
-                    {t('career_agent.onboarding.overview_card3_body', "You're free to explore any direction inside your field of study — but a direction from a completely different field (e.g. an IT student picking a Medicine path) can't be selected.")}
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1.1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-                    <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Lock size={16} />
-                    </div>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.onboarding.overview_card4_title', 'Your 3 paths get locked')}</span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text2)', lineHeight: 1.5, margin: 0 }}>
-                    {t('career_agent.onboarding.overview_card4_body', 'Once submitted, your chosen directions lock in after 14 days or 5 attempts — whichever comes first. You can still explore your recommended directions anytime after locking.')}
-                  </p>
-                </div>
-              </div>
-
-              {user && (
-                <div
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mt-6"
-                  style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px' }}
-                >
-                  <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <CheckCircle size={16} />
-                  </div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
-                    {t('career_agent.onboarding.profile_linked_label', 'Profile Linked:')} <span style={{ color: 'var(--text2)', fontWeight: 500 }}>{t('career_agent.onboarding.profile_linked_body', "We've auto-filled your name, email, phone and registration number from your SMAART profile.")}</span>
-                  </div>
-                </div>
-              )}
-            </div>
+            </>
           )}
 
 
           {/* STEP 2: EDUCATION */}
           {step === 2 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <GraduationCap size={24} color="#ffffff" stroke={1.5} />
+            <>
+              <CardHead
+                icon={<GraduationCap size={20} />}
+                title={t('career_agent.onboarding.education_title', 'Education')}
+                subtitle={t('career_agent.onboarding.education_subtitle', 'Your academic background, from your student profile.')}
+                step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 2, total: 6 })}
+              />
+              <div className="ob-body">
+                <div className="ob-strip">
+                  <Lock size={18} />
+                  <p>
+                    <strong>{t('career_agent.onboarding.education_locked_label', 'Auto-filled and locked.')}</strong>{' '}
+                    {t('career_agent.onboarding.education_locked_body', "These details come from your student profile and can't be edited here. Contact your institute if anything is out of date.")}
+                  </p>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</span>
-                    <span className="step-tag">STEP 2 / 6</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your academic background - auto-filled from your student profile.</p>
-                </div>
-              </div>
 
-              {user && (
-                <div
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-6"
-                  style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px' }}
-                >
-                  <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <ShieldCheck size={16} />
-                  </div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
-                    Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your education details from your SMAART profile.</span>
-                  </div>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {formData.education.map((edu, i) => (
-                  <div key={i} className="p-4 sm:p-6 md:p-8 relative" style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-dashed border-[rgba(var(--accent-rgb),0.15)]">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                        <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(var(--accent-rgb), 0.3)' : 'none' }}>
-                          {i + 1}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.01em' }}>
-                            Academic Record
-                          </span>
-                          {i === 0 && <span style={{ color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Primary & Mandatory</span>}
-                        </div>
-                      </div>
-                    </div>
+                  <div key={i} className="ob-section">
+                    <Eyebrow right={i === 0 ? <span className="step-tag">{t('career_agent.onboarding.primary_mandatory', 'Primary · Mandatory')}</span> : null}>
+                      {t('career_agent.onboarding.academic_record', 'Academic record')} {String(i + 1).padStart(2, '0')}
+                    </Eyebrow>
 
                     <div className="fgrid">
                       {/* Level */}
@@ -2128,228 +1964,233 @@ const CareerAgentOnboarding = () => {
                     marked "currently pursuing" produces its own block
                     above), so there is nothing left for a manual add to do. */}
               </div>
-            </div>
+            </>
           )}
 
           {/* STEP 3: PRIMARY PREFERENCE */}
           {step === 3 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <Trophy size={24} color="#ffffff" stroke={1.5} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Primary Preference</span>
-                    <span className="step-tag">STEP 3 / 6</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your main career direction - used for your deepest intelligence analysis.</p>
-                </div>
+            <>
+              <CardHead
+                icon={<Trophy size={20} />}
+                title={t('career_agent.onboarding.primary_title', 'Primary preference')}
+                subtitle={t('career_agent.onboarding.primary_subtitle', 'Your main career direction — used for the deepest analysis.')}
+                step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 3, total: 6 })}
+              />
+              <div className="ob-body">
+                <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
               </div>
-              <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
-            </div>
+            </>
           )}
 
           {/* STEP 4: SECONDARY PREFERENCE */}
           {step === 4 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <Compass size={24} color="#ffffff" stroke={1.5} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Secondary Preference</span>
-                    <span className="step-tag">STEP 4 / 6</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your alternative path - helps calculate market zone overlap.</p>
-                </div>
+            <>
+              <CardHead
+                icon={<Compass size={20} />}
+                title={t('career_agent.onboarding.secondary_title', 'Secondary preference')}
+                subtitle={t('career_agent.onboarding.secondary_subtitle', 'Your alternative path — helps calculate market zone overlap.')}
+                step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 4, total: 6 })}
+              />
+              <div className="ob-body">
+                <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
               </div>
-              <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
-            </div>
+            </>
           )}
 
           {/* STEP 5: TERTIARY PREFERENCE */}
           {step === 5 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <Target size={24} color="#ffffff" stroke={1.5} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Tertiary Preference</span>
-                    <span className="step-tag">STEP 5 / 6</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Your backup or curiosity direction - gives a complete market view.</p>
-                </div>
+            <>
+              <CardHead
+                icon={<Target size={20} />}
+                title={t('career_agent.onboarding.tertiary_title', 'Tertiary preference')}
+                subtitle={t('career_agent.onboarding.tertiary_subtitle', 'Your backup or curiosity direction — gives a complete market view.')}
+                step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 5, total: 6 })}
+              />
+              <div className="ob-body">
+                <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
               </div>
-              <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
-            </div>
+            </>
           )}
 
           {/* STEP 6: REVIEW & SUBMIT */}
-          {step === 6 && (
-            <div className="form-card">
-              <div className="flex flex-col sm:flex-row items-start gap-4 mb-6">
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #102660)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid #142d6e', boxShadow: '0 6px 16px rgba(26,56,132,0.2)' }}>
-                  <CheckCircle size={24} color="#ffffff" stroke={1.5} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Review & Submit</span>
-                    <span className="step-tag">STEP 6 / 6</span>
-                  </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400, margin: '0.25rem 0 0 0' }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
-                </div>
-              </div>
+          {step === 6 && (() => {
+            const tiers = [
+              { key: 'primary', label: t('career_agent.onboarding.tier_primary', 'Primary'), chip: '', val: formData.preferences.primary },
+              { key: 'secondary', label: t('career_agent.onboarding.tier_secondary', 'Secondary'), chip: ' neutral', val: formData.preferences.secondary },
+              { key: 'tertiary', label: t('career_agent.onboarding.tier_tertiary', 'Tertiary'), chip: ' neutral', val: formData.preferences.tertiary },
+            ];
+            const chosen = tiers.filter(x => x.val?.careerDirectionName || x.val?.role);
+            const isRecommended = (val) => !!val?.careerDirectionId && careerDirections.some(d => d.directionId === val.careerDirectionId);
+            const attemptsUsed = lockDetails?.attemptsUsed ?? 0;
+            const maxAttempts = lockDetails?.maxAttempts ?? 5;
+            const windowText = lockDetails?.found && lockDetails?.lockExpiryDate
+              ? t('career_agent.onboarding.lock_days_left', '{{count}} days left', { count: lockDetails.remainingDays ?? 0 })
+              : t('career_agent.onboarding.lock_window_default', '14 days from first submit');
+            return (
+              <>
+                <CardHead
+                  icon={<CheckCircle size={20} />}
+                  title={t('career_agent.onboarding.review_title', 'Review & submit')}
+                  subtitle={t('career_agent.onboarding.review_subtitle', 'Check everything before we generate your report.')}
+                  step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 6, total: 6 })}
+                />
+                <div className="ob-body">
 
-              {/* Summary Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.75rem' }}>
-
-                {/* Education Summary */}
-                <div style={{ border: '1px solid rgba(37,99,235,0.15)', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.85rem 1.2rem', background: 'linear-gradient(135deg, rgba(37,99,235,0.07), rgba(37,99,235,0.03))', borderBottom: '1px solid rgba(37,99,235,0.1)' }}>
-                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'rgba(37,99,235,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <GraduationCap size={13} color="var(--accent)" />
-                    </div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Education History</span>
-                  </div>
-                  <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {/* Education */}
+                  <div className="ob-section">
+                    <Eyebrow>{t('career_agent.onboarding.review_education', 'Education')}</Eyebrow>
                     {formData.education.map((edu, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingBottom: idx < formData.education.length - 1 ? '0.75rem' : 0, borderBottom: idx < formData.education.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(37,99,235,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                          <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--accent)' }}>{idx === 0 ? 'UG' : 'PG'}</span>
-                        </div>
+                      <div key={idx} className="ob-review-row">
+                        <div className="ob-edu-badge">{(edu.level || '').toLowerCase().includes('post') ? 'PG' : 'UG'}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: '0.87rem', color: 'var(--text1)', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.2rem' }}>{edu.degreeGroup || 'Degree not set'}{edu.specialisation?.length > 0 ? ` in ${edu.specialisation.join(', ')}` : ''}</p>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                            {edu.graduationYear && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' · Currently Pursuing' : ''}</span>}
-                            {edu.university && <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 500 }}>· {edu.university}</span>}
+                          <div className="ob-review-title">
+                            {edu.degreeGroup || t('career_agent.onboarding.degree_not_set', 'Degree not set')}
+                            {edu.specialisation?.length > 0 ? ` · ${edu.specialisation.join(', ')}` : ''}
+                          </div>
+                          <div className="ob-review-sub">
+                            {[
+                              edu.domain,
+                              edu.graduationYear ? t('career_agent.onboarding.class_of', 'Class of {{year}}', { year: edu.graduationYear }) : null,
+                              edu.currentlyPursuing ? t('career_agent.onboarding.currently_pursuing', 'Currently pursuing') : null,
+                              edu.university || null,
+                            ].filter(Boolean).join(' · ')}
                           </div>
                         </div>
+                        <span className="ob-chip done">{t('career_agent.onboarding.verified', 'Verified')}</span>
                       </div>
                     ))}
                   </div>
-                </div>
 
-                {/* Career Directions Summary */}
-                <div style={{ border: '1px solid rgba(245,158,11,0.2)', borderRadius: '16px', overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.85rem 1.2rem', background: 'linear-gradient(135deg, rgba(245,158,11,0.07), rgba(245,158,11,0.02))', borderBottom: '1px solid rgba(245,158,11,0.12)' }}>
-                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Target size={13} color="#f59e0b" />
-                    </div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Career Directions</span>
-                  </div>
-                  <div style={{ padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-                    {[
-                      { label: 'Primary', accent: 'var(--accent)', bg: 'rgba(37,99,235,0.06)', border: 'rgba(37,99,235,0.18)', val: formData.preferences.primary },
-                      { label: 'Secondary', accent: 'var(--accent2)', bg: 'rgba(34,211,238,0.05)', border: 'rgba(34,211,238,0.18)', val: formData.preferences.secondary },
-                      { label: 'Tertiary', accent: '#a78bfa', bg: 'rgba(167,139,250,0.05)', border: 'rgba(167,139,250,0.18)', val: formData.preferences.tertiary }
-                    ].map(({ label, accent, bg, border, val }) =>
-                      (val?.careerDirectionName || val?.role) ? (
-                        <div
-                          key={label}
-                          className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 sm:p-4"
-                          style={{ borderRadius: '10px', background: bg, border: `1px solid ${border}` }}
-                        >
-                          <span style={{ fontSize: '0.58rem', fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.1em', minWidth: '60px', flexShrink: 0 }}>{label}</span>
-                          <div className="hidden sm:block w-[1px] h-[26px]" style={{ background: border, flexShrink: 0 }} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text1)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{val?.careerDirectionName || val?.role}</p>
-                            {val?.role && val?.careerDirectionName && (
-                              <p style={{ fontSize: '0.67rem', color: 'var(--muted)', margin: '0.12rem 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Role: {val.role}</p>
-                            )}
+                  {/* Career directions */}
+                  <div className="ob-section">
+                    <Eyebrow right={<span className={`ob-chip${chosen.length === 3 ? ' done' : ' neutral'}`}>{chosen.length} of 3 {t('career_agent.onboarding.selected', 'selected')}</span>}>
+                      {t('career_agent.onboarding.review_directions', 'Career directions')}
+                    </Eyebrow>
+                    {chosen.map(({ key, label, chip, val }) => (
+                      <div key={key} className="ob-review-row">
+                        <div className="ob-review-chip"><span className={`ob-chip${chip}`}>{label}</span></div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="ob-review-title">{val.careerDirectionName || val.role}</div>
+                          <div className="ob-review-sub">
+                            {[
+                              val.role && val.careerDirectionName ? t('career_agent.onboarding.role_prefix', 'Role: {{role}}', { role: val.role }) : null,
+                              val.type || null,
+                              val.salary || null,
+                            ].filter(Boolean).join(' · ')}
                           </div>
                         </div>
-                      ) : null
-                    )}
+                        <span className="ob-review-right">
+                          {isRecommended(val)
+                            ? t('career_agent.onboarding.source_recommended', 'Recommended')
+                            : val.careerDirectionId
+                              ? t('career_agent.onboarding.source_browsed', 'Browsed · same field')
+                              : t('career_agent.onboarding.source_custom', 'Custom role')}
+                        </span>
+                      </div>
+                    ))}
                   </div>
+
+                  {/* Locking */}
+                  <div className="ob-section">
+                    <Eyebrow>{t('career_agent.onboarding.review_locking', 'Locking')}</Eyebrow>
+                    <div className="ob-stats">
+                      <div className="ob-stat">
+                        <span className="ob-stat-k">{t('career_agent.onboarding.attempts_used', 'Attempts used')}</span>
+                        <span className="ob-stat-v">{attemptsUsed} of {maxAttempts}</span>
+                      </div>
+                      <div className="ob-stat">
+                        <span className="ob-stat-k">{t('career_agent.onboarding.lock_window', 'Lock window')}</span>
+                        <span className="ob-stat-v">{windowText}</span>
+                      </div>
+                      <div className="ob-stat">
+                        <span className="ob-stat-k">{t('career_agent.onboarding.status', 'Status')}</span>
+                        <span className="ob-stat-v">{t('career_agent.onboarding.not_locked', 'Not locked')}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="ob-strip warn">
+                      <Info size={18} />
+                      <p>{error}</p>
+                    </div>
+                  )}
+
+                  <div className="ob-strip">
+                    <Sparkles size={18} />
+                    <p>
+                      <strong>{t('career_agent.onboarding.next_label', 'What happens next.')}</strong>{' '}
+                      {t('career_agent.onboarding.next_body', "SMAART's intelligence engine computes your career mapping and personalised roadmap. This usually takes 15–30 seconds.")}
+                    </p>
+                  </div>
+
+                  <button type="submit" disabled={isSubmitting} className="ob-submit">
+                    {isSubmitting
+                      ? t('career_agent.onboarding.generating', 'Generating report…')
+                      : t('career_agent.onboarding.generate_report', 'Generate Career Intelligence Report')}
+                    {!isSubmitting && <ArrowRight size={16} />}
+                  </button>
                 </div>
-
-              </div>
-
-              {error && (
-                <div style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  {error}
-                </div>
-              )}
-
-              {/* AI Notice Strip */}
-              <div
-                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 mb-6"
-                style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.05),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '12px' }}
-              >
-                <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Sparkles size={14} color="var(--accent)" />
-                </div>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text2)', lineHeight: 1.55, margin: 0 }}>
-                  Once submitted, SMAART’s intelligence engine will compute your career mapping and personalized roadmap.{' '}
-                  <strong style={{ color: 'var(--text1)' }}>This typically takes 15–30 seconds.</strong>
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.65rem', boxShadow: '0 8px 24px rgba(var(--accent-rgb), 0.3)', transition: 'all 0.2s', fontFamily: 'var(--font)', opacity: isSubmitting ? 0.7 : 1 }}
-                onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(var(--accent-rgb), 0.4)'; } }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(var(--accent-rgb), 0.3)'; }}
-              >
-                <Sparkles size={17} />
-                {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
-              </button>
-            </div>
-          )}
+              </>
+            );
+          })()}
 
           {/* VALIDATION ERROR BANNER */}
           <AnimatePresence>
             {validationState.messages.length > 0 && (
               <motion.div
                 className="validation-banner"
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
               >
                 <div className="validation-banner-inner">
                   <div className="validation-banner-icon">
-                    <ShieldCheck size={20} />
+                    <Info size={18} />
                   </div>
                   <div className="validation-banner-content">
-                    <div className="validation-banner-title">Complete all required fields to continue to the next step.</div>
+                    <div className="validation-banner-title">{t('career_agent.onboarding.complete_required', 'Complete all required fields to continue to the next step.')}</div>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* NAVIGATION */}
+          {/* NAVIGATION — card footer */}
           <div className="form-nav">
-            <div className="flex items-center gap-4 w-full justify-between sm:w-auto sm:justify-start">
+            <div className="ob-nav-l">
               {step > 1 && (
                 <button type="button" className="btn-back" onClick={() => setStep(s => s - 1)}>
-                  Back
+                  <ArrowLeft size={16} />
+                  {t('career_agent.onboarding.back', 'Back')}
                 </button>
               )}
               <button type="button" className="btn-reset" onClick={resetProfile}>
-                Reset
+                {t('career_agent.onboarding.reset', 'Reset')}
               </button>
             </div>
-            <div className="flex items-center gap-4 w-full justify-between sm:w-auto sm:justify-end">
-              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: isCurrentStepComplete ? '#10b981' : 'var(--muted)' }}>
-                {isCurrentStepComplete ? 'All required details completed' : `Step ${step} of ${STEPS.length}`}
+            <div className="ob-nav-r">
+              <span className={`ob-status${isCurrentStepComplete ? ' ok' : ''}`}>
+                {isCurrentStepComplete
+                  ? t('career_agent.onboarding.all_complete', 'All required details completed')
+                  : t('career_agent.onboarding.step_of', 'Step {{current}} of {{total}}', { current: step, total: STEPS.length })}
               </span>
               {step < STEPS.length && (
                 <button type="button" className={`btn-primary-onboard${validationState.messages.length > 0 ? ' shake' : ''}`} onClick={handleNext}>
-                  Save & Continue <Navigation size={16} />
+                  {step === 1
+                    ? t('career_agent.onboarding.continue', 'Continue')
+                    : t('career_agent.onboarding.save_continue', 'Save & Continue')}
+                  <ArrowRight size={16} />
                 </button>
               )}
             </div>
           </div>
 
+          </div>
         </form>
+
+        </div>
       </div>
     </PageTransition>
   );
