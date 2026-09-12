@@ -70,6 +70,9 @@ const STEP_DISPLAY_LABELS = ['Overview', 'Education', 'Primary', 'Secondary', 'T
 
 const createEmptyValidationState = () => ({ messages: [], fields: {} });
 
+// Role name → { description, jobFamily } blurbs, fetched once per session.
+const ROLE_BRIEF_CACHE = new Map();
+
 
 // MultiSelect — clean open chip grid, no scrollbox
 function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, disabled = false }) {
@@ -406,8 +409,10 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
 // "Recommended for you" (matched to the student's own degree) comes first, then
 // every other direction across ALL degrees, grouped Domain → Degree ·
 // Specialisation so a student can see exactly where each one belongs. Nothing
-// is blocked — any direction from any degree can be chosen.
-function CareerDirectionSelector({ directions = [], browseGroups = [], selected = null, onChange, loading = false, excludeRoles = [], disabled = false }) {
+// is blocked — any direction from any degree can be chosen. Once a direction
+// is picked, its roles are shown as cards with a plain-English description so
+// the student can choose a target role they actually understand.
+function CareerDirectionSelector({ directions = [], browseGroups = [], selected = null, onChange, loading = false, excludeRoles = [], dbRoles = [], disabled = false }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -429,6 +434,47 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
     () => [...directions, ...browseGroups.flatMap(g => g.degrees.flatMap(d => d.directions))],
     [directions, browseGroups]
   );
+
+  const selectedDir = selected ? allSelectable.find(d => d.directionId === selected.directionId) : null;
+  const isRecommended = !!selectedDir && directions.some(d => d.directionId === selectedDir.directionId);
+  const availableRoles = selectedDir ? (selectedDir.roles || []).filter(r => !excludeRoles.includes(r.role)) : [];
+  const metaLine = (dir) => [dir.degreeAbbr || dir.degreeName, dir.specialisation].filter(Boolean).join(' · ');
+  const roleNames = availableRoles.map(r => r.role);
+  const roleNamesKey = roleNames.join('|');
+
+  // Short "what this role actually does" blurbs for the selected direction's
+  // roles — fetched once per role and cached for the session.
+  const [briefs, setBriefs] = useState({});
+  const [briefsLoading, setBriefsLoading] = useState(false);
+  useEffect(() => {
+    if (!roleNamesKey) { setBriefs({}); return; }
+    const cached = {};
+    roleNames.forEach(n => { if (ROLE_BRIEF_CACHE.has(n)) cached[n] = ROLE_BRIEF_CACHE.get(n); });
+    setBriefs(cached);
+    const missing = roleNames.filter(n => !ROLE_BRIEF_CACHE.has(n));
+    if (missing.length === 0) return;
+    let cancelled = false;
+    setBriefsLoading(true);
+    axios.post('/api/career-agent/role-briefs', { names: missing })
+      .then(res => {
+        const got = res.data?.briefs || {};
+        missing.forEach(n => ROLE_BRIEF_CACHE.set(n, got[n] || { description: '', jobFamily: '', found: false }));
+        if (!cancelled) setBriefs(prev => ({ ...prev, ...got }));
+      })
+      .catch(err => console.warn('[CareerDirectionSelector] role-briefs failed:', err.message))
+      .finally(() => { if (!cancelled) setBriefsLoading(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roleNamesKey]);
+
+  // "Type a custom role" mode — starts on when the saved role isn't one of the
+  // direction's own roles (e.g. re-opening a previously saved custom pick).
+  const [customMode, setCustomMode] = useState(false);
+  useEffect(() => {
+    const saved = (selected?.role || '').trim();
+    setCustomMode(!!saved && !roleNames.includes(saved));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDir?.directionId]);
 
   const q = query.trim().toLowerCase();
   const matches = (dir, extra = '') => {
@@ -458,11 +504,6 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
   }
 
   if (allSelectable.length === 0) return null;
-
-  const selectedDir = selected ? allSelectable.find(d => d.directionId === selected.directionId) : null;
-  const isRecommended = !!selectedDir && directions.some(d => d.directionId === selectedDir.directionId);
-  const availableRoles = selectedDir ? (selectedDir.roles || []).filter(r => !excludeRoles.includes(r.role)) : [];
-  const metaLine = (dir) => [dir.degreeAbbr || dir.degreeName, dir.specialisation].filter(Boolean).join(' · ');
 
   const pick = (dir) => { onChange(dir); setOpen(false); setQuery(''); };
 
@@ -601,30 +642,76 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
             </>
           )}
 
-          {availableRoles.length > 0 && (
-            <>
-              <div className="ob-divider" />
-              <div className="ob-label-row">
-                <span className="fl">{t('career_agent.onboarding.core_entry_roles', 'Core entry roles')}</span>
-                <span className="ob-label-right">{t('career_agent.onboarding.pick_target_role', 'Pick the role you are targeting')}</span>
-              </div>
-              <div className="ob-pills">
-                {availableRoles.map((r, ri) => {
-                  const isRoleSel = selected?.role === r.role;
-                  return (
-                    <button
-                      key={ri}
-                      type="button"
-                      onClick={e => { e.stopPropagation(); onChange({ ...selectedDir, role: r.role }); }}
-                      className={`ob-pill${isRoleSel ? ' selected' : ''}`}
-                    >
-                      {r.role}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
+          <div className="ob-divider" />
+          <div className="ob-label-row">
+            <span className="fl">{t('career_agent.onboarding.choose_target_role', 'Choose your target role')} <span className="req">*</span></span>
+            <span className="ob-label-right">
+              {customMode
+                ? t('career_agent.onboarding.custom_role_mode', 'Custom role')
+                : t('career_agent.onboarding.role_count', '{{count}} roles', { count: availableRoles.length })}
+            </span>
+          </div>
+
+          {!customMode && availableRoles.length > 0 && (
+            <div className="ob-role-grid">
+              {availableRoles.map((r, ri) => {
+                const isRoleSel = (selected?.role || '') === r.role;
+                const brief = briefs[r.role];
+                const desc = brief?.description || r.rationale || '';
+                const family = brief?.jobFamily || r.jobFamily || '';
+                return (
+                  <button
+                    key={ri}
+                    type="button"
+                    onClick={e => { e.stopPropagation(); onChange({ ...selectedDir, role: r.role }); }}
+                    className={`ob-role-card${isRoleSel ? ' selected' : ''}`}
+                  >
+                    <span className="ob-role-radio">{isRoleSel && <Check size={12} />}</span>
+                    <span className="ob-role-body">
+                      <span className="ob-role-top">
+                        <span className="ob-role-name">{r.role}</span>
+                        {r.achievability && (
+                          <span className={`ob-chip${/direct/i.test(r.achievability) ? ' done' : ' neutral'}`}>{r.achievability}</span>
+                        )}
+                      </span>
+                      {family && <span className="ob-role-meta">{family}</span>}
+                      {desc ? (
+                        <span className="ob-role-desc">{desc}</span>
+                      ) : briefsLoading ? (
+                        <span className="ob-skel" />
+                      ) : (
+                        <span className="ob-role-desc muted">{t('career_agent.onboarding.role_desc_missing', 'Description not available yet.')}</span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           )}
+
+          {!customMode && availableRoles.length === 0 && (
+            <p className="ob-help">
+              {t('career_agent.onboarding.no_roles_left', 'Every role in this direction is already chosen in another preference — type a custom role instead.')}
+            </p>
+          )}
+
+          {customMode && (
+            <RoleSearchInput
+              value={selected?.role || ''}
+              onChange={v => onChange({ ...selectedDir, role: v })}
+              dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
+            />
+          )}
+
+          <button
+            type="button"
+            className="ob-link-btn"
+            onClick={() => { setCustomMode(m => !m); onChange({ ...selectedDir, role: '' }); }}
+          >
+            {customMode
+              ? t('career_agent.onboarding.back_to_suggested', '← Back to suggested roles')
+              : t('career_agent.onboarding.type_custom_role', "Can't find the role you want? Type a custom role instead")}
+          </button>
         </motion.div>
       )}
     </div>
@@ -638,7 +725,6 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
   const up = (field, val) => onChange({ ...data, [field]: val });
 
   const hasDirectionSelected = !!(data.careerDirection && (data.careerDirection.directionId || data.careerDirection.directionName));
-  const hasCustomRoleEntered = !!(data.role && data.role.trim() && !hasDirectionSelected);
 
   // Recommended list minus whatever's already picked in another tier; browse
   // groups get the same exclusion applied to each group's direction list.
@@ -664,56 +750,53 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
           {hasAnyDirectionOptions ? (
             <div className="fgrid">
               <div className="fg full">
-                <label className="fl">{t('career_agent.onboarding.career_directions', 'Career direction')}</label>
-                <CareerDirectionSelector
-                  directions={filteredDirections}
-                  browseGroups={filteredBrowseGroups}
-                  selected={data.careerDirection || null}
-                  excludeRoles={excludeRoles}
-                  disabled={hasCustomRoleEntered}
-                  onChange={dir => {
-                    if (dir) {
-                      onChange({
-                        ...data,
-                        careerDirection: dir,
-                        careerDirectionId: dir?.directionId || '',
-                        careerDirectionName: dir?.directionName || '',
-                        careerDirectionDescription: dir?.directionDescription || '',
-                        role: dir?.role || dir?.directionName || ''
-                      });
-                    } else {
-                      onChange({
-                        ...data,
-                        careerDirection: null,
-                        careerDirectionId: '',
-                        careerDirectionName: '',
-                        careerDirectionDescription: '',
-                        role: ''
-                      });
-                    }
-                  }}
-                />
-                {!hasDirectionSelected && !hasCustomRoleEntered && (
+                <label className="fl">{t('career_agent.onboarding.career_directions', 'Career direction')} <span className="req">*</span></label>
+                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                  <CareerDirectionSelector
+                    directions={filteredDirections}
+                    browseGroups={filteredBrowseGroups}
+                    selected={data.careerDirection || null}
+                    excludeRoles={excludeRoles}
+                    dbRoles={dbRoles}
+                    onChange={dir => {
+                      if (dir) {
+                        // The role is chosen explicitly (role card or custom
+                        // entry) — picking a direction alone never fills it.
+                        onChange({
+                          ...data,
+                          careerDirection: dir,
+                          careerDirectionId: dir?.directionId || '',
+                          careerDirectionName: dir?.directionName || '',
+                          careerDirectionDescription: dir?.directionDescription || '',
+                          role: dir?.role || ''
+                        });
+                      } else {
+                        onChange({
+                          ...data,
+                          careerDirection: null,
+                          careerDirectionId: '',
+                          careerDirectionName: '',
+                          careerDirectionDescription: '',
+                          role: ''
+                        });
+                      }
+                    }}
+                  />
+                </div>
+                {!hasDirectionSelected && (
                   <p className="ob-help">{t('career_agent.onboarding.direction_help', 'Recommended directions are listed first — you can also search and pick any direction from any degree or specialisation.')}</p>
                 )}
               </div>
 
-              {/* OR Divider */}
-              <div className="fg full ob-or">
-                <span className="ob-chip neutral">{t('career_agent.onboarding.or', 'OR')}</span>
-              </div>
-
-              <div className="fg full">
-                <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
-                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
-                  <RoleSearchInput
-                    value={data.role || ''}
-                    disabled={hasDirectionSelected}
-                    onChange={v => up('role', v)}
-                    dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
-                  />
+              {!hasDirectionSelected && (
+                <div className="fg full">
+                  <label className="fl">{t('career_agent.onboarding.target_role', 'Target role')} <span className="req">*</span></label>
+                  <div className="ob-role-locked">
+                    <Lock size={16} />
+                    <span>{t('career_agent.onboarding.role_locked_hint', 'Select a career direction first — its roles will appear here, each with a short description, for you to choose from.')}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : directions.length > 0 || browseGroups.length > 0 ? (
             <div className="fgrid">
@@ -1600,7 +1683,7 @@ const CareerAgentOnboarding = () => {
         const pref = formData.preferences.primary;
         const { locations, orgTypes } = getPreferenceSelections(pref);
         if (!pref?.role?.trim()) {
-          messages.push('Select a Career Direction or type a Desired Job Role');
+          messages.push('Select a career direction and choose your target role');
           setFieldError(fields, 'preferences.primary.role');
         }
         if (!pref?.salary) {
@@ -1621,7 +1704,7 @@ const CareerAgentOnboarding = () => {
         const pref = formData.preferences.secondary;
         const { locations, orgTypes } = getPreferenceSelections(pref);
         if (!pref?.role?.trim()) {
-          messages.push('Select a Career Direction or type a Desired Job Role');
+          messages.push('Select a career direction and choose your target role');
           setFieldError(fields, 'preferences.secondary.role');
         }
         if (!pref?.salary) {
@@ -1642,7 +1725,7 @@ const CareerAgentOnboarding = () => {
         const pref = formData.preferences.tertiary;
         const { locations, orgTypes } = getPreferenceSelections(pref);
         if (!pref?.role?.trim()) {
-          messages.push('Select a Career Direction or type a Desired Job Role');
+          messages.push('Select a career direction and choose your target role');
           setFieldError(fields, 'preferences.tertiary.role');
         }
         if (!pref?.salary) {

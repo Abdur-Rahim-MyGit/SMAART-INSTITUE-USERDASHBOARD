@@ -10,6 +10,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
 const { processCareerIntelligence } = require('../engine/careerEngine');
 const { enhanceWithAI } = require('../services/careerAIService');
@@ -41,6 +42,20 @@ function makeProfileHash(studentData) {
     skills: (studentData.skills || []).map(s => s.name || s).sort()
   });
   return crypto.createHash('sha256').update(key).digest('hex');
+}
+
+// Merge the per-role audit metadata a data set may carry (rolesDetail[] —
+// achievability tag, mapping rationale, job family) into a direction's roles.
+function attachRoleDetail(doc, roles) {
+  const details = Array.isArray(doc.rolesDetail) ? doc.rolesDetail : [];
+  if (details.length === 0) return roles;
+  const byName = new Map(details.map(d => [String(d.roleName || '').trim().toLowerCase(), d]));
+  return roles.map(r => {
+    const d = byName.get(String(r.role).trim().toLowerCase());
+    return d
+      ? { ...r, jobFamily: d.jobFamily || null, achievability: d.achievabilityTag || null, rationale: d.mappingRationale || null }
+      : r;
+  });
 }
 
 function findCachedRecord(hash) {
@@ -80,6 +95,73 @@ router.get('/career-role/:roleName', async (req, res) => {
   } catch (error) {
     console.error('[career-agent] Error fetching role:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/career-agent/role-briefs
+ * Body: { names: string[] } (max 40)
+ * Returns a short "what this role actually does" blurb + job family for each
+ * role name, so the onboarding role picker can explain roles to students who
+ * have never heard of them. Reads careerroles (narrative_para1) and the
+ * career_agent_data intel sheet ('Para 1: What This Role Actually Does').
+ */
+const IntelModel = mongoose.models['CareerAgentIntel']
+  || mongoose.model('CareerAgentIntel', new mongoose.Schema({}, { strict: false }), 'career_agent_data');
+
+function escapeRegex(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function briefText(text, max = 240) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return '';
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max);
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(', '), cut.lastIndexOf(' '));
+  return (end > 80 ? cut.slice(0, end) : cut).replace(/[,\s]+$/, '') + '…';
+}
+
+router.post('/role-briefs', async (req, res) => {
+  try {
+    const names = Array.isArray(req.body?.names)
+      ? req.body.names.filter(n => typeof n === 'string' && n.trim()).slice(0, 40)
+      : [];
+    if (names.length === 0) return res.json({ briefs: {} });
+
+    const regexes = names.map(n => new RegExp(`^${escapeRegex(n.trim())}$`, 'i'));
+    const [roleDocs, intelDocs] = await Promise.all([
+      CareerRoleModel.find({ role_name: { $in: regexes } }).lean(),
+      IntelModel.find({ 'Role Name': { $in: regexes } }).lean()
+    ]);
+
+    const indexByLower = (docs, key) => {
+      const m = new Map();
+      docs.forEach(d => {
+        const k = String(d[key] || '').trim().toLowerCase();
+        if (k && !m.has(k)) m.set(k, d);
+      });
+      return m;
+    };
+    const roleMap = indexByLower(roleDocs, 'role_name');
+    const intelMap = indexByLower(intelDocs, 'Role Name');
+
+    const briefs = {};
+    for (const name of names) {
+      const k = name.trim().toLowerCase();
+      const r = roleMap.get(k);
+      const i = intelMap.get(k);
+      const description = briefText(
+        (r && (r.narrative_para1 || r.role_description || r.description)) ||
+        (i && (i['Para 1: What This Role Actually Does'] || i.narrative_para1)) ||
+        ''
+      );
+      const jobFamily = (r && (r.job_family || r['Job Family'])) || (i && (i['Job Family'] || i.job_family)) || '';
+      briefs[name] = { description, jobFamily, found: !!(r || i) };
+    }
+
+    res.json({ briefs });
+  } catch (err) {
+    console.error('[career-agent/role-briefs] Error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch role briefs', details: err.message });
   }
 });
 
@@ -576,7 +658,7 @@ router.get('/directions/:uniqueId', async (req, res) => {
       directionOverview: doc['Overview / Description'], // Mapping both for compatibility
       type: doc['Type'] || 'Primary', // Default to Primary if type not in Excel
       uniqueId: doc['Spec ID'],
-      roles: [
+      roles: attachRoleDetail(doc, [
         { role: doc['Job Role 1'], id: doc['Role ID 1'] },
         { role: doc['Job Role 2'], id: doc['Role ID 2'] },
         { role: doc['Job Role 3'], id: doc['Role ID 3'] },
@@ -587,7 +669,7 @@ router.get('/directions/:uniqueId', async (req, res) => {
         { role: doc['Job Role 8'], id: doc['Role ID 8'] },
         { role: doc['Job Role 9'], id: doc['Role ID 9'] },
         { role: doc['Job Role 10'], id: doc['Role ID 10'] }
-      ].filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== '')
+      ].filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== ''))
     }));
 
     const typeOrder = { 'Primary': 0, 'Secondary': 1, 'Alternative': 2, 'Alternate': 2 };
@@ -630,9 +712,9 @@ router.get('/all-directions', async (req, res) => {
         degreeName: deg ? deg.fullName : null,
         degreeAbbr: deg ? deg.abbreviation : null,
         specialisation: deg ? deg.specialization : null,
-        roles: [1,2,3,4,5,6,7,8,9,10]
+        roles: attachRoleDetail(doc, [1,2,3,4,5,6,7,8,9,10]
           .map(n => ({ role: doc[`Job Role ${n}`], id: doc[`Role ID ${n}`] }))
-          .filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== '')
+          .filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== ''))
       };
     }).filter(d => d.directionId && d.directionName);
 
