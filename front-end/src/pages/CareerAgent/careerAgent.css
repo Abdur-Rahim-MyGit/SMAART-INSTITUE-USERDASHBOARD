@@ -1819,3 +1819,8 @@
 .career-agent-page .ob-link-btn:hover { text-decoration: underline; }
 .career-agent-page .field-error .ob-picker-trigger { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.12) !important; }
 @media (max-width: 768px) { .career-agent-page .ob-role-grid { grid-template-columns: 1fr; } }
+
+/* Selected target role — confirmation field under the role cards */
+.career-agent-page .ob-locked.ok { border-color: rgba(4,92,154,0.35); background: var(--ob-tint); font-weight: 600; }
+.career-agent-page .ob-locked.ok .ob-lock-ic { color: var(--ob-brand); }
+.career-agent-page .ob-role-desc { font-size: 13px; }

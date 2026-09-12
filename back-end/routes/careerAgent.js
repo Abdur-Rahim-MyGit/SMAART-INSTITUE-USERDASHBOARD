@@ -111,13 +111,27 @@ const IntelModel = mongoose.models['CareerAgentIntel']
 
 function escapeRegex(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-function briefText(text, max = 240) {
-  const clean = String(text || '').replace(/\s+/g, ' ').trim();
-  if (!clean) return '';
-  if (clean.length <= max) return clean;
-  const cut = clean.slice(0, max);
-  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(', '), cut.lastIndexOf(' '));
-  return (end > 80 ? cut.slice(0, end) : cut).replace(/[,\s]+$/, '') + '…';
+// One short, plain sentence a student can read at a glance — first sentence
+// only, the "A Sales Executive in India is responsible for …" lead-in dropped,
+// and cut at the first dash clause or a natural boundary once it runs long.
+function briefText(text, max = 120) {
+  let s = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!s) return '';
+  const firstStop = s.search(/\.\s|\.$/);
+  if (firstStop > 40) s = s.slice(0, firstStop);
+  s = s.replace(/^(?:an?|the)\s+[^—,.]{2,60}?\s+in india\s+(?:is responsible for|is|are|typically|usually)?\s*/i, '');
+  s = s.replace(/^(?:is responsible for|responsible for|works to|works on|helps to|helps)\s+/i, '');
+  const dash = s.indexOf(' — ');
+  if (dash > 30) s = s.slice(0, dash);
+  if (s.length > max) {
+    const cut = s.slice(0, max);
+    const end = Math.max(cut.lastIndexOf(', '), cut.lastIndexOf(' '));
+    s = end > 50 ? cut.slice(0, end) : cut;
+  }
+  s = s.replace(/[,;:\s—-]+$/, '');
+  if (!s) return '';
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  return /[.!?]$/.test(s) ? s : `${s}.`;
 }
 
 router.post('/role-briefs', async (req, res) => {

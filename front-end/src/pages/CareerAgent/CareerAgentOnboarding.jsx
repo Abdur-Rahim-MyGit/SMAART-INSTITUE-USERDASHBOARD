@@ -73,6 +73,13 @@ const createEmptyValidationState = () => ({ messages: [], fields: {} });
 // Role name → { description, jobFamily } blurbs, fetched once per session.
 const ROLE_BRIEF_CACHE = new Map();
 
+// First sentence of a longer note, for the rare role with no server-side brief.
+const shortSentence = (text) => {
+  const s = String(text || '').replace(/\s+/g, ' ').trim();
+  const i = s.search(/\.\s|\.$/);
+  return i > 40 ? s.slice(0, i + 1) : s;
+};
+
 
 // MultiSelect — clean open chip grid, no scrollbox
 function MultiSelect({ options, selected = [], onChange, max = 3, placeholder, disabled = false }) {
@@ -657,8 +664,7 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
               {availableRoles.map((r, ri) => {
                 const isRoleSel = (selected?.role || '') === r.role;
                 const brief = briefs[r.role];
-                const desc = brief?.description || r.rationale || '';
-                const family = brief?.jobFamily || r.jobFamily || '';
+                const desc = brief?.description || shortSentence(r.rationale);
                 return (
                   <button
                     key={ri}
@@ -668,13 +674,7 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
                   >
                     <span className="ob-role-radio">{isRoleSel && <Check size={12} />}</span>
                     <span className="ob-role-body">
-                      <span className="ob-role-top">
-                        <span className="ob-role-name">{r.role}</span>
-                        {r.achievability && (
-                          <span className={`ob-chip${/direct/i.test(r.achievability) ? ' done' : ' neutral'}`}>{r.achievability}</span>
-                        )}
-                      </span>
-                      {family && <span className="ob-role-meta">{family}</span>}
+                      <span className="ob-role-name">{r.role}</span>
                       {desc ? (
                         <span className="ob-role-desc">{desc}</span>
                       ) : briefsLoading ? (
@@ -701,6 +701,16 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
               onChange={v => onChange({ ...selectedDir, role: v })}
               dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
             />
+          )}
+
+          {!customMode && (selected?.role || '').trim() && (
+            <div className="fg">
+              <label className="fl">{t('career_agent.onboarding.selected_role', 'Selected target role')}</label>
+              <div className="ob-locked ok">
+                <span>{selected.role}</span>
+                <span className="ob-lock-ic"><CheckCircle size={16} /></span>
+              </div>
+            </div>
           )}
 
           <button
