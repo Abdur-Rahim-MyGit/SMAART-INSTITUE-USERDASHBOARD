@@ -19,6 +19,8 @@ import {
   ChevronDown,
   Check,
   Info,
+  Star,
+  X,
   ArrowRight,
   IconArrowLeft as ArrowLeft
 } from '@/components/icons';
@@ -400,81 +402,163 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
   );
 }
 
-// CareerDirectionSelector — clean dropdown + preview panel
-// Shows a "Recommended for you" group (matched to the student's own degree)
-// followed by "Browse other directions" grouped by field/domain — directions
-// from a field other than the student's own are listed but disabled, mirroring
-// the server-side block enforced on submit.
+// CareerDirectionSelector — searchable, grouped picker + preview panel.
+// "Recommended for you" (matched to the student's own degree) comes first, then
+// every other direction across ALL degrees, grouped Domain → Degree ·
+// Specialisation so a student can see exactly where each one belongs. Nothing
+// is blocked — any direction from any degree can be chosen.
 function CareerDirectionSelector({ directions = [], browseGroups = [], selected = null, onChange, loading = false, excludeRoles = [], disabled = false }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const allSelectable = useMemo(
+    () => [...directions, ...browseGroups.flatMap(g => g.degrees.flatMap(d => d.directions))],
+    [directions, browseGroups]
+  );
+
+  const q = query.trim().toLowerCase();
+  const matches = (dir, extra = '') => {
+    if (!q) return true;
+    const hay = [dir.directionName, dir.degreeAbbr, dir.degreeName, dir.specialisation, dir.domain, extra, ...(dir.roles || []).map(r => r.role)]
+      .filter(Boolean).join(' ').toLowerCase();
+    return hay.includes(q);
+  };
+  const recFiltered = directions.filter(d => matches(d));
+  const groupsFiltered = browseGroups
+    .map(g => ({
+      ...g,
+      degrees: g.degrees
+        .map(d => ({ ...d, directions: d.directions.filter(dir => matches(dir, `${d.degreeLabel} ${d.degreeName} ${d.specialisation}`)) }))
+        .filter(d => d.directions.length > 0)
+    }))
+    .filter(g => g.degrees.length > 0);
+  const totalMatches = recFiltered.length + groupsFiltered.reduce((n, g) => n + g.degrees.reduce((m, d) => m + d.directions.length, 0), 0);
+
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.2rem', background: 'var(--navy2)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-        <Search size={18} className="animate-pulse" style={{ color: 'var(--accent)', flexShrink: 0 }} />
-        <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--muted)' }}>{t('career_agent.onboarding.sourcing_intelligence', 'Sourcing intelligence for your profile...')}</span>
+      <div className="ob-strip">
+        <Search size={18} className="animate-pulse" />
+        <p>{t('career_agent.onboarding.sourcing_intelligence', 'Loading career directions for your profile…')}</p>
       </div>
     );
   }
 
-  const allSelectable = [...directions, ...browseGroups.flatMap(g => g.directions)];
   if (allSelectable.length === 0) return null;
 
   const selectedDir = selected ? allSelectable.find(d => d.directionId === selected.directionId) : null;
+  const isRecommended = !!selectedDir && directions.some(d => d.directionId === selectedDir.directionId);
   const availableRoles = selectedDir ? (selectedDir.roles || []).filter(r => !excludeRoles.includes(r.role)) : [];
+  const metaLine = (dir) => [dir.degreeAbbr || dir.degreeName, dir.specialisation].filter(Boolean).join(' · ');
+
+  const pick = (dir) => { onChange(dir); setOpen(false); setQuery(''); };
+
+  const renderItem = (dir, showMeta = false) => {
+    const isSel = selected?.directionId === dir.directionId;
+    const roleCount = (dir.roles || []).length;
+    const sub = showMeta && metaLine(dir)
+      ? metaLine(dir)
+      : t('career_agent.onboarding.role_count', '{{count}} roles', { count: roleCount });
+    return (
+      <button key={dir.directionId} type="button" className={`ob-picker-item${isSel ? ' selected' : ''}`} onClick={() => pick(dir)}>
+        <span className="ob-picker-item-name">{dir.directionName}</span>
+        <span className="ob-picker-item-sub">{sub}</span>
+        {isSel && <Check size={16} />}
+      </button>
+    );
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div className="ob-select-wrap">
-        <select
-          value={selected?.directionId || ''}
+      <div className="ob-picker" ref={ref}>
+        <button
+          type="button"
+          className={`ob-picker-trigger${open ? ' open' : ''}`}
           disabled={disabled}
-          onChange={e => {
-            if (disabled) return;
-            const val = e.target.value;
-            if (!val) { onChange(null); return; }
-            const dir = allSelectable.find(d => d.directionId === val);
-            if (dir) onChange(dir);
-          }}
-          style={{
-            width: '100%',
-            appearance: 'none',
-            WebkitAppearance: 'none',
-            paddingRight: '2.5rem',
-            fontWeight: selected ? 500 : 400,
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            opacity: disabled ? 0.6 : 1,
-          }}
+          onClick={() => { if (!disabled) setOpen(o => !o); }}
         >
-          <option value="">
-            {disabled
-              ? t('career_agent.onboarding.direction_disabled_msg', '— Disabled (Desired Job Role specified below) —')
-              : t('career_agent.onboarding.select_direction_placeholder', '— Select a career direction —')}
-          </option>
-          {directions.length > 0 && (
-            <optgroup label={t('career_agent.onboarding.recommended_for_you', 'Recommended for you')}>
-              {directions.map(dir => (
-                <option key={dir.directionId} value={dir.directionId}>
-                  {dir.directionName}
-                </option>
-              ))}
-            </optgroup>
+          {selectedDir ? (
+            <span className="ob-picker-value">
+              <span className="ob-picker-value-name">{selectedDir.directionName}</span>
+              {isRecommended && <span className="ob-chip">{t('career_agent.onboarding.recommended', 'Recommended')}</span>}
+            </span>
+          ) : (
+            <span className="ob-picker-placeholder">
+              {disabled
+                ? t('career_agent.onboarding.direction_disabled_msg', 'Disabled — a job role is typed below')
+                : t('career_agent.onboarding.select_direction_placeholder', 'Select a career direction')}
+            </span>
           )}
-          {browseGroups.map(group => (
-            <optgroup
-              key={group.domain}
-              label={group.inDomain
-                ? t('career_agent.onboarding.browse_group_in_domain', 'Browse: {{domain}}', { domain: group.domain })
-                : t('career_agent.onboarding.browse_group_out_domain', '{{domain}} (different field — not available)', { domain: group.domain })}
-            >
-              {group.directions.map(dir => (
-                <option key={dir.directionId} value={dir.directionId} disabled={!group.inDomain}>
-                  {dir.directionName}
-                </option>
+          <ChevronDown size={18} className="ob-picker-caret" />
+        </button>
+
+        {open && (
+          <div className="ob-picker-pop">
+            <div className="ob-picker-search">
+              <Search size={16} />
+              <input
+                type="text"
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder={t('career_agent.onboarding.search_directions', 'Search directions, degrees or specialisations…')}
+              />
+              {query && (
+                <button type="button" className="ob-picker-clear" onClick={() => setQuery('')} aria-label="Clear search">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            <div className="ob-picker-list">
+              {recFiltered.length > 0 && (
+                <div className="ob-picker-group">
+                  <div className="ob-picker-ghead">
+                    <Star size={14} />
+                    {t('career_agent.onboarding.recommended_for_you', 'Recommended for you')}
+                    <span className="ob-chip">{recFiltered.length}</span>
+                  </div>
+                  {recFiltered.map(dir => renderItem(dir, true))}
+                </div>
+              )}
+              {groupsFiltered.map(g => (
+                <div key={g.domain} className="ob-picker-group">
+                  <div className="ob-picker-ghead">
+                    <Compass size={14} />
+                    {g.domain}
+                  </div>
+                  {g.degrees.map(d => (
+                    <div key={d.key}>
+                      <div className="ob-picker-shead">
+                        <GraduationCap size={14} />
+                        <span>{d.degreeLabel}</span>
+                        {d.specialisation && <span className="ob-picker-shead-spec">· {d.specialisation}</span>}
+                      </div>
+                      {d.directions.map(dir => renderItem(dir))}
+                    </div>
+                  ))}
+                </div>
               ))}
-            </optgroup>
-          ))}
-        </select>
-        <span className="ob-caret"><ChevronDown size={18} /></span>
+              {totalMatches === 0 && (
+                <div className="ob-picker-empty">
+                  {t('career_agent.onboarding.no_direction_matches', 'No directions match "{{q}}"', { q: query })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {disabled && (
@@ -493,9 +577,12 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
           className="ob-panel"
         >
           <div className="ob-label-row">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-              <CheckCircle size={16} style={{ color: 'var(--ob-brand)', flexShrink: 0 }} />
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ob-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedDir.directionName}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+              <CheckCircle size={18} style={{ color: 'var(--ob-brand)', flexShrink: 0 }} />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ob-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedDir.directionName}</div>
+                {metaLine(selectedDir) && <div className="ob-help">{metaLine(selectedDir)}{isRecommended ? ` · ${t('career_agent.onboarding.recommended', 'Recommended')}` : ''}</div>}
+              </div>
             </div>
             <button
               type="button"
@@ -508,11 +595,15 @@ function CareerDirectionSelector({ directions = [], browseGroups = [], selected 
           </div>
 
           {selectedDir.directionDescription && (
-            <p>{selectedDir.directionDescription}</p>
+            <>
+              <div className="ob-divider" />
+              <p>{selectedDir.directionDescription}</p>
+            </>
           )}
 
           {availableRoles.length > 0 && (
             <>
+              <div className="ob-divider" />
               <div className="ob-label-row">
                 <span className="fl">{t('career_agent.onboarding.core_entry_roles', 'Core entry roles')}</span>
                 <span className="ob-label-right">{t('career_agent.onboarding.pick_target_role', 'Pick the role you are targeting')}</span>
@@ -553,13 +644,14 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
   // groups get the same exclusion applied to each group's direction list.
   const filteredDirections = directions.filter(d => !excludeDirections.includes(d.directionId));
   const filteredBrowseGroups = browseGroups
-    .map(g => ({ ...g, directions: g.directions.filter(d => !excludeDirections.includes(d.directionId)) }))
-    .filter(g => g.directions.length > 0);
+    .map(g => ({
+      ...g,
+      degrees: g.degrees
+        .map(d => ({ ...d, directions: d.directions.filter(dir => !excludeDirections.includes(dir.directionId)) }))
+        .filter(d => d.directions.length > 0)
+    }))
+    .filter(g => g.degrees.length > 0);
   const hasAnyDirectionOptions = filteredDirections.length > 0 || filteredBrowseGroups.length > 0;
-  // Recommended, or at least something selectable within the student's own
-  // field — as opposed to hasAnyDirectionOptions, which is also true when
-  // every available option is a blocked, different-field one.
-  const hasUsableOwnFieldOptions = filteredDirections.length > 0 || filteredBrowseGroups.some(g => g.inDomain);
 
   const fieldErrorClass = (key) => fieldErrors[key] ? 'field-error' : '';
 
@@ -569,7 +661,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
         {/* SECTION A: TARGET ROLE */}
         <div className="ob-section">
           <Eyebrow>01 &nbsp;{t('career_agent.onboarding.career_targeting', 'Career targeting')}</Eyebrow>
-          {hasUsableOwnFieldOptions ? (
+          {hasAnyDirectionOptions ? (
             <div className="fgrid">
               <div className="fg full">
                 <label className="fl">{t('career_agent.onboarding.career_directions', 'Career direction')}</label>
@@ -602,7 +694,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
                   }}
                 />
                 {!hasDirectionSelected && !hasCustomRoleEntered && (
-                  <p className="ob-help">{t('career_agent.onboarding.direction_help', 'Recommended directions are listed first; other directions within your own field follow below them.')}</p>
+                  <p className="ob-help">{t('career_agent.onboarding.direction_help', 'Recommended directions are listed first — you can also search and pick any direction from any degree or specialisation.')}</p>
                 )}
               </div>
 
@@ -620,19 +712,6 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], browseG
                     onChange={v => up('role', v)}
                     dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))}
                   />
-                </div>
-              </div>
-            </div>
-          ) : hasAnyDirectionOptions ? (
-            <div className="fgrid">
-              <div className="fg full">
-                <div className="ob-strip warn" style={{ marginBottom: '4px' }}>
-                  <Info size={18} />
-                  <p>{t('career_agent.onboarding.no_directions_for_field', "Career direction data for your field isn't available yet — check back soon. In the meantime, type your desired job role below.")}</p>
-                </div>
-                <label className="fl">{t('career_agent.onboarding.desired_role', 'Desired Job Role')} <span className="req">*</span></label>
-                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
-                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
                 </div>
               </div>
             </div>
@@ -1383,15 +1462,23 @@ const CareerAgentOnboarding = () => {
 
   }, [eduSummaryStr]);
 
-  // Student's own field(s) of study — used to flag/block directions from a
-  // completely different field in the "Browse other directions" list.
+  // Student's own field(s) of study — used only to ORDER the browse list (own
+  // field first). Nothing is blocked: any direction from any degree is selectable.
   const studentDomains = useMemo(() => new Set(
     (formData.education || []).map(e => e?.domain).filter(Boolean)
   ), [formData.education]);
 
-  // "Browse other directions" — everything NOT already in the recommended list,
-  // grouped by field/domain, with out-of-field groups flagged as not selectable
-  // (mirrors the server-side block enforced on submit).
+  const allById = useMemo(() => new Map(allDirections.map(d => [d.directionId, d])), [allDirections]);
+
+  // Recommended directions come from /directions/:uniqueId, which carries no
+  // degree meta — borrow degree / specialisation / domain from the full list so
+  // the picker and preview can label them.
+  const recommendedDirections = useMemo(
+    () => careerDirections.map(d => ({ ...(allById.get(d.directionId) || {}), ...d })),
+    [careerDirections, allById]
+  );
+
+  // Everything NOT already recommended, grouped Domain → Degree · Specialisation.
   const browseGroups = useMemo(() => {
     const recommendedIds = new Set(careerDirections.map(d => d.directionId));
     const rest = allDirections.filter(d => !recommendedIds.has(d.directionId));
@@ -1399,19 +1486,28 @@ const CareerAgentOnboarding = () => {
     const byDomain = new Map();
     for (const dir of rest) {
       const domainKey = dir.domain || 'Other';
-      if (!byDomain.has(domainKey)) byDomain.set(domainKey, []);
-      byDomain.get(domainKey).push(dir);
+      if (!byDomain.has(domainKey)) byDomain.set(domainKey, new Map());
+      const degMap = byDomain.get(domainKey);
+      const degreeLabel = dir.degreeAbbr || dir.degreeName || 'Other';
+      const specialisation = dir.specialisation || '';
+      const degKey = `${degreeLabel}|${specialisation}`;
+      if (!degMap.has(degKey)) {
+        degMap.set(degKey, { key: degKey, degreeLabel, degreeName: dir.degreeName || '', specialisation, directions: [] });
+      }
+      degMap.get(degKey).directions.push(dir);
     }
 
-    const groups = Array.from(byDomain.entries()).map(([domain, dirs]) => ({
+    const groups = Array.from(byDomain.entries()).map(([domain, degMap]) => ({
       domain,
-      inDomain: studentDomains.size === 0 || studentDomains.has(domain),
-      directions: dirs
+      own: studentDomains.has(domain),
+      degrees: Array.from(degMap.values()).sort((a, b) =>
+        a.degreeLabel.localeCompare(b.degreeLabel) || a.specialisation.localeCompare(b.specialisation)
+      )
     }));
 
     // Student's own field(s) first, then everything else alphabetically.
     groups.sort((a, b) => {
-      if (a.inDomain !== b.inDomain) return a.inDomain ? -1 : 1;
+      if (a.own !== b.own) return a.own ? -1 : 1;
       return a.domain.localeCompare(b.domain);
     });
     return groups;
@@ -1860,7 +1956,7 @@ const CareerAgentOnboarding = () => {
                   {[
                     { num: '01', icon: <GraduationCap size={18} />, title: t('career_agent.onboarding.overview_card1_title', 'Recommended for your degree'), body: t('career_agent.onboarding.overview_card1_body', 'We show the 5 career directions that best match your degree and specialisation — 10 if you have two degrees on file.') },
                     { num: '02', icon: <Target size={18} />, title: t('career_agent.onboarding.overview_card2_title', 'Pick a Primary, Secondary & Tertiary path'), body: t('career_agent.onboarding.overview_card2_body', 'Choose 3 directions in total. Pick from your recommendations, or browse any other direction within your own field of study.') },
-                    { num: '03', icon: <ShieldCheck size={18} />, title: t('career_agent.onboarding.overview_card3_title', 'Stay within your own field'), body: t('career_agent.onboarding.overview_card3_body', "Explore any direction inside your field freely. A direction from a different field (e.g. an IT student choosing Medicine) can't be selected.") },
+                    { num: '03', icon: <Compass size={18} />, title: t('career_agent.onboarding.overview_card3_title', 'Browse every direction'), body: t('career_agent.onboarding.overview_card3_body', 'Recommendations come first, but nothing is off-limits — search and pick any direction from any degree or specialisation.') },
                     { num: '04', icon: <Lock size={18} />, title: t('career_agent.onboarding.overview_card4_title', 'Your 3 paths get locked'), body: t('career_agent.onboarding.overview_card4_body', 'After submitting, directions lock in after 14 days or 5 attempts — whichever comes first. Recommendations stay viewable afterwards.') },
                   ].map(r => (
                     <div key={r.num} className="ob-rule">
@@ -1977,7 +2073,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 3, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
+                <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={recommendedDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
               </div>
             </>
           )}
@@ -1992,7 +2088,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 4, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
+                <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={recommendedDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
               </div>
             </>
           )}
@@ -2007,7 +2103,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 5, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
+                <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={recommendedDirections} browseGroups={browseGroups} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
               </div>
             </>
           )}

@@ -1721,3 +1721,59 @@
   .career-agent-page .ob-nav-l, .career-agent-page .ob-nav-r { width: 100%; justify-content: space-between; }
   .career-agent-page .ob-nav-r { flex-direction: row-reverse; }
 }
+
+/* ── Career direction picker — searchable popover, grouped Domain → Degree · Specialisation ── */
+.career-agent-page .ob-picker { position: relative; }
+.career-agent-page .ob-picker-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  height: 40px; padding: 0 12px; border: 1px solid var(--ob-hair); border-radius: 10px;
+  background: var(--ob-card); font-family: var(--font); font-size: 14px; color: var(--ob-ink);
+  cursor: pointer; text-align: left; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.career-agent-page .ob-picker-trigger:hover { border-color: rgba(4,92,154,0.4); }
+.career-agent-page .ob-picker-trigger.open { border-color: var(--ob-brand); box-shadow: 0 0 0 3px rgba(4,92,154,0.12); }
+.career-agent-page .ob-picker-trigger:disabled { opacity: 0.6; cursor: not-allowed; background: var(--ob-soft); }
+.career-agent-page .ob-picker-value { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 500; }
+.career-agent-page .ob-picker-value-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.career-agent-page .ob-picker-placeholder { color: var(--ob-faint); }
+.career-agent-page .ob-picker-caret { color: var(--ob-muted); flex-shrink: 0; }
+
+.career-agent-page .ob-picker-pop {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 90;
+  background: var(--ob-card); border: 1px solid var(--ob-hair); border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(15,23,42,0.12); overflow: hidden;
+}
+.career-agent-page .ob-picker-search {
+  display: flex; align-items: center; gap: 8px; padding: 4px 12px;
+  border-bottom: 1px solid var(--ob-hair); color: var(--ob-faint);
+}
+.career-agent-page .ob-picker-search input {
+  flex: 1; border: none !important; box-shadow: none !important; background: transparent !important;
+  height: 36px !important; padding: 0 !important; border-radius: 0 !important;
+}
+.career-agent-page .ob-picker-clear { background: none; border: none; cursor: pointer; color: var(--ob-muted); display: flex; padding: 4px; }
+.career-agent-page .ob-picker-list { max-height: 380px; overflow-y: auto; padding: 6px 0; }
+.career-agent-page .ob-picker-group + .ob-picker-group { border-top: 1px solid var(--ob-hair); margin-top: 6px; padding-top: 6px; }
+.career-agent-page .ob-picker-ghead {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--ob-card); color: var(--ob-ink);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.career-agent-page .ob-picker-ghead .ob-chip { margin-left: auto; }
+.career-agent-page .ob-picker-shead {
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px 4px 20px;
+  color: var(--ob-brand); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.career-agent-page .ob-picker-shead-spec { color: var(--ob-muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+.career-agent-page .ob-picker-item {
+  width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 20px;
+  background: transparent; border: none; text-align: left; cursor: pointer;
+  font-family: var(--font); color: var(--ob-ink); transition: background 0.1s;
+}
+.career-agent-page .ob-picker-item:hover { background: var(--ob-soft); }
+.career-agent-page .ob-picker-item.selected { background: var(--ob-tint); }
+.career-agent-page .ob-picker-item.selected .ob-picker-item-name { font-weight: 600; color: var(--ob-brand); }
+.career-agent-page .ob-picker-item-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.career-agent-page .ob-picker-item-sub { font-size: 12px; color: var(--ob-muted); white-space: nowrap; }
+.career-agent-page .ob-picker-empty { padding: 16px 12px; font-size: 13px; color: var(--ob-muted); text-align: center; }
