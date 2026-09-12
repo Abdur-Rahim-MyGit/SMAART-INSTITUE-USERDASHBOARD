@@ -167,7 +167,13 @@ const connectDB = async () => {
     serverSelectionTimeoutMS: 15000,
     socketTimeoutMS: 45000,
     retryWrites: true,
-    retryReads: true
+    retryReads: true,
+    // Force IPv4 to avoid a well-known Node 18+ DNS/SRV resolution bug on
+    // Windows that makes mongodb+srv:// lookups fail intermittently outside
+    // Docker's Linux containers (where this doesn't occur). The failure
+    // surfaces as a generic "could not connect to any servers" error that
+    // looks like an IP-whitelist issue but isn't.
+    family: 4
   };
 
   let connected = false;
