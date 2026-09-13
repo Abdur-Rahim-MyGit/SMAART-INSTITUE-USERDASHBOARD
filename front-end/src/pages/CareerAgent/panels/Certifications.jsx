@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Award, AlertCircle, RefreshCw, Code, Bot, Building, Building2 } from '@/components/icons';
+import { Award, AlertCircle, RefreshCw, Code, Bot, Building, Building2, IconCertificate, CheckCircle, Users } from '@/components/icons';
 import { Spinner, EmptyState, CardHead } from './shared';
 
 // ─── Category config ───────────────────────────────────────────────────────────
@@ -9,23 +9,46 @@ const CATS = [
   { key: 'domain',    label: 'Domain certifications',    sub: 'Subject-matter credentials for the field', Icon: Building },
 ];
 
-const providerOf = (cert) => (cert.provider || '').split(' – ')[0].split(' / ')[0].trim().slice(0, 32);
+// Certificate names in the data often repeat the provider and the pricing in the
+// title ("Statistics with Python – Coursera / University of Michigan (Free audit)").
+// The provider has its own row and "free" its own tag, so keep the title itself short.
+const providerOf = (cert) => (cert.provider || '').split(' – ')[0].split(' / ')[0].trim();
+
+const FREE_RE = /\(\s*free[^)]*\)/i;
+
+const cleanCertName = (raw = '') => {
+  let name = String(raw).replace(FREE_RE, '').trim();
+  const dash = name.search(/\s[–—-]\s/);
+  if (dash > 12) name = name.slice(0, dash);
+  return name.replace(/[\s,–—-]+$/, '').trim() || String(raw).trim();
+};
 
 // ─── Cert Card ─────────────────────────────────────────────────────────────────
 const CertCard = ({ cert, totalRoles }) => {
   const [tip, setTip] = useState(false);
   const provider = providerOf(cert);
+  const isFree = FREE_RE.test(cert.name || '') || /free/i.test(cert.provider || '');
   return (
     <div className="cert-card">
-      <div className="cert-name">{cert.name}</div>
-      {provider && <div className="cert-prov"><Building2 size={14} /> {provider}</div>}
+      <div className="cert-top">
+        <div className="cert-ic"><IconCertificate size={18} /></div>
+        <div className="cert-name" title={cert.name}>{cleanCertName(cert.name)}</div>
+      </div>
+      {provider && <div className="cert-prov"><Building2 size={14} /><span>{provider}</span></div>}
+      {cert.skillName && (
+        <div className="cert-skill" title={cert.skillName}>
+          <b>Skill covered</b>
+          {cert.skillName}
+        </div>
+      )}
       <div className="cert-foot">
-        {cert.skillName ? <span className="dchip">{cert.skillName}</span> : <span />}
+        {isFree ? <span className="cert-free"><CheckCircle size={14} /> Free</span> : <span />}
         <span
           className="rm-count"
           onMouseEnter={() => setTip(true)}
           onMouseLeave={() => setTip(false)}
         >
+          <span className="ic"><Users size={13} /></span>
           {cert.roleCount}/{totalRoles} roles
           {tip && cert.roles?.length > 0 && (
             <div className="rm-tip">
