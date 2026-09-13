@@ -313,437 +313,274 @@ const SkillCard = ({ item, status, onStatusChange, onInProgress, totalRoles }) =
     );
 };
 
-/* ── In Progress Confirmation Modal ── */
-const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
+/* ─────────────────────────────────────────────────────────────
+   Roadmap modals
+   These render through a portal into document.body, i.e. OUTSIDE
+   .career-agent-page — so the page's CSS variables do not resolve here.
+   Every colour below is therefore literal, from the same brand palette.
+   ───────────────────────────────────────────────────────────── */
+const palette = (theme) => {
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const C = {
-        bg:      isDark ? '#0f1729' : '#ffffff',
-        surface: isDark ? '#141f35' : '#f8fafc',
-        border:  isDark ? 'rgba(255,255,255,0.09)' : '#d7ebf5',
-        text1:   isDark ? '#f1f5f9' : '#072036',
-        text2:   isDark ? '#94a3b8' : '#475569',
-        muted:   isDark ? '#64748b' : '#94a3b8',
-        btnBg:   isDark ? '#1e2d48' : '#f1f5f9',
+    return {
+        isDark,
+        overlay: 'rgba(7,32,54,0.45)',
+        card:    isDark ? '#001b3a' : '#ffffff',
+        soft:    isDark ? '#00152E' : '#F8FAFC',
+        panel:   isDark ? '#002147' : '#F1F5F9',
+        hair:    isDark ? 'rgba(255,255,255,0.10)' : '#d7ebf5',
+        ink:     isDark ? '#f8fafc' : '#072036',
+        sub:     isDark ? '#cbd5e1' : '#35566b',
+        muted:   isDark ? '#94a3b8' : '#64748b',
+        brand:   isDark ? '#A6D7E8' : '#045C9A',
+        tint:    isDark ? 'rgba(4,92,154,0.22)' : '#EAF7FD',
+        border:  isDark ? 'rgba(166,215,232,0.35)' : 'rgba(4,92,154,0.25)',
+        solid:   isDark ? '#045C9A' : '#072036',
+        solidHover: isDark ? '#0b6fb8' : '#0d3a5f',
+        green:   '#059669',
+        amber:   '#d97706',
     };
+};
 
-    return ReactDOM.createPortal(
+const FONT = 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+const Shell = ({ C, width = 420, onClose, children }) => (
+    <div
+        style={{
+            position: 'fixed', inset: 0, background: C.overlay,
+            backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)',
+            zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '1rem', animation: 'fadeIn 0.15s ease',
+        }}
+        onClick={onClose}
+    >
         <div
             style={{
-                position: 'fixed', inset: 0,
-                background: 'rgba(0,0,0,0.55)',
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
-                zIndex: 99999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '1rem',
-                animation: 'fadeIn 0.15s ease',
+                background: C.card, border: `1px solid ${C.hair}`, borderRadius: 16,
+                width: '100%', maxWidth: width, overflow: 'hidden', fontFamily: FONT,
+                boxShadow: C.isDark ? '0 24px 60px rgba(0,0,0,0.6)' : '0 24px 60px rgba(7,32,54,0.18)',
+                animation: 'popIn 0.18s ease',
             }}
-            onClick={onClose}
+            onClick={e => e.stopPropagation()}
         >
-            <div
+            {children}
+        </div>
+    </div>
+);
+
+const Head = ({ C, icon, title, sub, onClose }) => (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '20px 20px 16px', borderBottom: `1px solid ${C.hair}` }}>
+        <div style={{
+            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+            background: C.tint, color: C.brand,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>{icon}</div>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: C.ink, letterSpacing: '-0.01em', lineHeight: 1.3 }}>{title}</div>
+            {sub && <div style={{ fontSize: 13, fontWeight: 500, color: C.muted, lineHeight: 1.5 }}>{sub}</div>}
+        </div>
+        {onClose && (
+            <button
+                type="button" onClick={onClose} title="Close"
                 style={{
-                    background: C.bg,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: '20px',
-                    width: '100%', maxWidth: '380px',
-                    overflow: 'hidden',
-                    boxShadow: isDark
-                        ? '0 32px 64px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06)'
-                        : '0 20px 50px -10px rgba(0,0,0,0.18)',
-                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                    animation: 'slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+                    width: 32, height: 32, borderRadius: 8, flexShrink: 0, cursor: 'pointer',
+                    background: C.soft, border: `1px solid ${C.hair}`, color: C.muted,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
-                onClick={e => e.stopPropagation()}
             >
-                {/* Top accent bar */}
-                <div style={{ height: '4px', background: 'var(--accent)' }} />
+                <X size={16} />
+            </button>
+        )}
+    </div>
+);
 
-                {/* Body */}
-                <div style={{ padding: '1.8rem 1.5rem 1.2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
-                    <div style={{
-                        width: '54px', height: '54px', borderRadius: '50%',
-                        background: 'var(--accent-tint)',
-                        border: '1px solid var(--accent-border)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#045C9A',
-                    }}><Target size={26} /></div>
+const Foot = ({ C, children }) => (
+    <div style={{
+        display: 'flex', gap: 8, justifyContent: 'flex-end',
+        padding: '14px 20px', borderTop: `1px solid ${C.hair}`, background: C.soft,
+    }}>{children}</div>
+);
 
-                    <div>
-                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: C.text1, marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
-                            Start Learning?
-                        </div>
-                        <div style={{ fontSize: '0.82rem', color: C.text2, lineHeight: 1.6 }}>
-                            Mark <strong style={{ color: C.text1 }}>&#34;{skillName}&#34;</strong> as{' '}
-                            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>In Progress</span>?<br />
-                            <span style={{ color: C.muted, fontSize: '0.76rem' }}>You can undo this at any time.</span>
-                        </div>
-                    </div>
-                </div>
+const btnGhost = (C) => ({
+    display: 'inline-flex', alignItems: 'center', gap: 6, height: 40, padding: '0 16px',
+    background: C.card, color: C.sub, border: `1px solid ${C.hair}`, borderRadius: 10,
+    fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+});
 
-                {/* Footer */}
+const btnSolid = (C, enabled = true) => ({
+    display: 'inline-flex', alignItems: 'center', gap: 6, height: 40, padding: '0 16px',
+    background: enabled ? C.solid : C.panel,
+    color: enabled ? '#ffffff' : C.muted,
+    border: `1px solid ${enabled ? C.solid : C.hair}`, borderRadius: 10,
+    fontFamily: FONT, fontSize: 13, fontWeight: 600,
+    cursor: enabled ? 'pointer' : 'not-allowed',
+});
+
+/* ── Start-learning confirmation ── */
+const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
+    const C = palette(theme);
+    return ReactDOM.createPortal(
+        <Shell C={C} width={420} onClose={onClose}>
+            <Head
+                C={C}
+                icon={<Target size={20} />}
+                title="Start learning this skill?"
+                sub="It moves to In progress on your roadmap. You can undo this at any time."
+                onClose={onClose}
+            />
+            <div style={{ padding: '18px 20px' }}>
                 <div style={{
-                    display: 'flex', gap: '0.6rem',
-                    padding: '1rem 1.5rem',
-                    borderTop: `1px solid ${C.border}`,
-                    background: C.surface,
-                    justifyContent: 'flex-end',
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px',
+                    background: C.tint, border: `1px solid ${C.border}`, borderRadius: 10,
                 }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: '0.55rem 1.2rem',
-                            background: C.btnBg, color: C.text2,
-                            border: `1px solid ${C.border}`, borderRadius: '9px',
-                            fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        style={{
-                            padding: '0.55rem 1.4rem',
-                            background: 'var(--accent2)',
-                            color: '#ffffff',
-                            border: '1px solid var(--accent2)',
-                            borderRadius: '9px',
-                            fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
-                            boxShadow: 'none',
-                        }}
-                    >
-                        Yes, Start Learning
-                    </button>
+                    <span style={{ color: C.brand, display: 'flex', flexShrink: 0 }}><Terminal size={18} /></span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: C.ink, lineHeight: 1.4 }}>{skillName}</span>
                 </div>
             </div>
-        </div>,
+            <Foot C={C}>
+                <button type="button" style={btnGhost(C)} onClick={onClose}>Cancel</button>
+                <button type="button" style={btnSolid(C)} onClick={onConfirm}>
+                    <CheckCircle size={16} /> Start learning
+                </button>
+            </Foot>
+        </Shell>,
         document.body
     );
 };
 
-/* ── Certificate Modal ── */
+/* ── Mark-as-complete + certificate upload ── */
 const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
     const [file, setFile] = useState(null);
     const [dragOver, setDragOver] = useState(false);
     const [verified, setVerified] = useState(false);
     const [skipCert, setSkipCert] = useState(false);
     const fileInputRef = useRef(null);
-
-    // Use the app's actual theme value; only fall back to OS for 'system' mode
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const C = palette(theme);
 
     const handleFile = (f) => {
         if (f && (f.type === 'application/pdf' || f.type.startsWith('image/'))) {
-            setFile(f);
-            setVerified(false);
-            setSkipCert(false);
+            setFile(f); setVerified(false); setSkipCert(false);
         }
     };
-
-    const handleVerify = () => { if (file) setVerified(true); };
     const canConfirm = verified || skipCert;
-    const handleConfirm = () => { onConfirm(skillName, file); };
-
     const step = !file && !skipCert ? 1 : (file && !verified) ? 2 : 3;
-
-    const C = {
-        bg:       isDark ? '#0f1729' : '#ffffff',
-        surface:  isDark ? '#141f35' : '#f8fafc',
-        border:   isDark ? 'rgba(255,255,255,0.09)' : '#d7ebf5',
-        text1:    isDark ? '#f1f5f9' : '#072036',
-        text2:    isDark ? '#94a3b8' : '#475569',
-        muted:    isDark ? '#64748b' : '#94a3b8',
-        accent:   'var(--accent)',
-        accentBg: isDark ? 'rgba(4,92,154,0.22)' : '#EAF7FD',
-        accentBorder: isDark ? 'rgba(166,215,232,0.35)' : 'rgba(4,92,154,0.25)',
-        dropBg:   isDark ? '#111827' : '#f8fafc',
-        btnBg:    isDark ? '#1e2d48' : '#f1f5f9',
-    };
-
     const STEPS = ['Upload', 'Verify', 'Confirm'];
 
     return ReactDOM.createPortal(
-        <div
-            style={{
-                position: 'fixed', inset: 0,
-                background: 'rgba(0,0,0,0.65)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                zIndex: 99999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '1rem',
-                animation: 'fadeIn 0.18s ease',
-            }}
-            onClick={onClose}
-        >
-            <div
-                style={{
-                    background: C.bg,
-                    border: `1px solid ${C.border}`,
-                    borderRadius: '24px',
-                    width: '100%', maxWidth: '460px',
-                    overflow: 'hidden',
-                    boxShadow: isDark
-                        ? '0 40px 80px -20px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)'
-                        : '0 24px 60px -12px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)',
-                    position: 'relative',
-                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                    animation: 'slideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)',
-                }}
-                onClick={e => e.stopPropagation()}
-            >
-                {/* Accent gradient bar */}
-                <div style={{
-                    height: '4px',
-                    background: 'var(--accent)',
-                }} />
+        <Shell C={C} width={480} onClose={onClose}>
+            <Head
+                C={C}
+                icon={<CheckCircle size={20} />}
+                title="Mark this skill as completed"
+                sub={skillName}
+                onClose={onClose}
+            />
 
-                {/* Header */}
-                <div style={{
-                    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-                    padding: '1.4rem 1.5rem 1.1rem',
-                    borderBottom: `1px solid ${C.border}`,
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                        {/* Tag pill */}
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                            fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.1em',
-                            textTransform: 'uppercase', color: 'var(--accent)',
-                            background: C.accentBg,
-                            border: `1px solid ${C.accentBorder}`,
-                            padding: '0.22rem 0.6rem', borderRadius: '100px', width: 'fit-content',
-                        }}>
-                            <CheckCircle size={9} />
-                            Mark as Completed
-                        </div>
-                        {/* Skill name */}
-                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: C.text1, letterSpacing: '-0.02em', lineHeight: 1.3 }}>
-                            {skillName}
-                        </div>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            background: C.surface, border: `1px solid ${C.border}`,
-                            cursor: 'pointer', color: C.text2,
-                            padding: '0.4rem', borderRadius: '9px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'all 0.15s', flexShrink: 0, marginTop: '0.1rem',
-                        }}
-                    >
-                        <X size={15} />
-                    </button>
-                </div>
-
-                {/* Step Tracker */}
-                <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '1rem 1.5rem',
-                    background: C.surface,
-                    borderBottom: `1px solid ${C.border}`,
-                    gap: '0',
-                }}>
-                    {STEPS.map((s, i) => {
-                        const isActive = step === i + 1;
-                        const isDone   = step > i + 1;
-                        return (
-                            <React.Fragment key={s}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
-                                    <div style={{
-                                        width: '28px', height: '28px', borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        transition: 'all 0.25s',
-                                        background: isDone ? '#059669' : isActive ? 'var(--accent)' : C.btnBg,
-                                        border: isDone ? '2px solid #059669' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
-                                        boxShadow: isActive ? '0 0 0 4px rgba(4,92,154,0.15)' : 'none',
-                                    }}>
-                                        {isDone
-                                            ? <CheckCircle size={13} color="#fff" />
-                                            : <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isActive ? '#fff' : C.muted }}>{i + 1}</span>
-                                        }
-                                    </div>
-                                    <span style={{
-                                        fontSize: '0.65rem', fontWeight: 700,
-                                        color: isDone ? '#059669' : isActive ? C.text1 : C.muted,
-                                        transition: 'color 0.2s',
-                                    }}>
-                                        {s}
-                                    </span>
-                                </div>
-                                {i < 2 && (
-                                    <div style={{
-                                        width: '48px', height: '2px',
-                                        margin: '0 0.4rem',
-                                        marginBottom: '1.1rem',
-                                        background: step > i + 1 ? '#059669' : C.border,
-                                        transition: 'background 0.3s',
-                                        borderRadius: '2px',
-                                    }} />
-                                )}
-                            </React.Fragment>
-                        );
-                    })}
-                </div>
-
-                {/* Body */}
-                <div style={{ padding: '1.4rem 1.5rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                    {/* Drop Zone */}
-                    <div
-                        style={{
-                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#059669' : file ? 'rgba(16,185,129,0.5)' : C.border}`,
-                            borderRadius: '16px',
-                            padding: '2.2rem 1.5rem',
-                            textAlign: 'center', cursor: verified ? 'default' : 'pointer',
-                            transition: 'all 0.2s',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
-                            userSelect: 'none',
-                            background: verified
-                                ? 'rgba(16,185,129,0.06)'
-                                : dragOver
-                                    ? C.accentBg
-                                    : C.dropBg,
-                        }}
-                        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                        onDragLeave={() => setDragOver(false)}
-                        onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
-                        onClick={() => !verified && fileInputRef.current?.click()}
-                    >
-                        <input ref={fileInputRef} type="file" accept=".pdf,image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
-
-                        {verified ? (
-                            <>
+            {/* Steps */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 0, padding: '14px 20px', background: C.soft, borderBottom: `1px solid ${C.hair}` }}>
+                {STEPS.map((s, i) => {
+                    const active = step === i + 1;
+                    const done = step > i + 1;
+                    return (
+                        <React.Fragment key={s}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <div style={{
-                                    width: '52px', height: '52px', borderRadius: '50%',
-                                    background: 'rgba(16,185,129,0.12)',
-                                    border: '2px solid rgba(16,185,129,0.35)',
+                                    width: 24, height: 24, borderRadius: 999, flexShrink: 0,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: done ? C.green : active ? C.solid : C.panel,
+                                    border: `1px solid ${done ? C.green : active ? C.solid : C.hair}`,
+                                    color: done || active ? '#ffffff' : C.muted,
+                                    fontSize: 11, fontWeight: 700,
                                 }}>
-                                    <CheckCircle size={26} color="#059669" />
+                                    {done ? <CheckCircle size={13} /> : i + 1}
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669' }}>Certificate Verified</div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
-                            </>
-                        ) : file ? (
-                            <>
-                                <div style={{
-                                    width: '52px', height: '52px', borderRadius: '14px',
-                                    background: 'rgba(16,185,129,0.1)',
-                                    border: '1px solid rgba(16,185,129,0.3)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#059669',
-                                }}><FileText size={24} /></div>
-                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#059669' }}>{file.name}</div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
-                            </>
-                        ) : (
-                            <>
-                                <div style={{
-                                    width: '56px', height: '56px', borderRadius: '16px',
-                                    background: C.btnBg,
-                                    border: `1px solid ${C.border}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'all 0.2s',
-                                }}>
-                                    <Upload size={22} color={C.muted} />
-                                </div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.text1, lineHeight: 1.4 }}>
-                                    Drop your certificate here or{' '}
-                                    <span style={{ color: 'var(--accent)', fontWeight: 700 }}>browse files</span>
-                                </div>
-                                <div style={{ fontSize: '0.72rem', color: C.muted }}>PDF, JPG or PNG accepted</div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Action row */}
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
-                        {file && !verified && (
-                            <button
-                                onClick={handleVerify}
-                                style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                                    padding: '0.55rem 1.1rem',
-                                    background: C.accentBg, color: 'var(--accent)',
-                                    border: `1px solid ${C.accentBorder}`, borderRadius: '9px',
-                                    fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
-                                    transition: 'all 0.15s',
-                                }}
-                            >
-                                <CheckCircle size={13} /> Verify Certificate
-                            </button>
-                        )}
-                        {!skipCert && !verified && (
-                            <button
-                                onClick={() => setSkipCert(true)}
-                                style={{
-                                    display: 'inline-flex', alignItems: 'center',
-                                    padding: '0.55rem 1rem',
-                                    background: 'transparent', color: C.text2,
-                                    border: `1px solid ${C.border}`, borderRadius: '9px',
-                                    fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer',
-                                    transition: 'all 0.15s',
-                                }}
-                            >
-                                Skip - Mark Without Certificate
-                            </button>
-                        )}
-                        {skipCert && (
-                            <div style={{
-                                fontSize: '0.74rem', color: '#f59e0b',
-                                padding: '0.45rem 0.8rem',
-                                background: 'rgba(245,158,11,0.08)',
-                                border: '1px solid rgba(245,158,11,0.22)',
-                                borderRadius: '9px',
-                                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                            }}>
-                                <AlertTriangle size={14} /> Marking as complete without a certificate
+                                <span style={{ fontSize: 12.5, fontWeight: active || done ? 600 : 500, color: done ? C.green : active ? C.ink : C.muted }}>{s}</span>
                             </div>
-                        )}
+                            {i < STEPS.length - 1 && (
+                                <div style={{ flex: 1, height: 1, margin: '0 12px', background: step > i + 1 ? C.green : C.hair }} />
+                            )}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div
+                    style={{
+                        border: `1px dashed ${dragOver ? C.solid : verified ? C.green : file ? C.border : C.hair}`,
+                        borderRadius: 12, padding: '28px 20px', textAlign: 'center',
+                        cursor: verified ? 'default' : 'pointer', userSelect: 'none',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                        background: verified ? 'rgba(5,150,105,0.06)' : dragOver ? C.tint : C.soft,
+                        transition: 'border-color 0.15s, background 0.15s',
+                    }}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+                    onClick={() => !verified && fileInputRef.current?.click()}
+                >
+                    <input ref={fileInputRef} type="file" accept=".pdf,image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+                    <div style={{
+                        width: 40, height: 40, borderRadius: 10,
+                        background: verified ? 'rgba(5,150,105,0.12)' : file ? 'rgba(5,150,105,0.1)' : C.panel,
+                        border: `1px solid ${verified || file ? 'rgba(5,150,105,0.3)' : C.hair}`,
+                        color: verified || file ? C.green : C.muted,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        {verified ? <CheckCircle size={20} /> : file ? <FileText size={20} /> : <Upload size={20} />}
                     </div>
+                    {verified ? (
+                        <>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: C.green }}>Certificate verified</div>
+                            <div style={{ fontSize: 12, color: C.muted, maxWidth: 280, wordBreak: 'break-all' }}>{file.name}</div>
+                        </>
+                    ) : file ? (
+                        <>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, maxWidth: 320, wordBreak: 'break-all' }}>{file.name}</div>
+                            <div style={{ fontSize: 12, color: C.muted }}>{(file.size / 1024).toFixed(1)} KB · click to change</div>
+                        </>
+                    ) : (
+                        <>
+                            <div style={{ fontSize: 14, fontWeight: 500, color: C.ink, lineHeight: 1.5 }}>
+                                Drop your certificate here or <span style={{ color: C.brand, fontWeight: 600 }}>browse files</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: C.muted }}>PDF, JPG or PNG</div>
+                        </>
+                    )}
                 </div>
 
-                {/* Footer */}
-                <div style={{
-                    display: 'flex', gap: '0.65rem',
-                    padding: '1rem 1.5rem',
-                    borderTop: `1px solid ${C.border}`,
-                    justifyContent: 'flex-end',
-                    background: C.surface,
-                }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: '0.6rem 1.3rem',
-                            background: C.btnBg, color: C.text2,
-                            border: `1px solid ${C.border}`, borderRadius: '10px',
-                            fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
-                            transition: 'all 0.15s',
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleConfirm}
-                        disabled={!canConfirm}
-                        style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
-                            padding: '0.6rem 1.4rem',
-                            background: canConfirm ? 'var(--accent2)' : C.btnBg,
-                            color: canConfirm ? '#ffffff' : C.muted,
-                            border: canConfirm ? '1px solid var(--accent2)' : `1px solid ${C.border}`,
-                            borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700,
-                            transition: 'all 0.2s',
-                            cursor: canConfirm ? 'pointer' : 'not-allowed',
-                            boxShadow: 'none',
-                        }}
-                    >
-                        <CheckCircle size={14} />
-                        {verified ? 'Complete with Certificate' : 'Mark as Completed'}
-                    </button>
+                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                    {file && !verified && (
+                        <button type="button" style={{ ...btnGhost(C), height: 36, color: C.brand, borderColor: C.border, background: C.tint }} onClick={() => setVerified(true)}>
+                            <CheckCircle size={15} /> Verify certificate
+                        </button>
+                    )}
+                    {!skipCert && !verified && (
+                        <button type="button" style={{ ...btnGhost(C), height: 36 }} onClick={() => setSkipCert(true)}>
+                            Continue without a certificate
+                        </button>
+                    )}
+                    {skipCert && (
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            padding: '8px 12px', borderRadius: 8,
+                            background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)',
+                            fontSize: 12.5, fontWeight: 500, color: C.amber,
+                        }}>
+                            <AlertTriangle size={15} /> Marking as complete without a certificate
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>,
+
+            <Foot C={C}>
+                <button type="button" style={btnGhost(C)} onClick={onClose}>Cancel</button>
+                <button type="button" style={btnSolid(C, canConfirm)} disabled={!canConfirm} onClick={() => onConfirm(skillName, file)}>
+                    <CheckCircle size={16} />
+                    {verified ? 'Complete with certificate' : 'Mark as completed'}
+                </button>
+            </Foot>
+        </Shell>,
         document.body
     );
 };
