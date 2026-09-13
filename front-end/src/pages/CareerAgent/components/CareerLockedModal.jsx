@@ -154,7 +154,7 @@ const CareerLockedModal = ({ isOpen, onClose, lockStatus }) => {
                                     padding: '0.25rem 0.75rem', borderRadius: '999px',
                                     background: c.badgeBg
                                 }}>
-                                    ✅ {t('career_locked.badge', 'Path Finalized')}
+                                    <CheckCircle size={13} style={{ marginRight: 4, verticalAlign: '-2px' }} /> {t('career_locked.badge', 'Path Finalized')}
                                 </span>
                             </motion.div>
 

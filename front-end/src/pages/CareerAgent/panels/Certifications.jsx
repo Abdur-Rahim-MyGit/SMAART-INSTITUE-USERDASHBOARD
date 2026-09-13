@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Award, BookOpen, Star, AlertCircle, RefreshCw, Cpu, BrainCircuit, Building2 } from '@/components/icons';
+import { Award, BookOpen, Star, AlertCircle, RefreshCw, Cpu, BrainCircuit, Building2, GraduationCap } from '@/components/icons';
 
 // ─── Category config ───────────────────────────────────────────────────────────
 const CATS = [
@@ -275,7 +275,7 @@ const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
       {/* No data */}
       {!loading && !error && total === 0 && (
         <div style={{ textAlign: 'center', minHeight: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
-          <div style={{ fontSize: '2.5rem', opacity: 0.25 }}>🎓</div>
+          <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--muted)', opacity: 0.6 }}><GraduationCap size={40} /></div>
           <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>No certifications found for this career path.</p>
         </div>
       )}

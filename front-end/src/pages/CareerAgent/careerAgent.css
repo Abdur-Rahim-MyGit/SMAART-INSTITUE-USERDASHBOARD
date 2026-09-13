@@ -8,31 +8,33 @@
   --navy:   #ffffff;
   --navy2:  #F8FAFC;
   --navy3:  #F1F5F9;
-  --accent: #1a3884;
-  --accent-text: #1a3884;
-  --accent2:#132c6b;
-  --accent3:#2a4d9e;
-  --accent-rgb: 26, 56, 132;
-  --accent-tint: rgba(26, 56, 132, 0.08);
-  --accent-border: rgba(26, 56, 132, 0.15);
-  --green:  #10b981;
-  --amber:  #f59e0b;
-  --red:    #ef4444;
-  --text:   #0F172A;
-  --text1:  #0F172A;
-  --text2:  #334155;
-  --muted:  #64748B;
-  --border: rgba(0,0,0,0.08);
-  --border2:rgba(0,0,0,0.12);
+  /* Legacy dashboard tokens — remapped onto the corporate palette used by
+     My Courses / Dashboard Home so every report panel inherits it. */
+  --accent: #045C9A;
+  --accent-text: #045C9A;
+  --accent2:#072036;
+  --accent3:#0d3a5f;
+  --accent-rgb: 4, 92, 154;
+  --accent-tint: #EAF7FD;
+  --accent-border: rgba(4, 92, 154, 0.25);
+  --green:  #059669;
+  --amber:  #d97706;
+  --red:    #dc2626;
+  --text:   #072036;
+  --text1:  #072036;
+  --text2:  #35566b;
+  --muted:  #64748b;
+  --border: #d7ebf5;
+  --border2:#cfe3ee;
   --card:   #ffffff;
   --card2:  #F8FAFC;
   --header-bg: #ffffff;
-  --header-border: rgba(0,0,0,0.08);
+  --header-border: #d7ebf5;
   --sidebar-bg: #ffffff;
-  --sidebar-hover: rgba(26, 56, 132, 0.06);
+  --sidebar-hover: #F8FAFC;
   --tooltip-bg: #ffffff;
   --card-bg: #ffffff;
-  --card-hover: rgba(26, 56, 132, 0.04);
+  --card-hover: #F8FAFC;
   --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* ── Onboarding (corporate) tokens — lifted from My Courses / Dashboard Home ── */
@@ -60,13 +62,13 @@
   --navy2:  #00152E; /* Unified with sidebar for a clean look */
   --navy3:  #001f44;
   --navy4:  #002a5c;
-  --accent: #1a3884; /* Deep Navy accent for consistent theme */
-  --accent-text: #60a5fa; /* Lighter blue for readable text/icons */
-  --accent2:#132c6b;
-  --accent3:#2a4d9e;
-  --accent-rgb: 26, 56, 132;
-  --accent-tint: rgba(26, 56, 132, 0.25);
-  --accent-border: rgba(26, 56, 132, 0.4);
+  --accent: #045C9A;
+  --accent-text: #A6D7E8; /* Lighter brand blue for readable text/icons */
+  --accent2:#072036;
+  --accent3:#0d3a5f;
+  --accent-rgb: 4, 92, 154;
+  --accent-tint: rgba(4, 92, 154, 0.22);
+  --accent-border: rgba(166, 215, 232, 0.35);
   --text:   #f8fafc;
   --text1:  #f8fafc;
   --text2:  #e2e8f0;
@@ -139,7 +141,7 @@
   flex-shrink: 0;
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
-  padding: 1rem 2rem 0;
+  padding: 18px 28px 0;
   transition: background 0.2s ease;
 }
 
@@ -148,42 +150,53 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
+.career-agent-page .dash-title-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
 .career-agent-page .dash-name {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.022em;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--text1);
 }
 
-.career-agent-page .dash-name span {
-  color: var(--accent-text);
-}
+.career-agent-page .dash-name span { color: var(--accent-text); }
 
 .career-agent-page .dash-meta {
-  font-size: 0.75rem;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--muted);
-  margin-top: 0.2rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 8px;
   flex-wrap: wrap;
 }
+.career-agent-page .dash-meta .dash-meta-name { color: var(--text2); font-weight: 600; }
+.career-agent-page .dash-meta .dash-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); display: inline-block; }
 
 .career-agent-page .dash-actions {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 8px;
   flex-shrink: 0;
 }
+
+.career-agent-page .btn-icon {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--card); border: 1px solid var(--border); color: var(--text2);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.career-agent-page .btn-icon:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-tint); }
 
 /* ── Role Tabs Bar ── */
 .career-agent-page .role-tabs-bar {
   display: flex;
-  gap: 0;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -192,35 +205,33 @@
 
 .career-agent-page .rtab {
   flex-shrink: 0;
-  padding: 0.7rem 1.4rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 10px 14px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
   color: var(--muted);
   border: none;
-  border-bottom: 2.5px solid transparent;
+  border-bottom: 2px solid transparent;
   background: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: color 0.15s, border-color 0.15s;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 8px;
   line-height: 1.2;
-  max-width: 300px;
+  max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.career-agent-page .rtab:hover {
-  color: var(--text2);
-  background: var(--sidebar-hover);
+.career-agent-page .rtab .rtab-k {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--muted); padding: 2px 6px; border-radius: 4px; background: var(--card2);
+  border: 1px solid var(--border); flex-shrink: 0;
 }
-
-.career-agent-page .rtab.active {
-  color: var(--text1);
-  border-bottom-color: var(--accent);
-  font-weight: 700;
-}
+.career-agent-page .rtab:hover { color: var(--text1); }
+.career-agent-page .rtab.active { color: var(--accent-text); border-bottom-color: var(--accent); font-weight: 600; }
+.career-agent-page .rtab.active .rtab-k { color: var(--accent-text); background: var(--accent-tint); border-color: var(--accent-border); }
 
 /* ── Body layout — sidebar + main ── */
 .career-agent-page .dash-body {
@@ -232,7 +243,7 @@
 
 /* ── Sidebar ── */
 .career-agent-page .sidebar {
-  width: 220px;
+  width: 248px;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
   background: var(--sidebar-bg);
@@ -250,102 +261,104 @@
 
 /* Sidebar header with role indicator */
 .career-agent-page .sb-header {
-  padding: 1.25rem 1.1rem;
+  padding: 18px 16px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(to bottom, var(--navy2), transparent);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.career-agent-page .sb-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
 }
 
 .career-agent-page .sb-role-indicator {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 10px;
 }
 
 .career-agent-page .sb-role-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.career-agent-page .sb-role-dot.green { background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,0.6); }
-.career-agent-page .sb-role-dot.amber { background: var(--amber); box-shadow: 0 0 8px rgba(245,158,11,0.6); }
-.career-agent-page .sb-role-dot.red   { background: var(--red);   box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+.career-agent-page .sb-role-dot.green { background: var(--green); }
+.career-agent-page .sb-role-dot.amber { background: var(--amber); }
+.career-agent-page .sb-role-dot.red   { background: var(--red); }
 
 .career-agent-page .sb-role-name {
-  font-size: 0.82rem;
-  font-weight: 750;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.015em;
+}
+.career-agent-page .sb-role-dir {
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* Sidebar nav items */
 .career-agent-page .sidebar-nav {
   flex: 1;
-  padding: 0.75rem 0.5rem;
+  padding: 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 2px;
 }
+.career-agent-page .sidebar-nav .sb-label { padding: 4px 12px 8px; }
 
 .career-agent-page .sitem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.9rem;
-  margin: 0 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 550;
-  color: var(--muted);
+  gap: 10px;
+  height: 40px;
+  padding: 0 12px;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: var(--font);
+  color: var(--text2);
   background: transparent;
   border: none;
   border-radius: 10px;
-  width: calc(100% - 0.8rem);
+  width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.career-agent-page .sitem:hover {
-  color: var(--text1);
-  background: var(--sidebar-hover);
-}
+.career-agent-page .sitem:hover { color: var(--text1); background: var(--sidebar-hover); }
 
 .career-agent-page .sitem.active {
   color: #ffffff;
-  background: var(--accent);
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+  background: var(--accent2);
+  font-weight: 600;
+  box-shadow: none;
 }
 
 :is(.dark) .career-agent-page .sitem.active {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--accent);
   color: #ffffff;
   box-shadow: none;
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.career-agent-page .sitem.active .si-icon-wrap {
-  color: #ffffff;
-}
-
-:is(.dark) .career-agent-page .sitem.active .si-icon-wrap {
-  color: var(--accent);
-}
+.career-agent-page .sitem.active .si-icon-wrap { color: #ffffff; }
 
 .career-agent-page .si-icon-wrap {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: inherit;
-  transition: color 0.2s ease;
+  color: var(--muted);
+  transition: color 0.15s ease;
 }
+.career-agent-page .sitem:hover .si-icon-wrap { color: var(--accent-text); }
 
 /* Sidebar footer — account status */
 .career-agent-page .sidebar-footer {
@@ -357,53 +370,80 @@
 /* ── Main content area ── */
 .career-agent-page .dash-main {
   flex: 1;
-  padding: 1.6rem 3%;
+  padding: 24px 28px 40px;
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
-  background: var(--navy2);
+  background: transparent;
 }
+.career-agent-page .dash-main .panel { padding: 0; }
+
+/* Standard panel header — 40px icon tile + title + subtitle */
+.career-agent-page .ph {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.career-agent-page .ph-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.career-agent-page .ph-tile {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: var(--accent-tint); color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+}
+.career-agent-page .ph-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.career-agent-page .ph h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--text1); line-height: 1.25; margin: 0; }
+.career-agent-page .ph p { font-size: 13px; font-weight: 500; color: var(--muted); margin: 0; line-height: 1.5; }
+.career-agent-page .ph p strong { color: var(--text2); font-weight: 600; }
+.career-agent-page .ph-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* Neutral status chip (matches onboarding .ob-chip) */
+.career-agent-page .dchip {
+  display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px;
+  background: var(--card2); border: 1px solid var(--border); color: var(--text2);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;
+}
+.career-agent-page .dchip.brand { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent-text); }
+.career-agent-page .dchip.ok { background: rgba(5,150,105,0.08); border-color: rgba(5,150,105,0.25); color: var(--green); }
 
 /* ───────────────────────────────────────────────────────────────
    BUTTON STYLES
    ─────────────────────────────────────────────────────────────── */
 
 .career-agent-page .btn-ghost {
-  background: transparent;
-  border: 1.5px solid var(--border2);
+  display: inline-flex; align-items: center; gap: 8px; height: 40px;
+  background: var(--card);
+  border: 1px solid var(--border);
   color: var(--text2);
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
   font-family: var(--font);
 }
 .career-agent-page .btn-ghost:hover {
-  background: var(--navy3);
+  background: var(--accent-tint);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .career-agent-page .btn-primary {
-  background: var(--accent);
+  display: inline-flex; align-items: center; gap: 8px; height: 40px;
+  background: var(--accent2);
   color: #fff;
   border: none;
-  padding: 0.55rem 1.4rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.18s;
+  transition: background 0.15s, opacity 0.15s;
   font-family: var(--font);
-  box-shadow: 0 4px 14px rgba(37,99,235,0.25);
+  box-shadow: none;
 }
-.career-agent-page .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37,99,235,0.35);
-}
+.career-agent-page .btn-primary:hover:not(:disabled) { background: var(--accent3); transform: none; box-shadow: none; }
+:is(.dark) .career-agent-page .btn-primary { background: var(--accent); }
+:is(.dark) .career-agent-page .btn-primary:hover:not(:disabled) { background: #0b6fb8; }
 
 /* ───────────────────────────────────────────────────────────────
    PANEL CARDS & DATA COMPONENTS
@@ -419,47 +459,38 @@
 .career-agent-page .overview-hero {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.4rem;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .career-agent-page .oh-card {
-  border-radius: 14px;
-  padding: 1.25rem 1.4rem;
+  border-radius: 16px;
+  padding: 18px 20px;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 8px;
   background: var(--card);
   border: 1px solid var(--border);
 }
 
-.career-agent-page .oh-card.zone-primary {
-  background: linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));
-  border: 1px solid rgba(245,158,11,.25);
-}
-.career-agent-page .oh-card.zone-green-card {
-  background: linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.04));
-  border: 1px solid rgba(16,185,129,.25);
-}
-.career-agent-page .oh-card.zone-red-card {
-  background: linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.03));
-  border: 1px solid rgba(239,68,68,.2);
-}
+.career-agent-page .oh-card.zone-primary   { border-color: rgba(217,119,6,0.3); }
+.career-agent-page .oh-card.zone-green-card { border-color: rgba(5,150,105,0.3); }
+.career-agent-page .oh-card.zone-red-card   { border-color: rgba(220,38,38,0.3); }
 
 .career-agent-page .oh-card-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .career-agent-page .oh-pct {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1;
   color: var(--text1);
 }
@@ -471,37 +502,37 @@
 .career-agent-page .ri-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.1rem 1.2rem;
-  transition: border-color 0.2s;
+  border-radius: 16px;
+  padding: 20px;
+  transition: border-color 0.15s;
 }
 .career-agent-page .ri-card:hover { border-color: var(--border2); }
 
 .career-agent-page .ri-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 0.45rem;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 6px;
 }
 
 /* ML Score card */
 .career-agent-page .ml-score-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.3rem 1.5rem;
-  margin-bottom: 1rem;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
 }
 
 .career-agent-page .ml-score-num {
-  font-size: 2.5rem;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 .career-agent-page .ml-score-num.amber-clr { color: var(--amber); }
@@ -512,12 +543,12 @@
 .career-agent-page .region-box {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  padding: 18px 20px;
 }
-.career-agent-page .rb-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
-.career-agent-page .rb-stat { display: flex; flex-direction: column; gap: 0.25rem; }
-.career-agent-page .rb-stat-num { font-size: 0.85rem; font-weight: 600; color: var(--text1); }
+.career-agent-page .rb-stats { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; }
+.career-agent-page .rb-stat { display: flex; flex-direction: column; gap: 4px; }
+.career-agent-page .rb-stat-num { font-size: 14px; font-weight: 600; color: var(--text1); }
 
 /* ───────────────────────────────────────────────────────────────
    MODAL
@@ -1296,63 +1327,113 @@
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ── Direction Overview Panel Role Cards ── */
+/* ── Direction panels: shared card vocabulary (Direction Overview + Recommended) ── */
+.career-agent-page .dp { display: flex; flex-direction: column; gap: 16px; }
+.career-agent-page .dp-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px;
+}
+.career-agent-page .dp-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.career-agent-page .dp-tile {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: var(--accent-tint); color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+}
+.career-agent-page .dp-card-title { font-size: 15px; font-weight: 600; color: var(--text1); line-height: 1.3; }
+.career-agent-page .dp-card-sub { font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+.career-agent-page .dp-rule { height: 1px; background: var(--border); margin: 0 0 14px; }
+.career-agent-page .dp-text { font-size: 14px; line-height: 1.7; color: var(--text2); margin: 0; }
+.career-agent-page .dp-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
+}
+.career-agent-page .dp-eyebrow::before { content: ""; width: 3px; height: 12px; border-radius: 2px; background: var(--accent); }
+.career-agent-page .dp-eyebrow .dp-eyebrow-rule { flex: 1; height: 1px; background: var(--border); }
+.career-agent-page .dp-title-wrap { display: flex; flex-direction: column; gap: 8px; }
+.career-agent-page .dp-dir-name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--text1); line-height: 1.25; margin: 0; }
+.career-agent-page .dp-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
 .career-agent-page .dir-roles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
 }
 
 .career-agent-page .dir-role-card {
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 1.1rem;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+  border-radius: 10px;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: default;
+  box-shadow: none;
+  text-align: left;
+  font-family: var(--font);
+  width: 100%;
+  color: var(--text1);
 }
-
-.career-agent-page .dir-role-card:hover {
-  border-color: var(--accent);
-  background: var(--card);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.08);
-}
+.career-agent-page .dir-role-card.clickable { cursor: pointer; }
+.career-agent-page .dir-role-card.clickable:hover { border-color: var(--accent); transform: none; box-shadow: none; }
+.career-agent-page .dir-role-card.selected { border-color: var(--accent); background: var(--accent-tint); box-shadow: inset 0 0 0 1px var(--accent); }
+.career-agent-page .dir-role-card.current { border-color: var(--accent-border); background: var(--accent-tint); }
 
 .career-agent-page .dir-role-card-number {
   flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--accent-tint);
-  border: 1px solid var(--accent-border);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--card2);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--accent);
-  transition: all 0.25s ease;
-}
-
-.career-agent-page .dir-role-card:hover .dir-role-card-number {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-  box-shadow: 0 3px 8px rgba(var(--accent-rgb), 0.2);
-}
-
-.career-agent-page .dir-role-card-name {
-  font-size: 0.85rem;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text1);
+  color: var(--text2);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.career-agent-page .dir-role-card.selected .dir-role-card-number,
+.career-agent-page .dir-role-card.current .dir-role-card-number { background: var(--accent); color: #fff; border-color: var(--accent); }
+.career-agent-page .dir-role-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.career-agent-page .dir-role-card-name { font-size: 14px; font-weight: 600; color: var(--text1); line-height: 1.3; }
+.career-agent-page .dir-role-card-desc { font-size: 12.5px; line-height: 1.5; color: var(--text2); }
+.career-agent-page .dir-role-card-desc.muted { color: var(--muted); font-style: italic; }
+.career-agent-page .dir-role-card-family { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent-text); }
+.career-agent-page .dir-role-caret { color: var(--muted); flex-shrink: 0; align-self: center; transition: transform 0.2s; }
+.career-agent-page .dir-role-card.selected .dir-role-caret { transform: rotate(180deg); color: var(--accent-text); }
+.career-agent-page .dir-role-skel {
+  display: block; height: 10px; width: 80%; border-radius: 6px; margin-top: 4px;
+  background: linear-gradient(90deg, var(--card2) 25%, var(--border) 50%, var(--card2) 75%);
+  background-size: 200% 100%; animation: ob-shimmer 1.2s infinite;
 }
 
-/* Onboarding Step Progress Indicator — one slim strip (desktop) */
+/* Expanded role detail (role-profile sections) */
+.career-agent-page .dir-role-detail {
+  margin-top: 12px; padding: 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--card2);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.career-agent-page .dir-role-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.career-agent-page .dir-role-detail-title { font-size: 16px; font-weight: 700; color: var(--text1); letter-spacing: -0.01em; }
+.career-agent-page .dir-role-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.career-agent-page .dir-role-section {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.career-agent-page .dir-role-section-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text1); }
+.career-agent-page .dir-role-section-head .ic { color: var(--accent-text); display: flex; }
+.career-agent-page .dir-role-section p { font-size: 13.5px; line-height: 1.65; color: var(--text2); margin: 0; }
+.career-agent-page .dir-role-section p.muted { color: var(--muted); font-style: italic; }
+.career-agent-page .dir-role-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.career-agent-page .dir-role-stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.career-agent-page .dir-role-stat-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.career-agent-page .dir-role-stat-v { font-size: 13px; font-weight: 600; color: var(--text1); }
+@media (max-width: 900px) {
+  .career-agent-page .dir-role-detail-grid { grid-template-columns: 1fr; }
+  .career-agent-page .dir-role-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 .onboard-progress-container {
   margin: 0;
 }
@@ -1826,46 +1907,42 @@
 .career-agent-page .ob-role-desc { font-size: 13px; }
 
 /* ── Recommended Directions panel (report page) — always open, before & after locking ── */
-.career-agent-page .rec-count-chip {
-  display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 6px;
-  background: var(--accent-tint); color: var(--accent-text);
-  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
-}
 .career-agent-page .rec-empty {
-  padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem;
-  background: var(--navy2); border: 1px dashed var(--border2); border-radius: 14px;
+  padding: 32px 24px; text-align: center; color: var(--muted); font-size: 14px; font-weight: 500;
+  background: var(--card); border: 1px dashed var(--border2); border-radius: 16px;
 }
-.career-agent-page .rec-dir-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.career-agent-page .rec-strip {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 10px;
+  background: var(--accent-tint); border: 1px solid var(--accent-border); color: var(--text2);
+  font-size: 13px; font-weight: 500; line-height: 1.5;
+}
+.career-agent-page .rec-strip .ic { color: var(--accent-text); display: flex; flex-shrink: 0; }
+.career-agent-page .rec-dir-list { display: flex; flex-direction: column; gap: 12px; }
 .career-agent-page .rec-dir-card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  transition: border-color 0.15s;
 }
 .career-agent-page .rec-dir-card:hover { border-color: var(--border2); }
-.career-agent-page .rec-dir-card.open { border-color: var(--accent-border); box-shadow: 0 6px 20px rgba(0,0,0,0.05); }
-.career-agent-page .rec-dir-card.chosen { border-color: rgba(16,185,129,0.35); }
+.career-agent-page .rec-dir-card.open { border-color: var(--accent-border); }
 .career-agent-page .rec-dir-head {
-  width: 100%; display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.1rem;
+  width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px 20px;
   background: transparent; border: none; cursor: pointer; text-align: left; font-family: var(--font); color: var(--text1);
 }
 .career-agent-page .rec-dir-num {
-  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  background: var(--accent-tint); border: 1px solid var(--accent-border);
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: var(--accent-tint); color: var(--accent-text);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.72rem; font-weight: 800; color: var(--accent-text);
+  font-size: 13px; font-weight: 700;
 }
-.career-agent-page .rec-dir-titlewrap { flex: 1; min-width: 0; }
-.career-agent-page .rec-dir-title { font-size: 0.95rem; font-weight: 700; color: var(--text1); }
-.career-agent-page .rec-dir-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-.career-agent-page .rec-dir-chip {
-  display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px;
-  background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: var(--green);
-  font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
-}
+.career-agent-page .rec-dir-titlewrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.career-agent-page .rec-dir-title { font-size: 15px; font-weight: 600; color: var(--text1); line-height: 1.3; }
+.career-agent-page .rec-dir-meta { font-size: 12px; font-weight: 500; color: var(--muted); }
 .career-agent-page .rec-dir-caret { color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
 .career-agent-page .rec-dir-card.open .rec-dir-caret { transform: rotate(180deg); }
-.career-agent-page .rec-dir-body { padding: 0.9rem 1.1rem 1.1rem 3.35rem; border-top: 1px solid var(--border); }
-.career-agent-page .rec-dir-desc { font-size: 0.86rem; line-height: 1.65; color: var(--text2); margin: 0 0 0.9rem; }
-.career-agent-page .rec-dir-roles-label {
-  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem;
+.career-agent-page .rec-dir-body { padding: 0 20px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; }
+.career-agent-page .rec-dir-body > :first-child { margin-top: 16px; }
+.career-agent-page .rec-dir-desc { font-size: 14px; line-height: 1.7; color: var(--text2); margin: 0; }
+@media (max-width: 768px) {
+  .career-agent-page .rec-dir-head { padding: 14px 16px; }
+  .career-agent-page .rec-dir-body { padding: 0 16px 16px; }
 }
-@media (max-width: 768px) { .career-agent-page .rec-dir-body { padding-left: 1.1rem; } }

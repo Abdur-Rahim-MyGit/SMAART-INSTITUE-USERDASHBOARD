@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight } from '@/components/icons';
+import { ChevronRight, Briefcase, UserCheck, FileText } from '@/components/icons';
 
 /**
  * RoleDetailedView
@@ -170,7 +170,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
             {/* ── Error / no data ── */}
             {error ? (
                 <div style={styles.emptyWrap}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📂</div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: 'var(--muted)' }}><FileText size={40} /></div>
                     <h3 style={{ color: 'var(--text2)', marginBottom: '0.5rem' }}>
                         No Detailed Data for "{selectedRole}"
                     </h3>
@@ -187,7 +187,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                         {/* BOX 1 – What This Role Actually Does */}
                         <div style={styles.box}>
                             <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>🏛️</span>
+                                <span style={styles.boxIconWrap}><Briefcase size={20} /></span>
                                 <div style={styles.boxTitle}>What This Role Actually Does</div>
                             </div>
                             <div style={styles.boxDivider} />
@@ -202,7 +202,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                         {/* BOX 2 – Who Should Consider This Role */}
                         <div style={styles.box}>
                             <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>🧑‍💼</span>
+                                <span style={styles.boxIconWrap}><UserCheck size={20} /></span>
                                 <div style={styles.boxTitle}>Who Should Consider This Role</div>
                             </div>
                             <div style={styles.boxDivider} />
@@ -265,7 +265,7 @@ const styles = {
     boxHeader: {
         display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem',
     },
-    boxIconWrap: { fontSize: '1.4rem' },
+    boxIconWrap: { width: 40, height: 40, borderRadius: 10, background: 'var(--accent-tint)', color: 'var(--accent-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     boxTitle: {
         fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent)',
     },

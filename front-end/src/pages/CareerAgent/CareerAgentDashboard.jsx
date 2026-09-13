@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import NeuralBackground from '@/components/ui/NeuralBackground';
 import RoleDetailedView from './panels/RoleDetailedView';
 import DirectionOverview from './panels/DirectionOverview';
+import RecommendedDirections from './panels/RecommendedDirections';
 import MarketIntelligence from './panels/MarketIntelligence';
 import SkillsPanel from './panels/SkillsPanel';
 import AIImplementation from './panels/AIImplementation';
@@ -26,27 +27,36 @@ import {
     Dna,
     Map,
     Award,
-    Rocket,
-    Bot,
     Mic,
     FileText,
-    Code,
     Lock,
-    Unlock,
-    CheckCircle,
-    Trophy,
-    Medal,
-    Target,
     Sparkles,
     Sun,
     Moon,
-    Monitor,
     ChevronDown,
     X,
-    Menu,
     RefreshCw,
-    Star
+    Star,
+    IconArrowLeft,
+    Wrench,
+    MapPin
 } from '@/components/icons';
+
+/* Standard panel header: 40px icon tile + title + subtitle (+ optional right slot) */
+const PanelHead = ({ icon, title, subtitle, right }) => (
+    <div className="ph">
+        <div className="ph-left">
+            <div className="ph-tile">{icon}</div>
+            <div className="ph-text">
+                <h2>{title}</h2>
+                {subtitle && <p>{subtitle}</p>}
+            </div>
+        </div>
+        {right && <div className="ph-right">{right}</div>}
+    </div>
+);
+const HIDDEN_PANELS = ['interview', 'resume'];
+
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -68,7 +78,6 @@ const CareerAgentDashboard = () => {
     // explore, before and after locking (the 3 chosen paths are a subset).
     const [recommended, setRecommended] = useState([]);
     const [recommendedLoading, setRecommendedLoading] = useState(true);
-    const [expandedRec, setExpandedRec] = useState(null);
     useEffect(() => {
         let cancelled = false;
         fetch('/api/career-agent/my-recommended-directions', { credentials: 'include' })
@@ -340,9 +349,10 @@ const CareerAgentDashboard = () => {
         { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} stroke={1.5} /> },
         { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} stroke={1.5} /> },
         { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} stroke={1.5} /> },
+        // Hidden for now (kept wired so they can be re-enabled by removing them from HIDDEN_PANELS)
         { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} stroke={1.5} /> },
         { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} stroke={1.5} /> }
-    ];
+    ].filter(p => !HIDDEN_PANELS.includes(p.id));
 
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
     const isCareerLocked = lockStatus?.isLocked ?? false;
@@ -425,46 +435,38 @@ const CareerAgentDashboard = () => {
 
             <header className="dash-header">
                 <div className="dash-top">
-                    <div>
+                    <div className="dash-title-wrap">
                         <div className="dash-name">{t('career_agent.header.title_start', 'Career ')}<span>{t('career_agent.header.title_span', 'Intelligence')}</span>{t('career_agent.header.title_end', ' Report')}</div>
                         <div className="dash-meta">
-                            <span>{t('career_agent.header.candidate', 'CANDIDATE:')} {displayName}</span>
-                            <span>|</span>
-                            <span>{displayEmail}</span>
+                            <span className="dash-meta-name">{displayName}</span>
+                            {displayEmail && <><span className="dash-meta-sep" /><span>{displayEmail}</span></>}
+                            {isCareerLocked && <><span className="dash-meta-sep" /><span className="dchip ok"><Lock size={13} /> {t('career_agent.header.path_locked', 'Paths locked')}</span></>}
                         </div>
                     </div>
                     <div className="dash-actions">
-                        <button
-                            className="btn-ghost"
-                            onClick={() => navigate('/dashboard')}
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid var(--border)' }}
-                        >
-                            <span className="hide-mobile">{t('career_agent.header.back', '← Back to Dashboard')}</span>
-                            <span className="show-mobile-inline">← {t('common.back', 'Back')}</span>
+                        <button className="btn-ghost" onClick={() => navigate('/dashboard')}>
+                            <IconArrowLeft size={18} />
+                            <span className="hide-mobile">{t('career_agent.header.back_plain', 'Back to Dashboard')}</span>
+                            <span className="show-mobile-inline">{t('common.back', 'Back')}</span>
                         </button>
 
                         <button
-                            onClick={() => {
-                                const next = theme === 'light' ? 'dark' : 'light';
-                                setTheme(next);
-                            }}
-                            title="Toggle Theme"
-                            className={`flex items-center justify-center w-[38px] h-[38px] rounded-full border transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 ${theme === 'dark'
-                                    ? 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:border-white/20 hover:text-white'
-                                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-[#1a3884]/30 hover:text-[#1a3884]'
-                                }`}
+                            type="button"
+                            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                            title="Toggle theme"
+                            className="btn-icon"
                         >
-                            {theme === 'dark' ? <Sun size={20} stroke={1.5} /> : <Moon size={20} stroke={1.5} />}
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
-
 
                         <button
                             className="btn-primary"
                             onClick={() => navigate('/dashboard/career-agent/onboarding')}
                             disabled={isCareerLocked}
                             style={{ opacity: isCareerLocked ? 0.5 : 1, cursor: isCareerLocked ? 'not-allowed' : 'pointer' }}
-                            title={isCareerLocked ? "Your career direction is permanently locked." : "Start a new analysis"}
+                            title={isCareerLocked ? 'Your career direction is permanently locked.' : 'Start a new analysis'}
                         >
+                            {isCareerLocked ? <Lock size={18} /> : <RefreshCw size={18} />}
                             <span className="hide-mobile">{t('career_agent.header.new_analysis', 'New Analysis')}</span>
                             <span className="show-mobile-inline">{t('career_agent.header.new', 'New')}</span>
                         </button>
@@ -472,18 +474,16 @@ const CareerAgentDashboard = () => {
                 </div>
 
                 <div className="role-tabs-bar">
-                    <button className={`rtab ${activeRole === 1 ? 'active' : ''}`} onClick={() => setActiveRole(1)}>
-                        <Trophy size={15} stroke={1.5} style={{ flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefPrimary}</span>
-                    </button>
-                    <button className={`rtab ${activeRole === 2 ? 'active' : ''}`} onClick={() => setActiveRole(2)}>
-                        <Medal size={15} stroke={1.5} style={{ flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefSecondary}</span>
-                    </button>
-                    <button className={`rtab ${activeRole === 3 ? 'active' : ''}`} onClick={() => setActiveRole(3)}>
-                        <Target size={15} stroke={1.5} style={{ flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prefTertiary}</span>
-                    </button>
+                    {[
+                        { n: 1, k: t('career_agent.tabs.primary', 'Primary'), label: prefPrimary },
+                        { n: 2, k: t('career_agent.tabs.secondary', 'Secondary'), label: prefSecondary },
+                        { n: 3, k: t('career_agent.tabs.tertiary', 'Tertiary'), label: prefTertiary },
+                    ].map(tab => (
+                        <button key={tab.n} className={`rtab ${activeRole === tab.n ? 'active' : ''}`} onClick={() => setActiveRole(tab.n)} title={tab.label}>
+                            <span className="rtab-k">{tab.k}</span>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tab.label}</span>
+                        </button>
+                    ))}
                 </div>
             </header>
 
@@ -510,20 +510,22 @@ const CareerAgentDashboard = () => {
             <div className="dash-body">
                 <aside className="sidebar">
                     <div className="sb-header">
-                        <div style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-                            Active Direction
-                        </div>
+                        <div className="sb-label">{t('career_agent.sidebar.active_role', 'Active target role')}</div>
                         <div className="sb-role-indicator">
                             <div className={`sb-role-dot ${zoneDot}`}></div>
                             <div className="sb-role-name" title={currentData?.tab1?.role_name || 'Loading...'}>
                                 {currentData?.tab1?.role_name || 'Loading...'}
                             </div>
                         </div>
+                        <div className="sb-role-dir" title={activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}>
+                            {activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}
+                        </div>
                     </div>
 
                     <CareerLockStatusCard lockStatus={lockStatus} />
 
                     <div className="sidebar-nav">
+                        <div className="sb-label">{t('career_agent.sidebar.sections', 'Report sections')}</div>
                         {panels.map(p => (
                             <button
                                 key={p.id}
@@ -585,7 +587,7 @@ const CareerAgentDashboard = () => {
                                 </div>
                             </div>
                             <div className="region-box">
-                                <div className="ri-label">{t('career_agent.overview.market_signal', '📍 Tier-1 India Market Signal')}</div>
+                                <div className="ri-label"><MapPin size={16} /> {t('career_agent.overview.market_signal_plain', 'Tier-1 India Market Signal')}</div>
                                 <div className="rb-stats">
                                     <div className="rb-stat">
                                         <div className="oh-card-label">{t('career_agent.overview.typical_employers', 'Typical Employers')}</div>
@@ -603,30 +605,12 @@ const CareerAgentDashboard = () => {
                     {/* ─────── Panel: Direction Overview ─────── */}
                     {activePanel === 'direction' && (
                         <div className="panel animate-fade-in">
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Compass size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.direction', 'Direction Overview')}
-                                    </h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        {t('career_agent.direction.desc', 'Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database.')}
-                                    </p>
-                                </div>
-
-                                {isCareerLocked && (
-                                    /* Locked state badge */
-                                    <div style={{
-                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                        padding: '0.55rem 1rem',
-                                        background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
-                                        borderRadius: '10px',
-                                        fontSize: '0.78rem', fontWeight: 700, color: 'var(--green)',
-                                        flexShrink: 0,
-                                    }}>
-                                        <Lock size={14} /> {t('career_agent.header.path_locked', 'Path Locked In')}
-                                    </div>
-                                )}
-                            </div>
+                            <PanelHead
+                                icon={<Compass size={20} />}
+                                title={t('career_agent.panels.direction', 'Direction Overview')}
+                                subtitle={t('career_agent.direction.desc', 'Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database.')}
+                                right={isCareerLocked ? <span className="dchip ok"><Lock size={13} /> {t('career_agent.header.path_locked_in', 'Path locked in')}</span> : null}
+                            />
                             <DirectionOverview
                                 directionData={currentData?.direction || null}
                                 roleName={currentData?.tab1?.role_name || ''}
@@ -637,69 +621,17 @@ const CareerAgentDashboard = () => {
                     {/* ─────── Panel: Recommended Directions — always open, before & after locking ─────── */}
                     {activePanel === 'recommended' && (
                         <div className="panel animate-fade-in">
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Star size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.recommended', 'Recommended Directions')}
-                                    </h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        {t('career_agent.recommended.desc', 'Every direction matched to your degree and specialisation — always open to explore, before and after your paths are locked.')}
-                                    </p>
-                                </div>
-                                {recommended.length > 0 && (
-                                    <span className="rec-count-chip">{recommended.length} {t('career_agent.recommended.count', 'directions')}</span>
-                                )}
-                            </div>
-
-                            {recommendedLoading ? (
-                                <div className="rec-empty">{t('career_agent.recommended.loading', 'Loading your recommended directions…')}</div>
-                            ) : recommended.length === 0 ? (
-                                <div className="rec-empty">{t('career_agent.recommended.none', 'No recommended directions are available for your degree yet.')}</div>
-                            ) : (
-                                <div className="rec-dir-list">
-                                    {recommended.map((dir, i) => {
-                                        const tier = chosenTierFor(dir);
-                                        const isOpen = expandedRec === dir.directionId;
-                                        const roles = Array.isArray(dir.roles) ? dir.roles : [];
-                                        const meta = [dir.degreeAbbr || dir.degreeName, dir.specialisation].filter(Boolean).join(' · ');
-                                        return (
-                                            <div key={dir.directionId} className={`rec-dir-card${isOpen ? ' open' : ''}${tier ? ' chosen' : ''}`}>
-                                                <button type="button" className="rec-dir-head" onClick={() => setExpandedRec(isOpen ? null : dir.directionId)}>
-                                                    <div className="rec-dir-num">{i + 1}</div>
-                                                    <div className="rec-dir-titlewrap">
-                                                        <div className="rec-dir-title">{dir.directionName}</div>
-                                                        <div className="rec-dir-meta">
-                                                            {meta ? `${meta} · ` : ''}{roles.length} {t('career_agent.recommended.roles', 'roles')}
-                                                        </div>
-                                                    </div>
-                                                    {tier && (
-                                                        <span className="rec-dir-chip">
-                                                            {t(`career_agent.recommended.chosen_${tier}`, `Your ${tier}`)}
-                                                        </span>
-                                                    )}
-                                                    <ChevronDown size={18} className="rec-dir-caret" />
-                                                </button>
-                                                {isOpen && (
-                                                    <div className="rec-dir-body">
-                                                        {dir.directionDescription && <p className="rec-dir-desc">{dir.directionDescription}</p>}
-                                                        <div className="rec-dir-roles-label">{t('career_agent.recommended.roles_label', 'Possible job roles')}</div>
-                                                        <div className="dir-roles-grid">
-                                                            {roles.map((r, ri) => (
-                                                                <div key={r.id || ri} className="dir-role-card">
-                                                                    <div className="dir-role-card-number">{ri + 1}</div>
-                                                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                                                        <div className="dir-role-card-name">{r.role}</div>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            <PanelHead
+                                icon={<Star size={20} />}
+                                title={t('career_agent.panels.recommended', 'Recommended Directions')}
+                                subtitle={t('career_agent.recommended.desc_remaining', 'The other directions recommended for your degree — always open to explore, before and after your paths are locked.')}
+                                right={recommended.length > 0 ? <span className="dchip brand">{recommended.length} {t('career_agent.recommended.count', 'recommended')}</span> : null}
+                            />
+                            <RecommendedDirections
+                                directions={recommended}
+                                chosenTierFor={chosenTierFor}
+                                loading={recommendedLoading}
+                            />
                         </div>
                     )}
 
@@ -707,13 +639,11 @@ const CareerAgentDashboard = () => {
                     {activePanel === 'roledetail' && (
                         <div className="panel animate-fade-in">
 
-                            {/* Header row with lock button */}
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.roledetail', 'Role Detailed View')}</h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>{t('career_agent.roledetail.desc_start', 'Reviewing ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.roledetail.desc_end', ' — confirm if this is your career path.')}</p>
-                                </div>
-                            </div>
+                            <PanelHead
+                                icon={<ClipboardList size={20} />}
+                                title={t('career_agent.panels.roledetail', 'Role Detailed View')}
+                                subtitle={<>{t('career_agent.roledetail.desc_start', 'Reviewing ')}<strong>{currentData.tab1.role_name}</strong>{t('career_agent.roledetail.desc_end', ' — confirm if this is your career path.')}</>}
+                            />
 
                             <RoleDetailedView
                                 roleName={currentData.tab1.role_name}
@@ -726,18 +656,11 @@ const CareerAgentDashboard = () => {
                     {/* Panel 2: Market Intel */}
                     {activePanel === 'market' && (
                         <div className="panel animate-fade-in">
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <BarChart3 size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.market.title', 'Market Intelligence')}
-                                    </h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        {t('career_agent.market.desc_start', 'Showing roles for ')}<strong style={{ color: 'var(--text2)' }}>
-                                            {activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}
-                                        </strong>{t('career_agent.market.desc_end', ' — select a role below to view its market data.')}
-                                    </p>
-                                </div>
-                            </div>
+                            <PanelHead
+                                icon={<BarChart3 size={20} />}
+                                title={t('career_agent.market.title', 'Market Intelligence')}
+                                subtitle={<>{t('career_agent.market.desc_start', 'Showing roles for ')}<strong>{activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}</strong>{t('career_agent.market.desc_end', ' — select a role below to view its market data.')}</>}
+                            />
                             <MarketIntelligence
                                 roleName={roleName}
                                 allDirections={allDirections}
@@ -750,7 +673,11 @@ const CareerAgentDashboard = () => {
                     {/* Panel 3: Skills */}
                     {activePanel === 'skills' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Dna size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.skills.title', 'Skills Overview')}</h2>
+                            <PanelHead
+                                icon={<Dna size={20} />}
+                                title={t('career_agent.skills.title', 'Skills Overview')}
+                                subtitle={<>{t('career_agent.skills.desc_start', 'The skills that matter for ')}<strong>{roleName}</strong>{t('career_agent.skills.desc_end', ' — and where you stand today.')}</>}
+                            />
                             <SkillsPanel
                                 roleName={roleName}
                                 mongoRoleData={currentData}
@@ -762,15 +689,12 @@ const CareerAgentDashboard = () => {
 
                     {/* Panel 5: Roadmap */}
                     {activePanel === 'roadmap' && (
-                        <div className="panel animate-fade-in" style={{ padding: '1.75rem' }}>
-                            <div style={{ marginBottom: '2rem' }}>
-                                <h2 style={{ fontSize: '1.4rem', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                    <Compass size={24} color="var(--accent-text)" /> {t('career_agent.roadmap.title', 'SMAART Career Intelligence')}
-                                </h2>
-                                <p style={{ color: 'var(--muted)', fontSize: '0.85rem', maxWidth: '600px' }}>
-                                    {t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}
-                                </p>
-                            </div>
+                        <div className="panel animate-fade-in">
+                            <PanelHead
+                                icon={<Map size={20} />}
+                                title={t('career_agent.panels.roadmap', 'Career Roadmap')}
+                                subtitle={<>{t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}</>}
+                            />
 
                             {/* LEARNING ROADMAP & MILESTONE STEPS (Now at Top) */}
                             <CareerRoadmap
@@ -792,8 +716,11 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Interview Prep */}
                     {activePanel === 'interview' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mic size={22} color="var(--accent-text)" /> {t('career_agent.interview.title', 'Interview Prep')}</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>{t('career_agent.interview.desc_start', 'Resources and questions tailored for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.interview.desc_end', ' — aptitude, domain, technical & HR rounds.')}</p>
+                            <PanelHead
+                                icon={<Mic size={20} />}
+                                title={t('career_agent.interview.title', 'Interview Prep')}
+                                subtitle={<>{t('career_agent.interview.desc_start', 'Resources and questions tailored for ')}<strong>{roleName}</strong>{t('career_agent.interview.desc_end', ' — aptitude, domain, technical & HR rounds.')}</>}
+                            />
                             <InterviewPrep roleName={roleName} />
                         </div>
                     )}
@@ -801,10 +728,11 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Resume Tips */}
                     {activePanel === 'resume' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileText size={22} color="var(--accent-text)" /> {t('career_agent.resume.title', 'Resume Tips')}</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>
-                                {t('career_agent.resume.desc_start', 'Build a strong, ATS-ready resume for ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.resume.desc_end', ' — structure, keywords, and an AI generator.')}
-                            </p>
+                            <PanelHead
+                                icon={<FileText size={20} />}
+                                title={t('career_agent.resume.title', 'Resume Tips')}
+                                subtitle={<>{t('career_agent.resume.desc_start', 'Build a strong, ATS-ready resume for ')}<strong>{currentData.tab1.role_name}</strong>{t('career_agent.resume.desc_end', ' — structure, keywords, and an AI generator.')}</>}
+                            />
                             <ResumeTips roleName={currentData.tab1.role_name} />
                         </div>
                     )}
@@ -812,7 +740,11 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Certifications */}
                     {activePanel === 'certs' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent-text)" /> {t('career_agent.certs.title', 'Certifications')}</h2>
+                            <PanelHead
+                                icon={<Award size={20} />}
+                                title={t('career_agent.certs.title', 'Certifications')}
+                                subtitle={<>{t('career_agent.certs.desc_start', 'Industry certifications that strengthen your profile for ')}<strong>{currentData.tab1.role_name}</strong>.</>}
+                            />
                             <Certifications
                                 roleName={currentData.tab1.role_name}
                                 directionName={currentData?.direction?.directionName || ''}
@@ -823,9 +755,9 @@ const CareerAgentDashboard = () => {
 
 
                     {/* Placeholders for remaining panels */}
-                    {!['direction', 'overview', 'roledetail', 'market', 'skills', 'roadmap', 'interview', 'resume', 'certs'].includes(activePanel) && (
+                    {!['direction', 'recommended', 'overview', 'roledetail', 'market', 'skills', 'roadmap', 'interview', 'resume', 'certs'].includes(activePanel) && (
                         <div className="panel animate-fade-in" style={{ textAlign: 'center', padding: '5rem 0' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔧</div>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: 'var(--muted)' }}><Wrench size={40} /></div>
                             <h3>{panels.find(p => p.id === activePanel)?.label} Panel</h3>
                             <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>{t('career_agent.placeholders.processed_v7', 'This intelligence vector is currently being processed by the v7 analysis engine.')}</p>
                         </div>

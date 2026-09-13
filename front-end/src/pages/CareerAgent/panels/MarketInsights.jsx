@@ -1,3 +1,4 @@
+import { TrendingUp, BarChart3, Briefcase } from '@/components/icons';
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -43,7 +44,7 @@ const MarketInsights = () => {
 
       <div className="panel">
         <div className="ri-card" style={{ height: '500px', marginBottom: '3rem' }}>
-          <div className="ri-label">📈 Supply & Demand Momentum (Monthly Volume)</div>
+          <div className="ri-label"><TrendingUp size={16} /> Supply & Demand Momentum (Monthly Volume)</div>
           <div style={{ height: '400px', marginTop: '2rem' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={mockTrendData}>
@@ -69,7 +70,7 @@ const MarketInsights = () => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           <div className="ri-card">
-            <div className="ri-label">📊 Top High-Growth Roles</div>
+            <div className="ri-label"><BarChart3 size={16} /> Top High-Growth Roles</div>
             <div style={{ marginTop: '1.5rem' }}>
               {[
                 { role: 'AI Engineering', growth: '+310%', zone: 'Green' },
@@ -86,7 +87,7 @@ const MarketInsights = () => {
           </div>
 
           <div className="ri-card">
-            <div className="ri-label">💼 Entry-Level Benchmarks (India)</div>
+            <div className="ri-label"><Briefcase size={16} /> Entry-Level Benchmarks (India)</div>
             <div style={{ marginTop: '1.5rem' }}>
               {[
                 { role: 'Software Engineer', range: '6–12 LPA' },

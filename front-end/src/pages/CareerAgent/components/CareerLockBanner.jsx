@@ -1,175 +1,99 @@
 /**
  * CareerLockBanner.jsx
  * Adaptive banner shown at the top of the Career Direction Dashboard.
- * Changes style/message based on: active, warning (2 left), critical (1 left), locked.
+ * Changes tone based on: active, warning (2 left), critical (1 left), locked.
+ * Corporate vocabulary: 40px icon tile, hairline border, brand tokens, no emoji.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, RefreshCw, AlertTriangle, AlertOctagon, Lock, CheckCircle, Target, ShieldCheck } from '@/components/icons';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Clock, RefreshCw, AlertTriangle, AlertOctagon, Lock, Target } from '@/components/icons';
+
+const TONES = {
+    locked:   { fg: 'var(--green)', bg: 'rgba(5,150,105,0.06)',  border: 'rgba(5,150,105,0.25)' },
+    critical: { fg: 'var(--red)',   bg: 'rgba(220,38,38,0.05)',  border: 'rgba(220,38,38,0.25)' },
+    warning:  { fg: 'var(--amber)', bg: 'rgba(217,119,6,0.06)',  border: 'rgba(217,119,6,0.28)' },
+    active:   { fg: 'var(--accent-text)', bg: 'var(--card)', border: 'var(--border)' },
+};
+
+const Stat = ({ icon, label, tone }) => (
+    <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px', borderRadius: 8,
+        background: 'var(--card)', border: `1px solid ${tone.border}`,
+        fontSize: 12, fontWeight: 600, color: 'var(--text1)', whiteSpace: 'nowrap',
+    }}>
+        <span style={{ color: tone.fg, display: 'flex' }}>{icon}</span>
+        {label}
+    </div>
+);
 
 const CareerLockBanner = ({ lockStatus }) => {
-    const { theme } = useTheme();
-
     if (!lockStatus || !lockStatus.found) return null;
 
-    const {
-        isLocked,
-        remainingDays,
-        remainingAttempts,
-        attemptsUsed,
-        maxAttempts,
-        lockReason,
-        primaryCareerPath,
-        secondaryCareerPath,
-        tertiaryCareerPath,
-    } = lockStatus;
+    const { isLocked, remainingDays, remainingAttempts, attemptsUsed, maxAttempts, lockReason } = lockStatus;
 
-    // ── Locked state ────────────────────────────────────────────────────────────
+    let toneKey, icon, badge, title, subtitle;
     if (isLocked) {
-        return (
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{
-                    margin: '0 0 1rem 0',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '8px',
-                    background: theme === 'dark' ? 'rgba(16,185,129,0.08)' : '#f0fdf4',
-                    border: '1px solid rgba(16,185,129,0.2)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: '1rem', flexWrap: 'wrap',
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{
-                        width: '28px', height: '28px', borderRadius: '6px', flexShrink: 0,
-                        background: 'rgba(16,185,129,0.15)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <Lock size={14} color="#10b981" />
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#10b981' }}>
-                            Career Direction Permanently Locked
-                        </span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text)', opacity: 0.7 }}>
-                            {lockReason === 'time_expired' ? '(14-day selection period ended)' : '(Paths confirmed and driving recommendations)'}
-                        </span>
-                    </div>
-                </div>
-            </motion.div>
-        );
-    }
-
-    // ── Determine warning level ──────────────────────────────────────────────────
-    let config;
-    if (remainingAttempts <= 1) {
-        config = {
-            bg: theme === 'dark' ? 'rgba(239,68,68,0.10)' : '#fef2f2',
-            border: 'rgba(239,68,68,0.30)',
-            iconBg: 'rgba(239,68,68,0.15)',
-            iconColor: '#ef4444',
-            glow: 'rgba(239,68,68,0.08)',
-            icon: <AlertOctagon size={16} color="#ef4444" />,
-            badge: '🚨 Final Opportunity',
-            badgeColor: '#ef4444',
-            title: 'This is your last available career analysis attempt.',
-            subtitle: 'The next saved result will become your permanently locked career direction.',
-        };
+        toneKey = 'locked';
+        icon = <Lock size={20} />;
+        badge = 'Career direction locked';
+        title = 'Your career paths are finalised.';
+        subtitle = lockReason === 'time_expired'
+            ? 'The 14-day selection period has ended. Your three paths now drive every recommendation in this report.'
+            : 'Your three paths are confirmed and now drive every recommendation in this report.';
+    } else if (remainingAttempts <= 1) {
+        toneKey = 'critical';
+        icon = <AlertOctagon size={20} />;
+        badge = 'Final attempt';
+        title = 'This is your last available career analysis attempt.';
+        subtitle = 'The next saved result becomes your permanently locked career direction.';
     } else if (remainingAttempts <= 2) {
-        config = {
-            bg: theme === 'dark' ? 'rgba(245,158,11,0.10)' : '#fffbeb',
-            border: 'rgba(245,158,11,0.30)',
-            iconBg: 'rgba(245,158,11,0.15)',
-            iconColor: '#f59e0b',
-            glow: 'rgba(245,158,11,0.08)',
-            icon: <AlertTriangle size={16} color="#f59e0b" />,
-            badge: '⚠️ Career Direction Warning',
-            badgeColor: '#f59e0b',
-            title: `You have only ${remainingAttempts} analysis attempt${remainingAttempts === 1 ? '' : 's'} remaining.`,
-            subtitle: 'Review your career choices carefully before generating a new analysis.',
-        };
+        toneKey = 'warning';
+        icon = <AlertTriangle size={20} />;
+        badge = 'Attempts running low';
+        title = `You have ${remainingAttempts} analysis attempts remaining.`;
+        subtitle = 'Review your career choices carefully before generating a new analysis.';
     } else {
-        config = {
-            bg: theme === 'dark' ? 'rgba(26, 56, 132, 0.2)' : '#f1f5f9',
-            border: 'rgba(26, 56, 132, 0.2)',
-            iconBg: theme === 'dark' ? 'rgba(26, 56, 132, 0.5)' : '#e2e8f0',
-            iconColor: theme === 'dark' ? '#60a5fa' : '#1a3884',
-            glow: 'rgba(26, 56, 132, 0.05)',
-            icon: <Target size={16} color={theme === 'dark' ? '#60a5fa' : '#1a3884'} />,
-            badge: '🎯 Career Direction Finalization In Progress',
-            badgeColor: theme === 'dark' ? '#60a5fa' : '#1a3884',
-            title: null,
-            subtitle: 'You may update your career direction by running a new AI analysis.',
-        };
+        toneKey = 'active';
+        icon = <Target size={20} />;
+        badge = 'Selection in progress';
+        title = 'You can still refine your career direction.';
+        subtitle = 'Run a new analysis to update your paths. Once the countdown ends or all attempts are used, your direction is locked permanently.';
     }
+    const tone = TONES[toneKey];
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             style={{
-                margin: '0 0 1rem 0',
-                padding: '0.75rem 1rem',
-                borderRadius: '10px',
-                background: config.bg,
-                border: `1px solid ${config.border}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                gap: '1rem', flexWrap: 'wrap',
-                boxShadow: `0 4px 20px ${config.glow}`,
+                margin: '0 0 20px', padding: '14px 18px', borderRadius: 12,
+                background: tone.bg, border: `1px solid ${tone.border}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
             }}
         >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 260 }}>
                 <div style={{
-                    width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
-                    background: config.iconBg,
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    background: toneKey === 'active' ? 'var(--accent-tint)' : 'var(--card)',
+                    border: `1px solid ${tone.border}`, color: tone.fg,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                    {config.icon}
+                    {icon}
                 </div>
-                <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: config.badgeColor, marginBottom: '0.15rem' }}>
-                        {config.badge}
-                    </div>
-                    {config.title && (
-                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.1rem' }}>
-                            {config.title}
-                        </div>
-                    )}
-                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)', lineHeight: 1.4 }}>
-                        {config.subtitle}
-                        {' '}After the countdown expires or all attempts are consumed, your final career direction will be permanently locked.
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: tone.fg }}>{badge}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text1)', lineHeight: 1.3 }}>{title}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--muted)', lineHeight: 1.5 }}>{subtitle}</div>
                 </div>
             </div>
 
-            {/* Stats pills */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: '0.35rem',
-                    padding: '0.4rem 0.75rem', borderRadius: '6px',
-                    background: 'var(--card)',
-                    border: `1px solid ${config.border}`,
-                }}>
-                    <Clock size={13} color={config.iconColor} />
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)' }}>
-                        {remainingDays}d left
-                    </span>
+            {!isLocked && (
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Stat icon={<Clock size={15} />} label={`${remainingDays} days left`} tone={tone} />
+                    <Stat icon={<RefreshCw size={15} />} label={`${attemptsUsed} / ${maxAttempts} attempts used`} tone={tone} />
                 </div>
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: '0.35rem',
-                    padding: '0.4rem 0.75rem', borderRadius: '6px',
-                    background: 'var(--card)',
-                    border: `1px solid ${config.border}`,
-                }}>
-                    <RefreshCw size={13} color={config.iconColor} />
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)' }}>
-                        {attemptsUsed}/{maxAttempts} used
-                    </span>
-                </div>
-            </div>
+            )}
         </motion.div>
     );
 };

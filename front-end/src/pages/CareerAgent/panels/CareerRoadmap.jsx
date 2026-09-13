@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from '@/components/icons';
+import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle } from '@/components/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 
@@ -395,8 +395,8 @@ const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
                         background: 'rgba(59, 130, 246, 0.12)',
                         border: '1px solid rgba(59, 130, 246, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '1.6rem',
-                    }}>🎯</div>
+                        color: '#045C9A',
+                    }}><Target size={26} /></div>
 
                     <div>
                         <div style={{ fontSize: '1.05rem', fontWeight: 800, color: C.text1, marginBottom: '0.4rem', letterSpacing: '-0.01em' }}>
@@ -651,7 +651,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                 }}>
                                     <CheckCircle size={26} color="#10b981" />
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981' }}>Certificate Verified ✓</div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981' }}>Certificate Verified</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
                             </>
                         ) : file ? (
@@ -661,8 +661,8 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     background: 'rgba(16,185,129,0.1)',
                                     border: '1px solid rgba(16,185,129,0.3)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '1.5rem',
-                                }}>📄</div>
+                                    color: '#059669',
+                                }}><FileText size={24} /></div>
                                 <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#10b981' }}>{file.name}</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
                             </>
@@ -727,7 +727,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                 borderRadius: '9px',
                                 display: 'flex', alignItems: 'center', gap: '0.35rem',
                             }}>
-                                ⚠️ Marking as complete without a certificate
+                                <AlertTriangle size={14} /> Marking as complete without a certificate
                             </div>
                         )}
                     </div>

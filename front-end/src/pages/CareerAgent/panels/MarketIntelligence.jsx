@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { TrendingUp, Globe, Zap, UserCheck, BarChart3, ChevronRight, Info } from '@/components/icons';
+import { TrendingUp, Globe, Zap, UserCheck, BarChart3, ChevronRight, Info, Wrench } from '@/components/icons';
 
 /**
  * MarketIntelligence
@@ -93,7 +93,7 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
     if (!loading && dirRoleNames.length === 0 && selectedRole === null) {
         return (
             <div style={S.emptyState}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔧</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem', color: 'var(--muted)' }}><Wrench size={40} /></div>
                 <h3 style={{ color: 'var(--text2)', margin: '0 0 0.5rem' }}>Data Coming Soon</h3>
                 <p style={{ color: 'var(--muted)', fontSize: '0.85rem', maxWidth: '380px', textAlign: 'center' }}>
                     Market intelligence for <strong style={{ color: 'var(--text1)' }}>
