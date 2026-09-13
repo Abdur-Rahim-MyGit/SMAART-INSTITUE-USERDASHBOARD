@@ -1043,6 +1043,10 @@ const LOADING_MESSAGES = [
   "Synthesizing Strategic Roadmap...",
   "Generating Full Analysis Report..."
 ];
+// Keeps the loading screen up for at least this long on success, so it never
+// flashes past the messages/progress bar when the API responds quickly — the
+// copy promises "15-20 seconds" and the UI now actually takes that long.
+const MIN_LOADING_MS = 16000;
 
 // Main Component
 const CareerAgentOnboarding = () => {
@@ -1786,12 +1790,19 @@ const CareerAgentOnboarding = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    // Wait for the real analysis AND the minimum display time together, so a
+    // fast backend response doesn't cut the loading screen short — but a
+    // failure surfaces immediately rather than being held back.
+    const minDisplay = new Promise(resolve => setTimeout(resolve, MIN_LOADING_MS));
     try {
       const payload = {
         ...formData,
         personalDetails: { ...formData.personalDetails, name: formData.personalDetails.name || 'Student' },
       };
-      const res = await axios.post('/api/career-agent/onboarding', payload, { withCredentials: true });
+      const [res] = await Promise.all([
+        axios.post('/api/career-agent/onboarding', payload, { withCredentials: true }),
+        minDisplay
+      ]);
 
       // Normalise both response shapes
       // Normal:   {status: 'success', analysis: {...} }
@@ -1866,9 +1877,11 @@ const CareerAgentOnboarding = () => {
 
   useEffect(() => {
     if (isSubmitting) {
+      setSubmittingStep(0);
+      const stepMs = MIN_LOADING_MS / LOADING_MESSAGES.length;
       const interval = setInterval(() => {
         setSubmittingStep(s => (s < LOADING_MESSAGES.length - 1 ? s + 1 : s));
-      }, 2000);
+      }, stepMs);
       return () => clearInterval(interval);
     }
   }, [isSubmitting]);
@@ -2204,9 +2217,9 @@ const CareerAgentOnboarding = () => {
           {/* STEP 6: REVIEW & SUBMIT */}
           {step === 6 && (() => {
             const tiers = [
-              { key: 'primary', label: t('career_agent.onboarding.tier_primary', 'Primary'), chip: '', val: formData.preferences.primary },
-              { key: 'secondary', label: t('career_agent.onboarding.tier_secondary', 'Secondary'), chip: ' neutral', val: formData.preferences.secondary },
-              { key: 'tertiary', label: t('career_agent.onboarding.tier_tertiary', 'Tertiary'), chip: ' neutral', val: formData.preferences.tertiary },
+              { key: 'primary', label: t('career_agent.onboarding.tier_primary', 'Primary'), val: formData.preferences.primary },
+              { key: 'secondary', label: t('career_agent.onboarding.tier_secondary', 'Secondary'), val: formData.preferences.secondary },
+              { key: 'tertiary', label: t('career_agent.onboarding.tier_tertiary', 'Tertiary'), val: formData.preferences.tertiary },
             ];
             const chosen = tiers.filter(x => x.val?.careerDirectionName || x.val?.role);
             const isRecommended = (val) => !!val?.careerDirectionId && careerDirections.some(d => d.directionId === val.careerDirectionId);
@@ -2255,9 +2268,9 @@ const CareerAgentOnboarding = () => {
                     <Eyebrow right={<span className={`ob-chip${chosen.length === 3 ? ' done' : ' neutral'}`}>{chosen.length} of 3 {t('career_agent.onboarding.selected', 'selected')}</span>}>
                       {t('career_agent.onboarding.review_directions', 'Career directions')}
                     </Eyebrow>
-                    {chosen.map(({ key, label, chip, val }) => (
+                    {chosen.map(({ key, label, val }) => (
                       <div key={key} className="ob-review-row">
-                        <div className="ob-review-chip"><span className={`ob-chip${chip}`}>{label}</span></div>
+                        <div className="ob-review-chip"><span className="ob-chip">{label}</span></div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="ob-review-title">{val.careerDirectionName || val.role}</div>
                           <div className="ob-review-sub">
