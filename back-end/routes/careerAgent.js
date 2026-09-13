@@ -53,7 +53,14 @@ function attachRoleDetail(doc, roles) {
   return roles.map(r => {
     const d = byName.get(String(r.role).trim().toLowerCase());
     return d
-      ? { ...r, jobFamily: d.jobFamily || null, achievability: d.achievabilityTag || null, rationale: d.mappingRationale || null }
+      ? {
+          ...r,
+          jobFamily: d.jobFamily || null,
+          achievability: d.achievabilityTag || null,
+          achievabilityDetail: d.achievabilityDetail || null,
+          rationale: d.mappingRationale || null,
+          placementNote: d.placementNote || null,
+        }
       : r;
   });
 }
@@ -415,7 +422,10 @@ router.get('/direction-roles/:directionName', async (req, res) => {
       directionName: doc['Career Direction'],
       directionId:   doc['Direction ID'],
       overview:      doc['Overview / Description'] || '',
-      roles,
+      // Extra direction-level metadata some data sets carry (B.Com 2026 set)
+      specialisation:     doc['specializationName'] || doc['Specialisation'] || '',
+      primaryJobFamilies: Array.isArray(doc['primaryJobFamilies']) ? doc['primaryJobFamilies'] : (doc['primaryJobFamilies'] ? String(doc['primaryJobFamilies']).split(/\s*[;,|]\s*/).filter(Boolean) : []),
+      roles: attachRoleDetail(doc, roles),
       found: true
     });
   } catch (err) {

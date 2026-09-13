@@ -1,302 +1,108 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight } from '@/components/icons';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dna, Code, Building, Bot, Users, Layers, Award } from '@/components/icons';
+import { RoleSwitcher, Spinner, EmptyState, CardHead } from './shared';
 
-const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
+/**
+ * SkillsPanel — "Skill DNA"
+ * Role switcher for the active direction + the mapped skills for the
+ * selected role (/api/career-agent/role-skills/:roleTitle), grouped by
+ * category on the shared report vocabulary.
+ */
+const CATEGORY_META = {
+    'Technical':  { label: 'Technical skills',  sub: 'Tools, software and hands-on methods', icon: <Code size={20} /> },
+    'Domain':     { label: 'Domain knowledge',  sub: 'Subject expertise the role is built on', icon: <Building size={20} /> },
+    'AI-Tool':    { label: 'AI tools',          sub: 'AI assistants and platforms used day to day', icon: <Bot size={20} /> },
+    'Soft Skill': { label: 'Soft skills',       sub: 'Communication, teamwork and judgement', icon: <Users size={20} /> },
+    'General':    { label: 'General',           sub: 'Broad competencies for the role', icon: <Layers size={20} /> },
+};
+const CATEGORY_ORDER = ['Domain', 'Technical', 'AI-Tool', 'Soft Skill', 'General'];
+
+const SKILL_CACHE = new Map();
+
+const SkillsPanel = ({ roleName, direction }) => {
+    const roleNames = useMemo(() => [...new Set((direction?.roles || [])
+        .map(r => (typeof r === 'string' ? r : r?.role))
+        .filter(Boolean))], [direction]);
+
     const [selectedRole, setSelectedRole] = useState(roleName);
-    const [familyRoles, setFamilyRoles] = useState([]);
-    const [dbRole, setDbRole] = useState(null);
+    useEffect(() => {
+        const match = roleNames.find(r => r.toLowerCase() === String(roleName || '').toLowerCase());
+        setSelectedRole(match || roleName || roleNames[0] || null);
+    }, [roleName, roleNames.join('|')]);
+
+    const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [errorMsg, setErrorMsg] = useState(null);
 
-    // Track context to avoid infinite loops
-    const contextId = `${roleName}_${mongoRoleData?.job_family || ''}`;
-    const lastContext = useRef(null);
-
-    /* 1. Resolve Family Roles (Horizontal Tabs) */
     useEffect(() => {
-        if (lastContext.current === contextId) return;
-        lastContext.current = contextId;
-
-        const resolveFamily = async () => {
-            let roles = [];
-
-            // Case A: From props/Analysis state
-            if (direction?.roles && direction.roles.length > 0) {
-                roles = direction.roles.map(r => typeof r === 'string' ? r : (r.role || r.role_name));
-            }
-
-            // Case B: Fallback - Resolve Job Family name and fetch siblings
-            if (roles.length === 0) {
-                // Robust check for job_family in different object levels
-                const jf = mongoRoleData?.job_family || 
-                           mongoRoleData?.tab1?.job_family || 
-                           mongoRoleData?.job_family_name || 
-                           mongoRoleData?.tab1?.job_family_name;
-                           
-                if (jf) {
-                    try {
-                        const cleanFamily = jf.split(' ')[0];
-                        const familyRes = await fetch(`/api/career-agent/role-skills/family/${encodeURIComponent(cleanFamily)}`);
-                        if (familyRes.ok) roles = await familyRes.json();
-                    } catch (e) { console.warn('Family fetch err:', e); }
-                }
-            }
-
-            // Case C: Predict direction from roleName if still empty
-            if (roles.length === 0 && roleName) {
-                try {
-                    const dirRes = await fetch('/api/career-agent/career-direction', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ roleName, degree: 'Any', specialisation: 'Any' })
-                    });
-                    if (dirRes.ok) {
-                        const dirData = await dirRes.json();
-                        if (dirData?.direction?.roles) {
-                            roles = dirData.direction.roles;
-                        }
-                    }
-                } catch (e) { console.warn('Direction prediction err:', e); }
-            }
-
-            if (roles.length > 0) {
-                const uniqueRoles = [...new Set(roles)]
-                    .filter(Boolean)
-                    .filter(r => r.toLowerCase() !== 'software engineer');
-                setFamilyRoles(uniqueRoles);
-                
-                // If our current roleName is a "Category Name" (often matches jf), 
-                // we should select the first ACTUAL sub-role.
-                const jfName = (mongoRoleData?.job_family || mongoRoleData?.job_family_name || '').toLowerCase();
-                const currentIsCategory = roleName.toLowerCase() === jfName;
-                
-                if (currentIsCategory || !uniqueRoles.includes(roleName)) {
-                    setSelectedRole(uniqueRoles[0]);
-                } else {
-                    setSelectedRole(roleName);
-                }
-            } else {
-                setSelectedRole(roleName);
-            }
-        };
-
-        resolveFamily();
-    }, [contextId, direction, mongoRoleData, roleName]);
-
-    /* 2. Fetch Skills for Selected Role */
-    useEffect(() => {
-        if (!selectedRole) return;
-        
-        // SPECIAL GUARD: If selectedRole is EXACTLY the same as the Job Family name, 
-        // we shouldn't attempt a role fetch yet, as it's likely a category container.
-        const jf = (mongoRoleData?.job_family || mongoRoleData?.tab1?.job_family || '').toLowerCase();
-        if (selectedRole.toLowerCase() === jf && familyRoles.length > 0) {
-             // Let resolveFamily update selectedRole to the first sub-role instead
-             return;
-        }
-
+        if (!selectedRole) { setSkills([]); setLoading(false); return; }
+        if (SKILL_CACHE.has(selectedRole)) { setSkills(SKILL_CACHE.get(selectedRole)); setLoading(false); return; }
         let cancelled = false;
-        
-        const loadSkills = async () => {
-            setLoading(true);
-            setErrorMsg(null);
-            try {
-                // Fetch from roleSkills collection - Ensure absolute path starting with /
-                const res = await fetch(`/api/career-agent/role-skills/${encodeURIComponent(selectedRole)}`);
-                if (!res.ok) {
-                    // Try basic role data if skills collection is missing this specific entry
-                    const fallbackRes = await fetch(`/api/career-agent/career-role/${encodeURIComponent(selectedRole)}`);
-                    if (fallbackRes.ok) {
-                        const basic = await fallbackRes.json();
-                        if (!cancelled) {
-                            setDbRole(basic);
-                            setLoading(false);
-                        }
-                    } else {
-                        if (!cancelled) {
-                            setDbRole(null);
-                            setLoading(false);
-                        }
-                    }
-                    return;
-                }
-                const data = await res.json();
-                if (!cancelled) {
-                    setDbRole(data);
-                    setLoading(false);
-                }
-            } catch (e) {
-                if (!cancelled) {
-                    setErrorMsg(e.message);
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadSkills();
+        setLoading(true);
+        fetch(`/api/career-agent/role-skills/${encodeURIComponent(selectedRole)}`, { credentials: 'include' })
+            .then(r => (r.ok ? r.json() : null))
+            .then(data => {
+                const list = Array.isArray(data?.skills) ? data.skills : [];
+                SKILL_CACHE.set(selectedRole, list);
+                if (!cancelled) setSkills(list);
+            })
+            .catch(() => { if (!cancelled) setSkills([]); })
+            .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
-    }, [selectedRole, familyRoles, mongoRoleData]);
+    }, [selectedRole]);
 
-    if (loading) {
-        return (
-            <div style={styles.loadingWrap}>
-                <div style={styles.spinner} />
-                <p style={{ color: 'var(--muted)', marginTop: '1rem', fontSize: '0.85rem' }}>Resolving skill DNA for {selectedRole}...</p>
-            </div>
-        );
-    }
+    const groups = useMemo(() => {
+        const byCat = {};
+        skills.forEach(s => {
+            const cat = s.skillCategory || 'General';
+            (byCat[cat] = byCat[cat] || []).push(s);
+        });
+        const order = [...CATEGORY_ORDER, ...Object.keys(byCat).filter(c => !CATEGORY_ORDER.includes(c))];
+        return order.filter(c => byCat[c]?.length).map(c => ({ key: c, items: byCat[c], meta: CATEGORY_META[c] || { label: c, sub: '', icon: <Layers size={20} /> } }));
+    }, [skills]);
 
-    const skills = dbRole?.skills || [];
-    
-    // Group by category if available
-    const categories = [...new Set(skills.map(s => s.skillCategory))].filter(Boolean);
+    const highCount = skills.filter(s => s.importance === 'High').length;
+    const certCount = skills.filter(s => s.certificationName).length;
 
     return (
-        <div style={styles.container} className="animate-fade-in">
-            
-            {/* ── Role Selector Tabs ── */}
-            {familyRoles.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
-                    {familyRoles.map(role => {
-                        const isSel = selectedRole === role;
-                        return (
-                            <button
-                                key={role}
-                                onClick={() => setSelectedRole(role)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '0.42rem 0.95rem',
-                                    background: isSel ? 'var(--accent)' : 'var(--navy3)',
-                                    border: '1px solid',
-                                    borderColor: isSel ? 'var(--accent)' : 'var(--border)',
-                                    borderRadius: '100px',
-                                    fontSize: '0.74rem',
-                                    fontWeight: 600,
-                                    color: isSel ? 'white' : 'var(--text2)',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    boxShadow: isSel ? '0 4px 12px var(--border2)' : 'none',
-                                }}
-                            >
-                                {role}
-                                {isSel && <ChevronRight size={13} style={{ marginLeft: '3px' }} />}
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
+        <div className="dp animate-fade-in">
+            <RoleSwitcher roles={roleNames} value={selectedRole} onChange={setSelectedRole} />
 
-            {/* ───── Page Header ───── */}
-            <div style={styles.pageHeader}>
-                <div style={styles.roleChip}>
-                    <span style={styles.roleChipDot} />
-                    <span style={styles.roleChipText}>SKILL DNA • {selectedRole}</span>
-                </div>
-                <h2 style={styles.roleName}>Skill DNA Profile</h2>
-                <p style={{ color: 'var(--muted)', fontSize: '0.82rem', margin: 0 }}>
-                    Granular breakdown of core competencies, tools, and certifications required in the industry today.
-                </p>
-            </div>
-
-            {!dbRole || skills.length === 0 ? (
-                <div style={styles.emptyWrap}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem', opacity: 0.4 }}>&#128300;</div>
-                    <h3 style={{ color: 'var(--text2)', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700 }}>No Skill Data for "{selectedRole}"</h3>
-                    <p style={{ color: 'var(--muted)', fontSize: '0.82rem', maxWidth: '360px', lineHeight: 1.6 }}>
-                        The Agent Database doesn't have a mapped skill profile for this specific variant yet.
-                        Please try another role from the tabs above.
-                    </p>
-                </div>
+            {loading ? (
+                <Spinner text={`Resolving the skill DNA for ${selectedRole}…`} />
+            ) : !selectedRole || skills.length === 0 ? (
+                <EmptyState
+                    icon={<Dna size={24} />}
+                    title={selectedRole ? `No skill map for “${selectedRole}” yet` : 'No role selected'}
+                    text="The database does not have a mapped skill profile for this role yet. Try another role above."
+                />
             ) : (
-                <div style={styles.skillsGrid}>
-                    {categories.map(cat => {
-                        const catLabel = {
-                            'Technical':  'Technical Skills',
-                            'Domain':     'Domain Knowledge',
-                            'AI-Tool':    'AI Tools',
-                            'Soft Skill': 'Soft Skills',
-                            'General':    'General',
-                        }[cat] || cat;
-                        return (
-                            <div key={cat} style={styles.categoryWrap}>
-                                <h4 style={styles.categoryTitle}>{catLabel}</h4>
-                                <div style={styles.tagWrap}>
-                                    {skills
-                                        .filter(s => s.skillCategory === cat)
-                                        .map((s, i) => (
-                                            <div key={i} style={styles.skillTag}>
-                                                <span style={styles.skillName}>{s.skillName}</span>
-                                            </div>
-                                        ))
-                                    }
+                <>
+                    <div className="dp-grid-4">
+                        <div className="stat"><div className="stat-k">Skills mapped</div><div className="stat-v brand">{skills.length}</div><div className="stat-s">for {selectedRole}</div></div>
+                        <div className="stat"><div className="stat-k">Categories</div><div className="stat-v">{groups.length}</div><div className="stat-s">skill groups</div></div>
+                        <div className="stat"><div className="stat-k">High priority</div><div className="stat-v">{highCount}</div><div className="stat-s">must-have skills</div></div>
+                        <div className="stat"><div className="stat-k">With certification</div><div className="stat-v">{certCount}</div><div className="stat-s">skills with a recognised cert</div></div>
+                    </div>
+
+                    <div className="dp-grid-2">
+                        {groups.map(g => (
+                            <div key={g.key} className="dp-card">
+                                <CardHead icon={g.meta.icon} title={g.meta.label} sub={g.meta.sub} right={<span className="dchip">{g.items.length}</span>} />
+                                <div className="pills">
+                                    {g.items.map((s, i) => (
+                                        <span key={`${s.skillName}-${i}`} className={`pill${s.importance === 'High' ? ' high' : ''}`} title={s.certificationName ? `Certification: ${s.certificationName}${s.platform ? ` · ${s.platform}` : ''}` : undefined}>
+                                            {s.skillName}
+                                            {s.certificationName && <Award size={14} style={{ color: 'var(--accent-text)' }} />}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
-                        );
-                    })}
-
-                    {skills.filter(s => !s.skillCategory).length > 0 && (
-                        <div style={styles.categoryWrap}>
-                            <h4 style={styles.categoryTitle}>Additional Competencies</h4>
-                            <div style={styles.tagWrap}>
-                                {skills.filter(s => !s.skillCategory).map((s, i) => (
-                                    <div key={i} style={styles.skillTag}>
-                                        <span style={styles.skillName}>{s.skillName}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        ))}
+                    </div>
+                </>
             )}
-
         </div>
     );
-};
-
-const styles = {
-    container:    { display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '0.25rem' },
-    loadingWrap:  { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px' },
-    spinner:      { width: '40px', height: '40px', borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--accent)', animation: 'spin 0.8s linear infinite' },
-    emptyWrap:    { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', textAlign: 'center', padding: '2rem', background: 'var(--navy2)', borderRadius: '16px', border: '1px solid var(--border)' },
-    pageHeader:   { display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.5rem' },
-    roleChip:     { display: 'inline-flex', alignItems: 'center', gap: '0.4rem' },
-    roleChipDot:  { width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' },
-    roleChipText: { fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.1em', color: 'var(--accent)', textTransform: 'uppercase' },
-    roleName:     { fontSize: '1.4rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.02em', margin: 0 },
-    skillsGrid:   { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' },
-    // Card: solid background from theme, border from theme
-    categoryWrap:  {
-        background:   'var(--navy2)',
-        border:       '1px solid var(--border)',
-        borderRadius: '14px',
-        padding:      '1.1rem 1.25rem',
-    },
-    // Title: accent color + subtle underline divider, all from theme
-    categoryTitle: {
-        fontSize:      '0.68rem',
-        fontWeight:    800,
-        color:         'var(--accent)',
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        marginBottom:  '0.85rem',
-        paddingBottom: '0.5rem',
-        borderBottom:  '1px solid var(--border)',
-    },
-    tagWrap:  { display: 'flex', flexWrap: 'wrap', gap: '0.45rem' },
-    // Each skill pill: navy3 background, theme border
-    skillTag: {
-        display:      'flex',
-        alignItems:   'center',
-        gap:          '0.45rem',
-        padding:      '0.35rem 0.7rem',
-        background:   'var(--navy3)',
-        border:       '1px solid var(--border)',
-        borderRadius: '8px',
-    },
-    skillName:  { fontSize: '0.78rem', fontWeight: 600, color: 'var(--text2)', fontFamily: 'var(--font)' },
-    // Importance badge: accent-tinted or muted
-    importance: { fontSize: '0.54rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' },
 };
 
 export default SkillsPanel;

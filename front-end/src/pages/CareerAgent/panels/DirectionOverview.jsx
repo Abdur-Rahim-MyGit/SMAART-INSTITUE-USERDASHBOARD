@@ -1,13 +1,15 @@
 import React from 'react';
-import { Compass, Map } from '@/components/icons';
+import { Compass, Map, Briefcase } from '@/components/icons';
 import DirectionRolesGrid from './DirectionRolesGrid';
+import { EmptyState, cleanFamily } from './shared';
 
 /* ─────────────────────────────────────────────
    DirectionOverview
    Props:
      directionData: {
-       directionId, directionName, directionDescription,
-       directionOverview, type, roles: [{ role, id }]
+       directionId, directionName, directionDescription, directionOverview,
+       type, roles: [{ role, id, jobFamily?, achievability?, rationale? }],
+       specialisation?, primaryJobFamilies?
      }
      roleName: the student's target role in this direction
    ──────────────────────────────────────────── */
@@ -18,20 +20,21 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
 
     if (!directionData || !directionData.directionName) {
         return (
-            <div className="rec-empty" style={{ padding: '48px 24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, color: 'var(--muted)' }}><Compass size={40} /></div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text1)', marginBottom: 6 }}>No career direction data</div>
-                <div style={{ maxWidth: 420, margin: '0 auto', fontSize: 13, lineHeight: 1.6 }}>
-                    Direction data comes from your onboarding selection. Run the onboarding again and
-                    choose a career direction to see the full breakdown here.
-                </div>
-            </div>
+            <EmptyState
+                icon={<Compass size={24} />}
+                title="No career direction data"
+                text="Direction data comes from your onboarding selection. Run the onboarding again and choose a career direction to see the full breakdown here."
+            />
         );
     }
 
     const description = directionData.directionOverview || directionData.directionDescription || directionData.overview || '';
     const { directionName, type, roles = [] } = directionData;
     const roleCount = roles.filter(r => (typeof r === 'string' ? r.trim() : r?.role?.trim())).length;
+    const families = Array.isArray(directionData.primaryJobFamilies)
+        ? directionData.primaryJobFamilies.map(cleanFamily).filter(Boolean)
+        : [...new Set(roles.map(r => cleanFamily(r?.jobFamily)).filter(Boolean))];
+    const specialisation = directionData.specialisation || '';
 
     return (
         <div className="dp animate-fade-in">
@@ -43,6 +46,7 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                     {TYPE_LABEL[type] && <span className="dchip brand">{TYPE_LABEL[type]}</span>}
                     {roleName && <span className="dchip">Target role · {roleName}</span>}
                     <span className="dchip">{roleCount} {roleCount === 1 ? 'job role' : 'job roles'}</span>
+                    {specialisation && <span className="dchip">{specialisation}</span>}
                 </div>
             </div>
 
@@ -57,6 +61,17 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                 </div>
                 <div className="dp-rule" />
                 <p className="dp-text">{description || 'Overview not available for this direction yet.'}</p>
+                {families.length > 0 && (
+                    <>
+                        <div className="dp-rule" style={{ margin: '14px 0' }} />
+                        <div className="dp-eyebrow" style={{ marginBottom: 8 }}>Job families in this direction</div>
+                        <div className="pills">
+                            {families.map(f => (
+                                <span key={f} className="pill"><Briefcase size={15} style={{ color: 'var(--accent-text)' }} />{f}</span>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Roles */}
@@ -65,7 +80,7 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                     <div className="dp-tile"><Compass size={20} /></div>
                     <div>
                         <div className="dp-card-title">Job roles in this direction</div>
-                        <div className="dp-card-sub">Select any role to read its full profile</div>
+                        <div className="dp-card-sub">Select any role to read its full profile and how it fits your degree</div>
                     </div>
                 </div>
                 <div className="dp-rule" />

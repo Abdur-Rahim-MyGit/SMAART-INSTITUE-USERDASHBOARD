@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle } from '@/components/icons';
+import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle, RotateCcw, Map } from '@/components/icons';
+import { Spinner, EmptyState, CardHead } from './shared';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 
@@ -168,42 +169,33 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
         }
     };
 
-    if (loading) {
-        return (
-            <div style={styles.loadingWrap}>
-                <div style={styles.spinner} />
-                <p style={{ color: 'var(--muted)', marginTop: '1rem', fontSize: '0.85rem' }}>Building multi-role roadmap intelligence...</p>
-            </div>
-        );
-    }
+    if (loading) return <Spinner text="Building your multi-role roadmap…" />;
 
     if (!roadmap.length) {
         return (
-            <div style={styles.unavailableWrap}>
-                <div style={styles.iconGhost}><Network size={48} /></div>
-                <h3 style={{ color: 'var(--text1)', marginBottom: '0.5rem' }}>Dynamic Roadmap Unavailable</h3>
-                <p style={{ color: 'var(--muted)', fontSize: '0.88rem', maxWidth: '400px' }}>
-                    We couldn't aggregate enough skills from this job family to build a roadmap.
-                </p>
-            </div>
+            <EmptyState
+                icon={<Network size={24} />}
+                title="Roadmap not available yet"
+                text="We could not aggregate enough mapped skills from this direction's roles to build a roadmap."
+            />
         );
     }
 
     const foundation = roadmap.filter(s => s.overlap >= 70);
     const growth = roadmap.filter(s => s.overlap >= 30 && s.overlap < 70);
     const mastery = roadmap.filter(s => s.overlap < 30);
+    const doneCount = roadmap.filter(s => skillProgress[s.name] === 'Completed').length;
+    const doingCount = roadmap.filter(s => skillProgress[s.name] === 'In Progress').length;
+    const pct = roadmap.length ? Math.round((doneCount / roadmap.length) * 100) : 0;
+
+    const PHASES = [
+        { title: 'Foundational skills', sub: `Needed by 70%+ of the ${totalRolesCount} roles — start here`, icon: <ShieldCheck size={20} />, items: foundation },
+        { title: 'Specialisation skills', sub: 'Needed by 30–70% of roles — build depth', icon: <Terminal size={20} />, items: growth },
+        { title: 'Edge skills', sub: 'Niche skills that set you apart for specific roles', icon: <Zap size={20} />, items: mastery },
+    ].filter(p => p.items.length > 0);
 
     return (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div style={styles.roadmapHeader}>
-                <h2 style={styles.title}>Dynamic Career Roadmap</h2>
-                <p style={styles.subtitle}>
-                    Strategic learning path based on skill overlaps across all {totalRolesCount} roles within this family.
-                    Foundational skills appear first, followed by niche specializations
-                </p>
-            </div>
-
-            {/* Certificate Upload Modal */}
+        <div className="rm animate-fade-in">
             {certModal && (
                 <CertificateModal
                     skillName={certModal.skillName}
@@ -212,7 +204,6 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                     theme={theme}
                 />
             )}
-
             {inProgressModal && (
                 <InProgressModal
                     skillName={inProgressModal.skillName}
@@ -225,28 +216,50 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                 />
             )}
 
-            <div style={styles.roadmapFlow}>
-                {foundation.length > 0 && <RoadmapPhase title="Foundational Skills" icon={ShieldCheck} items={foundation} color="var(--accent)" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
-                {growth.length > 0 && <RoadmapPhase title="Specialization Skills" icon={Terminal} items={growth} color="var(--accent2)" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
-                {mastery.length > 0 && <RoadmapPhase title="Edge Skills" icon={Zap} items={mastery} color="#a78bfa" skillProgress={skillProgress} onStatusChange={handleStatusChange} onInProgress={setInProgressModal} totalRoles={totalRolesCount} />}
+            {/* Progress summary */}
+            <div className="rm-summary">
+                <div className="stat">
+                    <div className="stat-k">Overall progress</div>
+                    <div className="stat-v brand">{pct}%</div>
+                    <div className="meter" style={{ marginTop: 6 }}><i style={{ width: `${pct}%` }} /></div>
+                </div>
+                <div className="stat"><div className="stat-k">Skills in roadmap</div><div className="stat-v">{roadmap.length}</div><div className="stat-s">across {totalRolesCount} roles</div></div>
+                <div className="stat"><div className="stat-k">In progress</div><div className="stat-v">{doingCount}</div><div className="stat-s">currently learning</div></div>
+                <div className="stat"><div className="stat-k">Completed</div><div className="stat-v" style={{ color: 'var(--green)' }}>{doneCount}</div><div className="stat-s">verified or marked done</div></div>
             </div>
+
+            <div className="dp-card soft" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ color: 'var(--accent-text)', display: 'flex' }}><Map size={18} /></span>
+                <span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.5 }}>
+                    Skills are ordered by how many of this direction's roles need them. Hover a skill to see which roles need it; mark a skill <strong style={{ fontWeight: 600, color: 'var(--text1)' }}>In progress</strong> or <strong style={{ fontWeight: 600, color: 'var(--text1)' }}>Done</strong> to track your progress.
+                </span>
+            </div>
+
+            {PHASES.map(ph => (
+                <RoadmapPhase
+                    key={ph.title}
+                    title={ph.title}
+                    sub={ph.sub}
+                    icon={ph.icon}
+                    items={ph.items}
+                    skillProgress={skillProgress}
+                    onStatusChange={handleStatusChange}
+                    onInProgress={setInProgressModal}
+                    totalRoles={totalRolesCount}
+                />
+            ))}
         </div>
     );
 };
 
-const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatusChange, onInProgress, totalRoles }) => (
-    <div style={styles.phaseWrap}>
-        <div style={{ ...styles.phaseLine, background: `linear-gradient(to bottom, ${color}, transparent)` }} />
-        <div style={styles.phaseHeader}>
-            <div style={{ ...styles.phaseIcon, borderColor: color, color: color }}><Icon size={18} /></div>
-            <h3 style={{ ...styles.phaseTitle, color: color }}>{title}</h3>
-        </div>
-        <div style={styles.phaseGrid}>
-            {items.map((item, idx) => (
+const RoadmapPhase = ({ title, sub, icon, items, skillProgress, onStatusChange, onInProgress, totalRoles }) => (
+    <div className="dp-card">
+        <CardHead icon={icon} title={title} sub={sub} right={<span className="dchip">{items.length} skills</span>} />
+        <div className="rm-grid">
+            {items.map((item) => (
                 <SkillCard
-                    key={idx}
+                    key={item.name}
                     item={item}
-                    color={color}
                     status={skillProgress[item.name] || 'Not Started'}
                     onStatusChange={onStatusChange}
                     onInProgress={onInProgress}
@@ -257,85 +270,42 @@ const RoadmapPhase = ({ title, icon: Icon, items, color, skillProgress, onStatus
     </div>
 );
 
-const SkillCard = ({ item, color, status, onStatusChange, onInProgress, totalRoles }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(false);
-
-    const getStatusStyle = (s) => {
-        switch (s) {
-            case 'Completed': return { background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' };
-            case 'In Progress': return { background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' };
-            default: return { background: 'rgba(148, 163, 184, 0.1)', color: '#64748b', border: '1px solid rgba(148, 163, 184, 0.2)' };
-        }
-    };
-
+const SkillCard = ({ item, status, onStatusChange, onInProgress, totalRoles }) => {
+    const [tip, setTip] = useState(false);
+    const done = status === 'Completed';
+    const doing = status === 'In Progress';
     return (
-        <div
-            style={{
-                ...styles.skillCard,
-                borderColor: isHovered ? color : 'var(--border)',
-                transform: isHovered ? 'translateY(-2px)' : 'none',
-                background: isHovered ? 'var(--navy3)' : 'var(--navy2)',
-                boxShadow: isHovered ? `0 10px 20px -5px rgba(0,0,0,0.15)` : 'none'
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => { setIsHovered(false); setShowTooltip(false); }}
-        >
-            <div style={styles.skillTop}>
-                <span style={{ ...styles.skillName, color: isHovered ? 'var(--text1)' : 'var(--text2)' }}>{item.name}</span>
-                <div
-                    style={{ ...styles.overlapTag, background: color === 'var(--accent)' ? 'var(--accent-tint)' : 'rgba(34,211,238, 0.1)', color: color, cursor: 'help', position: 'relative' }}
-                    onMouseEnter={() => setShowTooltip(true)}
-                    onMouseLeave={() => setShowTooltip(false)}
-                >
-                    {item.count}/{totalRoles} Roles
-
-                    {showTooltip && (
-                        <div style={styles.customTooltip}>
-                            <div style={styles.tooltipHeader}>Required for:</div>
-                            <div style={styles.tooltipList}>
-                                {item.roles.map((r, i) => (
-                                    <div key={i} style={styles.tooltipItem}>&bull; {r}</div>
-                                ))}
-                            </div>
-                            <div style={styles.tooltipArrow} />
+        <div className={`rm-card${done ? ' done' : doing ? ' doing' : ''}`}>
+            <div className="rm-top">
+                <span className="rm-name">{item.name}</span>
+                <span className="rm-count" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
+                    {item.count}/{totalRoles} roles
+                    {tip && (
+                        <div className="rm-tip">
+                            <div className="rm-tip-h">Needed for</div>
+                            {item.roles.map((r, i) => <div key={i} className="rm-tip-i">{r}</div>)}
                         </div>
                     )}
-                </div>
+                </span>
             </div>
-
-            <div style={styles.skillMeta}>
-                <span style={{ color: 'var(--muted)' }}>{item.category || 'Competency'}</span>
-                {status !== 'Not Started' && (
-                    <span style={{ ...styles.statusBadge, ...getStatusStyle(status) }}>
-                        {status}
-                    </span>
-                )}
+            <div className="rm-meta">
+                <span>{item.category || 'Competency'}</span>
+                {done && <span className="status-chip done"><CheckCircle size={12} /> Done</span>}
+                {doing && <span className="status-chip doing">In progress</span>}
             </div>
-
-            {status !== 'Completed' && (
-                <div style={{ ...styles.progressActions, opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(5px)' }}>
-                    {status !== 'In Progress' ? (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onInProgress({ skillName: item.name }); }}
-                            style={{ ...styles.actionBtn, background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}
-                        >
-                            In Progress
+            {!done && (
+                <div className="rm-actions">
+                    {!doing ? (
+                        <button type="button" className="rm-btn" onClick={(e) => { e.stopPropagation(); onInProgress({ skillName: item.name }); }}>
+                            Start
                         </button>
                     ) : (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Not Started'); }}
-                            style={{ ...styles.actionBtn, background: 'rgba(148, 163, 184, 0.12)', color: '#94a3b8', border: '1px solid rgba(148,163,184,0.25)' }}
-                            title="Undo In Progress"
-                        >
-                            ↩ Undo
+                        <button type="button" className="rm-btn" title="Undo In Progress" onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Not Started'); }}>
+                            <RotateCcw size={13} /> Undo
                         </button>
                     )}
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Completed'); }}
-                        style={{ ...styles.actionBtn, background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}
-                    >
-                        Mark Done
+                    <button type="button" className="rm-btn primary" onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Completed'); }}>
+                        <CheckCircle size={13} /> Done
                     </button>
                 </div>
             )}
@@ -349,8 +319,8 @@ const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
     const C = {
         bg:      isDark ? '#0f1729' : '#ffffff',
         surface: isDark ? '#141f35' : '#f8fafc',
-        border:  isDark ? 'rgba(255,255,255,0.09)' : '#e2e8f0',
-        text1:   isDark ? '#f1f5f9' : '#0f172a',
+        border:  isDark ? 'rgba(255,255,255,0.09)' : '#d7ebf5',
+        text1:   isDark ? '#f1f5f9' : '#072036',
         text2:   isDark ? '#94a3b8' : '#475569',
         muted:   isDark ? '#64748b' : '#94a3b8',
         btnBg:   isDark ? '#1e2d48' : '#f1f5f9',
@@ -386,14 +356,14 @@ const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
                 onClick={e => e.stopPropagation()}
             >
                 {/* Top accent bar */}
-                <div style={{ height: '4px', background: 'linear-gradient(90deg, #3b82f6, #6366f1)' }} />
+                <div style={{ height: '4px', background: 'var(--accent)' }} />
 
                 {/* Body */}
                 <div style={{ padding: '1.8rem 1.5rem 1.2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
                     <div style={{
                         width: '54px', height: '54px', borderRadius: '50%',
-                        background: 'rgba(59, 130, 246, 0.12)',
-                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                        background: 'var(--accent-tint)',
+                        border: '1px solid var(--accent-border)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#045C9A',
                     }}><Target size={26} /></div>
@@ -404,7 +374,7 @@ const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
                         </div>
                         <div style={{ fontSize: '0.82rem', color: C.text2, lineHeight: 1.6 }}>
                             Mark <strong style={{ color: C.text1 }}>&#34;{skillName}&#34;</strong> as{' '}
-                            <span style={{ color: '#3b82f6', fontWeight: 700 }}>In Progress</span>?<br />
+                            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>In Progress</span>?<br />
                             <span style={{ color: C.muted, fontSize: '0.76rem' }}>You can undo this at any time.</span>
                         </div>
                     </div>
@@ -433,12 +403,12 @@ const InProgressModal = ({ skillName, onConfirm, onClose, theme }) => {
                         onClick={onConfirm}
                         style={{
                             padding: '0.55rem 1.4rem',
-                            background: 'rgba(59, 130, 246, 0.15)',
-                            color: '#3b82f6',
-                            border: '1px solid rgba(59,130,246,0.4)',
+                            background: 'var(--accent2)',
+                            color: '#ffffff',
+                            border: '1px solid var(--accent2)',
                             borderRadius: '9px',
                             fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(59,130,246,0.2)',
+                            boxShadow: 'none',
                         }}
                     >
                         Yes, Start Learning
@@ -478,13 +448,13 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
     const C = {
         bg:       isDark ? '#0f1729' : '#ffffff',
         surface:  isDark ? '#141f35' : '#f8fafc',
-        border:   isDark ? 'rgba(255,255,255,0.09)' : '#e2e8f0',
-        text1:    isDark ? '#f1f5f9' : '#0f172a',
+        border:   isDark ? 'rgba(255,255,255,0.09)' : '#d7ebf5',
+        text1:    isDark ? '#f1f5f9' : '#072036',
         text2:    isDark ? '#94a3b8' : '#475569',
         muted:    isDark ? '#64748b' : '#94a3b8',
         accent:   'var(--accent)',
-        accentBg: isDark ? 'rgba(79,142,247,0.12)' : 'rgba(37,99,235,0.08)',
-        accentBorder: isDark ? 'rgba(79,142,247,0.3)' : 'rgba(37,99,235,0.25)',
+        accentBg: isDark ? 'rgba(4,92,154,0.22)' : '#EAF7FD',
+        accentBorder: isDark ? 'rgba(166,215,232,0.35)' : 'rgba(4,92,154,0.25)',
         dropBg:   isDark ? '#111827' : '#f8fafc',
         btnBg:    isDark ? '#1e2d48' : '#f1f5f9',
     };
@@ -524,7 +494,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                 {/* Accent gradient bar */}
                 <div style={{
                     height: '4px',
-                    background: 'linear-gradient(90deg, var(--accent), #818cf8, #06b6d4)',
+                    background: 'var(--accent)',
                 }} />
 
                 {/* Header */}
@@ -583,9 +553,9 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                         width: '28px', height: '28px', borderRadius: '50%',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         transition: 'all 0.25s',
-                                        background: isDone ? '#10b981' : isActive ? 'var(--accent)' : C.btnBg,
-                                        border: isDone ? '2px solid #10b981' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
-                                        boxShadow: isActive ? '0 0 0 4px rgba(79,142,247,0.18)' : 'none',
+                                        background: isDone ? '#059669' : isActive ? 'var(--accent)' : C.btnBg,
+                                        border: isDone ? '2px solid #059669' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
+                                        boxShadow: isActive ? '0 0 0 4px rgba(4,92,154,0.15)' : 'none',
                                     }}>
                                         {isDone
                                             ? <CheckCircle size={13} color="#fff" />
@@ -594,7 +564,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     </div>
                                     <span style={{
                                         fontSize: '0.65rem', fontWeight: 700,
-                                        color: isDone ? '#10b981' : isActive ? C.text1 : C.muted,
+                                        color: isDone ? '#059669' : isActive ? C.text1 : C.muted,
                                         transition: 'color 0.2s',
                                     }}>
                                         {s}
@@ -605,7 +575,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                         width: '48px', height: '2px',
                                         margin: '0 0.4rem',
                                         marginBottom: '1.1rem',
-                                        background: step > i + 1 ? '#10b981' : C.border,
+                                        background: step > i + 1 ? '#059669' : C.border,
                                         transition: 'background 0.3s',
                                         borderRadius: '2px',
                                     }} />
@@ -621,7 +591,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                     {/* Drop Zone */}
                     <div
                         style={{
-                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#10b981' : file ? 'rgba(16,185,129,0.5)' : C.border}`,
+                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#059669' : file ? 'rgba(16,185,129,0.5)' : C.border}`,
                             borderRadius: '16px',
                             padding: '2.2rem 1.5rem',
                             textAlign: 'center', cursor: verified ? 'default' : 'pointer',
@@ -649,9 +619,9 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     border: '2px solid rgba(16,185,129,0.35)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
-                                    <CheckCircle size={26} color="#10b981" />
+                                    <CheckCircle size={26} color="#059669" />
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981' }}>Certificate Verified</div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#059669' }}>Certificate Verified</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
                             </>
                         ) : file ? (
@@ -663,7 +633,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     color: '#059669',
                                 }}><FileText size={24} /></div>
-                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#10b981' }}>{file.name}</div>
+                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#059669' }}>{file.name}</div>
                                 <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB &middot; Click to change</div>
                             </>
                         ) : (
@@ -759,13 +729,13 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
                         style={{
                             display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
                             padding: '0.6rem 1.4rem',
-                            background: canConfirm ? 'var(--accent)' : C.btnBg,
+                            background: canConfirm ? 'var(--accent2)' : C.btnBg,
                             color: canConfirm ? '#ffffff' : C.muted,
-                            border: canConfirm ? '1px solid var(--accent)' : `1px solid ${C.border}`,
+                            border: canConfirm ? '1px solid var(--accent2)' : `1px solid ${C.border}`,
                             borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700,
                             transition: 'all 0.2s',
                             cursor: canConfirm ? 'pointer' : 'not-allowed',
-                            boxShadow: canConfirm ? '0 4px 14px rgba(79,142,247,0.35)' : 'none',
+                            boxShadow: 'none',
                         }}
                     >
                         <CheckCircle size={14} />
@@ -776,113 +746,6 @@ const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
         </div>,
         document.body
     );
-};
-
-const styles = {
-    loadingWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', padding: '2rem' },
-    spinner: { width: '42px', height: '42px', borderRadius: '50%', border: '3px solid var(--accent-border)', borderTopColor: 'var(--accent)', animation: 'spin 1s linear infinite' },
-    unavailableWrap: { background: 'var(--navy2)', border: '1px solid var(--border)', borderRadius: '16px', padding: '4rem 2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-    iconGhost: { color: 'var(--muted)', opacity: 0.3, marginBottom: '1.5rem' },
-    roadmapHeader: { maxWidth: '800px' },
-    badge: { display: 'inline-flex', alignItems: 'center', padding: '0.4rem 0.8rem', borderRadius: '100px', background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' },
-    title: { fontSize: '1.75rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.02em', margin: '0 0 0.5rem 0' },
-    subtitle: { color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 },
-    roadmapFlow: { display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' },
-    phaseWrap: { position: 'relative', paddingLeft: '1.8rem' },
-    phaseLine: { position: 'absolute', left: '10px', top: '20px', bottom: '-20px', width: '2px', opacity: 0.12 },
-    phaseHeader: { display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' },
-    phaseIcon: { width: '24px', height: '24px', borderRadius: '50%', border: '2px solid', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--navy1)', zIndex: 2, position: 'absolute', left: '0' },
-    phaseTitle: { fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' },
-    phaseGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.5rem' },
-    skillCard: {
-        background: 'var(--navy2)',
-        border: '1px solid var(--border)',
-        borderRadius: '10px',
-        padding: '0.65rem',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        cursor: 'default',
-        position: 'relative'
-    },
-    skillTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' },
-    skillName: { fontSize: '0.75rem', fontWeight: 700, color: 'var(--text2)', lineHeight: 1.2 },
-    overlapTag: { fontSize: '0.55rem', fontWeight: 800, padding: '0.12rem 0.4rem', borderRadius: '3px' },
-    skillMeta: { fontSize: '0.65rem', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    statusBadge: {
-        fontSize: '0.55rem',
-        fontWeight: 700,
-        padding: '0.15rem 0.4rem',
-        borderRadius: '5px',
-        textTransform: 'uppercase',
-        letterSpacing: '0.02em'
-    },
-    progressActions: {
-        marginTop: '0.5rem',
-        display: 'flex',
-        gap: '0.3rem',
-        transition: 'all 0.3s ease',
-        pointerEvents: 'auto'
-    },
-    actionBtn: {
-        width: 'auto',
-        minWidth: '70px',
-        padding: '0.25rem 0.45rem',
-        borderRadius: '4px',
-        fontSize: '0.6rem',
-        fontWeight: 700,
-        border: '1px solid rgba(255,255,255,0.08)',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '0.2rem'
-    },
-    customTooltip: {
-        position: 'absolute',
-        bottom: '100%',
-        right: '0',
-        transform: 'translateY(-8px)',
-        background: 'var(--navy2)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        padding: '0.65rem 0.75rem',
-        width: '170px',
-        zIndex: 100,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-        animation: 'fadeInUp 0.2s ease forwards',
-        pointerEvents: 'none'
-    },
-    tooltipHeader: {
-        fontSize: '0.65rem',
-        fontWeight: 800,
-        color: 'var(--muted)',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        marginBottom: '0.4rem',
-        borderBottom: '1px solid var(--border)',
-        paddingBottom: '0.3rem'
-    },
-    tooltipList: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.25rem'
-    },
-    tooltipItem: {
-        fontSize: '0.7rem',
-        color: 'var(--text1)',
-        lineHeight: 1.3
-    },
-    tooltipArrow: {
-        position: 'absolute',
-        top: '100%',
-        right: '15px',
-        width: '0',
-        height: '0',
-        borderLeft: '6px solid transparent',
-        borderRight: '6px solid transparent',
-        borderTop: '6px solid var(--navy2)'
-    }
 };
 
 export default CareerRoadmap;

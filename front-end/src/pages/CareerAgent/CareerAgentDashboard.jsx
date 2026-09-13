@@ -10,11 +10,9 @@ import AIImplementation from './panels/AIImplementation';
 import InterviewPrep from './panels/InterviewPrep';
 import ResumeTips from './panels/ResumeTips';
 import CareerRoadmap from './panels/CareerRoadmap';
-import CareerDirectionCard from './panels/CareerDirectionCard';
 import Certifications from './panels/Certifications';
 import CareerFirstVisitModal from './components/CareerFirstVisitModal';
 import CareerLockBanner from './components/CareerLockBanner';
-import CareerLockStatusCard from './components/CareerLockStatusCard';
 import CareerLockedModal from './components/CareerLockedModal';
 import { fetchLockStatus } from '@/services/CareerLockService';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -219,7 +217,9 @@ const CareerAgentDashboard = () => {
                                 directionDescription: dir.overview || existingDir.directionDescription || '',
                                 directionOverview: dir.overview || existingDir.directionOverview || '',
                                 type: existingDir.type || (key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative'),
-                                roles: dir.roles || [],  // ← always use fresh DB roles (full list)
+                                roles: dir.roles || [],  // ← always use fresh DB roles (full list, incl. degree-fit detail)
+                                specialisation: dir.specialisation || existingDir.specialisation || '',
+                                primaryJobFamilies: dir.primaryJobFamilies || existingDir.primaryJobFamilies || [],
                             };
                         }
                     }
@@ -522,8 +522,6 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
 
-                    <CareerLockStatusCard lockStatus={lockStatus} />
-
                     <div className="sidebar-nav">
                         <div className="sb-label">{t('career_agent.sidebar.sections', 'Report sections')}</div>
                         {panels.map(p => (
@@ -696,17 +694,10 @@ const CareerAgentDashboard = () => {
                                 subtitle={<>{t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}</>}
                             />
 
-                            {/* LEARNING ROADMAP & MILESTONE STEPS (Now at Top) */}
                             <CareerRoadmap
                                 roleName={roleName}
                                 mongoRoleData={currentData}
                                 direction={currentData.direction}
-                            />
-
-                            {/* DYNAMIC ROLE INTELLIGENCE & GAP ANALYSIS (Now at Last) */}
-                            <CareerDirectionCard
-                                roleName={roleName}
-                                mongoRoleData={currentData}
                             />
                         </div>
                     )}
