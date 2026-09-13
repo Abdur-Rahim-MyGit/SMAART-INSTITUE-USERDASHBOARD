@@ -1285,6 +1285,93 @@ router.get('/my-analysis', optionalAuth, async (req, res) => {
 });
 
 /**
+ * GET /api/career-agent/my-recommended-directions
+ * The directions matched to the logged-in student's own degree(s) — the same
+ * "Recommended for you" list shown during onboarding — with description and
+ * roles. Always available, before AND after the career direction is locked,
+ * so the student can keep exploring every recommended direction from the
+ * report page. Education is read from the student's latest analysis input.
+ */
+async function findDirectionDocsForSpec(uniqueId) {
+  let docs = await CareerAgentDataModel.find({ 'Spec ID': uniqueId }).lean();
+  if ((!docs || docs.length === 0) && uniqueId.startsWith('PG-')) {
+    docs = await CareerAgentDataModel.find({ 'Spec ID': uniqueId.replace(/^PG-/, 'UG-') }).lean();
+  }
+  return docs || [];
+}
+
+function mapDirectionDocToSummary(doc) {
+  return {
+    directionId: doc['Direction ID'],
+    directionName: doc['Career Direction'],
+    directionDescription: doc['Overview / Description'] || '',
+    type: doc['Type'] || 'Primary',
+    uniqueId: doc['Spec ID'],
+    roles: attachRoleDetail(doc, [1,2,3,4,5,6,7,8,9,10]
+      .map(n => ({ role: doc[`Job Role ${n}`], id: doc[`Role ID ${n}`] }))
+      .filter(r => r.role && typeof r.role === 'string' && r.role.trim() !== ''))
+  };
+}
+
+router.get('/my-recommended-directions', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Authentication required.' });
+    const userId = req.user._id || req.user.id;
+    const email = req.user.email;
+
+    let record = await CareerAnalysisModel.findOne({ userId }).sort({ created_at: -1 }).lean();
+    if (!record && email) {
+      record = await CareerAnalysisModel.findOne({ student_email: email }).sort({ created_at: -1 }).lean();
+    }
+
+    const education = Array.isArray(record?.input_data?.education) ? record.input_data.education : [];
+    const validEntries = education.filter(e => e && e.level && e.domain && e.degreeGroup);
+    if (validEntries.length === 0) {
+      return res.json({ found: false, directions: [], total: 0, degrees: [] });
+    }
+
+    const seen = new Set();
+    const directions = [];
+    const degrees = [];
+    for (const entry of validEntries) {
+      const specs = Array.isArray(entry.specialisation) && entry.specialisation.length > 0
+        ? entry.specialisation
+        : ['General'];
+      for (const spec of specs) {
+        const base = { level: entry.level, domain: entry.domain };
+        let degree = await Degree.findOne({ ...base, fullName: entry.degreeGroup, specialization: spec }).lean();
+        if (!degree) degree = await Degree.findOne({ ...base, fullName: entry.degreeGroup }).lean();
+        if (!degree) degree = await Degree.findOne({ ...base, abbreviation: entry.degreeGroup }).lean();
+        if (!degree) continue;
+
+        degrees.push({ degree: degree.abbreviation || degree.fullName, specialisation: degree.specialization || '' });
+        const docs = await findDirectionDocsForSpec(degree.uniqueId);
+        for (const doc of docs) {
+          const d = mapDirectionDocToSummary(doc);
+          if (!d.directionId || !d.directionName || seen.has(d.directionId)) continue;
+          seen.add(d.directionId);
+          directions.push({
+            ...d,
+            domain: degree.domain || null,
+            degreeName: degree.fullName || null,
+            degreeAbbr: degree.abbreviation || null,
+            specialisation: degree.specialization || null
+          });
+        }
+      }
+    }
+
+    const typeOrder = { Primary: 0, Secondary: 1, Alternative: 2, Alternate: 2 };
+    directions.sort((a, b) => (typeOrder[a.type] ?? 3) - (typeOrder[b.type] ?? 3));
+
+    res.json({ found: directions.length > 0, directions, total: directions.length, degrees });
+  } catch (err) {
+    console.error('[career-agent/my-recommended-directions] Error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch recommended directions', details: err.message });
+  }
+});
+
+/**
  * GET /api/career-agent/my-analysis/all
  * Returns all analyses for the logged-in user (for history/new analysis).
  */

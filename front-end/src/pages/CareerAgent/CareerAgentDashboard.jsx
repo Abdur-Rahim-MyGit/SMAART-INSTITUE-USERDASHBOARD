@@ -44,7 +44,8 @@ import {
     ChevronDown,
     X,
     Menu,
-    RefreshCw
+    RefreshCw,
+    Star
 } from '@/components/icons';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
@@ -62,6 +63,21 @@ const CareerAgentDashboard = () => {
     });
     const [activePanel, setActivePanel] = useState('direction');
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
+    // Recommended directions for the student's own degree(s) — always open to
+    // explore, before and after locking (the 3 chosen paths are a subset).
+    const [recommended, setRecommended] = useState([]);
+    const [recommendedLoading, setRecommendedLoading] = useState(true);
+    const [expandedRec, setExpandedRec] = useState(null);
+    useEffect(() => {
+        let cancelled = false;
+        fetch('/api/career-agent/my-recommended-directions', { credentials: 'include' })
+            .then(r => (r.ok ? r.json() : { directions: [] }))
+            .then(p => { if (!cancelled) setRecommended(Array.isArray(p?.directions) ? p.directions : []); })
+            .catch(() => { if (!cancelled) setRecommended([]); })
+            .finally(() => { if (!cancelled) setRecommendedLoading(false); });
+        return () => { cancelled = true; };
+    }, []);
 
     // Keep activeRole in sync if user navigates with different ?tab= param
     useEffect(() => {
@@ -303,8 +319,22 @@ const CareerAgentDashboard = () => {
     const zoneDot = currentData?.zone === 'Green' ? 'green' : currentData?.zone === 'Amber' ? 'amber' : currentData?.zone === 'Red' ? 'red' : (activeRole === 1 ? 'green' : activeRole === 2 ? 'amber' : 'red');
     const zoneCardClass = currentData?.zone === 'Green' ? 'zone-green-card' : currentData?.zone === 'Amber' ? 'zone-primary' : currentData?.zone === 'Red' ? 'zone-red-card' : (activeRole === 1 ? 'zone-green-card' : activeRole === 2 ? 'zone-primary' : 'zone-red-card');
 
+    // Which of the student's 3 chosen paths a recommended direction is (if any).
+    const chosenTierFor = (dir) => {
+        const id = dir?.directionId;
+        const name = dir?.directionName;
+        if (id && data?.primary?.direction?.directionId === id) return 'primary';
+        if (id && data?.secondary?.direction?.directionId === id) return 'secondary';
+        if (id && data?.tertiary?.direction?.directionId === id) return 'tertiary';
+        if (name && name === prefPrimary) return 'primary';
+        if (name && name === prefSecondary) return 'secondary';
+        if (name && name === prefTertiary) return 'tertiary';
+        return null;
+    };
+
     const panels = [
         { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} stroke={1.5} /> },
+        { id: 'recommended', label: t('career_agent.panels.recommended', 'Recommended Directions'), icon: <Star size={18} stroke={1.5} /> },
         { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} stroke={1.5} /> },
         { id: 'market', label: t('career_agent.panels.market', 'Market Intel'), icon: <BarChart3 size={18} stroke={1.5} /> },
         { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} stroke={1.5} /> },
@@ -601,6 +631,75 @@ const CareerAgentDashboard = () => {
                                 directionData={currentData?.direction || null}
                                 roleName={currentData?.tab1?.role_name || ''}
                             />
+                        </div>
+                    )}
+
+                    {/* ─────── Panel: Recommended Directions — always open, before & after locking ─────── */}
+                    {activePanel === 'recommended' && (
+                        <div className="panel animate-fade-in">
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+                                <div>
+                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Star size={22} stroke={1.5} color="var(--accent-text)" /> {t('career_agent.panels.recommended', 'Recommended Directions')}
+                                    </h2>
+                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
+                                        {t('career_agent.recommended.desc', 'Every direction matched to your degree and specialisation — always open to explore, before and after your paths are locked.')}
+                                    </p>
+                                </div>
+                                {recommended.length > 0 && (
+                                    <span className="rec-count-chip">{recommended.length} {t('career_agent.recommended.count', 'directions')}</span>
+                                )}
+                            </div>
+
+                            {recommendedLoading ? (
+                                <div className="rec-empty">{t('career_agent.recommended.loading', 'Loading your recommended directions…')}</div>
+                            ) : recommended.length === 0 ? (
+                                <div className="rec-empty">{t('career_agent.recommended.none', 'No recommended directions are available for your degree yet.')}</div>
+                            ) : (
+                                <div className="rec-dir-list">
+                                    {recommended.map((dir, i) => {
+                                        const tier = chosenTierFor(dir);
+                                        const isOpen = expandedRec === dir.directionId;
+                                        const roles = Array.isArray(dir.roles) ? dir.roles : [];
+                                        const meta = [dir.degreeAbbr || dir.degreeName, dir.specialisation].filter(Boolean).join(' · ');
+                                        return (
+                                            <div key={dir.directionId} className={`rec-dir-card${isOpen ? ' open' : ''}${tier ? ' chosen' : ''}`}>
+                                                <button type="button" className="rec-dir-head" onClick={() => setExpandedRec(isOpen ? null : dir.directionId)}>
+                                                    <div className="rec-dir-num">{i + 1}</div>
+                                                    <div className="rec-dir-titlewrap">
+                                                        <div className="rec-dir-title">{dir.directionName}</div>
+                                                        <div className="rec-dir-meta">
+                                                            {meta ? `${meta} · ` : ''}{roles.length} {t('career_agent.recommended.roles', 'roles')}
+                                                        </div>
+                                                    </div>
+                                                    {tier && (
+                                                        <span className="rec-dir-chip">
+                                                            {t(`career_agent.recommended.chosen_${tier}`, `Your ${tier}`)}
+                                                        </span>
+                                                    )}
+                                                    <ChevronDown size={18} className="rec-dir-caret" />
+                                                </button>
+                                                {isOpen && (
+                                                    <div className="rec-dir-body">
+                                                        {dir.directionDescription && <p className="rec-dir-desc">{dir.directionDescription}</p>}
+                                                        <div className="rec-dir-roles-label">{t('career_agent.recommended.roles_label', 'Possible job roles')}</div>
+                                                        <div className="dir-roles-grid">
+                                                            {roles.map((r, ri) => (
+                                                                <div key={r.id || ri} className="dir-role-card">
+                                                                    <div className="dir-role-card-number">{ri + 1}</div>
+                                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                                        <div className="dir-role-card-name">{r.role}</div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
 
