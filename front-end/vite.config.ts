@@ -192,16 +192,13 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     drop: mode === "production" ? ["console", "debugger"] : [],
   },
-  // TEMPORARY diagnostic aid: production stack traces are otherwise
-  // unreadable minified identifiers (e.g. "me is not a constructor"),
-  // which makes a production-only crash impossible to pin down. Source
-  // maps let DevTools show the real file/line even in the prod build.
-  // Safe to leave on or remove once the current bug is found — it only
-  // adds .map files DevTools fetches when open, no runtime behaviour
-  // change.
-  build: {
-    sourcemap: true,
-  },
+  // Production source maps were tried here as a one-off diagnostic aid but
+  // reverted: generating maps for all ~11.8k modules pushed the build's
+  // memory use past this environment's Node heap limit and OOM-killed the
+  // build (`FATAL ERROR: Reached heap limit ... JavaScript heap out of
+  // memory`). Not worth the cost for a build-breaking, occasional benefit —
+  // if a future prod-only crash needs decoding, run a dedicated one-off
+  // build with sourcemap: true rather than leaving it on by default.
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
