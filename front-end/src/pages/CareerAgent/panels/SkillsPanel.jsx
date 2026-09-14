@@ -78,10 +78,10 @@ const SkillsPanel = ({ roleName, direction }) => {
             ) : (
                 <>
                     <div className="dp-grid-4">
-                        <MetricTile icon={<Dna size={18} />} value={skills.length} label="Skills mapped" sub={`for ${selectedRole}`} tone="brand" />
+                        <MetricTile icon={<Dna size={18} />} value={skills.length} label="Skills mapped" sub={`for ${selectedRole}`} />
                         <MetricTile icon={<Layers size={18} />} value={groups.length} label="Categories" sub="skill groups" />
-                        <MetricTile icon={<Flame size={18} />} value={highCount} label="High priority" sub="must-have skills" tone="amber" />
-                        <MetricTile icon={<Award size={18} />} value={certCount} label="With certification" sub="skills with a recognised cert" tone="green" />
+                        <MetricTile icon={<Flame size={18} />} value={highCount} label="High priority" sub="must-have skills" />
+                        <MetricTile icon={<Award size={18} />} value={certCount} label="With certification" sub="skills with a recognised cert" />
                     </div>
 
                     <div className="dp-grid-2">

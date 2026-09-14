@@ -165,7 +165,7 @@ const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
   return (
     <div className="dp animate-fade-in">
       <div className="dp-grid-4">
-        <MetricTile icon={<Award size={18} />} value={total} label="Certifications" sub={`across ${totalRoles} roles${directionName ? ` in ${directionName}` : ''}`} tone="brand" />
+        <MetricTile icon={<Award size={18} />} value={total} label="Certifications" sub={`across ${totalRoles} roles${directionName ? ` in ${directionName}` : ''}`} />
         <MetricTile icon={<Code size={18} />} value={data.technical.length} label="Technical" sub="tools & platforms" />
         <MetricTile icon={<Bot size={18} />} value={data.ai.length} label="AI & data" sub="AI assistants & analytics" />
         <MetricTile icon={<Building size={18} />} value={data.domain.length} label="Domain" sub="subject-matter credentials" />

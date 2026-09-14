@@ -219,16 +219,16 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
             {/* Progress summary */}
             <div className="rm-summary">
                 <div className="stat">
-                    <div className="stat-ic brand"><TrendingUp size={18} /></div>
+                    <div className="stat-ic"><TrendingUp size={18} /></div>
                     <div className="stat-body" style={{ width: '100%' }}>
                         <div className="stat-k">Overall progress</div>
-                        <div className="stat-v brand">{pct}%</div>
+                        <div className="stat-v">{pct}%</div>
                         <div className="meter" style={{ marginTop: 6 }}><i style={{ width: `${pct}%` }} /></div>
                     </div>
                 </div>
                 <MetricTile icon={<Layers size={18} />} value={roadmap.length} label="Skills in roadmap" sub={`across ${totalRolesCount} roles`} />
-                <MetricTile icon={<Clock size={18} />} value={doingCount} label="In progress" sub="currently learning" tone="amber" />
-                <MetricTile icon={<CheckCircle size={18} />} value={doneCount} label="Completed" sub="verified or marked done" tone="green" />
+                <MetricTile icon={<Clock size={18} />} value={doingCount} label="In progress" sub="currently learning" />
+                <MetricTile icon={<CheckCircle size={18} />} value={doneCount} label="Completed" sub="verified or marked done" />
             </div>
 
             <div className="dp-card soft" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>

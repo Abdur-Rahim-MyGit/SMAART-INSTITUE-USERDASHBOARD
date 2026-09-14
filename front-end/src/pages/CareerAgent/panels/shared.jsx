@@ -66,14 +66,16 @@ export const RoleSwitcher = ({ roles = [], value, onChange, label = 'Roles in th
     );
 };
 
-/* Metric tile: icon + value + label, one consistent visual weight across
-   every stat row in the report (Skill DNA, Certifications, Roadmap). */
-export const MetricTile = ({ icon, value, label, sub, tone = '' }) => (
+/* Metric tile: icon + value + label. One consistent brand-coloured look
+   across every stat row in the report (Skill DNA, Certifications,
+   Roadmap, salary stats) — no per-tile colour so nothing looks singled
+   out or accidental. */
+export const MetricTile = ({ icon, value, label, sub }) => (
     <div className="stat">
-        <div className={`stat-ic${tone ? ` ${tone}` : ''}`}>{icon}</div>
+        <div className="stat-ic">{icon}</div>
         <div className="stat-body">
             <div className="stat-k">{label}</div>
-            <div className={`stat-v${tone ? ` ${tone}` : ''}`}>{value}</div>
+            <div className="stat-v">{value}</div>
             {sub && <div className="stat-s">{sub}</div>}
         </div>
     </div>
@@ -118,7 +120,7 @@ export const SalaryStats = ({ profile }) => {
     return (
         <div className="dp-grid-4">
             {stats.map(s => (
-                <MetricTile key={s.k} icon={<CreditCard size={18} />} value={s.v} label={s.k} sub="per annum" tone="brand" />
+                <MetricTile key={s.k} icon={<CreditCard size={18} />} value={s.v} label={s.k} sub="per annum" />
             ))}
         </div>
     );
