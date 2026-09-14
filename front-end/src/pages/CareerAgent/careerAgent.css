@@ -2026,13 +2026,35 @@
 .career-agent-page .meter > i.red { background: var(--red); }
 .career-agent-page .meter > i.green { background: var(--green); }
 
-/* Salary progression card — one row of inline segments, no per-value card */
-.career-agent-page .salary-row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 4px 28px; }
-.career-agent-page .salary-seg { display: flex; flex-direction: column; gap: 4px; min-width: 84px; }
-.career-agent-page .salary-seg-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
-.career-agent-page .salary-seg-v { font-size: 18px; font-weight: 700; color: var(--accent-text); letter-spacing: -0.01em; }
-.career-agent-page .salary-seg-note { margin-left: auto; align-self: flex-end; font-size: 12px; color: var(--muted); padding-bottom: 1px; }
-@media (max-width: 640px) { .career-agent-page .salary-seg-note { margin-left: 0; width: 100%; order: 99; } }
+/* Salary progression — a connected ladder: a track line with a dot per
+   experience band (bigger dot = higher pay), labels underneath. Reads as
+   actual growth over time instead of four disconnected numbers. */
+.career-agent-page .salary-ladder { display: flex; flex-direction: column; gap: 10px; }
+.career-agent-page .salary-track { position: relative; display: flex; align-items: center; justify-content: space-between; height: 22px; padding: 0 2px; }
+.career-agent-page .salary-track-line {
+  position: absolute; left: 11px; right: 11px; top: 50%; height: 2px; transform: translateY(-50%);
+  background: linear-gradient(90deg, var(--accent-border), var(--accent));
+  border-radius: 2px; z-index: 0;
+}
+.career-agent-page .salary-node {
+  position: relative; z-index: 1; flex-shrink: 0; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--card);
+}
+.career-agent-page .salary-labels { display: flex; justify-content: space-between; gap: 12px; }
+.career-agent-page .salary-label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.career-agent-page .salary-label:last-child { align-items: flex-end; text-align: right; }
+.career-agent-page .salary-label-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.career-agent-page .salary-label-v { font-size: 17px; font-weight: 700; color: var(--text1); letter-spacing: -0.01em; }
+@media (max-width: 560px) {
+  .career-agent-page .salary-track, .career-agent-page .salary-labels { display: none; }
+  .career-agent-page .salary-ladder-mobile { display: flex !important; }
+}
+.career-agent-page .salary-ladder-mobile { display: none; flex-direction: column; gap: 12px; }
+.career-agent-page .salary-ladder-mobile .salary-row-m {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.career-agent-page .salary-ladder-mobile .salary-row-m:last-child { border-bottom: none; padding-bottom: 0; }
 
 /* Role signals card — AI exposure and English side by side */
 .career-agent-page .signal-split { display: flex; gap: 28px; }

@@ -109,8 +109,16 @@ export const useRoleProfile = (roleTitle) => {
 
 export const aiTone = (pct) => (pct >= 65 ? 'red' : pct >= 45 ? 'amber' : '');
 
-/* Salary progression — one compact card with inline segments, not four
-   separate bordered tiles repeating "per annum" four times. */
+// Pulls the highest figure out of a salary string ("₹11–18 L" → 18) so the
+// ladder's dots can grow with pay instead of all rendering the same size.
+const salaryUpperBound = (v) => {
+    const nums = String(v || '').match(/[\d.]+/g);
+    return nums && nums.length ? parseFloat(nums[nums.length - 1]) : 0;
+};
+
+/* Salary progression — a connected ladder (track + growing dots) instead
+   of four disconnected numbers, so it visibly reads as pay growing with
+   experience rather than a stat list. */
 export const SalaryStats = ({ profile }) => {
     const stats = [
         { k: 'Year 0–1', v: profile?.salaryYear0_1 },
@@ -119,17 +127,40 @@ export const SalaryStats = ({ profile }) => {
         { k: 'Year 6+', v: profile?.salaryYear6plus },
     ].filter(s => s.v);
     if (stats.length === 0) return null;
+
+    const maxV = Math.max(...stats.map(s => salaryUpperBound(s.v)), 1);
+    const nodeSize = (v) => 8 + (salaryUpperBound(v) / maxV) * 12; // 8–20px
+
     return (
         <div className="dp-card">
-            <CardHead icon={<CreditCard size={20} />} title="Salary progression" sub="Typical annual pay in India, by experience" />
-            <div className="salary-row">
+            <CardHead icon={<CreditCard size={20} />} title="Salary progression" sub="Typical annual pay in India, by experience — figures per annum" />
+
+            <div className="salary-ladder">
+                <div className="salary-track">
+                    <div className="salary-track-line" />
+                    {stats.map(s => {
+                        const size = nodeSize(s.v);
+                        return <div key={s.k} className="salary-node" style={{ width: size, height: size }} title={`${s.k}: ${s.v}`} />;
+                    })}
+                </div>
+                <div className="salary-labels">
+                    {stats.map(s => (
+                        <div key={s.k} className="salary-label">
+                            <div className="salary-label-k">{s.k}</div>
+                            <div className="salary-label-v">{s.v}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Narrow screens: the ladder gets cramped, so fall back to a simple list */}
+            <div className="salary-ladder-mobile">
                 {stats.map(s => (
-                    <div key={s.k} className="salary-seg">
-                        <div className="salary-seg-k">{s.k}</div>
-                        <div className="salary-seg-v">{s.v}</div>
+                    <div key={s.k} className="salary-row-m">
+                        <span className="salary-label-k">{s.k}</span>
+                        <span className="salary-label-v">{s.v}</span>
                     </div>
                 ))}
-                <div className="salary-seg-note">per annum</div>
             </div>
         </div>
     );
