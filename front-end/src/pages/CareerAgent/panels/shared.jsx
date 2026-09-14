@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info, CreditCard, BarChart3 } from '@/components/icons';
+import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info, CreditCard, BarChart3, Lightbulb } from '@/components/icons';
 
 /* ─────────────────────────────────────────────────────────────
    Shared building blocks for the Career Agent report panels.
@@ -182,20 +182,38 @@ export const Section = ({ icon, title, text, missing = 'Not available for this r
 
 /* Degree-fit block — the per-role mapping data a data set may carry
    (B.Com 2026 set: achievability, rationale, placement note). */
+const FIT_TONE = {
+    'direct fit': 'ok',
+    'skill-bridgeable': 'amber',
+    'skill bridgeable': 'amber',
+};
+
 export const DegreeFit = ({ role }) => {
     if (!role || (!role.rationale && !role.achievability && !role.placementNote)) return null;
-    const tag = role.achievability ? String(role.achievability).replace(/-/g, ' ').toLowerCase() : '';
-    const tagLabel = tag ? tag.charAt(0).toUpperCase() + tag.slice(1) : '';
+    const tagKey = role.achievability ? String(role.achievability).toLowerCase() : '';
+    const tagLabel = tagKey ? tagKey.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase()) : '';
+    const tone = FIT_TONE[tagKey] || 'brand';
+
     return (
         <Section icon={<GraduationCap size={20} />} title="How this role fits your degree" className="tint">
             {tagLabel && (
-                <div style={{ marginBottom: 10 }}>
-                    <span className="dchip brand"><ShieldCheck size={13} /> {tagLabel}</span>
-                    {role.achievabilityDetail && <span className="dchip" style={{ marginLeft: 8 }}>{role.achievabilityDetail}</span>}
+                <span className={`dchip ${tone}`} style={{ marginBottom: 12 }}>
+                    <ShieldCheck size={13} /> {tagLabel}
+                </span>
+            )}
+            {role.rationale && <p className="dp-text" style={{ marginTop: tagLabel ? 10 : 0 }}>{role.rationale}</p>}
+            {role.achievabilityDetail && (
+                <div className="fit-note" style={{ marginTop: 12 }}>
+                    <span className="ic"><Lightbulb size={17} /></span>
+                    <span><strong style={{ fontWeight: 600, color: 'var(--text1)' }}>Skill to bridge — </strong>{role.achievabilityDetail}</span>
                 </div>
             )}
-            {role.rationale && <p className="dp-text">{role.rationale}</p>}
-            {role.placementNote && <p className="dp-text" style={{ marginTop: 10 }}><strong style={{ color: 'var(--text1)', fontWeight: 600 }}>Placement note: </strong>{role.placementNote}</p>}
+            {role.placementNote && (
+                <div style={{ marginTop: 14 }}>
+                    <div className="dp-eyebrow" style={{ marginBottom: 6 }}>Placement note<span className="dp-eyebrow-rule" /></div>
+                    <p className="dp-text">{role.placementNote}</p>
+                </div>
+            )}
         </Section>
     );
 };

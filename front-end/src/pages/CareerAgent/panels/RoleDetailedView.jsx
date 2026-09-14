@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ClipboardList } from '@/components/icons';
-import { RoleSwitcher, Spinner, EmptyState, SalaryStats, ExposureTiles, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
+import { RoleSwitcher, Spinner, EmptyState, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
 
 /**
  * RoleDetailedView
  * Role switcher for the active direction + the unified role profile
- * (/api/career-agent/role-profile/:roleTitle) laid out on the shared
- * report vocabulary: hero, salary tiles, degree-fit, narrative sections.
+ * (/api/career-agent/role-profile/:roleTitle): degree fit and the
+ * narrative sections (what it does, who should consider it, growth,
+ * human value). Salary and AI/English signals live in Market Intel —
+ * not repeated here.
  */
 const RoleDetailedView = ({ roleName, direction }) => {
     const roleItems = useMemo(() => (direction?.roles || [])
@@ -40,21 +42,19 @@ const RoleDetailedView = ({ roleName, direction }) => {
                 />
             ) : (
                 <>
-                    {/* Hero — identity only, no bordered box (matches Direction Overview);
-                        salary and AI/English signals live in the cards below. */}
+                    {/* Hero — identity only, no bordered box (matches Direction Overview). */}
                     <div className="dp-title-wrap">
                         <div className="dp-eyebrow">Role profile<span className="dp-eyebrow-rule" /></div>
                         <h3 className="rp-title">{profile.roleTitle}</h3>
                         {(profile.jobFamily || item?.jobFamily) && <div className="rp-family">{cleanFamily(profile.jobFamily || item?.jobFamily)}</div>}
-                        <div className="dp-chips">
-                            {isTarget && <span className="dchip brand">Your target role</span>}
-                            {profile.roleId && <span className="dchip">{profile.roleId}</span>}
-                        </div>
+                        {isTarget && (
+                            <div className="dp-chips">
+                                <span className="dchip brand">Your target role</span>
+                            </div>
+                        )}
                     </div>
 
                     <DegreeFit role={item} />
-                    <SalaryStats profile={profile} />
-                    <ExposureTiles profile={profile} />
                     <ProfileSections profile={profile} which={['what', 'who', 'growth', 'human']} />
                 </>
             )}

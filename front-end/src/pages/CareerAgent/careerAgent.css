@@ -404,6 +404,7 @@
 }
 .career-agent-page .dchip.brand { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent-text); }
 .career-agent-page .dchip.ok { background: rgba(5,150,105,0.08); border-color: rgba(5,150,105,0.25); color: var(--green); }
+.career-agent-page .dchip.amber { background: rgba(217,119,6,0.08); border-color: rgba(217,119,6,0.28); color: var(--amber); }
 
 /* ───────────────────────────────────────────────────────────────
    BUTTON STYLES
@@ -1918,6 +1919,16 @@
   font-size: 13px; font-weight: 500; line-height: 1.5;
 }
 .career-agent-page .rec-strip .ic { color: var(--accent-text); display: flex; flex-shrink: 0; }
+
+/* Inset note inside an already-tinted card (e.g. DegreeFit's "skill to
+   bridge") — card-white so it still pops against the tinted parent
+   instead of blending into it. */
+.career-agent-page .fit-note {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--accent-border); color: var(--text2);
+  font-size: 13px; font-weight: 500; line-height: 1.55;
+}
+.career-agent-page .fit-note .ic { color: var(--accent-text); display: flex; flex-shrink: 0; margin-top: 1px; }
 .career-agent-page .rec-dir-list { display: flex; flex-direction: column; gap: 12px; }
 .career-agent-page .rec-dir-card {
   background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
