@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Award, AlertCircle, RefreshCw, Code, Bot, Building, Building2, IconCertificate, CheckCircle, Users } from '@/components/icons';
-import { Spinner, EmptyState, CardHead } from './shared';
+import { Spinner, EmptyState, CardHead, MetricTile } from './shared';
 
 // ─── Category config ───────────────────────────────────────────────────────────
 const CATS = [
@@ -165,10 +165,10 @@ const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
   return (
     <div className="dp animate-fade-in">
       <div className="dp-grid-4">
-        <div className="stat"><div className="stat-k">Certifications</div><div className="stat-v brand">{total}</div><div className="stat-s">across {totalRoles} roles{directionName ? ` in ${directionName}` : ''}</div></div>
-        <div className="stat"><div className="stat-k">Technical</div><div className="stat-v">{data.technical.length}</div><div className="stat-s">tools &amp; platforms</div></div>
-        <div className="stat"><div className="stat-k">AI &amp; data</div><div className="stat-v">{data.ai.length}</div><div className="stat-s">AI assistants &amp; analytics</div></div>
-        <div className="stat"><div className="stat-k">Domain</div><div className="stat-v">{data.domain.length}</div><div className="stat-s">subject-matter credentials</div></div>
+        <MetricTile icon={<Award size={18} />} value={total} label="Certifications" sub={`across ${totalRoles} roles${directionName ? ` in ${directionName}` : ''}`} tone="brand" />
+        <MetricTile icon={<Code size={18} />} value={data.technical.length} label="Technical" sub="tools & platforms" />
+        <MetricTile icon={<Bot size={18} />} value={data.ai.length} label="AI & data" sub="AI assistants & analytics" />
+        <MetricTile icon={<Building size={18} />} value={data.domain.length} label="Domain" sub="subject-matter credentials" />
       </div>
       {CATS.map(cat => (
         <CertSection key={cat.key} label={cat.label} sub={cat.sub} Icon={cat.Icon} certs={data[cat.key]} totalRoles={totalRoles} />

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dna, Code, Building, Bot, Users, Layers, Award } from '@/components/icons';
-import { RoleSwitcher, Spinner, EmptyState, CardHead } from './shared';
+import { Dna, Code, Building, Bot, Users, Layers, Award, Flame } from '@/components/icons';
+import { RoleSwitcher, Spinner, EmptyState, CardHead, MetricTile } from './shared';
 
 /**
  * SkillsPanel — "Skill DNA"
@@ -78,10 +78,10 @@ const SkillsPanel = ({ roleName, direction }) => {
             ) : (
                 <>
                     <div className="dp-grid-4">
-                        <div className="stat"><div className="stat-k">Skills mapped</div><div className="stat-v brand">{skills.length}</div><div className="stat-s">for {selectedRole}</div></div>
-                        <div className="stat"><div className="stat-k">Categories</div><div className="stat-v">{groups.length}</div><div className="stat-s">skill groups</div></div>
-                        <div className="stat"><div className="stat-k">High priority</div><div className="stat-v">{highCount}</div><div className="stat-s">must-have skills</div></div>
-                        <div className="stat"><div className="stat-k">With certification</div><div className="stat-v">{certCount}</div><div className="stat-s">skills with a recognised cert</div></div>
+                        <MetricTile icon={<Dna size={18} />} value={skills.length} label="Skills mapped" sub={`for ${selectedRole}`} tone="brand" />
+                        <MetricTile icon={<Layers size={18} />} value={groups.length} label="Categories" sub="skill groups" />
+                        <MetricTile icon={<Flame size={18} />} value={highCount} label="High priority" sub="must-have skills" tone="amber" />
+                        <MetricTile icon={<Award size={18} />} value={certCount} label="With certification" sub="skills with a recognised cert" tone="green" />
                     </div>
 
                     <div className="dp-grid-2">

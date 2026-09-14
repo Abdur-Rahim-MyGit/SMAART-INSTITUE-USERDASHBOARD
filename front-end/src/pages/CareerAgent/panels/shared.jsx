@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info } from '@/components/icons';
+import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info, CreditCard } from '@/components/icons';
 
 /* ─────────────────────────────────────────────────────────────
    Shared building blocks for the Career Agent report panels.
@@ -40,12 +40,14 @@ export const CardHead = ({ icon, title, sub, right }) => (
     </>
 );
 
-/* Role switcher: tabs for the roles within the active direction */
+/* Role switcher: an even grid of role cards for the roles within the
+   active direction — every card the same size regardless of name length,
+   so the row never looks ragged. */
 export const RoleSwitcher = ({ roles = [], value, onChange, label = 'Roles in this direction' }) => {
     if (!roles || roles.length === 0) return null;
     return (
         <div className="rs">
-            <div className="rs-label">{label}</div>
+            <div className="rs-label">{label}<span className="rs-count">{roles.length}</span></div>
             <div className="rs-tabs">
                 {roles.map((r, i) => (
                     <button
@@ -53,15 +55,29 @@ export const RoleSwitcher = ({ roles = [], value, onChange, label = 'Roles in th
                         type="button"
                         className={`rs-tab${value === r ? ' active' : ''}`}
                         onClick={() => onChange(r)}
+                        title={r}
                     >
-                        <span className="rs-n">{String(i + 1).padStart(2, '0')}</span>
-                        {r}
+                        <span className="rs-n">{i + 1}</span>
+                        <span className="rs-name">{r}</span>
                     </button>
                 ))}
             </div>
         </div>
     );
 };
+
+/* Metric tile: icon + value + label, one consistent visual weight across
+   every stat row in the report (Skill DNA, Certifications, Roadmap). */
+export const MetricTile = ({ icon, value, label, sub, tone = '' }) => (
+    <div className="stat">
+        <div className={`stat-ic${tone ? ` ${tone}` : ''}`}>{icon}</div>
+        <div className="stat-body">
+            <div className="stat-k">{label}</div>
+            <div className={`stat-v${tone ? ` ${tone}` : ''}`}>{value}</div>
+            {sub && <div className="stat-s">{sub}</div>}
+        </div>
+    </div>
+);
 
 /* Fetch a unified role profile (/role-profile/:roleTitle) with caching */
 const PROFILE_CACHE = new Map();
@@ -102,11 +118,7 @@ export const SalaryStats = ({ profile }) => {
     return (
         <div className="dp-grid-4">
             {stats.map(s => (
-                <div key={s.k} className="stat">
-                    <div className="stat-k">Salary · {s.k}</div>
-                    <div className="stat-v brand">{s.v}</div>
-                    <div className="stat-s">per annum</div>
-                </div>
+                <MetricTile key={s.k} icon={<CreditCard size={18} />} value={s.v} label={s.k} sub="per annum" tone="brand" />
             ))}
         </div>
     );

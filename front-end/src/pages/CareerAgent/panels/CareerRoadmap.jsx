@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle, RotateCcw, Map } from '@/components/icons';
-import { Spinner, EmptyState, CardHead } from './shared';
+import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle, RotateCcw, Map, TrendingUp, Layers, Clock } from '@/components/icons';
+import { Spinner, EmptyState, CardHead, MetricTile } from './shared';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
 
@@ -219,13 +219,16 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
             {/* Progress summary */}
             <div className="rm-summary">
                 <div className="stat">
-                    <div className="stat-k">Overall progress</div>
-                    <div className="stat-v brand">{pct}%</div>
-                    <div className="meter" style={{ marginTop: 6 }}><i style={{ width: `${pct}%` }} /></div>
+                    <div className="stat-ic brand"><TrendingUp size={18} /></div>
+                    <div className="stat-body" style={{ width: '100%' }}>
+                        <div className="stat-k">Overall progress</div>
+                        <div className="stat-v brand">{pct}%</div>
+                        <div className="meter" style={{ marginTop: 6 }}><i style={{ width: `${pct}%` }} /></div>
+                    </div>
                 </div>
-                <div className="stat"><div className="stat-k">Skills in roadmap</div><div className="stat-v">{roadmap.length}</div><div className="stat-s">across {totalRolesCount} roles</div></div>
-                <div className="stat"><div className="stat-k">In progress</div><div className="stat-v">{doingCount}</div><div className="stat-s">currently learning</div></div>
-                <div className="stat"><div className="stat-k">Completed</div><div className="stat-v" style={{ color: 'var(--green)' }}>{doneCount}</div><div className="stat-s">verified or marked done</div></div>
+                <MetricTile icon={<Layers size={18} />} value={roadmap.length} label="Skills in roadmap" sub={`across ${totalRolesCount} roles`} />
+                <MetricTile icon={<Clock size={18} />} value={doingCount} label="In progress" sub="currently learning" tone="amber" />
+                <MetricTile icon={<CheckCircle size={18} />} value={doneCount} label="Completed" sub="verified or marked done" tone="green" />
             </div>
 
             <div className="dp-card soft" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
