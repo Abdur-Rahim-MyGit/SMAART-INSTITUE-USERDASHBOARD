@@ -195,21 +195,25 @@ export const DegreeFit = ({ role }) => {
     const tone = FIT_TONE[tagKey] || 'brand';
 
     return (
-        <Section icon={<GraduationCap size={20} />} title="How this role fits your degree" className="tint">
-            {tagLabel && (
-                <span className={`dchip ${tone}`} style={{ marginBottom: 12 }}>
-                    <ShieldCheck size={13} /> {tagLabel}
-                </span>
-            )}
-            {role.rationale && <p className="dp-text" style={{ marginTop: tagLabel ? 10 : 0 }}>{role.rationale}</p>}
+        <Section icon={<GraduationCap size={20} />} title="How this role fits your degree" className="tint compact">
+            {/* Badge sits inline with the rationale (one row, not a stacked
+                badge-then-paragraph) — denser and reads as one sentence. */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flexWrap: 'wrap' }}>
+                {tagLabel && (
+                    <span className={`dchip ${tone}`} style={{ marginTop: 1, flexShrink: 0 }}>
+                        <ShieldCheck size={13} /> {tagLabel}
+                    </span>
+                )}
+                {role.rationale && <p className="dp-text" style={{ flex: '1 1 220px', minWidth: 0, margin: 0 }}>{role.rationale}</p>}
+            </div>
             {role.achievabilityDetail && (
-                <div className="fit-note" style={{ marginTop: 12 }}>
-                    <span className="ic"><Lightbulb size={17} /></span>
+                <div className="fit-note">
+                    <span className="ic"><Lightbulb size={16} /></span>
                     <span><strong style={{ fontWeight: 600, color: 'var(--text1)' }}>Skill to bridge — </strong>{role.achievabilityDetail}</span>
                 </div>
             )}
             {role.placementNote && (
-                <div style={{ marginTop: 14 }}>
+                <div>
                     <div className="dp-eyebrow" style={{ marginBottom: 6 }}>Placement note<span className="dp-eyebrow-rule" /></div>
                     <p className="dp-text">{role.placementNote}</p>
                 </div>

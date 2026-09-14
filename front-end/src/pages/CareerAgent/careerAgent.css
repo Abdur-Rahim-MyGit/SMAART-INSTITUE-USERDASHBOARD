@@ -1335,6 +1335,13 @@
   background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px;
 }
 .career-agent-page .dp-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+/* Compact variant — a card whose content is a few short lines, not
+   paragraphs (e.g. DegreeFit): tighter padding, no accumulated inline
+   margins between its children. */
+.career-agent-page .dp-card.compact { padding: 16px 20px; }
+.career-agent-page .dp-card.compact .dp-card-head { margin-bottom: 10px; }
+.career-agent-page .dp-card.compact .dp-rule { margin-bottom: 12px; }
+.career-agent-page .dp-card.compact > * + * { margin-top: 10px; }
 .career-agent-page .dp-tile {
   width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
   background: var(--accent-tint); color: var(--accent-text);
@@ -1924,9 +1931,9 @@
    bridge") — card-white so it still pops against the tinted parent
    instead of blending into it. */
 .career-agent-page .fit-note {
-  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 10px;
+  display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 8px;
   background: var(--card); border: 1px solid var(--accent-border); color: var(--text2);
-  font-size: 13px; font-weight: 500; line-height: 1.55;
+  font-size: 13px; font-weight: 500; line-height: 1.5;
 }
 .career-agent-page .fit-note .ic { color: var(--accent-text); display: flex; flex-shrink: 0; margin-top: 1px; }
 .career-agent-page .rec-dir-list { display: flex; flex-direction: column; gap: 12px; }
