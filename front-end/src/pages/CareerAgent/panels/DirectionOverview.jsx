@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Map, Briefcase } from '@/components/icons';
+import { Compass, Map as MapIcon, Briefcase } from '@/components/icons';
 import DirectionRolesGrid from './DirectionRolesGrid';
 import { EmptyState, cleanFamily } from './shared';
 
@@ -53,7 +53,7 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
             {/* Overview */}
             <div className="dp-card">
                 <div className="dp-card-head">
-                    <div className="dp-tile"><Map size={20} /></div>
+                    <div className="dp-tile"><MapIcon size={20} /></div>
                     <div>
                         <div className="dp-card-title">Direction overview</div>
                         <div className="dp-card-sub">What this career direction is about</div>

@@ -23,7 +23,7 @@ import {
     ClipboardList,
     BarChart3,
     Dna,
-    Map,
+    Map as MapIcon,
     Award,
     Mic,
     FileText,
@@ -348,7 +348,7 @@ const CareerAgentDashboard = () => {
         { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} stroke={1.5} /> },
         { id: 'market', label: t('career_agent.panels.market', 'Market Intel'), icon: <BarChart3 size={18} stroke={1.5} /> },
         { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} stroke={1.5} /> },
-        { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} stroke={1.5} /> },
+        { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <MapIcon size={18} stroke={1.5} /> },
         { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} stroke={1.5} /> },
         // Beyond the 3 chosen paths — sits last, after all Primary/Secondary/
         // Tertiary content, since it's supplementary exploration.
@@ -693,7 +693,7 @@ const CareerAgentDashboard = () => {
                     {activePanel === 'roadmap' && (
                         <div className="panel animate-fade-in">
                             <PanelHead
-                                icon={<Map size={20} />}
+                                icon={<MapIcon size={20} />}
                                 title={t('career_agent.panels.roadmap', 'Career Roadmap')}
                                 subtitle={<>{t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}</>}
                             />

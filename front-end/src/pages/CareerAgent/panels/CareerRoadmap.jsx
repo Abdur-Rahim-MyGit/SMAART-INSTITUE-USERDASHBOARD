@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle, RotateCcw, Map, TrendingUp, Layers, Clock } from '@/components/icons';
+import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle, Target, FileText, AlertTriangle, RotateCcw, Map as MapIcon, TrendingUp, Layers, Clock } from '@/components/icons';
 import { Spinner, EmptyState, CardHead, MetricTile } from './shared';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -232,7 +232,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
             </div>
 
             <div className="dp-card soft" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ color: 'var(--accent-text)', display: 'flex' }}><Map size={18} /></span>
+                <span style={{ color: 'var(--accent-text)', display: 'flex' }}><MapIcon size={18} /></span>
                 <span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.5 }}>
                     Skills are ordered by how many of this direction's roles need them. Hover a skill to see which roles need it; mark a skill <strong style={{ fontWeight: 600, color: 'var(--text1)' }}>In progress</strong> or <strong style={{ fontWeight: 600, color: 'var(--text1)' }}>Done</strong> to track your progress.
                 </span>

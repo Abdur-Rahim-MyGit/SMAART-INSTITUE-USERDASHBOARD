@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, X, ClipboardList, BarChart3, Dna, Map, Award } from '@/components/icons';
+import { ChevronDown, X, ClipboardList, BarChart3, Dna, Map as MapIcon, Award } from '@/components/icons';
 import { Spinner, EmptyState, SalaryStats, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
 import MarketIntelligence from './MarketIntelligence';
 import SkillsPanel from './SkillsPanel';
@@ -38,7 +38,7 @@ const SUB_TABS = [
     { id: 'profile', label: 'Role Profile', icon: <ClipboardList size={15} /> },
     { id: 'market', label: 'Market Intel', icon: <BarChart3 size={15} /> },
     { id: 'skills', label: 'Skill DNA', icon: <Dna size={15} /> },
-    { id: 'roadmap', label: 'Roadmap', icon: <Map size={15} /> },
+    { id: 'roadmap', label: 'Roadmap', icon: <MapIcon size={15} /> },
     { id: 'certs', label: 'Certifications', icon: <Award size={15} /> },
 ];
 
