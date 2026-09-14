@@ -41,8 +41,9 @@ export const CardHead = ({ icon, title, sub, right }) => (
 );
 
 /* Role switcher: an even grid of role cards for the roles within the
-   active direction — every card the same size regardless of name length,
-   so the row never looks ragged. */
+   active direction — a lightweight underline tab strip (the same
+   language as the header's Primary/Secondary/Tertiary tabs), so it reads
+   as one system rather than a grid of boxy, disconnected cards. */
 export const RoleSwitcher = ({ roles = [], value, onChange, label = 'Roles in this direction' }) => {
     if (!roles || roles.length === 0) return null;
     return (
@@ -57,7 +58,7 @@ export const RoleSwitcher = ({ roles = [], value, onChange, label = 'Roles in th
                         onClick={() => onChange(r)}
                         title={r}
                     >
-                        <span className="rs-n">{i + 1}</span>
+                        <span className="rs-n">{String(i + 1).padStart(2, '0')}</span>
                         <span className="rs-name">{r}</span>
                     </button>
                 ))}
