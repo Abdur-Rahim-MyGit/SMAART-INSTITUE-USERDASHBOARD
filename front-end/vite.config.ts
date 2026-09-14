@@ -192,6 +192,16 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     drop: mode === "production" ? ["console", "debugger"] : [],
   },
+  // TEMPORARY diagnostic aid: production stack traces are otherwise
+  // unreadable minified identifiers (e.g. "me is not a constructor"),
+  // which makes a production-only crash impossible to pin down. Source
+  // maps let DevTools show the real file/line even in the prod build.
+  // Safe to leave on or remove once the current bug is found — it only
+  // adds .map files DevTools fetches when open, no runtime behaviour
+  // change.
+  build: {
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
