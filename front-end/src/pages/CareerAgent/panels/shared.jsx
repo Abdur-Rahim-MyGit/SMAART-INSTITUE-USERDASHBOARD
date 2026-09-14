@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info, CreditCard } from '@/components/icons';
+import { Briefcase, Bot, UserCheck, TrendingUp, Languages, ShieldCheck, GraduationCap, Info, CreditCard, BarChart3 } from '@/components/icons';
 
 /* ─────────────────────────────────────────────────────────────
    Shared building blocks for the Career Agent report panels.
@@ -109,7 +109,8 @@ export const useRoleProfile = (roleTitle) => {
 
 export const aiTone = (pct) => (pct >= 65 ? 'red' : pct >= 45 ? 'amber' : '');
 
-/* Salary progression stat tiles */
+/* Salary progression — one compact card with inline segments, not four
+   separate bordered tiles repeating "per annum" four times. */
 export const SalaryStats = ({ profile }) => {
     const stats = [
         { k: 'Year 0–1', v: profile?.salaryYear0_1 },
@@ -119,10 +120,17 @@ export const SalaryStats = ({ profile }) => {
     ].filter(s => s.v);
     if (stats.length === 0) return null;
     return (
-        <div className="dp-grid-4">
-            {stats.map(s => (
-                <MetricTile key={s.k} icon={<CreditCard size={18} />} value={s.v} label={s.k} sub="per annum" />
-            ))}
+        <div className="dp-card">
+            <CardHead icon={<CreditCard size={20} />} title="Salary progression" sub="Typical annual pay in India, by experience" />
+            <div className="salary-row">
+                {stats.map(s => (
+                    <div key={s.k} className="salary-seg">
+                        <div className="salary-seg-k">{s.k}</div>
+                        <div className="salary-seg-v">{s.v}</div>
+                    </div>
+                ))}
+                <div className="salary-seg-note">per annum</div>
+            </div>
         </div>
     );
 };
@@ -177,44 +185,35 @@ export const ProfileSections = ({ profile, which = ['what', 'who', 'ai', 'growth
     );
 };
 
-/* AI exposure + English requirement tiles */
+/* Role signals — AI exposure and English requirement side by side in one
+   compact card, instead of two half-empty cards each carrying its own
+   border and padding for a single number and a chip. */
 export const ExposureTiles = ({ profile }) => {
     const pct = Number(profile?.aiExposurePct) || 0;
     const hasEnglish = !!profile?.englishRequirement;
     if (!pct && !hasEnglish) return null;
     return (
-        <div className="dp-grid-2">
-            {pct > 0 && (
-                <div className="dp-card">
-                    <div className="dp-card-head">
-                        <div className="dp-tile"><Bot size={20} /></div>
-                        <div>
-                            <div className="dp-card-title">AI exposure</div>
-                            <div className="dp-card-sub">How much of this role's work AI can already assist with</div>
+        <div className="dp-card">
+            <CardHead icon={<BarChart3 size={20} />} title="Role signals" sub="AI exposure and English requirement for this role in India" />
+            <div className="signal-split">
+                {pct > 0 && (
+                    <div className="signal-col">
+                        <div className="signal-label"><Bot size={15} /> AI exposure</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+                            <div className="stat-v" style={{ fontSize: 24 }}>{pct}%</div>
+                            {profile.aiExposureLevel && <span className="dchip">{profile.aiExposureLevel}</span>}
                         </div>
+                        <div className="meter"><i className={aiTone(pct)} style={{ width: `${Math.min(100, pct)}%` }} /></div>
                     </div>
-                    <div className="dp-rule" />
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
-                        <div className="stat-v brand" style={{ fontSize: 28 }}>{pct}%</div>
-                        {profile.aiExposureLevel && <span className="dchip">{profile.aiExposureLevel} exposure</span>}
+                )}
+                {hasEnglish && (
+                    <div className="signal-col">
+                        <div className="signal-label"><Languages size={15} /> English &amp; communication</div>
+                        <span className="dchip brand" style={{ width: 'fit-content' }}>{profile.englishRequirement}</span>
+                        {profile.englishContext && <p className="dp-text" style={{ fontSize: 13 }}>{profile.englishContext}</p>}
                     </div>
-                    <div className="meter"><i className={aiTone(pct)} style={{ width: `${Math.min(100, pct)}%` }} /></div>
-                </div>
-            )}
-            {hasEnglish && (
-                <div className="dp-card">
-                    <div className="dp-card-head">
-                        <div className="dp-tile"><Languages size={20} /></div>
-                        <div>
-                            <div className="dp-card-title">English &amp; communication</div>
-                            <div className="dp-card-sub">Language expectation for this role in India</div>
-                        </div>
-                    </div>
-                    <div className="dp-rule" />
-                    <div style={{ marginBottom: profile.englishContext ? 10 : 0 }}><span className="dchip brand">{profile.englishRequirement}</span></div>
-                    {profile.englishContext && <p className="dp-text">{profile.englishContext}</p>}
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };

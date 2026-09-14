@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ClipboardList } from '@/components/icons';
-import { RoleSwitcher, Spinner, EmptyState, SalaryStats, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
+import { RoleSwitcher, Spinner, EmptyState, SalaryStats, ExposureTiles, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
 
 /**
  * RoleDetailedView
@@ -40,32 +40,21 @@ const RoleDetailedView = ({ roleName, direction }) => {
                 />
             ) : (
                 <>
-                    {/* Hero */}
-                    <div className="dp-card">
-                        <div className="rp-hero">
-                            <div className="rp-hero-left">
-                                <div className="dp-eyebrow">Role profile</div>
-                                <h3 className="rp-title">{profile.roleTitle}</h3>
-                                {(profile.jobFamily || item?.jobFamily) && <div className="rp-family">{cleanFamily(profile.jobFamily || item?.jobFamily)}</div>}
-                                <div className="dp-chips">
-                                    {isTarget && <span className="dchip brand">Your target role</span>}
-                                    {profile.aiExposureLevel && <span className="dchip">AI exposure · {profile.aiExposureLevel}</span>}
-                                    {profile.englishRequirement && <span className="dchip">English · {profile.englishRequirement}</span>}
-                                    {profile.roleId && <span className="dchip">{profile.roleId}</span>}
-                                </div>
-                            </div>
-                            {profile.salaryYear0_1 && (
-                                <div className="rp-kpi">
-                                    <div className="rp-kpi-k">Entry-level salary</div>
-                                    <div className="rp-kpi-v">{profile.salaryYear0_1}</div>
-                                    <div className="rp-kpi-s">per annum · year 0–1</div>
-                                </div>
-                            )}
+                    {/* Hero — identity only, no bordered box (matches Direction Overview);
+                        salary and AI/English signals live in the cards below. */}
+                    <div className="dp-title-wrap">
+                        <div className="dp-eyebrow">Role profile<span className="dp-eyebrow-rule" /></div>
+                        <h3 className="rp-title">{profile.roleTitle}</h3>
+                        {(profile.jobFamily || item?.jobFamily) && <div className="rp-family">{cleanFamily(profile.jobFamily || item?.jobFamily)}</div>}
+                        <div className="dp-chips">
+                            {isTarget && <span className="dchip brand">Your target role</span>}
+                            {profile.roleId && <span className="dchip">{profile.roleId}</span>}
                         </div>
                     </div>
 
                     <DegreeFit role={item} />
                     <SalaryStats profile={profile} />
+                    <ExposureTiles profile={profile} />
                     <ProfileSections profile={profile} which={['what', 'who', 'growth', 'human']} />
                 </>
             )}

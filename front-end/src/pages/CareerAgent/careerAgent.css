@@ -2026,6 +2026,25 @@
 .career-agent-page .meter > i.red { background: var(--red); }
 .career-agent-page .meter > i.green { background: var(--green); }
 
+/* Salary progression card — one row of inline segments, no per-value card */
+.career-agent-page .salary-row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 4px 28px; }
+.career-agent-page .salary-seg { display: flex; flex-direction: column; gap: 4px; min-width: 84px; }
+.career-agent-page .salary-seg-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.career-agent-page .salary-seg-v { font-size: 18px; font-weight: 700; color: var(--accent-text); letter-spacing: -0.01em; }
+.career-agent-page .salary-seg-note { margin-left: auto; align-self: flex-end; font-size: 12px; color: var(--muted); padding-bottom: 1px; }
+@media (max-width: 640px) { .career-agent-page .salary-seg-note { margin-left: 0; width: 100%; order: 99; } }
+
+/* Role signals card — AI exposure and English side by side */
+.career-agent-page .signal-split { display: flex; gap: 28px; }
+.career-agent-page .signal-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.career-agent-page .signal-col + .signal-col { padding-left: 28px; border-left: 1px solid var(--border); }
+.career-agent-page .signal-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.career-agent-page .signal-label svg { color: var(--accent-text); }
+@media (max-width: 640px) {
+  .career-agent-page .signal-split { flex-direction: column; gap: 16px; }
+  .career-agent-page .signal-col + .signal-col { padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 16px; }
+}
+
 /* Skill pills */
 .career-agent-page .pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .career-agent-page .pill {

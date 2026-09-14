@@ -71,26 +71,13 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
                 <EmptyState icon={<BarChart3 size={24} />} title={`No market data for “${selectedRole}” yet`} text="Select another role above." />
             ) : (
                 <>
-                    {/* Hero */}
-                    <div className="dp-card">
-                        <div className="rp-hero">
-                            <div className="rp-hero-left">
-                                <div className="dp-eyebrow">Market snapshot · India</div>
-                                <h3 className="rp-title">{profile.roleTitle}</h3>
-                                {profile.jobFamily && <div className="rp-family">{cleanFamily(profile.jobFamily)}</div>}
-                                <div className="dp-chips">
-                                    {profile.aiExposureLevel && <span className="dchip">AI exposure · {profile.aiExposureLevel}</span>}
-                                    {profile.englishRequirement && <span className="dchip">English · {profile.englishRequirement}</span>}
-                                </div>
-                            </div>
-                            {profile.salaryYear0_1 && (
-                                <div className="rp-kpi">
-                                    <div className="rp-kpi-k">Entry-level salary</div>
-                                    <div className="rp-kpi-v">{profile.salaryYear0_1}</div>
-                                    <div className="rp-kpi-s">per annum · year 0–1</div>
-                                </div>
-                            )}
-                        </div>
+                    {/* Hero — identity only, no bordered box (matches Direction Overview);
+                        the entry salary and AI/English signals live in the cards below,
+                        not repeated here. */}
+                    <div className="dp-title-wrap">
+                        <div className="dp-eyebrow">Market snapshot · India<span className="dp-eyebrow-rule" /></div>
+                        <h3 className="rp-title">{profile.roleTitle}</h3>
+                        {profile.jobFamily && <div className="rp-family">{cleanFamily(profile.jobFamily)}</div>}
                     </div>
 
                     <SalaryStats profile={profile} />
