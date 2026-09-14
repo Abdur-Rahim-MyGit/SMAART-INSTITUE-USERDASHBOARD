@@ -83,14 +83,17 @@ const DirectionRolesGrid = ({ roles = [], currentRole = '', directionName = '' }
         return () => { cancelled = true; };
     }, [namesKey]);
 
+    // A minimal "direction" shape the Market Intel / Skill DNA / Roadmap
+    // panels already know how to read (they only need { roles }). Computed
+    // unconditionally, before any early return, so hook order never
+    // depends on whether the role list is empty (Rules of Hooks).
+    const directionShape = useMemo(() => ({ roles: list }), [list]);
+
     if (list.length === 0) {
         return <EmptyState title="No job roles mapped yet" text="No job roles are mapped to this direction in the database yet." />;
     }
 
     const openItem = openRole ? list.find(r => r.role === openRole) : null;
-    // A minimal "direction" shape the Market Intel / Skill DNA / Roadmap
-    // panels already know how to read (they only need { roles }).
-    const directionShape = useMemo(() => ({ roles: list }), [list]);
 
     return (
         <div className="dp">
