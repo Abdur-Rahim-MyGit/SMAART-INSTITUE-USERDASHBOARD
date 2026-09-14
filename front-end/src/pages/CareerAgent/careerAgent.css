@@ -1425,6 +1425,24 @@
 }
 .career-agent-page .dir-role-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .career-agent-page .dir-role-detail-title { font-size: 16px; font-weight: 700; color: var(--text1); letter-spacing: -0.01em; }
+
+/* Segmented sub-tabs inside an expanded role — a quieter, smaller tier
+   than the header's underline RoleSwitcher, for browsing the same
+   report sections (profile / market / skills / roadmap / certs) without
+   leaving the recommended direction's context. */
+.career-agent-page .subtabs {
+  display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 10px;
+  background: var(--card2); border: 1px solid var(--border);
+}
+.career-agent-page .subtab {
+  display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 7px;
+  background: transparent; border: none; color: var(--muted);
+  font-family: var(--font); font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.career-agent-page .subtab:hover { color: var(--text1); }
+.career-agent-page .subtab.active { background: var(--card); color: var(--accent-text); box-shadow: 0 1px 3px rgba(7,32,54,0.08); }
+:is(.dark) .career-agent-page .subtab.active { background: var(--accent); color: #fff; box-shadow: none; }
 .career-agent-page .dir-role-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .career-agent-page .dir-role-section {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;

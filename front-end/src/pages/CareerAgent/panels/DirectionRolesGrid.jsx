@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, X } from '@/components/icons';
+import { ChevronDown, X, ClipboardList, BarChart3, Dna, Map, Award } from '@/components/icons';
 import { Spinner, EmptyState, SalaryStats, ProfileSections, DegreeFit, useRoleProfile, cleanFamily } from './shared';
+import MarketIntelligence from './MarketIntelligence';
+import SkillsPanel from './SkillsPanel';
+import CareerRoadmap from './CareerRoadmap';
+import Certifications from './Certifications';
 
 /* ─────────────────────────────────────────────────────────────
    DirectionRolesGrid
@@ -8,11 +12,14 @@ import { Spinner, EmptyState, SalaryStats, ProfileSections, DegreeFit, useRolePr
    recommended direction shows exactly the same depth as a chosen one:
      • role cards with a one-line plain-English brief (/role-briefs)
        and, when the data set carries it, the degree-fit tag
-     • click a role → full profile (/role-profile/:roleTitle) plus the
-       "how this fits your degree" rationale
+     • click a role → the same set of report sections a chosen path
+       gets (Role Profile / Market Intel / Skill DNA / Roadmap /
+       Certifications), scoped to this direction, without switching
+       the top-level Primary/Secondary/Tertiary tab.
    Props:
-     roles        [{ role, id, jobFamily?, achievability?, rationale? }] | string[]
-     currentRole  string (highlighted as the student's target role)
+     roles         [{ role, id, jobFamily?, achievability?, rationale? }] | string[]
+     currentRole   string (highlighted as the student's target role)
+     directionName string (used by Market Intel / Certifications)
    ───────────────────────────────────────────────────────────── */
 
 const BRIEF_CACHE = new Map();
@@ -27,7 +34,15 @@ const fitLabel = (tag) => {
     return t.charAt(0).toUpperCase() + t.slice(1);
 };
 
-const DirectionRolesGrid = ({ roles = [], currentRole = '' }) => {
+const SUB_TABS = [
+    { id: 'profile', label: 'Role Profile', icon: <ClipboardList size={15} /> },
+    { id: 'market', label: 'Market Intel', icon: <BarChart3 size={15} /> },
+    { id: 'skills', label: 'Skill DNA', icon: <Dna size={15} /> },
+    { id: 'roadmap', label: 'Roadmap', icon: <Map size={15} /> },
+    { id: 'certs', label: 'Certifications', icon: <Award size={15} /> },
+];
+
+const DirectionRolesGrid = ({ roles = [], currentRole = '', directionName = '' }) => {
     const list = useMemo(() => normaliseRoles(roles), [roles]);
     const names = useMemo(() => list.map(r => r.role), [list]);
     const namesKey = names.join('|');
@@ -35,9 +50,10 @@ const DirectionRolesGrid = ({ roles = [], currentRole = '' }) => {
     const [briefs, setBriefs] = useState({});
     const [briefsLoading, setBriefsLoading] = useState(false);
     const [openRole, setOpenRole] = useState(null);
-    const { profile, loading: profileLoading, error: profileError } = useRoleProfile(openRole);
+    const [subTab, setSubTab] = useState('profile');
+    const { profile, loading: profileLoading, error: profileError } = useRoleProfile(subTab === 'profile' ? openRole : null);
 
-    useEffect(() => { setOpenRole(null); }, [namesKey]);
+    useEffect(() => { setOpenRole(null); setSubTab('profile'); }, [namesKey]);
 
     /* ── Briefs ── */
     useEffect(() => {
@@ -72,6 +88,9 @@ const DirectionRolesGrid = ({ roles = [], currentRole = '' }) => {
     }
 
     const openItem = openRole ? list.find(r => r.role === openRole) : null;
+    // A minimal "direction" shape the Market Intel / Skill DNA / Roadmap
+    // panels already know how to read (they only need { roles }).
+    const directionShape = useMemo(() => ({ roles: list }), [list]);
 
     return (
         <div className="dp">
@@ -86,7 +105,7 @@ const DirectionRolesGrid = ({ roles = [], currentRole = '' }) => {
                             type="button"
                             key={r.id || `${r.role}-${i}`}
                             className={`dir-role-card clickable${isOpen ? ' selected' : ''}${!isOpen && isCurrent ? ' current' : ''}`}
-                            onClick={() => setOpenRole(isOpen ? null : r.role)}
+                            onClick={() => { setOpenRole(isOpen ? null : r.role); setSubTab('profile'); }}
                             aria-expanded={isOpen}
                         >
                             <div className="dir-role-card-number">{i + 1}</div>
@@ -117,31 +136,64 @@ const DirectionRolesGrid = ({ roles = [], currentRole = '' }) => {
                 <div className="dir-role-detail animate-fade-in">
                     <div className="dir-role-detail-head">
                         <div>
-                            <div className="dir-role-detail-title">{profile?.roleTitle || openRole}</div>
-                            {(profile?.jobFamily || openItem?.jobFamily) && (
-                                <div className="rp-family">{cleanFamily(profile?.jobFamily || openItem?.jobFamily)}</div>
-                            )}
+                            <div className="dir-role-detail-title">{openRole}</div>
+                            {openItem?.jobFamily && <div className="rp-family">{cleanFamily(openItem.jobFamily)}</div>}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {profile?.aiExposureLevel && <span className="dchip">AI exposure · {profile.aiExposureLevel}</span>}
-                            <button type="button" className="btn-icon" style={{ width: 32, height: 32, borderRadius: 8 }} onClick={() => setOpenRole(null)} title="Close">
-                                <X size={16} />
-                            </button>
-                        </div>
+                        <button type="button" className="btn-icon" style={{ width: 32, height: 32, borderRadius: 8 }} onClick={() => setOpenRole(null)} title="Close">
+                            <X size={16} />
+                        </button>
                     </div>
 
-                    <DegreeFit role={openItem} />
+                    {/* Same sections a chosen (Primary/Secondary/Tertiary) path gets,
+                        scoped to this role without leaving this direction. */}
+                    <div className="subtabs">
+                        {SUB_TABS.map(t => (
+                            <button
+                                key={t.id}
+                                type="button"
+                                className={`subtab${subTab === t.id ? ' active' : ''}`}
+                                onClick={() => setSubTab(t.id)}
+                            >
+                                {t.icon}{t.label}
+                            </button>
+                        ))}
+                    </div>
 
-                    {profileLoading ? (
-                        <Spinner text={`Loading the profile for ${openRole}…`} />
-                    ) : profileError ? (
-                        <EmptyState title="Profile not available yet" text="A detailed profile for this role is not in the database yet." />
-                    ) : profile ? (
+                    {subTab === 'profile' && (
                         <>
-                            <SalaryStats profile={profile} />
-                            <ProfileSections profile={profile} />
+                            <DegreeFit role={openItem} />
+                            {profileLoading ? (
+                                <Spinner text={`Loading the profile for ${openRole}…`} />
+                            ) : profileError ? (
+                                <EmptyState title="Profile not available yet" text="A detailed profile for this role is not in the database yet." />
+                            ) : profile ? (
+                                <>
+                                    <SalaryStats profile={profile} />
+                                    <ProfileSections profile={profile} />
+                                </>
+                            ) : null}
                         </>
-                    ) : null}
+                    )}
+
+                    {subTab === 'market' && (
+                        <MarketIntelligence
+                            roleName={openRole}
+                            allDirections={[{ directionName, label: directionName, roles: list }]}
+                            activeTabIndex={0}
+                        />
+                    )}
+
+                    {subTab === 'skills' && (
+                        <SkillsPanel roleName={openRole} direction={directionShape} />
+                    )}
+
+                    {subTab === 'roadmap' && (
+                        <CareerRoadmap roleName={openRole} direction={directionShape} />
+                    )}
+
+                    {subTab === 'certs' && (
+                        <Certifications roleName={openRole} directionName={directionName} directionRoles={names} />
+                    )}
                 </div>
             )}
         </div>

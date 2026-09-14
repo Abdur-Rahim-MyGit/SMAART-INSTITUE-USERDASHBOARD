@@ -80,7 +80,7 @@ const RecommendedDirections = ({ directions = [], chosenTierFor = () => null, lo
                                     </div>
                                     <div>
                                         <div className="dp-eyebrow" style={{ marginBottom: 10 }}>Job roles in this direction<span className="dp-eyebrow-rule" /></div>
-                                        <DirectionRolesGrid roles={roles} />
+                                        <DirectionRolesGrid roles={roles} directionName={dir.directionName} />
                                     </div>
                                 </div>
                             )}

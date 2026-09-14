@@ -84,7 +84,7 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                     </div>
                 </div>
                 <div className="dp-rule" />
-                <DirectionRolesGrid roles={roles} currentRole={roleName} />
+                <DirectionRolesGrid roles={roles} currentRole={roleName} directionName={directionName} />
             </div>
         </div>
     );
