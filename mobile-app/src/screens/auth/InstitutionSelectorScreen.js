@@ -84,6 +84,14 @@ export default function InstitutionSelectorScreen({ navigation }) {
 
           <Text style={styles.title}>Select Your College</Text>
           <Text style={styles.subtitle}>Find your institution to continue to Sign In</Text>
+
+          {/* Sign-in itself does not require a college — the backend resolves it
+              from the account — so a student who cannot find their institution
+              must not be trapped here. */}
+          <Pressable onPress={() => navigation.navigate('Login')} hitSlop={10} style={styles.skipBtn}>
+            <Text style={styles.skipText}>Skip for now</Text>
+            <Feather name="chevron-right" size={14} color="rgba(255,255,255,0.7)" />
+          </Pressable>
         </View>
       </FadeSlideIn>
 
@@ -234,6 +242,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255,255,255,0.65)',
     marginTop: 6,
+  },
+  skipBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 12,
+    gap: 2,
+  },
+  skipText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.7)',
   },
 
   // White Curved Body Sheet

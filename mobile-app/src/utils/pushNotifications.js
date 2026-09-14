@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { isRunningInExpoGo, requireOptionalNativeModule } from 'expo';
 import { notificationsAPI } from '../api/notifications';
+import { resolveNotificationTarget } from './notificationRouting';
 
 /**
  * expo-notifications is loaded lazily and only after we have confirmed the
@@ -79,6 +80,40 @@ export function setupNotificationHandler() {
   } catch (err) {
     console.warn('[push] notification handler unavailable:', err.message);
   }
+}
+
+/**
+ * Routes a tapped notification to the screen it is about.
+ *
+ * The backend attaches a link to every push, but nothing on the client ever
+ * read it: tapping a notification just resumed whatever screen was last open.
+ * Handles both cases — the app already running (`addNotificationResponse…`) and
+ * the app launched cold by the tap (`getLastNotificationResponseAsync`).
+ *
+ * @param {import('@react-navigation/native').NavigationContainerRef} navigationRef
+ * @returns {() => void} unsubscribe
+ */
+export function setupNotificationTapHandler(navigationRef) {
+  const Notifications = loadNotifications();
+  if (!Notifications) return () => {};
+
+  const go = (response) => {
+    try {
+      const data = response?.notification?.request?.content?.data;
+      const [screen, params] = resolveNotificationTarget(data);
+      if (navigationRef?.isReady?.()) navigationRef.navigate(screen, params);
+    } catch (err) {
+      console.warn('[push] could not open the tapped notification:', err.message);
+    }
+  };
+
+  // A tap that cold-started the app is delivered here, not to the subscription.
+  Notifications.getLastNotificationResponseAsync?.()
+    .then((response) => response && go(response))
+    .catch(() => {});
+
+  const sub = Notifications.addNotificationResponseReceivedListener(go);
+  return () => sub?.remove?.();
 }
 
 let cachedToken = null;

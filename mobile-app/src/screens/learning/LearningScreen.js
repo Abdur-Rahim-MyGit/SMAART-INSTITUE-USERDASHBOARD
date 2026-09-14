@@ -34,7 +34,13 @@ import {
   saveQuizProgress,
 } from '../../api/courses';
 import { getCourseNote, saveCourseNote } from '../../api/notes';
-import { resolveLearningFlow, indexProgressByStep } from '../../utils/courseFlow';
+import {
+  resolveLearningFlow,
+  indexProgressByStep,
+  isStepComplete,
+  isWrittenStep,
+  isPlaceholderVideo,
+} from '../../utils/courseFlow';
 import { getStageStatus } from '../../api/assessments';
 import { STAGES, TRACKS } from '../../data/courseStructureData';
 import {
@@ -517,9 +523,7 @@ export default function LearningScreen({ navigation }) {
         setStepProgress(saved);
 
         // Resume on the first step that is neither watched nor answered.
-        const firstUnfinished = resolved.steps.findIndex(
-          (s) => !saved[s.stepId]?.videoCompleted && !saved[s.stepId]?.testCompleted
-        );
+        const firstUnfinished = resolved.steps.findIndex((s) => !isStepComplete(saved[s.stepId]));
         setActiveStepIdx(firstUnfinished === -1 ? 0 : firstUnfinished);
       } catch (err) {
         if (!cancelled) {
@@ -551,6 +555,12 @@ export default function LearningScreen({ navigation }) {
       const step = flow[activeStepIdx];
       const courseCode = selectedCourse?.courseCode;
       if (!step || !courseCode) return;
+
+      // A day with no uploaded video falls back to a public sample clip (the
+      // web degrades the same way). Watching that sample to the end used to
+      // record genuine course progress, so a student could "complete" a day
+      // whose content does not exist yet. Show it, never score it.
+      if (isPlaceholderVideo(step.videoUrl)) return;
 
       // Merge, never replace: a step can carry both a video and a quiz, and a
       // wholesale overwrite dropped `testCompleted`/`testScore` the moment the
@@ -603,7 +613,14 @@ export default function LearningScreen({ navigation }) {
    */
   const handleSaveNotes = useCallback(async () => {
     const courseId = selectedCourse?.courseCode || selectedCourse?._id;
+    const courseCode = selectedCourse?.courseCode;
     if (!courseId || !notesText.trim()) return;
+
+    const step = flow[activeStepIdx];
+    // Reflect and Notes steps have no video and no quiz, so writing the
+    // reflection IS how they are completed. Without this they stayed permanently
+    // unticked no matter what the student did.
+    const completesStep = isWrittenStep(step) && !!courseCode;
 
     setNotesSaving(true);
     try {
@@ -612,7 +629,28 @@ export default function LearningScreen({ navigation }) {
         title: selectedCourse?.title || courseId,
         content: notesText.trim(),
       });
-      Alert.alert('Notes saved', 'Your takeaways are stored against this course.');
+
+      if (completesStep) {
+        setStepProgress((prev) => ({
+          ...prev,
+          [step.stepId]: { ...(prev[step.stepId] || {}), assignmentStatus: 'Submitted' },
+        }));
+        await saveUserProgress({
+          courseCode,
+          moduleId: '1',
+          dayId: 1,
+          stepId: step.stepId,
+          assignmentStatus: 'Submitted',
+          assignmentProgress: 100,
+        });
+      }
+
+      Alert.alert(
+        completesStep ? 'Step complete' : 'Notes saved',
+        completesStep
+          ? `Your reflection is saved and "${step.title}" is marked complete.`
+          : 'Your takeaways are stored against this course.'
+      );
     } catch (err) {
       Alert.alert(
         "Couldn't save notes",
@@ -621,7 +659,7 @@ export default function LearningScreen({ navigation }) {
     } finally {
       setNotesSaving(false);
     }
-  }, [selectedCourse, notesText]);
+  }, [selectedCourse, notesText, flow, activeStepIdx]);
 
   const handleQuizSubmit = useCallback(async () => {
     const step = flow[activeStepIdx];
@@ -1622,16 +1660,27 @@ export default function LearningScreen({ navigation }) {
                     {/* Video steps play; every other authored type renders its
                         own content rather than falling back to a video frame. */}
                     {step.videoUrl ? (
-                      <CourseVideoPlayer
-                        // Remount on step change so the player reloads its
-                        // source and resumes from that step's own timestamp.
-                        key={`${selectedCourse?.courseCode}-${step.stepId}`}
-                        source={step.videoUrl}
-                        startAt={saved?.lastTimestamp || 0}
-                        alreadyCompleted={saved?.videoCompleted || false}
-                        accent={stageAccent}
-                        onProgress={handleVideoProgress}
-                      />
+                      <>
+                        <CourseVideoPlayer
+                          // Remount on step change so the player reloads its
+                          // source and resumes from that step's own timestamp.
+                          key={`${selectedCourse?.courseCode}-${step.stepId}`}
+                          source={step.videoUrl}
+                          startAt={saved?.lastTimestamp || 0}
+                          alreadyCompleted={saved?.videoCompleted || false}
+                          accent={stageAccent}
+                          onProgress={handleVideoProgress}
+                        />
+                        {isPlaceholderVideo(step.videoUrl) && (
+                          <View style={[styles.placeholderNotice, { borderColor: themeColors.border }]}>
+                            <Feather name="info" size={13} color={themeColors.textMuted} />
+                            <Text style={[styles.placeholderNoticeText, { color: themeColors.textMuted }]}>
+                              Sample clip — this day's video hasn't been uploaded yet, so watching it
+                              doesn't count towards your progress.
+                            </Text>
+                          </View>
+                        )}
+                      </>
                     ) : (
                       <View style={[styles.notesStepBox, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
                         <Feather
@@ -1830,7 +1879,7 @@ export default function LearningScreen({ navigation }) {
                     // A step counts as done when its video is watched OR its
                     // quiz is submitted — non-video steps have no video flag.
                     const saved = stepProgress[item.stepId];
-                    const done = saved?.videoCompleted || saved?.testCompleted;
+                    const done = isStepComplete(saved);
                     const active = idx === activeStepIdx;
                     return (
                       <PressCard
@@ -1927,7 +1976,11 @@ export default function LearningScreen({ navigation }) {
                   onPress={handleSaveNotes}
                 >
                   <Text style={styles.saveNotesText}>
-                    {notesSaving ? 'Saving…' : 'Save Notes'}
+                    {notesSaving
+                      ? 'Saving…'
+                      : isWrittenStep(flow[activeStepIdx])
+                        ? 'Save & Mark Complete'
+                        : 'Save Notes'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -3069,6 +3122,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
   },
+  placeholderNotice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    marginTop: 10,
+    paddingVertical: 9,
+    paddingHorizontal: 11,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  placeholderNoticeText: { flex: 1, fontSize: 11.5, lineHeight: 16, fontWeight: '600' },
   notesSection: {
     marginBottom: 10,
   },

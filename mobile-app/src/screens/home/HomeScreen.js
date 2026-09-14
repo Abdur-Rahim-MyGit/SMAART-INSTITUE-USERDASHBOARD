@@ -42,6 +42,7 @@ import { getStageStatus } from '../../api/assessments';
 import { getCollegeBanners } from '../../api/colleges';
 import { notificationsAPI } from '../../api/notifications';
 import { getStreakStatus, recordActivity } from '../../api/streaks';
+import { getBadgeStats } from '../../api/badges';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BANNER_ROTATE_MS = 6000;
@@ -172,13 +173,23 @@ function pickActiveEnrollment(enrollments) {
 }
 
 function derivePendingAssessment(stageStatus) {
-  if (!stageStatus) return 'T1';
+  if (!stageStatus) return null;
   return ['T1', 'T2', 'T3', 'T4'].find((k) => !stageStatus[k]?.completed) || null;
 }
 
+/**
+ * How many of the four stages the student has actually cleared, 0-4.
+ *
+ * This used to return 1 both when the status had not loaded and when the real
+ * answer was zero, so the journey card always claimed 25% and put a green tick
+ * on the baseline stage for a student who had done nothing at all. `null` now
+ * means "not known yet" and is rendered as such.
+ *
+ * @returns {number|null} null until the stage status has loaded.
+ */
 function countCompletedStages(stageStatus) {
-  if (!stageStatus) return 1;
-  return ['T1', 'T2', 'T3', 'T4'].filter((k) => stageStatus[k]?.completed).length || 1;
+  if (!stageStatus) return null;
+  return ['T1', 'T2', 'T3', 'T4'].filter((k) => stageStatus[k]?.completed).length;
 }
 
 function AnimatedSection({ children, delay = 0 }) {
@@ -254,6 +265,10 @@ export default function HomeScreen({ navigation }) {
   const [stageStatus, setStageStatus] = useState(null);
   const [banners, setBanners] = useState([]);
   const [streak, setStreak] = useState(null); // null until /streaks/status answers
+  // null until /badges/user/:id/stats answers. The badge count used to be the
+  // literal text "12 Badges" and the level read a field no endpoint returns.
+  const [badgeStats, setBadgeStats] = useState(null);
+  const [stageError, setStageError] = useState(false);
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -316,12 +331,13 @@ export default function HomeScreen({ navigation }) {
   const collegeId = user?.college?._id || user?.college?.id || user?.college || user?.collegeId;
 
   const fetchData = useCallback(async () => {
-    const [enrollRes, stageRes, bannerRes, streakRes] = await Promise.allSettled([
+    const [enrollRes, stageRes, bannerRes, streakRes, badgeRes] = await Promise.allSettled([
       userId ? getEnrollments(userId) : Promise.resolve(null),
       userId ? getStageStatus(userId) : Promise.resolve(null),
       collegeId ? getCollegeBanners(collegeId) : Promise.resolve(null),
       // Same as the web dashboard: today counts as activity, then read the streak.
       recordActivity().catch(() => null).then(() => getStreakStatus()),
+      userId ? getBadgeStats(userId) : Promise.resolve(null),
     ]);
 
     if (streakRes.status === 'fulfilled' && streakRes.value?.data) {
@@ -333,11 +349,22 @@ export default function HomeScreen({ navigation }) {
       setEnrolledCount(list.length);
       setActiveEnrollment(pickActiveEnrollment(list));
     }
+
+    // A failed stage call used to be indistinguishable from "this student has
+    // completed nothing", because the fallbacks invented a plausible-looking
+    // answer. The card now says it could not load, and offers a retry.
     if (stageRes.status === 'fulfilled' && stageRes.value?.data) {
       setStageStatus(stageRes.value.data);
+      setStageError(false);
+    } else if (stageRes.status === 'rejected') {
+      setStageError(true);
     }
+
     if (bannerRes.status === 'fulfilled' && bannerRes.value?.data) {
       setBanners(bannerRes.value.data);
+    }
+    if (badgeRes.status === 'fulfilled' && badgeRes.value?.data) {
+      setBadgeStats(badgeRes.value.data);
     }
   }, [userId, collegeId]);
 
@@ -376,10 +403,20 @@ export default function HomeScreen({ navigation }) {
   // genuine notices to students, so the row simply disappears when none exist.
   const activeAnnouncementBanners = banners;
 
-  // Derive Essential Hero Data
+  // Derive Essential Hero Data.
+  //
+  // `progressPct` used to be pinned to zero for anyone with a stage still
+  // outstanding — nearly every student — even though the real figure had
+  // already been fetched. It is the enrolment's own progress, full stop.
   const courseTitle = activeEnrollment?.course?.title || 'Capacity: Foundations';
-  const progressPct = pendingAssessment ? 0 : Math.round(activeEnrollment?.progress || 0);
-  const ctaLabel = pendingAssessment ? `Start ${pendingAssessment} Assessment` : 'Continue Learning';
+  const progressPct = Math.round(activeEnrollment?.progress || 0);
+  // `loadingData` was set but never read, so the hero asserted a next action
+  // before it knew what the student had finished.
+  const ctaLabel = loadingData
+    ? 'Loading…'
+    : pendingAssessment
+      ? `Start ${pendingAssessment} Assessment`
+      : 'Continue Learning';
 
   // Smooth Animated Progress Bar Fill
   useEffect(() => {
@@ -794,9 +831,9 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="star-circle" size={22} color="#EAB308" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                Level {user?.level || 2}
+                {badgeStats ? `${badgeStats.totalXP ?? 0} XP` : '—'}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.textMuted }]}>XP Rank</Text>
+              <Text style={[styles.statLabel, { color: colors.textMuted }]}>Experience</Text>
             </View>
 
             <View style={[styles.statDividerVertical, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]} />
@@ -807,7 +844,9 @@ export default function HomeScreen({ navigation }) {
                 <MaterialCommunityIcons name="trophy" size={21} color="#6366F1" />
               </View>
               <Text style={[styles.statValue, { color: colors.text }]}>
-                12 Badges
+                {badgeStats
+                  ? `${badgeStats.totalEarned ?? 0} ${badgeStats.totalEarned === 1 ? 'Badge' : 'Badges'}`
+                  : '—'}
               </Text>
               <Text style={[styles.statLabel, { color: colors.textMuted }]}>Achievements</Text>
             </View>
@@ -925,7 +964,9 @@ export default function HomeScreen({ navigation }) {
             <View style={styles.journeyTopRow}>
               {/* Left: Progress score ring */}
               <View style={[styles.ringContainer, { borderColor: isDark ? 'rgba(20,120,184,0.2)' : '#EAF7FD' }]}>
-                <Text style={[styles.ringPctText, { color: '#045C9A' }]}>{completedCount * 25}%</Text>
+                <Text style={[styles.ringPctText, { color: '#045C9A' }]}>
+                  {completedCount == null ? '—' : `${completedCount * 25}%`}
+                </Text>
               </View>
 
               <View style={styles.journeyTextWrap}>
@@ -933,7 +974,11 @@ export default function HomeScreen({ navigation }) {
                   Assessment Journey
                 </Text>
                 <Text style={[styles.journeySubHeading, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-                  {completedCount} of 4 Stage Milestones Cleared
+                  {completedCount != null
+                    ? `${completedCount} of 4 Stage Milestones Cleared`
+                    : stageError
+                      ? "Couldn't load your progress — pull to refresh"
+                      : 'Loading your progress…'}
                 </Text>
               </View>
 
@@ -946,8 +991,10 @@ export default function HomeScreen({ navigation }) {
               <View style={[styles.stepperLineBg, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0' }]} />
 
               {['Baseline', 'Capacity', 'Capability', 'Leadership'].map((stgLabel, idx) => {
-                const isDone = completedCount > idx;
-                const isCurrent = completedCount === idx;
+                // Unknown progress marks nothing done and nothing current,
+                // rather than quietly ticking the baseline stage.
+                const isDone = completedCount != null && completedCount > idx;
+                const isCurrent = completedCount != null && completedCount === idx;
 
                 return (
                   <View key={stgLabel} style={styles.nodeItem}>

@@ -3,8 +3,15 @@ import * as storage from '../utils/storage';
 import { getDeviceHeaders } from '../utils/device';
 
 // Set EXPO_PUBLIC_API_URL in .env (see .env.example) — Metro exposes EXPO_PUBLIC_*
-// vars to the app automatically, no extra config needed.
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
+// vars to the app automatically, no extra config needed. Store builds get it
+// from the `env` block of the matching build profile in eas.json; .env itself
+// is in .easignore so a developer's LAN address can never reach a release.
+//
+// The fallback is the real production API, NOT localhost: a device has no
+// server on its own loopback, and plain HTTP is blocked by iOS App Transport
+// Security and by Android's default cleartext policy, so a localhost fallback
+// could only ever fail. A misconfigured build at least reaches a real host.
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://api.smaartminds.com/api';
 
 export const TOKEN_KEY = 'smaart_auth_token';
 

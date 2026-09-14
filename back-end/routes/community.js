@@ -1319,10 +1319,23 @@ router.post("/discussions/:id/best-answer", async (req, res) => {
   }
 });
 
-// Peer vote on a discussion (quality score)
+// Peer vote on a discussion (quality score).
+//
+// This path carries TWO distinct actions that clients have always sent to the
+// same URL: a peer up/down quality vote (`{ vote: 'up'|'down' }`) and a poll
+// vote (`{ optionIndex }`). Express dispatches to whichever handler is
+// registered first, so the poll handler further down this file was dead and
+// every poll vote failed the `vote must be "up" or "down"` check. Dispatch on
+// the body here and delegate; `handlePollVote` is also mounted on its own
+// `/poll-vote` path below for new callers.
 router.post("/discussions/:id/vote", async (req, res) => {
   try {
-    const { userId, vote } = req.body;
+    const { userId, vote, optionIndex } = req.body;
+
+    if (optionIndex !== undefined && optionIndex !== null && optionIndex !== "") {
+      return handlePollVote(req, res);
+    }
+
     const normalizedVote = vote === "up" || vote === "down" ? vote : null;
     if (!normalizedVote) {
       return res
@@ -1634,8 +1647,11 @@ router.post("/discussions/:id/bookmark", async (req, res) => {
   }
 });
 
-// Vote in a poll
-router.post("/discussions/:id/vote", async (req, res) => {
+// Vote in a poll. Reached either via its own path or by delegation from the
+// peer-vote handler above when the body carries `optionIndex`.
+router.post("/discussions/:id/poll-vote", (req, res) => handlePollVote(req, res));
+
+async function handlePollVote(req, res) {
   try {
     const { userId, optionIndex } = req.body;
     const discussion = await CommunityPost.findById(req.params.id);
@@ -1705,7 +1721,7 @@ router.post("/discussions/:id/vote", async (req, res) => {
     console.error("Error voting in poll:", error);
     res.status(500).json({ success: false, error: "Failed to vote in poll" });
   }
-});
+}
 
 // Add reply to a discussion
 router.post("/discussions/:id/reply", async (req, res) => {

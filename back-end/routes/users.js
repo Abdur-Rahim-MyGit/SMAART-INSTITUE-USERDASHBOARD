@@ -47,7 +47,11 @@ const buildFlatRegistration = (studentDoc) => {
     studentId: doc.studentId,
     rollNumber: doc.rollNumber,
     admissionDate: doc.admissionDate,
-    address: doc.address,
+    // The registration's own address wins. `PATCH /register-section` writes
+    // there, so reading the Student's top-level field first meant a saved
+    // address was written and then never read back — the profile kept showing
+    // "Not completed" after a successful save.
+    address: (sub.address && Object.keys(sub.address).length) ? sub.address : doc.address,
     status: doc.profileStatus,
   };
 };
@@ -502,15 +506,38 @@ router.patch('/register-section', registrationIdentity((req) => req.body?.email)
           registration.profilePhoto = data.profilePhoto;
         }
 
-        if (data.address) {
-          registration.address = {
-            street: data.address.street || registration.address?.street || '',
-            city: data.address.city || registration.address?.city || '',
-            state: data.address.state || registration.address?.state || '',
-            country: data.address.country || registration.address?.country || '',
-            district: data.address.district || registration.address?.district || '',
-            pincode: data.address.pincode || registration.address?.pincode || '',
-          };
+        // Address arrives either nested (`data.address`, the web form) or as
+        // flat top-level fields (the mobile profile editor sends city/state/
+        // country/zip). Accepting only the nested shape meant mobile edits were
+        // silently discarded while the client still showed a success alert.
+        // `zip` is the mobile spelling of `pincode`.
+        const addressInput = data.address && typeof data.address === 'object' ? data.address : {};
+        const flatAddress = {
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+          district: data.district,
+          pincode: data.pincode !== undefined ? data.pincode : data.zip,
+        };
+        const pick = (key) => {
+          const nested = addressInput[key];
+          if (nested !== undefined && nested !== null && nested !== '') return nested;
+          const flat = key === 'pincode'
+            ? (flatAddress.pincode !== undefined ? flatAddress.pincode : addressInput.zip)
+            : flatAddress[key];
+          if (flat !== undefined && flat !== null && flat !== '') return flat;
+          return undefined;
+        };
+        const addressKeys = ['street', 'city', 'state', 'country', 'district', 'pincode'];
+        if (addressKeys.some((k) => pick(k) !== undefined)) {
+          const existing = registration.address || {};
+          registration.address = addressKeys.reduce((acc, key) => {
+            const next = pick(key);
+            acc[key] = (next !== undefined ? next : existing[key]) || '';
+            return acc;
+          }, {});
+          registration.markModified('address');
         }
 
         // Sync critical fields to the student (student data never goes to users)
@@ -545,8 +572,18 @@ router.patch('/register-section', registrationIdentity((req) => req.body?.email)
           state: data.state || registration.address?.state || '',
           country: data.country || registration.address?.country || '',
           district: data.district || registration.address?.district || '',
-          pincode: data.pincode || registration.address?.pincode || '',
+          // `zip` is the mobile client's spelling of the same field.
+          pincode: data.pincode || data.zip || registration.address?.pincode || '',
         };
+        registration.markModified('address');
+
+        // Keep the Student's own address in step, so whichever one a reader
+        // reaches first shows the same thing.
+        if (student) {
+          student.address = { ...registration.address };
+          student.markModified('address');
+          await student.save();
+        }
       },
       'tenthDetails': async () => {
         registration.tenthDetails = {

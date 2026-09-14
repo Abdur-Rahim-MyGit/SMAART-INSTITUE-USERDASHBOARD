@@ -76,7 +76,13 @@ export default function ProctoringGate({ session, accent, onCancel }) {
   const busy = phase === 'starting' || phase === 'loading-models' || phase === 'registering';
   const canStart = phase === 'idle' || phase === 'error';
   const bodyCopy = phase === 'loading-models'
-    ? `Preparing verification models… ${session.modelProgress}%`
+    ? `Preparing verification models… ${session.modelProgress}%` +
+      // The models are ~178MB and download on first use, which can take
+      // minutes on a slow connection — while the attempt clock is already
+      // running. Say so, rather than leaving a silent percentage.
+      (session.modelProgress < 100
+        ? '\n\nThis is a one-time download for this device. Your exam timer is already running — on a slow connection, consider cancelling and starting again on better Wi-Fi.'
+        : '')
     : phase === 'registering'
       ? (session.registerStatus || PHASE_COPY.registering)
       : phase === 'error'

@@ -19,8 +19,23 @@ import { Feather } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { placementsAPI } from '../../api/placements';
+import { exportResume, listResumes } from '../../api/resumes';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+/**
+ * Mirrors `back-end/routes/placements.js` — the apply handler rejects anything
+ * shorter. Kept as named constants so the counter the student sees and the rule
+ * the server enforces cannot drift apart.
+ */
+const MIN_COVER_LETTER_WORDS = 50;
+const MAX_COVER_LETTER_CHARS = 6000;
+
+/** The same word count the backend performs, so the preview matches the verdict. */
+function countWords(text) {
+  const trimmed = (text || '').trim();
+  return trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+}
 
 export function normalizeJobType(job) {
   const combined = [job.displayType, job.type, job.jobType, job.employmentType]
@@ -94,6 +109,27 @@ export default function CareerScreen({ navigation }) {
   const [signatureText, setSignatureText] = useState('');
   const [declineReason, setDeclineReason] = useState('');
 
+  // Job Application State.
+  //
+  // Applying used to post a hardcoded five-word cover letter and nothing else,
+  // against a handler that requires fifty words, a resume URL, a mobile number
+  // and an active-backlog count — so every application returned 400 and no
+  // student could ever apply. These fields are exactly what that handler wants.
+  const [applyJob, setApplyJob] = useState(null);
+  const [applyModalVisible, setApplyModalVisible] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [applyMobile, setApplyMobile] = useState('');
+  const [activeBacklog, setActiveBacklog] = useState('');
+  const [portfolioUrl, setPortfolioUrl] = useState('');
+  const [linkedInUrl, setLinkedInUrl] = useState('');
+  const [resumeUrl, setResumeUrl] = useState('');
+  const [resumeName, setResumeName] = useState('');
+  const [resumeLoading, setResumeLoading] = useState(false);
+  const [applySubmitting, setApplySubmitting] = useState(false);
+  const [applyError, setApplyError] = useState('');
+
+  const coverLetterWords = countWords(coverLetter);
+
   const fetchJobs = async () => {
     try {
       const res = await placementsAPI.getJobs({ limit: 100 });
@@ -164,24 +200,137 @@ export default function CareerScreen({ navigation }) {
     });
   }, [jobs, typeFilter, sourceFilter, searchQuery]);
 
-  // Handle Job Application
-  const handleApply = async (job) => {
+  /**
+   * Attaches the student's SMAART-built resume to the application.
+   *
+   * The backend refuses any application without a `resumeUrl` ("Please build
+   * your SMAART resume before applying"). Mobile has no PDF renderer, so rather
+   * than upload a file it exports the most recently edited resume and sends the
+   * public verification URL that `POST /resumes/:id/export` returns — the same
+   * link the QR code on the printed resume points at. It is durable, public to
+   * a recruiter, and provably SMAART-issued.
+   */
+  // `POST /resumes/:id/export` is rate-limited to 10 per hour. A student
+  // browsing several roles would burn through that just by opening the form,
+  // so the exported URL is reused for the rest of the session — it addresses
+  // the resume, not the application.
+  const cachedResumeRef = useRef(null);
+
+  const attachResume = useCallback(async () => {
+    if (cachedResumeRef.current) {
+      setResumeUrl(cachedResumeRef.current.url);
+      setResumeName(cachedResumeRef.current.name);
+      return;
+    }
+
+    setResumeLoading(true);
+    setApplyError('');
+    try {
+      const res = await listResumes();
+      const resumes = res?.data || [];
+      if (!resumes.length) {
+        setResumeUrl('');
+        setResumeName('');
+        setApplyError('You need a SMAART resume before you can apply. Build one, then come back.');
+        return;
+      }
+
+      // `GET /resumes` sorts by updatedAt descending — the first is the newest.
+      const resume = resumes[0];
+      const exported = await exportResume(resume._id);
+      const url = exported?.data?.verificationUrl;
+      if (!url) {
+        setApplyError('Could not attach your resume. Please try again in a moment.');
+        return;
+      }
+      const name = resume.title || resume.personalInfo?.targetRole || 'SMAART Resume';
+      cachedResumeRef.current = { url, name };
+      setResumeUrl(url);
+      setResumeName(name);
+    } catch (err) {
+      setApplyError(err.message || 'Could not attach your resume. Please try again.');
+    } finally {
+      setResumeLoading(false);
+    }
+  }, []);
+
+  // Opens the application form. Nothing is sent until the student submits it.
+  const handleApply = (job) => {
     const alreadyApplied = applications.some((app) => (app.job?._id || app.job) === job._id);
     if (alreadyApplied) {
       Alert.alert('Already Applied', 'You have already submitted an application for this role.');
       return;
     }
 
+    setApplyJob(job);
+    setCoverLetter('');
+    setActiveBacklog('');
+    setPortfolioUrl('');
+    setLinkedInUrl('');
+    setResumeUrl('');
+    setResumeName('');
+    setApplyError('');
+    setApplyMobile(user?.mobile || user?.mobileNumber || '');
+    setApplyModalVisible(true);
+    attachResume();
+  };
+
+  /**
+   * Validates against the same rules as the server before spending a request,
+   * then submits. Every field below is one the backend handler requires.
+   */
+  const submitApplication = async () => {
+    if (!applyJob) return;
+
+    if (coverLetterWords < MIN_COVER_LETTER_WORDS) {
+      setApplyError(
+        `Your cover letter needs at least ${MIN_COVER_LETTER_WORDS} words — it has ${coverLetterWords}.`
+      );
+      return;
+    }
+    if (coverLetter.trim().length > MAX_COVER_LETTER_CHARS) {
+      setApplyError(`Your cover letter is too long (maximum ${MAX_COVER_LETTER_CHARS} characters).`);
+      return;
+    }
+    if (!resumeUrl) {
+      setApplyError('Your SMAART resume must be attached before you can apply.');
+      return;
+    }
+    if (!applyMobile.trim()) {
+      setApplyError('A mobile number is required so the employer can reach you.');
+      return;
+    }
+    // The server treats a missing backlog count as invalid, and 0 is a
+    // meaningful answer — so check for "not filled in", not for falsiness.
+    if (activeBacklog.trim() === '' || Number.isNaN(Number(activeBacklog))) {
+      setApplyError('Enter your number of active backlogs (0 if you have none).');
+      return;
+    }
+
+    setApplySubmitting(true);
+    setApplyError('');
     try {
-      const source = job.sourceCollection || 'jobpostings';
-      await placementsAPI.applyJob(source, job._id, {
-        coverLetter: 'Applied via SMAART Mobile App.',
+      const source = applyJob.sourceCollection || 'jobpostings';
+      await placementsAPI.applyJob(source, applyJob._id, {
+        fullName: user?.fullName || '',
+        email: user?.email || '',
+        mobile: applyMobile.trim(),
+        coverLetter: coverLetter.trim(),
+        resumeUrl,
+        activeBacklog: Number(activeBacklog),
+        portfolioUrl: portfolioUrl.trim() || undefined,
+        linkedInUrl: linkedInUrl.trim() || undefined,
       });
-      Alert.alert('Application Submitted! 🎉', 'Your profile details have been sent to the employer.');
-      navigation.goBack();
+      setApplyModalVisible(false);
+      setApplyJob(null);
+      Alert.alert('Application Submitted! 🎉', 'Your application has been sent to the employer.');
       fetchApplications();
     } catch (err) {
-      Alert.alert('Apply Failed', err.message || 'Please try again.');
+      // The server's message is the specific one (word count, moderation,
+      // duplicate) — show it rather than a generic retry prompt.
+      setApplyError(err.message || 'Could not submit your application. Please try again.');
+    } finally {
+      setApplySubmitting(false);
     }
   };
 
@@ -574,6 +723,157 @@ export default function CareerScreen({ navigation }) {
           )}
         </ScrollView>
       )}
+
+      {/* JOB APPLICATION MODAL */}
+      <Modal visible={applyModalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: themeColors.bg, maxHeight: '90%' }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: themeColors.border }]}>
+              <Text style={[styles.modalHeaderTitle, { color: themeColors.text }]} numberOfLines={1}>
+                Apply · {applyJob?.displayTitle || applyJob?.title || 'Role'}
+              </Text>
+              <TouchableOpacity
+                style={styles.modalCloseBtn}
+                onPress={() => setApplyModalVisible(false)}
+                disabled={applySubmitting}
+              >
+                <Feather name="x" size={20} color={themeColors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              contentContainerStyle={styles.modalScroll}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {/* Resume — required by the server, attached automatically. */}
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>Your SMAART resume</Text>
+              <View
+                style={[
+                  styles.resumeBox,
+                  { backgroundColor: themeColors.card, borderColor: resumeUrl ? '#10B981' : themeColors.border },
+                ]}
+              >
+                {resumeLoading ? (
+                  <>
+                    <ActivityIndicator size="small" color={themeColors.textMuted} />
+                    <Text style={[styles.resumeText, { color: themeColors.textMuted }]}>Attaching…</Text>
+                  </>
+                ) : resumeUrl ? (
+                  <>
+                    <Feather name="check-circle" size={16} color="#10B981" />
+                    <Text style={[styles.resumeText, { color: themeColors.text }]} numberOfLines={1}>
+                      {resumeName} attached
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Feather name="alert-circle" size={16} color="#F59E0B" />
+                    <Text style={[styles.resumeText, { color: themeColors.textMuted }]} numberOfLines={2}>
+                      No resume attached
+                    </Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('ResumeBuilder')}>
+                      <Text style={styles.resumeAction}>Build one</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+
+              {/* Cover letter — 50-word minimum, enforced server-side. */}
+              <View style={styles.labelRow}>
+                <Text style={[styles.inputLabel, { color: themeColors.text }]}>Cover letter</Text>
+                <Text
+                  style={[
+                    styles.wordCount,
+                    { color: coverLetterWords >= MIN_COVER_LETTER_WORDS ? '#10B981' : themeColors.textMuted },
+                  ]}
+                >
+                  {coverLetterWords}/{MIN_COVER_LETTER_WORDS} words
+                </Text>
+              </View>
+              <TextInput
+                style={[
+                  styles.modalTextInput,
+                  styles.coverLetterInput,
+                  { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text },
+                ]}
+                placeholder={`Why are you right for this role? At least ${MIN_COVER_LETTER_WORDS} words.`}
+                placeholderTextColor={themeColors.textMuted}
+                value={coverLetter}
+                onChangeText={setCoverLetter}
+                multiline
+                textAlignVertical="top"
+                maxLength={MAX_COVER_LETTER_CHARS}
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text, marginTop: 14 }]}>Mobile number</Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="Where the employer can reach you"
+                placeholderTextColor={themeColors.textMuted}
+                value={applyMobile}
+                onChangeText={setApplyMobile}
+                keyboardType="phone-pad"
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text, marginTop: 14 }]}>Active backlogs</Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="0 if you have none"
+                placeholderTextColor={themeColors.textMuted}
+                value={activeBacklog}
+                onChangeText={(t) => setActiveBacklog(t.replace(/[^0-9]/g, ''))}
+                keyboardType="number-pad"
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text, marginTop: 14 }]}>
+                Portfolio link (optional)
+              </Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="https://"
+                placeholderTextColor={themeColors.textMuted}
+                value={portfolioUrl}
+                onChangeText={setPortfolioUrl}
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+
+              <Text style={[styles.inputLabel, { color: themeColors.text, marginTop: 14 }]}>
+                LinkedIn (optional)
+              </Text>
+              <TextInput
+                style={[styles.modalTextInput, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
+                placeholder="https://linkedin.com/in/…"
+                placeholderTextColor={themeColors.textMuted}
+                value={linkedInUrl}
+                onChangeText={setLinkedInUrl}
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+
+              {applyError ? (
+                <View style={styles.applyErrorBox}>
+                  <Feather name="alert-circle" size={15} color="#EF4444" />
+                  <Text style={styles.applyErrorText}>{applyError}</Text>
+                </View>
+              ) : null}
+
+              <TouchableOpacity
+                style={[styles.applySubmitBtn, { backgroundColor: applySubmitting ? '#64748B' : '#10B981' }]}
+                onPress={submitApplication}
+                disabled={applySubmitting}
+              >
+                {applySubmitting ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.offerActionText}>Submit application</Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* OFFER LETTER RESPOND MODAL */}
       <Modal visible={offerModalVisible} animationType="slide" transparent>
@@ -1048,6 +1348,67 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
     marginBottom: 6,
+  },
+
+  /* JOB APPLICATION FORM */
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: 16,
+  },
+  wordCount: {
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  coverLetterInput: {
+    minHeight: 132,
+    paddingTop: 12,
+  },
+  resumeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+  },
+  resumeText: {
+    flex: 1,
+    fontSize: 12.5,
+    fontWeight: '600',
+  },
+  resumeAction: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#3B82F6',
+  },
+  applyErrorBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(239,68,68,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(239,68,68,0.28)',
+  },
+  applyErrorText: {
+    flex: 1,
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: '#EF4444',
+    lineHeight: 18,
+  },
+  applySubmitBtn: {
+    marginTop: 20,
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalTextInput: {
     borderRadius: 14,

@@ -215,6 +215,38 @@ router.delete('/clear-all', protect, async (req, res) => {
   }
 });
 
+// Unregister this device's Expo push token — call on logout so a signed-out
+// device stops receiving pushes for the account.
+//
+// MUST stay above `DELETE /:id`: Express matches in declaration order, so with
+// the generic route first this request was handled as "delete notification with
+// id 'register-device'", which threw a CastError. Sign-out therefore never
+// unregistered the device and a signed-out phone kept receiving the account's
+// pushes.
+router.delete('/register-device', protect, async (req, res) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const { expoPushToken } = req.body;
+
+    const Student = require('../models/Student');
+    const User = require('../models/User');
+
+    let owner = await Student.findById(userId);
+    if (!owner) owner = await User.findById(userId);
+    if (!owner) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    owner.expoPushTokens = (owner.expoPushTokens || []).filter((t) => t !== expoPushToken);
+    await owner.save();
+
+    res.json({ success: true, message: 'Device unregistered' });
+  } catch (error) {
+    console.error('Error unregistering push token:', error);
+    res.status(500).json({ success: false, message: 'Failed to unregister device' });
+  }
+});
+
 router.delete('/:id', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
@@ -443,32 +475,6 @@ router.post('/register-device', protect, async (req, res) => {
   } catch (error) {
     console.error('Error registering push token:', error);
     res.status(500).json({ success: false, message: 'Failed to register device' });
-  }
-});
-
-// Unregister this device's Expo push token — call on logout so a signed-out
-// device stops receiving pushes for the account.
-router.delete('/register-device', protect, async (req, res) => {
-  try {
-    const userId = getAuthenticatedUserId(req);
-    const { expoPushToken } = req.body;
-
-    const Student = require('../models/Student');
-    const User = require('../models/User');
-
-    let owner = await Student.findById(userId);
-    if (!owner) owner = await User.findById(userId);
-    if (!owner) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    owner.expoPushTokens = (owner.expoPushTokens || []).filter((t) => t !== expoPushToken);
-    await owner.save();
-
-    res.json({ success: true, message: 'Device unregistered' });
-  } catch (error) {
-    console.error('Error unregistering push token:', error);
-    res.status(500).json({ success: false, message: 'Failed to unregister device' });
   }
 });
 

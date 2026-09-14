@@ -22,6 +22,7 @@ import CareerDirectionsScreen from '../screens/career/CareerDirectionsScreen';
 import ToolkitScreen from '../screens/career/ToolkitScreen';
 import CgpaCalculatorScreen from '../screens/learning/CgpaCalculatorScreen';
 import DictionaryScreen from '../screens/career/DictionaryScreen';
+import LegalScreen from '../screens/legal/LegalScreen';
 import SideDrawer from '../components/SideDrawer';
 import { DrawerProvider, useDrawer } from '../context/DrawerContext';
 import { colors } from '../theme';
@@ -115,6 +116,8 @@ function AppNavigator() {
 
         {/* Learning-tab satellites (cont.) */}
         <Stack.Screen name="CgpaCalculator" component={CgpaCalculatorScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PrivacyPolicy" component={LegalScreen} initialParams={{ doc: 'privacy' }} options={{ headerShown: false }} />
+        <Stack.Screen name="Terms" component={LegalScreen} initialParams={{ doc: 'terms' }} options={{ headerShown: false }} />
 
         {/* Standalone analytics screen — reached from the sidebar and Home's shortcut tile */}
         <Stack.Screen name="Performance" component={PerformanceScreen} options={{ headerShown: false }} />

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { setupNotificationTapHandler } from '../utils/pushNotifications';
 import { useAuth } from '../context/AuthContext';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
@@ -23,6 +24,18 @@ import { colors } from '../theme';
  */
 export default function RootNavigator() {
   const { user, isBootstrapping, isLocked, needsProfileCompletion } = useAuth();
+
+  // Tapping a push must open what it is about. The listener is attached only
+  // while a signed-in session is showing the app stack — the routes it targets
+  // do not exist in AuthStack, and navigating a signed-out user into them would
+  // throw.
+  const navigationRef = useRef(null);
+  const showAppStack = !!user && !isLocked && !needsProfileCompletion;
+
+  useEffect(() => {
+    if (!showAppStack) return undefined;
+    return setupNotificationTapHandler(navigationRef.current);
+  }, [showAppStack]);
 
   if (isBootstrapping) {
     // Same navy background + logo as the native splash (app.json's
@@ -48,7 +61,11 @@ export default function RootNavigator() {
     return <ProfileCompletionScreen />;
   }
 
-  return <NavigationContainer>{user ? <AppStack /> : <AuthStack />}</NavigationContainer>;
+  return (
+    <NavigationContainer ref={navigationRef}>
+      {user ? <AppStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -26,6 +26,12 @@ export function AuthProvider({ children }) {
   const [isLocked, setIsLocked] = useState(false);
   const [biometricEnabled, setBiometricEnabledState] = useState(false);
 
+  // Why the student is looking at the login screen when they did not ask to be.
+  // Both paths below used to drop them there silently: a failed session restore
+  // and a server-side force-logout are very different problems, and neither is
+  // "you typed your password wrong".
+  const [authNotice, setAuthNotice] = useState('');
+
   const backgroundedAt = useRef(null);
   const renewalTimer = useRef(null);
 
@@ -33,10 +39,19 @@ export function AuthProvider({ children }) {
   // exposes this as `isRegistered` (and `hasRegistration` on some responses).
   const needsProfileCompletion = !!user && user.isRegistered !== true && user.hasRegistration !== true;
 
-  const clearSession = useCallback(async () => {
+  /**
+   * Drops the local session.
+   *
+   * @param {string} notice why, shown on the login screen. The axios
+   *   interceptor calls this with no argument when token renewal has failed —
+   *   a server-side force-logout — which used to dump the student at the login
+   *   screen with no explanation at all.
+   */
+  const clearSession = useCallback(async (notice = 'Your session has ended. Please sign in again.') => {
     await storage.deleteItem(TOKEN_KEY);
     setUser(null);
     setIsLocked(false);
+    setAuthNotice(notice);
   }, []);
 
   // On app start: if a token is already stored (secure storage, per FR-AUTH-07),
@@ -60,7 +75,20 @@ export function AuthProvider({ children }) {
           registerForPushNotifications().catch(() => {});
         }
       } catch (err) {
-        await storage.deleteItem(TOKEN_KEY);
+        // Only an authentication failure means the stored token is actually
+        // dead. Deleting it on *any* thrown error signed the student out for a
+        // timeout, a 500 or simply launching with no connection — permanently,
+        // because the token was already gone by the time the network returned.
+        const status = err?.status;
+        if (status === 401 || status === 403) {
+          await storage.deleteItem(TOKEN_KEY);
+          setAuthNotice('Your session has expired. Please sign in again.');
+        } else {
+          console.warn('[auth] could not validate the stored session, keeping it:', err?.message);
+          setAuthNotice(
+            "We couldn't reach SMAART to restore your session. Your sign-in is still saved — reconnect and reopen the app."
+          );
+        }
       } finally {
         setIsBootstrapping(false);
       }
@@ -120,6 +148,7 @@ export function AuthProvider({ children }) {
 
   const signIn = async (token, userData) => {
     await storage.setItem(TOKEN_KEY, token);
+    setAuthNotice('');
     setUser(userData);
     if (userData && userData.college) {
       setCollege(userData.college);
@@ -135,7 +164,8 @@ export function AuthProvider({ children }) {
     } catch {
       // best-effort — clear local session regardless of server response
     }
-    await clearSession();
+    // A deliberate sign-out needs no explanation on the login screen.
+    await clearSession('');
   };
 
   /** Called by BiometricUnlockScreen once the OS prompt succeeds. */
@@ -174,6 +204,8 @@ export function AuthProvider({ children }) {
       isLocked,
       biometricEnabled,
       needsProfileCompletion,
+      authNotice,
+      clearAuthNotice: () => setAuthNotice(''),
       signIn,
       signOut,
       unlock,
@@ -187,6 +219,7 @@ export function AuthProvider({ children }) {
       isLocked,
       biometricEnabled,
       needsProfileCompletion,
+      authNotice,
       unlock,
       setBiometricPreference,
       refreshUser,

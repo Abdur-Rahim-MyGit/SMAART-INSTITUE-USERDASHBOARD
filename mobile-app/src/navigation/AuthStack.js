@@ -11,6 +11,7 @@ import CreatePasswordScreen from '../screens/auth/CreatePasswordScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
 import ChangePasswordScreen from '../screens/auth/ChangePasswordScreen';
+import LegalScreen from '../screens/legal/LegalScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,12 @@ export default function AuthStack() {
       {/* FR-AUTH-06 — forgot / reset password */}
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+
+      {/* Store requirement: a privacy policy must be reachable without an
+          account, so both documents live in the auth stack as well as the app
+          stack. */}
+      <Stack.Screen name="PrivacyPolicy" component={LegalScreen} initialParams={{ doc: 'privacy' }} />
+      <Stack.Screen name="Terms" component={LegalScreen} initialParams={{ doc: 'terms' }} />
 
       {/* FR-AUTH-05 — forced first-login password change */}
       <Stack.Screen

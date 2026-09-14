@@ -120,12 +120,19 @@ export default function ProfileScreen({ navigation }) {
         setStageStatus(stageData.data);
       }
 
-      // Initialize form fields
+      // Initialize form fields.
+      //
+      // The address lives in its own nested object on the registration record,
+      // not as flat keys on `personalDetails` — reading it from there returned
+      // undefined every time, which is why the address always displayed as
+      // "Not completed" even right after a save reported success. The flat
+      // lookup is kept as a fallback for older records.
       const pDetails = regData?.personalDetails || {};
-      setCity(pDetails.city || '');
-      setStateName(pDetails.state || '');
-      setCountry(pDetails.country || '');
-      setZip(pDetails.zip || '');
+      const addr = regData?.address || pDetails.address || {};
+      setCity(addr.city || pDetails.city || '');
+      setStateName(addr.state || pDetails.state || '');
+      setCountry(addr.country || pDetails.country || '');
+      setZip(addr.pincode || pDetails.zip || '');
 
       const hEdu = regData?.higherEducation?.[0] || {};
       setDegree(hEdu.degree || '');
@@ -157,14 +164,18 @@ export default function ProfileScreen({ navigation }) {
     setSaving(true);
     try {
       if (activeSection === 'address') {
-        const payload = {
-          ...(regDetails?.personalDetails || {}),
+        // The 'address' section — not 'personalDetails'. The backend has a
+        // dedicated handler for it that takes exactly these flat fields;
+        // posting them to 'personalDetails' meant they were read off an object
+        // that handler never looks at and silently dropped, while the app still
+        // showed a success alert.
+        await saveRegistrationSection(email, 'address', {
+          ...(regDetails?.address || {}),
           city,
           state: stateName,
           country,
-          zip,
-        };
-        await saveRegistrationSection(email, 'personalDetails', payload);
+          pincode: zip,
+        });
         Alert.alert('Success', 'Address details updated successfully.');
       } else if (activeSection === 'education') {
         const updatedEdu = [...(regDetails?.higherEducation || [])];

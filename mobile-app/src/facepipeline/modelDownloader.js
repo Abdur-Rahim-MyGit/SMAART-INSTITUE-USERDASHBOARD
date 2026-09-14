@@ -12,7 +12,11 @@
  */
 import { File, Paths } from 'expo-file-system';
 
-const MODEL_BASE_URL = process.env.EXPO_PUBLIC_MODEL_BASE_URL || 'http://localhost:5173/models/onnx';
+// Falls back to the production web app, which already serves these exact files
+// from front-end/public/models/onnx/. The previous default named a local port
+// that did not match .env.example's, so neither worked outside one machine and
+// an unreachable host blocks every assessment behind the face gate.
+const MODEL_BASE_URL = process.env.EXPO_PUBLIC_MODEL_BASE_URL || 'https://app.smaartminds.com/models/onnx';
 
 export const MODELS = {
   scrfd: { file: 'scrfd_500m_bnkps.onnx', approxBytes: 3_300_000 },

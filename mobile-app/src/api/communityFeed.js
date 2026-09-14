@@ -70,18 +70,16 @@ export const communityFeedAPI = {
   // check is only cosmetic (hides the button); the backend is the real gate.
   togglePin: (discussionId) => apiClient.patch(`/community/discussions/${discussionId}/pin`).then((r) => r.data),
 
-  // DEAD ROUTE: back-end/routes/community.js registers
-  // `POST /discussions/:id/vote` TWICE — the peer up/down handler
-  // (voteOnPost, below) is registered first, and Express dispatches to the
-  // first matching handler only, so this {userId, optionIndex} payload never
-  // reaches the poll-vote code. Kept only for parity with communityApi.js;
-  // do not wire UI to it — it's broken on the web dashboard today too.
+  // Poll vote. `POST /discussions/:id/vote` used to be registered TWICE in
+  // back-end/routes/community.js — the peer up/down handler first — so an
+  // `optionIndex` payload hit a handler that only understood "up"/"down" and
+  // every poll vote failed. The surviving handler now dispatches on the body,
+  // so this shape works again on both clients; `/poll-vote` is its own path
+  // for new callers.
   voteInPoll: (discussionId, userId, optionIndex) =>
     apiClient.post(`/community/discussions/${discussionId}/vote`, { userId, optionIndex }).then((r) => r.data),
 
-  // The LIVE handler at that same path — peer quality up/down vote. No web
-  // UI consumes this today; kept for parity, not wired into a mobile screen
-  // in this pass either (matches web).
+  // Peer quality up/down vote, same path, distinguished by the body.
   voteOnPost: (discussionId, vote) =>
     apiClient.post(`/community/discussions/${discussionId}/vote`, { vote }).then((r) => r.data),
 

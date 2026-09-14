@@ -176,6 +176,11 @@ export default function JobDetailScreen({ navigation, route }) {
     if (!onApply || !job || alreadyApplied || localApplying) return;
     setLocalApplying(true);
     try {
+      // `onApply` opens the application form, and that form is a Modal rendered
+      // by CareerScreen — it needs that screen's applications and resume state.
+      // A Modal belonging to a screen that is not on top never appears, so go
+      // back first and let the form open on the screen that owns it.
+      navigation.goBack();
       await onApply(job);
     } finally {
       setLocalApplying(false);

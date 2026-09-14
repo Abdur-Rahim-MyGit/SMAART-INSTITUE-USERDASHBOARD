@@ -46,6 +46,12 @@ import { useTheme } from '../../context/ThemeContext';
 import { assessmentApi } from '../../api/assessments';
 import { getStageConfig, STAGE_ACCENT } from '../../data/assessmentStages';
 import { useProctoringSession } from '../../facepipeline/useProctoringSession';
+import {
+  clearPendingAnswers,
+  isRetryableSaveError,
+  loadPendingAnswers,
+  savePendingAnswers,
+} from '../../utils/pendingAnswers';
 import ProctoringGate from './ProctoringGate';
 
 /** Web blocks Next for this long on each question. Integrity rule, not UI. */
@@ -92,6 +98,13 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   // Server's attempt start, in epoch ms. The single source of truth for the
   // countdown — see note 1 in the header.
   const startedAtRef = useRef(null);
+  // Attempt length in seconds. The server's `durationMinutes` wins when it sends
+  // one, so a duration changed in the stage config takes effect without an app
+  // release; the local stage config is the fallback.
+  const durationSecondsRef = useRef(config.durationMinutes * 60);
+  // Mirrors `resultId` so the persistence helpers can be called from callbacks
+  // that must not re-create themselves every time the id changes.
+  const resultIdRef = useRef(null);
   const questionShownAtRef = useRef(Date.now());
   const [dwellElapsed, setDwellElapsed] = useState(0);
   const warnedRef = useRef(false);
@@ -104,8 +117,26 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
   // this is what actually makes "one dropped write is not fatal" true; before
   // this it was a comment, not a mechanism (submitAssessment never resends
   // answers, it only scores whatever the server already has on file).
+  //
+  // Mirrored to disk on every change (utils/pendingAnswers.js). Holding it in
+  // memory alone meant an app kill destroyed answers the student had really
+  // given, and the server then scored them blank.
+  //
+  // Each entry carries `retryable`. A write the server rejected on its own
+  // merits — a stale token, a malformed body — can never succeed on a retry,
+  // and treating it as a network blip is what used to trap a student on the
+  // last question forever behind "check your connection".
   const pendingRef = useRef(new Map());
   const [pendingCount, setPendingCount] = useState(0);
+  const [fatalCount, setFatalCount] = useState(0);
+
+  // Keeps the badge counts and the on-disk copy in step with pendingRef.
+  const syncPending = useCallback(() => {
+    const entries = Array.from(pendingRef.current.values());
+    setPendingCount(pendingRef.current.size);
+    setFatalCount(entries.filter((e) => e.retryable === false).length);
+    savePendingAnswers(resultIdRef.current, pendingRef.current);
+  }, []);
 
   // Proctoring: identity gate before the first question, then heartbeat +
   // app-backgrounding detection for the rest of the attempt. See
@@ -138,6 +169,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
         const data = startRes.data;
         setResultId(data.resultId);
+        resultIdRef.current = data.resultId;
         setAssessmentId(assessmentRes.data._id);
         setAssessmentToken(data.assessmentToken);
 
@@ -149,21 +181,58 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
         // Anchor the countdown. `startedAt` is preferred because it survives an
         // app kill; `remainingSeconds` is the fallback when it is absent.
-        if (data.startedAt) {
-          startedAtRef.current = new Date(data.startedAt).getTime();
-          const elapsed = (Date.now() - startedAtRef.current) / 1000;
-          setRemaining(Math.max(0, config.durationMinutes * 60 - elapsed));
+        //
+        // Both come from `POST /results/start`. When the server omitted them the
+        // countdown effect below exited immediately on its `!startedAtRef.current`
+        // guard: the clock froze, the one-minute warning never fired, nothing
+        // auto-submitted, and the attempt had no time limit at all. The final
+        // branch makes that unreachable — an attempt always has a deadline, even
+        // if the only defensible one is "full duration, starting now".
+        durationSecondsRef.current =
+          typeof data.durationMinutes === 'number' && data.durationMinutes > 0
+            ? data.durationMinutes * 60
+            : config.durationMinutes * 60;
+        const durationSeconds = durationSecondsRef.current;
+
+        const startedAtMs = data.startedAt ? new Date(data.startedAt).getTime() : NaN;
+        if (Number.isFinite(startedAtMs)) {
+          startedAtRef.current = startedAtMs;
+          const elapsed = (Date.now() - startedAtMs) / 1000;
+          setRemaining(Math.max(0, durationSeconds - elapsed));
         } else if (typeof data.remainingSeconds === 'number') {
-          startedAtRef.current = Date.now() - (config.durationMinutes * 60 - data.remainingSeconds) * 1000;
+          startedAtRef.current = Date.now() - (durationSeconds - data.remainingSeconds) * 1000;
           setRemaining(data.remainingSeconds);
+        } else {
+          console.warn('[assessment] start response carried no startedAt or remainingSeconds — anchoring the clock locally.');
+          startedAtRef.current = Date.now();
+          setRemaining(durationSeconds);
         }
 
         // Resume: replay saved answers and land on the first unanswered.
-        if (data.responses?.length) {
-          const map = {};
-          data.responses.forEach((r) => {
-            map[r.questionId] = r.selectedValue;
-          });
+        const map = {};
+        (data.responses || []).forEach((r) => {
+          map[r.questionId] = r.selectedValue;
+        });
+
+        // Answers this device chose but never managed to send. They survive an
+        // app kill on disk; without this they would be lost and scored blank.
+        // They are re-queued so the retry loop and the pre-submit flush pick
+        // them up, and shown as selected so the student is not asked to answer
+        // a question they already answered.
+        const queued = await loadPendingAnswers(data.resultId);
+        Object.entries(queued).forEach(([qid, entry]) => {
+          if (!entry || entry.selectedValue === undefined) return;
+          map[qid] = entry.selectedValue;
+          // Restored entries are always retried once: a rejection from a
+          // previous session may well have been a token that has since been
+          // renewed.
+          pendingRef.current.set(qid, { ...entry, retryable: true });
+        });
+        if (cancelled) return;
+        setPendingCount(pendingRef.current.size);
+        setFatalCount(0);
+
+        if (Object.keys(map).length) {
           setAnswers(map);
           const firstUnanswered = limited.findIndex((q) => !map[q._id]);
           setIndex(firstUnanswered === -1 ? Math.max(0, limited.length - 1) : firstUnanswered);
@@ -188,28 +257,54 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
     };
   }, [config.code, config.durationMinutes, config.questionLimit, config.title, navigation]);
 
-  // Retries every locally-queued failed write. Returns the number still
-  // pending after the attempt (0 means fully caught up).
-  const flushPending = useCallback(async () => {
-    if (!resultId || pendingRef.current.size === 0) return 0;
+  /**
+   * Retries locally-queued failed writes.
+   *
+   * @param {{ includeFatal?: boolean }} opts when true, entries previously
+   *   rejected by the server are tried once more — worth doing before a submit,
+   *   since a token may have been renewed since, but pointless on the periodic
+   *   loop where it would just hammer an endpoint that keeps saying no.
+   * @returns {Promise<{ total: number, retryable: number, fatal: number }>}
+   *   what is still owed to the server afterwards.
+   */
+  const flushPending = useCallback(
+    async ({ includeFatal = false } = {}) => {
+      const summarise = () => {
+        const values = Array.from(pendingRef.current.values());
+        return {
+          total: values.length,
+          retryable: values.filter((e) => e.retryable !== false).length,
+          fatal: values.filter((e) => e.retryable === false).length,
+        };
+      };
 
-    const entries = Array.from(pendingRef.current.entries());
-    await Promise.all(
-      entries.map(async ([qid, answer]) => {
-        try {
-          await assessmentApi.saveAnswer(resultId, qid, answer.selectedValue, answer.questionText, assessmentToken);
-          pendingRef.current.delete(qid);
-        } catch {
-          // Still unreachable — stays queued for the next flush.
-        }
-      })
-    );
-    setPendingCount(pendingRef.current.size);
-    return pendingRef.current.size;
-  }, [resultId, assessmentToken]);
+      if (!resultId || pendingRef.current.size === 0) return summarise();
+
+      const entries = Array.from(pendingRef.current.entries()).filter(
+        ([, answer]) => includeFatal || answer.retryable !== false
+      );
+
+      await Promise.all(
+        entries.map(async ([qid, answer]) => {
+          try {
+            await assessmentApi.saveAnswer(resultId, qid, answer.selectedValue, answer.questionText, assessmentToken);
+            pendingRef.current.delete(qid);
+          } catch (err) {
+            // Stays queued, but remember whether another attempt can ever help.
+            pendingRef.current.set(qid, { ...answer, retryable: isRetryableSaveError(err) });
+          }
+        })
+      );
+
+      syncPending();
+      return summarise();
+    },
+    [resultId, assessmentToken, syncPending]
+  );
 
   // Retry queued writes in the background so a brief network drop resolves
-  // itself before the student ever reaches submit.
+  // itself before the student ever reaches submit. Entries the server has
+  // already rejected are skipped here — see flushPending's `includeFatal`.
   useEffect(() => {
     if (loading || report || proctoring.heldInfo) return undefined;
     const id = setInterval(() => {
@@ -229,14 +324,36 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
       // The server only ever scores what it actually received — drain every
       // queued write first so a dropped answer doesn't silently score as blank.
+      // `includeFatal` because a previously rejected write may succeed now: the
+      // axios interceptor renews an expired token on a 401 and replays.
       if (pendingRef.current.size > 0) {
-        const stillPending = await flushPending();
-        if (stillPending > 0 && reason === 'manual') {
-          Alert.alert(
-            'Some answers are unsent',
-            `${stillPending} answer${stillPending === 1 ? '' : 's'} couldn't reach the server yet. Check your connection and try again in a moment.`
-          );
-          return;
+        const left = await flushPending({ includeFatal: true });
+
+        if (left.total > 0 && reason === 'manual') {
+          if (left.retryable > 0) {
+            Alert.alert(
+              'Some answers are unsent',
+              `${left.retryable} answer${left.retryable === 1 ? '' : 's'} couldn't reach the server yet. Check your connection and try again in a moment.`
+            );
+            return;
+          }
+
+          // Nothing left is retryable. Repeating "check your connection" here
+          // is both wrong and inescapable — the request will be refused every
+          // time — so say what actually happened and let the student decide.
+          const proceed = await new Promise((resolve) => {
+            Alert.alert(
+              "Some answers couldn't be saved",
+              `${left.fatal} answer${left.fatal === 1 ? '' : 's'} ${left.fatal === 1 ? 'was' : 'were'} refused by the server and cannot be sent again. ` +
+                `Submitting now will score ${left.fatal === 1 ? 'it' : 'them'} as unanswered.`,
+              [
+                { text: 'Go back', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Submit anyway', style: 'destructive', onPress: () => resolve(true) },
+              ],
+              { cancelable: false }
+            );
+          });
+          if (!proceed) return;
         }
         // Timeout/violation submits can't wait on connectivity — proceed and
         // let completeMissingAnswers fill the gaps, same as any other unanswered question.
@@ -254,9 +371,19 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           // Submit-time hold: answers are saved, score withheld. The held
           // effect below must not re-submit a pending_review attempt.
           heldSubmitRef.current = true;
+          pendingRef.current.clear();
+          clearPendingAnswers(resultId);
+          setPendingCount(0);
+          setFatalCount(0);
           proctoring.complete();
           proctoring.markHeld(res);
         } else if (res?.success) {
+          // The attempt is scored — nothing is owed to the server any more, so
+          // the on-disk queue must go too or it would be replayed next launch.
+          pendingRef.current.clear();
+          clearPendingAnswers(resultId);
+          setPendingCount(0);
+          setFatalCount(0);
           setReport(res.data);
           proctoring.complete();
         } else {
@@ -309,7 +436,7 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
 
     const tick = setInterval(() => {
       const elapsed = (Date.now() - startedAtRef.current) / 1000;
-      const left = Math.max(0, config.durationMinutes * 60 - elapsed);
+      const left = Math.max(0, durationSecondsRef.current - elapsed);
       setRemaining(left);
 
       if (left <= WARN_AT_SECONDS && !warnedRef.current) {
@@ -360,17 +487,22 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
         setSavingAnswer(true);
         await assessmentApi.saveAnswer(resultId, qid, value, questionText, assessmentToken);
         // A retry may have queued this question earlier — this write supersedes it.
-        if (pendingRef.current.delete(qid)) setPendingCount(pendingRef.current.size);
-      } catch {
+        if (pendingRef.current.delete(qid)) syncPending();
+      } catch (err) {
         // Queued for the background retry loop and for the mandatory
-        // pre-submit flush — see flushPending().
-        pendingRef.current.set(qid, { selectedValue: value, questionText });
-        setPendingCount(pendingRef.current.size);
+        // pre-submit flush — see flushPending() — and written to disk so an
+        // app kill cannot turn a given answer into a blank one.
+        pendingRef.current.set(qid, {
+          selectedValue: value,
+          questionText,
+          retryable: isRetryableSaveError(err),
+        });
+        syncPending();
       } finally {
         setSavingAnswer(false);
       }
     },
-    [current, resultId, assessmentToken, submitting, report]
+    [current, resultId, assessmentToken, submitting, report, syncPending]
   );
 
   const canAdvance = !!current && !!answers[current._id] && dwellElapsed >= MIN_QUESTION_DWELL_MS;
@@ -587,8 +719,15 @@ export default function AssessmentPlayerScreen({ route, navigation }) {
           <Text style={[styles.savingHint, { color: themeColors.textMuted }]}>Saving…</Text>
         )}
         {!savingAnswer && pendingCount > 0 && (
-          <Text style={[styles.savingHint, { color: themeColors.warning }]}>
-            {pendingCount} answer{pendingCount === 1 ? '' : 's'} unsent — retrying…
+          <Text
+            style={[
+              styles.savingHint,
+              { color: fatalCount === pendingCount ? themeColors.danger : themeColors.warning },
+            ]}
+          >
+            {fatalCount === pendingCount
+              ? `${pendingCount} answer${pendingCount === 1 ? '' : 's'} refused by the server — they will score as unanswered`
+              : `${pendingCount} answer${pendingCount === 1 ? '' : 's'} unsent — retrying…`}
           </Text>
         )}
       </ScrollView>

@@ -37,6 +37,15 @@ export const NOTES_STEP_INDEX = 6;
  */
 export const FALLBACK_VIDEO_URL = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
+/**
+ * True when a step is showing the shared sample clip rather than real course
+ * content. Watching a placeholder must never count as having studied the day —
+ * see `handleVideoProgress` in LearningScreen.
+ */
+export function isPlaceholderVideo(url) {
+  return !!url && url === FALLBACK_VIDEO_URL;
+}
+
 /** Same precedence chain as the web's `getVideoUrlFromDay`. */
 export function getVideoUrlFromDay(day) {
   const url =
@@ -405,7 +414,32 @@ export function indexProgressByStep(progressResponse) {
       videoCompleted: Boolean(row.videoCompleted),
       testCompleted: Boolean(row.testCompleted),
       testScore: row.testScore ?? null,
+      // Reflection and notes steps carry neither a video nor a quiz, so they
+      // complete through the assignment fields instead. Without this they could
+      // never be ticked off at all — see isStepComplete below.
+      assignmentStatus: row.assignmentStatus || 'Not Started',
     };
   });
   return byStep;
+}
+
+/**
+ * Whether a saved progress row counts its step as done.
+ *
+ * A step completes by watching its video, submitting its quiz, OR submitting
+ * its written reflection. Only the first two used to count, which meant the
+ * Reflect and Notes steps — which have no video and no questions — could never
+ * be marked complete by any action the student could take.
+ */
+export function isStepComplete(saved) {
+  if (!saved) return false;
+  return Boolean(saved.videoCompleted || saved.testCompleted || saved.assignmentStatus === 'Submitted');
+}
+
+/** A step the student completes by writing something rather than watching or answering. */
+export function isWrittenStep(step) {
+  if (!step) return false;
+  if (step.questions?.length) return false;
+  if (step.cards?.length) return false;
+  return step.contentType === 'notes' || step.contentType === 'reflection';
 }

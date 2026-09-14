@@ -22,6 +22,7 @@ import PillInput from '../../components/PillInput';
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
 
 export default function LoginScreen({ navigation }) {
+  const { college, authNotice, clearAuthNotice } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -63,7 +64,7 @@ export default function LoginScreen({ navigation }) {
       <FadeSlideIn duration={380}>
         <View style={styles.topHeader}>
           <Pressable
-            onPress={() => navigation.navigate('WelcomeOnboarding')}
+            onPress={() => navigation.navigate('InstitutionSelector')}
             hitSlop={12}
             style={styles.backBtn}
           >
@@ -74,6 +75,22 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.headerSubtitle}>
             Sign in to enjoy the best educational experience
           </Text>
+
+          {/* FR-AUTH-01 — show the institution chosen on the previous step and
+              give a way back to change it. Sign-in itself does not send the
+              college (the backend resolves it from the account), so this is
+              informational and stays out of the way when none was picked. */}
+          <Pressable
+            onPress={() => navigation.navigate('InstitutionSelector')}
+            style={styles.institutionChip}
+            hitSlop={8}
+          >
+            <Feather name="home" size={13} color="rgba(255,255,255,0.75)" />
+            <Text style={styles.institutionText} numberOfLines={1}>
+              {college?.collegeName || 'Select your institution'}
+            </Text>
+            <Text style={styles.institutionChange}>{college ? 'Change' : 'Choose'}</Text>
+          </Pressable>
         </View>
       </FadeSlideIn>
 
@@ -108,6 +125,19 @@ export default function LoginScreen({ navigation }) {
             </Pressable>
           </View>
 
+          {/* Why the student is here when they did not ask to be: a session
+              that expired, a force-logout, or a launch with no connection.
+              Previously all three dropped them here with no explanation. */}
+          {authNotice && !error ? (
+            <View style={styles.noticeBanner}>
+              <Feather name="info" size={16} color={colors.primaryBright} />
+              <Text style={styles.noticeText}>{authNotice}</Text>
+              <Pressable onPress={clearAuthNotice} hitSlop={8}>
+                <Feather name="x" size={15} color="rgba(255,255,255,0.5)" />
+              </Pressable>
+            </View>
+          ) : null}
+
           {/* Error Banner */}
           {error ? (
             <Animated.View style={[styles.errorBanner, shakeStyle]}>
@@ -131,9 +161,29 @@ export default function LoginScreen({ navigation }) {
             )}
           </PressScale>
 
+          {/* FR-AUTH-02 — entry point into the signup flow. SignupScreen,
+              SignupOtpScreen and CreatePasswordScreen were all built and
+              registered in AuthStack but nothing ever navigated to them. */}
+          <View style={styles.signupRow}>
+            <Text style={styles.signupPrompt}>New to SMAART?</Text>
+            <Pressable onPress={() => navigation.navigate('Signup')} hitSlop={8}>
+              <Text style={styles.signupLink}>Create an account</Text>
+            </Pressable>
+          </View>
+
           <Text style={styles.footerNote}>
             Trouble signing in? Contact your institution administrator.
           </Text>
+
+          <View style={styles.legalRow}>
+            <Pressable onPress={() => navigation.navigate('PrivacyPolicy')} hitSlop={8}>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </Pressable>
+            <Text style={styles.legalDot}>·</Text>
+            <Pressable onPress={() => navigation.navigate('Terms')} hitSlop={8}>
+              <Text style={styles.legalLink}>Terms of Use</Text>
+            </Pressable>
+          </View>
         </View>
       </FadeSlideIn>
     </SafeAreaView>
@@ -174,6 +224,85 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255,255,255,0.65)',
     marginTop: 6,
+  },
+  institutionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 7,
+    marginTop: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    maxWidth: '100%',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  institutionText: {
+    flexShrink: 1,
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.85)',
+  },
+  institutionChange: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: colors.primaryBright,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  noticeBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+    padding: 12,
+    marginBottom: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(59,130,246,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.28)',
+  },
+  noticeText: {
+    flex: 1,
+    fontSize: 12.5,
+    fontWeight: '600',
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.82)',
+  },
+  signupRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 22,
+  },
+  signupPrompt: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.6)',
+  },
+  signupLink: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.primaryBright,
+  },
+  legalRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 14,
+  },
+  legalLink: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+    textDecorationLine: 'underline',
+  },
+  legalDot: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
   },
 
   // Obsidian Curved Form Card

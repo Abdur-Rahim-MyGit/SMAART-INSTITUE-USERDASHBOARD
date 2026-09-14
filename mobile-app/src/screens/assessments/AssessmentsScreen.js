@@ -28,6 +28,7 @@ import { useTheme } from '../../context/ThemeContext';
 import SkeletonBox from '../../components/SkeletonBox';
 import Banner from '../../components/Banner';
 import { assessmentApi } from '../../api/assessments';
+import { ensureAllModelsDownloaded, isModelDownloaded } from '../../facepipeline/modelDownloader';
 import {
   STAGE_ACCENT,
   STAGE_ICON,
@@ -86,6 +87,11 @@ export default function AssessmentsScreen({ navigation }) {
   // locked". Failures surface here with pull-to-refresh / retry.
   const [loadError, setLoadError] = useState(null);
 
+  // Face-model prefetch, so the identity gate does not download 178MB while
+  // the exam clock is running. See the effect below.
+  const [prefetchingModels, setPrefetchingModels] = useState(false);
+  const [modelPrefetchPct, setModelPrefetchPct] = useState(0);
+
   const load = useCallback(async () => {
     if (!userId) return;
     try {
@@ -116,6 +122,32 @@ export default function AssessmentsScreen({ navigation }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Warm the face-verification models while the student is still choosing a
+  // stage. They are ~178MB and download on first use — previously that happened
+  // inside the identity gate, i.e. AFTER the attempt had been created and the
+  // server clock had started, so a slow connection ate exam time. Fetching them
+  // here costs nothing if they are already on disk, and failures are ignored:
+  // the gate retries and reports properly when it actually needs them.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (isModelDownloaded('scrfd') && isModelDownloaded('arcface')) return;
+        setPrefetchingModels(true);
+        await ensureAllModelsDownloaded((pct) => {
+          if (!cancelled) setModelPrefetchPct(pct);
+        });
+      } catch {
+        /* The gate will surface a real error if the models are still missing. */
+      } finally {
+        if (!cancelled) setPrefetchingModels(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Stage state can change while the player is open, so refresh on return.
   useEffect(() => navigation.addListener('focus', load), [navigation, load]);
@@ -188,6 +220,16 @@ export default function AssessmentsScreen({ navigation }) {
           <Pressable onPress={load} accessibilityRole="button" accessibilityLabel="Retry loading stages">
             <Banner variant="error" message={`${loadError} Tap to retry, or pull down to refresh.`} />
           </Pressable>
+        )}
+
+        {prefetchingModels && (
+          <View style={[styles.prefetchBanner, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+            <Feather name="download-cloud" size={15} color={themeColors.primaryBright} />
+            <Text style={[styles.prefetchText, { color: themeColors.textMuted }]}>
+              Preparing face verification for this device — {modelPrefetchPct}%. Doing this now means
+              it won't eat into your exam time later.
+            </Text>
+          </View>
         )}
 
         <AnimatedSection delay={0}>
@@ -328,6 +370,17 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   scroll: { paddingHorizontal: 20, paddingTop: 4, paddingBottom: 40 },
 
+  prefetchBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 9,
+    marginBottom: 14,
+    paddingVertical: 11,
+    paddingHorizontal: 13,
+    borderRadius: 13,
+    borderWidth: 1,
+  },
+  prefetchText: { flex: 1, fontSize: 11.5, lineHeight: 16.5, fontWeight: '600' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 },
   backBtn: {
     width: 40, height: 40, borderRadius: 20, borderWidth: 1,

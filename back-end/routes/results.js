@@ -315,7 +315,14 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     answeredCount: existingResult.answeredQuestions || 0,
                     responses: existingResult.responses || [],
                     assessmentToken,
-                    mcqConfig: publicMcqConfig(assessment)
+                    mcqConfig: publicMcqConfig(assessment),
+                    // The clock is server-authoritative. Clients anchor their
+                    // countdown on `startedAt` (survives an app kill) and fall
+                    // back to `remainingSeconds` if they cannot parse a date.
+                    // Omitting these is what left the mobile timer frozen.
+                    startedAt: existingResult.startedAt,
+                    remainingSeconds,
+                    durationMinutes
                 }
             });
         }
@@ -328,6 +335,43 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
         if (stageKey) {
             // Stage Assessment: Check attempt limits before allowing a new attempt
             const StageResult = require('../models/StageResult');
+
+            // Sequential stage gate, enforced server-side.
+            //
+            // The clients refuse to open a locked stage, but nothing here used
+            // to stop a request that starts the final stage cold — the checks
+            // below only verify this stage has not already been passed and that
+            // attempts remain. This mirrors exactly the rule the clients render
+            // from `GET /stageresults/user/:userId/status`: T1 counts as done
+            // when a baseline result exists, T2-T4 when that stage has a
+            // passing StageResult. Quotient assessments (AIQ/SQ/PIQ) are not
+            // part of this chain and are unaffected.
+            const SEQUENTIAL_STAGES = ['T1', 'T2', 'T3', 'T4'];
+            const stageIdx = SEQUENTIAL_STAGES.indexOf(stageKey);
+            if (stageIdx > 0) {
+                const previousStage = SEQUENTIAL_STAGES[stageIdx - 1];
+                let previousComplete;
+                if (previousStage === 'T1') {
+                    const BaseLineResult = require('../models/BaseLineResult');
+                    previousComplete = Boolean(
+                        await BaseLineResult.findOne({ userId }).select('_id').lean()
+                    );
+                } else {
+                    previousComplete = Boolean(
+                        await StageResult.findOne({ userId, stage: previousStage, passed: true }).select('_id').lean()
+                    );
+                }
+
+                if (!previousComplete) {
+                    console.log(`🔒 User ${userId} tried to start ${stageKey} without completing ${previousStage}.`);
+                    return res.status(403).json({
+                        success: false,
+                        error: `Complete the ${previousStage} assessment before starting ${stageInfo.name}.`,
+                        locked: true,
+                        requiredStage: previousStage
+                    });
+                }
+            }
 
             // Check if user already passed this stage
             const passedResult = await StageResult.findOne({
@@ -448,7 +492,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 questions: orderedQuestions,
                 totalQuestions: totalQuestions,
                 assessmentToken,
-                mcqConfig: publicMcqConfig(assessment)
+                mcqConfig: publicMcqConfig(assessment),
+                // Same contract as the resume branch above — see the note there.
+                startedAt: result.startedAt,
+                remainingSeconds: durationMinutes * 60,
+                durationMinutes
             }
         });
     } catch (err) {

@@ -67,6 +67,9 @@ const GRIEVANCE_CATEGORIES = [
 
 const PRIORITIES = ['low', 'medium', 'high'];
 
+/** Matches the server's own default for `GET /tickets`. */
+const TICKETS_PER_PAGE = 10;
+
 function statusStyle(status, themeColors) {
   if (status === 'resolved') return { bg: `${themeColors.success}22`, fg: themeColors.success };
   if (status === 'in-progress') return { bg: `${themeColors.primaryBright}22`, fg: themeColors.primaryBright };
@@ -137,6 +140,10 @@ export default function SupportScreen({ navigation }) {
 
   const [tickets, setTickets] = useState([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [ticketsLoadingMore, setTicketsLoadingMore] = useState(false);
+  const [ticketsPage, setTicketsPage] = useState(1);
+  const [ticketsTotalPages, setTicketsTotalPages] = useState(1);
+  const [ticketsTotal, setTicketsTotal] = useState(0);
   const [grievances, setGrievances] = useState([]);
   const [grievancesLoading, setGrievancesLoading] = useState(false);
 
@@ -149,15 +156,33 @@ export default function SupportScreen({ navigation }) {
   const [replyText, setReplyText] = useState('');
   const [replying, setReplying] = useState(false);
 
-  const loadTickets = useCallback(async () => {
-    setTicketsLoading(true);
+  /**
+   * Loads one page of tickets, appending when paging forward.
+   *
+   * Previously this called `getMyTickets()` with no parameters against a server
+   * that defaults to ten per page, with no load-more and no total shown — so a
+   * student with real support history simply lost everything older than their
+   * tenth ticket, with nothing on screen to suggest more existed.
+   */
+  const loadTickets = useCallback(async (page = 1) => {
+    if (page === 1) setTicketsLoading(true);
+    else setTicketsLoadingMore(true);
     try {
-      const res = await ticketsAPI.getMyTickets();
-      setTickets(res.data || []);
+      const res = await ticketsAPI.getMyTickets({ page, limit: TICKETS_PER_PAGE });
+      const rows = res.data || [];
+      setTickets((prev) => (page === 1 ? rows : [...prev, ...rows]));
+      setTicketsPage(res.pagination?.page || page);
+      setTicketsTotalPages(res.pagination?.totalPages || 1);
+      setTicketsTotal(res.pagination?.total ?? rows.length);
     } catch {
-      setTickets([]);
+      if (page === 1) {
+        setTickets([]);
+        setTicketsTotalPages(1);
+        setTicketsTotal(0);
+      }
     } finally {
       setTicketsLoading(false);
+      setTicketsLoadingMore(false);
     }
   }, []);
 
@@ -502,6 +527,24 @@ export default function SupportScreen({ navigation }) {
                 </Pressable>
               );
             })}
+
+            {/* Load-more. Only tickets are paged server-side; grievances come
+                back in full, so the row is absent for them. */}
+            {section === 'tickets' && ticketsPage < ticketsTotalPages && (
+              <Pressable
+                onPress={() => loadTickets(ticketsPage + 1)}
+                disabled={ticketsLoadingMore}
+                style={[styles.loadMoreBtn, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}
+              >
+                {ticketsLoadingMore ? (
+                  <ActivityIndicator size="small" color={themeColors.primaryBright} />
+                ) : (
+                  <Text style={[styles.loadMoreText, { color: themeColors.primaryBright }]}>
+                    Load older tickets ({list.length} of {ticketsTotal})
+                  </Text>
+                )}
+              </Pressable>
+            )}
           </View>
         )}
       </ScrollView>
@@ -634,6 +677,15 @@ const styles = StyleSheet.create({
   submitText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
 
   empty: { alignItems: 'center', gap: 10, paddingVertical: 60, paddingHorizontal: 30 },
+  loadMoreBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+  },
+  loadMoreText: { fontSize: 13, fontWeight: '800' },
   emptyIconWrap: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   emptyTitle: { fontSize: 16, fontWeight: '800' },
   emptyText: { fontSize: 13, textAlign: 'center', lineHeight: 19 },

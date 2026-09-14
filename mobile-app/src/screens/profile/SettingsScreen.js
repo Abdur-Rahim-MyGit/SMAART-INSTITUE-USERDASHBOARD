@@ -165,7 +165,7 @@ function ChangePasswordModal({ visible, onClose }) {
   );
 }
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const { user, biometricEnabled, setBiometricPreference } = useAuth();
   const { colors: c, theme, toggleTheme } = useTheme();
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -310,6 +310,42 @@ export default function SettingsScreen() {
             <Feather name="chevron-right" size={18} color={c.textMuted} />
           </View>
         </Pressable>
+      </AnimatedSection>
+
+      {/* Both stores require a privacy policy to be reachable from inside an
+          app that uses the camera and processes biometric data. */}
+      <AnimatedSection delay={170}>
+        <Text style={[styles.sectionLabel, { color: c.textMuted }]}>LEGAL</Text>
+
+        <View style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
+          <Pressable onPress={() => navigation.navigate('PrivacyPolicy')} style={styles.row}>
+            <View style={[styles.rowIcon, { backgroundColor: c.pillBg }]}>
+              <Feather name="shield" size={17} color={c.primaryBright} />
+            </View>
+            <View style={styles.rowText}>
+              <Text style={[styles.rowTitle, { color: c.text }]}>Privacy Policy</Text>
+              <Text style={[styles.rowSubtitle, { color: c.textMuted }]}>
+                What we collect, and how face verification works
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={c.textMuted} />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: c.border }]} />
+
+          <Pressable onPress={() => navigation.navigate('Terms')} style={styles.row}>
+            <View style={[styles.rowIcon, { backgroundColor: c.pillBg }]}>
+              <Feather name="file-text" size={17} color={c.primaryBright} />
+            </View>
+            <View style={styles.rowText}>
+              <Text style={[styles.rowTitle, { color: c.text }]}>Terms of Use</Text>
+              <Text style={[styles.rowSubtitle, { color: c.textMuted }]}>
+                Assessment integrity, attempt limits and conduct
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={c.textMuted} />
+          </Pressable>
+        </View>
       </AnimatedSection>
 
       <AnimatedSection delay={200}>

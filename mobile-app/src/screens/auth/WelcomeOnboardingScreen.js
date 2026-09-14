@@ -532,9 +532,11 @@ export default function WelcomeOnboardingScreen({ navigation }) {
   const [bioCapable, setBioCapable] = useState({ available: false, enrolled: false, label: 'Biometrics' });
   const [modalVisible, setModalVisible] = useState(false);
   const [langCode, setLangCode] = useState('en');
+  // Microphone and location cards were removed: nothing in the app records
+  // audio or reads a position, and both stores reject permissions with no
+  // feature behind them (location additionally triggers a Play review form).
+  // See app.json, where they are also blocked from the merged manifest.
   const [notifGranted, setNotifGranted] = useState(false);
-  const [audioGranted, setAudioGranted] = useState(false);
-  const [locationGranted, setLocationGranted] = useState(false);
 
   const scrollX = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef(null);
@@ -612,7 +614,11 @@ export default function WelcomeOnboardingScreen({ navigation }) {
 
   const handleCompleteOnboarding = async () => {
     await storage.setItem('smaart_pref_language', langCode);
-    navigation.replace('Login');
+    // FR-AUTH-01 — institution selection is the step between onboarding and
+    // login. This used to replace straight to Login, which is what left
+    // InstitutionSelectorScreen built, registered and unreachable. `navigate`
+    // rather than `replace` so the selector's back button lands here.
+    navigation.navigate('InstitutionSelector');
   };
 
   const getSlideMotionStyle = (index) => {
@@ -635,36 +641,6 @@ export default function WelcomeOnboardingScreen({ navigation }) {
       }
     } catch {
       setNotifGranted(true);
-    }
-  };
-
-  const handleAudio = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        const res = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-        );
-        setAudioGranted(res === PermissionsAndroid.RESULTS.GRANTED);
-      } else {
-        setAudioGranted(true);
-      }
-    } catch {
-      setAudioGranted(true);
-    }
-  };
-
-  const handleLocation = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        const res = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-        setLocationGranted(res === PermissionsAndroid.RESULTS.GRANTED);
-      } else {
-        setLocationGranted(true);
-      }
-    } catch {
-      setLocationGranted(true);
     }
   };
 
@@ -860,26 +836,6 @@ export default function WelcomeOnboardingScreen({ navigation }) {
                   active={hasCameraPermission}
                   color="#10B981"
                   onPress={handleCamera}
-                  themeColors={themeColors}
-                />
-                <PermItem
-                  icon="mic"
-                  label="Microphone"
-                  desc="Audio assessment & speech verification"
-                  status={audioGranted ? 'Granted' : 'Grant'}
-                  active={audioGranted}
-                  color="#8B5CF6"
-                  onPress={handleAudio}
-                  themeColors={themeColors}
-                />
-                <PermItem
-                  icon="map-pin"
-                  label="Location"
-                  desc="Campus detection & smart attendance"
-                  status={locationGranted ? 'Granted' : 'Grant'}
-                  active={locationGranted}
-                  color="#F59E0B"
-                  onPress={handleLocation}
                   themeColors={themeColors}
                 />
                 {bioCapable.available && (

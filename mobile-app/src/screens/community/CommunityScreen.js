@@ -23,6 +23,9 @@ import { communityFeedAPI } from '../../api/communityFeed';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+/** Matches the server's own default for `GET /community/discussions`. */
+const DISCUSSIONS_PER_PAGE = 10;
+
 const GROUP_ICONS = ['users', 'book-open', 'coffee', 'award', 'zap', 'hash'];
 const GROUP_COLORS = ['#1478B8', '#10B981', '#8B5CF6', '#EC4899', '#F59E0B', '#14B8A6'];
 
@@ -64,6 +67,7 @@ function PressCard({ onPress, style, children, disabled }) {
 
 export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
+  const userId = user?._id || user?.id;
   const { colors: themeColors, theme } = useTheme();
 
   const [activeTab, setActiveTab] = useState('notices'); // 'notices' | 'groups' | 'discussions'
@@ -75,6 +79,10 @@ export default function CommunityScreen({ navigation }) {
 
   // Discussions feed state
   const [discussions, setDiscussions] = useState([]);
+  const [discussionsPage, setDiscussionsPage] = useState(1);
+  const [discussionsPages, setDiscussionsPages] = useState(1);
+  const [discussionsTotal, setDiscussionsTotal] = useState(0);
+  const [discussionsLoadingMore, setDiscussionsLoadingMore] = useState(false);
   const [discussionSearch, setDiscussionSearch] = useState('');
   const [createPostModalVisible, setCreatePostModalVisible] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
@@ -130,14 +138,50 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
-  const fetchDiscussions = async () => {
+  /**
+   * Counts one emoji on an announcement.
+   *
+   * `Announcement.reactions` is an ARRAY of `{ userId, emoji }` (see
+   * `back-end/models/Announcement.js`), not a map of emoji to a list of people.
+   * Reading it as `reactions[emoji].length` always produced `undefined` and the
+   * count always rendered zero, no matter how many people had reacted — and the
+   * "did I react" check compared against an email against a list of ObjectIds,
+   * so a student's own reaction never highlighted either.
+   */
+  const summariseReaction = (reactions, emoji, currentUserId) => {
+    if (!Array.isArray(reactions)) return { count: 0, mine: false };
+    let count = 0;
+    let mine = false;
+    reactions.forEach((r) => {
+      if (r?.emoji !== emoji) return;
+      count += 1;
+      if (currentUserId && String(r.userId?._id || r.userId) === String(currentUserId)) mine = true;
+    });
+    return { count, mine };
+  };
+
+  /**
+   * Loads one page of discussions, appending when paging forward.
+   *
+   * This used to ask for a flat 30 with no way to reach anything older, so an
+   * active community silently truncated. The server reports
+   * `pagination.pages`, which is what drives the load-more row.
+   */
+  const fetchDiscussions = async (page = 1) => {
+    if (page > 1) setDiscussionsLoadingMore(true);
     try {
-      const res = await communityFeedAPI.getDiscussions({ limit: 30 });
+      const res = await communityFeedAPI.getDiscussions({ page, limit: DISCUSSIONS_PER_PAGE });
       if (res?.success) {
-        setDiscussions(res.data || []);
+        const rows = res.data || [];
+        setDiscussions((prev) => (page === 1 ? rows : [...prev, ...rows]));
+        setDiscussionsPage(res.pagination?.page || page);
+        setDiscussionsPages(res.pagination?.pages || 1);
+        setDiscussionsTotal(res.pagination?.total ?? rows.length);
       }
     } catch (err) {
       console.warn('Failed to load discussions:', err);
+    } finally {
+      setDiscussionsLoadingMore(false);
     }
   };
 
@@ -438,8 +482,7 @@ export default function CommunityScreen({ navigation }) {
                           { emoji: '❤️', label: 'Love' },
                           { emoji: '🎉', label: 'Celebrate' },
                         ].map((rx) => {
-                          const count = ann.reactions?.[rx.emoji]?.length || 0;
-                          const hasReacted = ann.reactions?.[rx.emoji]?.includes(user?.email);
+                          const { count, mine: hasReacted } = summariseReaction(ann.reactions, rx.emoji, userId);
 
                           return (
                             <TouchableOpacity
@@ -599,6 +642,24 @@ export default function CommunityScreen({ navigation }) {
                     </PressCard>
                   );
                 })
+              )}
+
+              {/* Load-more. Hidden while a search filter is active, since the
+                  filter only sees what has already been fetched. */}
+              {!discussionSearch.trim() && discussionsPage < discussionsPages && (
+                <TouchableOpacity
+                  onPress={() => fetchDiscussions(discussionsPage + 1)}
+                  disabled={discussionsLoadingMore}
+                  style={[styles.loadMoreBtn, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}
+                >
+                  {discussionsLoadingMore ? (
+                    <ActivityIndicator size="small" color={themeColors.primaryBright} />
+                  ) : (
+                    <Text style={[styles.loadMoreText, { color: themeColors.primaryBright }]}>
+                      Load older discussions ({discussions.length} of {discussionsTotal})
+                    </Text>
+                  )}
+                </TouchableOpacity>
               )}
             </View>
             </AnimatedSection>
@@ -911,6 +972,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '850',
   },
+  loadMoreBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    marginTop: 4,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+  },
+  loadMoreText: { fontSize: 13, fontWeight: '800' },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',

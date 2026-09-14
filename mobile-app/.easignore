@@ -21,3 +21,12 @@ ios/
 .expo/
 dist/
 web-build/
+
+# The local .env points at a developer's LAN address over plain HTTP. Metro
+# inlines EXPO_PUBLIC_* at bundle time, so uploading it would bake a private
+# address into the store build. Real values come from the `env` block of the
+# build profile in eas.json.
+.env
+
+# Store-submission credentials are never uploaded with the project source.
+credentials/
