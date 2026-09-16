@@ -45,7 +45,6 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                 <div className="dp-chips">
                     {TYPE_LABEL[type] && <span className="dchip brand">{TYPE_LABEL[type]}</span>}
                     {roleName && <span className="dchip">Target role · {roleName}</span>}
-                    <span className="dchip">{roleCount} {roleCount === 1 ? 'job role' : 'job roles'}</span>
                     {specialisation && <span className="dchip">{specialisation}</span>}
                 </div>
             </div>
@@ -61,17 +60,6 @@ const DirectionOverview = ({ directionData, roleName = '' }) => {
                 </div>
                 <div className="dp-rule" />
                 <p className="dp-text">{description || 'Overview not available for this direction yet.'}</p>
-                {families.length > 0 && (
-                    <>
-                        <div className="dp-rule" style={{ margin: '14px 0' }} />
-                        <div className="dp-eyebrow" style={{ marginBottom: 8 }}>Job families in this direction</div>
-                        <div className="pills">
-                            {families.map(f => (
-                                <span key={f} className="pill"><Briefcase size={15} style={{ color: 'var(--accent-text)' }} />{f}</span>
-                            ))}
-                        </div>
-                    </>
-                )}
             </div>
 
             {/* Roles */}

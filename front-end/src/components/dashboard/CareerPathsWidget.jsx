@@ -42,7 +42,7 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -6, scale: 1.015 }}
                 transition={{ delay: idx * 0.08, duration: 0.4, ease: "easeOut" }}
-                className="relative group bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm hover:shadow-xl hover:shadow-[#045C9A]/10 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/50 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="relative group bg-white dark:bg-[#0d3a5f] rounded-2xl border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm hover:shadow-xl hover:shadow-[#045C9A]/10 hover:border-[#045C9A]/40 dark:hover:border-[#045C9A]/50 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer h-full"
               >
                 {/* Top accent line */}
                 <motion.div
@@ -77,7 +77,7 @@ const CareerPathsWidget = memo(({ paths = [], loading = false }) => {
                           </span>
                         </div>
                       )}
-                      <h3 className="text-[13px] font-bold text-[#072036] dark:text-white leading-snug tracking-tight line-clamp-2">
+                      <h3 className="text-[13px] font-bold text-[#072036] dark:text-white leading-snug tracking-tight line-clamp-2 min-h-[36px]">
                         {path.title}
                       </h3>
                     </div>

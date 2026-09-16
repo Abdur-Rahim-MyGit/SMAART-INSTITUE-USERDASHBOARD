@@ -1,5 +1,5 @@
 import './careerAgent.css';
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import NeuralBackground from '@/components/ui/NeuralBackground';
 import RoleDetailedView from './panels/RoleDetailedView';
 import DirectionOverview from './panels/DirectionOverview';
@@ -35,10 +35,12 @@ import {
     X,
     RefreshCw,
     Star,
+    Clock,
     IconArrowLeft,
     Wrench,
     MapPin
 } from '@/components/icons';
+import MaterialIcon from '@/components/icons/MaterialIcon';
 
 /* Standard panel header: 40px icon tile + title + subtitle (+ optional right slot) */
 const PanelHead = ({ icon, title, subtitle, right }) => (
@@ -261,20 +263,6 @@ const CareerAgentDashboard = () => {
 
     const { primary = {}, secondary = {}, tertiary = {}, combined_tab4 = {} } = data || {};
 
-    // Safety check for current data structure
-    const getSafeRole = (roleData) => {
-        if (!roleData || !roleData.tab1) {
-            return {
-                tab1: { role_name: 'Analyzing...', role_description: 'Processing role intelligence...' },
-                tab3: { ai_tools: [], ai_exposure: { percentage: '0%', level: 'Analyzing' } }
-            };
-        }
-        return roleData;
-    };
-
-    const currentData = getSafeRole(activeRole === 1 ? primary : activeRole === 2 ? secondary : tertiary);
-    const roleName = currentData.tab1?.role_name || 'Selected Role';
-
     // Read user's originally selected preferences — use analysis direction data first (avoids stale localStorage)
     const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
     const _dp = _draft?.preferences || {};
@@ -282,6 +270,60 @@ const CareerAgentDashboard = () => {
     const prefPrimary = primary?.direction?.directionName || localStorage.getItem('smaart_pref_primary') || _dp.primary?.careerDirectionName || _dp.primary?.role || primary?.tab1?.role_name || 'Primary';
     const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
     const prefTertiary = tertiary?.direction?.directionName || localStorage.getItem('smaart_pref_tertiary') || _dp.tertiary?.careerDirectionName || _dp.tertiary?.role || tertiary?.tab1?.role_name || 'Tertiary';
+
+    // Which of the student's 3 chosen paths a recommended direction is (if any).
+    const chosenTierFor = (dir) => {
+        const id = dir?.directionId;
+        const name = dir?.directionName;
+        if (id && data?.primary?.direction?.directionId === id) return 'primary';
+        if (id && data?.secondary?.direction?.directionId === id) return 'secondary';
+        if (id && data?.tertiary?.direction?.directionId === id) return 'tertiary';
+        if (name && name === prefPrimary) return 'primary';
+        if (name && name === prefSecondary) return 'secondary';
+        if (name && name === prefTertiary) return 'tertiary';
+        return null;
+    };
+
+    const getDirectionIcon = (directionName) => {
+        if (!directionName) return 'explore';
+        const lower = directionName.toLowerCase();
+        if (lower.includes('data') || lower.includes('analytics') || lower.includes('insight')) return 'analytics';
+        if (lower.includes('hr') || lower.includes('people') || lower.includes('recruit')) return 'groups';
+        if (lower.includes('advertis') || lower.includes('market') || lower.includes('campaign')) return 'campaign';
+        if (lower.includes('software') || lower.includes('develop') || lower.includes('code')) return 'code';
+        if (lower.includes('design') || lower.includes('creative')) return 'design_services';
+        if (lower.includes('engineer') || lower.includes('architect') || lower.includes('system')) return 'engineering';
+        if (lower.includes('finance') || lower.includes('account')) return 'account_balance';
+        if (lower.includes('product') || lower.includes('project') || lower.includes('business') || lower.includes('manage')) return 'work';
+        if (lower.includes('security') || lower.includes('cyber')) return 'security';
+        if (lower.includes('network') || lower.includes('cloud')) return 'cloud';
+        if (lower.includes('sale') || lower.includes('trade')) return 'trending_up';
+        if (lower.includes('support') || lower.includes('service') || lower.includes('customer')) return 'support_agent';
+        if (lower.includes('research') || lower.includes('science')) return 'science';
+        if (lower.includes('legal') || lower.includes('law')) return 'gavel';
+        if (lower.includes('media') || lower.includes('content') || lower.includes('write')) return 'article';
+        return 'explore';
+    };
+
+    const remainingRecommended = (recommended || []).filter(d => d && d.directionName && !chosenTierFor(d));
+
+    // Safety check for current data structure
+    const getSafeRole = (roleData, fallbackDir = null) => {
+        if (!roleData || !roleData.tab1) {
+            return {
+                direction: fallbackDir || {},
+                tab1: { role_name: fallbackDir?.directionName || 'Recommended Role', role_description: fallbackDir?.directionDescription || 'Processing role intelligence...' },
+                tab3: { ai_tools: [], ai_exposure: { percentage: '0%', level: 'Analyzing' } }
+            };
+        }
+        return roleData;
+    };
+
+    const currentData = activeRole === 1 ? getSafeRole(primary) : 
+                        activeRole === 2 ? getSafeRole(secondary) : 
+                        activeRole === 3 ? getSafeRole(tertiary) : 
+                        getSafeRole(null, remainingRecommended[activeRole - 4]);
+    const roleName = currentData.tab1?.role_name || 'Selected Role';
 
     const userStr = sessionStorage.getItem("user");
     const user = userStr ? JSON.parse(userStr) : null;
@@ -301,6 +343,11 @@ const CareerAgentDashboard = () => {
         { label: prefPrimary, directionName: primary?.direction?.directionName || prefPrimary, roles: buildDirRoles(primary) },
         { label: prefSecondary, directionName: secondary?.direction?.directionName || prefSecondary, roles: buildDirRoles(secondary) },
         { label: prefTertiary, directionName: tertiary?.direction?.directionName || prefTertiary, roles: buildDirRoles(tertiary) },
+        ...remainingRecommended.map(dir => ({
+            label: dir.directionName,
+            directionName: dir.directionName,
+            roles: buildDirRoles({ direction: dir })
+        }))
     ];
 
 
@@ -328,21 +375,8 @@ const CareerAgentDashboard = () => {
     const zoneDot = currentData?.zone === 'Green' ? 'green' : currentData?.zone === 'Amber' ? 'amber' : currentData?.zone === 'Red' ? 'red' : (activeRole === 1 ? 'green' : activeRole === 2 ? 'amber' : 'red');
     const zoneCardClass = currentData?.zone === 'Green' ? 'zone-green-card' : currentData?.zone === 'Amber' ? 'zone-primary' : currentData?.zone === 'Red' ? 'zone-red-card' : (activeRole === 1 ? 'zone-green-card' : activeRole === 2 ? 'zone-primary' : 'zone-red-card');
 
-    // Which of the student's 3 chosen paths a recommended direction is (if any).
-    const chosenTierFor = (dir) => {
-        const id = dir?.directionId;
-        const name = dir?.directionName;
-        if (id && data?.primary?.direction?.directionId === id) return 'primary';
-        if (id && data?.secondary?.direction?.directionId === id) return 'secondary';
-        if (id && data?.tertiary?.direction?.directionId === id) return 'tertiary';
-        if (name && name === prefPrimary) return 'primary';
-        if (name && name === prefSecondary) return 'secondary';
-        if (name && name === prefTertiary) return 'tertiary';
-        return null;
-    };
-
     const panels = [
-        // Sections scoped to the active Primary/Secondary/Tertiary tab above —
+        // Sections scoped to the active Primary/Secondary/Tertiary/Recommended tab above —
         // grouped first, in the order a student reads them.
         { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} stroke={1.5} /> },
         { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} stroke={1.5} /> },
@@ -350,9 +384,6 @@ const CareerAgentDashboard = () => {
         { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} stroke={1.5} /> },
         { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <MapIcon size={18} stroke={1.5} /> },
         { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} stroke={1.5} /> },
-        // Beyond the 3 chosen paths — sits last, after all Primary/Secondary/
-        // Tertiary content, since it's supplementary exploration.
-        { id: 'recommended', label: t('career_agent.panels.recommended', 'Recommended Directions'), icon: <Star size={18} stroke={1.5} /> },
         // Hidden for now (kept wired so they can be re-enabled by removing them from HIDDEN_PANELS)
         { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} stroke={1.5} /> },
         { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} stroke={1.5} /> }
@@ -440,14 +471,45 @@ const CareerAgentDashboard = () => {
             <header className="dash-header">
                 <div className="dash-top">
                     <div className="dash-title-wrap">
-                        <div className="dash-name">{t('career_agent.header.title_start', 'Career ')}<span>{t('career_agent.header.title_span', 'Intelligence')}</span>{t('career_agent.header.title_end', ' Report')}</div>
-                        <div className="dash-meta">
-                            <span className="dash-meta-name">{displayName}</span>
-                            {displayEmail && <><span className="dash-meta-sep" /><span>{displayEmail}</span></>}
-                            {isCareerLocked && <><span className="dash-meta-sep" /><span className="dchip ok"><Lock size={13} /> {t('career_agent.header.path_locked', 'Paths locked')}</span></>}
+                        <div className="dash-name" style={{ fontFamily: '"Inter", sans-serif', fontSize: '1.5rem', display: 'flex', gap: '6px', alignItems: 'center', lineHeight: 1.375, letterSpacing: '-0.025em' }}>
+                            <span style={{ fontWeight: 800, color: theme === 'dark' ? '#60a5fa' : '#1a3884' }}>SMAART</span>
+                            <span style={{ fontWeight: 700, color: theme === 'dark' ? '#ffffff' : '#002147' }}>
+                                {t('career_agent.header.title_start', 'Career ')}
+                                {t('career_agent.header.title_span', 'Intelligence')}
+                                {t('career_agent.header.title_end', ' Report')}
+                            </span>
+                        </div>
+                        <div className="dash-meta" style={{ marginTop: '6px', fontSize: '0.85rem', color: 'var(--muted)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text1)' }}>
+                                <MaterialIcon name="person" size={16} style={{ opacity: 0.8 }} />
+                                <span style={{ fontWeight: 600 }}>{displayName}</span>
+                            </div>
+                            {displayEmail && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--border2)' }} />
+                                    <MaterialIcon name="mail" size={15} style={{ opacity: 0.8 }} />
+                                    <span>{displayEmail}</span>
+                                </div>
+                            )}
+                            {isCareerLocked && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--border2)' }} />
+                                    <span className="dchip ok"><Lock size={13} /> {t('career_agent.header.path_locked', 'Paths locked')}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className="dash-actions">
+                    <div className="dash-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {lockStatus?.found && !isCareerLocked && (
+                            <div className="hide-mobile" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginRight: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text1)', background: 'var(--card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                    <Clock size={14} style={{ color: 'var(--accent-text)' }} /> {lockStatus.remainingDays} {t('career_agent.header.days_left', 'days left')}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text1)', background: 'var(--card)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                    <RefreshCw size={14} style={{ color: 'var(--accent-text)' }} /> {lockStatus.attemptsUsed} / {lockStatus.maxAttempts} {t('career_agent.header.attempts_used', 'attempts used')}
+                                </div>
+                            </div>
+                        )}
                         <button className="btn-ghost" onClick={() => navigate('/dashboard')}>
                             <IconArrowLeft size={18} />
                             <span className="hide-mobile">{t('career_agent.header.back_plain', 'Back to Dashboard')}</span>
@@ -478,14 +540,17 @@ const CareerAgentDashboard = () => {
                 </div>
 
                 <div className="role-tabs-bar">
-                    {[
-                        { n: 1, k: t('career_agent.tabs.primary', 'Primary'), label: prefPrimary },
-                        { n: 2, k: t('career_agent.tabs.secondary', 'Secondary'), label: prefSecondary },
-                        { n: 3, k: t('career_agent.tabs.tertiary', 'Tertiary'), label: prefTertiary },
-                    ].map(tab => (
-                        <button key={tab.n} className={`rtab ${activeRole === tab.n ? 'active' : ''}`} onClick={() => setActiveRole(tab.n)} title={tab.label}>
-                            <span className="rtab-k">{tab.k}</span>
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tab.label}</span>
+                    {panels.map(p => (
+                        <button 
+                            key={p.id} 
+                            className={`rtab ${activePanel === p.id ? 'active' : ''}`} 
+                            onClick={() => setActivePanel(p.id)} 
+                            title={p.label}
+                        >
+                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'inherit' }}>
+                                {p.icon}
+                            </span>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.label}</span>
                         </button>
                     ))}
                 </div>
@@ -521,30 +586,45 @@ const CareerAgentDashboard = () => {
                                 {currentData?.tab1?.role_name || 'Loading...'}
                             </div>
                         </div>
-                        <div className="sb-role-dir" title={activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}>
-                            {activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}
+                        <div className="sb-role-dir" title={allDirections[activeRole - 1]?.label || 'Selected Role'}>
+                            {allDirections[activeRole - 1]?.label || 'Selected Role'}
                         </div>
                     </div>
 
                     <div className="sidebar-nav">
-                        <div className="sb-label">{t('career_agent.sidebar.sections', 'Report sections')}</div>
-                        {panels.map(p => (
+                        <div className="sb-label">{t('career_agent.sidebar.career_paths', 'Career Paths')}</div>
+                        {[
+                            { n: 1, k: t('career_agent.tabs.primary', 'Primary'), label: prefPrimary, iconName: getDirectionIcon(prefPrimary) },
+                            { n: 2, k: t('career_agent.tabs.secondary', 'Secondary'), label: prefSecondary, iconName: getDirectionIcon(prefSecondary) },
+                            { n: 3, k: t('career_agent.tabs.tertiary', 'Tertiary'), label: prefTertiary, iconName: getDirectionIcon(prefTertiary) },
+                            ...remainingRecommended.map((dir, idx) => ({
+                                n: 4 + idx,
+                                k: t('career_agent.tabs.recommended', 'Recommended'),
+                                label: dir.directionName,
+                                iconName: getDirectionIcon(dir.directionName)
+                            }))
+                        ].map(tab => (
                             <button
-                                key={p.id}
-                                className={`sitem ${activePanel === p.id ? 'active' : ''}`}
-                                onClick={() => setActivePanel(p.id)}
+                                key={tab.n}
+                                className={`sitem ${activeRole === tab.n ? 'active' : ''}`}
+                                onClick={() => {
+                                    setActiveRole(tab.n);
+                                    if (activePanel === 'recommended') setActivePanel('direction');
+                                }}
+                                title={tab.label}
+                                style={{ height: 'auto', padding: '10px 12px', alignItems: 'flex-start' }}
                             >
-                                <span className="si-icon-wrap">{p.icon}</span>
-                                {p.label}
+                                <span className="si-icon-wrap" style={{ marginTop: '2px' }}><MaterialIcon name={tab.iconName} size={20} /></span>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', overflow: 'hidden' }}>
+                                    <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', opacity: 0.8, letterSpacing: '0.05em', marginBottom: '2px' }}>{tab.k}</span>
+                                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', lineHeight: 1.2 }}>{tab.label}</span>
+                                </div>
                             </button>
                         ))}
                     </div>
                 </aside>
 
                 <main className="dash-main">
-                    {/* Career Direction Lock Banner */}
-                    <CareerLockBanner lockStatus={lockStatus} />
-
                     {/* Panel 1: Overview */}
                     {activePanel === 'overview' && (
                         <div className="panel animate-fade-in">
@@ -620,22 +700,7 @@ const CareerAgentDashboard = () => {
                         </div>
                     )}
 
-                    {/* ─────── Panel: Recommended Directions — always open, before & after locking ─────── */}
-                    {activePanel === 'recommended' && (
-                        <div className="panel animate-fade-in">
-                            <PanelHead
-                                icon={<Star size={20} />}
-                                title={t('career_agent.panels.recommended', 'Recommended Directions')}
-                                subtitle={t('career_agent.recommended.desc_remaining', 'The other directions recommended for your degree — always open to explore, before and after your paths are locked.')}
-                                right={recommended.length > 0 ? <span className="dchip brand">{recommended.length} {t('career_agent.recommended.count', 'recommended')}</span> : null}
-                            />
-                            <RecommendedDirections
-                                directions={recommended}
-                                chosenTierFor={chosenTierFor}
-                                loading={recommendedLoading}
-                            />
-                        </div>
-                    )}
+
 
                     {/* ─────── Panel: Role Detailed View ─────── */}
                     {activePanel === 'roledetail' && (
@@ -661,7 +726,7 @@ const CareerAgentDashboard = () => {
                             <PanelHead
                                 icon={<BarChart3 size={20} />}
                                 title={t('career_agent.market.title', 'Market Intelligence')}
-                                subtitle={<>{t('career_agent.market.desc_start', 'Showing roles for ')}<strong>{activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}</strong>{t('career_agent.market.desc_end', ' — select a role below to view its market data.')}</>}
+                                subtitle={<>{t('career_agent.market.desc_start', 'Showing roles for ')}<strong>{allDirections[activeRole - 1]?.label || prefPrimary}</strong>{t('career_agent.market.desc_end', ' — select a role below to view its market data.')}</>}
                             />
                             <MarketIntelligence
                                 roleName={roleName}
