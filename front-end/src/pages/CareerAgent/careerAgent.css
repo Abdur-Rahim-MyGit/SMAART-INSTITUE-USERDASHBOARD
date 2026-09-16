@@ -2190,3 +2190,26 @@
 
 /* Overview mini-card grid used in Direction Overview */
 .career-agent-page .dp-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ── Direction picker v2: recommended-only default, role-aware search ── */
+/* Role result group: "Role name · in N directions", then the directions that carry it */
+.career-agent-page .ob-picker-rolegroup { padding-bottom: 4px; }
+.career-agent-page .ob-picker-rolegroup + .ob-picker-rolegroup { border-top: 1px solid var(--ob-hair); margin-top: 4px; padding-top: 4px; }
+.career-agent-page .ob-picker-role-name { color: var(--ob-ink); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 13px; }
+.career-agent-page .ob-picker-item .ob-chip { margin-left: 8px; flex-shrink: 0; }
+/* Hint row under the recommended list */
+.career-agent-page .ob-picker-hint {
+  display: flex; align-items: center; gap: 8px; margin: 6px 12px 4px; padding: 8px 10px; border-radius: 8px;
+  background: var(--ob-soft); color: var(--ob-muted); font-size: 12px; line-height: 1.4;
+}
+.career-agent-page .ob-picker-hint svg { color: var(--ob-brand); flex-shrink: 0; }
+/* Read-only role cards in the direction preview — informational, not selectable */
+.career-agent-page .ob-role-card.readonly { cursor: default; }
+.career-agent-page .ob-role-card.readonly:hover { border-color: var(--ob-hair); }
+.career-agent-page .ob-role-card.focus { border-color: var(--ob-brand); background: var(--ob-tint); }
+.career-agent-page .ob-role-num {
+  width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ob-panel); color: var(--ob-muted); font-size: 11px; font-weight: 700;
+}
+.career-agent-page .ob-role-card.focus .ob-role-num { background: var(--ob-brand); color: #fff; }
