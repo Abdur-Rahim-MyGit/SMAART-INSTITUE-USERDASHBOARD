@@ -62,7 +62,13 @@ services:
       - ../../back-end/uploads:/usr/src/app/uploads
     expose:
       - "5000"
-    networks: [smaart]
+    networks:
+      smaart:
+        # The user frontend's own nginx.conf proxies /api, /socket.io, /ws and
+        # /uploads to a host called `backend` (the local docker-compose.yml
+        # service name). Answer to that name here too so the same image works
+        # in both stacks.
+        aliases: [backend]
     restart: unless-stopped
 
   # ── User dashboard frontend (Vite/React → nginx) ─────────────────────────
