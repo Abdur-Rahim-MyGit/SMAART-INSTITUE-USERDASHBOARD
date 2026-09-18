@@ -2197,6 +2197,27 @@
 .career-agent-page .ob-picker-rolegroup + .ob-picker-rolegroup { border-top: 1px solid var(--ob-hair); margin-top: 4px; padding-top: 4px; }
 .career-agent-page .ob-picker-role-name { color: var(--ob-ink); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 13px; }
 .career-agent-page .ob-picker-item .ob-chip { margin-left: 8px; flex-shrink: 0; }
+/* Direction already owned by another tier: visible, greyed, not pickable */
+.career-agent-page .ob-picker-item.taken { cursor: not-allowed; }
+.career-agent-page .ob-picker-item.taken:hover { background: transparent; }
+.career-agent-page .ob-picker-item.taken .ob-picker-item-name,
+.career-agent-page .ob-picker-item.taken .ob-picker-item-sub { color: var(--ob-muted); opacity: 0.7; }
+/* Warning shown when a taken direction is tapped */
+.career-agent-page .ob-picker-warn {
+  display: flex; align-items: flex-start; gap: 8px; margin: 8px 12px 4px; padding: 9px 11px; border-radius: 8px;
+  background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 12.5px; line-height: 1.45; font-weight: 500;
+}
+.career-agent-page .ob-picker-warn svg { color: #d97706; flex-shrink: 0; margin-top: 1px; }
+:is(.dark) .career-agent-page .ob-picker-warn { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: #fcd34d; }
+:is(.dark) .career-agent-page .ob-picker-warn svg { color: #fbbf24; }
+/* Inline note under a field whose value clashes with another tier */
+.career-agent-page .ob-field-warn {
+  display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; padding: 9px 11px; border-radius: 8px;
+  background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 12.5px; line-height: 1.45; font-weight: 500;
+}
+.career-agent-page .ob-field-warn svg { color: #d97706; flex-shrink: 0; margin-top: 1px; }
+:is(.dark) .career-agent-page .ob-field-warn { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: #fcd34d; }
+:is(.dark) .career-agent-page .ob-field-warn svg { color: #fbbf24; }
 /* Hint row under the recommended list */
 .career-agent-page .ob-picker-hint {
   display: flex; align-items: center; gap: 8px; margin: 6px 12px 4px; padding: 8px 10px; border-radius: 8px;

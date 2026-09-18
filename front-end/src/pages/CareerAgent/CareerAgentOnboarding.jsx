@@ -22,6 +22,7 @@ import {
   Star,
   Briefcase,
   X,
+  AlertTriangle,
   ArrowRight,
   IconArrowLeft as ArrowLeft
 } from '@/components/icons';
@@ -424,11 +425,20 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
 //     a short description. No role is picked by hand — the target role the
 //     analysis engine needs is set automatically (the searched role if they
 //     arrived via a role, otherwise the first role not used by another tier).
-function CareerDirectionSelector({ directions = [], allDirections = [], selected = null, onChange, loading = false, excludeRoles = [], disabled = false }) {
+function CareerDirectionSelector({ directions = [], allDirections = [], selected = null, onChange, loading = false, excludeRoles = [], takenDirections = {}, tierLabel = '', disabled = false }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  // Set when the student taps a direction another tier already owns.
+  const [warn, setWarn] = useState('');
   const ref = useRef(null);
+
+  useEffect(() => {
+    if (!warn) return;
+    const id = setTimeout(() => setWarn(''), 4000);
+    return () => clearTimeout(id);
+  }, [warn]);
+  useEffect(() => { if (!open) setWarn(''); }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -540,7 +550,20 @@ function CareerDirectionSelector({ directions = [], allDirections = [], selected
 
   if (searchPool.length === 0) return null;
 
+  // One direction can be chosen for one tier only. A direction another tier
+  // already owns stays visible (so a role search still explains where that
+  // role lives) but is greyed out, tagged, and tapping it only warns.
+  const takenBy = (dir) => takenDirections[dir.directionId] || '';
+
   const pick = (dir, viaRole = '') => {
+    const owner = takenBy(dir);
+    if (owner) {
+      setWarn(t('career_agent.onboarding.direction_taken_warn',
+        '"{{direction}}" is already your {{owner}} preference. Choose a different direction for {{tier}}.',
+        { direction: dir.directionName, owner, tier: tierLabel || 'this preference' }));
+      return;
+    }
+    setWarn('');
     onChange({ ...dir, role: defaultRoleFor(dir, viaRole), matchedRole: viaRole || '' });
     setOpen(false);
     setQuery('');
@@ -550,14 +573,23 @@ function CareerDirectionSelector({ directions = [], allDirections = [], selected
     const isSel = selected?.directionId === dir.directionId;
     const roleCount = (dir.roles || []).length;
     const rec = recommendedIds.has(dir.directionId);
+    const owner = takenBy(dir);
     return (
-      <button type="button" className={`ob-picker-item${isSel ? ' selected' : ''}`} onClick={() => pick(dir, viaRole)}>
+      <button
+        type="button"
+        className={`ob-picker-item${isSel ? ' selected' : ''}${owner ? ' taken' : ''}`}
+        aria-disabled={owner ? 'true' : undefined}
+        title={owner ? t('career_agent.onboarding.direction_taken_title', 'Already chosen as {{owner}}', { owner }) : undefined}
+        onClick={() => pick(dir, viaRole)}
+      >
         <span className="ob-picker-item-name">{dir.directionName}</span>
         <span className="ob-picker-item-sub">
           {metaLine(dir) || t('career_agent.onboarding.role_count', '{{count}} roles', { count: roleCount })}
         </span>
-        {rec && <span className="ob-chip">{t('career_agent.onboarding.recommended', 'Recommended')}</span>}
-        {isSel && <Check size={16} />}
+        {owner
+          ? <span className="ob-chip warn">{t('career_agent.onboarding.chosen_as', 'Chosen as {{owner}}', { owner })}</span>
+          : rec && <span className="ob-chip">{t('career_agent.onboarding.recommended', 'Recommended')}</span>}
+        {isSel && !owner && <Check size={16} />}
       </button>
     );
   };
@@ -602,6 +634,12 @@ function CareerDirectionSelector({ directions = [], allDirections = [], selected
               )}
             </div>
             <div className="ob-picker-list">
+              {warn && (
+                <div className="ob-picker-warn" role="alert">
+                  <AlertTriangle size={15} />
+                  <span>{warn}</span>
+                </div>
+              )}
               {!q && (
                 <div className="ob-picker-group">
                   <div className="ob-picker-ghead">
@@ -740,18 +778,21 @@ function CareerDirectionSelector({ directions = [], allDirections = [], selected
 }
 
 
-function PrefBlock({ label, colorClass, data, onChange, directions = [], allDirections = [], directionsLoading = false, dbRoles = [], excludeRoles = [], excludeDirections = [], fieldErrors = {} }) {
+function PrefBlock({ label, colorClass, data, onChange, directions = [], allDirections = [], directionsLoading = false, dbRoles = [], excludeRoles = [], takenDirections = {}, fieldErrors = {} }) {
   const { t } = useTranslation();
   const sectors = ALL_SECTORS;
   const up = (field, val) => onChange({ ...data, [field]: val });
 
   const hasDirectionSelected = !!(data.careerDirection && (data.careerDirection.directionId || data.careerDirection.directionName));
 
-  // Recommended list minus whatever's already picked in another tier; the
-  // global search pool gets the same exclusion.
-  const filteredDirections = directions.filter(d => !excludeDirections.includes(d.directionId));
-  const filteredAllDirections = allDirections.filter(d => !excludeDirections.includes(d.directionId));
-  const hasAnyDirectionOptions = filteredDirections.length > 0 || filteredAllDirections.length > 0;
+  // Directions owned by another tier are NOT removed from the lists: the
+  // selector shows them greyed out with a "Chosen as Primary/Secondary" tag
+  // and warns when tapped, so a student searching a role still learns which
+  // direction it belongs to and why it cannot be picked twice.
+  const hasAnyDirectionOptions = directions.length > 0 || allDirections.length > 0;
+  // The tier that already owns THIS block's chosen direction (e.g. the
+  // student went back and switched Primary to what Secondary holds).
+  const duplicateOwner = data.careerDirectionId ? (takenDirections[data.careerDirectionId] || '') : '';
 
   const fieldErrorClass = (key) => fieldErrors[key] ? 'field-error' : '';
 
@@ -767,10 +808,12 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], allDire
                 <label className="fl">{t('career_agent.onboarding.career_directions', 'Career direction')} <span className="req">*</span></label>
                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
                   <CareerDirectionSelector
-                    directions={filteredDirections}
-                    allDirections={filteredAllDirections}
+                    directions={directions}
+                    allDirections={allDirections}
                     selected={data.careerDirection || null}
                     excludeRoles={excludeRoles}
+                    takenDirections={takenDirections}
+                    tierLabel={label}
                     onChange={dir => {
                       if (dir) {
                         // Whole-direction selection. The engine's target role
@@ -797,6 +840,16 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], allDire
                     }}
                   />
                 </div>
+                {duplicateOwner && (
+                  <div className="ob-field-warn" role="alert">
+                    <AlertTriangle size={15} />
+                    <span>
+                      {t('career_agent.onboarding.direction_duplicate',
+                        'This direction is already your {{owner}} preference. Choose a different direction for {{tier}}.',
+                        { owner: duplicateOwner, tier: label })}
+                    </span>
+                  </div>
+                )}
                 {!hasDirectionSelected && (
                   <p className="ob-help">{t('career_agent.onboarding.direction_help_v2', 'Only the directions recommended for your degree are listed. Type a job role to find every direction that includes it — from any degree.')}</p>
                 )}
@@ -1574,6 +1627,25 @@ const CareerAgentOnboarding = () => {
     return { ...f, education: edu };
   });
   const updatePref = (tier, data) => setFormData(f => ({ ...f, preferences: { ...f.preferences, [tier]: data } }));
+
+  // directionId -> label of the OTHER tier that already owns it. Symmetric on
+  // purpose: going back and switching Primary to the direction Secondary
+  // holds is blocked the same way as the forward case.
+  const TIER_LABELS = { primary: 'Primary', secondary: 'Secondary', tertiary: 'Tertiary' };
+  const takenDirectionsFor = (tier) => {
+    const out = {};
+    for (const other of ['primary', 'secondary', 'tertiary']) {
+      if (other === tier) continue;
+      const id = formData.preferences[other]?.careerDirectionId;
+      if (id) out[id] = TIER_LABELS[other];
+    }
+    return out;
+  };
+  // Validation helper: the tier whose direction clashes with `tier`, if any.
+  const duplicateDirectionOwner = (tier) => {
+    const id = formData.preferences[tier]?.careerDirectionId;
+    return id ? (takenDirectionsFor(tier)[id] || '') : '';
+  };
   const updateExp = (i, field, val) => setFormData(f => {
     const exp = [...f.experience]; exp[i] = { ...exp[i], [field]: val };
     return { ...f, experience: exp };
@@ -1653,6 +1725,9 @@ const CareerAgentOnboarding = () => {
         if (!(pref?.careerDirectionId || pref?.role?.trim())) {
           messages.push('Select a career direction');
           setFieldError(fields, 'preferences.primary.role');
+        } else if (duplicateDirectionOwner('primary')) {
+          messages.push(`This direction is already your ${duplicateDirectionOwner('primary')} preference — choose a different one`);
+          setFieldError(fields, 'preferences.primary.role');
         }
         if (!pref?.salary) {
           messages.push('Select the expected CTC range');
@@ -1674,6 +1749,9 @@ const CareerAgentOnboarding = () => {
         if (!(pref?.careerDirectionId || pref?.role?.trim())) {
           messages.push('Select a career direction');
           setFieldError(fields, 'preferences.secondary.role');
+        } else if (duplicateDirectionOwner('secondary')) {
+          messages.push(`This direction is already your ${duplicateDirectionOwner('secondary')} preference — choose a different one`);
+          setFieldError(fields, 'preferences.secondary.role');
         }
         if (!pref?.salary) {
           messages.push('Select the expected CTC range');
@@ -1694,6 +1772,9 @@ const CareerAgentOnboarding = () => {
         const { locations, orgTypes } = getPreferenceSelections(pref);
         if (!(pref?.careerDirectionId || pref?.role?.trim())) {
           messages.push('Select a career direction');
+          setFieldError(fields, 'preferences.tertiary.role');
+        } else if (duplicateDirectionOwner('tertiary')) {
+          messages.push(`This direction is already your ${duplicateDirectionOwner('tertiary')} preference — choose a different one`);
           setFieldError(fields, 'preferences.tertiary.role');
         }
         if (!pref?.salary) {
@@ -2133,7 +2214,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 3, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
+                <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} takenDirections={takenDirectionsFor('primary')} fieldErrors={validationState.fields} />
               </div>
             </>
           )}
@@ -2148,7 +2229,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 4, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
+                <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} takenDirections={takenDirectionsFor('secondary')} fieldErrors={validationState.fields} />
               </div>
             </>
           )}
@@ -2163,7 +2244,7 @@ const CareerAgentOnboarding = () => {
                 step={t('career_agent.onboarding.step_indicator', 'STEP {{current}} / {{total}}', { current: 5, total: 6 })}
               />
               <div className="ob-body">
-                <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
+                <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={recommendedDirections} allDirections={allDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} takenDirections={takenDirectionsFor('tertiary')} fieldErrors={validationState.fields} />
               </div>
             </>
           )}
