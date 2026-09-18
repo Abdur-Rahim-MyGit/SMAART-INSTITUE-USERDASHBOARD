@@ -4,7 +4,7 @@
  * Kept for potential future use — do not import without integrating into the editor layout.
  */
 import React from "react";
-import { ZoomIn, ZoomOut, RotateCw, Trash2, RefreshCw } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCw, Trash2, RefreshCw } from "@/components/icons";
 
 const SelectionControls = ({
   selectedSlot,
@@ -38,7 +38,7 @@ const SelectionControls = ({
   };
 
   return (
-    <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 bg-white dark:bg-[#002A5C] border-2 border-slate-200 dark:border-white/20 shadow-2xl rounded-full px-6 py-3 flex items-center gap-6 z-[9999]">
+    <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 bg-white dark:bg-[#0d3a5f] border-2 border-slate-200 dark:border-white/20 shadow-2xl rounded-full px-6 py-3 flex items-center gap-6 z-[9999]">
       
       {/* Zoom Controls */}
       <div className="flex items-center gap-3">

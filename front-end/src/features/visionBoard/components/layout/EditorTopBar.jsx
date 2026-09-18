@@ -8,7 +8,7 @@ import {
   Eye,
   Save,
   Loader2,
-} from "lucide-react";
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -40,24 +40,24 @@ const EditorTopBar = ({
       : t("vision_board.ready");
 
   return (
-    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/50 bg-white/70 px-2 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-slate-800/50 dark:bg-[#00152E]/80 dark:text-white sm:px-3">
+    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/50 bg-white/70 px-2 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-white/10 dark:bg-[#0d3a5f]/80 dark:text-white sm:px-3">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <Link
           to="/vision-board-pro/gallery"
-          className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-[#002A5C]"
+          className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-[#072036]/70 dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:block">{t("vision_board.boards")}</span>
         </Link>
 
-        <div className="hidden items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-white/10 dark:bg-slate-900/60 sm:flex">
+        <div className="hidden items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-white/10 dark:bg-[#072036]/60 sm:flex">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-white"
+                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#0d3a5f] dark:hover:text-white"
                   onClick={onUndo}
                   disabled={!canUndo}
                 >
@@ -74,7 +74,7 @@ const EditorTopBar = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-white"
+                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#0d3a5f] dark:hover:text-white"
                   onClick={onRedo}
                   disabled={!canRedo}
                 >
@@ -88,7 +88,7 @@ const EditorTopBar = ({
       </div>
 
       <div className="mx-1 min-w-0 flex-1 md:block">
-        <div className="group relative flex min-h-[72px] items-center rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-inner transition-all focus-within:bg-white dark:border-white/10 dark:bg-slate-900/70">
+        <div className="group relative flex min-h-[72px] items-center rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-inner transition-all focus-within:bg-white dark:border-white/10 dark:bg-[#072036]/70">
           <div className="min-w-0 flex-1">
             <Input
               value={title}
@@ -100,9 +100,9 @@ const EditorTopBar = ({
               placeholder={t("vision_board.untitled_board")}
             />
           </div>
-          <div className="hidden flex-shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 shadow-sm transition-all dark:border-white/10 dark:bg-slate-900 dark:text-slate-400 xl:flex">
+          <div className="hidden flex-shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 shadow-sm transition-all dark:border-white/10 dark:bg-[#072036] dark:text-slate-400 xl:flex">
             {isSaving ? (
-              <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+              <Loader2 className="h-3 w-3 animate-spin text-[#045C9A]" />
             ) : (
               <div className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -117,7 +117,7 @@ const EditorTopBar = ({
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          className="h-10 gap-2 rounded-2xl border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-[#002A5C]"
+          className="h-10 gap-2 rounded-2xl border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-[#072036]/70 dark:text-slate-200 dark:hover:bg-[#0d3a5f]"
           onClick={onSave}
           disabled={isSaving}
         >
@@ -130,7 +130,7 @@ const EditorTopBar = ({
         </Button>
 
         <Button
-          className="h-10 gap-2 rounded-2xl bg-[#1a3884] px-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 hover:bg-[#1a3884]/90 hover:shadow-blue-500/40 dark:bg-[#1a3884] sm:px-4"
+          className="h-10 gap-2 rounded-2xl bg-[#045C9A] px-3 text-sm font-bold text-white shadow-lg shadow-[#045C9A]/20 transition-all hover:-translate-y-0.5 hover:bg-[#045C9A]/90 hover:shadow-[#045C9A]/40 dark:bg-[#045C9A] sm:px-4"
           onClick={onPreview}
         >
           <Eye className="h-4 w-4" />

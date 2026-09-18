@@ -9,7 +9,7 @@ import {
   Sparkles,
   Trash2,
   Type,
-} from "lucide-react";
+} from "@/components/icons";
 import {
   FONT_CATEGORIES,
   TEXT_COLORS,
@@ -24,7 +24,7 @@ const labelClass =
   "mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-white/45";
 
 const sliderClass =
-  "h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#1a3884] dark:bg-white/10";
+  "h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#045C9A] dark:bg-white/10";
 
 const backgroundOptions = [
   { id: "none", label: "None" },
@@ -86,7 +86,7 @@ const TypographyPanel = ({
     <div className="space-y-4">
       {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">
             <Type className="h-5 w-5" />
           </div>
           <div className="flex-1">
@@ -100,7 +100,7 @@ const TypographyPanel = ({
         </div>
         <button
           onClick={() => createTextOverlay()}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#132c6b]"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#034a7d]"
         >
           <Plus className="h-4 w-4" />
           Add Text Layer
@@ -160,7 +160,7 @@ const TypographyPanel = ({
                 value={selectedOverlay.text}
                 onChange={(e) => onUpdateText(selectedTextId, { text: e.target.value })}
                 rows={3}
-                className="w-full resize-none rounded-2xl border border-slate-200/80 bg-slate-50/50 px-3 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-[#1a3884]/40 focus:bg-white focus:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+                className="w-full resize-none rounded-2xl border border-slate-200/80 bg-slate-50/50 px-3 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-[#045C9A]/40 focus:bg-white focus:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
                 placeholder="Enter your text"
               />
             </div>
@@ -289,7 +289,7 @@ const TypographyPanel = ({
                       key={value}
                       onClick={() => onUpdateText(selectedTextId, { align: value })}
                       className={`flex-1 rounded-xl p-2 transition-all duration-200 ${active
-                          ? "bg-white text-[#1a3884] shadow-md dark:bg-[#1a3884]/20 dark:text-[#9cb9ff]"
+                          ? "bg-white text-[#045C9A] shadow-md dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]"
                           : "text-slate-500 hover:text-slate-900 dark:text-white/45 dark:hover:text-white"
                         }`}
                     >
@@ -341,7 +341,7 @@ const TypographyPanel = ({
                       type="button"
                       onClick={() => onUpdateText(selectedTextId, { backgroundStyle: option.id })}
                       className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${active
-                          ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] dark:text-[#9cb9ff]"
+                          ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] text-[#045C9A] dark:text-[#A6D7E8]"
                           : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
                         }`}
                     >
@@ -384,7 +384,7 @@ const TypographyPanel = ({
                       key={effect.id}
                       onClick={() => onUpdateText(selectedTextId, { effect: effect.id })}
                       className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${active
-                          ? "border-[#1a3884]/60 bg-[#1a3884] text-white"
+                          ? "border-[#045C9A]/60 bg-[#045C9A] text-white"
                           : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65 dark:hover:border-white/20"
                         }`}
                     >
@@ -459,7 +459,7 @@ const TypographyPanel = ({
                             fontFamily: font.family,
                             fontWeight: font.weight || "400",
                             fontStyle: font.style || "normal",
-                            color: "#0f172a",
+                            color: "#0d3a5f",
                           });
                         }}
                         className="rounded-xl border border-transparent bg-white px-3 py-3 text-left transition hover:border-slate-200 hover:bg-slate-50 dark:bg-white/[0.04] dark:hover:border-white/10 dark:hover:bg-white/[0.07]"
@@ -513,7 +513,7 @@ const TypographyPanel = ({
                   key={id}
                   onClick={() => onSelectText(id)}
                   className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${active
-                      ? "border-[#1a3884]/60 bg-[#1a3884]/[0.07]"
+                      ? "border-[#045C9A]/60 bg-[#045C9A]/[0.07]"
                       : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
                     }`}
                   role="button"

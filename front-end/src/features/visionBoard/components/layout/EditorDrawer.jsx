@@ -11,7 +11,7 @@ import {
   Target,
   LayoutTemplate,
   Layers3,
-} from "lucide-react";
+} from "@/components/icons";
 import TemplateSelector from "../panels/TemplateSelector";
 import TypographyPanel from "../panels/TypographyPanel";
 import StylePanel from "../panels/StylePanel";
@@ -83,7 +83,7 @@ const GoalList = ({ title, description, goals, setGoals, placeholder, accentClas
                 e.target.blur();
               }
             }}
-            className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-[#1a3884] dark:border-white/10 dark:bg-[#09111f] dark:text-white"
+            className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white"
             placeholder={placeholder}
           />
           <button
@@ -171,15 +171,15 @@ const EditorDrawer = ({
       animate={{ opacity: 1, y: 0, x: 0 }}
       exit={{ opacity: 0, y: 12, x: -10 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
-      className="fixed inset-x-0 bottom-[68px] top-auto z-40 flex h-[64vh] flex-col rounded-t-3xl border-t border-slate-200 bg-white shadow-[0_-12px_28px_rgba(15,23,42,0.12)] lg:static lg:h-full lg:w-[360px] lg:rounded-none lg:border-r lg:border-t-0 lg:border-slate-200 lg:bg-[#f8fafc] lg:shadow-none dark:border-white/8 dark:bg-[#0d1626] lg:dark:border-white/8 lg:dark:bg-[#0d1626] xl:w-[380px]">
+      className="fixed inset-x-0 bottom-[68px] top-auto z-40 flex h-[64vh] flex-col rounded-t-3xl border-t border-slate-200 bg-white shadow-[0_-12px_28px_rgba(15,23,42,0.12)] lg:static lg:h-full lg:w-[360px] lg:rounded-none lg:border-r lg:border-t-0 lg:border-slate-200 lg:bg-[#f8fafc] lg:shadow-none dark:border-white/8 dark:bg-[#0d3a5f] lg:dark:border-white/8 lg:dark:bg-[#0d3a5f] xl:w-[380px]">
       <div className="flex w-full justify-center pb-1 pt-2 lg:hidden">
         <div className="h-1 w-10 rounded-full bg-slate-200 dark:bg-white/20" />
       </div>
 
-      {/* <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-white/8 dark:bg-[#0d1626]/95">
+      {/* <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-white/8 dark:bg-[#0d3a5f]/95">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-blue-400/20 dark:text-blue-300">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">
               <HeaderIcon className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
@@ -306,8 +306,8 @@ const EditorDrawer = ({
                     type="button"
                     onClick={() => setAspectRatio(key)}
                     className={`rounded-2xl border px-3 py-3 text-left text-xs transition-all ${aspectRatio === key
-                      ? "border-[#1a3884] bg-[#1a3884]/10 text-[#1a3884] dark:border-blue-400 dark:bg-blue-400/20 dark:text-blue-300"
-                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-white/10 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-white"
+                      ? "border-[#045C9A] bg-[#045C9A]/10 text-[#045C9A] dark:border-[#A6D7E8] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-white/10 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-[#0d3a5f] dark:hover:text-white"
                       }`}
                   >
                     <div className="mb-0.5 font-semibold">{key}</div>
@@ -334,7 +334,7 @@ const EditorDrawer = ({
                goals={shortTermGoals}
                setGoals={setShortTermGoals}
                placeholder="Enter short-term goal..."
-               accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-blue-400/10 dark:text-blue-300"
+               accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-[#A6D7E8]/10 dark:text-[#A6D7E8]"
              />
  
              <GoalList
@@ -350,7 +350,7 @@ const EditorDrawer = ({
        </div>
  
        <div
-         className="absolute top-1/2 -right-3 z-0 hidden h-12 w-3 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-r-md border border-l-0 border-slate-200 bg-white text-slate-400 shadow-sm hover:text-slate-600 dark:border-white/8 dark:bg-[#0d1626] lg:flex"
+         className="absolute top-1/2 -right-3 z-0 hidden h-12 w-3 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-r-md border border-l-0 border-slate-200 bg-white text-slate-400 shadow-sm hover:text-slate-600 dark:border-white/8 dark:bg-[#0d3a5f] lg:flex"
          onClick={closeDrawer}
          title={t("vision_board.close_panel")}
        >

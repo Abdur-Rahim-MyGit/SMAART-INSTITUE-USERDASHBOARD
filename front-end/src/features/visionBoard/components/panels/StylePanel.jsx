@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Grid3X3, ImageIcon, PaintBucket, Square } from "lucide-react";
+import { Grid3X3, ImageIcon, PaintBucket, Square } from "@/components/icons";
 import {
   BACKGROUND_COLORS,
   BORDER_RADIUS_PRESETS,
@@ -29,7 +29,7 @@ const StylePanel = ({
     <div className="space-y-4">
       {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">
             <PaintBucket className="h-5 w-5" />
           </div>
           <div>
@@ -94,7 +94,7 @@ const StylePanel = ({
           <label className="text-sm font-semibold text-slate-900 dark:text-white">
             Corner Radius
           </label>
-          <span className="ml-auto text-xs font-medium text-[#1a3884] dark:text-[#9cb9ff]">
+          <span className="ml-auto text-xs font-medium text-[#045C9A] dark:text-[#A6D7E8]">
             {borderRadius === 9999 ? "Full" : `${borderRadius}px`}
           </span>
         </div>
@@ -107,7 +107,7 @@ const StylePanel = ({
                 key={preset.value}
                 onClick={() => setBorderRadius(preset.value)}
                 className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${active
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                    ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] shadow-sm"
                     : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
                   }`}
               >
@@ -129,7 +129,7 @@ const StylePanel = ({
           <label className="text-sm font-semibold text-slate-900 dark:text-white">
             Slot Spacing
           </label>
-          <span className="ml-auto text-xs font-medium text-[#1a3884] dark:text-[#9cb9ff]">
+          <span className="ml-auto text-xs font-medium text-[#045C9A] dark:text-[#A6D7E8]">
             {gap}px
           </span>
         </div>
@@ -142,7 +142,7 @@ const StylePanel = ({
                 key={preset.value}
                 onClick={() => setGap(preset.value)}
                 className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${active
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                    ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] shadow-sm"
                     : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
                   }`}
               >
@@ -210,7 +210,7 @@ const StylePanel = ({
         ) : (
           <button
             onClick={() => backgroundInputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center transition hover:border-[#1a3884]/35 hover:bg-[#1a3884]/[0.04] dark:border-white/15 dark:bg-white/[0.03] dark:hover:border-[#7aa2ff]/25 dark:hover:bg-[#7aa2ff]/[0.05]"
+            className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center transition hover:border-[#045C9A]/35 hover:bg-[#045C9A]/[0.04] dark:border-white/15 dark:bg-white/[0.03] dark:hover:border-[#A6D7E8]/25 dark:hover:bg-[#A6D7E8]/[0.05]"
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm dark:bg-white/10">
               <ImageIcon className="h-5 w-5 text-slate-500 dark:text-white/55" />

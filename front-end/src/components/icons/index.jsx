@@ -15,10 +15,13 @@ import MaterialIcon from "./MaterialIcon";
 export const ICON_NAMES = Object.freeze([
   "account_balance",
   "add",
+  "add_photo_alternate",
+  "add_reaction",
   "ads_click",
   "analytics",
   "apartment",
   "arrow_back",
+  "arrow_downward",
   "arrow_forward",
   "arrow_upward",
   "article",
@@ -33,6 +36,7 @@ export const ICON_NAMES = Object.freeze([
   "campaign",
   "cancel",
   "card_membership",
+  "center_focus_strong",
   "check",
   "check_circle",
   "checklist",
@@ -49,6 +53,7 @@ export const ICON_NAMES = Object.freeze([
   "credit_card",
   "dangerous",
   "dark_mode",
+  "dashboard_customize",
   "database",
   "delete",
   "description",
@@ -65,20 +70,27 @@ export const ICON_NAMES = Object.freeze([
   "fit_screen",
   "flag",
   "flight",
+  "format_align_center",
+  "format_align_justify",
   "format_align_left",
+  "format_align_right",
+  "format_color_fill",
   "fullscreen",
   "fullscreen_exit",
   "gavel",
   "genetics",
   "gpp_maybe",
+  "grid_view",
   "groups",
   "handshake",
   "handyman",
   "help",
   "home_pin",
+  "horizontal_distribute",
   "how_to_reg",
   "hub",
   "id_card",
+  "image",
   "info",
   "inventory_2",
   "keyboard_arrow_down",
@@ -105,15 +117,20 @@ export const ICON_NAMES = Object.freeze([
   "mic",
   "military_tech",
   "monitor_heart",
+  "more_vert",
   "music_note",
   "my_location",
   "navigation",
   "neurology",
   "notifications",
+  "open_in_full",
   "open_in_new",
+  "open_with",
+  "palette",
   "pause",
   "person",
   "photo_camera",
+  "photo_library",
   "picture_in_picture_alt",
   "play_arrow",
   "play_circle",
@@ -123,10 +140,13 @@ export const ICON_NAMES = Object.freeze([
   "push_pin",
   "qr_code_2",
   "record_voice_over",
+  "rectangle",
   "redeem",
+  "redo",
   "refresh",
   "restart_alt",
   "rocket_launch",
+  "rotate_right",
   "save",
   "schedule",
   "school",
@@ -134,24 +154,33 @@ export const ICON_NAMES = Object.freeze([
   "security",
   "send",
   "settings",
+  "shapes",
   "share",
   "shield",
   "shopping_cart",
   "smart_display",
   "smart_toy",
+  "smartphone",
   "space_dashboard",
+  "square",
   "star",
   "sticky_note_2",
   "support_agent",
   "target",
   "terminal",
+  "text_fields",
   "timer",
   "transgender",
   "trending_up",
   "trophy",
+  "tune",
+  "undo",
   "upload",
   "verified_user",
+  "vertical_distribute",
+  "view_list",
   "visibility",
+  "visibility_off",
   "volume_off",
   "volume_up",
   "wand_stars",
@@ -379,3 +408,39 @@ export const XCircle = /*#__PURE__*/ icon("XCircle", "cancel");
 export const Zap = /*#__PURE__*/ icon("Zap", "bolt");
 export const ZoomIn = /*#__PURE__*/ icon("ZoomIn", "zoom_in");
 export const ZoomOut = /*#__PURE__*/ icon("ZoomOut", "zoom_out");
+
+// --- vision board editor / gallery (previously lucide-react) ---
+export const AlignCenter = /*#__PURE__*/ icon("AlignCenter", "format_align_center");
+export const AlignRight = /*#__PURE__*/ icon("AlignRight", "format_align_right");
+export const AlignJustify = /*#__PURE__*/ icon("AlignJustify", "format_align_justify");
+export const AlignHorizontalSpaceAround = /*#__PURE__*/ icon("AlignHorizontalSpaceAround", "horizontal_distribute");
+export const AlignVerticalSpaceAround = /*#__PURE__*/ icon("AlignVerticalSpaceAround", "vertical_distribute");
+export const ArrowDown = /*#__PURE__*/ icon("ArrowDown", "arrow_downward");
+export const ArrowLeft = /*#__PURE__*/ icon("ArrowLeft", "arrow_back");
+export const ArrowUp = /*#__PURE__*/ icon("ArrowUp", "arrow_upward");
+export const Edit = /*#__PURE__*/ icon("Edit", "edit");
+export const Expand = /*#__PURE__*/ icon("Expand", "open_in_full");
+export const EyeOff = /*#__PURE__*/ icon("EyeOff", "visibility_off");
+export const Grid3X3 = /*#__PURE__*/ icon("Grid3X3", "grid_view");
+export const ImageIcon = /*#__PURE__*/ icon("ImageIcon", "image");
+export const ImagePlus = /*#__PURE__*/ icon("ImagePlus", "add_photo_alternate");
+export const Images = /*#__PURE__*/ icon("Images", "photo_library");
+export const LayoutGrid = /*#__PURE__*/ icon("LayoutGrid", "grid_view");
+export const LayoutTemplate = /*#__PURE__*/ icon("LayoutTemplate", "dashboard_customize");
+export const Layers3 = /*#__PURE__*/ icon("Layers3", "layers");
+export const List = /*#__PURE__*/ icon("List", "view_list");
+export const MoreVertical = /*#__PURE__*/ icon("MoreVertical", "more_vert");
+export const Move = /*#__PURE__*/ icon("Move", "open_with");
+export const PaintBucket = /*#__PURE__*/ icon("PaintBucket", "format_color_fill");
+export const Palette = /*#__PURE__*/ icon("Palette", "palette");
+export const RectangleHorizontal = /*#__PURE__*/ icon("RectangleHorizontal", "rectangle");
+export const Redo2 = /*#__PURE__*/ icon("Redo2", "redo");
+export const RotateCw = /*#__PURE__*/ icon("RotateCw", "rotate_right");
+export const ScanLine = /*#__PURE__*/ icon("ScanLine", "center_focus_strong");
+export const Settings2 = /*#__PURE__*/ icon("Settings2", "tune");
+export const Shapes = /*#__PURE__*/ icon("Shapes", "shapes");
+export const Smartphone = /*#__PURE__*/ icon("Smartphone", "smartphone");
+export const Square = /*#__PURE__*/ icon("Square", "square");
+export const Sticker = /*#__PURE__*/ icon("Sticker", "add_reaction");
+export const Type = /*#__PURE__*/ icon("Type", "text_fields");
+export const Undo2 = /*#__PURE__*/ icon("Undo2", "undo");

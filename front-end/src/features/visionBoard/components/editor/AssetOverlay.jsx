@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Move, RotateCw, Trash2 } from "lucide-react";
+import { Move, RotateCw, Trash2 } from "@/components/icons";
 
 const AssetOverlay = ({
   asset,
@@ -198,7 +198,7 @@ const AssetOverlay = ({
       <div
         className={`relative h-full w-full transition-all ${
           isSelected
-            ? "ring-2 ring-[#1a3884] ring-offset-2 ring-offset-white dark:ring-[#7aa2ff] dark:ring-offset-[#0f172a]"
+            ? "ring-2 ring-[#045C9A] ring-offset-2 ring-offset-white dark:ring-[#A6D7E8] dark:ring-offset-[#072036]"
             : ""
         }`}
       >
@@ -206,13 +206,13 @@ const AssetOverlay = ({
 
         {isSelected && (
           <>
-            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-[#00152E]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
+            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-[#072036]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
               <Move className="h-3 w-3" />
               {asset.locked ? "Locked Asset" : "Drag Asset"}
             </div>
             <button
               type="button"
-              className="absolute -bottom-3 -right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-[#1a3884] text-white shadow-xl transition-all hover:scale-110 active:scale-95"
+              className="absolute -bottom-3 -right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-[#045C9A] text-white shadow-xl transition-all hover:scale-110 active:scale-95"
               onMouseDown={handleTransformStart}
               onTouchStart={handleTransformStart}
               title="Resize and rotate"

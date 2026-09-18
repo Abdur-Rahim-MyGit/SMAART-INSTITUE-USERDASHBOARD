@@ -9,7 +9,7 @@ import {
   Smartphone,
   Sparkles,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { EXPORT_RESOLUTIONS } from "../../templates/gridTemplates";
 
@@ -299,12 +299,12 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                 </div>
               ) : (
                 <div className="flex h-64 items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#1a3884]" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#045C9A]" />
                 </div>
               )}
             </div>
 
-            <div className="custom-scrollbar min-h-0 overflow-y-auto border-t border-slate-200 bg-slate-50/90 p-4 dark:border-white/10 dark:bg-[#081120] lg:border-l lg:border-t-0">
+            <div className="custom-scrollbar min-h-0 overflow-y-auto border-t border-slate-200 bg-slate-50/90 p-4 dark:border-white/10 dark:bg-[#072036] lg:border-l lg:border-t-0">
               <div className="space-y-4">
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -324,7 +324,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                           onClick={() => setSelectedResolution(preset.id)}
                           className={`rounded-2xl border px-3 py-3 text-left transition ${
                             active
-                              ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08]"
+                              ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08]"
                               : "border-slate-200 bg-slate-50 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.03]"
                           }`}
                         >
@@ -363,7 +363,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                             onClick={() => setExportFormat(format)}
                             className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${
                               exportFormat === format
-                                ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] dark:text-[#9cb9ff]"
+                                ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] text-[#045C9A] dark:text-[#A6D7E8]"
                                 : "border-slate-200 bg-slate-50 text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55"
                             }`}
                           >
@@ -387,7 +387,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                             onClick={() => setQualityMode(option.id)}
                             className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${
                               qualityMode === option.id
-                                ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] dark:text-[#9cb9ff]"
+                                ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] text-[#045C9A] dark:text-[#A6D7E8]"
                                 : "border-slate-200 bg-slate-50 text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55"
                             }`}
                           >
@@ -410,7 +410,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                         type="button"
                         onClick={() => setIncludeWatermark(!includeWatermark)}
                         className={`relative h-7 w-12 rounded-full transition ${
-                          includeWatermark ? "bg-[#1a3884]" : "bg-slate-300 dark:bg-white/15"
+                          includeWatermark ? "bg-[#045C9A]" : "bg-slate-300 dark:bg-white/15"
                         }`}
                       >
                         <span
@@ -444,7 +444,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                   <Button
                     onClick={handleDownload}
                     disabled={isExporting}
-                    className="mt-4 h-11 w-full rounded-xl bg-[#1a3884] font-semibold text-white hover:bg-[#132c6b]"
+                    className="mt-4 h-11 w-full rounded-xl bg-[#045C9A] font-semibold text-white hover:bg-[#034a7d]"
                   >
                     {isExporting ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

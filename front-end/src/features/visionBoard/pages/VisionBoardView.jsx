@@ -1,19 +1,54 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import {
-  ChevronLeft,
-  Download,
-  Edit,
-  Loader2,
-  Calendar,
-  Clock,
-  ArrowLeft,
-} from "lucide-react";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
+import { ChevronLeft, Download, Edit, Loader2, Calendar, Clock, ArrowLeft } from "@/components/icons";
 import { getVisionBoard } from "../services/visionBoardProApi";
+
+const SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const CHIP_BRAND =
+  "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]";
+const BTN_PRIMARY =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#072036] text-xs font-bold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white";
+const BTN_GHOST =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-xs font-bold text-slate-600 transition-colors hover:border-[#045C9A]/30 hover:bg-[#EAF7FD] hover:text-[#045C9A] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white";
+const EASE = [0.25, 0.1, 0.25, 1];
+
+const useDarkTheme = () => {
+  const [isDark, setIsDark] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+};
+
+const Shell = ({ isDark, children }) => (
+  <PageTransition>
+    <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+        <NeuralBackground theme={isDark ? "dark" : "light"} />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+        <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+      </div>
+      <main className="relative z-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">{children}</div>
+      </main>
+    </div>
+  </PageTransition>
+);
 
 const VisionBoardView = () => {
   const navigate = useNavigate();
@@ -21,115 +56,90 @@ const VisionBoardView = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const canvasRef = useRef(null);
+  const isDark = useDarkTheme();
 
   const [board, setBoard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // Derive canvas dimensions from board data
   // The Pro editor saves canvasSettings at the top level, NOT under boardData
   const canvasSettings = useMemo(() => board?.canvasSettings || board?.boardData || {}, [board]);
   const canvasWidth = canvasSettings.width || canvasSettings.canvasWidth || 1200;
   const canvasHeight = canvasSettings.height || canvasSettings.canvasHeight || 800;
 
   useEffect(() => {
-    loadBoard();
+    let cancelled = false;
+    (async () => {
+      try {
+        setIsLoading(true);
+        const result = await getVisionBoard(id);
+        if (!cancelled) setBoard(result.data);
+      } catch (error) {
+        if (cancelled) return;
+        toast({ title: "Error", description: "Failed to load vision board", variant: "destructive" });
+        navigate("/dashboard/vision-boards");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  // Keep the canvas scaled to the viewport on mobile to avoid horizontal scroll
+  // Keep a legacy element-canvas scaled to the viewport so it never overflows
   useEffect(() => {
     const computeScale = () => {
       if (!board) return;
-      const viewportWidth = typeof window !== "undefined" ? window.innerWidth : canvasWidth;
-      const viewportHeight = typeof window !== "undefined" ? window.innerHeight : canvasHeight;
-      const maxWidth = Math.max(240, viewportWidth - 32);
-      const maxHeight = Math.max(240, viewportHeight - 220);
-      const nextScale = Math.min(1, maxWidth / canvasWidth, maxHeight / canvasHeight);
-      setScale(nextScale > 0 ? nextScale : 1);
+      const maxWidth = Math.max(240, window.innerWidth - 32);
+      const maxHeight = Math.max(240, window.innerHeight - 220);
+      const next = Math.min(1, maxWidth / canvasWidth, maxHeight / canvasHeight);
+      setScale(next > 0 ? next : 1);
     };
-
     computeScale();
     window.addEventListener("resize", computeScale);
     return () => window.removeEventListener("resize", computeScale);
   }, [board, canvasWidth, canvasHeight]);
 
-  const loadBoard = async () => {
-    try {
-      setIsLoading(true);
-      const result = await getVisionBoard(id);
-      setBoard(result.data);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load vision board",
-        variant: "destructive",
-      });
-      navigate("/vision-board-pro/gallery");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleDownload = async () => {
     if (!canvasRef.current) return;
-
     try {
       setIsDownloading(true);
-
       const canvas = await html2canvas(canvasRef.current, {
         backgroundColor: board.boardData?.background?.value || "#ffffff",
-        scale: 2, // High quality
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
       });
-
-      // Create download link
       const link = document.createElement("a");
       link.download = `${board.title || "vision-board"}.png`;
       link.href = canvas.toDataURL("image/png", 1.0);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      toast({
-        title: "Downloaded!",
-        description: "Vision board saved as PNG",
-      });
+      toast({ title: "Downloaded!", description: "Vision board saved as PNG" });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to download",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to download", variant: "destructive" });
     } finally {
       setIsDownloading(false);
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "Unknown date";
     const d = new Date(dateString);
-    if (isNaN(d.getTime())) return "Unknown date";
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    if (!dateString || isNaN(d.getTime())) return null;
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   };
 
   const formatTime = (dateString) => {
-    if (!dateString) return "";
     const d = new Date(dateString);
-    if (isNaN(d.getTime())) return "";
-    return d.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    if (!dateString || isNaN(d.getTime())) return null;
+    return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   };
 
-  // Render element (read-only)
+  // Legacy element-based boards (pre-collage)
   const renderElement = (element) => {
     const style = {
       position: "absolute",
@@ -145,12 +155,7 @@ const VisionBoardView = () => {
       case "image":
         return (
           <div key={element.id} style={style}>
-            <img
-              src={element.src}
-              alt="Vision board element"
-              className="w-full h-full object-cover rounded"
-              draggable={false}
-            />
+            <img src={element.src} alt="" className="h-full w-full rounded object-cover" draggable={false} />
           </div>
         );
       case "text":
@@ -178,19 +183,10 @@ const VisionBoardView = () => {
         );
       case "shape":
         return (
-          <div
-            key={element.id}
-            style={style}
-            className={element.shape === "circle" ? "rounded-full" : "rounded"}
-          >
+          <div key={element.id} style={style} className={element.shape === "circle" ? "rounded-full" : "rounded"}>
             <div
-              className={`w-full h-full ${
-                element.shape === "circle" ? "rounded-full" : "rounded"
-              }`}
-              style={{
-                backgroundColor: element.color || "#14B8A6",
-                opacity: element.opacity || 1,
-              }}
+              className={`h-full w-full ${element.shape === "circle" ? "rounded-full" : "rounded"}`}
+              style={{ backgroundColor: element.color || "#14B8A6", opacity: element.opacity || 1 }}
             />
           </div>
         );
@@ -201,138 +197,138 @@ const VisionBoardView = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb] dark:bg-[#06101d]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1a3884]" />
-      </div>
+      <Shell isDark={isDark}>
+        <div className="flex flex-col items-center justify-center gap-3 py-32">
+          <Loader2 className="h-9 w-9 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
+          <p className="text-sm font-medium text-[#35566b] dark:text-slate-400">{t("vision_board.loading_boards")}</p>
+        </div>
+      </Shell>
     );
   }
 
   if (!board) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb] dark:bg-[#06101d]">
-        <p className="text-gray-500">Vision board not found</p>
-      </div>
-    );
-  }
-
-  // Pro editor saves a pre-rendered collageImage; legacy editor saves elements array
-  const collageImage = board.collageImage || null;
-  const elements = board.boardData?.elements || [];
-  const bgColor = canvasSettings.backgroundColor || board.boardData?.background?.value || "#ffffff";
-  const bgImage = canvasSettings.backgroundImage || (board.boardData?.background?.type === "image" ? board.boardData.background.value : null);
-
-  const scaledWidth = canvasWidth * scale;
-  const scaledHeight = canvasHeight * scale;
-
-  return (
-    <div className="min-h-screen bg-[#f4f7fb] dark:bg-[#06101d]">
-      <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
-        {/* Back Button - Mobile Only */}
-        <div className="mb-4 md:hidden">
-          <button
-            onClick={() => navigate("/vision-board-pro/gallery")}
-            className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-              <ArrowLeft className="h-4 w-4" />
-            </div>
+      <Shell isDark={isDark}>
+        <div className={`flex flex-col items-center justify-center rounded-2xl px-6 py-24 text-center ${SURFACE}`}>
+          <h2 className="text-lg font-extrabold tracking-tight text-[#072036] dark:text-white">
+            {t("vision_board.not_found", "Vision board not found")}
+          </h2>
+          <button type="button" onClick={() => navigate("/dashboard/vision-boards")} className={`${BTN_GHOST} mt-5 h-9 px-4`}>
+            <ChevronLeft className="h-4 w-4" />
             {t("vision_board.back_to_gallery", "Back to Gallery")}
           </button>
         </div>
+      </Shell>
+    );
+  }
 
-        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
-          <div className="border-b border-slate-200 px-4 py-4 dark:border-white/8 sm:px-6">
-            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/vision-board-pro/gallery")}
-                className="hidden sm:inline-flex rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#002A5C] dark:hover:text-white"
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Back to Gallery
-              </Button>
-              <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-[#003170]" />
-              <div>
-                <div className="mb-2 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300">
-                  Presentation View
-                </div>
-                <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                  {board.title}
-                </h1>
-                <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(board.createdAt)}
-                  </span>
-                  {formatTime(board.createdAt) && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {formatTime(board.createdAt)}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
-              >
-                {isDownloading ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Download className="w-4 h-4 mr-2" />
-                )}
-                Download PNG
-              </Button>
-              <Button
-                onClick={() =>
-                  navigate(`/vision-board-pro/create`, {
-                    state: {
-                      isEditing: true,
-                      boardId: id,
-                    },
-                  })
-                }
-                className="rounded-xl bg-[#1a3884] text-white hover:bg-[#132c6b]"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </div>
+  const collageImage = board.collageImage || null;
+  const elements = board.boardData?.elements || [];
+  const bgColor = canvasSettings.backgroundColor || board.boardData?.background?.value || "#ffffff";
+  const bgImage =
+    canvasSettings.backgroundImage ||
+    (board.boardData?.background?.type === "image" ? board.boardData.background.value : null);
+  const createdDate = formatDate(board.createdAt);
+  const createdTime = formatTime(board.createdAt);
+
+  return (
+    <Shell isDark={isDark}>
+      {/* Back button -- mobile only */}
+      <div className="flex items-center sm:hidden">
+        <button type="button" onClick={() => navigate("/dashboard/vision-boards")} className="group flex w-fit items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:group-hover:border-[#045C9A]/40">
+            <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
           </div>
-          {board.description && (
-            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{board.description}</p>
-          )}
-        </div>
+          <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+            {t("vision_board.back_to_gallery", "Back to Gallery")}
+          </span>
+        </button>
+      </div>
 
-        <div className="bg-[radial-gradient(circle_at_top,#f8fafc_0%,#edf2f8_100%)] p-4 sm:p-6 dark:bg-[radial-gradient(circle_at_top,#12213b_0%,#07101d_100%)]">
-          <div className="flex justify-center overflow-auto rounded-[24px] border border-slate-200/80 bg-white/45 p-4 backdrop-blur dark:border-white/10 dark:bg-slate-950/20 sm:p-6">
+      {/* Page hero */}
+      <motion.section
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className={`relative w-full overflow-hidden rounded-2xl ${SURFACE}`}
+      >
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+        <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 max-w-2xl">
+            <span className={`mb-2 inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${CHIP_BRAND}`}>
+              {t("vision_board.presentation_view", "Presentation view")}
+            </span>
+            <h1
+              className="truncate text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+              style={{ letterSpacing: "-0.02em" }}
+              title={board.title}
+            >
+              {board.title}
+            </h1>
+            {board.description && (
+              <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">{board.description}</p>
+            )}
+            {(createdDate || createdTime) && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                {createdDate && (
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {createdDate}
+                  </span>
+                )}
+                {createdTime && (
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    {createdTime}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <button type="button" onClick={() => navigate("/dashboard/vision-boards")} className={`${BTN_GHOST} hidden h-9 px-4 sm:inline-flex`}>
+              <ChevronLeft className="h-4 w-4" />
+              {t("vision_board.back_to_gallery", "Back to Gallery")}
+            </button>
+            <button type="button" onClick={handleDownload} disabled={isDownloading} className={`${BTN_GHOST} h-9 px-4`}>
+              {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              {t("vision_board.download_png", "Download PNG")}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/vision-board-pro/create", { state: { isEditing: true, boardId: id } })}
+              className={`${BTN_PRIMARY} h-9 px-4`}
+            >
+              <Edit className="h-4 w-4" />
+              {t("vision_board.edit")}
+            </button>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Stage */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE, delay: 0.08 }}
+        className={`overflow-hidden rounded-2xl ${SURFACE}`}
+      >
+        <div className="bg-[#F1F5F9] p-4 dark:bg-[#072036]/60 sm:p-6">
+          <div className="flex min-h-[240px] items-center justify-center overflow-auto">
             {collageImage ? (
               <div
                 ref={canvasRef}
-                className="relative overflow-hidden rounded-[24px] border border-white/80 shadow-[0_30px_70px_rgba(15,23,42,0.18)] dark:border-white/10"
-                style={{ maxWidth: '100%', maxHeight: '75vh' }}
+                className="overflow-hidden rounded-xl border border-white/80 shadow-[0_24px_60px_-20px_rgba(7,32,54,0.35)] dark:border-white/10"
+                style={{ maxWidth: "100%", maxHeight: "75vh" }}
               >
-                <img
-                  src={collageImage}
-                  alt={board.title}
-                  className="h-full w-full rounded-[24px] object-contain"
-                  style={{ maxHeight: '75vh' }}
-                />
+                <img src={collageImage} alt={board.title} className="h-full w-full object-contain" style={{ maxHeight: "75vh" }} />
               </div>
             ) : (
-              <div
-                className="relative"
-                style={{ width: scaledWidth, height: scaledHeight, overflow: "hidden" }}
-              >
+              <div className="relative" style={{ width: canvasWidth * scale, height: canvasHeight * scale, overflow: "hidden" }}>
                 <div
                   ref={canvasRef}
-                  className="relative overflow-hidden rounded-[24px] border border-white/80 shadow-[0_30px_70px_rgba(15,23,42,0.18)] dark:border-white/10"
+                  className="relative overflow-hidden rounded-xl border border-white/80 shadow-[0_24px_60px_-20px_rgba(7,32,54,0.35)] dark:border-white/10"
                   style={{
                     width: canvasWidth,
                     height: canvasHeight,
@@ -345,10 +341,9 @@ const VisionBoardView = () => {
                   }}
                 >
                   {elements.map(renderElement)}
-
                   {elements.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                      <p>This vision board is empty</p>
+                    <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400">
+                      {t("vision_board.board_empty", "This vision board is empty")}
                     </div>
                   )}
                 </div>
@@ -356,16 +351,12 @@ const VisionBoardView = () => {
             )}
           </div>
         </div>
-
-        <div className="border-t border-slate-200 px-6 py-4 text-sm text-slate-500 dark:border-white/8 dark:text-slate-400">
-          Designed in Vision Board Studio
+        <div className="border-t border-[#d7ebf5] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:border-white/10 dark:text-slate-500">
+          {t("vision_board.designed_in", "Designed in Vision Board Studio")}
         </div>
-      </div>
-    </div>
-    </div>
+      </motion.section>
+    </Shell>
   );
 };
 
 export default VisionBoardView;
-
-

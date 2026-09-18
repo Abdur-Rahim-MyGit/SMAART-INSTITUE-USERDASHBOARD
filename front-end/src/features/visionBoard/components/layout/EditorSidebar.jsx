@@ -8,11 +8,11 @@ import {
   Settings2,
   Target,
   Layers3,
-} from "lucide-react";
+} from "@/components/icons";
 
 // ─── Brand tokens (match tailwind.config.ts + index.css globals) ────────────
-// Light  → sidebar bg : #ffffff  |  active fill : #1a3884  |  idle icon : #64748b
-// Dark   → sidebar bg : #002147  |  active fill : #1a3884  |  idle icon : #94a3b8
+// Light  → sidebar bg : #ffffff  |  active fill : #045C9A  |  idle icon : #64748b
+// Dark   → sidebar bg : #072036  |  active fill : #045C9A  |  idle icon : #94a3b8
 
 const EditorSidebar = ({ activePanel, setActivePanel }) => {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
        Mobile  : fixed bottom bar  (h-[68px], horizontal scroll)
        Desktop : left column       (w-[80px], vertical stack)
        Light   : bg-white  border-slate-200
-       Dark    : bg-[#002147] border-[#1a3884]/40   ← global navy theme  */
+       Dark    : bg-[#072036] border-[#045C9A]/40   ← global navy theme  */
     <div
       className={[
         // mobile base
@@ -47,8 +47,8 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
         "border-t border-slate-200 bg-white",
         "lg:border-r lg:border-t-0 lg:border-slate-200",
         // dark mode colours — fill with global navy
-        "dark:border-[#1a3884]/40 dark:bg-[#00152E]",
-        "lg:dark:border-[#1a3884]/40 lg:dark:bg-[#00152E]",
+        "dark:border-[#045C9A]/40 dark:bg-[#0d3a5f]",
+        "lg:dark:border-[#045C9A]/40 lg:dark:bg-[#0d3a5f]",
       ].join(" ")}
     >
       {tabs.map((tab) => {
@@ -72,26 +72,26 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
               isActive
                 ? [
                   // light — primary blue fill, white text
-                  "text-[#1a3884]",
-                  "lg:bg-[#1a3884] lg:text-white lg:shadow-[0_10px_20px_-5px_rgba(26,56,132,0.3)]",
+                  "text-[#045C9A]",
+                  "lg:bg-[#045C9A] lg:text-white lg:shadow-[0_10px_20px_-5px_rgba(4,92,154,0.3)]",
                   // dark  — primary blue fill, white text (same pill colour)
                   "dark:text-white",
-                  "lg:dark:bg-[#1a3884] lg:dark:text-white lg:dark:shadow-[0_10px_25px_-5px_rgba(26,56,132,0.5)]",
+                  "lg:dark:bg-[#045C9A] lg:dark:text-white lg:dark:shadow-[0_10px_25px_-5px_rgba(4,92,154,0.5)]",
                 ].join(" ")
                 // ── idle state ────────────────────────────────────────────
                 : [
                   // light
                   "text-slate-400 lg:text-slate-500",
-                  "lg:hover:bg-slate-100 lg:hover:text-[#1a3884]",
-                  // dark — slate-300 so labels are readable on #002147
+                  "lg:hover:bg-slate-100 lg:hover:text-[#045C9A]",
+                  // dark — slate-300 so labels are readable on #072036
                   "dark:text-slate-300",
-                  "lg:dark:hover:bg-[#1a3884]/20 lg:dark:hover:text-white",
+                  "lg:dark:hover:bg-[#045C9A]/20 lg:dark:hover:text-white",
                 ].join(" "),
             ].join(" ")}
           >
             {/* ── Mobile active indicator (top bar) ─────────────────────── */}
             {isActive && (
-              <span className="absolute left-4 right-4 top-0 h-[3px] rounded-b bg-[#1a3884] dark:bg-blue-400 lg:hidden" />
+              <span className="absolute left-4 right-4 top-0 h-[3px] rounded-b bg-[#045C9A] dark:bg-[#A6D7E8] lg:hidden" />
             )}
 
             {/* ── Icon ──────────────────────────────────────────────────── */}
@@ -100,9 +100,9 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
                 "rounded-lg p-1.5 transition-all duration-200",
                 isActive
                   ? // active: icon sits on the filled pill directly
-                  "text-[#1a3884] lg:text-white lg:dark:text-white"
+                  "text-[#045C9A] lg:text-white lg:dark:text-white"
                   : // idle: inherit button colour
-                  "lg:group-hover:text-[#1a3884] dark:lg:group-hover:text-white",
+                  "lg:group-hover:text-[#045C9A] dark:lg:group-hover:text-white",
               ].join(" ")}
             >
               <tab.icon
@@ -116,8 +116,8 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
               className={[
                 "text-[8px] font-semibold tracking-wide lg:text-[9.5px]",
                 isActive
-                  ? "text-[#1a3884] lg:text-white dark:text-white"
-                  : "text-slate-400 dark:text-slate-300 group-hover:text-[#1a3884] dark:group-hover:text-white",
+                  ? "text-[#045C9A] lg:text-white dark:text-white"
+                  : "text-slate-400 dark:text-slate-300 group-hover:text-[#045C9A] dark:group-hover:text-white",
               ].join(" ")}
             >
               {tab.label}

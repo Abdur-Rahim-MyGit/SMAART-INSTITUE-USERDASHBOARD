@@ -2,19 +2,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import {
   Plus,
   Trash2,
   Copy,
   Eye,
   EyeOff,
-  Star,
   Loader2,
   Images,
-  Calendar,
   Search,
   Grid3X3,
   List,
@@ -23,11 +21,9 @@ import {
   X,
   CheckCircle2,
   ArrowRight,
-  Edit,
-  Sparkles,
   ArrowLeft,
-} from "lucide-react";
-import PageHero from "@/components/ui/PageHero";
+  Edit,
+} from "@/components/icons";
 import {
   getAllVisionBoards,
   deleteVisionBoard,
@@ -37,130 +33,185 @@ import {
   getActiveVision,
   resetUserIdCache,
 } from "../services/visionBoardProApi";
-import { GRID_TEMPLATES } from "../templates/gridTemplates";
-import { moderateTextAsync, loadToxicityModel, moderateText } from "../utils/contentModeration";
+import { loadToxicityModel, moderateText } from "../utils/contentModeration";
+
+// Same tokens as CourseStructure / AssessmentsDashboard so the gallery reads
+// as one product with the rest of the dashboard.
+const SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const MODAL_SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5] dark:border-[#045C9A]/30 shadow-2xl";
+const PANEL =
+  "bg-[#F1F5F9] dark:bg-[#072036]/60 border border-[#d7ebf5] dark:border-white/10";
+const CHIP_BRAND =
+  "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]";
+const BTN_PRIMARY =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#072036] text-xs font-bold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white";
+const BTN_BRAND =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#045C9A] text-xs font-bold text-white transition-colors hover:bg-[#034a7d] disabled:cursor-not-allowed disabled:opacity-60";
+const BTN_GHOST =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-xs font-bold text-slate-600 transition-colors hover:border-[#045C9A]/30 hover:bg-[#EAF7FD] hover:text-[#045C9A] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white";
+const FIELD =
+  "w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-4 text-sm font-medium text-[#072036] outline-none transition-colors placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-[#072036]";
+const EASE = [0.25, 0.1, 0.25, 1];
+
+const formatDate = (dateString) =>
+  new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BOARD CARD COMPONENT
+// BOARD CARD
 // ═══════════════════════════════════════════════════════════════════════════
 
-const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsActive, onDeactivate, isCurrentVision, viewMode = "grid" }) => {
+const BoardCard = ({
+  board,
+  onDelete,
+  onDuplicate,
+  onEdit,
+  onPreview,
+  onSetAsActive,
+  onDeactivate,
+  isCurrentVision,
+  viewMode = "grid",
+}) => {
   const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [isSettingActive, setIsSettingActive] = useState(false);
+  const isList = viewMode === "list";
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const toggleActive = async (e) => {
+    e.stopPropagation();
+    setIsSettingActive(true);
+    try {
+      if (isCurrentVision) {
+        await onDeactivate(board);
+      } else {
+        await onSetAsActive(board);
+      }
+    } finally {
+      setIsSettingActive(false);
+    }
   };
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
-      className={`group relative overflow-hidden rounded-[24px] border bg-white transition-all duration-500 hover:-translate-y-1.5 dark:bg-[#00152E] ${viewMode === "list" ? "md:flex" : ""} ${isCurrentVision
-        ? "border-primary/30 shadow-[0_20px_50px_rgba(26,56,132,0.12)] ring-1 ring-primary/10"
-        : "border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 dark:border-white/8 dark:hover:border-slate-700 dark:hover:shadow-black/40"
-        }`}
+      transition={{ duration: 0.35, ease: EASE }}
+      className={`group relative flex overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${SURFACE} ${
+        isCurrentVision ? "ring-1 ring-[#045C9A]/40 dark:ring-[#A6D7E8]/30" : ""
+      } ${isList ? "flex-col md:flex-row" : "flex-col"}`}
     >
-      {isCurrentVision && (
-        <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/80 bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#081120]/90 dark:text-blue-300">
-          <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          {t("vision_board.active_vision")}
-        </div>
-      )}
-
-      <div className={`relative overflow-hidden bg-slate-100 dark:bg-[#002147] ${viewMode === "list" ? "md:w-[320px] md:flex-shrink-0" : "aspect-[4/5]"}`}>
+      {/* Artwork */}
+      <div
+        className={`relative overflow-hidden bg-[#F1F5F9] dark:bg-[#072036]/60 ${
+          isList ? "aspect-[4/3] md:aspect-auto md:min-h-[210px] md:w-[300px] md:shrink-0" : "aspect-[4/3]"
+        }`}
+      >
         {board.collageImage ? (
           <img
             src={board.collageImage}
             alt={board.title}
-            className={`h-full w-full transition-transform duration-500 group-hover:scale-[1.03] ${viewMode === "list" ? "object-cover md:min-h-[260px]" : "object-cover"}`}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-slate-300 dark:text-slate-700">
-            <Images className="h-14 w-14" />
+          <div className="flex h-full w-full items-center justify-center text-slate-300 dark:text-slate-600">
+            <Images className="h-12 w-12" />
           </div>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-transparent" />
-
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => onPreview(board)}
-              className="rounded-full bg-white px-5 font-semibold text-slate-900 shadow-lg hover:bg-slate-100"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              {t("vision_board.preview")}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onEdit(board)}
-              className="rounded-full border-white/60 bg-white/10 px-5 font-semibold text-white backdrop-blur hover:bg-white/20"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              {t("vision_board.edit")}
-            </Button>
+        {isCurrentVision && (
+          <div className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#045C9A] shadow-sm backdrop-blur dark:bg-[#072036]/90 dark:text-[#A6D7E8]">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
+            {t("vision_board.active_vision")}
           </div>
+        )}
+
+        {/* Hover actions (pointer devices) */}
+        <div className="pointer-events-none absolute inset-0 hidden items-center justify-center gap-2 bg-[#072036]/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:flex">
+          <button
+            type="button"
+            onClick={() => onPreview(board)}
+            className="pointer-events-auto inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-4 text-xs font-bold text-[#072036] shadow-lg transition-colors hover:bg-[#EAF7FD]"
+          >
+            <Eye className="h-4 w-4" />
+            {t("vision_board.preview")}
+          </button>
+          <button
+            type="button"
+            onClick={() => onEdit(board)}
+            className="pointer-events-auto inline-flex h-9 items-center gap-1.5 rounded-full border border-white/60 bg-white/15 px-4 text-xs font-bold text-white backdrop-blur transition-colors hover:bg-white/25"
+          >
+            <Edit className="h-4 w-4" />
+            {t("vision_board.edit")}
+          </button>
         </div>
 
-        <div className="absolute right-3 top-3 z-20 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        {/* Overflow menu -- always reachable on touch, hover-revealed on desktop */}
+        <div className="absolute right-3 top-3 z-20 opacity-100 transition-opacity duration-200 md:opacity-0 md:focus-within:opacity-100 md:group-hover:opacity-100">
           <div className="relative">
             <button
+              type="button"
+              aria-label={t("vision_board.more_actions", "More actions")}
+              aria-expanded={showMenu}
               onClick={(e) => {
                 e.stopPropagation();
-                setShowMenu(!showMenu);
+                setShowMenu((v) => !v);
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/92 text-slate-700 shadow-lg transition-colors hover:bg-slate-100 dark:border-white/10 dark:bg-[#081120]/90 dark:text-slate-200 dark:hover:bg-[#002A5C]"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#072036] shadow-sm backdrop-blur transition-colors hover:bg-white dark:bg-[#072036]/90 dark:text-white dark:hover:bg-[#072036]"
             >
-              <MoreVertical className="w-4 h-4" />
+              <MoreVertical className="h-4 w-4" />
             </button>
 
             {showMenu && (
               <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
                 <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowMenu(false)}
-                />
-                <div className="absolute right-0 top-full z-30 mt-2 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-white/10 dark:bg-[#002A5C]">
+                  role="menu"
+                  className={`absolute right-0 top-full z-30 mt-2 w-44 overflow-hidden rounded-xl py-1 ${MODAL_SURFACE}`}
+                >
                   <button
+                    type="button"
+                    role="menuitem"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDuplicate(board);
                       setShowMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-semibold text-[#16324a] transition-colors hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-200 dark:hover:bg-white/[0.06] dark:hover:text-white"
                   >
-                    <Copy className="w-3.5 h-3.5" /> {t("vision_board.duplicate")}
+                    <Copy className="h-4 w-4" /> {t("vision_board.duplicate")}
                   </button>
                   <button
+                    type="button"
+                    role="menuitem"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(board);
                       setShowMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-semibold text-[#16324a] transition-colors hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:text-slate-200 dark:hover:bg-white/[0.06] dark:hover:text-white"
                   >
-                    <Edit className="w-3.5 h-3.5" /> {t("vision_board.edit")}
+                    <Edit className="h-4 w-4" /> {t("vision_board.edit")}
                   </button>
-
+                  <div className="my-1 h-px bg-[#d7ebf5] dark:bg-white/10" />
                   <button
+                    type="button"
+                    role="menuitem"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(board);
                       setShowMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
                   >
-                    <Trash2 className="w-3.5 h-3.5" /> {t("vision_board.delete")}
+                    <Trash2 className="h-4 w-4" /> {t("vision_board.delete")}
                   </button>
                 </div>
               </>
@@ -169,68 +220,68 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
         </div>
       </div>
 
-      <div className="space-y-3.5 p-4 md:flex-1">
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${isCurrentVision
-              ? "border-[#1a3884]/20 bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-400"
-              : "border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700/50 dark:bg-slate-800/50 dark:text-slate-400"
-              }`}>
-              {isCurrentVision ? t("vision_board.current_focus") : t("vision_board.stored_vision")}
-            </span>
-            <p className="text-[10.5px] font-bold text-slate-400 dark:text-slate-500">
-              {formatDate(board.createdAt)}
-            </p>
-          </div>
-          <h3 className="truncate text-[16px] font-extrabold tracking-tight text-slate-900 dark:text-white" title={board.title}>
+      {/* Body */}
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex items-center justify-between gap-2">
+          <span
+            className={`inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${
+              isCurrentVision
+                ? CHIP_BRAND
+                : "bg-[#F1F5F9] text-[#35566b] dark:bg-white/[0.06] dark:text-slate-400"
+            }`}
+          >
+            {isCurrentVision ? t("vision_board.current_focus") : t("vision_board.stored_vision")}
+          </span>
+          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+            {formatDate(board.createdAt)}
+          </span>
+        </div>
+
+        <div className="min-w-0">
+          <h3
+            className="truncate text-[15px] font-extrabold tracking-tight text-[#072036] dark:text-white"
+            title={board.title}
+          >
             {board.title}
           </h3>
-          <p className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
+          <p className="mt-1 line-clamp-2 min-h-[2.4rem] text-[12.5px] leading-relaxed text-[#35566b] dark:text-slate-400">
             {board.description || t("vision_board.default_board_desc")}
           </p>
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
+        <div className="mt-auto flex gap-2 pt-1">
+          <button
+            type="button"
             onClick={() => onPreview(board)}
-            className="flex-1 rounded-lg border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
+            className={`${BTN_GHOST} h-9 flex-1`}
           >
+            <Eye className="h-4 w-4" />
             {t("vision_board.preview")}
-          </Button>
-          <Button
-            size="sm"
-            onClick={async (e) => {
-              e.stopPropagation();
-              setIsSettingActive(true);
-              if (isCurrentVision) {
-                await onDeactivate(board);
-              } else {
-                await onSetAsActive(board);
-              }
-              setIsSettingActive(false);
-            }}
+          </button>
+          <button
+            type="button"
+            onClick={toggleActive}
             disabled={isSettingActive}
-            className={`flex-1 rounded-lg font-bold tracking-wide transition-all ${isCurrentVision
-              ? "bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-200"
-              : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20"
-              }`}
+            className={`h-9 flex-1 ${
+              isCurrentVision
+                ? "inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 text-xs font-bold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+                : BTN_BRAND
+            }`}
           >
             {isSettingActive ? (
               <>
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 {t("vision_board.updating")}
               </>
             ) : isCurrentVision ? (
               <>
-                <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
+                <CheckCircle2 className="h-4 w-4" />
                 {t("vision_board.active")}
               </>
             ) : (
               t("vision_board.set_active")
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </motion.div>
@@ -238,79 +289,73 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DELETE CONFIRMATION MODAL
+// MODALS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
-  const { t } = useTranslation();
-  if (!isOpen) return null;
+const ModalShell = ({ onClose, children, className = "" }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/70 p-4 backdrop-blur-sm"
+    onClick={onClose}
+  >
+    <motion.div
+      initial={{ scale: 0.96, opacity: 0, y: 8 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.96, opacity: 0, y: 8 }}
+      transition={{ duration: 0.25, ease: EASE }}
+      role="dialog"
+      aria-modal="true"
+      className={`rounded-2xl ${MODAL_SURFACE} ${className}`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </motion.div>
+  </motion.div>
+);
 
+const DeleteModal = ({ board, onConfirm, onCancel, isDeleting }) => {
+  const { t } = useTranslation();
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-        onClick={onCancel}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-[#00152E] rounded-[24px] max-w-md w-full p-8 shadow-2xl border border-slate-100 dark:border-white/8"
-          onClick={(e) => e.stopPropagation()}
+    <ModalShell onClose={isDeleting ? undefined : onCancel} className="w-full max-w-md p-6 sm:p-7">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300">
+        <Trash2 className="h-6 w-6" />
+      </div>
+      <h3 className="text-center text-lg font-extrabold tracking-tight text-[#072036] dark:text-white">
+        {t("vision_board.delete_modal_title")}
+      </h3>
+      <p className="mt-2 text-center text-sm text-[#35566b] dark:text-slate-400">
+        {t("vision_board.delete_modal_desc", { title: board?.title })}
+      </p>
+      <div className="mt-6 flex gap-3">
+        <button type="button" onClick={onCancel} disabled={isDeleting} className={`${BTN_GHOST} h-10 flex-1`}>
+          {t("vision_board.cancel")}
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={isDeleting}
+          className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-rose-600 text-xs font-bold text-white transition-colors hover:bg-rose-700 disabled:opacity-60"
         >
-          <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
-            <Trash2 className="w-6 h-6 text-red-600" />
-          </div>
-          <h3 className="text-xl font-black text-center mb-2 text-slate-900 dark:text-white uppercase tracking-tight">
-            {t("vision_board.delete_modal_title")}
-          </h3>
-          <p className="text-center mb-6 text-gray-500">
-            {t("vision_board.delete_modal_desc", { title: board?.title })}
-          </p>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-50"
-              onClick={onCancel}
-              disabled={isDeleting}
-            >
-              {t("vision_board.cancel")}
-            </Button>
-            <Button
-              variant="destructive"
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-              onClick={onConfirm}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t("vision_board.deleting")}
-                </>
-              ) : (
-                t("vision_board.delete")
-              )}
-            </Button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          {isDeleting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {t("vision_board.deleting")}
+            </>
+          ) : (
+            t("vision_board.delete")
+          )}
+        </button>
+      </div>
+    </ModalShell>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// VIEW MODAL
-// ═══════════════════════════════════════════════════════════════════════════
-
-const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) => {
+const PreviewModal = ({ board, onClose, currentVisionId, onVisionChange }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-
-  if (!isOpen || !board) return null;
-
+  const [busy, setBusy] = useState(false);
   const isCurrentVision = currentVisionId === board._id;
 
   const handleDownload = () => {
@@ -323,138 +368,176 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
     document.body.removeChild(link);
   };
 
-  const handleSetAsVision = async () => {
+  const handleToggleVision = async () => {
+    setBusy(true);
     try {
-      await setActiveVision(board._id);
-      onVisionChange(board._id);
-
-      toast({
-        title: t("vision_board.toast_vision_enabled_title") || "Vision Enabled!",
-        description: t("vision_board.toast_vision_enabled_desc") || "Your vision board is now displayed on your dashboard.",
-      });
+      if (isCurrentVision) {
+        await clearActiveVision();
+        onVisionChange(null);
+        toast({
+          title: t("vision_board.toast_vision_disabled_title", "Vision Disabled"),
+          description: t("vision_board.toast_vision_disabled_desc", "Vision board removed from dashboard."),
+        });
+      } else {
+        await setActiveVision(board._id);
+        onVisionChange(board._id);
+        toast({
+          title: t("vision_board.toast_vision_enabled_title", "Vision Enabled!"),
+          description: t("vision_board.toast_vision_enabled_desc", "Your vision board is now displayed on your dashboard."),
+        });
+      }
       onClose();
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to set as vision",
+        description: error.message || "Failed to update vision",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleDisableVision = async () => {
-    try {
-      await clearActiveVision();
-      onVisionChange(null);
-
-      toast({
-        title: t("vision_board.toast_vision_disabled_title") || "Vision Disabled",
-        description: t("vision_board.toast_vision_disabled_desc") || "Vision board removed from dashboard.",
-      });
-      onClose();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to disable vision",
-        variant: "destructive",
-      });
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-[#00152E] rounded-[28px] w-auto max-w-[90vw] shadow-2xl border border-slate-100 dark:border-white/8"
-          onClick={(e) => e.stopPropagation()}
+    <ModalShell onClose={onClose} className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden">
+      <div className="flex items-start justify-between gap-4 border-b border-[#d7ebf5] px-5 py-4 dark:border-white/10">
+        <div className="min-w-0">
+          <h2 className="truncate text-lg font-extrabold tracking-tight text-[#072036] dark:text-white">
+            {board.title}
+          </h2>
+          {board.description && (
+            <p className="mt-0.5 line-clamp-2 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+              {board.description}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t("vision_board.close", "Close")}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-[#F1F5F9] hover:text-[#072036] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
         >
-          {/* Header */}
-          <div className="flex items-start justify-between px-4 py-3 border-b border-gray-200">
-            <div className="flex flex-col pr-4">
-              <h2 className="text-lg font-semibold text-[#002147] break-words">
-                {board.title}
-              </h2>
-              {board.description && (
-                <p className="text-sm text-gray-500 mt-1 max-w-xl break-words">
-                  {board.description}
-                </p>
-              )}
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
-          {/* Image - Auto size based on content */}
-          <div className="p-4 bg-white flex justify-center items-center">
-            {board.collageImage ? (
-              <img
-                src={board.collageImage}
-                alt={board.title}
-                className="rounded-lg shadow-lg"
-                style={{
-                  maxWidth: '80vw',
-                  maxHeight: '60vh',
-                  width: 'auto',
-                  height: 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-48 w-48 text-gray-500">
-                <Images className="w-16 h-16" />
-              </div>
-            )}
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-[#F1F5F9] p-4 dark:bg-[#072036]/60 sm:p-6">
+        {board.collageImage ? (
+          <img
+            src={board.collageImage}
+            alt={board.title}
+            className="max-h-[60vh] max-w-full rounded-xl object-contain shadow-lg"
+          />
+        ) : (
+          <div className="flex h-48 w-48 items-center justify-center text-slate-300 dark:text-slate-600">
+            <Images className="h-16 w-16" />
           </div>
+        )}
+      </div>
 
-          {/* Actions */}
-          <div className="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-            {isCurrentVision ? (
-              <Button
-                onClick={handleDisableVision}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-semibold"
-              >
-                <EyeOff className="w-4 h-4 mr-2" />
-                {t("vision_board.disable_vision")}
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSetAsVision}
-                className="w-full sm:w-auto bg-[#1a3884] hover:bg-[#132c6b] text-white font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {t("vision_board.enable_vision")}
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              onClick={handleDownload}
-              className="w-full sm:w-auto border-gray-200 text-[#002147] hover:bg-gray-50 bg-white"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {t("vision_board.download")}
-            </Button>
+      <div className="flex flex-col gap-2 border-t border-[#d7ebf5] px-5 py-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          onClick={handleToggleVision}
+          disabled={busy}
+          className={`h-10 px-5 ${
+            isCurrentVision
+              ? "inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 text-xs font-bold text-rose-700 transition-colors hover:bg-rose-100 disabled:opacity-60 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+              : BTN_BRAND
+          }`}
+        >
+          {busy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : isCurrentVision ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+          {isCurrentVision ? t("vision_board.disable_vision") : t("vision_board.enable_vision")}
+        </button>
+        <button
+          type="button"
+          onClick={handleDownload}
+          disabled={!board.collageImage}
+          className={`${BTN_GHOST} h-10 px-5`}
+        >
+          <Download className="h-4 w-4" />
+          {t("vision_board.download")}
+        </button>
+      </div>
+    </ModalShell>
+  );
+};
+
+const CreateModal = ({ onClose, onConfirm, title, setTitle, description, setDescription, titleLimit, descLimit, onInstantCheck }) => {
+  const { t } = useTranslation();
+  return (
+    <ModalShell onClose={onClose} className="w-full max-w-md p-6 sm:p-7">
+      <h3 className="text-xl font-extrabold tracking-tight text-[#072036] dark:text-white">
+        {t("vision_board.manifest_vision")}
+      </h3>
+      <p className="mt-1 text-sm text-[#35566b] dark:text-slate-400">{t("vision_board.manifest_desc")}</p>
+
+      <div className="mt-6 space-y-5">
+        <div>
+          <div className="mb-1.5 flex items-center justify-between text-[11px]">
+            <label htmlFor="vb-new-title" className="font-bold uppercase tracking-wider text-[#35566b] dark:text-slate-400">
+              {t("vision_board.board_title")}
+            </label>
+            <span className={`font-bold ${title.length >= titleLimit ? "text-rose-500" : "text-slate-400"}`}>
+              {title.length}/{titleLimit}
+            </span>
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          <input
+            id="vb-new-title"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              onInstantCheck(e.target.value, "title");
+            }}
+            placeholder={t("vision_board.title_placeholder")}
+            maxLength={titleLimit}
+            className={`${FIELD} h-11`}
+          />
+        </div>
+        <div>
+          <div className="mb-1.5 flex items-center justify-between text-[11px]">
+            <label htmlFor="vb-new-desc" className="font-bold uppercase tracking-wider text-[#35566b] dark:text-slate-400">
+              {t("vision_board.aspiration_details")}
+            </label>
+            <span className={`font-bold ${description.length >= descLimit ? "text-rose-500" : "text-slate-400"}`}>
+              {description.length}/{descLimit}
+            </span>
+          </div>
+          <textarea
+            id="vb-new-desc"
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              onInstantCheck(e.target.value, "description");
+            }}
+            rows={4}
+            placeholder={t("vision_board.aspiration_placeholder")}
+            maxLength={descLimit}
+            className={`${FIELD} resize-none py-3 leading-relaxed`}
+          />
+        </div>
+      </div>
+
+      <div className="mt-7 flex justify-end gap-3">
+        <button type="button" onClick={onClose} className={`${BTN_GHOST} h-10 px-5`}>
+          {t("vision_board.cancel")}
+        </button>
+        <button type="button" onClick={onConfirm} className={`${BTN_PRIMARY} h-10 px-5`}>
+          {t("vision_board.start_creating")} <ArrowRight className="h-4 w-4" />
+        </button>
+      </div>
+    </ModalShell>
   );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MAIN GALLERY COMPONENT
+// GALLERY PAGE
 // ═══════════════════════════════════════════════════════════════════════════
 
 const VisionBoardGalleryPro = () => {
@@ -462,11 +545,22 @@ const VisionBoardGalleryPro = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteBoard, setDeleteBoard] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [viewBoard, setPreviewBoard] = useState(null);
+  const [previewBoard, setPreviewBoard] = useState(null);
   const [maxAllowed, setMaxAllowed] = useState(3);
   const [canCreateMore, setCanCreateMore] = useState(true);
   const [currentVisionId, setCurrentVisionId] = useState(null);
@@ -482,72 +576,52 @@ const VisionBoardGalleryPro = () => {
   const DESCRIPTION_CHAR_LIMIT = 250;
 
   const filteredBoards = useMemo(() => {
-    let nextBoards = [...boards];
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.trim().toLowerCase();
-      nextBoards = nextBoards.filter((board) =>
-        board.title?.toLowerCase().includes(query) ||
-        board.description?.toLowerCase().includes(query)
+    let next = [...boards];
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      next = next.filter(
+        (b) => b.title?.toLowerCase().includes(query) || b.description?.toLowerCase().includes(query)
       );
     }
+    if (statusFilter === "active") next = next.filter((b) => currentVisionId === b._id);
+    if (statusFilter === "stored") next = next.filter((b) => currentVisionId !== b._id);
 
-    if (statusFilter === "active") {
-      nextBoards = nextBoards.filter((board) => currentVisionId === board._id);
-    }
-
-    if (statusFilter === "draft") {
-      nextBoards = nextBoards.filter((board) => currentVisionId !== board._id);
-    }
-
-    nextBoards.sort((a, b) => {
-      if (sortBy === "name") {
-        return (a.title || "").localeCompare(b.title || "");
-      }
-
-      if (sortBy === "oldest") {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      }
-
+    next.sort((a, b) => {
+      if (sortBy === "name") return (a.title || "").localeCompare(b.title || "");
+      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-
-    return nextBoards;
+    return next;
   }, [boards, currentVisionId, searchQuery, sortBy, statusFilter]);
 
-  // Load boards and check current vision
   useEffect(() => {
-    // Check if user has basic info (at least email) before making API calls
-    const user = JSON.parse(
-      sessionStorage.getItem("user") || "{}"
-    );
-
-    // Allow loading if user has id OR email (API will fetch id by email if missing)
-    if (!user._id && !user.id && !user.email) {
-      // User not authenticated at all - skip silently
-      return;
-    }
-
-    // Reset cache to ensure fresh ID fetch (important for dev bypass login)
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+    if (!user._id && !user.id && !user.email) return;
     resetUserIdCache();
-
     loadBoards();
     loadActiveVision();
-    // Pre-load Toxicity Model
     loadToxicityModel();
   }, []);
 
+  // Escape closes whichever overlay is open.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== "Escape") return;
+      if (showCreateModal) setShowCreateModal(false);
+      else if (previewBoard) setPreviewBoard(null);
+      else if (deleteBoard && !isDeleting) setDeleteBoard(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showCreateModal, previewBoard, deleteBoard, isDeleting]);
+
   const loadActiveVision = async () => {
     try {
-      // API will fetch correct user ID by email if missing from session
       const result = await getActiveVision();
-      if (result.data) {
-        setCurrentVisionId(result.data.id);
-      }
+      if (result.data) setCurrentVisionId(result.data.id);
     } catch (error) {
-      // Only log error if it's not an authentication error (those are expected for new users)
-      if (!error.message?.includes('not authenticated')) {
-        console.error('Failed to load active vision:', error);
+      if (!error.message?.includes("not authenticated")) {
+        console.error("Failed to load active vision:", error);
       }
     }
   };
@@ -555,35 +629,24 @@ const VisionBoardGalleryPro = () => {
   const loadBoards = async () => {
     try {
       setIsLoading(true);
-
-      // API will fetch correct user ID by email if missing from session
-
       const result = await getAllVisionBoards();
       setBoards(result.data || []);
       setMaxAllowed(result.maxAllowed || 3);
       setCanCreateMore(result.canCreateMore !== false);
     } catch (error) {
-      // Check if it's an authentication error
-      if (error.message && error.message.includes("not authenticated")) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to view your vision boards",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to load vision boards",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: error.message?.includes("not authenticated") ? "Authentication Required" : "Error",
+        description: error.message?.includes("not authenticated")
+          ? "Please log in to view your vision boards"
+          : error.message || "Failed to load vision boards",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleInstantCheck = (text, fieldName) => {
-    // Use exact word-boundary matching to avoid false positives
     const result = moderateText(text, true);
     if (!result.isClean) {
       toast({
@@ -608,11 +671,10 @@ const VisionBoardGalleryPro = () => {
     setShowCreateModal(true);
   };
 
-  const handleConfirmCreate = async () => {
+  const handleConfirmCreate = () => {
     const trimmedTitle = newTitle.trim();
     const trimmedDescription = newDescription.trim();
 
-    // Synchronous Gatekeeper Check
     if (handleInstantCheck(trimmedTitle, "title")) return;
     if (handleInstantCheck(trimmedDescription, "description")) return;
 
@@ -624,30 +686,6 @@ const VisionBoardGalleryPro = () => {
       });
       return;
     }
-
-    // Content moderation check - REMOVED deep checks for speed, relying on Editor's Save
-    /* 
-    const titleCheck = await moderateTextAsync(trimmedTitle);
-    if (!titleCheck.isClean) {
-      toast({
-        title: "Inappropriate Content",
-        description: "Your vision board title contains inappropriate language. Please revise.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const descCheck = await moderateTextAsync(trimmedDescription);
-    if (!descCheck.isClean) {
-      toast({
-        title: "Inappropriate Content",
-        description: "Your vision board description contains inappropriate language. Please revise.",
-        variant: "destructive",
-      });
-      return;
-    }
-    */
-
     if (trimmedTitle.length > TITLE_CHAR_LIMIT) {
       toast({
         title: "Title is too long",
@@ -656,7 +694,6 @@ const VisionBoardGalleryPro = () => {
       });
       return;
     }
-
     if (trimmedDescription.length > DESCRIPTION_CHAR_LIMIT) {
       toast({
         title: "Description is too long",
@@ -666,18 +703,12 @@ const VisionBoardGalleryPro = () => {
       return;
     }
 
-    const payload = {
-      initialTitle: trimmedTitle,
-      initialDescription: trimmedDescription,
-    };
     setShowCreateModal(false);
     setNewTitle("");
     setNewDescription("");
-    navigate("/vision-board-pro/create", { state: payload });
-  };
-
-  const handlePreview = (board) => {
-    setPreviewBoard(board);
+    navigate("/vision-board-pro/create", {
+      state: { initialTitle: trimmedTitle, initialDescription: trimmedDescription },
+    });
   };
 
   const handleEdit = (board) => {
@@ -689,27 +720,20 @@ const VisionBoardGalleryPro = () => {
         initialDescription: board.description,
         initialShortTermGoals: board.shortTermGoals,
         initialLongTermGoals: board.longTermGoals,
-        // Optional: you can pass templateId, textOverlays etc if you want full restore,
-        // but since we only save the collage image, full restore is tricky.
-        // We will pass the collageImage as the backgroundImage so they can build on top of it.
-        backgroundImage: board.collageImage
-      }
+        backgroundImage: board.collageImage,
+      },
     });
   };
 
-  // Handle setting a vision board as active and navigating to dashboard
   const handleSetAsActive = async (board) => {
     try {
       await setActiveVision(board._id);
       setCurrentVisionId(board._id);
-
       toast({
         title: "Vision Enabled!",
         description: "Your vision board is now displayed on your dashboard.",
       });
-
-      // Navigate to dashboard to show the active vision
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Error",
@@ -719,28 +743,30 @@ const VisionBoardGalleryPro = () => {
     }
   };
 
+  const handleDeactivate = async () => {
+    try {
+      await clearActiveVision();
+      setCurrentVisionId(null);
+      toast({ title: "Vision Deactivated", description: "Vision board removed from dashboard." });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to deactivate vision board", variant: "destructive" });
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteBoard) return;
-
     try {
       setIsDeleting(true);
       await deleteVisionBoard(deleteBoard._id);
       setBoards((prev) => {
-        const newBoards = prev.filter((b) => b._id !== deleteBoard._id);
-        // Update canCreateMore since we deleted one
-        setCanCreateMore(newBoards.length < maxAllowed);
-        return newBoards;
+        const next = prev.filter((b) => b._id !== deleteBoard._id);
+        setCanCreateMore(next.length < maxAllowed);
+        return next;
       });
-      toast({
-        title: "Deleted",
-        description: "Vision board deleted successfully",
-      });
+      if (currentVisionId === deleteBoard._id) setCurrentVisionId(null);
+      toast({ title: "Deleted", description: "Vision board deleted successfully" });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete vision board",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to delete vision board", variant: "destructive" });
     } finally {
       setIsDeleting(false);
       setDeleteBoard(null);
@@ -748,7 +774,6 @@ const VisionBoardGalleryPro = () => {
   };
 
   const handleDuplicate = async (board) => {
-    // Check limit before duplicating
     if (boards.length >= maxAllowed) {
       toast({
         title: "Limit Reached",
@@ -757,18 +782,14 @@ const VisionBoardGalleryPro = () => {
       });
       return;
     }
-
     try {
       const result = await duplicateVisionBoard(board._id);
       setBoards((prev) => {
-        const newBoards = [result.data, ...prev];
-        setCanCreateMore(newBoards.length < maxAllowed);
-        return newBoards;
+        const next = [result.data, ...prev];
+        setCanCreateMore(next.length < maxAllowed);
+        return next;
       });
-      toast({
-        title: "Duplicated",
-        description: "Vision board duplicated successfully",
-      });
+      toast({ title: "Duplicated", description: "Vision board duplicated successfully" });
     } catch (error) {
       toast({
         title: "Error",
@@ -778,246 +799,286 @@ const VisionBoardGalleryPro = () => {
     }
   };
 
-  const handleDeactivate = async () => {
-    try {
-      await clearActiveVision();
-      setCurrentVisionId(null);
-      toast({
-        title: "Vision Deactivated",
-        description: "Vision board removed from dashboard.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to deactivate vision board",
-        variant: "destructive",
-      });
-    }
-  };
-
+  const statusChips = [
+    { id: "all", label: t("vision_board.filter_all", "All") },
+    { id: "active", label: t("vision_board.filter_active", "Active") },
+    { id: "stored", label: t("vision_board.filter_stored", "Stored") },
+  ];
 
   return (
-    <main className="min-h-screen w-full bg-transparent px-4 py-5 transition-colors duration-300 md:px-8">
-      <div className="mx-auto max-w-[1600px] pb-6">
-        {/* Back Button - Mobile Only */}
-        <div className="mb-4 md:hidden">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-              <ArrowLeft className="w-4 h-4" />
-            </div>
-            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-          </button>
+    <PageTransition>
+      <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+        {/* Same ambient layer as the dashboard, courses and assessments pages */}
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+          <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+        </div>
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+          <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
         </div>
 
-        {/* ── Standardized Header ── */}
-        <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-4 py-4 sm:px-6 sm:py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
-            <div className="flex flex-col">
-                <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                  {(() => {
-                    const title = t("vision_board.gallery_title", "Vision Board Gallery");
-                    const lastSpaceIndex = title.lastIndexOf(" ");
-                    if (lastSpaceIndex !== -1) {
-                      return (
-                        <>
-                          {title.substring(0, lastSpaceIndex)}{" "}
-                          <span className="text-[#1a3884] dark:text-blue-300">
-                            {title.substring(lastSpaceIndex + 1)}
-                          </span>
-                        </>
-                      );
-                    }
-                    return title;
-                  })()}
-                </h1>
-                <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                    {t("vision_board.gallery_subtitle")}
-                </p>
-            </div>
-            
-            <div className="flex flex-wrap items-center justify-end gap-3">
-                <div className="inline-flex items-center gap-1.5 rounded-lg border border-slate-100 bg-[#F8FAFC] dark:bg-[#002147] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-white shadow-sm dark:border-white/10">
-                    <Grid3X3 className="h-3.5 w-3.5 text-[#1a3884] dark:text-blue-400" />
-                    {boards.length} / {maxAllowed} {t("vision_board.slots")}
+        <main className="relative z-10">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
+            {/* Back button -- mobile only */}
+            <div className="flex items-center sm:hidden">
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard")}
+                className="group flex w-fit items-center gap-3"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:group-hover:border-[#045C9A]/40">
+                  <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
                 </div>
-                <Button
+                <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                  {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                </span>
+              </button>
+            </div>
+
+            {/* Page hero -- same structure and type scale as Courses / Assessments */}
+            <motion.section
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className={`relative w-full overflow-hidden rounded-2xl ${SURFACE}`}
+            >
+              <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+              <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0 max-w-2xl">
+                  <h1
+                    className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
+                    style={{ letterSpacing: "-0.02em" }}
+                  >
+                    {t("vision_board.gallery_title", "Vision Board Gallery")}
+                  </h1>
+                  <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                    {t("vision_board.gallery_subtitle")}
+                  </p>
+                </div>
+
+                <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
+                  <div
+                    className={`inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[11px] font-bold uppercase tracking-wider text-[#35566b] dark:text-slate-300 ${PANEL}`}
+                  >
+                    <Grid3X3 className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />
+                    <span className="tabular-nums">
+                      {boards.length} / {maxAllowed}
+                    </span>
+                    {t("vision_board.slots")}
+                  </div>
+                  <button
+                    type="button"
                     onClick={handleCreateNew}
                     disabled={!canCreateMore}
-                    className={`h-8 rounded-lg px-4 text-xs font-bold tracking-wide transition-all active:scale-95 ${canCreateMore
-                        ? "bg-[#1a3884] text-white hover:bg-[#132c6b] shadow-sm"
-                        : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
-                        }`}
-                >
-                    <Plus className="mr-1.5 h-3.5 w-3.5" />
+                    className={`${BTN_PRIMARY} h-9 px-4`}
+                  >
+                    <Plus className="h-4 w-4" />
                     {t("vision_board.create_new_board")}
-                </Button>
-            </div>
-        </motion.div>
-
-        <div className="mt-4">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-[#1a3884]" />
-              <p className="animate-pulse text-slate-400">{t("vision_board.loading_boards")}</p>
-            </div>
-          ) : boards.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm dark:border-white/10 dark:bg-[#0b1627]">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#1a3884]/10">
-                <Images className="h-8 w-8 text-[#1a3884]" />
+                  </button>
+                </div>
               </div>
-              <h3 className="mb-2 text-2xl font-semibold text-slate-900 dark:text-white">{t("vision_board.no_boards")}</h3>
-              <p className="mx-auto mb-8 max-w-md text-slate-500 dark:text-slate-400">
-                {t("vision_board.no_boards_desc")}
-              </p>
-              <Button onClick={handleCreateNew} className="h-11 rounded-2xl bg-[#1a3884] px-8 font-semibold text-white hover:bg-[#132c6b]">
-                <Plus className="mr-2 h-4.5 w-4.5" />
-                {t("vision_board.create_vision_board")}
-              </Button>
-            </div>
-          ) : filteredBoards.length === 0 ? (
-            <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-20 text-center shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
-              <Search className="mx-auto mb-4 h-10 w-10 text-slate-300 dark:text-slate-600" />
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t("vision_board.no_boards_match")}</h3>
-              <p className="mt-2 text-slate-500 dark:text-slate-400">{t("vision_board.no_boards_match_desc")}</p>
-            </div>
-          ) : (
-            <div className={viewMode === "grid"
-              ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              : "grid grid-cols-1 gap-4"
-            }>
-              <AnimatePresence>
-                {filteredBoards.map((board) => (
-                  <BoardCard
-                    key={board._id}
-                    board={board}
-                    onDelete={setDeleteBoard}
-                    onDuplicate={handleDuplicate}
-                    onEdit={handleEdit}
-                    onPreview={handlePreview}
-                    onSetAsActive={handleSetAsActive}
-                    onDeactivate={handleDeactivate}
-                    isCurrentVision={currentVisionId === board._id}
-                    viewMode={viewMode}
+            </motion.section>
+
+            {/* Toolbar -- only once there is something to search or sort */}
+            {!isLoading && boards.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
+                className={`flex flex-col gap-3 rounded-2xl p-3 sm:flex-row sm:items-center ${SURFACE}`}
+              >
+                <div className="relative min-w-0 flex-1 sm:min-w-[220px]">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="vb-search"
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t("vision_board.search_placeholder", "Search boards…")}
+                    className={`${FIELD} h-10 pl-10`}
                   />
-                ))}
-              </AnimatePresence>
-            </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <div id="vb-status" className={`flex h-10 items-center gap-1 rounded-xl p-1 ${PANEL}`}>
+                    {statusChips.map((chip) => {
+                      const active = statusFilter === chip.id;
+                      return (
+                        <button
+                          key={chip.id}
+                          type="button"
+                          onClick={() => setStatusFilter(chip.id)}
+                          aria-pressed={active}
+                          className={`h-8 rounded-lg px-3 text-xs font-bold transition-colors ${
+                            active
+                              ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#045C9A]/40 dark:text-white"
+                              : "text-[#35566b] hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-white"
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <select
+                    id="vb-sort"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    aria-label={t("vision_board.sort_by", "Sort by")}
+                    className="h-10 cursor-pointer rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-3 pr-8 text-xs font-bold text-[#35566b] outline-none transition-colors focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300"
+                  >
+                    <option value="recent">{t("vision_board.sort_recent", "Newest first")}</option>
+                    <option value="oldest">{t("vision_board.sort_oldest", "Oldest first")}</option>
+                    <option value="name">{t("vision_board.sort_name", "Name A–Z")}</option>
+                  </select>
+
+                  <div id="vb-view" className={`flex h-10 items-center gap-1 rounded-xl p-1 ${PANEL}`}>
+                    {[
+                      { id: "grid", Icon: Grid3X3, label: t("vision_board.view_grid", "Grid view") },
+                      { id: "list", Icon: List, label: t("vision_board.view_list", "List view") },
+                    ].map(({ id, Icon, label }) => {
+                      const active = viewMode === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setViewMode(id)}
+                          aria-pressed={active}
+                          aria-label={label}
+                          title={label}
+                          className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                            active
+                              ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#045C9A]/40 dark:text-white"
+                              : "text-[#35566b] hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-white"
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Content */}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-28">
+                <Loader2 className="h-9 w-9 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
+                <p className="text-sm font-medium text-[#35566b] dark:text-slate-400">
+                  {t("vision_board.loading_boards")}
+                </p>
+              </div>
+            ) : boards.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+                className={`flex flex-col items-center justify-center rounded-2xl px-6 py-20 text-center ${SURFACE}`}
+              >
+                <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#045C9A]/10 dark:bg-[#045C9A]/25">
+                  <Images className="h-9 w-9 text-[#045C9A] dark:text-[#A6D7E8]" />
+                </div>
+                <h3 className="text-xl font-extrabold tracking-tight text-[#072036] dark:text-white">
+                  {t("vision_board.no_boards")}
+                </h3>
+                <p className="mx-auto mt-2 max-w-md text-sm text-[#35566b] dark:text-slate-400">
+                  {t("vision_board.no_boards_desc")}
+                </p>
+                <button type="button" onClick={handleCreateNew} className={`${BTN_PRIMARY} mt-7 h-10 px-6 text-sm`}>
+                  <Plus className="h-4 w-4" />
+                  {t("vision_board.create_vision_board")}
+                </button>
+              </motion.div>
+            ) : filteredBoards.length === 0 ? (
+              <div className={`rounded-2xl px-6 py-16 text-center ${SURFACE}`}>
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F1F5F9] dark:bg-white/[0.06]">
+                  <Search className="h-6 w-6 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-extrabold tracking-tight text-[#072036] dark:text-white">
+                  {t("vision_board.no_boards_match")}
+                </h3>
+                <p className="mt-1.5 text-sm text-[#35566b] dark:text-slate-400">
+                  {t("vision_board.no_boards_match_desc")}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("all");
+                  }}
+                  className={`${BTN_GHOST} mt-5 h-9 px-4`}
+                >
+                  {t("vision_board.clear_filters", "Clear filters")}
+                </button>
+              </div>
+            ) : (
+              <div
+                className={
+                  viewMode === "grid"
+                    ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    : "grid grid-cols-1 gap-4"
+                }
+              >
+                <AnimatePresence>
+                  {filteredBoards.map((board) => (
+                    <BoardCard
+                      key={board._id}
+                      board={board}
+                      onDelete={setDeleteBoard}
+                      onDuplicate={handleDuplicate}
+                      onEdit={handleEdit}
+                      onPreview={setPreviewBoard}
+                      onSetAsActive={handleSetAsActive}
+                      onDeactivate={handleDeactivate}
+                      isCurrentVision={currentVisionId === board._id}
+                      viewMode={viewMode}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        </main>
+
+        <AnimatePresence>
+          {deleteBoard && (
+            <DeleteModal
+              key="delete"
+              board={deleteBoard}
+              onConfirm={handleDelete}
+              onCancel={() => setDeleteBoard(null)}
+              isDeleting={isDeleting}
+            />
           )}
-        </div>
+          {previewBoard && (
+            <PreviewModal
+              key="preview"
+              board={previewBoard}
+              onClose={() => setPreviewBoard(null)}
+              currentVisionId={currentVisionId}
+              onVisionChange={setCurrentVisionId}
+            />
+          )}
+          {showCreateModal && (
+            <CreateModal
+              key="create"
+              onClose={() => setShowCreateModal(false)}
+              onConfirm={handleConfirmCreate}
+              title={newTitle}
+              setTitle={setNewTitle}
+              description={newDescription}
+              setDescription={setNewDescription}
+              titleLimit={TITLE_CHAR_LIMIT}
+              descLimit={DESCRIPTION_CHAR_LIMIT}
+              onInstantCheck={handleInstantCheck}
+            />
+          )}
+        </AnimatePresence>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      <DeleteModal
-        isOpen={!!deleteBoard}
-        board={deleteBoard}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteBoard(null)}
-        isDeleting={isDeleting}
-      />
-
-      {/* Preview Modal */}
-      <PreviewModal
-        isOpen={!!viewBoard}
-        board={viewBoard}
-        onClose={() => setPreviewBoard(null)}
-        currentVisionId={currentVisionId}
-        onVisionChange={setCurrentVisionId}
-      />
-
-      {/* Create New Modal */}
-      <AnimatePresence>
-        {showCreateModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-            onClick={() => setShowCreateModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-[#00152E] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-white/10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">{t("vision_board.manifest_vision")}</h3>
-              <p className="text-[14px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 mb-8">{t("vision_board.manifest_desc")}
-              </p>
-
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
-                    <label className="font-bold uppercase tracking-wider">{t("vision_board.board_title")}</label>
-                    <span className={`font-bold ${newTitle.length >= TITLE_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
-                      {newTitle.length}/{TITLE_CHAR_LIMIT}
-                    </span>
-                  </div>
-                  <Input
-                    value={newTitle}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setNewTitle(val);
-                      handleInstantCheck(val, "title");
-                    }}
-                    placeholder={t("vision_board.title_placeholder")}
-                    maxLength={TITLE_CHAR_LIMIT}
-                    className="h-12 bg-slate-50 dark:bg-[#002147] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 rounded-xl font-medium"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
-                    <label className="font-bold uppercase tracking-wider">{t("vision_board.aspiration_details")}</label>
-                    <span className={`font-bold ${newDescription.length >= DESCRIPTION_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
-                      {newDescription.length}/{DESCRIPTION_CHAR_LIMIT}
-                    </span>
-                  </div>
-                  <textarea
-                    value={newDescription}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setNewDescription(val);
-                      handleInstantCheck(val, "description");
-                    }}
-                    rows={4}
-                    placeholder={t("vision_board.aspiration_placeholder")}
-                    maxLength={DESCRIPTION_CHAR_LIMIT}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none font-medium leading-relaxed"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 mt-10">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCreateModal(false)}
-                  className="h-12 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white dark:bg-[#002A5C] hover:bg-slate-50 dark:hover:bg-[#002A5C] rounded-xl font-bold px-6"
-                >
-                  {t("vision_board.cancel")}
-                </Button>
-                <Button
-                  onClick={handleConfirmCreate}
-                  className="h-12 bg-primary hover:bg-primary/90 text-white font-bold shadow-xl shadow-primary/20 rounded-xl px-8"
-                >
-                  {t("vision_board.start_creating")} <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
+    </PageTransition>
   );
 };
 
 export default VisionBoardGalleryPro;
-
-
-

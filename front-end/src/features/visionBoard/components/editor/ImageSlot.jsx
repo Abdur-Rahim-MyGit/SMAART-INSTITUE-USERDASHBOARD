@@ -7,7 +7,7 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
-} from "lucide-react";
+} from "@/components/icons";
 
 const ImageSlot = ({
   slot,
@@ -305,7 +305,7 @@ const ImageSlot = ({
       style={slotStyle}
       className={`group relative transition-all ${
         isSelected
-          ? "ring-2 ring-[#1a3884] ring-offset-4 ring-offset-white dark:ring-[#7aa2ff] dark:ring-offset-[#0f172a]"
+          ? "ring-2 ring-[#045C9A] ring-offset-4 ring-offset-white dark:ring-[#A6D7E8] dark:ring-offset-[#072036]"
           : ""
       } ${
         !image
@@ -482,7 +482,7 @@ const ImageSlot = ({
               {!isLocked && (
                 <button
                   type="button"
-                  className="absolute -bottom-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-[#1a3884] text-white shadow-lg"
+                  className="absolute -bottom-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-[#045C9A] text-white shadow-lg"
                   onMouseDown={handleTransformStart}
                   onTouchStart={handleTransformStart}
                   title="Resize and rotate"

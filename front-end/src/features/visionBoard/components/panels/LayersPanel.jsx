@@ -18,7 +18,7 @@ import {
   Trash2,
   Type,
   Unlock,
-} from "lucide-react";
+} from "@/components/icons";
 import { IMAGE_FILTER_PRESETS } from "../../utils/constants";
 
 const sectionClass =
@@ -28,7 +28,7 @@ const labelClass =
   "mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-white/45";
 
 const sliderClass =
-  "h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#1a3884] dark:bg-white/10";
+  "h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#045C9A] dark:bg-white/10";
 
 const tintSwatches = [
   "rgba(0,0,0,0)",
@@ -79,7 +79,7 @@ const LayersPanel = ({
     <div className="space-y-4">
       {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">
             <Layers3 className="h-5 w-5" />
           </div>
           <div>
@@ -108,7 +108,7 @@ const LayersPanel = ({
             onClick={() => setSnapEnabled(!snapEnabled)}
             className={`inline-flex h-10 items-center gap-2 rounded-2xl border px-3 transition ${
               snapEnabled
-                ? "border-[#1a3884]/20 bg-[#1a3884]/10 text-[#1a3884] dark:border-[#7aa2ff]/25 dark:bg-[#7aa2ff]/12 dark:text-[#9cb9ff]"
+                ? "border-[#045C9A]/20 bg-[#045C9A]/10 text-[#045C9A] dark:border-[#A6D7E8]/25 dark:bg-[#A6D7E8]/12 dark:text-[#A6D7E8]"
                 : "border-slate-200 bg-slate-50 text-slate-500 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
             }`}
             aria-pressed={snapEnabled}
@@ -118,7 +118,7 @@ const LayersPanel = ({
             </span>
             <span
               className={`relative h-6 w-10 rounded-full transition ${
-                snapEnabled ? "bg-[#1a3884]" : "bg-slate-300 dark:bg-white/15"
+                snapEnabled ? "bg-[#045C9A]" : "bg-slate-300 dark:bg-white/15"
               }`}
             >
               <span
@@ -162,7 +162,7 @@ const LayersPanel = ({
                         onUpdateImage({ fitMode: mode.id, cropMode: mode.id === "crop" })
                       }
                       className={`rounded-2xl border px-3 py-2 text-xs font-bold transition-all duration-200 ${active
-                          ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] shadow-sm dark:text-[#9cb9ff]"
+                          ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] text-[#045C9A] shadow-sm dark:text-[#A6D7E8]"
                           : "border-slate-200 bg-slate-50 text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
                         }`}
                     >
@@ -312,7 +312,7 @@ const LayersPanel = ({
                     type="button"
                     onClick={() => onUpdateImage({ ...preset.values, filterPreset: preset.id })}
                     className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${(selectedImage.filterPreset || "clean") === preset.id
-                        ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                        ? "border-[#045C9A]/60 bg-[#045C9A]/[0.08] shadow-sm"
                         : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
                       }`}
                   >
@@ -401,7 +401,7 @@ const LayersPanel = ({
                 title={button.hint}
                 className="group rounded-2xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 px-2 py-3 text-center transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_10px_24px_rgba(15,23,42,0.06)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 dark:border-white/10 dark:bg-white/[0.04] dark:from-white/[0.05] dark:to-white/[0.02]"
               >
-                <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition group-hover:bg-[#1a3884]/10 group-hover:text-[#1a3884] dark:bg-white/[0.06] dark:text-white/60 dark:group-hover:bg-[#7aa2ff]/12 dark:group-hover:text-[#9cb9ff]">
+                <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition group-hover:bg-[#045C9A]/10 group-hover:text-[#045C9A] dark:bg-white/[0.06] dark:text-white/60 dark:group-hover:bg-[#A6D7E8]/12 dark:group-hover:text-[#A6D7E8]">
                   <Icon className="h-4 w-4" />
                 </span>
                 <span className="block text-[11px] font-semibold text-slate-700 dark:text-white/70">
@@ -439,7 +439,7 @@ const LayersPanel = ({
               <div
                 key={`${layer.type}-${layer.id}`}
                 className={`rounded-2xl border px-3 py-3 transition-all duration-200 ${isSelected
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.07] shadow-inner"
+                    ? "border-[#045C9A]/60 bg-[#045C9A]/[0.07] shadow-inner"
                     : "border-slate-200 bg-slate-50/50 dark:border-white/10 dark:bg-white/[0.03]"
                   }`}
               >
@@ -449,7 +449,7 @@ const LayersPanel = ({
                     onClick={(event) =>
                       onSelectLayer(layer.id, layer.type, event.shiftKey || event.metaKey || event.ctrlKey)
                     }
-                    className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-[14px] bg-white text-[#1a3884] shadow-sm transition-transform hover:scale-105 dark:bg-white/10 dark:text-blue-300"
+                    className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-[14px] bg-white text-[#045C9A] shadow-sm transition-transform hover:scale-105 dark:bg-white/10 dark:text-[#A6D7E8]"
                   >
                     <Icon className="h-4 w-4" />
                   </button>

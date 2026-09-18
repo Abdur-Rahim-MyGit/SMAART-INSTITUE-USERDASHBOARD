@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, LayoutGrid } from "lucide-react";
+import { Check, LayoutGrid } from "@/components/icons";
 import { GRID_TEMPLATES } from "../../templates/gridTemplates";
 
 const TemplateSelector = ({ selectedTemplate, onSelect }) => {
@@ -7,7 +7,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
     <div className="space-y-4">
       {/* <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm dark:border-white/10 dark:from-white/10 dark:to-white/5 dark:bg-white/5">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#A6D7E8]/15 dark:text-[#A6D7E8]">
             <LayoutGrid className="h-5 w-5" />
           </div>
           <div>
@@ -30,7 +30,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
               key={template.id}
               onClick={() => onSelect(template.id)}
               className={`group relative overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200 ${isActive
-                ? "border-[#1a3884]/70 bg-[#1a3884]/[0.08] shadow-[0_20px_40px_-24px_rgba(26,56,132,0.7)]"
+                ? "border-[#045C9A]/70 bg-[#045C9A]/[0.08] shadow-[0_20px_40px_-24px_rgba(4,92,154,0.7)]"
                 : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/90 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/20 dark:hover:bg-white/[0.07]"
                 }`}
             >
@@ -44,7 +44,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
                   </div> */}
                 </div>
                 {isActive ? (
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1a3884] text-white shadow-md">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#045C9A] text-white shadow-md">
                     <Check className="h-4 w-4" />
                   </div>
                 ) : (
@@ -56,8 +56,8 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
 
               <div
                 className={`relative aspect-[1.05/1] overflow-hidden rounded-2xl border p-2 ${isActive
-                  ? "border-[#1a3884]/25 bg-white/80 dark:bg-[#0d1732]/80"
-                  : "border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-[#00152E]/70"
+                  ? "border-[#045C9A]/25 bg-white/80 dark:bg-[#0d3a5f]/80"
+                  : "border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-[#0d3a5f]/70"
                   }`}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.12),transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.07),transparent_55%)]" />
@@ -71,7 +71,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
                     <div
                       key={slot.id}
                       className={`absolute rounded-md transition-colors ${isActive
-                        ? "bg-[#1a3884]/70"
+                        ? "bg-[#045C9A]/70"
                         : "bg-slate-300/90 dark:bg-white/20"
                         }`}
                       style={{
