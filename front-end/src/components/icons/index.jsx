@@ -444,3 +444,4 @@ export const Square = /*#__PURE__*/ icon("Square", "square");
 export const Sticker = /*#__PURE__*/ icon("Sticker", "add_reaction");
 export const Type = /*#__PURE__*/ icon("Type", "text_fields");
 export const Undo2 = /*#__PURE__*/ icon("Undo2", "undo");
+export const Share = /*#__PURE__*/ icon("Share", "share");

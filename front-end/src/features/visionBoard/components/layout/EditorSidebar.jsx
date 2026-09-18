@@ -19,12 +19,12 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
 
   const tabs = [
     { id: "templates", icon: LayoutTemplate, label: t("vision_board.tab_design") },
+    { id: "goals", icon: Target, label: t("vision_board.tab_goals", "Goals") },
     { id: "assets", icon: Sticker, label: t("vision_board.tab_assets") },
     { id: "text", icon: Type, label: t("vision_board.tab_text") },
     { id: "style", icon: Palette, label: t("vision_board.tab_style") },
     { id: "layers", icon: Layers3, label: t("vision_board.tab_layers") },
     { id: "settings", icon: Settings2, label: t("vision_board.tab_canvas") },
-    // { id: "goals",     icon: Target,         label: "Goals"   },
   ];
 
   return (

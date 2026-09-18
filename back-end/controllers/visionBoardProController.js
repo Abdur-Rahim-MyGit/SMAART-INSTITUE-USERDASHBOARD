@@ -6,6 +6,7 @@ const {
   deleteImage,
 } = require("../helpers/cloudinaryHelper");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 /**
  * Vision Board Pro Controller
@@ -48,6 +49,43 @@ const buildOwnedBoardQuery = (boardId, userId) => ({
 const clonePlain = (value, fallback) => {
   if (value === undefined || value === null) return fallback;
   return JSON.parse(JSON.stringify(value));
+};
+
+const MAX_GOALS_PER_LIST = 20;
+const MAX_GOAL_LENGTH = 160;
+
+// Goals were originally plain strings; they are now { text, done }. Accept
+// both on the way in so older boards and older clients keep working.
+const normalizeGoal = (goal) => {
+  if (goal === null || goal === undefined) return null;
+  if (typeof goal === "string") {
+    const text = goal.trim().slice(0, MAX_GOAL_LENGTH);
+    return text ? { text, done: false } : null;
+  }
+  if (typeof goal === "object") {
+    const text = String(goal.text ?? "").trim().slice(0, MAX_GOAL_LENGTH);
+    return text ? { text, done: Boolean(goal.done) } : null;
+  }
+  return null;
+};
+
+const normalizeGoals = (list) =>
+  Array.isArray(list) ? list.map(normalizeGoal).filter(Boolean).slice(0, MAX_GOALS_PER_LIST) : [];
+
+const goalProgress = (board) => {
+  const all = [...normalizeGoals(board?.shortTermGoals), ...normalizeGoals(board?.longTermGoals)];
+  const done = all.filter((g) => g.done).length;
+  return { done, total: all.length };
+};
+
+const buildSharePath = (token) => `/vision-board/shared/${token}`;
+
+const lookupOwnerName = async (userId) => {
+  if (!isValidObjectId(userId)) return null;
+  const student = await Student.findById(userId).select("fullName").lean();
+  if (student?.fullName) return student.fullName;
+  const user = await User.findById(userId).select("fullName").lean();
+  return user?.fullName || null;
 };
 
 /**
@@ -132,8 +170,8 @@ exports.createVisionBoard = async (req, res) => {
       textOverlays: textOverlays || {},
       assetOverlays: assetOverlays || {},
       userUploads: userUploads || [],
-      shortTermGoals: shortTermGoals || [],
-      longTermGoals: longTermGoals || [],
+      shortTermGoals: normalizeGoals(shortTermGoals),
+      longTermGoals: normalizeGoals(longTermGoals),
       // Store userId as ObjectId for consistency
       userId: isValidObjectId(userId) ? new mongoose.Types.ObjectId(userId) : userId,
     });
@@ -355,8 +393,8 @@ exports.updateVisionBoard = async (req, res) => {
     if (textOverlays !== undefined) board.textOverlays = textOverlays;
     if (assetOverlays !== undefined) board.assetOverlays = assetOverlays;
     if (userUploads !== undefined) board.userUploads = userUploads;
-    if (shortTermGoals !== undefined) board.shortTermGoals = shortTermGoals;
-    if (longTermGoals !== undefined) board.longTermGoals = longTermGoals;
+    if (shortTermGoals !== undefined) board.shortTermGoals = normalizeGoals(shortTermGoals);
+    if (longTermGoals !== undefined) board.longTermGoals = normalizeGoals(longTermGoals);
 
     await board.save();
 
@@ -481,8 +519,11 @@ exports.duplicateVisionBoard = async (req, res) => {
       textOverlays: clonePlain(original.textOverlays, {}),
       assetOverlays: clonePlain(original.assetOverlays, {}),
       userUploads: clonePlain(original.userUploads, []),
-      shortTermGoals: clonePlain(original.shortTermGoals, []),
-      longTermGoals: clonePlain(original.longTermGoals, []),
+      shortTermGoals: normalizeGoals(original.shortTermGoals),
+      longTermGoals: normalizeGoals(original.longTermGoals),
+      // A copy starts private; it never inherits the original's share link.
+      isShared: false,
+      shareToken: null,
       // Note: We share the same image URL, no publicId to avoid accidental deletion
       userId: isValidObjectId(userId) ? new mongoose.Types.ObjectId(userId) : userId,
     });
@@ -709,8 +750,12 @@ exports.getActiveVision = async (req, res) => {
         title: board.title,
         image: board.collageImage,
         description: board.description,
-        shortTermGoals: board.shortTermGoals,
-        longTermGoals: board.longTermGoals,
+        shortTermGoals: normalizeGoals(board.shortTermGoals),
+        longTermGoals: normalizeGoals(board.longTermGoals),
+        progress: goalProgress(board),
+        isShared: Boolean(board.isShared),
+        shareToken: board.isShared ? board.shareToken : null,
+        updatedAt: board.updatedAt,
       },
     });
   } catch (error) {
@@ -757,5 +802,105 @@ exports.clearActiveVision = async (req, res) => {
       message: "Failed to clear active vision",
       error: error.message,
     });
+  }
+};
+
+/**
+ * Turn public sharing on for a board (creates the link on first use)
+ * POST /api/vision-board-pro/:id/share
+ */
+exports.enableShare = async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { id } = req.params;
+    if (!userId || !isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid request" });
+    }
+
+    const board = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
+    if (!board) {
+      return res.status(404).json({ success: false, message: "Vision board not found or does not belong to you" });
+    }
+
+    if (!board.shareToken) {
+      board.shareToken = crypto.randomBytes(16).toString("hex");
+    }
+    board.isShared = true;
+    await board.save();
+
+    res.status(200).json({
+      success: true,
+      data: { isShared: true, shareToken: board.shareToken, sharePath: buildSharePath(board.shareToken) },
+    });
+  } catch (error) {
+    console.error("Enable share error:", error);
+    res.status(500).json({ success: false, message: "Failed to enable sharing", error: error.message });
+  }
+};
+
+/**
+ * Turn public sharing off. The token is discarded so the old link is dead
+ * for good; enabling again issues a fresh one.
+ * DELETE /api/vision-board-pro/:id/share
+ */
+exports.disableShare = async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { id } = req.params;
+    if (!userId || !isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid request" });
+    }
+
+    const board = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
+    if (!board) {
+      return res.status(404).json({ success: false, message: "Vision board not found or does not belong to you" });
+    }
+
+    board.isShared = false;
+    board.shareToken = null;
+    await board.save();
+
+    res.status(200).json({ success: true, data: { isShared: false, shareToken: null } });
+  } catch (error) {
+    console.error("Disable share error:", error);
+    res.status(500).json({ success: false, message: "Failed to disable sharing", error: error.message });
+  }
+};
+
+/**
+ * Public, read-only view of a shared board. No auth: the token is the key.
+ * GET /api/vision-board-pro/shared/:token
+ */
+exports.getSharedBoard = async (req, res) => {
+  try {
+    const token = String(req.params.token || "").trim();
+    if (!/^[a-f0-9]{32}$/i.test(token)) {
+      return res.status(404).json({ success: false, message: "This board is not shared" });
+    }
+
+    const board = await VisionBoardPro.findOne({ shareToken: token, isShared: true }).lean();
+    if (!board) {
+      return res.status(404).json({ success: false, message: "This board is not shared" });
+    }
+
+    const ownerName = await lookupOwnerName(board.userId);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        title: board.title,
+        description: board.description,
+        collageImage: board.collageImage,
+        shortTermGoals: normalizeGoals(board.shortTermGoals),
+        longTermGoals: normalizeGoals(board.longTermGoals),
+        progress: goalProgress(board),
+        ownerName,
+        createdAt: board.createdAt,
+        updatedAt: board.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Get shared board error:", error);
+    res.status(500).json({ success: false, message: "Failed to load shared board", error: error.message });
   }
 };

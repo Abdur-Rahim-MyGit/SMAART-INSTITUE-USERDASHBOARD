@@ -9,6 +9,7 @@ import LearningProgress from "@/components/dashboard/LearningProgress";
 import CareerPathsWidget from "@/components/dashboard/CareerPathsWidget";
 import ActiveSkillsWidget from "@/components/dashboard/ActiveSkillsWidget";
 import WordOfTheDay from "@/components/dashboard/WordOfTheDay";
+import ActiveVisionCard from "@/components/dashboard/ActiveVisionCard";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
@@ -267,6 +268,7 @@ const DashboardHome = () => {
                 className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-6"
               >
                 <CareerPathsWidget paths={paths} loading={pathsLoading} />
+                <ActiveVisionCard />
                 <ActiveSkillsWidget userEmail={user?.email} paths={paths} />
               </motion.div>
 

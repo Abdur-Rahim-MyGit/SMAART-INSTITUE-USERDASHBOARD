@@ -18,6 +18,7 @@ import StylePanel from "../panels/StylePanel";
 import LayersPanel from "../panels/LayersPanel";
 import AssetsPanel from "../panels/AssetsPanel";
 import { ASPECT_RATIOS } from "../../templates/gridTemplates";
+import { toEditableGoals, MAX_GOALS_PER_LIST, MAX_GOAL_LENGTH } from "../../utils/goals";
 
 const PANEL_META = {
   templates: {
@@ -50,62 +51,78 @@ const PANEL_META = {
     description: "Match the board ratio to phone, desktop, or presentation needs.",
     icon: Settings2,
   },
-  // goals: {
-  //   title: "Goals",
-  //   description: "Keep short-term and long-term goals visible while you design.",
-  //   icon: Target,
-  // },
+  goals: {
+    title: "Goals",
+    description: "Keep short-term and long-term goals visible while you design.",
+    icon: Target,
+  },
 };
 
-const GoalList = ({ title, description, goals, setGoals, placeholder, accentClass }) => (
-  <div className="space-y-3">
-    <div>
-      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
-      <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</p>
-    </div>
+// Goals commit on blur / Enter rather than every keystroke so the undo
+// history gets one entry per goal, not one per character.
+const GoalList = ({ title, description, goals, setGoals, placeholder, accentClass, addLabel, doneLabel }) => {
+  const list = toEditableGoals(goals);
+  const full = list.length >= MAX_GOALS_PER_LIST;
+  const commit = (index, text) => {
+    const next = [...list];
+    next[index] = { ...next[index], text };
+    setGoals(next);
+  };
 
-    <div className="space-y-2">
-      {goals.map((goal, index) => (
-        <div key={`${title}-${index}`} className="flex gap-2">
-          <input
-            type="text"
-            defaultValue={goal}
-            onBlur={(e) => {
-              const nextGoals = [...goals];
-              nextGoals[index] = e.target.value;
-              setGoals(nextGoals);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const nextGoals = [...goals];
-                nextGoals[index] = e.target.value;
-                setGoals(nextGoals);
-                e.target.blur();
-              }
-            }}
-            className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white"
-            placeholder={placeholder}
-          />
-          <button
-            type="button"
-            onClick={() => setGoals(goals.filter((_, i) => i !== index))}
-            className="rounded-xl p-2 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      ))}
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+        <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</p>
+      </div>
 
-      <button
-        type="button"
-        onClick={() => setGoals([...goals, ""])}
-        className={`w-full rounded-xl py-2 text-sm font-medium transition-colors ${accentClass}`}
-      >
-        + Add Goal
-      </button>
+      <div className="space-y-2">
+        {list.map((goal, index) => (
+          <div key={`${title}-${index}-${list.length}`} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={goal.done}
+              aria-label={doneLabel}
+              onChange={() => setGoals(list.map((g, i) => (i === index ? { ...g, done: !g.done } : g)))}
+              className="h-4 w-4 shrink-0 cursor-pointer rounded border-slate-300 accent-[#045C9A] dark:border-white/20"
+            />
+            <input
+              type="text"
+              defaultValue={goal.text}
+              maxLength={MAX_GOAL_LENGTH}
+              onBlur={(e) => commit(index, e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  commit(index, e.target.value);
+                  e.target.blur();
+                }
+              }}
+              className={`min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-[#045C9A] dark:border-white/10 dark:bg-[#072036] dark:text-white ${goal.done ? "line-through opacity-60" : ""}`}
+              placeholder={placeholder}
+            />
+            <button
+              type="button"
+              aria-label="Remove goal"
+              onClick={() => setGoals(list.filter((_, i) => i !== index))}
+              className="shrink-0 rounded-xl p-2 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          disabled={full}
+          onClick={() => setGoals([...list, { text: "", done: false }])}
+          className={`w-full rounded-xl py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${accentClass}`}
+        >
+          {full ? `${MAX_GOALS_PER_LIST} max` : addLabel}
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const EditorDrawer = ({
   activePanel,
@@ -326,27 +343,37 @@ const EditorDrawer = ({
            </div>
          )}
  
-         {/* {activePanel === "goals" && (
+         {activePanel === "goals" && (
            <div className="space-y-6">
+             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
+               {t("vision_board.tab_goals", "Goals")}
+             </p>
+             <p className="-mt-3 text-xs leading-5 text-slate-500 dark:text-slate-400">
+               {t("vision_board.goals_panel_desc", "These goals show on your dashboard with a progress meter. Tick them off as you get there.")}
+             </p>
              <GoalList
-               title="Short Term Goals"
-               description="Near-term targets for the next one to six months."
+               title={t("vision_board.short_term_goals", "Short-term goals")}
+               description={t("vision_board.short_term_desc", "Near-term targets for the next one to six months.")}
                goals={shortTermGoals}
                setGoals={setShortTermGoals}
-               placeholder="Enter short-term goal..."
-               accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-[#A6D7E8]/10 dark:text-[#A6D7E8]"
+               placeholder={t("vision_board.short_term_placeholder", "Enter a short-term goal…")}
+               addLabel={t("vision_board.add_goal", "+ Add goal")}
+               doneLabel={t("vision_board.mark_done", "Mark as done")}
+               accentClass="bg-[#045C9A]/10 text-[#045C9A] hover:bg-[#045C9A]/20 dark:bg-[#A6D7E8]/10 dark:text-[#A6D7E8]"
              />
- 
+
              <GoalList
-               title="Long Term Goals"
-               description="Bigger milestones that anchor the broader vision."
+               title={t("vision_board.long_term_goals", "Long-term goals")}
+               description={t("vision_board.long_term_desc", "Bigger milestones that anchor the broader vision.")}
                goals={longTermGoals}
                setGoals={setLongTermGoals}
-               placeholder="Enter long-term goal..."
-               accentClass="bg-emerald-500/8 text-emerald-700 hover:bg-emerald-500/12 dark:bg-emerald-500/10 dark:text-emerald-300"
+               placeholder={t("vision_board.long_term_placeholder", "Enter a long-term goal…")}
+               addLabel={t("vision_board.add_goal", "+ Add goal")}
+               doneLabel={t("vision_board.mark_done", "Mark as done")}
+               accentClass="bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"
              />
            </div>
-         )} */}
+         )}
        </div>
  
        <div

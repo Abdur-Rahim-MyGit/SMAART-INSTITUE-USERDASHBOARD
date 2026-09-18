@@ -34,6 +34,7 @@ const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
 const VisionBoardEditorPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardEditorPro'));
 const VisionBoardView = lazy(() => import('@/features/visionBoard/pages/VisionBoardView'));
+const SharedVisionBoard = lazy(() => import('@/features/visionBoard/pages/SharedVisionBoard'));
 
 const GeneralDictionary = lazy(() => import('@/pages/GeneralDictionary'));
 const SMAArtToolkit = lazy(() => import('@/pages/SMAArtToolkit'));
@@ -115,6 +116,7 @@ const AnimatedRoutes = () => {
                     <Route path="/verify-resume/:resumeId" element={<VerifyResume />} />
                     <Route path="/verify-badge" element={<VerifyBadge />} />
                     <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
+                    <Route path="/vision-board/shared/:token" element={<SharedVisionBoard />} />
                     <Route path="/legal" element={<Legal />} />
                     <Route path="/employer/register" element={<EmployerRegister />} />
 

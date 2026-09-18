@@ -184,3 +184,44 @@ export const clearActiveVision = async () => {
     method: "DELETE",
   });
 };
+
+/**
+ * Rename a board without opening the editor
+ */
+export const renameVisionBoard = async (id, { title, description }) => {
+  return apiCall(`/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ title, description }),
+  });
+};
+
+/**
+ * Persist goal text / completion without touching the canvas
+ */
+export const saveVisionBoardGoals = async (id, { shortTermGoals, longTermGoals }) => {
+  return apiCall(`/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ shortTermGoals, longTermGoals }),
+  });
+};
+
+/**
+ * Public share link on / off
+ */
+export const enableShare = async (id) => {
+  return apiCall(`/${id}/share`, { method: "POST", body: JSON.stringify({}) });
+};
+
+export const disableShare = async (id) => {
+  return apiCall(`/${id}/share`, { method: "DELETE" });
+};
+
+export const buildShareUrl = (token) =>
+  `${window.location.origin}/vision-board/shared/${token}`;
+
+/**
+ * Read a shared board. Public: no user id, no auth.
+ */
+export const getSharedVisionBoard = async (token) => {
+  return globalApiCall(`/vision-board-pro/shared/${encodeURIComponent(token)}`);
+};

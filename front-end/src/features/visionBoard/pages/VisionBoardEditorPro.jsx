@@ -25,6 +25,8 @@ import {
   checkBase64ImageNSFW,
   preloadNSFWModel,
 } from "../utils/imageModeration";
+import { normalizeGoals } from "../utils/goals";
+import { getStarterBoard } from "../templates/starterBoards";
 
 // Layout Components
 import EditorTopBar from "../components/layout/EditorTopBar";
@@ -65,8 +67,9 @@ const VisionBoardEditorPro = () => {
   const initialTitle = (location.state?.initialTitle || t("vision_board.untitled_board") || "Untitled Vision Board").slice(0, TITLE_CHAR_LIMIT);
   const initialDescription = (location.state?.initialDescription || "").slice(0, DESCRIPTION_CHAR_LIMIT);
 
-  const initialShortTermGoals = location.state?.initialShortTermGoals || [];
-  const initialLongTermGoals = location.state?.initialLongTermGoals || [];
+  const initialShortTermGoals = normalizeGoals(location.state?.initialShortTermGoals);
+  const initialLongTermGoals = normalizeGoals(location.state?.initialLongTermGoals);
+  const starterId = location.state?.starterId || null;
 
   const boardId = location.state?.boardId || location.state?.editBoardId || null;
   const isEditing = Boolean(location.state?.isEditing || boardId);
@@ -315,8 +318,8 @@ const VisionBoardEditorPro = () => {
     return {
       title: (board?.title || "Untitled Vision Board").slice(0, TITLE_CHAR_LIMIT),
       description: (board?.description || "").slice(0, DESCRIPTION_CHAR_LIMIT),
-      shortTermGoals: board?.shortTermGoals || [],
-      longTermGoals: board?.longTermGoals || [],
+      shortTermGoals: normalizeGoals(board?.shortTermGoals),
+      longTermGoals: normalizeGoals(board?.longTermGoals),
       templateId: board?.templateId || "grid-2x2",
       aspectRatio: board?.canvasSettings?.aspectRatio || "1:1",
       backgroundColor: board?.canvasSettings?.backgroundColor || "#FFFFFF",
@@ -1099,6 +1102,45 @@ const VisionBoardEditorPro = () => {
     nextTextId,
     nextAssetId,
   ]);
+
+  // A starter preset (chosen in the gallery's Create modal) seeds a NEW board
+  // with its layout, colour and headline text. Applied as one snapshot so it
+  // lands as the history baseline rather than a stack of undo steps.
+  const starterAppliedRef = useRef(false);
+  useEffect(() => {
+    if (isEditing || starterAppliedRef.current) return;
+    const starter = getStarterBoard(starterId);
+    if (!starter) return;
+    starterAppliedRef.current = true;
+
+    const seededText = {};
+    starter.texts.forEach((textData, index) => {
+      const id = `text-${index + 1}`;
+      seededText[id] = {
+        ...textData,
+        id,
+        name: `${t("vision_board.text_label")} ${index + 1}`,
+        hidden: false,
+        locked: false,
+        zIndex: 50 + index,
+        scale: 1,
+        backgroundColor: "rgba(255,255,255,0.9)",
+      };
+    });
+
+    applySnapshot(
+      normalizeBoardSnapshot({
+        title: initialTitle,
+        description: initialDescription,
+        shortTermGoals: initialShortTermGoals,
+        longTermGoals: initialLongTermGoals,
+        templateId: starter.templateId,
+        canvasSettings: { aspectRatio: starter.aspectRatio, backgroundColor: starter.backgroundColor },
+        textOverlays: seededText,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isEditing || !boardId || boardLoadAttemptedRef.current || draftRestoredRef.current) {

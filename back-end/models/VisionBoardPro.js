@@ -19,15 +19,29 @@ const visionBoardProSchema = new mongoose.Schema({
     default: "",
   },
 
-  shortTermGoals: [{
-    type: String,
-    trim: true,
-  }],
+  // Goals are stored as { text, done }. Older boards hold plain strings;
+  // the controller normalizes both shapes on read and write.
+  shortTermGoals: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
+  },
 
-  longTermGoals: [{
+  longTermGoals: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
+  },
+
+  // Public read-only sharing (/vision-board/shared/:token)
+  isShared: {
+    type: Boolean,
+    default: false,
+  },
+
+  shareToken: {
     type: String,
-    trim: true,
-  }],
+    default: null,
+    index: true,
+  },
 
   // Template configuration
   templateId: {

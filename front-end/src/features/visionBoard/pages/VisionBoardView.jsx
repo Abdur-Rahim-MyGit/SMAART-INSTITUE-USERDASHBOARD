@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
-import { ChevronLeft, Download, Edit, Loader2, Calendar, Clock, ArrowLeft } from "@/components/icons";
-import { getVisionBoard } from "../services/visionBoardProApi";
+import { ChevronLeft, Download, Edit, Loader2, Calendar, Clock, ArrowLeft, Share, LinkIcon, Target } from "@/components/icons";
+import { getVisionBoard, saveVisionBoardGoals } from "../services/visionBoardProApi";
+import { goalProgress, normalizeGoals, toggleGoalAt } from "../utils/goals";
+import GoalChecklist, { GoalMeter } from "../components/GoalChecklist";
+import ShareBoardModal from "../components/modals/ShareBoardModal";
 
 const SURFACE =
   "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
@@ -61,6 +64,7 @@ const VisionBoardView = () => {
   const [board, setBoard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [scale, setScale] = useState(1);
 
   // The Pro editor saves canvasSettings at the top level, NOT under boardData
@@ -102,6 +106,14 @@ const VisionBoardView = () => {
     return () => window.removeEventListener("resize", computeScale);
   }, [board, canvasWidth, canvasHeight]);
 
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape" && showShare) setShowShare(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showShare]);
+
   const handleDownload = async () => {
     if (!canvasRef.current) return;
     try {
@@ -124,6 +136,21 @@ const VisionBoardView = () => {
       toast({ title: "Error", description: "Failed to download", variant: "destructive" });
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const toggleGoal = async (listKey, index) => {
+    const previous = board;
+    const next = { ...board, [listKey]: toggleGoalAt(board[listKey], index) };
+    setBoard(next);
+    try {
+      await saveVisionBoardGoals(board._id, {
+        shortTermGoals: normalizeGoals(next.shortTermGoals),
+        longTermGoals: normalizeGoals(next.longTermGoals),
+      });
+    } catch (error) {
+      setBoard(previous);
+      toast({ title: "Error", description: error.message || "Could not save that goal", variant: "destructive" });
     }
   };
 
@@ -230,6 +257,8 @@ const VisionBoardView = () => {
     (board.boardData?.background?.type === "image" ? board.boardData.background.value : null);
   const createdDate = formatDate(board.createdAt);
   const createdTime = formatTime(board.createdAt);
+  const progress = goalProgress(board);
+  const hasGoals = normalizeGoals(board.shortTermGoals).length + normalizeGoals(board.longTermGoals).length > 0;
 
   return (
     <Shell isDark={isDark}>
@@ -255,9 +284,17 @@ const VisionBoardView = () => {
         <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
         <div className="relative z-10 flex flex-col gap-5 px-6 py-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 max-w-2xl">
-            <span className={`mb-2 inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${CHIP_BRAND}`}>
-              {t("vision_board.presentation_view", "Presentation view")}
-            </span>
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${CHIP_BRAND}`}>
+                {t("vision_board.presentation_view", "Presentation view")}
+              </span>
+              {board.isShared && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                  <LinkIcon className="h-3 w-3" />
+                  {t("vision_board.shared", "Shared")}
+                </span>
+              )}
+            </div>
             <h1
               className="truncate text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl"
               style={{ letterSpacing: "-0.02em" }}
@@ -284,12 +321,17 @@ const VisionBoardView = () => {
                 )}
               </div>
             )}
+            {progress.total > 0 && <GoalMeter progress={progress} className="mt-3 max-w-xs" />}
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <button type="button" onClick={() => navigate("/dashboard/vision-boards")} className={`${BTN_GHOST} hidden h-9 px-4 sm:inline-flex`}>
               <ChevronLeft className="h-4 w-4" />
               {t("vision_board.back_to_gallery", "Back to Gallery")}
+            </button>
+            <button type="button" onClick={() => setShowShare(true)} className={`${BTN_GHOST} h-9 px-4`}>
+              <Share className="h-4 w-4" />
+              {t("vision_board.share", "Share")}
             </button>
             <button type="button" onClick={handleDownload} disabled={isDownloading} className={`${BTN_GHOST} h-9 px-4`}>
               {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
@@ -355,6 +397,54 @@ const VisionBoardView = () => {
           {t("vision_board.designed_in", "Designed in Vision Board Studio")}
         </div>
       </motion.section>
+
+      {/* Goals */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE, delay: 0.14 }}
+        className={`rounded-2xl p-5 sm:p-6 ${SURFACE}`}
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Target className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />
+            <h2 className="text-sm font-extrabold uppercase tracking-widest text-[#072036] dark:text-white">
+              {t("vision_board.goals", "Goals")}
+            </h2>
+          </div>
+          <p className="text-xs text-[#35566b] dark:text-slate-400">
+            {hasGoals
+              ? t("vision_board.goals_tap_hint", "Tap a goal to mark it done — it saves instantly.")
+              : t("vision_board.goals_add_hint", "Add goals in the editor's Goals panel to track them here.")}
+          </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <GoalChecklist
+            title={t("vision_board.short_term_goals", "Short-term goals")}
+            goals={board.shortTermGoals}
+            onToggle={(i) => toggleGoal("shortTermGoals", i)}
+            emptyText={t("vision_board.no_goals_yet", "No goals yet.")}
+          />
+          <GoalChecklist
+            title={t("vision_board.long_term_goals", "Long-term goals")}
+            goals={board.longTermGoals}
+            onToggle={(i) => toggleGoal("longTermGoals", i)}
+            accent="emerald"
+            emptyText={t("vision_board.no_goals_yet", "No goals yet.")}
+          />
+        </div>
+      </motion.section>
+
+      <AnimatePresence>
+        {showShare && (
+          <ShareBoardModal
+            key="share"
+            board={board}
+            onClose={() => setShowShare(false)}
+            onChanged={(updated) => setBoard((prev) => ({ ...prev, isShared: updated.isShared, shareToken: updated.shareToken }))}
+          />
+        )}
+      </AnimatePresence>
     </Shell>
   );
 };
