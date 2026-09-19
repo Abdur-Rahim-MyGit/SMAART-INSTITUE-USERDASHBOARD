@@ -183,60 +183,60 @@ const Settings = () => {
             ) : (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.display_name")}</label>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.display_name")}</label>
                   <input
                     type="text"
                     name="name"
                     value={profileFormData.name}
                     onChange={handleProfileChange}
                     placeholder={t("settings_page.enter_display_name")}
-                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
+                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.email_address")}</label>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.email_address")}</label>
                   <input
                     type="email"
                     name="email"
                     value={profileFormData.email}
                     disabled
                     placeholder={t("settings_page.enter_email")}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-[#00152E] border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 cursor-not-allowed focus:outline-none transition-colors"
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3.5 text-[15px] font-medium text-slate-400 cursor-not-allowed outline-none dark:border-white/5 dark:bg-white/5 dark:text-slate-500"
                   />
                   <p className="mt-1 text-xs text-gray-500">{t("settings_page.email_cannot_change")}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.phone_number")}</label>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.phone_number")}</label>
                   <input
                     type="tel"
                     name="phone"
                     value={profileFormData.phone}
                     onChange={handleProfileChange}
                     placeholder={t("settings_page.enter_phone_number")}
-                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
+                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.bio")}</label>
+                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.bio")}</label>
                   <textarea
                     name="bio"
                     value={profileFormData.bio}
                     onChange={handleProfileChange}
                     placeholder={t("settings_page.tell_about_yourself")}
                     rows={4}
-                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors resize-none"
+                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A] resize-none"
                   />
                 </div>
-                <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-white/10 dark:bg-white/5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.change_password")}</h4>
-                      <p className="text-gray-500 dark:text-slate-300 text-sm">{t("settings_page.update_password_desc")}</p>
+                      <h4 className="text-[15px] font-bold text-slate-900 dark:text-white">{t("settings_page.change_password")}</h4>
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">{t("settings_page.update_password_desc")}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowChangePasswordModal(true)}
-                      className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] text-sm font-bold hover:bg-[#1a3884]/10 transition-colors"
+                      className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-white/10 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
                     >
                       {t("settings_page.change")}
                     </button>
@@ -564,21 +564,23 @@ const Settings = () => {
       {/* Settings Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Navigation */}
-        <div className="lg:col-span-1">
-          <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 p-4 space-y-2 shadow-sm dark:shadow-none">
+        <div className="lg:col-span-1 lg:pr-4">
+          <div className="sticky top-24 flex flex-col gap-1">
             {settingsTabs.map((tab) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeTab === tab.id
-                    ? "bg-[#1a3884]/20 text-gray-900 dark:text-white border border-[#1a3884]"
-                    : "text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
-                    }`}
+                  className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 transition-all text-left ${
+                    isActive
+                      ? "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/20 dark:text-white"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                  }`}
                 >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium text-[14px]">{tab.label}</span>
+                  <Icon className={`h-5 w-5 flex-shrink-0 transition-colors ${isActive ? "text-[#045C9A] dark:text-white" : "text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white"}`} />
+                  <span className="font-bold text-[14px] tracking-wide">{tab.label}</span>
                 </button>
               );
             })}
@@ -592,29 +594,31 @@ const Settings = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none"
+            className="rounded-[32px] bg-white border border-slate-100 p-8 lg:p-10 shadow-2xl shadow-slate-200/40 dark:bg-slate-900 dark:border-white/5 dark:shadow-none min-h-[600px]"
           >
-            <h2 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white mb-1">
-              {settingsTabs.find((tab) => tab.id === activeTab)?.label}
-            </h2>
-            <p className="text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 mb-6">
-              {settingsTabs.find((tab) => tab.id === activeTab)?.description}
-            </p>
+            <div className="mb-10">
+              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
+                {settingsTabs.find((tab) => tab.id === activeTab)?.label}
+              </h2>
+              <p className="text-[14.5px] font-medium text-slate-500 dark:text-slate-400">
+                {settingsTabs.find((tab) => tab.id === activeTab)?.description}
+              </p>
+            </div>
 
             {renderTabContent()}
 
             {/* Save Button */}
             {(activeTab === "profile" || activeTab === "customisation") && (
-              <div className="mt-8 flex justify-end gap-3">
-                <button className="px-4 py-2 text-sm font-bold rounded-lg border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
+              <div className="mt-12 flex justify-end gap-4 border-t border-slate-100 pt-8 dark:border-white/10">
+                <button className="rounded-xl px-6 py-3 text-[14px] font-bold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white">
                   {t("settings_page.cancel")}
                 </button>
                 <button
                   onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
                   disabled={saving}
-                  className="px-4 py-2 text-sm font-bold rounded-lg bg-[#1a3884] text-white hover:bg-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                  className="flex items-center gap-2 rounded-xl bg-[#045C9A] px-8 py-3 text-[14px] font-bold text-white shadow-lg shadow-[#045C9A]/20 transition-all hover:bg-[#03497b] hover:shadow-xl hover:shadow-[#045C9A]/30 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                   {t("settings_page.save_changes")}
                 </button>
               </div>

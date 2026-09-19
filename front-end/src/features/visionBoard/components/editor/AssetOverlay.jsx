@@ -227,19 +227,7 @@ const AssetOverlay = ({
             >
               <RotateCw className="h-4 w-4" />
             </button>
-            {!asset.hasCutout && (
-              <button
-                type="button"
-                className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-emerald-600 text-white shadow-xl transition-all hover:scale-110 active:scale-95"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCutout?.();
-                }}
-                title="Remove background (Cutout)"
-              >
-                <Sparkles className="h-4 w-4" />
-              </button>
-            )}
+
             <button
               type="button"
               className="absolute -bottom-3 -left-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-red-600 text-white shadow-xl transition-all hover:scale-110 active:scale-95"

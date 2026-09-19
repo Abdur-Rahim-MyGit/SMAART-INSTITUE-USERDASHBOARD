@@ -118,10 +118,14 @@ const AssetsPanel = ({ userUploads, onUploadAsset, onAddAssetToCanvas, onAddUplo
                 key={`emoji-${index}`}
                 onClick={() => {
                   if (onAddText) {
-                    onAddText(emoji, { 
+                    onAddText({ 
+                      text: emoji,
                       fontFamily: 'sans-serif',
                       fontSize: 80,
                       color: '#000000',
+                      position: { x: 50, y: 50 },
+                      rotation: 0,
+                      align: 'center',
                     });
                   }
                 }}
