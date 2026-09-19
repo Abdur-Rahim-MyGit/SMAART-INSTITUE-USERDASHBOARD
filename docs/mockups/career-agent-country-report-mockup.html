@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Analyst Market Board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=account_balance,analytics,apartment,arrow_back,arrow_downward,arrow_forward,arrow_upward,auto_awesome,badge,bar_chart,business_center,campaign,card_membership,check_circle,code,corporate_fare,currency_rupee,dark_mode,diversity_3,explore,flag,forum,genetics,groups,handshake,how_to_reg,hub,info,language,layers,light_mode,lightbulb,local_fire_department,map,memory,military_tech,neurology,payments,psychology,public,record_voice_over,refresh,route,schedule,school,shield,smart_toy,speed,star,sticky_note_2,translate,trending_flat,trending_up,verified,work,workspace_premium&display=block">
+<style>
+  /* ── Tokens: copied from careerAgent.css (.career-agent-page) ── */
+  :root {
+    --navy: #ffffff; --navy2: #F8FAFC; --navy3: #F1F5F9;
+    --accent: #045C9A; --accent-text: #045C9A; --accent2: #072036; --accent3: #0d3a5f;
+    --accent-tint: #EAF7FD; --accent-border: rgba(4, 92, 154, 0.25);
+    --green: #059669; --amber: #d97706; --red: #dc2626;
+    --text: #072036; --text1: #072036; --text2: #35566b; --muted: #64748b;
+    --border: #d7ebf5; --border2: #cfe3ee;
+    --card: #ffffff; --card2: #F8FAFC;
+    --header-bg: #ffffff; --header-border: #d7ebf5; --sidebar-bg: #ffffff; --sidebar-hover: #F8FAFC;
+    --page-bg: #F4F8FB;
+    --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --navy: #00152E; --navy2: #00152E; --navy3: #001f44;
+      --accent: #045C9A; --accent-text: #A6D7E8; --accent2: #072036; --accent3: #0d3a5f;
+      --accent-tint: rgba(4, 92, 154, 0.22); --accent-border: rgba(166, 215, 232, 0.35);
+      --green: #34d399; --amber: #fbbf24; --red: #f87171;
+      --text: #f8fafc; --text1: #f8fafc; --text2: #e2e8f0; --muted: #94a3b8;
+      --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.12);
+      --card: #001b3a; --card2: #002147;
+      --header-bg: #00152E; --header-border: rgba(255,255,255,0.08); --sidebar-bg: #00152E; --sidebar-hover: rgba(255,255,255,0.05);
+      --page-bg: #00152E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --navy: #00152E; --navy2: #00152E; --navy3: #001f44;
+    --accent: #045C9A; --accent-text: #A6D7E8; --accent2: #072036; --accent3: #0d3a5f;
+    --accent-tint: rgba(4, 92, 154, 0.22); --accent-border: rgba(166, 215, 232, 0.35);
+    --green: #34d399; --amber: #fbbf24; --red: #f87171;
+    --text: #f8fafc; --text1: #f8fafc; --text2: #e2e8f0; --muted: #94a3b8;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.12);
+    --card: #001b3a; --card2: #002147;
+    --header-bg: #00152E; --header-border: rgba(255,255,255,0.08); --sidebar-bg: #00152E; --sidebar-hover: rgba(255,255,255,0.05);
+    --page-bg: #00152E;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--page-bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, h4, p { margin: 0; }
+  button { font-family: var(--font); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .ms { font-family: "Material Symbols Outlined"; font-weight: 400; font-style: normal; font-size: 20px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr; font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; -webkit-font-feature-settings: "liga"; font-feature-settings: "liga"; overflow: hidden; max-width: 1.2em; }
+  html:not(.icons-ready) .ms { color: transparent !important; }
+  .ms.s13 { font-size: 13px; } .ms.s15 { font-size: 15px; } .ms.s18 { font-size: 18px; } .ms.s24 { font-size: 24px; }
+
+  /* ── Page shell (careerAgent.css) ── */
+  .career-agent-page { display: flex; flex-direction: column; height: 100%; min-height: 100vh; overflow: hidden; position: relative; z-index: 0; }
+  .dash-header { flex-shrink: 0; background: var(--header-bg); border-bottom: 1px solid var(--header-border); padding: 18px 28px 0; }
+  .dash-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .dash-title-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dash-name { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--text1); }
+  .dash-name span { color: var(--accent-text); }
+  .dash-meta { font-size: 13px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dash-meta .dash-meta-name { color: var(--text2); font-weight: 600; }
+  .dash-meta .dash-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); display: inline-block; }
+  .dash-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .btn-icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border); color: var(--text2); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-tint); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; height: 40px; background: var(--card); border: 1px solid var(--border); color: var(--text2); padding: 0 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+  .btn-ghost:hover { background: var(--accent-tint); border-color: var(--accent); color: var(--accent-text); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 40px; background: var(--accent2); color: #fff; border: none; padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--accent3); }
+  :root[data-theme="dark"] .btn-primary { background: var(--accent); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-primary { background: var(--accent); } }
+
+  .role-tabs-bar { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .role-tabs-bar::-webkit-scrollbar { display: none; }
+  .rtab { flex-shrink: 0; padding: 10px 14px 12px; font-size: 13px; font-weight: 500; color: var(--muted); border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 8px; line-height: 1.2; max-width: 320px; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s, border-color 0.15s; }
+  .rtab .rtab-k { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 2px 6px; border-radius: 4px; background: var(--card2); border: 1px solid var(--border); flex-shrink: 0; }
+  .rtab:hover { color: var(--text1); }
+  .rtab.active { color: var(--accent-text); border-bottom-color: var(--accent); font-weight: 600; }
+  .rtab.active .rtab-k { color: var(--accent-text); background: var(--accent-tint); border-color: var(--accent-border); }
+
+  .dash-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+  .sidebar { width: 248px; flex-shrink: 0; border-right: 1px solid var(--border); background: var(--sidebar-bg); display: flex; flex-direction: column; overflow-y: auto; }
+  .sb-header { padding: 18px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+  .sb-label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .sb-role-indicator { display: flex; align-items: center; gap: 10px; }
+  .sb-role-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--green); }
+  .sb-role-name { font-size: 14px; font-weight: 600; color: var(--text1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sb-role-dir { font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-nav { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-nav .sb-label { padding: 4px 12px 8px; }
+  .sitem { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; font-size: 13.5px; font-weight: 500; color: var(--text2); background: transparent; border: none; border-radius: 10px; width: 100%; text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 0.15s, color 0.15s; }
+  .sitem:hover { color: var(--text1); background: var(--sidebar-hover); }
+  .sitem.active { color: #fff; background: var(--accent2); font-weight: 600; }
+  :root[data-theme="dark"] .sitem.active { background: var(--accent); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sitem.active { background: var(--accent); } }
+  .si-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--muted); }
+  .si-icon-wrap .ms { font-size: 18px; }
+  .sitem:hover .si-icon-wrap { color: var(--accent-text); }
+  .sitem.active .si-icon-wrap { color: #fff; }
+
+  .dash-main { flex: 1; padding: 24px 28px 40px; overflow-y: auto; overflow-x: hidden; min-width: 0; }
+  .ph { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .ph-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+  .ph-tile { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; background: var(--accent-tint); color: var(--accent-text); display: flex; align-items: center; justify-content: center; }
+  .ph-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .ph h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--text1); line-height: 1.25; }
+  .ph p { font-size: 13px; font-weight: 500; color: var(--muted); line-height: 1.5; }
+  .ph-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .dchip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: var(--card2); border: 1px solid var(--border); color: var(--text2); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; flex-shrink: 0; }
+  .dchip.brand { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent-text); }
+  .dchip.ok { background: rgba(5,150,105,0.08); border-color: rgba(5,150,105,0.25); color: var(--green); }
+  .dchip.amber { background: rgba(217,119,6,0.08); border-color: rgba(217,119,6,0.28); color: var(--amber); }
+  .dchip.red { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.28); color: var(--red); }
+
+  /* ── Report panel vocabulary ── */
+  .dp { display: flex; flex-direction: column; gap: 16px; }
+  .dp-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px; min-width: 0; }
+  .dp-card.tint { background: var(--accent-tint); border-color: var(--accent-border); }
+  .dp-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .dp-tile { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; background: var(--accent-tint); color: var(--accent-text); display: flex; align-items: center; justify-content: center; }
+  .dp-card-title { font-size: 15px; font-weight: 600; color: var(--text1); line-height: 1.3; }
+  .dp-card-sub { font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+  .dp-rule { height: 1px; background: var(--border); margin: 0 0 14px; }
+  .dp-text { font-size: 14px; line-height: 1.7; color: var(--text2); }
+  .dp-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .dp-eyebrow::before { content: ""; width: 3px; height: 12px; border-radius: 2px; background: var(--accent); }
+  .dp-eyebrow .dp-eyebrow-rule { flex: 1; height: 1px; background: var(--border); }
+  .dp-title-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .rp-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--text1); line-height: 1.25; }
+  .rp-family { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .dp-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dp-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .dp-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 900px) { .dp-grid-2, .dp-grid-3 { grid-template-columns: 1fr; } }
+
+  .rs { display: flex; flex-direction: column; gap: 10px; }
+  .rs-label { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .rs-tabs { display: flex; flex-wrap: wrap; row-gap: 2px; column-gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 1px; }
+  .rs-tab { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
+  .rs-tab:hover { color: var(--text1); border-bottom-color: var(--border2); }
+  .rs-tab .rs-n { font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); }
+  .rs-tab.active { color: var(--accent-text); border-bottom-color: var(--accent); font-weight: 600; }
+  .rs-tab.active .rs-n { color: var(--accent-text); }
+  .rs-tab .ms { font-size: 18px; }
+
+  .stat { position: relative; min-width: 0; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; }
+  .stat-ic { flex-shrink: 0; width: 36px; height: 36px; border-radius: 9px; background: var(--accent-tint); color: var(--accent-text); display: flex; align-items: center; justify-content: center; }
+  .stat-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .stat-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stat-v.sm + .stat-s, .stat-body .stat-s { -webkit-line-clamp: 2; }
+  .stat-v { font-size: 20px; font-weight: 700; color: var(--accent-text); letter-spacing: -0.01em; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat-s { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  .meter { height: 6px; border-radius: 6px; background: var(--border); overflow: hidden; }
+  .meter > i { display: block; height: 100%; border-radius: 6px; background: var(--accent); }
+  .meter > i.amber { background: var(--amber); }
+  .meter > i.red { background: var(--red); }
+  .meter > i.green { background: var(--green); }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 12px; border-radius: 8px; background: var(--card2); border: 1px solid var(--border); color: var(--text1); font-size: 13px; font-weight: 500; line-height: 1.3; }
+  .pill .ms { color: var(--accent-text); font-size: 16px; }
+
+  /* ── Country tables (this mockup) ── */
+  .tbl-wrap { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
+  table { width: 100%; border-collapse: collapse; min-width: 680px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0 10px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th.r, td.r { text-align: right; }
+  td { padding: 13px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--card2); }
+  .country { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text1); white-space: nowrap; }
+  .code { width: 38px; height: 28px; border-radius: 6px; background: var(--accent-tint); border: 1px solid var(--accent-border); color: var(--accent-text); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; display: grid; place-items: center; }
+  .country small { display: block; font-weight: 500; color: var(--muted); font-size: 11.5px; }
+  .range { display: grid; gap: 6px; min-width: 240px; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--text1); }
+  .range-labels span:last-child { color: var(--accent-text); }
+  .track { position: relative; height: 6px; border-radius: 6px; background: var(--border); }
+  .band { position: absolute; top: 0; bottom: 0; border-radius: 6px; background: var(--accent); }
+  .band::before, .band::after { content: ""; position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--card); transform: translate(-50%, -50%); }
+  .band::before { left: 0; } .band::after { left: 100%; }
+  .range-note { font-size: 12px; color: var(--muted); }
+  .adverts { font-size: 15px; font-weight: 700; color: var(--text1); }
+  .delta { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+  .delta .ms { font-size: 15px; }
+  .delta.up { color: var(--green); } .delta.down { color: var(--red); } .delta.flat { color: var(--muted); }
+  .foot { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--muted); margin-top: 14px; }
+  .foot .ms { color: var(--accent-text); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .meter-cell { display: flex; align-items: center; gap: 10px; min-width: 200px; }
+  .meter-cell .meter { flex: 1; }
+  .pct { font-weight: 700; color: var(--text1); width: 42px; text-align: right; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .change { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .change li { display: flex; gap: 12px; align-items: flex-start; }
+  .change .dp-tile { width: 34px; height: 34px; border-radius: 9px; }
+  .change .dp-tile .ms { font-size: 18px; }
+  .change b { display: block; font-size: 13.5px; font-weight: 600; color: var(--text1); }
+  .change p { margin-top: 2px; font-size: 13px; line-height: 1.6; color: var(--text2); }
+  .values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 480px) { .values { grid-template-columns: 1fr; } }
+  .value { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px; background: var(--card2); border: 1px solid var(--border); }
+  .value .ms { color: var(--accent-text); flex-shrink: 0; margin-top: 1px; }
+  .value b { display: block; font-size: 13px; font-weight: 600; color: var(--text1); }
+  .value span { font-size: 12px; color: var(--muted); line-height: 1.45; }
+  .verdict { display: flex; gap: 12px; align-items: flex-start; }
+  .verdict .ms { color: var(--accent-text); flex-shrink: 0; }
+  .verdict b { display: block; font-size: 13.5px; color: var(--text1); }
+  .verdict p { margin-top: 2px; font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+
+  /* ── Skill DNA / Roadmap (mockup) ── */
+  .view { display: none; } .view.active { display: block; }
+  .dp-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .dp-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat-v.sm { font-size: 14px; line-height: 1.35; }
+  .ctab { display: inline-flex; align-items: center; gap: 8px; }
+  .ctab .code { width: 34px; height: 24px; font-size: 10.5px; }
+  .rs-tab:not(.active) .code { background: var(--card2); border-color: var(--border); color: var(--muted); }
+  .term-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .term-grid { grid-template-columns: 1fr; } }
+  .term { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; background: var(--card2); border: 1px solid var(--border); min-width: 0; }
+  .term-k { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .term-k .ms { font-size: 15px; color: var(--accent-text); }
+  .term-v { font-size: 14px; font-weight: 600; color: var(--text1); line-height: 1.35; }
+  .term-s { font-size: 12px; color: var(--muted); line-height: 1.45; }
+  .pill .ms { font-size: 15px; color: var(--accent-text); }
+  .pill .pill-sub { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent-text); }
+  .pill.high { border-color: var(--accent-border); background: var(--accent-tint); }
+  .pill.local { border-style: dashed; }
+
+  .roles-tbl td.rname { font-weight: 600; color: var(--text1); }
+  .roles-tbl .n { width: 26px; height: 26px; border-radius: 7px; background: var(--accent-tint); color: var(--accent-text); font-size: 11px; font-weight: 700; display: inline-grid; place-items: center; margin-right: 10px; vertical-align: middle; }
+  .roles-tbl .local { font-weight: 600; color: var(--accent-text); }
+  .roles-tbl .sub { display: block; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+  .fit-note { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--accent-border); color: var(--text2); font-size: 13px; font-weight: 500; line-height: 1.5; }
+  .fit-note .ms { color: var(--accent-text); flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+  .dp-card.compact { padding: 16px 20px; }
+  .dp-card.compact > * + * { margin-top: 10px; }
+  .fit-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .fit-row .dp-text { flex: 1 1 220px; min-width: 0; }
+  .dchip .ms { font-size: 13px; }
+
+  .range-inr, .stage-inr { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--accent-text); }
+  .range-inr .ms, .stage-inr .ms { font-size: 14px; }
+  .stage-inr { padding-top: 6px; }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; align-items: stretch; }
+  .cert-card { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; background: var(--card); border: 1px solid var(--border); min-width: 0; overflow: hidden; transition: border-color 0.15s; }
+  .cert-card:hover { border-color: var(--accent); }
+  .cert-top { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  .cert-ic { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; background: var(--accent-tint); color: var(--accent-text); display: flex; align-items: center; justify-content: center; }
+  .cert-ic .ms { font-size: 18px; }
+  .cert-name { font-size: 14px; font-weight: 600; color: var(--text1); line-height: 1.4; min-width: 0; }
+  .cert-prov { font-size: 12px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .cert-prov .ms { font-size: 14px; }
+  .cert-skill { font-size: 12px; color: var(--text2); line-height: 1.45; min-width: 0; }
+  .cert-skill b { font-weight: 600; color: var(--muted); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .cert-foot { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; flex-wrap: wrap; }
+  .cert-free { color: var(--green); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .cert-free .ms { font-size: 14px; }
+  .cert-dur { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .cert-dur .ms { font-size: 14px; }
+  .cert-cost b { font-size: 13px; font-weight: 700; color: var(--text1); }
+  .cert-cost span { font-size: 11.5px; font-weight: 600; color: var(--accent-text); }
+
+  /* Roadmap stages */
+  .stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; position: relative; }
+  @media (max-width: 900px) { .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .stages { grid-template-columns: 1fr; } }
+  .stage { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--border); min-width: 0; position: relative; }
+  .stage.now { border-color: var(--accent-border); background: var(--accent-tint); }
+  .stage-top { display: flex; align-items: center; gap: 10px; }
+  .stage-n { width: 30px; height: 30px; border-radius: 8px; background: var(--accent2); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; flex-shrink: 0; }
+  .stage.now .stage-n { background: var(--accent); }
+  .stage-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .stage-title { font-size: 14.5px; font-weight: 700; color: var(--text1); line-height: 1.3; }
+  .stage-alias { font-size: 12px; color: var(--muted); line-height: 1.45; }
+  .stage-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--text2); padding-top: 8px; border-top: 1px solid var(--border); }
+  .stage-row b { color: var(--text1); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stage-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .stage-skills span { font-size: 11.5px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: var(--card2); border: 1px solid var(--border); color: var(--text2); }
+  .stage.now .stage-skills span { background: var(--card); }
+  .notes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 900px) { .notes { grid-template-columns: 1fr; } }
+  .notes li { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px; background: var(--card2); border: 1px solid var(--border); }
+  .notes li .ms { color: var(--accent-text); flex-shrink: 0; margin-top: 1px; }
+  .notes b { display: block; font-size: 13px; font-weight: 600; color: var(--text1); }
+  .notes span { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .dash-header { padding: 14px 16px 0; }
+    .dash-main { padding: 18px 16px 32px; }
+    .dp-card { padding: 16px; }
+    .tbl-wrap { margin: 0 -16px; padding: 0 16px; }
+    .hide-mobile { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="career-agent-page">
+  <header class="dash-header">
+    <div class="dash-top">
+      <div class="dash-title-wrap">
+        <div class="dash-name">Career <span>Intelligence</span> Report</div>
+        <div class="dash-meta">
+          <span class="dash-meta-name">Amirtha</span>
+          <span class="dash-meta-sep"></span><span>amirtha@gmail.com</span>
+          <span class="dash-meta-sep"></span><span class="dchip brand">Sample data</span>
+        </div>
+      </div>
+      <div class="dash-actions">
+        <button class="btn-ghost" type="button"><span class="ms s18">arrow_back</span><span class="hide-mobile">Back to Dashboard</span></button>
+        <button class="btn-icon" type="button" id="theme-toggle" title="Toggle theme"><span class="ms" id="theme-icon">dark_mode</span></button>
+        <button class="btn-primary" type="button"><span class="ms s18">refresh</span><span class="hide-mobile">New Analysis</span></button>
+      </div>
+    </div>
+    <div class="role-tabs-bar">
+      <button class="rtab active" type="button"><span class="rtab-k">Primary</span><span>Business Intelligence &amp; Data Visualization</span></button>
+      <button class="rtab" type="button"><span class="rtab-k">Secondary</span><span>Data Analytics &amp; Insights</span></button>
+      <button class="rtab" type="button"><span class="rtab-k">Tertiary</span><span>Marketing &amp; Customer Analytics</span></button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <aside class="sidebar">
+      <div class="sb-header">
+        <div class="sb-label">Active target role</div>
+        <div class="sb-role-indicator"><div class="sb-role-dot"></div><div class="sb-role-name">Data Analyst</div></div>
+        <div class="sb-role-dir">Business Intelligence &amp; Data Visualization</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="sb-label">Report sections</div>
+        <button class="sitem" type="button" data-view="direction"><span class="si-icon-wrap"><span class="ms">explore</span></span>Direction Overview</button>
+        <button class="sitem" type="button" data-view="roledetail"><span class="si-icon-wrap"><span class="ms">sticky_note_2</span></span>Role Detailed View</button>
+        <button class="sitem active" type="button" data-view="market"><span class="si-icon-wrap"><span class="ms">bar_chart</span></span>Market Intel</button>
+        <button class="sitem" type="button" data-view="skills"><span class="si-icon-wrap"><span class="ms">genetics</span></span>Skill DNA</button>
+        <button class="sitem" type="button" data-view="roadmap"><span class="si-icon-wrap"><span class="ms">map</span></span>Career Roadmap</button>
+        <button class="sitem" type="button" data-view="certs"><span class="si-icon-wrap"><span class="ms">card_membership</span></span>Certifications</button>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <div class="view active" id="view-market">
+      <div class="ph">
+        <div class="ph-left">
+          <div class="ph-tile"><span class="ms">bar_chart</span></div>
+          <div class="ph-text">
+            <h2>Market Intel</h2>
+            <p>Salary, hiring demand and AI exposure for <strong>Data Analyst</strong> across six markets</p>
+          </div>
+        </div>
+        <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span><span class="dchip">Updated 18 Sep 2026</span></div>
+      </div>
+
+      <div class="dp">
+        <div class="dp-title-wrap">
+          <div class="dp-eyebrow">Market snapshot · Global<span class="dp-eyebrow-rule"></span></div>
+          <h3 class="rp-title">Data Analyst</h3>
+          <div class="rp-family">Data &amp; Analytics</div>
+          <div class="dp-chips"><span class="dchip brand">Primary path</span><span class="dchip">Business Intelligence &amp; Data Visualization</span></div>
+        </div>
+
+        <div class="rs">
+          <div class="rs-label">Market boards</div>
+          <div class="rs-tabs" role="tablist" aria-label="Market boards">
+            <button class="rs-tab active" role="tab" id="tab-salary" aria-selected="true" aria-controls="panel-salary" type="button"><span class="rs-n">01</span><span class="ms">payments</span>Salary &amp; Job Adverts</button>
+            <button class="rs-tab" role="tab" id="tab-ai" aria-selected="false" aria-controls="panel-ai" type="button" tabindex="-1"><span class="rs-n">02</span><span class="ms">smart_toy</span>AI Exposure</button>
+          </div>
+        </div>
+
+        <!-- ───────── BOARD 1: SALARY & JOB ADVERTS ───────── -->
+        <section class="dp" id="panel-salary" role="tabpanel" aria-labelledby="tab-salary">
+          <div class="dp-grid-3">
+            <div class="stat"><div class="stat-ic"><span class="ms">payments</span></div><div class="stat-body"><div class="stat-k">Highest paying market</div><div class="stat-v">United States</div><div class="stat-s">$58,000 – $118,000 per year · ≈ ₹49 L – ₹99 L</div></div></div>
+            <div class="stat"><div class="stat-ic"><span class="ms">campaign</span></div><div class="stat-body"><div class="stat-k">Most job adverts</div><div class="stat-v">24,700</div><div class="stat-s">United States · last 30 days</div></div></div>
+            <div class="stat"><div class="stat-ic"><span class="ms">trending_up</span></div><div class="stat-body"><div class="stat-k">Fastest growing demand</div><div class="stat-v">India</div><div class="stat-s">+12% adverts vs previous month</div></div></div>
+          </div>
+
+          <div class="dp-card">
+            <div class="dp-card-head">
+              <div class="dp-tile"><span class="ms">bar_chart</span></div>
+              <div><div class="dp-card-title">Salary range and job adverts by country</div><div class="dp-card-sub">Entry level to senior, gross per year in local currency. Bars sit on one shared scale so markets can be compared.</div></div>
+            </div>
+            <div class="dp-rule"></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Country</th><th>Salary range (low – high)</th><th class="r">Job adverts</th><th class="r">Demand</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><div class="country"><span class="code">IN</span><span>India<small>INR · per year</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>₹4.5 L</span><span>₹14 L</span></div><div class="track"><div class="band" style="left:3%;width:9%"></div></div><div class="range-note">Median ₹7.2 L · Bengaluru, Hyderabad and Pune pay 10–15% above median</div></div></td>
+                    <td class="r"><span class="adverts">18,400</span><span class="delta up"><span class="ms">arrow_upward</span>12%</span></td>
+                    <td class="r"><span class="dchip ok">High</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="country"><span class="code">UK</span><span>United Kingdom<small>GBP · per year</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>£28,000</span><span>£62,000</span></div><div class="track"><div class="band" style="left:28%;width:34%"></div></div><div class="range-note">Median £41,000 · London premium about 18%</div><div class="range-inr"><span class="ms">currency_rupee</span>≈ ₹31 L – ₹69 L per year · median ≈ ₹46 L</div></div></td>
+                    <td class="r"><span class="adverts">6,900</span><span class="delta up"><span class="ms">arrow_upward</span>4%</span></td>
+                    <td class="r"><span class="dchip ok">High</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="country"><span class="code">US</span><span>United States<small>USD · per year</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>$58,000</span><span>$118,000</span></div><div class="track"><div class="band" style="left:46%;width:48%"></div></div><div class="range-note">Median $82,000 · highest in New York, San Francisco and Seattle</div><div class="range-inr"><span class="ms">currency_rupee</span>≈ ₹49 L – ₹99 L per year · median ≈ ₹69 L</div></div></td>
+                    <td class="r"><span class="adverts">24,700</span><span class="delta up"><span class="ms">arrow_upward</span>7%</span></td>
+                    <td class="r"><span class="dchip ok">High</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="country"><span class="code">AU</span><span>Australia<small>AUD · per year</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>A$70,000</span><span>A$125,000</span></div><div class="track"><div class="band" style="left:37%;width:30%"></div></div><div class="range-note">Median A$92,000 · Sydney and Melbourne lead hiring</div><div class="range-inr"><span class="ms">currency_rupee</span>≈ ₹39 L – ₹70 L per year · median ≈ ₹52 L</div></div></td>
+                    <td class="r"><span class="adverts">4,300</span><span class="delta flat"><span class="ms">trending_flat</span>0%</span></td>
+                    <td class="r"><span class="dchip amber">Moderate</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="country"><span class="code">GCC</span><span>Gulf (GCC)<small>AED · per year · tax free</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>AED 120,000</span><span>AED 300,000</span></div><div class="track"><div class="band" style="left:26%;width:40%"></div></div><div class="range-note">Median AED 180,000 · Dubai, Abu Dhabi and Riyadh</div><div class="range-inr"><span class="ms">currency_rupee</span>≈ ₹28 L – ₹69 L per year · median ≈ ₹41 L</div></div></td>
+                    <td class="r"><span class="adverts">2,600</span><span class="delta up"><span class="ms">arrow_upward</span>9%</span></td>
+                    <td class="r"><span class="dchip amber">Moderate</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="country"><span class="code">SG</span><span>Singapore<small>SGD · per year</small></span></div></td>
+                    <td><div class="range"><div class="range-labels"><span>S$48,000</span><span>S$110,000</span></div><div class="track"><div class="band" style="left:28%;width:38%"></div></div><div class="range-note">Median S$68,000 · banking and fintech pay the most</div><div class="range-inr"><span class="ms">currency_rupee</span>≈ ₹31 L – ₹70 L per year · median ≈ ₹44 L</div></div></td>
+                    <td class="r"><span class="adverts">3,100</span><span class="delta down"><span class="ms">arrow_downward</span>3%</span></td>
+                    <td class="r"><span class="dchip amber">Moderate</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="foot"><span class="ms">info</span>Bars are placed on one shared USD-equivalent scale (0 to $125,000), so a wider bar means a wider pay spread in that market. Job adverts count live postings in the last 30 days. INR equivalents use indicative rates: £1 ≈ ₹112 · $1 ≈ ₹84 · A$1 ≈ ₹56 · AED 1 ≈ ₹23 · S$1 ≈ ₹64.</div>
+          </div>
+        </section>
+
+        <!-- ───────── BOARD 2: AI EXPOSURE ───────── -->
+        <section class="dp" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
+          <div class="dp-grid-3">
+            <div class="stat"><div class="stat-ic"><span class="ms">speed</span></div><div class="stat-body"><div class="stat-k">Average AI exposure</div><div class="stat-v">60%</div><div class="stat-s">Across 6 markets · High</div></div></div>
+            <div class="stat"><div class="stat-ic"><span class="ms">memory</span></div><div class="stat-body"><div class="stat-k">Most exposed market</div><div class="stat-v">Singapore</div><div class="stat-s">68% of tasks automatable</div></div></div>
+            <div class="stat"><div class="stat-ic"><span class="ms">shield</span></div><div class="stat-body"><div class="stat-k">Least exposed market</div><div class="stat-v">Gulf (GCC)</div><div class="stat-s">49% · Moderate</div></div></div>
+          </div>
+
+          <div class="dp-card">
+            <div class="dp-card-head">
+              <div class="dp-tile"><span class="ms">smart_toy</span></div>
+              <div><div class="dp-card-title">AI exposure by country</div><div class="dp-card-sub">Share of a Data Analyst's weekly tasks that current AI tools can perform or heavily assist</div></div>
+            </div>
+            <div class="dp-rule"></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Country</th><th>Exposure</th><th class="r">Level</th><th>What drives it</th></tr></thead>
+                <tbody>
+                  <tr><td><div class="country"><span class="code">IN</span><span>India</span></div></td><td><div class="meter-cell"><div class="meter"><i style="width:64%"></i></div><span class="pct">64%</span></div></td><td class="r"><span class="dchip red">High</span></td><td class="range-note">Large volume of routine reporting and data cleaning work</td></tr>
+                  <tr><td><div class="country"><span class="code">UK</span><span>United Kingdom</span></div></td><td><div class="meter-cell"><div class="meter"><i style="width:61%"></i></div><span class="pct">61%</span></div></td><td class="r"><span class="dchip red">High</span></td><td class="range-note">Fast adoption of AI-assisted BI tools in finance and public sector</td></tr>
+                  <tr><td><div class="country"><span class="code">US</span><span>United States</span></div></td><td><div class="meter-cell"><div class="meter"><i style="width:66%"></i></div><span class="pct">66%</span></div></td><td class="r"><span class="dchip red">High</span></td><td class="range-note">Highest tool adoption; analysts expected to work with AI daily</td></tr>
+                  <tr><td><div class="country"><span class="code">AU</span><span>Australia</span></div></td><td><div class="meter-cell"><div class="meter"><i class="amber" style="width:54%"></i></div><span class="pct">54%</span></div></td><td class="r"><span class="dchip amber">Moderate</span></td><td class="range-note">Mixed adoption; mining, health and government still manual-heavy</td></tr>
+                  <tr><td><div class="country"><span class="code">GCC</span><span>Gulf (GCC)</span></div></td><td><div class="meter-cell"><div class="meter"><i class="amber" style="width:49%"></i></div><span class="pct">49%</span></div></td><td class="r"><span class="dchip amber">Moderate</span></td><td class="range-note">Government and energy sectors moving slower on AI tooling</td></tr>
+                  <tr><td><div class="country"><span class="code">SG</span><span>Singapore</span></div></td><td><div class="meter-cell"><div class="meter"><i style="width:68%"></i></div><span class="pct">68%</span></div></td><td class="r"><span class="dchip red">High</span></td><td class="range-note">National AI programme; banks automate most standard reporting</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dp-rule" style="margin-top:14px"></div>
+            <div class="legend">
+              <span><i style="background:var(--green)"></i>Low · under 35%</span>
+              <span><i style="background:var(--amber)"></i>Moderate · 35–55%</span>
+              <span><i style="background:var(--accent)"></i>High · 55–75%</span>
+              <span><i style="background:var(--red)"></i>Very high · over 75%</span>
+            </div>
+          </div>
+
+          <div class="dp-grid-2">
+            <div class="dp-card">
+              <div class="dp-card-head">
+                <div class="dp-tile"><span class="ms">auto_awesome</span></div>
+                <div><div class="dp-card-title">How AI is changing this role</div><div class="dp-card-sub">What is being automated, and what the analyst now owns instead</div></div>
+              </div>
+              <div class="dp-rule"></div>
+              <ul class="change">
+                <li><div class="dp-tile"><span class="ms">memory</span></div><div><b>Data cleaning and preparation is largely automated</b><p>AI tools profile, deduplicate and reshape raw data in minutes. The analyst reviews and approves rather than scripts it by hand.</p></div></li>
+                <li><div class="dp-tile"><span class="ms">analytics</span></div><div><b>Dashboards and standard reports build themselves</b><p>Natural-language queries generate charts and summaries. Value shifts to choosing the right question and checking the answer.</p></div></li>
+                <li><div class="dp-tile"><span class="ms">neurology</span></div><div><b>Insight and interpretation stay human</b><p>Explaining why a number moved, what the business should do, and what the data cannot tell you is where analysts now spend most of their time.</p></div></li>
+                <li><div class="dp-tile"><span class="ms">verified</span></div><div><b>New responsibility: checking the machine</b><p>Validating AI output, spotting hallucinated figures and documenting data lineage is becoming a core part of the job description.</p></div></li>
+                <li><div class="dp-tile"><span class="ms">forum</span></div><div><b>More time with stakeholders, less with spreadsheets</b><p>Roles are moving closer to product, finance and marketing teams, with the analyst acting as a translator between data and decisions.</p></div></li>
+              </ul>
+            </div>
+
+            <div class="dp">
+              <div class="dp-card">
+                <div class="dp-card-head">
+                  <div class="dp-tile"><span class="ms">diversity_3</span></div>
+                  <div><div class="dp-card-title">Human values required</div><div class="dp-card-sub">Strengths AI cannot replace in this role</div></div>
+                </div>
+                <div class="dp-rule"></div>
+                <div class="values">
+                  <div class="value"><span class="ms">psychology</span><div><b>Critical thinking</b><span>Question the data and the model before trusting a result</span></div></div>
+                  <div class="value"><span class="ms">record_voice_over</span><div><b>Storytelling</b><span>Turn numbers into a clear recommendation people act on</span></div></div>
+                  <div class="value"><span class="ms">handshake</span><div><b>Business empathy</b><span>Understand what the team actually needs to decide</span></div></div>
+                  <div class="value"><span class="ms">shield</span><div><b>Ethical judgement</b><span>Handle bias, privacy and consent responsibly</span></div></div>
+                  <div class="value"><span class="ms">lightbulb</span><div><b>Curiosity</b><span>Notice the anomaly the dashboard did not flag</span></div></div>
+                  <div class="value"><span class="ms">groups</span><div><b>Collaboration</b><span>Work across product, finance and engineering</span></div></div>
+                </div>
+              </div>
+              <div class="dp-card tint">
+                <div class="verdict">
+                  <span class="ms s24">check_circle</span>
+                  <div><b>Outlook: augmented, not replaced</b><p>Demand for analysts who can direct AI tools and explain results is rising even as routine reporting work disappears.</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      </div>
+
+      <!-- ═══════════ DIRECTION OVERVIEW ═══════════ -->
+      <div class="view" id="view-direction">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-tile"><span class="ms">explore</span></div>
+            <div class="ph-text">
+              <h2>Direction Overview</h2>
+              <p>What the <strong>Business Intelligence &amp; Data Visualization</strong> direction looks like in each market, and what its roles are called there</p>
+            </div>
+          </div>
+          <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span></div>
+        </div>
+        <div class="dp">
+          <div class="dp-title-wrap">
+            <div class="dp-eyebrow">Career direction<span class="dp-eyebrow-rule"></span></div>
+            <h3 class="rp-title">Business Intelligence &amp; Data Visualization</h3>
+            <div class="dp-chips"><span class="dchip brand">Primary path</span><span class="dchip">10 job roles</span><span class="dchip">B.Com · Business Analytics</span></div>
+          </div>
+          <div class="rs">
+            <div class="rs-label">Select a market</div>
+            <div class="rs-tabs" role="tablist" aria-label="Direction markets" id="direction-tabs"></div>
+          </div>
+          <div id="direction-body" class="dp"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ROLE DETAILED VIEW ═══════════ -->
+      <div class="view" id="view-roledetail">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-tile"><span class="ms">sticky_note_2</span></div>
+            <div class="ph-text">
+              <h2>Role Detailed View</h2>
+              <p>The <strong>Data Analyst</strong> role as it is defined, hired and grown in each market</p>
+            </div>
+          </div>
+          <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span></div>
+        </div>
+        <div class="dp">
+          <div class="rs">
+            <div class="rs-label">Select a market</div>
+            <div class="rs-tabs" role="tablist" aria-label="Role markets" id="roledetail-tabs"></div>
+          </div>
+          <div id="roledetail-body" class="dp"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ CERTIFICATIONS ═══════════ -->
+      <div class="view" id="view-certs">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-tile"><span class="ms">card_membership</span></div>
+            <div class="ph-text">
+              <h2>Certifications</h2>
+              <p>Certifications employers in each market recognise for a <strong>Data Analyst</strong>, and how much weight each carries there</p>
+            </div>
+          </div>
+          <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span></div>
+        </div>
+        <div class="dp">
+          <div class="dp-title-wrap">
+            <div class="dp-eyebrow">Recognised certifications · by country<span class="dp-eyebrow-rule"></span></div>
+            <h3 class="rp-title">Data Analyst</h3>
+            <div class="rp-family">Data &amp; Analytics</div>
+          </div>
+          <div class="rs">
+            <div class="rs-label">Select a market</div>
+            <div class="rs-tabs" role="tablist" aria-label="Certification markets" id="certs-tabs"></div>
+          </div>
+          <div id="certs-body" class="dp"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ SKILL DNA ═══════════ -->
+      <div class="view" id="view-skills">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-tile"><span class="ms">genetics</span></div>
+            <div class="ph-text">
+              <h2>Skill DNA</h2>
+              <p>The skills, tools and local terminology employers expect from a <strong>Data Analyst</strong> in each market</p>
+            </div>
+          </div>
+          <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span></div>
+        </div>
+        <div class="dp">
+          <div class="dp-title-wrap">
+            <div class="dp-eyebrow">Skill profile · by country<span class="dp-eyebrow-rule"></span></div>
+            <h3 class="rp-title">Data Analyst</h3>
+            <div class="rp-family">Data &amp; Analytics</div>
+          </div>
+          <div class="rs">
+            <div class="rs-label">Select a market</div>
+            <div class="rs-tabs" role="tablist" aria-label="Skill DNA markets" id="skills-tabs"></div>
+          </div>
+          <div id="skills-body" class="dp"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ CAREER ROADMAP ═══════════ -->
+      <div class="view" id="view-roadmap">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-tile"><span class="ms">map</span></div>
+            <div class="ph-text">
+              <h2>Career Roadmap</h2>
+              <p>How a <strong>Data Analyst</strong> career progresses in each market, with the titles and milestones used there</p>
+            </div>
+          </div>
+          <div class="ph-right"><span class="dchip"><span class="ms s13">public</span>6 markets</span></div>
+        </div>
+        <div class="dp">
+          <div class="dp-title-wrap">
+            <div class="dp-eyebrow">Progression path · by country<span class="dp-eyebrow-rule"></span></div>
+            <h3 class="rp-title">Data Analyst</h3>
+            <div class="rp-family">Data &amp; Analytics</div>
+          </div>
+          <div class="rs">
+            <div class="rs-label">Select a market</div>
+            <div class="rs-tabs" role="tablist" aria-label="Roadmap markets" id="roadmap-tabs"></div>
+          </div>
+          <div id="roadmap-body" class="dp"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  (function () {
+    try {
+      var mark = function () { document.documentElement.classList.add('icons-ready'); };
+      if (document.fonts && document.fonts.load) {
+        document.fonts.load('24px "Material Symbols Outlined"').then(function (f) { if (f && f.length) mark(); else setTimeout(function () { document.fonts.load('24px "Material Symbols Outlined"').then(function (g) { if (g && g.length) mark(); }); }, 1500); });
+        document.fonts.addEventListener && document.fonts.addEventListener('loadingdone', function () { if (document.fonts.check('24px "Material Symbols Outlined"')) mark(); });
+      } else { mark(); }
+    } catch (e) { document.documentElement.classList.add('icons-ready'); }
+  })();
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+    var panels = { 'tab-salary': document.getElementById('panel-salary'), 'tab-ai': document.getElementById('panel-ai') };
+    function activate(tab) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.setAttribute('tabindex', on ? '0' : '-1');
+        panels[t.id].hidden = !on;
+      });
+      try { localStorage.setItem('market-board-tab', tab.id); } catch (e) { /* storage unavailable */ }
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () { activate(t); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var i = tabs.indexOf(t);
+        var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+        activate(next); next.focus();
+      });
+    });
+    var saved = null;
+    try { saved = localStorage.getItem('market-board-tab'); } catch (e) { saved = null; }
+    activate(tabs.filter(function (t) { return t.id === saved; })[0] || tabs[0]);
+
+    // Theme toggle (mirrors the report header button)
+    var root = document.documentElement, icon = document.getElementById('theme-icon');
+    function isDark() {
+      var s = root.getAttribute('data-theme');
+      if (s) return s === 'dark';
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function paint() { icon.textContent = isDark() ? 'light_mode' : 'dark_mode'; }
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      root.setAttribute('data-theme', isDark() ? 'light' : 'dark'); paint();
+    });
+    paint();
+  })();
+</script>
+
+<script>
+  (function () {
+    var RATES = '£1 ≈ ₹112 · $1 ≈ ₹84 · A$1 ≈ ₹56 · AED 1 ≈ ₹23 · S$1 ≈ ₹64';
+    var COUNTRIES = [
+      { code: 'IN', name: 'India' }, { code: 'UK', name: 'United Kingdom' }, { code: 'US', name: 'United States' },
+      { code: 'AU', name: 'Australia' }, { code: 'GCC', name: 'Gulf (GCC)' }, { code: 'SG', name: 'Singapore' }
+    ];
+
+    /* ── Skill DNA: what each market calls things and what it asks for ── */
+    var SKILLS = {
+      IN: {
+        title: 'Data Analyst / MIS Analyst', alias: 'Also advertised as "MIS Executive", "Business Analyst (Data)" and "Reporting Analyst"',
+        level: 'Fresher → Associate → Senior Analyst', levelNote: 'Campus "fresher" hiring with 0–1 year experience is common',
+        lingo: 'CTC, LPA, notice period', lingoNote: 'Pay is quoted as annual CTC in lakhs (LPA); a 30–90 day notice period is standard',
+        tiles: [24, 4, 9, 7],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['Business reporting (MIS)', 1], ['Sales & revenue analytics', 1], ['Finance basics', 0], ['E-commerce funnels', 0], ['BFSI compliance', 0]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['Advanced Excel', 1, 1], ['SQL', 1, 1], ['Power BI', 1, 1], ['Python (pandas)', 0, 1], ['Tableau', 0, 1], ['Google Sheets', 0], ['VBA macros', 0]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['ChatGPT for SQL & formulas', 1], ['Copilot in Excel', 0], ['Power BI Copilot', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Stakeholder reporting', 1], ['English & Hindi communication', 0], ['Attention to detail', 1], ['Working with tight deadlines', 0]] }
+        ],
+        certs: ['Microsoft PL-300 (Power BI)', 'Google Data Analytics (Coursera)', 'NASSCOM FutureSkills Data Analyst']
+      },
+      UK: {
+        title: 'Data Analyst / Insight Analyst', alias: 'Also "Business Intelligence Analyst", "Performance Analyst" (public sector) and "MI Analyst"',
+        level: 'Graduate → Analyst → Senior → Lead', levelNote: '"Graduate scheme" and "apprenticeship" entry routes are widely used',
+        lingo: 'Salary p.a., pro rata, hybrid', lingoNote: 'Pay quoted per annum; "hybrid 2–3 days" and "DBS check" appear in many adverts',
+        tiles: [22, 4, 8, 6],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['Management information (MI)', 1], ['GDPR & data protection', 1], ['NHS / public-sector KPIs', 0], ['Retail & financial services', 0]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['SQL', 1, 1], ['Power BI', 1, 1], ['Excel', 1], ['Python or R', 0], ['Azure Data Factory', 0, 1], ['Google Analytics 4', 0, 1]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['Microsoft Copilot', 1], ['ChatGPT Enterprise', 0], ['Power BI Copilot', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Presenting to non-technical stakeholders', 1], ['Written reports', 1], ['Prioritisation', 0], ['Data ethics awareness', 0]] }
+        ],
+        certs: ['Microsoft PL-300 (Power BI)', 'Level 4 Data Analyst Apprenticeship', 'BCS Data Analysis Concepts']
+      },
+      US: {
+        title: 'Data Analyst / Business Intelligence Analyst', alias: 'Also "Analytics Associate", "Product Analyst" and "Reporting & Insights Analyst"',
+        level: 'Analyst I → II → Senior → Staff / Manager', levelNote: 'Numbered levels (I, II, III) are standard in tech and finance',
+        lingo: 'Base salary, total comp, exempt', lingoNote: 'Pay is quoted as annual base; "total compensation" adds bonus and equity',
+        tiles: [26, 4, 10, 8],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['Product & growth metrics', 1], ['A/B testing', 1], ['Healthcare (HIPAA) data', 0], ['SaaS revenue metrics', 0]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['SQL', 1, 1], ['Tableau', 1, 1], ['Python', 1], ['Snowflake / BigQuery', 0, 1], ['dbt', 0], ['Looker', 0], ['Excel', 0]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['ChatGPT / Claude for analysis', 1], ['Tableau Pulse', 0], ['Snowflake Cortex', 0], ['GitHub Copilot', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Executive storytelling', 1], ['Cross-functional collaboration', 1], ['Ownership & initiative', 0], ['Async written communication', 0]] }
+        ],
+        certs: ['Tableau Desktop Specialist', 'Google Data Analytics Professional', 'SnowPro Core']
+      },
+      AU: {
+        title: 'Data & Insights Analyst', alias: 'Also "Reporting Analyst", "Business Analyst – Data" and "Analytics Officer" (government)',
+        level: 'Graduate → Analyst → Senior → Principal', levelNote: '"APS level" bands (APS4–APS6) are used in federal government roles',
+        lingo: 'Package incl. super, FTE, WFH', lingoNote: 'Pay quoted as a package including 11.5% superannuation; "full-time equivalent" is common',
+        tiles: [21, 4, 8, 6],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['Privacy Act & data governance', 1], ['Mining & resources reporting', 0], ['Health & government data', 0], ['Banking (Big Four) analytics', 1]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['SQL', 1, 1], ['Power BI', 1, 1], ['Snowflake', 0, 1], ['Python', 0], ['Excel', 1], ['Tableau', 0, 1]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['Microsoft Copilot', 1], ['ChatGPT', 0], ['Power BI Copilot', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Plain-English reporting', 1], ['Stakeholder management', 1], ['Working autonomously', 0], ['Team culture fit', 0]] }
+        ],
+        certs: ['Microsoft PL-300 (Power BI)', 'SnowPro Core', 'IAPA-accredited analytics courses']
+      },
+      GCC: {
+        title: 'Data Analyst / Business Analyst', alias: 'Also "MIS Analyst", "Reporting Specialist" and "Data Analyst (Arabic speaker)"',
+        level: 'Junior → Analyst → Senior → Manager', levelNote: 'Titles jump to "Manager" earlier than in Western markets',
+        lingo: 'Monthly salary, tax free, visa sponsored', lingoNote: 'Pay is quoted per month in AED or SAR; "family visa" and "Emiratisation / Saudisation" appear in adverts',
+        tiles: [20, 4, 7, 5],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['Government & smart-city KPIs', 1], ['Oil, gas & energy reporting', 0], ['Banking & Islamic finance', 0], ['Retail & hospitality', 0]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['Power BI', 1, 1], ['SQL', 1, 1], ['Excel', 1], ['SAP / Oracle reporting', 0, 1], ['Python', 0], ['Qlik', 0]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['Microsoft Copilot', 1], ['ChatGPT', 0], ['Arabic-language AI assistants', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Arabic & English reporting', 1], ['Executive presentations', 1], ['Multicultural teamwork', 0], ['Discretion with sensitive data', 0]] }
+        ],
+        certs: ['Microsoft PL-300 (Power BI)', 'SAP Analytics Cloud', 'PMI-PBA (Business Analysis)']
+      },
+      SG: {
+        title: 'Data Analyst / Analytics Executive', alias: 'Also "Business Intelligence Analyst", "Data Associate" and "Insights Executive"',
+        level: 'Executive → Senior Executive → Assistant Manager', levelNote: '"Executive" is the standard entry-level title, not a senior one',
+        lingo: 'Monthly salary, AWS bonus, EP / S Pass', lingoNote: 'Pay quoted per month; "AWS" is a 13th-month bonus; work passes decide eligibility',
+        tiles: [23, 4, 9, 7],
+        groups: [
+          { key: 'Domain', icon: 'corporate_fare', label: 'Domain knowledge', sub: 'Subject expertise the role is built on', items: [['PDPA & data governance', 1], ['Banking & fintech analytics', 1], ['Logistics & supply chain', 0], ['Public-sector (GovTech) data', 0]] },
+          { key: 'Technical', icon: 'code', label: 'Technical skills', sub: 'Tools, software and hands-on methods', items: [['SQL', 1, 1], ['Tableau', 1, 1], ['Python', 1], ['Power BI', 0, 1], ['Excel', 0], ['Google BigQuery', 0, 1]] },
+          { key: 'AI-Tool', icon: 'smart_toy', label: 'AI tools', sub: 'AI assistants and platforms used day to day', items: [['ChatGPT', 1], ['Microsoft Copilot', 0], ['Tableau Pulse', 0], ['Google Gemini', 0]] },
+          { key: 'Soft', icon: 'groups', label: 'Soft skills', sub: 'Communication, teamwork and judgement', items: [['Clear English presentations', 1], ['Multilingual advantage (Mandarin / Malay)', 0], ['Fast-paced delivery', 1], ['Structured thinking', 0]] }
+        ],
+        certs: ['SkillsFuture Data Analytics', 'Tableau Desktop Specialist', 'Google Data Analytics Professional']
+      }
+    };
+
+    /* ── Roadmap: stages with the titles each market uses ── */
+    var ROADMAP = {
+      IN: { tiles: ['4 stages', '6–8 yrs', 'Fresher / Trainee', '₹3.5 – 6 L'],
+        stages: [
+          { k: 'Entry · 0–1 yr', t: 'Data Analyst (Fresher)', a: 'Also "MIS Executive", "Analyst Trainee", "Graduate Engineer Trainee"', pay: '₹3.5 – 6 L', skills: ['Excel', 'SQL', 'Reporting'] },
+          { k: 'Mid · 2–3 yrs', t: 'Senior Data Analyst', a: 'Also "Analyst II", "Business Analyst"', pay: '₹6 – 10 L', skills: ['Power BI', 'Python', 'Stakeholders'] },
+          { k: 'Senior · 4–6 yrs', t: 'Lead Analyst / Analytics Consultant', a: 'Also "Assistant Manager – Analytics"', pay: '₹10 – 18 L', skills: ['Data modelling', 'Mentoring', 'Domain depth'] },
+          { k: 'Lead · 7+ yrs', t: 'Analytics Manager', a: 'Also "Manager – Business Intelligence", "Head of MIS"', pay: '₹18 – 30 L', skills: ['Team leadership', 'Strategy', 'Budgeting'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Campus placements run Aug–Feb; lateral hiring peaks Jan–Mar after appraisal cycles.'],
+          ['how_to_reg', 'Entry route', 'Campus placements and aptitude tests for freshers; a portfolio of Power BI dashboards is the usual differentiator.'],
+          ['military_tech', 'What unlocks the next step', 'Owning a full reporting stack end to end and one domain (BFSI, e-commerce) by year 3.'],
+          ['badge', 'Local terms to know', 'CTC, LPA, notice period, "immediate joiner", appraisal cycle, WFO / hybrid.']
+        ] },
+      UK: { tiles: ['4 stages', '6–9 yrs', 'Graduate / Apprentice', '£26 – 32k · ≈ ₹29 – 36 L'],
+        stages: [
+          { k: 'Entry · 0–1 yr', t: 'Graduate Data Analyst', a: 'Also "Junior Analyst", "Data Apprentice (Level 4)"', pay: '£26 – 32k', inr: '₹29 – 36 L', skills: ['SQL', 'Excel', 'Power BI'] },
+          { k: 'Mid · 2–4 yrs', t: 'Data Analyst / Insight Analyst', a: 'Also "MI Analyst", "Performance Analyst"', pay: '£35 – 48k', inr: '₹39 – 54 L', skills: ['Python / R', 'Data viz', 'GDPR'] },
+          { k: 'Senior · 4–7 yrs', t: 'Senior Data Analyst', a: 'Also "Senior Insight Analyst", "Analytics Consultant"', pay: '£48 – 62k', inr: '₹54 – 69 L', skills: ['Stakeholders', 'Modelling', 'Mentoring'] },
+          { k: 'Lead · 7+ yrs', t: 'Lead Analyst / Analytics Manager', a: 'Also "Head of Insight", "Principal Analyst" (Civil Service Grade 7)', pay: '£62 – 85k', inr: '₹69 – 95 L', skills: ['Leadership', 'Roadmaps', 'Governance'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Graduate schemes open Sep–Nov for the following year; general hiring is steady with a dip in August.'],
+          ['how_to_reg', 'Entry route', 'Graduate schemes and Level 4 apprenticeships; a "right to work" check is standard.'],
+          ['military_tech', 'What unlocks the next step', 'Delivering insight (not just reports) to senior stakeholders and leading a small project.'],
+          ['badge', 'Local terms to know', 'p.a., pro rata, hybrid, DBS check, IR35 (contracting), day rate, band / grade.']
+        ] },
+      US: { tiles: ['4 stages', '5–8 yrs', 'Analyst I', '$58 – 75k · ≈ ₹49 – 63 L'],
+        stages: [
+          { k: 'Entry · 0–2 yrs', t: 'Data Analyst I', a: 'Also "Analytics Associate", "Junior BI Analyst"', pay: '$58 – 75k', inr: '₹49 – 63 L', skills: ['SQL', 'Excel', 'Tableau'] },
+          { k: 'Mid · 2–4 yrs', t: 'Data Analyst II', a: 'Also "Business Intelligence Analyst", "Product Analyst"', pay: '$75 – 95k', inr: '₹63 – 80 L', skills: ['Python', 'A/B testing', 'Dashboards'] },
+          { k: 'Senior · 4–7 yrs', t: 'Senior Data Analyst', a: 'Also "Analyst III", "Senior BI Analyst"', pay: '$95 – 125k', inr: '₹80 L – 1.05 Cr', skills: ['Modelling', 'Ownership', 'Storytelling'] },
+          { k: 'Lead · 7+ yrs', t: 'Staff Analyst / Analytics Manager', a: 'Also "Principal Analyst", "Director of Analytics"', pay: '$125 – 170k', inr: '₹1.05 – 1.43 Cr', skills: ['Strategy', 'People management', 'Data platform'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Busiest Jan–Mar and Sep–Oct; new-grad roles open in autumn for the next summer.'],
+          ['how_to_reg', 'Entry route', 'Referrals and internships dominate; work authorisation (OPT / H-1B) is asked up front.'],
+          ['military_tech', 'What unlocks the next step', 'Measurable business impact (revenue, retention) and owning metrics for a product area.'],
+          ['badge', 'Local terms to know', 'Base, total comp, equity / RSU, exempt, PTO, 401(k), at-will, remote / hybrid.']
+        ] },
+      AU: { tiles: ['4 stages', '6–9 yrs', 'Graduate Analyst', 'A$65 – 78k · ≈ ₹36 – 44 L'],
+        stages: [
+          { k: 'Entry · 0–1 yr', t: 'Graduate Data Analyst', a: 'Also "Junior Analyst", "APS4 Data Officer"', pay: 'A$65 – 78k', inr: '₹36 – 44 L', skills: ['SQL', 'Excel', 'Power BI'] },
+          { k: 'Mid · 2–4 yrs', t: 'Data & Insights Analyst', a: 'Also "Reporting Analyst", "APS5/6 Analyst"', pay: 'A$80 – 100k', inr: '₹45 – 56 L', skills: ['Snowflake', 'Python', 'Governance'] },
+          { k: 'Senior · 4–7 yrs', t: 'Senior Data Analyst', a: 'Also "Senior Insights Analyst", "EL1 Assistant Director (data)"', pay: 'A$100 – 130k', inr: '₹56 – 73 L', skills: ['Stakeholders', 'Modelling', 'Mentoring'] },
+          { k: 'Lead · 7+ yrs', t: 'Principal Analyst / Analytics Lead', a: 'Also "Manager – Data & Insights", "Head of Analytics"', pay: 'A$130 – 170k', inr: '₹73 – 95 L', skills: ['Leadership', 'Strategy', 'Vendor management'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Graduate programs open Feb–Apr for the following year; general hiring slows over Dec–Jan.'],
+          ['how_to_reg', 'Entry route', 'Graduate programs and direct applications; government roles need a written "selection criteria" response.'],
+          ['military_tech', 'What unlocks the next step', 'Owning data governance for a team and presenting insight to executives.'],
+          ['badge', 'Local terms to know', 'Package incl. super, FTE, WFH, APS level, EL1, permanent vs fixed-term, PR / work rights.']
+        ] },
+      GCC: { tiles: ['4 stages', '5–7 yrs', 'Junior Analyst', 'AED 8 – 12k / month · ≈ ₹1.8 – 2.7 L / month'],
+        stages: [
+          { k: 'Entry · 0–1 yr', t: 'Junior Data Analyst', a: 'Also "MIS Executive", "Reporting Specialist"', pay: 'AED 8 – 12k / month', inr: '₹1.8 – 2.7 L / month', skills: ['Excel', 'Power BI', 'SQL'] },
+          { k: 'Mid · 2–4 yrs', t: 'Data Analyst', a: 'Also "Business Analyst", "BI Analyst"', pay: 'AED 12 – 18k / month', inr: '₹2.7 – 4.1 L / month', skills: ['SAP reporting', 'Dashboards', 'Arabic reporting'] },
+          { k: 'Senior · 4–6 yrs', t: 'Senior Data Analyst', a: 'Also "Analytics Specialist", "Section Head – MIS"', pay: 'AED 18 – 25k / month', inr: '₹4.1 – 5.7 L / month', skills: ['Modelling', 'Executive decks', 'Governance'] },
+          { k: 'Lead · 6+ yrs', t: 'Analytics Manager', a: 'Also "Head of Business Intelligence", "Data & Insights Manager"', pay: 'AED 25 – 40k / month', inr: '₹5.7 – 9.2 L / month', skills: ['Leadership', 'Strategy', 'Vendor management'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Peaks Sep–Nov and Jan–Mar; hiring slows during Ramadan and the summer months.'],
+          ['how_to_reg', 'Entry route', 'Recruiter-led hiring with an employer-sponsored visa; nationals get priority under quota rules.'],
+          ['military_tech', 'What unlocks the next step', 'Bilingual executive reporting and experience with government or energy-sector KPIs.'],
+          ['badge', 'Local terms to know', 'Monthly salary, tax free, housing allowance, gratuity, Emiratisation / Saudisation, family visa.']
+        ] },
+      SG: { tiles: ['4 stages', '5–7 yrs', 'Analytics Executive', 'S$4 – 5.5k / month · ≈ ₹2.6 – 3.5 L / month'],
+        stages: [
+          { k: 'Entry · 0–1 yr', t: 'Data Analyst / Analytics Executive', a: 'Also "Data Associate", "Junior BI Analyst"', pay: 'S$4 – 5.5k / month', inr: '₹2.6 – 3.5 L / month', skills: ['SQL', 'Excel', 'Tableau'] },
+          { k: 'Mid · 2–4 yrs', t: 'Senior Analytics Executive', a: 'Also "Data Analyst II", "BI Analyst"', pay: 'S$5.5 – 7.5k / month', inr: '₹3.5 – 4.8 L / month', skills: ['Python', 'Dashboards', 'PDPA'] },
+          { k: 'Senior · 4–6 yrs', t: 'Senior Data Analyst / Assistant Manager', a: 'Also "Analytics Lead", "Insights Manager"', pay: 'S$7.5 – 10k / month', inr: '₹4.8 – 6.4 L / month', skills: ['Modelling', 'Stakeholders', 'Mentoring'] },
+          { k: 'Lead · 6+ yrs', t: 'Analytics Manager', a: 'Also "Head of Data & Analytics", "AVP – Analytics" (banking)', pay: 'S$10 – 14k / month', inr: '₹6.4 – 9 L / month', skills: ['Leadership', 'Strategy', 'Data platform'] }
+        ],
+        notes: [
+          ['schedule', 'Hiring season', 'Steady year-round with a peak after bonus payouts in Mar–Apr.'],
+          ['how_to_reg', 'Entry route', 'Direct applications and referrals; Employment Pass salary thresholds decide eligibility for foreign hires.'],
+          ['military_tech', 'What unlocks the next step', 'Delivering a bank- or fintech-grade dashboard programme and presenting to management.'],
+          ['badge', 'Local terms to know', 'Monthly salary, AWS (13th month), CPF, EP / S Pass, "Executive" (entry), AVP.']
+        ] }
+    };
+
+    /* ── Direction Overview: the direction as each market knows it ── */
+    var ROLES10 = ['Data Analyst', 'BI Analyst', 'Data Visualization Specialist', 'Reporting Analyst', 'BI Developer', 'Analytics Consultant', 'Dashboard Developer', 'MIS Analyst', 'Insights Analyst', 'Data Quality Analyst'];
+    var DIRECTION = {
+      IN: { known: 'MIS & Business Intelligence', knownNote: 'Most adverts say "MIS", "Reporting" or "BI"; "Business Analytics" is used by IT services and start-ups',
+        sectors: 'IT services, BFSI, e-commerce, GCCs', sectorsNote: 'Global capability centres (GCCs) of foreign firms are the largest hirers',
+        maturity: 'Growing fast', maturityNote: 'High volume of entry-level roles; Power BI and Excel-led reporting still dominates',
+        overview: 'In India this direction is the reporting backbone of IT services firms, banks and the global capability centres of multinationals. Entry is high-volume and campus-driven, with strong demand for Excel, SQL and Power BI, and a fast route into consulting-style BI work.',
+        families: ['Data & Analytics', 'Business Intelligence', 'MIS & Reporting'],
+        local: ['Data Analyst / MIS Analyst', 'BI Analyst', 'Visualization Analyst', 'MIS Executive', 'Power BI Developer', 'Analytics Consultant', 'Dashboard Developer', 'MIS Analyst', 'Insights Analyst', 'Data Quality Analyst'],
+        demand: ['High', 'High', 'Moderate', 'High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate', 'Moderate'] },
+      UK: { known: 'Data & Insight', knownNote: '"Insight" is the common umbrella; "MI" (management information) in banks and the NHS',
+        sectors: 'Financial services, public sector, retail', sectorsNote: 'NHS, Civil Service and councils run large analyst teams',
+        maturity: 'Mature', maturityNote: 'Steady demand; apprenticeships and graduate schemes are established entry routes',
+        overview: 'In the UK this direction sits under "data and insight" teams in banks, retailers and the public sector. Roles emphasise GDPR-aware handling of data and clear written reporting, with Power BI and SQL as the standard toolkit.',
+        families: ['Data & Insight', 'Management Information', 'Business Intelligence'],
+        local: ['Data Analyst / Insight Analyst', 'BI Analyst', 'Data Visualisation Analyst', 'MI Analyst', 'BI Developer', 'Analytics Consultant', 'Power BI Developer', 'Performance Analyst', 'Insight Analyst', 'Data Quality Analyst'],
+        demand: ['High', 'High', 'Moderate', 'High', 'Moderate', 'Moderate', 'Moderate', 'Moderate', 'High', 'Moderate'] },
+      US: { known: 'Business Intelligence & Analytics', knownNote: '"Analytics" is the umbrella; product companies say "Product Analytics" or "Data & Insights"',
+        sectors: 'Tech, healthcare, finance, retail', sectorsNote: 'Largest market by volume; tech and healthcare lead',
+        maturity: 'Mature and tool-rich', maturityNote: 'Modern data stack (Snowflake, dbt, Looker, Tableau) is expected',
+        overview: 'In the United States this direction is broad and tool-heavy. Analysts are expected to own metrics for a product or business area, work in a modern data stack and present findings to leadership, with clear numbered levels from Analyst I to Staff.',
+        families: ['Analytics', 'Business Intelligence', 'Product Analytics'],
+        local: ['Data Analyst / BI Analyst', 'Business Intelligence Analyst', 'Data Visualization Engineer', 'Reporting Analyst', 'BI Developer', 'Analytics Consultant', 'Tableau Developer', 'Operations Analyst', 'Product Analyst', 'Data Quality Analyst'],
+        demand: ['High', 'High', 'Moderate', 'Moderate', 'High', 'High', 'Moderate', 'Moderate', 'High', 'Moderate'] },
+      AU: { known: 'Data & Insights', knownNote: '"Insights" is the standard word; government uses "Data Officer" and "Reporting Officer"',
+        sectors: 'Banking, government, mining, health', sectorsNote: 'Big Four banks and federal/state government are the anchor employers',
+        maturity: 'Mature, smaller volume', maturityNote: 'Fewer roles than the US or UK but strong pay and stability',
+        overview: 'In Australia this direction is anchored by the big banks, government agencies and resources companies. Data governance and privacy sit alongside reporting, and roles are advertised with a package that includes superannuation.',
+        families: ['Data & Insights', 'Business Intelligence', 'Reporting & Governance'],
+        local: ['Data & Insights Analyst', 'BI Analyst', 'Data Visualisation Specialist', 'Reporting Analyst', 'BI Developer', 'Analytics Consultant', 'Dashboard Developer', 'Reporting Officer', 'Insights Analyst', 'Data Quality Analyst'],
+        demand: ['High', 'Moderate', 'Moderate', 'Moderate', 'Moderate', 'Moderate', 'Moderate', 'High', 'High', 'Moderate'] },
+      GCC: { known: 'MIS & Business Intelligence', knownNote: '"MIS" and "Business Analyst" are used interchangeably; bilingual reporting is a plus',
+        sectors: 'Government, energy, banking, retail', sectorsNote: 'Smart-city and Vision 2030 programmes drive government demand',
+        maturity: 'Emerging, fast-growing', maturityNote: 'Strong investment in dashboards for government and energy; visa-sponsored hiring',
+        overview: 'Across the Gulf this direction is growing quickly on the back of government digitisation and energy-sector reporting. Employers value Power BI, SAP reporting and the ability to present to senior leadership in English and Arabic.',
+        families: ['MIS & Reporting', 'Business Intelligence', 'Performance Management'],
+        local: ['Data Analyst / MIS Analyst', 'BI Analyst', 'Visualization Specialist', 'Reporting Specialist', 'BI Developer', 'Analytics Consultant', 'Dashboard Developer', 'MIS Analyst', 'Business Analyst', 'Data Quality Analyst'],
+        demand: ['Moderate', 'High', 'Moderate', 'High', 'Moderate', 'Moderate', 'Moderate', 'High', 'Moderate', 'Low'] },
+      SG: { known: 'Data Analytics & BI', knownNote: '"Analytics" is used by banks and GovTech; "BI" by retail and logistics',
+        sectors: 'Banking, fintech, logistics, public sector', sectorsNote: 'Regional HQs of banks and tech firms hire for the whole of South-East Asia',
+        maturity: 'Mature hub', maturityNote: 'High tool adoption; SkillsFuture funds analytics upskilling',
+        overview: 'In Singapore this direction serves the regional headquarters of banks, fintechs and logistics firms. Analysts are expected to be fluent in SQL and Tableau, aware of PDPA, and comfortable presenting to regional management.',
+        families: ['Data Analytics', 'Business Intelligence', 'Regional Reporting'],
+        local: ['Data Analyst / Analytics Executive', 'BI Analyst', 'Data Visualisation Analyst', 'Reporting Analyst', 'BI Developer', 'Analytics Consultant', 'Dashboard Developer', 'MIS Executive', 'Insights Analyst', 'Data Quality Analyst'],
+        demand: ['High', 'High', 'Moderate', 'Moderate', 'Moderate', 'High', 'Moderate', 'Moderate', 'High', 'Moderate'] }
+    };
+
+    /* ── Role Detailed View: the Data Analyst role per market ── */
+    var ROLEDETAIL = {
+      IN: { localTitle: 'Data Analyst / MIS Analyst', fit: 'Direct fit', tone: 'ok',
+        rationale: 'A B.Com in Business Analytics maps directly to Indian MIS and reporting roles, which value commerce knowledge plus Excel, SQL and Power BI.',
+        bridge: 'Python for automation and a portfolio of Power BI dashboards move you from MIS work into analytics roles.',
+        terms: [['badge', 'Called here', 'Data Analyst, MIS Analyst, MIS Executive', 'Reporting Analyst in BFSI; Business Analyst (Data) in IT services'], ['how_to_reg', 'Work eligibility', 'No restriction for Indian citizens', 'Freshers enter through campus placements and aptitude tests'], ['apartment', 'Typical employers', 'TCS, Infosys, HDFC Bank, Flipkart, GCCs', 'Global capability centres pay 20–30% above local IT services']],
+        what: 'Builds and maintains MIS reports and Power BI dashboards for sales, finance and operations teams, cleans data in Excel and SQL, and explains weekly numbers to managers.',
+        who: 'Commerce graduates who enjoy structured numbers, are strong in Excel and want a fast, high-volume entry into analytics with a clear path to BI consulting.',
+        growth: 'Data Analyst (fresher) → Senior Data Analyst (2–3 yrs) → Lead Analyst / Analytics Consultant (4–6 yrs) → Analytics Manager (7+ yrs).',
+        human: 'Understanding what the business head actually needs from a report, reconciling conflicting sources and communicating exceptions clearly.' },
+      UK: { localTitle: 'Data Analyst / Insight Analyst', fit: 'Skill-bridgeable', tone: 'amber',
+        rationale: 'A B.Com is recognised as bachelor-equivalent, but UK employers expect evidence of SQL, Power BI and GDPR awareness before shortlisting.',
+        bridge: 'Complete PL-300 and a GDPR fundamentals course; a Level 4 Data Analyst apprenticeship is an alternative entry route.',
+        terms: [['badge', 'Called here', 'Data Analyst, Insight Analyst, MI Analyst', 'Performance Analyst in the public sector'], ['how_to_reg', 'Work eligibility', 'Graduate visa (2 yrs) or Skilled Worker visa', 'Sponsorship depends on the salary threshold'], ['apartment', 'Typical employers', 'NHS, Lloyds, Tesco, Civil Service, Deloitte', 'Banks and the public sector run the largest teams']],
+        what: 'Produces management information and insight reports, builds Power BI dashboards, answers ad-hoc questions with SQL and ensures data is handled in line with GDPR.',
+        who: 'Graduates who write clearly, like structured public- or financial-sector work and want a stable, well-defined progression with hybrid working.',
+        growth: 'Graduate Data Analyst → Data / Insight Analyst (2–4 yrs) → Senior Data Analyst (4–7 yrs) → Lead Analyst / Analytics Manager (7+ yrs).',
+        human: 'Turning a stakeholder question into the right analysis, judging data quality and explaining limitations honestly in written reports.' },
+      US: { localTitle: 'Data Analyst / Business Intelligence Analyst', fit: 'Skill-bridgeable', tone: 'amber',
+        rationale: 'US employers hire for skills over degree title, so a B.Com works when paired with SQL, Tableau and Python and a visible portfolio.',
+        bridge: 'Learn the modern data stack (Snowflake or BigQuery, dbt) and publish two or three Tableau Public dashboards with a written analysis.',
+        terms: [['badge', 'Called here', 'Data Analyst I / II, BI Analyst, Analytics Associate', 'Product Analyst in tech companies'], ['how_to_reg', 'Work eligibility', 'OPT (STEM extension), H-1B sponsorship', 'Many postings say "no sponsorship"; target larger firms'], ['apartment', 'Typical employers', 'Amazon, UnitedHealth, JPMorgan, Deloitte, Walmart', 'Tech and healthcare lead hiring volume']],
+        what: 'Owns metrics for a product or business area, writes SQL against a cloud warehouse, builds Tableau or Looker dashboards, runs A/B test readouts and presents findings to leadership.',
+        who: 'Graduates who want ownership of business outcomes, are comfortable with a fast tool-heavy environment and can tell a clear story with numbers.',
+        growth: 'Data Analyst I → Data Analyst II (2–4 yrs) → Senior Data Analyst (4–7 yrs) → Staff Analyst / Analytics Manager (7+ yrs).',
+        human: 'Deciding which metric matters, challenging a result that looks too good, and persuading a product team to act on the evidence.' },
+      AU: { localTitle: 'Data & Insights Analyst', fit: 'Skill-bridgeable', tone: 'amber',
+        rationale: 'A B.Com is well recognised in Australia, but employers look for Power BI, SQL and data-governance awareness and may prefer local experience.',
+        bridge: 'PL-300 plus a short course on the Privacy Act and data governance; Snowflake exposure helps for banking roles.',
+        terms: [['badge', 'Called here', 'Data & Insights Analyst, Reporting Analyst', 'APS4–APS6 Data Officer in federal government'], ['how_to_reg', 'Work eligibility', 'Temporary Graduate visa (485) or employer sponsorship', 'Government roles often require citizenship or PR'], ['apartment', 'Typical employers', 'CBA, NAB, ATO, BHP, Woolworths', 'Banks and government are the anchor hirers']],
+        what: 'Delivers reporting and insight for a business unit, maintains Power BI dashboards on a Snowflake or SQL warehouse, and supports data-governance and privacy compliance.',
+        who: 'Graduates who like a balanced, well-paid market, can work autonomously and communicate in plain English with non-technical stakeholders.',
+        growth: 'Graduate Data Analyst → Data & Insights Analyst (2–4 yrs) → Senior Data Analyst (4–7 yrs) → Principal Analyst / Analytics Lead (7+ yrs).',
+        human: 'Weighing privacy and governance obligations, prioritising competing requests and building trust with business owners.' },
+      GCC: { localTitle: 'Data Analyst / Business Analyst', fit: 'Direct fit', tone: 'ok',
+        rationale: 'Gulf employers hire Indian commerce graduates in large numbers for MIS and BI roles; the B.Com plus Power BI and Excel is a standard profile.',
+        bridge: 'SAP or Oracle reporting exposure and executive-style presentation skills lift you from MIS work into analytics roles.',
+        terms: [['badge', 'Called here', 'Data Analyst, MIS Analyst, Business Analyst', 'Reporting Specialist in government entities'], ['how_to_reg', 'Work eligibility', 'Employer-sponsored work visa', 'Nationals get priority under Emiratisation / Saudisation quotas'], ['apartment', 'Typical employers', 'Emirates, ADNOC, Emirates NBD, Aramco, Majid Al Futtaim', 'Government entities and energy firms pay the most']],
+        what: 'Prepares MIS packs and Power BI dashboards for management, pulls data from SAP or Oracle, and produces bilingual executive reports for government or energy-sector leadership.',
+        who: 'Graduates seeking tax-free pay and rapid title progression, comfortable working in a multicultural team and presenting to senior managers.',
+        growth: 'Junior Data Analyst → Data Analyst (2–4 yrs) → Senior Data Analyst (4–6 yrs) → Analytics Manager (6+ yrs).',
+        human: 'Reading the room in executive meetings, handling sensitive government or energy data with discretion, and bridging language and cultural context.' },
+      SG: { localTitle: 'Data Analyst / Analytics Executive', fit: 'Skill-bridgeable', tone: 'amber',
+        rationale: 'A B.Com is accepted, but Employment Pass salary thresholds and strong local competition mean SQL, Tableau and Python must be demonstrable.',
+        bridge: 'Tableau Desktop Specialist and a SkillsFuture-listed analytics course; a banking or fintech dashboard project is the best portfolio piece.',
+        terms: [['badge', 'Called here', 'Data Analyst, Analytics Executive, Data Associate', '"Executive" is the entry-level title in Singapore'], ['how_to_reg', 'Work eligibility', 'Employment Pass or S Pass', 'Salary thresholds apply; locals are prioritised under fair-consideration rules'], ['apartment', 'Typical employers', 'DBS, Grab, Shopee, GovTech, OCBC', 'Regional HQs hire for the whole of South-East Asia']],
+        what: 'Builds Tableau dashboards and SQL reporting for a regional business, supports PDPA-compliant data handling and presents monthly insights to management across markets.',
+        who: 'Graduates who want a fast-paced regional hub, can present clearly in English and are comfortable with high tool expectations and structured performance reviews.',
+        growth: 'Data Analyst / Analytics Executive → Senior Analytics Executive (2–4 yrs) → Assistant Manager (4–6 yrs) → Analytics Manager (6+ yrs).',
+        human: 'Understanding regional business context, prioritising across markets and translating analysis into a decision for management.' }
+    };
+
+    function demandChip(d) { return '<span class="dchip ' + (d === 'High' ? 'ok' : d === 'Low' ? 'red' : 'amber') + '">' + d + '</span>'; }
+
+    function renderDirection(code) {
+      var d = DIRECTION[code], c = COUNTRIES.filter(function (x) { return x.code === code; })[0];
+      var h = '';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">map</span></div><div><div class="dp-card-title">Direction overview · ' + esc(c.name) + '</div><div class="dp-card-sub">What this career direction is about in this market</div></div></div><div class="dp-rule"></div>' +
+        '<p class="dp-text">' + esc(d.overview) + '</p>' +
+        '<div class="dp-rule" style="margin:14px 0"></div><div class="dp-eyebrow" style="margin-bottom:8px">Job families in this direction</div><div class="pills">' +
+        d.families.map(function (f) { return '<span class="pill"><span class="ms">business_center</span>' + esc(f) + '</span>'; }).join('') + '</div></div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">translate</span></div><div><div class="dp-card-title">How this direction is known in ' + esc(c.name) + '</div><div class="dp-card-sub">The words employers use, who hires and how mature the market is</div></div></div><div class="dp-rule"></div><div class="term-grid">' +
+        term('badge', 'Known locally as', d.known, d.knownNote) + term('apartment', 'Who hires', d.sectors, d.sectorsNote) + term('trending_up', 'Market maturity', d.maturity, d.maturityNote) + '</div></div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">explore</span></div><div><div class="dp-card-title">Job roles in this direction</div><div class="dp-card-sub">All 10 roles, with the title used in ' + esc(c.name) + ' and local demand</div></div></div><div class="dp-rule"></div>' +
+        '<div class="tbl-wrap"><table class="roles-tbl"><thead><tr><th>Role</th><th>Called in ' + esc(c.name) + '</th><th class="r">Demand</th></tr></thead><tbody>' +
+        ROLES10.map(function (r, i) { return '<tr><td class="rname"><span class="n">' + String(i + 1).padStart(2, '0') + '</span>' + esc(r) + (i === 0 ? ' <span class="dchip brand" style="margin-left:8px">Your target role</span>' : '') + '</td><td><span class="local">' + esc(d.local[i]) + '</span></td><td class="r">' + demandChip(d.demand[i]) + '</td></tr>'; }).join('') +
+        '</tbody></table></div><div class="foot"><span class="ms">info</span>Select any role in the live report to read its full profile and how it fits your degree. Titles shown are the most common wording in local adverts.</div></div>';
+      document.getElementById('direction-body').innerHTML = h;
+    }
+
+    function renderRoleDetail(code) {
+      var d = ROLEDETAIL[code], c = COUNTRIES.filter(function (x) { return x.code === code; })[0];
+      var h = '';
+      h += '<div class="dp-title-wrap"><div class="dp-eyebrow">Role profile · ' + esc(c.name) + '<span class="dp-eyebrow-rule"></span></div><h3 class="rp-title">Data Analyst</h3><div class="rp-family">Data &amp; Analytics · known locally as <strong>' + esc(d.localTitle) + '</strong></div><div class="dp-chips"><span class="dchip brand">Your target role</span><span class="dchip ' + d.tone + '"><span class="ms">shield</span>' + esc(d.fit) + '</span></div></div>';
+      h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div class="dp-card-title">How this role fits your degree in ' + esc(c.name) + '</div></div><div class="dp-rule"></div>' +
+        '<div class="fit-row"><span class="dchip ' + d.tone + '"><span class="ms">shield</span>' + esc(d.fit) + '</span><p class="dp-text">' + esc(d.rationale) + '</p></div>' +
+        '<div class="fit-note"><span class="ms">lightbulb</span><span><strong style="font-weight:600;color:var(--text1)">Skill to bridge — </strong>' + esc(d.bridge) + '</span></div>' +
+        '</div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">translate</span></div><div><div class="dp-card-title">This role in ' + esc(c.name) + '</div><div class="dp-card-sub">Local title, work eligibility and who typically hires</div></div></div><div class="dp-rule"></div><div class="term-grid">' +
+        d.terms.map(function (t) { return term(t[0], t[1], t[2], t[3]); }).join('') + '</div></div>';
+      h += '<div class="dp-grid-2">' +
+        sec('work', 'What this role does', d.what) + sec('how_to_reg', 'Who should consider it', d.who) +
+        sec('trending_up', 'Career growth path', d.growth) + sec('diversity_3', 'Human value AI cannot replace', d.human) + '</div>';
+      document.getElementById('roledetail-body').innerHTML = h;
+    }
+    function sec(icon, title, text) { return '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">' + icon + '</span></div><div class="dp-card-title">' + esc(title) + '</div></div><div class="dp-rule"></div><p class="dp-text">' + esc(text) + '</p></div>'; }
+
+    var CERTS = {
+      IN: { note: 'Indian employers shortlist on Microsoft and Google credentials; NASSCOM FutureSkills is recognised by IT services firms.', tiles: ['5', '2', '3–4 weeks', 'PL-300'],
+        list: [
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', '₹4,800 exam', '', 'High', '4–6 weeks'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', '₹3,900 / month', '', 'High', '3–6 months'],
+          ['NASSCOM FutureSkills Prime: Data Analyst', 'NASSCOM · Govt of India', 'Analytics foundations, Python, SQL', '₹0 – 5,000', 'free', 'Moderate', '2–3 months'],
+          ['Tableau Desktop Specialist', 'Tableau (Salesforce)', 'Tableau dashboards, calculations', '$100 · ≈ ₹8,400', '', 'Moderate', '3–4 weeks'],
+          ['IBM Data Analyst Professional Certificate', 'IBM · Coursera', 'Excel, SQL, Python, Cognos', '₹3,900 / month', 'audit', 'Moderate', '3–5 months']
+        ] },
+      UK: { note: 'UK employers value Microsoft PL-300, BCS and apprenticeship standards; CIM adds weight for marketing-analytics roles.', tiles: ['5', '2', '3–4 weeks', 'PL-300'],
+        list: [
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', '£113 · ≈ ₹12,700', '', 'High', '4–6 weeks'],
+          ['Level 4 Data Analyst Apprenticeship', 'Institute for Apprenticeships', 'End-to-end analysis, GDPR, reporting', 'Employer funded', 'free', 'High', '18–24 months'],
+          ['BCS Foundation Certificate in Data Analysis', 'BCS, The Chartered Institute for IT', 'Analysis concepts, data quality, ethics', '£350 · ≈ ₹39,000', '', 'Moderate', '4–8 weeks'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', '£39 / month · ≈ ₹4,400', '', 'Moderate', '3–6 months'],
+          ['Tableau Desktop Specialist', 'Tableau (Salesforce)', 'Tableau dashboards, calculations', '$100 · ≈ ₹8,400', '', 'Moderate', '3–4 weeks']
+        ] },
+      US: { note: 'US employers care more about a portfolio than certificates; Tableau, Snowflake and Google credentials are the ones named in adverts.', tiles: ['5', '2', '2–3 weeks', 'Tableau'],
+        list: [
+          ['Tableau Desktop Specialist', 'Tableau (Salesforce)', 'Tableau dashboards, calculations', '$100 · ≈ ₹8,400', '', 'High', '3–4 weeks'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', '$49 / month · ≈ ₹4,100', '', 'High', '3–6 months'],
+          ['SnowPro Core Certification', 'Snowflake', 'Cloud data warehouse, SQL, data sharing', '$175 · ≈ ₹14,700', '', 'Moderate', '6–8 weeks'],
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', '$165 · ≈ ₹13,900', '', 'Moderate', '4–6 weeks'],
+          ['dbt Fundamentals', 'dbt Labs', 'Data transformation, modelling, testing', 'Free', 'free', 'Moderate', '2–3 weeks']
+        ] },
+      AU: { note: 'Australian employers recognise Microsoft, Snowflake and Tableau credentials; IAPA membership helps for insights roles.', tiles: ['5', '2', '1–2 weeks', 'PL-300'],
+        list: [
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', 'A$225 · ≈ ₹12,600', '', 'High', '4–6 weeks'],
+          ['SnowPro Core Certification', 'Snowflake', 'Cloud data warehouse, SQL', 'A$260 · ≈ ₹14,600', '', 'High', '6–8 weeks'],
+          ['Tableau Desktop Specialist', 'Tableau (Salesforce)', 'Tableau dashboards, calculations', '$100 · ≈ ₹8,400', '', 'Moderate', '3–4 weeks'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', 'A$75 / month · ≈ ₹4,200', '', 'Moderate', '3–6 months'],
+          ['Data Governance & Privacy Act Fundamentals', 'IAPA short course', 'Privacy Act, governance, data ethics', 'Free', 'free', 'Moderate', '1–2 weeks']
+        ] },
+      GCC: { note: 'Gulf employers recognise Microsoft, SAP and PMI credentials; Power BI is the most requested by name.', tiles: ['5', '1', '2–3 weeks', 'PL-300'],
+        list: [
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', 'AED 605 · ≈ ₹13,900', '', 'High', '4–6 weeks'],
+          ['SAP Analytics Cloud Certification', 'SAP', 'SAP reporting, planning, dashboards', 'AED 2,000 · ≈ ₹46,000', '', 'Moderate', '6–10 weeks'],
+          ['PMI-PBA: Professional in Business Analysis', 'Project Management Institute', 'Requirements, stakeholder analysis', 'AED 1,600 · ≈ ₹36,800', '', 'Moderate', '3–4 months'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', 'AED 180 / month · ≈ ₹4,100', '', 'Moderate', '3–6 months'],
+          ['Excel Expert (MO-201)', 'Microsoft', 'Advanced Excel, Power Query', 'AED 370 · ≈ ₹8,500', '', 'Moderate', '2–3 weeks']
+        ] },
+      SG: { note: 'Singapore employers recognise Tableau, Google and Microsoft credentials; SkillsFuture-listed courses attract government subsidies.', tiles: ['5', '2', '1–2 weeks', 'Tableau'],
+        list: [
+          ['Tableau Desktop Specialist', 'Tableau (Salesforce)', 'Tableau dashboards, calculations', '$100 · ≈ ₹8,400', '', 'High', '3–4 weeks'],
+          ['SkillsFuture Data Analytics Course', 'SkillsFuture Singapore', 'SQL, Python, visualisation', 'Subsidised up to 70%', 'free', 'High', '2–3 months'],
+          ['Google Data Analytics Professional Certificate', 'Google · Coursera', 'SQL, spreadsheets, R, dashboards', 'S$65 / month · ≈ ₹4,200', '', 'Moderate', '3–6 months'],
+          ['Microsoft PL-300: Power BI Data Analyst', 'Microsoft', 'Power BI, DAX, data modelling', 'S$220 · ≈ ₹14,100', '', 'Moderate', '4–6 weeks'],
+          ['Google BigQuery Fundamentals', 'Google Cloud Skills Boost', 'Cloud SQL, warehouse basics', 'Free', 'free', 'Moderate', '1–2 weeks']
+        ] }
+    };
+
+    function renderCerts(code) {
+      var d = CERTS[code], c = COUNTRIES.filter(function (x) { return x.code === code; })[0];
+      var h = '';
+      h += '<div class="dp-grid-4">' +
+        tile('card_membership', d.tiles[0], 'Recognised certs', 'named in local adverts') +
+        tile('local_fire_department', d.tiles[1], 'High priority', 'named as must-have') +
+        tile('schedule', d.tiles[2], 'Shortest path', 'quickest recognised credential', true) +
+        tile('star', d.tiles[3], 'Most requested', 'appears most often in adverts', true) + '</div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">card_membership</span></div><div><div class="dp-card-title">Certifications valued in ' + esc(c.name) + '</div><div class="dp-card-sub">' + esc(d.note) + '</div></div></div><div class="dp-rule"></div><div class="cert-grid">' +
+        d.list.map(function (x) {
+          return '<div class="cert-card"><div class="cert-top"><div class="cert-ic"><span class="ms">workspace_premium</span></div><div class="cert-name">' + esc(x[0]) + '</div></div>' +
+            '<div class="cert-prov"><span class="ms">apartment</span><span>' + esc(x[1]) + '</span></div>' +
+            '<div class="cert-skill"><b>Covers</b>' + esc(x[2]) + '</div>' +
+            '<div class="cert-foot"><span class="dchip' + (x[5] === 'High' ? ' brand' : '') + '">' + esc(x[5]) + ' priority</span><span class="cert-dur"><span class="ms">schedule</span>' + esc(x[6]) + '</span></div></div>';
+        }).join('') + '</div>' +
+        '<div class="foot"><span class="ms">info</span>Priority reflects how often the credential is named in local adverts for this role. Duration is the typical study time alongside a degree.</div></div>';
+      document.getElementById('certs-body').innerHTML = h;
+    }
+
+    function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function tabsHtml(prefix, active) {
+      return COUNTRIES.map(function (c, i) {
+        return '<button class="rs-tab' + (c.code === active ? ' active' : '') + '" role="tab" type="button" aria-selected="' + (c.code === active) + '" data-code="' + c.code + '"><span class="ctab"><span class="code">' + c.code + '</span>' + esc(c.name) + '</span></button>';
+      }).join('');
+    }
+
+    function renderSkills(code) {
+      var d = SKILLS[code], c = COUNTRIES.filter(function (x) { return x.code === code; })[0];
+      var h = '';
+      h += '<div class="dp-grid-4">' +
+        tile('genetics', d.tiles[0], 'Skills mapped', 'for this market') +
+        tile('layers', d.tiles[1], 'Categories', 'skill groups') +
+        tile('local_fire_department', d.tiles[2], 'High priority', 'must-have skills') +
+        tile('workspace_premium', d.tiles[3], 'With certification', 'skills with a recognised cert') + '</div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">translate</span></div><div><div class="dp-card-title">How this role is described in ' + esc(c.name) + '</div><div class="dp-card-sub">Titles, levels and pay language you will see in local job adverts</div></div></div><div class="dp-rule"></div>' +
+        '<div class="term-grid">' +
+        term('badge', 'Job title used', d.title, d.alias) +
+        term('layers', 'Level names', d.level, d.levelNote) +
+        term('payments', 'Pay & contract language', d.lingo, d.lingoNote) +
+        '</div></div>';
+      h += '<div class="dp-grid-2">' + d.groups.map(function (g) {
+        return '<div class="dp-card"><div class="dp-card-head" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:12px;min-width:0"><div class="dp-tile"><span class="ms">' + g.icon + '</span></div><div><div class="dp-card-title">' + esc(g.label) + '</div><div class="dp-card-sub">' + esc(g.sub) + '</div></div></div><span class="dchip">' + g.items.length + '</span></div><div class="dp-rule"></div><div class="pills">' +
+          g.items.map(function (it) { return '<span class="pill' + (it[1] ? ' high' : '') + '">' + esc(it[0]) + (it[2] ? '<span class="ms">workspace_premium</span>' : '') + '</span>'; }).join('') +
+          '</div></div>';
+      }).join('') + '</div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">workspace_premium</span></div><div><div class="dp-card-title">Certifications valued in ' + esc(c.name) + '</div><div class="dp-card-sub">Named most often in local adverts for this role</div></div></div><div class="dp-rule"></div><div class="pills">' +
+        d.certs.map(function (x) { return '<span class="pill"><span class="ms">verified</span>' + esc(x) + '</span>'; }).join('') + '</div>' +
+        '<div class="foot"><span class="ms">info</span>Highlighted pills are high-priority skills. A badge on a pill means a recognised certification exists for it.</div></div>';
+      document.getElementById('skills-body').innerHTML = h;
+    }
+
+    function renderRoadmap(code) {
+      var d = ROADMAP[code], c = COUNTRIES.filter(function (x) { return x.code === code; })[0];
+      var h = '';
+      h += '<div class="dp-grid-4">' +
+        tile('route', d.tiles[0], 'Career stages', 'entry to lead') +
+        tile('schedule', d.tiles[1], 'Time to lead', 'typical, with steady progress') +
+        tile('badge', d.tiles[2], 'Entry title', 'what the first job is called', true) +
+        (function () { var pp = d.tiles[3].split(' · ≈ '); return tile('payments', pp[0], 'Entry pay', pp[1] ? '≈ ' + pp[1] + ' in INR' : 'typical first-job salary', true); })() + '</div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">map</span></div><div><div class="dp-card-title">Progression path in ' + esc(c.name) + '</div><div class="dp-card-sub">Each stage shows the title used locally, other names for the same job, typical pay and the skills that matter most</div></div></div><div class="dp-rule"></div>' +
+        '<div class="stages">' + d.stages.map(function (s, i) {
+          return '<div class="stage' + (i === 0 ? ' now' : '') + '"><div class="stage-top"><div class="stage-n">' + (i + 1) + '</div><div class="stage-k">' + esc(s.k) + '</div></div><div class="stage-title">' + esc(s.t) + '</div><div class="stage-alias">' + esc(s.a) + '</div><div class="stage-skills">' + s.skills.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div><div class="stage-row"><span>Typical pay</span><b>' + esc(s.pay) + '</b></div>' + (s.inr ? '<div class="stage-inr"><span class="ms">currency_rupee</span>≈ ' + esc(s.inr) + ' in INR</div>' : '') + '</div>';
+        }).join('') + '</div>' +
+        '<div class="foot"><span class="ms">info</span>Stage 1 is highlighted as your current position. Pay is gross and quoted the way local adverts quote it; INR equivalents use indicative rates (' + RATES + ').</div></div>';
+      h += '<div class="dp-card"><div class="dp-card-head"><div class="dp-tile"><span class="ms">flag</span></div><div><div class="dp-card-title">Local pathway notes</div><div class="dp-card-sub">How hiring works in ' + esc(c.name) + ' and the words to know</div></div></div><div class="dp-rule"></div><ul class="notes">' +
+        d.notes.map(function (n) { return '<li><span class="ms">' + n[0] + '</span><div><b>' + esc(n[1]) + '</b><span>' + esc(n[2]) + '</span></div></li>'; }).join('') + '</ul></div>';
+      document.getElementById('roadmap-body').innerHTML = h;
+    }
+
+    function tile(icon, v, k, s, small) { return '<div class="stat"><div class="stat-ic"><span class="ms s18">' + icon + '</span></div><div class="stat-body"><div class="stat-k">' + esc(k) + '</div><div class="stat-v' + (small ? ' sm' : '') + '">' + esc(v) + '</div><div class="stat-s">' + esc(s) + '</div></div></div>'; }
+    function term(icon, k, v, s) { return '<div class="term"><div class="term-k"><span class="ms">' + icon + '</span>' + esc(k) + '</div><div class="term-v">' + esc(v) + '</div><div class="term-s">' + esc(s) + '</div></div>'; }
+
+    function wire(tabsId, render, storeKey) {
+      var el = document.getElementById(tabsId);
+      var saved = null; try { saved = localStorage.getItem(storeKey); } catch (e) { saved = null; }
+      var current = SKILLS[saved] ? saved : 'IN';
+      function go(code) {
+        current = code; el.innerHTML = tabsHtml(tabsId, code); render(code);
+        try { localStorage.setItem(storeKey, code); } catch (e) { /* storage unavailable */ }
+      }
+      el.addEventListener('click', function (e) { var b = e.target.closest('[data-code]'); if (b) go(b.getAttribute('data-code')); });
+      go(current);
+    }
+    wire('direction-tabs', renderDirection, 'direction-country');
+    wire('roledetail-tabs', renderRoleDetail, 'roledetail-country');
+    wire('skills-tabs', renderSkills, 'skills-country');
+    wire('certs-tabs', renderCerts, 'certs-country');
+    wire('roadmap-tabs', renderRoadmap, 'roadmap-country');
+
+    /* Sidebar → view switching */
+    var items = Array.prototype.slice.call(document.querySelectorAll('.sitem[data-view]'));
+    function showView(name) {
+      items.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === name); });
+      Array.prototype.slice.call(document.querySelectorAll('.view')).forEach(function (v) { v.classList.toggle('active', v.id === 'view-' + name); });
+      document.querySelector('.dash-main').scrollTop = 0;
+      try { localStorage.setItem('report-view', name); } catch (e) { /* storage unavailable */ }
+    }
+    items.forEach(function (b) { b.addEventListener('click', function () { showView(b.getAttribute('data-view')); }); });
+    var savedView = null; try { savedView = localStorage.getItem('report-view'); } catch (e) { savedView = null; }
+    if (savedView && document.getElementById('view-' + savedView)) showView(savedView);
+  })();
+</script>
+
+</body>
+</html>
