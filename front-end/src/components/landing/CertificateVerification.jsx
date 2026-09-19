@@ -42,7 +42,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
             verifyCertificate(certId);
         } catch (err) {
             console.error('QR scan error:', err);
-            setQrScanError(t("landing.verify.qr_error") || 'No QR code found in this image. Please try a clearer photo.');
+            setQrScanError(t("landing.verify.qr_error", 'No QR code found in this image. Please try a clearer photo.'));
         } finally {
             setIsQrScanning(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -51,7 +51,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
 
     const verifyCertificate = async (certId = certificateId) => {
         if (!certId || certId.trim() === '') {
-            toast.error(t("landing.verify.toast_enter_id") || 'Please enter a certificate ID');
+            toast.error(t("landing.verify.toast_enter_id", 'Please enter a certificate ID'));
             return;
         }
 
@@ -65,7 +65,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
             if (response.success) {
                 setVerificationResult(response);
                 if (response.verified) {
-                    toast.success(t("landing.verify.toast_success") || 'Certificate Authenticated Successfully!');
+                    toast.success(t("landing.verify.toast_success", 'Certificate Authenticated Successfully!'));
                 } else {
                     toast.warning(response.message);
                 }
@@ -73,9 +73,9 @@ const CertificateVerification = ({ isDashboard = false }) => {
         } catch (err) {
             console.error('Verification error:', err);
             if (err.status === 404) {
-                setError(t("landing.verify.error_not_found") || 'Certificate not found. Please check the ID and try again.');
+                setError(t("landing.verify.error_not_found", 'Certificate not found. Please check the ID and try again.'));
             } else {
-                setError(err.data?.message || err.message || t("landing.verify.error_failed") || 'Authentication failed.');
+                setError(err.data?.message || err.message || t("landing.verify.error_failed", 'Authentication failed.'));
             }
         } finally {
             setIsVerifying(false);
@@ -111,7 +111,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                             >
                                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#045C9A]/15 bg-[#EAF7FD] px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#045C9A] dark:border-[#045C9A]/30 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8]">
                                     <ShieldCheck className="h-3.5 w-3.5" />
-                                    {t("landing.verify.badge") || "OFFICIAL RECORDS"}
+                                    {t("landing.verify.badge", "OFFICIAL RECORDS")}
                                 </div>
                                 <h2 className={`font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white ${isDashboard ? 'text-[22px] sm:text-[26px] mb-3' : 'text-3xl md:text-4xl lg:text-[40px] mb-5'}`}>
                                     {t("landing.verify.title")} <br />
@@ -125,8 +125,8 @@ const CertificateVerification = ({ isDashboard = false }) => {
 
                                 <div className="space-y-3">
                                     {[
-                                        { icon: Shield, title: t("landing.verify.f1_title") || "TAMPER PROOF", info: t("landing.verify.f1_info") || "Blockchain Secured", sub: t("landing.verify.f1_sub") || "Immutable verification records" },
-                                        { icon: Zap, title: t("landing.verify.f2_title") || "INSTANT", info: t("landing.verify.f2_info") || "Real-time Verification", sub: t("landing.verify.f2_sub") || "Zero wait time validation" },
+                                        { icon: Shield, title: t("landing.verify.f1_title", "TAMPER PROOF"), info: t("landing.verify.f1_info", "Blockchain Secured"), sub: t("landing.verify.f1_sub", "Immutable verification records") },
+                                        { icon: Zap, title: t("landing.verify.f2_title", "INSTANT"), info: t("landing.verify.f2_info", "Real-time Verification"), sub: t("landing.verify.f2_sub", "Zero wait time validation") },
                                     ].map((item, idx) => (
                                         <motion.div
                                             key={idx}
@@ -166,12 +166,12 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                         <div className="relative z-10 flex items-center gap-3">
                                             <ShieldCheck className="h-6 w-6 text-[#A6D7E8]" />
                                             <h3 className="text-[16px] font-extrabold tracking-wide text-white">
-                                                {t("landing.verify.card_title") || "Credential Check"}
+                                                {t("landing.verify.card_title", "Credential Check")}
                                             </h3>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-grow flex-col px-5 pb-8 pt-5 sm:px-8">
+                                    <div className="relative flex flex-grow flex-col px-5 pb-8 pt-5 sm:px-8">
                                         {/* Tab Switcher */}
                                         <div className="relative z-10 mx-auto mb-6 flex w-full max-w-sm rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-1 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#072036]">
                                             <button
@@ -181,7 +181,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                     : 'text-slate-500 hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'}`}
                                             >
                                                 <Hash className="h-3.5 w-3.5" />
-                                                {t("landing.verify.tab_manual") || "MANUAL ID"}
+                                                {t("landing.verify.tab_manual", "MANUAL ID")}
                                             </button>
                                             <button
                                                 onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
@@ -190,7 +190,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                     : 'text-slate-500 hover:text-[#072036] dark:text-slate-400 dark:hover:text-white'}`}
                                             >
                                                 <QrCode className="h-3.5 w-3.5" />
-                                                {t("landing.verify.tab_scan") || "SCAN QR"}
+                                                {t("landing.verify.tab_scan", "SCAN QR")}
                                             </button>
                                         </div>
 
@@ -219,10 +219,10 @@ const CertificateVerification = ({ isDashboard = false }) => {
 
                                                             <div>
                                                                 <h4 className="text-[15px] font-bold text-[#072036] dark:text-white">
-                                                                    {t("landing.verify.scan_title") || "Upload QR Code"}
+                                                                    {t("landing.verify.scan_title", "Upload QR Code")}
                                                                 </h4>
                                                                 <p className="mx-auto mt-1 max-w-[240px] text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-                                                                    {t("landing.verify.scan_desc") || "Select an image containing the certificate QR code."}
+                                                                    {t("landing.verify.scan_desc", "Select an image containing the certificate QR code.")}
                                                                 </p>
                                                             </div>
 
@@ -239,7 +239,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                                 className="mt-2 flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-6 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#034a7d] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                                                             >
                                                                 <ImageIcon className="h-4 w-4" />
-                                                                {t("landing.verify.btn_choose") || "Choose Image"}
+                                                                {t("landing.verify.btn_choose", "Choose Image")}
                                                             </button>
                                                         </div>
                                                     </motion.div>
@@ -254,14 +254,14 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                     >
                                                         <div>
                                                             <label className="mb-1.5 ml-1 block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                                                {t("landing.verify.input_label") || "Certificate Identifier"}
+                                                                {t("landing.verify.input_label", "Certificate Identifier")}
                                                             </label>
                                                             <div className="relative">
                                                                 <input
                                                                     type="text"
                                                                     value={certificateId}
                                                                     onChange={(e) => setCertificateId(e.target.value)}
-                                                                    placeholder={t("landing.verify.placeholder") || "e.g. SMAART-CAP-2025-ABC12"}
+                                                                    placeholder={t("landing.verify.placeholder", "e.g. SMAART-CAP-2025-ABC12")}
                                                                     className="h-12 w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-4 pl-11 text-[13px] font-bold text-[#072036] outline-none transition-all focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/10 dark:border-[#045C9A]/20 dark:bg-[#072036] dark:text-white dark:placeholder:text-slate-600"
                                                                 />
                                                                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -278,7 +278,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                             ) : (
                                                                 <>
                                                                     <ShieldCheck className="h-4 w-4 text-white/80" />
-                                                                    {t("landing.verify.btn_auth") || "Authenticate"}
+                                                                    {t("landing.verify.btn_auth", "Authenticate")}
                                                                 </>
                                                             )}
                                                         </button>
@@ -293,7 +293,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                         initial={{ opacity: 0, y: 10 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         exit={{ opacity: 0, y: 10 }}
-                                                        className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 p-6 backdrop-blur-sm dark:bg-[#0d3a5f]/95"
+                                                        className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-white/95 p-5 backdrop-blur-sm dark:bg-[#0d3a5f]/95"
                                                     >
                                                         <button
                                                             onClick={() => { setVerificationResult(null); setError(null); }}
@@ -309,25 +309,25 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                                         <XCircle className="h-8 w-8 text-red-500" />
                                                                     </div>
                                                                     <h3 className="text-[16px] font-extrabold text-red-600 dark:text-red-400">
-                                                                        {t("landing.verify.failed_title") || "Verification Failed"}
+                                                                        {t("landing.verify.failed_title", "Verification Failed")}
                                                                     </h3>
                                                                     <p className="text-[13px] font-medium text-slate-600 dark:text-slate-300">{error}</p>
                                                                     <button
                                                                         onClick={() => { setVerificationResult(null); setError(null); }}
                                                                         className="mt-4 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-6 py-2 text-[12px] font-bold text-[#072036] transition-colors hover:border-[#045C9A]/30 dark:border-[#045C9A]/20 dark:bg-[#072036] dark:text-white dark:hover:border-blue-500/30"
                                                                     >
-                                                                        {t("landing.verify.btn_try") || "Try Again"}
+                                                                        {t("landing.verify.btn_try", "Try Again")}
                                                                     </button>
                                                                 </div>
                                                             ) : (
-                                                                <div className="space-y-5">
-                                                                    <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border ${verificationResult.verified ? 'border-green-200 bg-green-50 text-green-500 dark:border-green-900/30 dark:bg-green-900/10' : 'border-yellow-200 bg-yellow-50 text-yellow-500 dark:border-yellow-900/30 dark:bg-yellow-900/10'}`}>
-                                                                        {verificationResult.verified ? <CheckCircle2 className="h-8 w-8" /> : <AlertTriangle className="h-8 w-8" />}
+                                                                <div className="space-y-4">
+                                                                    <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border ${verificationResult.verified ? 'border-green-200 bg-green-50 text-green-500 dark:border-green-900/30 dark:bg-green-900/10' : 'border-yellow-200 bg-yellow-50 text-yellow-500 dark:border-yellow-900/30 dark:bg-yellow-900/10'}`}>
+                                                                        {verificationResult.verified ? <CheckCircle2 className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
                                                                     </div>
 
                                                                     <div>
                                                                         <h3 className="text-[16px] font-extrabold text-[#072036] dark:text-white">
-                                                                            {verificationResult.verified ? (t("landing.verify.valid_title") || "Valid Credential") : (t("landing.verify.issue_title") || "Invalid Credential")}
+                                                                            {verificationResult.verified ? (t("landing.verify.valid_title", "Valid Credential")) : (t("landing.verify.issue_title", "Invalid Credential"))}
                                                                         </h3>
                                                                         <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
                                                                             {verificationResult.message}
@@ -335,19 +335,19 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                                     </div>
 
                                                                     {verificationResult.verified && verificationResult.certificate && (
-                                                                        <div className="rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-4 text-left shadow-inner dark:border-[#045C9A]/20 dark:bg-[#072036]">
-                                                                            <div className="mb-3">
+                                                                        <div className="rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-3.5 text-left shadow-inner dark:border-[#045C9A]/20 dark:bg-[#072036]">
+                                                                            <div className="mb-2.5">
                                                                                 <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                                                                    {t("landing.verify.recipient") || "Issued To"}
+                                                                                    {t("landing.verify.recipient", "Issued To")}
                                                                                 </label>
                                                                                 <p className="text-[14px] font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">
                                                                                     {verificationResult.certificate.fullName}
                                                                                 </p>
                                                                             </div>
-                                                                            <div className="mb-3 h-px bg-[#d7ebf5] dark:bg-[#045C9A]/20" />
-                                                                            <div className="mb-3">
+                                                                            <div className="mb-2.5 h-px bg-[#d7ebf5] dark:bg-[#045C9A]/20" />
+                                                                            <div className="mb-2.5">
                                                                                 <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                                                                    {t("landing.verify.credential") || "Credential Name"}
+                                                                                    {t("landing.verify.credential", "Credential Name")}
                                                                                 </label>
                                                                                 <p className="text-[13px] font-bold text-[#072036] dark:text-white">
                                                                                     {verificationResult.certificate.certificateTitle}
@@ -356,7 +356,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                                             <div className="grid grid-cols-2 gap-4">
                                                                                 <div>
                                                                                     <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                                                                        {t("landing.verify.issued") || "Issue Date"}
+                                                                                        {t("landing.verify.issued", "Issue Date")}
                                                                                     </label>
                                                                                     <p className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                                                                                         {new Date(verificationResult.certificate.issueDate).toLocaleDateString()}
@@ -364,7 +364,7 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                                                                 </div>
                                                                                 <div>
                                                                                     <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                                                                        {t("landing.verify.band") || "Band"}
+                                                                                        {t("landing.verify.band", "Band")}
                                                                                     </label>
                                                                                     <p className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                                                                                         {verificationResult.certificate.readinessBand}

@@ -1805,7 +1805,12 @@
       "recipient": "Recipient",
       "credential": "Credential",
       "issued": "Issued",
-      "band": "Band"
+      "band": "Band",
+      "error_not_found": "Certificate not found. Please check the ID and try again.",
+      "error_failed": "Authentication failed. Please try again.",
+      "qr_error": "No QR code found in this image. Please try a clearer photo.",
+      "toast_enter_id": "Please enter a certificate ID",
+      "toast_success": "Certificate authenticated successfully!"
     },
     "contact": {
       "badge": "Get In Touch",
