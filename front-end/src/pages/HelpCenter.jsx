@@ -279,54 +279,38 @@ const HelpCenter = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2 rounded-xl bg-[#045C9A]/10 px-3.5 py-2 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
-                  <Clock className="h-4 w-4" />
-                  <div className="leading-tight">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]">{t("help_center.response_time", "Typical first response")}</p>
-                    <p className="text-xs font-bold">{t("help_center.response_time_value", "Within 24 hours")}</p>
-                  </div>
+                {/* Section switcher lives in the hero: IT Support | Grievance Redressal */}
+                <div
+                  id="help-tabs"
+                  role="tablist"
+                  aria-label={t("help_center.title", "Help & Support")}
+                  className={`flex shrink-0 gap-1 self-start rounded-xl p-1 sm:self-auto ${PANEL}`}
+                >
+                  {TABS.map((id) => {
+                    const meta = tabMeta[id];
+                    const active = activeTab === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        role="tab"
+                        id={`help-tab-${id}`}
+                        aria-selected={active}
+                        onClick={() => setActiveTab(id)}
+                        className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-colors ${
+                          active
+                            ? "bg-[#072036] text-white shadow-sm dark:bg-[#A6D7E8] dark:text-[#072036]"
+                            : "text-[#35566b] hover:bg-white hover:text-[#072036] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                        }`}
+                      >
+                        <meta.icon className="h-4 w-4" />
+                        <span className="whitespace-nowrap">{meta.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </motion.section>
-
-            {/* Tabs -- IT Support / Grievance Redressal */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
-              id="help-tabs"
-              role="tablist"
-              aria-label={t("help_center.title", "Help & Support")}
-              className="grid gap-3 sm:grid-cols-2"
-            >
-              {TABS.map((id) => {
-                const meta = tabMeta[id];
-                const active = activeTab === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="tab"
-                    id={`help-tab-${id}`}
-                    aria-selected={active}
-                    onClick={() => setActiveTab(id)}
-                    className={`flex items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-colors ${
-                      active
-                        ? "border-[#072036] bg-[#072036] text-white shadow-md shadow-[#072036]/15 dark:border-[#A6D7E8] dark:bg-[#A6D7E8] dark:text-[#072036]"
-                        : `${SURFACE} hover:border-[#045C9A]/40`
-                    }`}
-                  >
-                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? "bg-white/15 dark:bg-[#072036]/10" : "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"}`}>
-                      <meta.icon className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-extrabold">{meta.label}</span>
-                      <span className={`block text-xs ${active ? "text-white/75 dark:text-[#072036]/70" : "text-[#35566b] dark:text-slate-400"}`}>{meta.desc}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </motion.div>
 
             {/* Panel */}
             <AnimatePresence mode="wait" initial={false}>
