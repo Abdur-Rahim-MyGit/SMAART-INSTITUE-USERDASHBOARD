@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { apiCall as globalApiCall } from "@/services/api";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
@@ -436,14 +435,14 @@ const PreviewModal = ({ board, onClose, currentVisionId, onVisionChange }) => {
         onVisionChange(null);
         toast({
           title: t("vision_board.toast_vision_disabled_title", "Vision Disabled"),
-          description: t("vision_board.toast_vision_disabled_desc", "Vision board removed from dashboard."),
+          description: t("vision_board.toast_vision_disabled_desc", "This board is no longer your active vision."),
         });
       } else {
         await setActiveVision(board._id);
         onVisionChange(board._id);
         toast({
           title: t("vision_board.toast_vision_enabled_title", "Vision Enabled!"),
-          description: t("vision_board.toast_vision_enabled_desc", "Your vision board is now displayed on your dashboard."),
+          description: t("vision_board.toast_vision_enabled_desc", "This is now your active vision board."),
         });
       }
       onClose();
@@ -901,13 +900,8 @@ const VisionBoardGalleryPro = () => {
       await setActiveVision(board._id);
       setCurrentVisionId(board._id);
       toast({
-        title: "Vision Enabled!",
-        description: "Your vision board is now displayed on your dashboard.",
-        action: (
-          <ToastAction altText={t("vision_board.view_on_dashboard", "View on dashboard")} onClick={() => navigate("/dashboard")}>
-            {t("vision_board.view_on_dashboard", "View on dashboard")}
-          </ToastAction>
-        ),
+        title: t("vision_board.toast_vision_enabled_title", "Vision Enabled!"),
+        description: t("vision_board.toast_vision_enabled_desc", "This is now your active vision board."),
       });
     } catch (error) {
       toast({ title: "Error", description: error.message || "Failed to set vision board", variant: "destructive" });
@@ -918,7 +912,7 @@ const VisionBoardGalleryPro = () => {
     try {
       await clearActiveVision();
       setCurrentVisionId(null);
-      toast({ title: "Vision Deactivated", description: "Vision board removed from dashboard." });
+      toast({ title: t("vision_board.toast_vision_disabled_title", "Vision Disabled"), description: t("vision_board.toast_vision_disabled_desc", "This board is no longer your active vision.") });
     } catch (error) {
       toast({ title: "Error", description: "Failed to deactivate vision board", variant: "destructive" });
     }

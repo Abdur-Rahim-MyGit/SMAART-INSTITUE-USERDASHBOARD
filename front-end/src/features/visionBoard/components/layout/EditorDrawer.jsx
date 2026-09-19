@@ -349,7 +349,7 @@ const EditorDrawer = ({
                {t("vision_board.tab_goals", "Goals")}
              </p>
              <p className="-mt-3 text-xs leading-5 text-slate-500 dark:text-slate-400">
-               {t("vision_board.goals_panel_desc", "These goals show on your dashboard with a progress meter. Tick them off as you get there.")}
+               {t("vision_board.goals_panel_desc", "These goals appear on your board page with a progress meter. Tick them off as you get there.")}
              </p>
              <GoalList
                title={t("vision_board.short_term_goals", "Short-term goals")}
