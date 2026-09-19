@@ -6,37 +6,67 @@ import {
   Pin,
   Loader2,
   Calendar,
-  Link as LinkIcon,
+  LinkIcon,
   Search,
   X,
-  SlidersHorizontal,
-  Heart,
-  BellRing,
   Globe,
-  School,
-  Star,
-  ArrowUpRight,
+  GraduationCap,
+  ExternalLink,
   FileText,
-  Image as ImageIcon,
-  Clock,
-} from "lucide-react";
+  Sticker,
+} from "@/components/icons";
 import { announcementsAPI } from "@/services/announcementsApi";
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// Same tokens as the rest of the dashboard pages.
+const SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const PANEL =
+  "bg-[#F1F5F9] dark:bg-[#072036]/60 border border-[#d7ebf5] dark:border-white/10";
+const FIELD =
+  "w-full rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-4 text-sm font-medium text-[#072036] outline-none transition-colors placeholder:text-slate-400 focus:border-[#045C9A] focus:bg-white focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-[#072036]";
+const BTN_GHOST =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] text-xs font-bold text-slate-600 transition-colors hover:border-[#045C9A]/30 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white";
+const EASE = [0.25, 0.1, 0.25, 1];
+
+const REACTIONS = ["👍", "❤️", "🔥", "💡", "🙌", "😄"];
+
+const ChipGroup = ({ id, options, value, onChange }) => (
+  <div id={id} className={`flex h-10 max-w-full items-center gap-1 overflow-x-auto rounded-xl p-1 ${PANEL}`}>
+    {options.map(({ key, label, Icon }) => {
+      const active = value === key;
+      return (
+        <button
+          key={key}
+          type="button"
+          onClick={() => onChange(key)}
+          aria-pressed={active}
+          className={`inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-xs font-bold transition-colors ${
+            active
+              ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#045C9A]/40 dark:text-white"
+              : "text-[#35566b] hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-white"
+          }`}
+        >
+          {Icon && <Icon className="h-4 w-4" />}
+          {label}
+        </button>
+      );
+    })}
+  </div>
+);
+
 const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
   const { t } = useTranslation();
 
   const timeAgo = (dateString) => {
     const date = new Date(dateString);
-    const diffMs = Date.now() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
+    const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
     if (diffMins < 1) return t("community_page.just_now");
     if (diffMins < 60) return `${diffMins} ${t("community_page.m_ago")}`;
     if (diffHours < 24) return `${diffHours} ${t("community_page.h_ago")}`;
-    if (diffDays < 7) return `${diffDays} ${t("community_page.d_ago")}`;
-    return date.toLocaleDateString();
+    if (diffDays < 7) return `${diffDays} ${t("community_page.d_ago", "d ago")}`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   const DATE_FILTERS = [
@@ -47,8 +77,8 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
 
   const ROLE_FILTERS = [
     { key: "all", label: t("community_page.filter_all") },
-    { key: "admin", label: t("community_page.filter_smaart_admin") },
-    { key: "college_admin", label: t("community_page.filter_college_admin") },
+    { key: "admin", label: t("community_page.filter_smaart_admin"), Icon: Globe },
+    { key: "college_admin", label: t("community_page.filter_college_admin"), Icon: GraduationCap },
   ];
 
   const [announcements, setAnnouncements] = useState([]);
@@ -56,17 +86,15 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
   const [dateFilter, setDateFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activePicker, setActivePicker] = useState(null); // Track which announcement's picker is open
+  const [activePicker, setActivePicker] = useState(null);
 
-  // ── Fetch from backend (only re-runs when dateFilter changes) ──────────────
   const fetchAnnouncements = async (dFilter) => {
     setLoading(true);
-    if (onLoadingChange) onLoadingChange(true);
+    onLoadingChange?.(true);
     try {
       const params = dFilter !== "all" ? { dateFilter: dFilter } : {};
       const res = await announcementsAPI.getAnnouncements(params);
       if (res.success) {
-        // Pinned first, then newest
         const sorted = [...res.data].sort((a, b) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
@@ -78,7 +106,7 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
       console.error("[NoticesFeed] fetch error:", err);
     } finally {
       setLoading(false);
-      if (onLoadingChange) onLoadingChange(false);
+      onLoadingChange?.(false);
     }
   };
 
@@ -90,41 +118,18 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
     try {
       const res = await announcementsAPI.react(id, emoji);
       if (res.success) {
-        setAnnouncements((prev) =>
-          prev.map((ann) =>
-            ann._id === id
-              ? {
-                ...ann,
-                reactions: res.data.reactions,
-              }
-              : ann
-          )
-        );
+        setAnnouncements((prev) => prev.map((ann) => (ann._id === id ? { ...ann, reactions: res.data.reactions } : ann)));
       }
     } catch (err) {
       console.error("[NoticesFeed] React error:", err);
     }
   };
 
-  // ── Client-side filtering: search + role (in-memory, no extra API call) ────
   const visible = useMemo(() => {
     let list = announcements;
-
-    // Role filter
-    if (roleFilter !== "all") {
-      list = list.filter((a) => a.createdByRole === roleFilter);
-    }
-
-    // Search: match title or description (case-insensitive)
+    if (roleFilter !== "all") list = list.filter((a) => a.createdByRole === roleFilter);
     const q = searchQuery.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (a) =>
-          a.title?.toLowerCase().includes(q) ||
-          a.description?.toLowerCase().includes(q)
-      );
-    }
-
+    if (q) list = list.filter((a) => a.title?.toLowerCase().includes(q) || a.description?.toLowerCase().includes(q));
     return list;
   }, [announcements, roleFilter, searchQuery]);
 
@@ -136,316 +141,262 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
   };
 
   useEffect(() => {
-    const handleGlobalClick = () => setActivePicker(null);
-    window.addEventListener("click", handleGlobalClick);
-    return () => window.removeEventListener("click", handleGlobalClick);
+    const close = () => setActivePicker(null);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
   }, []);
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  const userId = currentUser?._id?.toString() || currentUser?.id?.toString();
+
   return (
-    <div className="space-y-4">
-
-      {/* ── Search bar ─────────────────────────────────────────────────── */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t("community_page.search_placeholder")}
-          className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-semibold text-[#002147] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
-        />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-
-      {/* ── Filter row: Date + Role + Clear ────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between w-full">
-        {/* Date filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-          {DATE_FILTERS.map((f) => (
+    <div className="flex flex-col gap-4 sm:gap-6">
+      {/* Toolbar */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
+        className={`flex flex-col gap-3 rounded-2xl p-3 xl:flex-row xl:items-center ${SURFACE}`}
+      >
+        <div className="relative min-w-0 flex-1 xl:min-w-[240px]">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            id="notice-search"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("community_page.search_placeholder")}
+            className={`${FIELD} h-10 pl-10 pr-10`}
+          />
+          {searchQuery && (
             <button
-              key={f.key}
-              onClick={() => setDateFilter(f.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${dateFilter === f.key
-                ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
-                }`}
+              type="button"
+              onClick={() => setSearchQuery("")}
+              aria-label={t("community_page.clear_search", "Clear search")}
+              className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:hover:bg-white/10"
             >
-              {f.label}
+              <X className="h-3.5 w-3.5" />
             </button>
-          ))}
+          )}
         </div>
-
-        {/* Role filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-white/10 shadow-sm">
-          {ROLE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setRoleFilter(f.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === f.key
-                ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
-                }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <ChipGroup id="notice-date" options={DATE_FILTERS} value={dateFilter} onChange={setDateFilter} />
+          <ChipGroup id="notice-role" options={ROLE_FILTERS} value={roleFilter} onChange={setRoleFilter} />
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── Loading ─────────────────────────────────────────────────────── */}
+      {/* Loading */}
       {loading && (
-        <div className="flex items-center justify-center py-14">
-          <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
+        <div className="flex flex-col items-center justify-center gap-3 py-20">
+          <Loader2 className="h-9 w-9 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
         </div>
       )}
 
-      {/* ── Empty states ────────────────────────────────────────────────── */}
+      {/* Empty */}
       {!loading && visible.length === 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 6 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-14 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-3xl border border-white/40 dark:border-slate-700/40 shadow-sm"
+          className={`flex flex-col items-center justify-center rounded-2xl px-6 py-16 text-center ${SURFACE}`}
         >
-          <Megaphone className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-4" />
-          {hasActiveFilters || searchQuery ? (
-            <>
-              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">{t("community_page.no_results")}</p>
-              <p className="text-gray-400 dark:text-slate-500 text-sm mb-4">
-                {t("community_page.no_results_desc")}
-              </p>
-              <button
-                onClick={clearFilters}
-                className="px-4 py-2 text-xs font-bold text-[#002147] dark:text-white bg-[#002147]/5 dark:bg-white/5 hover:bg-[#002147]/10 dark:hover:bg-white/10 rounded-xl transition-all"
-              >
-                {t("community_page.clear_filters")}
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">
-                {t("community_page.no_announcements")}
-              </p>
-              <p className="text-gray-400 dark:text-slate-500 text-sm">
-                {t("community_page.no_announcements_desc")}
-              </p>
-            </>
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#045C9A]/10 dark:bg-[#045C9A]/25">
+            <Megaphone className="h-7 w-7 text-[#045C9A] dark:text-[#A6D7E8]" />
+          </div>
+          <h3 className="text-lg font-extrabold tracking-tight text-[#072036] dark:text-white">
+            {hasActiveFilters ? t("community_page.no_results") : t("community_page.no_announcements")}
+          </h3>
+          <p className="mt-1.5 max-w-md text-sm text-[#35566b] dark:text-slate-400">
+            {hasActiveFilters ? t("community_page.no_results_desc") : t("community_page.no_announcements_desc")}
+          </p>
+          {hasActiveFilters && (
+            <button type="button" onClick={clearFilters} className={`${BTN_GHOST} mt-5 h-9 px-4`}>
+              {t("community_page.clear_filters")}
+            </button>
           )}
         </motion.div>
       )}
 
-      {/* ── Announcement cards ───────────────────────────────────────────── */}
+      {/* Cards */}
       <AnimatePresence mode="popLayout">
         {!loading &&
           visible.map((ann, index) => {
-            const isExpired =
-              ann.expiryDate && new Date(ann.expiryDate) < new Date();
+            const isExpired = ann.expiryDate && new Date(ann.expiryDate) < new Date();
+            const isSmaart = ann.createdByRole === "admin";
+            const reacted = ann.reactions?.some((r) => r.userId?.toString() === userId);
+            const attachment = ann.attachmentUrl
+              ? ann.attachmentType === "video" || /\.(mp4|webm|ogg)$/i.test(ann.attachmentUrl)
+                ? "video"
+                : ann.attachmentType === "image" || /\.(jpeg|jpg|gif|png|webp)$/i.test(ann.attachmentUrl)
+                  ? "image"
+                  : "link"
+              : null;
 
             return (
-              <motion.div
+              <motion.article
                 key={ann._id}
                 layout
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ delay: index * 0.04, duration: 0.2 }}
-                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
-                  ? "opacity-60 border-gray-100 dark:border-white/8"
-                  : ann.isPinned
-                    ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
-                    : "border-white/40 dark:border-slate-700/40 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
-                  }`}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ delay: Math.min(index, 6) * 0.04, duration: 0.3, ease: EASE }}
+                className={`relative overflow-hidden rounded-2xl transition-shadow hover:shadow-md ${SURFACE} ${isExpired ? "opacity-60" : ""}`}
               >
-                {/* Subtle indicator for pinned */}
                 {ann.isPinned && !isExpired && (
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400 rounded-l-3xl" />
+                  <div className="absolute inset-y-0 left-0 w-1 bg-[#045C9A] dark:bg-[#A6D7E8]" aria-hidden="true" />
                 )}
-                {/* ── Badge row ─────────────────────────────────────────── */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {ann.isPinned && !isExpired && (
-                    <span className="flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                      <Pin className="w-2.5 h-2.5" /> {t("community_page.pinned")}
-                    </span>
-                  )}
-                  {isExpired && (
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                      {t("community_page.expired")}
-                    </span>
-                  )}
-                  <span
-                    className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider ${ann.createdByRole === "admin"
-                      ? "bg-[#002147]/10 dark:bg-blue-900/30 text-[#002147] dark:text-blue-400 border border-[#002147]/5 dark:border-blue-800/30"
-                      : "bg-blue-50 dark:bg-[#003170] text-blue-700 dark:text-slate-300 border border-blue-100 dark:border-slate-600"
+
+                <div className="p-5 sm:p-6">
+                  {/* Badge row */}
+                  <div className="mb-3 flex flex-wrap items-center gap-1.5">
+                    {ann.isPinned && !isExpired && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-[#045C9A]/10 px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
+                        <Pin className="h-3 w-3" />
+                        {t("community_page.pinned")}
+                      </span>
+                    )}
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${
+                        isSmaart
+                          ? "bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]"
+                          : "bg-[#F1F5F9] text-[#35566b] dark:bg-white/[0.06] dark:text-slate-300"
                       }`}
-                  >
-                    {ann.createdByRole === "admin" ? (
-                      <Globe className="w-3 h-3" />
-                    ) : (
-                      <School className="w-3 h-3" />
+                    >
+                      {isSmaart ? <Globe className="h-3 w-3" /> : <GraduationCap className="h-3 w-3" />}
+                      {isSmaart ? t("community_page.smaart") : t("community_page.college")}
+                    </span>
+                    {isExpired && (
+                      <span className="inline-flex items-center rounded-md bg-[#F1F5F9] px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-slate-400 dark:bg-white/[0.06] dark:text-slate-500">
+                        {t("community_page.expired")}
+                      </span>
                     )}
-                    {ann.createdByRole === "admin" ? t("community_page.smaart") : t("community_page.college")}
-                  </span>
-                </div>
-
-                {/* ── Title ─────────────────────────────────────────────── */}
-                <h3 className="text-[#002147] dark:text-white text-base sm:text-lg font-extrabold mb-2 tracking-tight">
-                  {ann.title}
-                </h3>
-
-                {/* ── Description ───────────────────────────────────────── */}
-                <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line mb-4 sm:mb-6">
-                  {ann.description}
-                </p>
-
-                {/* ── Attachment link/preview ───────────────────────────────────── */}
-                {ann.attachmentUrl && (
-                  <div className="flex mb-4 sm:mb-6">
-                    {ann.attachmentType === 'video' || ann.attachmentUrl.match(/\.(mp4|webm|ogg)$/i) ? (
-                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-black">
-                        <video
-                          src={ann.attachmentUrl}
-                          controls
-                          className="w-full h-auto max-h-[400px]"
-                        />
-                      </div>
-                    ) : ann.attachmentType === 'image' || ann.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
-                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-[#F8FAFC] dark:bg-[#002A5C]">
-                        <img
-                          src={ann.attachmentUrl}
-                          alt="Announcement Attachment"
-                          className="w-full h-auto object-cover max-h-[400px]"
-                        />
-                      </div>
-                    ) : (
-                      <a
-                        href={ann.attachmentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-[#F8FAFC] dark:bg-[#003170] hover:bg-[#002147] dark:hover:bg-[#1a3884] text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
-                      >
-                        {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
-                          <LinkIcon className="w-4 h-4" />}
-                        {t("community_page.view_attachment")}
-                        <ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
-                      </a>
-                    )}
+                    <span className="ml-auto text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                      {timeAgo(ann.createdAt)}
+                    </span>
                   </div>
-                )}
 
-                {/* ── Footer: creator + time + expiry ───────────────────── */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-[11px] text-gray-400 font-medium pt-3 border-t border-gray-100 dark:border-slate-700/50">
-                  {/* ── Action Row: Reactions ──────────────────────────────── */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Reaction counts */}
-                    <div className="flex flex-wrap items-center gap-1">
-                      {["👍", "❤️", "🔥", "💡", "🙌", "😄"].map((emoji) => {
-                        const count = ann.reactions?.filter(r => r.emoji === emoji).length || 0;
-                        const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString() && r.emoji === emoji);
+                  <h3 className="text-[16px] font-extrabold tracking-tight text-[#072036] dark:text-white sm:text-[17px]">
+                    {ann.title}
+                  </h3>
+                  <p className="mt-1.5 whitespace-pre-line text-[13px] leading-relaxed text-[#35566b] dark:text-slate-400 sm:text-sm">
+                    {ann.description}
+                  </p>
 
-                        if (count === 0 && !hasReacted) return null;
+                  {/* Attachment */}
+                  {attachment === "video" && (
+                    <div className="mt-4 w-full max-w-2xl overflow-hidden rounded-xl border border-[#d7ebf5] bg-[#072036] dark:border-white/10">
+                      <video src={ann.attachmentUrl} controls className="h-auto max-h-[400px] w-full" />
+                    </div>
+                  )}
+                  {attachment === "image" && (
+                    <div className="mt-4 w-full max-w-2xl overflow-hidden rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] dark:border-white/10 dark:bg-[#072036]/60">
+                      <img src={ann.attachmentUrl} alt="" className="h-auto max-h-[400px] w-full object-cover" />
+                    </div>
+                  )}
+                  {attachment === "link" && (
+                    <a href={ann.attachmentUrl} target="_blank" rel="noopener noreferrer" className={`${BTN_GHOST} mt-4 h-9 px-4`}>
+                      {ann.attachmentType === "pdf" ? <FileText className="h-4 w-4" /> : <LinkIcon className="h-4 w-4" />}
+                      {t("community_page.view_attachment")}
+                      <ExternalLink className="h-3.5 w-3.5 opacity-60" />
+                    </a>
+                  )}
 
+                  {/* Footer: reactions + meta */}
+                  <div className="mt-4 flex flex-col gap-3 border-t border-[#d7ebf5] pt-3 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {REACTIONS.map((emoji) => {
+                        const count = ann.reactions?.filter((r) => r.emoji === emoji).length || 0;
+                        const mine = ann.reactions?.some((r) => r.userId?.toString() === userId && r.emoji === emoji);
+                        if (count === 0 && !mine) return null;
                         return (
                           <button
                             key={emoji}
+                            type="button"
                             onClick={() => handleReact(ann._id, emoji)}
-                            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold transition-all ${hasReacted
-                              ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                              : "bg-gray-100 dark:bg-[#003170] text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
-                              }`}
+                            aria-pressed={mine}
+                            className={`inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs font-bold tabular-nums transition-colors ${
+                              mine
+                                ? "border-[#045C9A]/30 bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8]/30 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"
+                                : "border-[#d7ebf5] bg-[#F1F5F9] text-[#35566b] hover:border-[#045C9A]/30 hover:bg-[#EAF7FD] dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-300 dark:hover:bg-white/10"
+                            }`}
                           >
-                            <span>{emoji}</span>
-                            <span>{count}</span>
+                            <span aria-hidden="true">{emoji}</span>
+                            {count}
                           </button>
                         );
                       })}
-                    </div>
 
-                    {/* React Button with Picker Popover */}
-                    <div className="relative">
-                      {(() => {
-                        const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString());
-                        if (hasReacted) return null;
-
-                        return (
+                      {!reacted && (
+                        <div className="relative">
                           <button
+                            type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-[#002A5C] ${activePicker === ann._id ? "bg-gray-100 dark:bg-[#003170] scale-110" : ""
-                              }`}
-                            title="React"
+                            aria-label={t("community_page.react", "React")}
+                            aria-expanded={activePicker === ann._id}
+                            className={`inline-flex h-7 items-center gap-1 rounded-full border border-dashed px-2.5 text-xs font-bold transition-colors ${
+                              activePicker === ann._id
+                                ? "border-[#045C9A] bg-[#EAF7FD] text-[#045C9A] dark:border-[#A6D7E8] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"
+                                : "border-[#d7ebf5] text-[#35566b] hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] hover:text-[#045C9A] dark:border-white/15 dark:text-slate-400 dark:hover:text-white"
+                            }`}
                           >
-                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
+                            <Sticker className="h-4 w-4" />
+                            {t("community_page.react", "React")}
                           </button>
-                        );
-                      })()}
 
-                      {/* Click-based picker */}
-                      <AnimatePresence>
-                        {activePicker === ann._id && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-[#002A5C] rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-white/10 flex items-center gap-1 z-20"
-                          >
-                            {["👍", "❤️", "🔥", "💡", "🙌", "😄"].map((emoji) => (
-                              <button
-                                key={emoji}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleReact(ann._id, emoji);
-                                  setActivePicker(null);
-                                }}
-                                className="w-9 h-9 flex items-center justify-center hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] rounded-full transition-colors text-xl hover:scale-125 duration-200"
+                          <AnimatePresence>
+                            {activePicker === ann._id && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 6, scale: 0.96 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                                transition={{ duration: 0.18, ease: EASE }}
+                                role="menu"
+                                className="absolute bottom-full left-0 z-20 mb-2 flex items-center gap-0.5 rounded-full border border-[#d7ebf5] bg-white p-1 shadow-xl dark:border-[#045C9A]/30 dark:bg-[#0d3a5f]"
                               >
-                                {emoji}
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                                {REACTIONS.map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    type="button"
+                                    role="menuitem"
+                                    aria-label={emoji}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleReact(ann._id, emoji);
+                                      setActivePicker(null);
+                                    }}
+                                    className="flex h-9 w-9 items-center justify-center rounded-full text-lg transition-transform hover:scale-125 hover:bg-[#EAF7FD] dark:hover:bg-white/10"
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                      {!isSmaart && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#045C9A]/10 text-[9px] font-extrabold text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
+                            {(ann.createdById?.fullName || "C").charAt(0).toUpperCase()}
+                          </span>
+                          <span className="text-[#35566b] dark:text-slate-300">{ann.createdById?.fullName || t("community_page.college")}</span>
+                        </span>
+                      )}
+                      {ann.expiryDate && (
+                        <span className={`inline-flex items-center gap-1 ${isExpired ? "" : "text-amber-600 dark:text-amber-300"}`}>
+                          <Calendar className="h-3.5 w-3.5" />
+                          {isExpired ? t("community_page.expired") : t("community_page.expires")}{" "}
+                          {new Date(ann.expiryDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    {ann.createdByRole !== "admin" && (
-                      <>
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
-                          {(ann.createdById?.fullName || "C")
-                            .charAt(0)
-                            .toUpperCase()}
-                        </div>
-                        <span className="text-gray-500 dark:text-slate-300 font-semibold">
-                          {ann.createdById?.fullName || t("community_page.college")}
-                        </span>
-                        <span className="text-gray-305 dark:text-slate-700">•</span>
-                      </>
-                    )}
-                    <span>{timeAgo(ann.createdAt)}</span>
-                    {ann.expiryDate && (
-                      <>
-                        <span className="text-gray-305 dark:text-slate-700">•</span>
-                        <span
-                          className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
-                            }`}
-                        >
-                          <Calendar className="w-3 h-3" />
-                          {isExpired ? t("community_page.expired") : t("community_page.expires")}{" "}
-                          {new Date(ann.expiryDate).toLocaleDateString()}
-                        </span>
-                      </>
-                    )}
-                  </div>
                 </div>
-              </motion.div>
+              </motion.article>
             );
           })}
       </AnimatePresence>

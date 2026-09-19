@@ -238,11 +238,12 @@
     "filter_all": "All",
     "filter_today": "Today",
     "filter_week": "This Week",
-    "filter_smaart_admin": "🌐 SMAART Admin",
-    "filter_college_admin": "🏫 College Admin",
+    "filter_smaart_admin": "SMAART Admin",
+    "filter_college_admin": "College Admin",
     "no_results": "No results found",
     "no_results_desc": "Try adjusting your search or filter.",
     "clear_filters": "Clear filters",
+    "clear_search": "Clear search",
     "no_announcements": "No announcements yet",
     "no_announcements_desc": "Check back later for updates from your institution.",
     "pinned": "Pinned",
@@ -254,6 +255,8 @@
     "just_now": "Just now",
     "m_ago": "m ago",
     "h_ago": "h ago",
+    "d_ago": "d ago",
+    "react": "React",
     "admin": "Admin"
   },
   "vision_board": {
