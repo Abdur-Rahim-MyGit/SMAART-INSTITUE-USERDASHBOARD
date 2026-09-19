@@ -118,10 +118,10 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 flex items-center gap-3"
+          className="flex items-center gap-3 rounded-xl border border-[#045C9A]/20 bg-[#EAF7FD] p-4 dark:border-[#045C9A]/40 dark:bg-[#045C9A]/15"
         >
-          <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{t("grievance.submitted_successfully", "Grievance submitted successfully")}</span>
+          <CheckCircle className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
+          <span className="text-[#072036] dark:text-white font-bold text-sm">{t("grievance.submitted_successfully", "Grievance submitted successfully")}</span>
         </motion.div>
       )}
 

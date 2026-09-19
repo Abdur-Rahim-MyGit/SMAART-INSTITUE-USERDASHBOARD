@@ -26,12 +26,13 @@ const EASE = [0.25, 0.1, 0.25, 1];
 
 const TABS = ["support", "grievance"];
 
+// One brand colour for every status; closed/resolved are muted, not coloured.
 const STATUS_STYLE = {
-  open: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30",
-  pending: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30",
-  "in-progress": "bg-[#EAF7FD] text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/20 dark:text-[#A6D7E8] dark:border-[#045C9A]/40",
-  resolved: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/30",
-  closed: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:border-white/10",
+  open: "bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] dark:border-[#045C9A]/40",
+  pending: "bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] dark:border-[#045C9A]/40",
+  "in-progress": "bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] dark:border-[#045C9A]/40",
+  resolved: "bg-[#F1F5F9] text-[#35566b] border-[#d7ebf5] dark:bg-white/5 dark:text-slate-300 dark:border-white/10",
+  closed: "bg-[#F1F5F9] text-[#35566b] border-[#d7ebf5] dark:bg-white/5 dark:text-slate-300 dark:border-white/10",
 };
 
 const StatusChip = ({ status, t }) => (
@@ -342,11 +343,11 @@ const HelpCenter = () => {
                       {supportView === "create" ? (
                         <div className="space-y-5">
                           {successTicket?.itsmTicketNumber && (
-                            <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10">
-                              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                            <div className={`flex items-start gap-3 rounded-xl px-4 py-3 ${PANEL}`}>
+                              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />
                               <div>
-                                <p className="text-[13px] font-extrabold text-emerald-800 dark:text-emerald-300">{t("help_center.ticket_created", "Ticket created")}</p>
-                                <p className="text-xs text-emerald-700/80 dark:text-emerald-300/80">
+                                <p className="text-[13px] font-extrabold text-[#072036] dark:text-white">{t("help_center.ticket_created", "Ticket created")}</p>
+                                <p className="text-xs text-[#35566b] dark:text-slate-400">
                                   {t("help_center.ticket_created_desc", { ref: successTicket.itsmTicketNumber, defaultValue: `Your reference number is ${successTicket.itsmTicketNumber}. Our support agents will respond shortly.` })}
                                 </p>
                               </div>
@@ -416,8 +417,8 @@ const HelpCenter = () => {
                           <div id="grievance-stats" className="grid grid-cols-3 gap-3">
                             {[
                               { label: t("help_center.stats_total", "Submitted"), value: gTotal, cls: "text-[#072036] dark:text-white" },
-                              { label: t("help_center.stats_open", "Open"), value: gOpen, cls: "text-amber-600 dark:text-amber-300" },
-                              { label: t("help_center.stats_resolved", "Resolved"), value: gResolved, cls: "text-emerald-600 dark:text-emerald-300" },
+                              { label: t("help_center.stats_open", "Open"), value: gOpen, cls: "text-[#045C9A] dark:text-[#A6D7E8]" },
+                              { label: t("help_center.stats_resolved", "Resolved"), value: gResolved, cls: "text-[#045C9A] dark:text-[#A6D7E8]" },
                             ].map((s) => (
                               <div key={s.label} className={`rounded-xl px-4 py-3 ${PANEL}`}>
                                 <p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#35566b] dark:text-slate-400">{s.label}</p>
