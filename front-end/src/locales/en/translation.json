@@ -1536,7 +1536,11 @@
     "language_failed": "Failed to update settings",
     "connection_error": "Connection error. Please try again.",
     "save_changes": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "hero_subtitle": "Manage your profile, notifications, security and how the dashboard looks.",
+    "role_student": "Student",
+    "unsaved_changes": "You have unsaved changes.",
+    "all_saved": "All changes saved."
   },
   "library": {
     "search_placeholder": "Search by title, author, or topic...",

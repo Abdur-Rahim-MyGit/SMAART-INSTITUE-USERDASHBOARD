@@ -447,3 +447,9 @@ export const Type = /*#__PURE__*/ icon("Type", "text_fields");
 export const Undo2 = /*#__PURE__*/ icon("Undo2", "undo");
 export const Share = /*#__PURE__*/ icon("Share", "share");
 export const Hash = /*#__PURE__*/ icon("Hash", "tag");
+// Settings page — glyphs already in the index.html subset (bug_report, mail,
+// call, support_agent); these are just the lucide-named aliases.
+export const Bug = /*#__PURE__*/ icon("Bug", "bug_report");
+export const Headset = /*#__PURE__*/ icon("Headset", "support_agent");
+export const Mail = /*#__PURE__*/ icon("Mail", "mail");
+export const Phone = /*#__PURE__*/ icon("Phone", "call");
