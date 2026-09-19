@@ -240,9 +240,6 @@ const NoticesFeed = ({ currentUser, refreshTrigger, onLoadingChange }) => {
                 transition={{ delay: Math.min(index, 6) * 0.04, duration: 0.3, ease: EASE }}
                 className={`relative overflow-hidden rounded-2xl transition-shadow hover:shadow-md ${SURFACE} ${isExpired ? "opacity-60" : ""}`}
               >
-                {ann.isPinned && !isExpired && (
-                  <div className="absolute inset-y-0 left-0 w-1 bg-[#045C9A] dark:bg-[#A6D7E8]" aria-hidden="true" />
-                )}
 
                 <div className="p-5 sm:p-6">
                   {/* Badge row */}

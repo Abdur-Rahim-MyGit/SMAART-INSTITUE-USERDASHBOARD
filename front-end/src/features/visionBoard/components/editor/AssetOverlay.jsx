@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Move, RotateCw, Trash2 } from "@/components/icons";
+import { Move, RotateCw, Trash2, Sparkles, Loader2 } from "@/components/icons";
 
 const AssetOverlay = ({
   asset,
@@ -13,6 +13,7 @@ const AssetOverlay = ({
   overlayId,
   onGuideChange,
   onDelete,
+  onCutout,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -202,11 +203,18 @@ const AssetOverlay = ({
             : ""
         }`}
       >
-        <img src={asset.src} alt={asset.name || "Asset"} draggable={false} className="h-full w-full object-contain" />
+        <div className="relative h-full w-full">
+          <img src={asset.src} alt={asset.name || "Asset"} draggable={false} className={`h-full w-full object-contain ${asset.isProcessingCutout ? 'opacity-50 grayscale' : ''}`} />
+          {asset.isProcessingCutout && (
+             <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px] rounded-xl">
+                <Loader2 className="h-6 w-6 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
+             </div>
+          )}
+        </div>
 
-        {isSelected && (
+        {isSelected && !asset.isProcessingCutout && (
           <>
-            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-[#072036]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
+            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-slate-900/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
               <Move className="h-3 w-3" />
               {asset.locked ? "Locked Asset" : "Drag Asset"}
             </div>
@@ -219,6 +227,19 @@ const AssetOverlay = ({
             >
               <RotateCw className="h-4 w-4" />
             </button>
+            {!asset.hasCutout && (
+              <button
+                type="button"
+                className="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-emerald-600 text-white shadow-xl transition-all hover:scale-110 active:scale-95"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCutout?.();
+                }}
+                title="Remove background (Cutout)"
+              >
+                <Sparkles className="h-4 w-4" />
+              </button>
+            )}
             <button
               type="button"
               className="absolute -bottom-3 -left-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-red-600 text-white shadow-xl transition-all hover:scale-110 active:scale-95"

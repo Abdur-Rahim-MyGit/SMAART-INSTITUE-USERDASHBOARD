@@ -63,8 +63,8 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.12),transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.07),transparent_55%)]" />
 
                 {template.slots.length === 0 ? (
-                  <div className="absolute inset-2 flex items-center justify-center rounded-lg border border-dashed border-slate-300/80 bg-white/75 text-[11px] font-medium text-slate-500 dark:border-white/15 dark:bg-white/5 dark:text-white/40">
-                    Text-first canvas
+                  <div className="absolute inset-2 flex items-center justify-center rounded-lg border border-dashed border-slate-300/80 bg-white/75 text-[11px] font-medium text-slate-500 dark:border-white/15 dark:bg-white/5 dark:text-white/40 text-center px-1">
+                    {template.isFreeform ? "Freeform Collage" : "Text-first canvas"}
                   </div>
                 ) : (
                   template.slots.map((slot) => (

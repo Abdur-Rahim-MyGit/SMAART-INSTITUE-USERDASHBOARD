@@ -448,10 +448,50 @@ export const ASSET_LIBRARY_PACKS = [
     height: 96,
     svg: `
       <svg xmlns="http://www.w3.org/2000/svg" width="220" height="96" viewBox="0 0 220 96" fill="none">
-        <path d="M12 70C58 72 76 22 120 22C151 22 169 38 196 38" stroke="#1D4ED8" stroke-width="10" stroke-linecap="round"/>
-        <path d="M178 18L208 38L178 58" stroke="#1D4ED8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 48H188M188 48L156 16M188 48L156 80" stroke="#F87171" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>`,
   }),
+  buildAsset({
+    id: "sticker-washi-tape",
+    name: "Washi Tape",
+    category: "Stickers",
+    width: 200,
+    height: 48,
+    svg: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="48" viewBox="0 0 200 48" fill="none">
+        <path d="M4 12C20 8 40 14 60 12C80 10 100 16 120 14C140 12 160 18 180 14C188 12 196 16 196 16V36C196 36 188 40 180 38C160 34 140 40 120 38C100 36 80 42 60 40C40 38 20 44 4 40C4 40 2 36 2 36V16C2 16 4 12 4 12Z" fill="#FCA5A5" fill-opacity="0.85"/>
+      </svg>`,
+  }),
+  buildAsset({
+    id: "sticker-push-pin",
+    name: "Push Pin",
+    category: "Stickers",
+    width: 64,
+    height: 64,
+    svg: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="24" r="14" fill="#EF4444"/>
+        <path d="M32 38L32 60" stroke="#94A3B8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="28" cy="20" r="4" fill="#FCA5A5"/>
+      </svg>`,
+  }),
+  buildAsset({
+    id: "sticker-polaroid",
+    name: "Polaroid Frame",
+    category: "Stickers",
+    width: 240,
+    height: 300,
+    svg: `
+      <svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300" fill="none">
+        <rect x="4" y="4" width="232" height="292" fill="#FAFAFA" stroke="#E2E8F0" stroke-width="2"/>
+        <rect x="16" y="16" width="208" height="216" fill="#1E293B"/>
+      </svg>`,
+  }),
+];
+
+export const EMOJI_LIST = [
+  "✨", "💖", "🔥", "🦋", "🌸", "⚡", "📌", "🎀", "🎯", "🍀", 
+  "👑", "⭐", "🌈", "💡", "🚀", "💎", "🌻", "🎨", "🌿", "🌟"
 ];
 
 export const IMAGE_FILTER_PRESETS = [

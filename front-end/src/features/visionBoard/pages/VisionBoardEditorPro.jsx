@@ -27,6 +27,8 @@ import {
 } from "../utils/imageModeration";
 import { normalizeGoals } from "../utils/goals";
 import { getStarterBoard } from "../templates/starterBoards";
+import { removeBackground } from "../utils/cutoutHelper";
+import { compressImage } from "../utils/imageCompression";
 
 // Layout Components
 import EditorTopBar from "../components/layout/EditorTopBar";
@@ -597,9 +599,9 @@ const VisionBoardEditorPro = () => {
   const handleUserUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const imageData = event.target.result;
+      try {
+        const imageData = await compressImage(file, 1200, 1200, 0.8);
+        
         // Optional: Check NSFW
         const nsfwResult = await checkBase64ImageNSFW(imageData);
         if (!nsfwResult.isSafe) {
@@ -620,8 +622,14 @@ const VisionBoardEditorPro = () => {
           },
           ...prev,
         ]);
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error("Error compressing image:", err);
+        toast({
+          title: "Upload Failed",
+          description: "Could not process the uploaded image.",
+          variant: "destructive",
+        });
+      }
     }
     e.target.value = "";
   };
@@ -729,6 +737,26 @@ const VisionBoardEditorPro = () => {
     syncPrimarySelection(
       selectedLayers.filter((entry) => !(entry.type === "asset" && entry.id === assetId))
     );
+  };
+
+  const handleCutoutAsset = async (assetId) => {
+    const asset = assetOverlays[assetId];
+    if (!asset || asset.hasCutout || asset.isProcessingCutout) return;
+
+    try {
+      handleUpdateAsset(assetId, { isProcessingCutout: true });
+      const newSrc = await removeBackground(asset.src);
+      handleUpdateAsset(assetId, { 
+        src: newSrc, 
+        isProcessingCutout: false,
+        hasCutout: true 
+      });
+      toast({ title: t("vision_board.cutout_success", "Background removed successfully") });
+    } catch (e) {
+      console.error(e);
+      handleUpdateAsset(assetId, { isProcessingCutout: false });
+      toast({ title: t("vision_board.cutout_error", "Failed to remove background"), variant: "destructive" });
+    }
   };
 
   // Select text overlay
@@ -1380,7 +1408,7 @@ const VisionBoardEditorPro = () => {
           });
 
           document.body.removeChild(clone);
-          resolve(canvas.toDataURL("image/png", 1.0));
+          resolve(canvas.toDataURL("image/jpeg", 0.7));
         } catch (err) {
           reject(err);
         }
@@ -1583,6 +1611,7 @@ const VisionBoardEditorPro = () => {
           setGuideState={setGuideState}
           handleDeleteText={handleDeleteText}
           handleDeleteAsset={handleDeleteAsset}
+          handleCutoutAsset={handleCutoutAsset}
         />
       </div>
 

@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { ImagePlus, Shapes, Sparkles, Sticker } from "@/components/icons";
-import { ASSET_LIBRARY_PACKS } from "../../utils/constants";
+import { ImagePlus, Shapes, Sparkles, Sticker, Type } from "@/components/icons";
+import { ASSET_LIBRARY_PACKS, EMOJI_LIST } from "../../utils/constants";
 
 const sectionClass =
   "rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]";
 
-const categories = ["All", "Shapes", "Badges", "Decor"];
+const categories = ["All", "Stickers", "Emojis", "Shapes", "Badges", "Decor"];
 
-const AssetsPanel = ({ userUploads, onUploadAsset, onAddAssetToCanvas, onAddUploadToCanvas }) => {
+const AssetsPanel = ({ userUploads, onUploadAsset, onAddAssetToCanvas, onAddUploadToCanvas, onAddText }) => {
   const [activeCategory, setActiveCategory] = useState("All");
 
   const visibleAssets = useMemo(() => {
@@ -87,7 +87,13 @@ const AssetsPanel = ({ userUploads, onUploadAsset, onAddAssetToCanvas, onAddUplo
         <div className="mb-4 flex flex-wrap gap-2">
           {categories.map((category) => {
             const active = category === activeCategory;
-            const Icon = category === "Shapes" ? Shapes : category === "Decor" ? Sparkles : Sticker;
+            let Icon = Sparkles;
+            if (category === "Shapes") Icon = Shapes;
+            if (category === "Decor") Icon = Sparkles;
+            if (category === "Stickers") Icon = Sticker;
+            if (category === "Emojis") Icon = Type;
+            if (category === "All") Icon = Sticker;
+            
             return (
               <button
                 key={category}
@@ -105,28 +111,50 @@ const AssetsPanel = ({ userUploads, onUploadAsset, onAddAssetToCanvas, onAddUplo
           })}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {visibleAssets.map((asset) => (
-            <button
-              key={asset.id}
-              type="button"
-              onClick={() => onAddAssetToCanvas(asset)}
-              className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_18px_38px_-10px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              <div className="flex aspect-[5/4] items-center justify-center bg-[radial-gradient(circle_at_top,#f8fafc_0%,#eff6ff_100%)] p-3 dark:bg-[radial-gradient(circle_at_top,#0d3a5f_0%,#072036_100%)]">
-                <img src={asset.src} alt={asset.name} className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110" />
-              </div>
-              <div className="px-3 py-2">
-                <div className="truncate text-[11px] font-bold text-slate-800 dark:text-white/80">
-                  {asset.name}
+        {activeCategory === "Emojis" ? (
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+            {EMOJI_LIST.map((emoji, index) => (
+              <button
+                key={`emoji-${index}`}
+                onClick={() => {
+                  if (onAddText) {
+                    onAddText(emoji, { 
+                      fontFamily: 'sans-serif',
+                      fontSize: 80,
+                      color: '#000000',
+                    });
+                  }
+                }}
+                className="flex aspect-square items-center justify-center rounded-2xl border border-slate-200 bg-white text-3xl shadow-sm transition-all hover:scale-110 hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {visibleAssets.map((asset) => (
+              <button
+                key={asset.id}
+                type="button"
+                onClick={() => onAddAssetToCanvas(asset)}
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_18px_38px_-10px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-white/[0.04]"
+              >
+                <div className="flex aspect-[5/4] items-center justify-center bg-[radial-gradient(circle_at_top,#f8fafc_0%,#eff6ff_100%)] p-3 dark:bg-[radial-gradient(circle_at_top,#0d3a5f_0%,#072036_100%)]">
+                  <img src={asset.src} alt={asset.name} className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110" />
                 </div>
-                <div className="mt-0.5 text-[10px] font-medium text-slate-500 dark:text-white/45">
-                  {asset.category}
+                <div className="px-3 py-2">
+                  <div className="truncate text-[11px] font-bold text-slate-800 dark:text-white/80">
+                    {asset.name}
+                  </div>
+                  <div className="mt-0.5 text-[10px] font-medium text-slate-500 dark:text-white/45">
+                    {asset.category}
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
-        </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

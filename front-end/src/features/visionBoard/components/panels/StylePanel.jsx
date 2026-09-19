@@ -1,7 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Grid3X3, ImageIcon, PaintBucket, Square } from "@/components/icons";
 import {
   BACKGROUND_COLORS,
+  BACKGROUND_GRADIENTS,
+  BACKGROUND_TEXTURES,
   BORDER_RADIUS_PRESETS,
   GAP_PRESETS,
 } from "../../templates/gridTemplates";
@@ -24,6 +26,7 @@ const StylePanel = ({
   handleBackgroundUpload,
 }) => {
   const backgroundInputRef = useRef(null);
+  const [bgTab, setBgTab] = useState("solid");
 
   return (
     <div className="space-y-4">
@@ -44,48 +47,126 @@ const StylePanel = ({
       </div> */}
 
       <div className={sectionClass}>
-        <label className={panelLabel}>Background Color</label>
-        <div className="grid grid-cols-6 gap-2">
-          {BACKGROUND_COLORS.map((color) => {
-            const active = backgroundColor === color;
+        <div className="mb-3 flex items-center justify-between">
+          <label className={panelLabel} style={{ marginBottom: 0 }}>Background Style</label>
+        </div>
+        
+        <div className="mb-3 flex gap-1 rounded-xl bg-slate-100 p-1 dark:bg-white/[0.04]">
+          {["solid", "gradient", "texture"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setBgTab(tab)}
+              className={`flex-1 rounded-lg py-1.5 text-xs font-semibold capitalize transition-all ${
+                bgTab === tab 
+                  ? "bg-white text-slate-900 shadow-sm dark:bg-white/10 dark:text-white" 
+                  : "text-slate-500 hover:text-slate-700 dark:text-white/50 dark:hover:text-white/80"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-            return (
-              <button
-                key={color}
-                onClick={() => setBackgroundColor(color)}
-                className={`h-9 w-9 rounded-2xl border transition-all duration-200 ${active
-                    ? "scale-110 border-slate-900 ring-2 ring-slate-200 shadow-lg dark:border-white dark:ring-white/10"
-                    : "border-slate-200 hover:scale-105 hover:shadow-md dark:border-white/10"
+        {bgTab === "solid" && (
+          <>
+            <div className="grid grid-cols-6 gap-2">
+              {BACKGROUND_COLORS.map((color) => {
+                const active = backgroundColor === color && (!backgroundImage || backgroundImage.startsWith('http'));
+
+                return (
+                  <button
+                    key={color}
+                    onClick={() => {
+                      setBackgroundColor(color);
+                      // Clear gradient/texture, keep custom image if any
+                      if (backgroundImage && (backgroundImage.startsWith('linear-gradient') || backgroundImage.startsWith('url('))) {
+                        setBackgroundImage(null);
+                      }
+                    }}
+                    className={`h-9 w-9 rounded-2xl border transition-all duration-200 ${active
+                        ? "border-slate-900 ring-2 ring-slate-200 shadow-sm dark:border-white dark:ring-white/10"
+                        : "border-slate-200 hover:border-slate-300 hover:shadow-sm dark:border-white/10 dark:hover:border-white/20"
+                      }`}
+                    style={{ backgroundColor: color }}
+                  />
+                );
+              })}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-slate-200/60 bg-slate-50/50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-bold text-slate-800 dark:text-white/80">
+                    Custom Tone
+                  </div>
+                  <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
+                    Fine tune the base canvas color.
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-sm dark:bg-white/10">
+                  <input
+                    type="color"
+                    value={backgroundColor === 'transparent' ? '#ffffff' : backgroundColor}
+                    onChange={(e) => {
+                      setBackgroundColor(e.target.value);
+                      if (backgroundImage && (backgroundImage.startsWith('linear-gradient') || backgroundImage.startsWith('url('))) {
+                        setBackgroundImage(null);
+                      }
+                    }}
+                    className="h-6 w-6 cursor-pointer rounded-lg border-0 bg-transparent p-0"
+                  />
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-white/60">
+                    {backgroundColor === 'transparent' ? 'Auto' : backgroundColor}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {bgTab === "gradient" && (
+          <div className="grid grid-cols-4 gap-2">
+            {BACKGROUND_GRADIENTS.map((grad, i) => {
+              const active = backgroundImage === grad;
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setBackgroundColor("transparent");
+                    setBackgroundImage(grad);
+                  }}
+                  className={`h-12 w-full rounded-2xl border transition-all duration-200 ${active
+                    ? "border-slate-900 ring-2 ring-slate-200 shadow-sm dark:border-white dark:ring-white/10"
+                    : "border-slate-200 hover:border-slate-300 hover:shadow-sm dark:border-white/10 dark:hover:border-white/20"
                   }`}
-                style={{ backgroundColor: color }}
-              />
-            );
-          })}
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-slate-200/60 bg-slate-50/50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-bold text-slate-800 dark:text-white/80">
-                Custom Tone
-              </div>
-              <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
-                Fine tune the base canvas color.
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-sm dark:bg-white/10">
-              <input
-                type="color"
-                value={backgroundColor}
-                onChange={(e) => setBackgroundColor(e.target.value)}
-                className="h-6 w-6 cursor-pointer rounded-lg border-0 bg-transparent p-0"
-              />
-              <span className="text-[11px] font-bold text-slate-600 dark:text-white/60">
-                {backgroundColor}
-              </span>
-            </div>
+                  style={{ background: grad }}
+                />
+              );
+            })}
           </div>
-        </div>
+        )}
+
+        {bgTab === "texture" && (
+          <div className="grid grid-cols-3 gap-2">
+            {BACKGROUND_TEXTURES.map((tex, i) => {
+              const active = backgroundImage === tex;
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setBackgroundColor("#FDFBF7"); // Soft aesthetic white fallback
+                    setBackgroundImage(tex);
+                  }}
+                  className={`h-16 w-full rounded-2xl border transition-all duration-200 ${active
+                    ? "border-slate-900 ring-2 ring-slate-200 shadow-sm dark:border-white dark:ring-white/10"
+                    : "border-slate-200 hover:border-slate-300 hover:shadow-sm dark:border-white/10 dark:hover:border-white/20"
+                  }`}
+                  style={{ backgroundImage: tex, backgroundColor: "#FDFBF7", backgroundSize: "32px 32px" }}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className={sectionClass}>

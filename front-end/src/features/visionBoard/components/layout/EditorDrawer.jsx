@@ -257,6 +257,7 @@ const EditorDrawer = ({
               onUploadAsset={handleUserUpload}
               onAddAssetToCanvas={handleAddAssetToCanvas}
               onAddUploadToCanvas={handleAddUploadToCanvas}
+              onAddText={handleAddText}
             />
           </div>
         )}

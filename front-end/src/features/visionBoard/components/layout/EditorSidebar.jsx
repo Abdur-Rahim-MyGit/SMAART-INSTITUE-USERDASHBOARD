@@ -67,16 +67,16 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
               "items-center justify-center gap-1",
               "transition-all duration-200",
               // desktop shape
-              "lg:h-auto lg:w-full lg:flex-none lg:rounded-[20px] lg:px-1 lg:py-2.5",
+              "lg:h-auto lg:w-full lg:flex-none lg:rounded-xl lg:px-1 lg:py-2",
               // ── active state ──────────────────────────────────────────────
               isActive
                 ? [
                   // light — primary blue fill, white text
                   "text-[#045C9A]",
-                  "lg:bg-[#045C9A] lg:text-white lg:shadow-[0_10px_20px_-5px_rgba(4,92,154,0.3)]",
+                  "lg:bg-[#045C9A]/10 lg:text-[#045C9A]",
                   // dark  — primary blue fill, white text (same pill colour)
-                  "dark:text-white",
-                  "lg:dark:bg-[#045C9A] lg:dark:text-white lg:dark:shadow-[0_10px_25px_-5px_rgba(4,92,154,0.5)]",
+                  "dark:text-[#A6D7E8]",
+                  "lg:dark:bg-[#A6D7E8]/15 lg:dark:text-[#A6D7E8]",
                 ].join(" ")
                 // ── idle state ────────────────────────────────────────────
                 : [
@@ -100,7 +100,7 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
                 "rounded-lg p-1.5 transition-all duration-200",
                 isActive
                   ? // active: icon sits on the filled pill directly
-                  "text-[#045C9A] lg:text-white lg:dark:text-white"
+                  "text-[#045C9A] lg:text-[#045C9A] lg:dark:text-[#A6D7E8]"
                   : // idle: inherit button colour
                   "lg:group-hover:text-[#045C9A] dark:lg:group-hover:text-white",
               ].join(" ")}
@@ -116,7 +116,7 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
               className={[
                 "text-[8px] font-semibold tracking-wide lg:text-[9.5px]",
                 isActive
-                  ? "text-[#045C9A] lg:text-white dark:text-white"
+                  ? "text-[#045C9A] lg:text-[#045C9A] dark:text-[#A6D7E8]"
                   : "text-slate-400 dark:text-slate-300 group-hover:text-[#045C9A] dark:group-hover:text-white",
               ].join(" ")}
             >

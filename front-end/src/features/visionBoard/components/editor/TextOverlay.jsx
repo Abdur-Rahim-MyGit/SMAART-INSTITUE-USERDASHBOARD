@@ -248,7 +248,7 @@ const TextOverlay = ({
       >
         {isSelected && (
           <>
-            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-[#072036]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
+            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-slate-900/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
               <Move className="h-3 w-3" />
               {overlay.locked ? "Locked Text" : "Drag Text"}
             </div>

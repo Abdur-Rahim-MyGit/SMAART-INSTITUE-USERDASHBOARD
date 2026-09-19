@@ -171,9 +171,7 @@ const PostCard = ({
       ref={articleRef}
       className="community-surface relative overflow-hidden rounded-[24px] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_22px_48px_rgba(15,23,42,0.08)]"
     >
-      <span className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-primary via-primary to-sky-500" aria-hidden="true" />
-
-      <div className="space-y-3 pl-2">
+      <div className="space-y-3">
         <div className="flex items-start gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
             {getInitials(post.author)}

@@ -13,6 +13,16 @@ export const GRID_TEMPLATES = {
     slots: [],
   },
 
+  // Freeform layout (Pinterest style)
+  "freeform": {
+    id: "freeform",
+    name: "Freeform Collage",
+    description: "Drag and drop anywhere, Pinterest-style",
+    icon: "❈",
+    slots: [],
+    isFreeform: true,
+  },
+
   // Single image
   single: {
     id: "single",
@@ -247,41 +257,54 @@ export const EXPORT_RESOLUTIONS = {
 
 // Background color presets
 export const BACKGROUND_COLORS = [
-  "#FFFFFF",
-  "#F8F9FA",
-  "#E9ECEF",
-  "#DEE2E6",
-  "#CED4DA",
-  "#000000",
-  "#212529",
-  "#343A40",
-  "#495057",
-  "#6C757D",
-  "#14B8A6",
-  "#0D9488",
-  "#0891B2",
-  "#06B6D4",
-  "#22D3EE",
-  "#3B82F6",
-  "#2563EB",
-  "#1D4ED8",
-  "#6366F1",
-  "#8B5CF6",
-  "#A855F7",
-  "#D946EF",
-  "#EC4899",
-  "#F43F5E",
-  "#EF4444",
-  "#F97316",
-  "#FB923C",
-  "#FBBF24",
-  "#EAB308",
-  "#84CC16",
-  "#22C55E",
-  "#10B981",
-  "#059669",
-  "#047857",
-  "#064E3B",
+  "#FFFFFF", // White
+  "#FDFBF7", // Warm White
+  "#F2E8DF", // Oatmeal
+  "#E8EAE6", // Sage Grey
+  "#F5E6E8", // Soft Blush
+  "#E5E7EB", // Cool Grey
+  "#D1D5DB", // Slate
+  "#0F172A", // Dark Slate
+  "#18181B", // Zinc
+  "#1C1917", // Stone
+  "#FCD34D", // Pastel Yellow
+  "#FDBA74", // Soft Orange
+  "#FCA5A5", // Soft Red
+  "#F9A8D4", // Pastel Pink
+  "#C084FC", // Soft Purple
+  "#818CF8", // Pastel Blue
+  "#67E8F9", // Cyan
+  "#5EEAD4", // Mint
+  "#86EFAC", // Pastel Green
+  "#0D9488", // Deep Teal
+  "#2563EB", // Royal Blue
+  "#9D174D", // Deep Rose
+];
+
+// Gradient presets
+export const BACKGROUND_GRADIENTS = [
+  "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)", // Cloudy Apple
+  "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)", // Cherry Blossom
+  "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)", // Winter Sky
+  "linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%)", // Fresh Turf
+  "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", // Peach
+  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", // Plum Plate
+  "linear-gradient(135deg, #BBD2C5 0%, #536976 100%)", // Green Beach
+  "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)", // Deep Space
+  "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)", // Mint
+  "linear-gradient(135deg, #fa709a 0%, #fee140 100%)", // Sunset
+];
+
+// Texture presets (SVG data URIs or image URLs)
+export const BACKGROUND_TEXTURES = [
+  // Grid Pattern
+  "url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M 20 0 L 0 0 0 20\" fill=\"none\" stroke=\"%23e2e8f0\" stroke-width=\"1\"/></svg>')",
+  // Dot Pattern
+  "url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"2\" cy=\"2\" r=\"1.5\" fill=\"%23cbd5e1\"/></svg>')",
+  // Diagonal Lines
+  "url('data:image/svg+xml;utf8,<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M-1,1 l2,-2 M0,10 l10,-10 M9,11 l2,-2\" stroke=\"%23e2e8f0\" stroke-width=\"1\"/></svg>')",
+  // Wavy Pattern
+  "url('data:image/svg+xml;utf8,<svg width=\"40\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0,5 Q10,10 20,5 T40,5\" fill=\"none\" stroke=\"%23e2e8f0\" stroke-width=\"1\"/></svg>')",
 ];
 
 // Border radius presets

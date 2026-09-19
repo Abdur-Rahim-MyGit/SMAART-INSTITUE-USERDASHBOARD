@@ -33,6 +33,7 @@ const EditorCanvas = ({
   setGuideState,
   handleDeleteText,
   handleDeleteAsset,
+  handleCutoutAsset,
 }) => {
   const overlayPeers = [
     ...Object.entries(textOverlays || {})
@@ -54,19 +55,24 @@ const EditorCanvas = ({
   ];
 
   return (
-    <div className="custom-scrollbar relative flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] p-4 pb-36 dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0d3a5f_28%,#040814_100%)] sm:p-5 sm:pb-36 lg:p-8 lg:pb-10">
-      <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)] [background-size:32px_32px] dark:opacity-20" />
-      <div className="absolute left-4 top-4 hidden rounded-xl border border-white/60 bg-white/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-md backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-slate-300 lg:block xl:left-6 xl:top-6">
+    <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0d3a5f_28%,#040814_100%)]">
+      {/* Fixed background and badge */}
+      <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)] [background-size:32px_32px] dark:opacity-20 z-0" />
+      <div className="absolute left-4 top-4 z-20 hidden rounded-xl border border-white/60 bg-white/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-md backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-slate-300 lg:block xl:left-6 xl:top-6">
         Studio Preview
       </div>
 
-      <div 
-        className="relative flex-shrink-0 origin-top-left transition-all duration-300 ease-out"
+      {/* Scrollable area */}
+      <div className="custom-scrollbar relative h-full w-full overflow-auto z-10">
+        {/* Inner flex container to allow centering */}
+        <div className="flex min-h-full min-w-full">
+          {/* Margin-auto wrapper with explicit padding guarantees safe breathing room from edges without clipping */}
+          <div className="m-auto p-12 pt-24 sm:p-16 sm:pt-28 lg:p-24 lg:pt-32">
+            <div 
+              className="relative flex-shrink-0 origin-top-left transition-all duration-300 ease-out shadow-2xl rounded-[32px]"
         style={{
             width: displayWidth * (zoomLevel / 100),
             height: displayHeight * (zoomLevel / 100),
-            maxWidth: "100%",
-            maxHeight: "100%",
         }}
       >
         <div
@@ -92,12 +98,24 @@ const EditorCanvas = ({
                 }}
             >
                 {backgroundImage && (
-                    <img
-                        src={backgroundImage}
-                        alt="Background"
-                        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-                        style={{ zIndex: 0 }}
-                    />
+                    backgroundImage.startsWith('linear-gradient') || backgroundImage.startsWith('url(') ? (
+                        <div 
+                            className="absolute inset-0 pointer-events-none"
+                            style={{ 
+                                zIndex: 0, 
+                                backgroundImage: backgroundImage,
+                                backgroundSize: backgroundImage.startsWith('url') ? '32px 32px' : 'cover',
+                                backgroundRepeat: backgroundImage.startsWith('url') ? 'repeat' : 'no-repeat'
+                            }} 
+                        />
+                    ) : (
+                        <img
+                            src={backgroundImage}
+                            alt="Background"
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                            style={{ zIndex: 0 }}
+                        />
+                    )
                 )}
 
                 {currentTemplate.slots.map((slot) => (
@@ -155,6 +173,7 @@ const EditorCanvas = ({
                         overlayId={id}
                         onGuideChange={setGuideState}
                         onDelete={() => handleDeleteAsset(id)}
+                        onCutout={() => handleCutoutAsset(id)}
                     />
                 ))}
 
@@ -169,12 +188,12 @@ const EditorCanvas = ({
                     {(guideState.spacingX || guideState.spacingY) && (
                       <div className="absolute right-3 top-3 flex flex-col gap-1">
                         {guideState.spacingX ? (
-                          <div className="rounded-xl bg-[#072036]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
+                          <div className="rounded-xl bg-slate-900/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             X Gap {guideState.spacingX}px
                           </div>
                         ) : null}
                         {guideState.spacingY ? (
-                          <div className="rounded-xl bg-[#072036]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
+                          <div className="rounded-xl bg-slate-900/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             Y Gap {guideState.spacingY}px
                           </div>
                         ) : null}
@@ -182,9 +201,12 @@ const EditorCanvas = ({
                     )}
                   </div>
                 )}
+              </div>
             </div>
+          </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

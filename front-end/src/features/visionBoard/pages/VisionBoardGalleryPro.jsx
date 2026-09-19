@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiCall as globalApiCall } from "@/services/api";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
+import { useSidebar } from "@/contexts/SidebarContext";
 import {
   Plus,
   Trash2,
@@ -30,6 +31,7 @@ import {
   LinkIcon,
   Target,
   Sparkles,
+  ChevronDown,
 } from "@/components/icons";
 import {
   getAllVisionBoards,
@@ -323,28 +325,32 @@ const BoardCard = ({
 // MODALS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const ModalShell = ({ onClose, children, className = "" }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/70 p-4 backdrop-blur-sm"
-    onClick={onClose}
-  >
+const ModalShell = ({ onClose, children, className = "" }) => {
+  const { isCollapsed } = useSidebar();
+  
+  return (
     <motion.div
-      initial={{ scale: 0.96, opacity: 0, y: 8 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.96, opacity: 0, y: 8 }}
-      transition={{ duration: 0.25, ease: EASE }}
-      role="dialog"
-      aria-modal="true"
-      className={`rounded-2xl ${MODAL_SURFACE} ${className}`}
-      onClick={(e) => e.stopPropagation()}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#072036]/70 p-4 backdrop-blur-sm transition-all duration-300 ${isCollapsed ? 'lg:pl-[70px]' : 'lg:pl-[240px]'}`}
+      onClick={onClose}
     >
-      {children}
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0, y: 8 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0, y: 8 }}
+        transition={{ duration: 0.25, ease: EASE }}
+        role="dialog"
+        aria-modal="true"
+        className={`rounded-2xl ${MODAL_SURFACE} ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </motion.div>
     </motion.div>
-  </motion.div>
-);
+  );
+};
 
 const ModalHeader = ({ title, description, onClose }) => {
   const { t } = useTranslation();
@@ -639,8 +645,8 @@ const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
           </button>
           {STARTER_BOARDS.map((starter) => (
             <button key={starter.id} type="button" onClick={() => pick(starter.id)} aria-pressed={source === starter.id} className={optionClass(source === starter.id)}>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: `linear-gradient(135deg, ${starter.swatch[0]} 0%, ${starter.swatch[1]} 100%)` }}>
-                <Target className="h-4 w-4 text-white" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#045C9A] text-white">
+                <Target className="h-4 w-4" />
               </span>
               <span className="text-sm font-extrabold text-[#072036] dark:text-white">{starter.name}</span>
               <span className="line-clamp-2 text-[11px] leading-snug text-[#35566b] dark:text-slate-400">{starter.tagline}</span>
@@ -1062,17 +1068,20 @@ const VisionBoardGalleryPro = () => {
                     })}
                   </div>
 
-                  <select
-                    id="vb-sort"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    aria-label={t("vision_board.sort_by", "Sort by")}
-                    className="h-10 cursor-pointer rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-3 pr-8 text-xs font-bold text-[#35566b] outline-none transition-colors focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300"
-                  >
-                    <option value="recent">{t("vision_board.sort_recent", "Newest first")}</option>
-                    <option value="oldest">{t("vision_board.sort_oldest", "Oldest first")}</option>
-                    <option value="name">{t("vision_board.sort_name", "Name A–Z")}</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="vb-sort"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      aria-label={t("vision_board.sort_by", "Sort by")}
+                      className="h-10 cursor-pointer appearance-none rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-3 pr-8 text-xs font-bold text-[#35566b] outline-none transition-colors focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300"
+                    >
+                      <option value="recent">{t("vision_board.sort_recent", "Newest first")}</option>
+                      <option value="oldest">{t("vision_board.sort_oldest", "Oldest first")}</option>
+                      <option value="name">{t("vision_board.sort_name", "Name A–Z")}</option>
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#35566b] dark:text-slate-300" strokeWidth={2.5} />
+                  </div>
 
                   <div id="vb-view" className={`flex h-10 items-center gap-1 rounded-xl p-1 ${PANEL}`}>
                     {[

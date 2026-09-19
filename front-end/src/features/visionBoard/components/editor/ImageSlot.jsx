@@ -7,7 +7,9 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
+  Lock
 } from "@/components/icons";
+import { compressImage } from "../../utils/imageCompression";
 
 const ImageSlot = ({
   slot,
@@ -47,29 +49,31 @@ const ImageSlot = ({
   const gapPercent = gap / 6;
   const imageScale = Math.round((image?.scale || 1) * 100);
 
-  const handleFileSelect = (event) => {
+  const handleFileSelect = async (event) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (loadEvent) => {
-        onImageUpload(slot.id, loadEvent.target.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedData = await compressImage(file, 1200, 1200, 0.8);
+        onImageUpload(slot.id, compressedData);
+      } catch (err) {
+        console.error("Failed to compress image:", err);
+      }
     }
     event.target.value = "";
   };
 
-  const handleDrop = (event) => {
+  const handleDrop = async (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     const file = event.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (loadEvent) => {
-        onImageUpload(slot.id, loadEvent.target.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedData = await compressImage(file, 1200, 1200, 0.8);
+        onImageUpload(slot.id, compressedData);
+      } catch (err) {
+        console.error("Failed to compress dropped image:", err);
+      }
       return;
     }
 
