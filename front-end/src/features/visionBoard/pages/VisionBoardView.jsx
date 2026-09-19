@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import html2canvas from "html2canvas";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
@@ -118,6 +117,7 @@ const VisionBoardView = () => {
     if (!canvasRef.current) return;
     try {
       setIsDownloading(true);
+      const html2canvas = (await import("html2canvas")).default;
       const canvas = await html2canvas(canvasRef.current, {
         backgroundColor: board.boardData?.background?.value || "#ffffff",
         scale: 2,

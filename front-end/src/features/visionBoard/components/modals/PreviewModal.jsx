@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import html2canvas from "html2canvas";
 import {
   Download,
   Expand,
@@ -119,6 +118,7 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
 
     const { wrapper, width, height } = built;
     try {
+      const html2canvas = (await import("html2canvas")).default;
       const rawCanvas = await html2canvas(wrapper, {
         scale: captureScale,
         useCORS: true,

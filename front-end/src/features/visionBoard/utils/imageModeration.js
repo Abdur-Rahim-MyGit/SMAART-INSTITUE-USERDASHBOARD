@@ -7,8 +7,6 @@
  * - OCR text extraction (OCR.space API via backend) - reads text from images for moderation
  */
 
-import * as nsfwjs from 'nsfwjs';
-import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import { moderateText } from './contentModeration';
 
 // Backend API URL.
@@ -22,6 +20,11 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 // ═══════════════════════════════════════════════════════════════════════════
 // MODEL SINGLETONS - Lazy loaded
 // ═══════════════════════════════════════════════════════════════════════════
+
+// NSFW.js and COCO-SSD each pull in TensorFlow.js. They are imported lazily so
+// that opening the editor does not download them before the canvas is usable.
+const loadNsfwLib = () => import('nsfwjs');
+const loadCocoLib = () => import('@tensorflow-models/coco-ssd');
 
 let nsfwModel = null;
 let nsfwModelPromise = null;
@@ -38,6 +41,7 @@ export const loadNSFWModel = async () => {
 
   nsfwModelPromise = (async () => {
     try {
+      const nsfwjs = await loadNsfwLib();
       nsfwModel = await nsfwjs.load();
       return nsfwModel;
     } catch (error) {
@@ -96,6 +100,7 @@ export const loadCocoModel = async () => {
 
   cocoModelPromise = (async () => {
     try {
+      const cocoSsd = await loadCocoLib();
       cocoModel = await cocoSsd.load();
       return cocoModel;
     } catch (error) {

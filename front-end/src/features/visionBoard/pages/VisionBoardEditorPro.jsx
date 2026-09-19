@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import html2canvas from "html2canvas";
 import { useToast } from "@/hooks/use-toast";
 
 // Data & Utils
@@ -27,7 +26,7 @@ import {
 } from "../utils/imageModeration";
 import { normalizeGoals } from "../utils/goals";
 import { getStarterBoard } from "../templates/starterBoards";
-import { removeBackground } from "../utils/cutoutHelper";
+import { removeBackground, preloadCutoutLibrary } from "../utils/cutoutHelper";
 import { compressImage } from "../utils/imageCompression";
 
 // Layout Components
@@ -219,17 +218,33 @@ const VisionBoardEditorPro = () => {
     return false;
   };
 
-  // Pre-load Toxicity Model and NSFW Detection Model
+  // Warm up the moderation models *after* the editor is interactive. These
+  // pull in TensorFlow.js and several megabytes of weights; loading them
+  // during mount used to block the first paint of a new board. Moderation
+  // still runs on save — loadToxicityModel() is memoised, so a save that
+  // arrives before the warm-up finishes simply awaits the same promise.
   useEffect(() => {
-    const initModels = async () => {
+    let cancelled = false;
+    const warmUp = () => {
+      if (cancelled) return;
       setIsModelLoading(true);
-      await Promise.all([
-        loadToxicityModel(),
-        preloadNSFWModel(),
-      ]);
-      setIsModelLoading(false);
+      Promise.resolve(loadToxicityModel())
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) setIsModelLoading(false);
+        });
+      preloadNSFWModel();
     };
-    initModels();
+
+    const schedule = window.requestIdleCallback
+      ? window.requestIdleCallback(warmUp, { timeout: 4000 })
+      : window.setTimeout(warmUp, 1200);
+
+    return () => {
+      cancelled = true;
+      if (window.requestIdleCallback && window.cancelIdleCallback) window.cancelIdleCallback(schedule);
+      else window.clearTimeout(schedule);
+    };
   }, []);
 
   const currentTemplate = GRID_TEMPLATES[templateId];
@@ -743,19 +758,48 @@ const VisionBoardEditorPro = () => {
     const asset = assetOverlays[assetId];
     if (!asset || asset.hasCutout || asset.isProcessingCutout) return;
 
+    // The cutout model is downloaded on first use and is tens of megabytes, so
+    // tell the student what is happening instead of leaving the button spinning.
+    let announcedDownload = false;
     try {
       handleUpdateAsset(assetId, { isProcessingCutout: true });
-      const newSrc = await removeBackground(asset.src);
-      handleUpdateAsset(assetId, { 
-        src: newSrc, 
+      const newSrc = await removeBackground(asset.src, (progress) => {
+        if (!announcedDownload && progress < 1) {
+          announcedDownload = true;
+          toast({
+            title: t("vision_board.cutout_downloading", "Preparing the cutout tool"),
+            description: t(
+              "vision_board.cutout_downloading_desc",
+              "Downloading the background removal model. This happens once and may take a minute."
+            ),
+          });
+        }
+      });
+      handleUpdateAsset(assetId, {
+        src: newSrc,
         isProcessingCutout: false,
-        hasCutout: true 
+        hasCutout: true,
       });
       toast({ title: t("vision_board.cutout_success", "Background removed successfully") });
     } catch (e) {
-      console.error(e);
+      console.error("Background removal failed:", e);
       handleUpdateAsset(assetId, { isProcessingCutout: false });
-      toast({ title: t("vision_board.cutout_error", "Failed to remove background"), variant: "destructive" });
+      const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+      const description =
+        offline || e?.reason === "network" || e?.reason === "library"
+          ? t(
+              "vision_board.cutout_error_network",
+              "The background removal model could not be downloaded. Check your internet connection and try again."
+            )
+          : t(
+              "vision_board.cutout_error_processing",
+              "This image could not be processed. Try a different photo."
+            );
+      toast({
+        title: t("vision_board.cutout_error", "Failed to remove background"),
+        description,
+        variant: "destructive",
+      });
     }
   };
 
@@ -767,6 +811,9 @@ const VisionBoardEditorPro = () => {
 
   const handleSelectAsset = (assetId, additive = false) => {
     if (assetOverlays[assetId]?.hidden) return;
+    // Selecting an asset reveals the cutout button — start fetching the
+    // library now so the first click is not a cold start.
+    preloadCutoutLibrary();
     buildSelection(assetId, "asset", additive);
   };
 
@@ -1395,6 +1442,7 @@ const VisionBoardEditorPro = () => {
 
           document.body.appendChild(clone);
 
+          const html2canvas = (await import("html2canvas")).default;
           const canvas = await html2canvas(clone, {
             scale: 1, // 1:1 of the forced pixel size
             useCORS: true,

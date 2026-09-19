@@ -1,5 +1,3 @@
-import * as tf from '@tensorflow/tfjs';
-import * as toxicity from '@tensorflow-models/toxicity';
 
 /**
  * Content Moderation Utility for Frontend
@@ -86,6 +84,28 @@ export const moderateText = (text, strictMode = false) => {
 /**
  * TensorFlow.js Toxicity Model integration
  */
+/**
+ * TensorFlow.js and the toxicity model together weigh ~1.8 MB of JavaScript
+ * before any model weights are downloaded. They are imported lazily so that
+ * pages using only the synchronous word-list check (the vision board editor
+ * and gallery, group chat) do not pay for them on load.
+ */
+let toxicityLibPromise = null;
+const loadToxicityLib = () => {
+  if (!toxicityLibPromise) {
+    toxicityLibPromise = Promise.all([
+      import('@tensorflow/tfjs'),
+      import('@tensorflow-models/toxicity'),
+    ])
+      .then(([, toxicity]) => toxicity)
+      .catch((error) => {
+        toxicityLibPromise = null;
+        throw error;
+      });
+  }
+  return toxicityLibPromise;
+};
+
 let toxicityModel = null;
 const TOXICITY_THRESHOLD = 0.85;
 // Valid labels: identity_attack, insult, obscene, severe_toxicity, sexual_explicit, threat, toxicity
@@ -97,6 +117,7 @@ const LABELS_TO_CHECK = ['toxicity', 'severe_toxicity', 'identity_attack', 'insu
 export const loadToxicityModel = async () => {
   if (toxicityModel) return toxicityModel;
   try {
+    const toxicity = await loadToxicityLib();
     toxicityModel = await toxicity.load(TOXICITY_THRESHOLD, LABELS_TO_CHECK);
     return toxicityModel;
   } catch (error) {

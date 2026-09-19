@@ -414,7 +414,11 @@
     "toast_session_expired": "Session Expired",
     "toast_session_expired_desc": "Please log in again to save your vision board",
     "toast_error": "Error",
-    "toast_failed_save": "Failed to save vision board"
+    "toast_failed_save": "Failed to save vision board",
+    "cutout_downloading": "Preparing the cutout tool",
+    "cutout_downloading_desc": "Downloading the background removal model. This happens once and may take a minute.",
+    "cutout_error_network": "The background removal model could not be downloaded. Check your internet connection and try again.",
+    "cutout_error_processing": "This image could not be processed. Try a different photo."
   },
   "profile": {
     "display_name": "Display Name",
