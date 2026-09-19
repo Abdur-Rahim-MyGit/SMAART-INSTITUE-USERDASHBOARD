@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, MessageSquare, Paperclip, ChevronRight } from "lucide-react";
+import { Clock, MessageSquare, Paperclip, ChevronRight } from "@/components/icons";
 
 const STATUS_CONFIG = {
   'open': { 
@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
   },
   'resolved': { 
     label: 'Resolved', 
-    color: 'bg-green-500/20 text-green-400 border-green-500/30' 
+    color: 'bg-green-500/20 text-emerald-600 dark:text-emerald-400 border-green-500/30' 
   },
   'closed': { 
     label: 'Closed', 
@@ -21,9 +21,9 @@ const STATUS_CONFIG = {
 };
 
 const PRIORITY_CONFIG = {
-  'low': { label: 'Low', color: 'text-green-400' },
+  'low': { label: 'Low', color: 'text-emerald-600 dark:text-emerald-400' },
   'medium': { label: 'Medium', color: 'text-yellow-400' },
-  'high': { label: 'High', color: 'text-red-400' }
+  'high': { label: 'High', color: 'text-rose-600 dark:text-rose-400' }
 };
 
 const CATEGORY_CONFIG = {
@@ -70,7 +70,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.01 }}
       onClick={() => onClick?.(ticket)}
-      className="p-4 rounded-xl bg-[#002147] border border-[#1a3884]/30 hover:border-[#1a3884] transition-all cursor-pointer group"
+      className="p-4 rounded-xl bg-[#072036] border border-[#045C9A]/30 hover:border-[#045C9A] transition-all cursor-pointer group"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
@@ -92,7 +92,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
           </div>
 
           {/* Title */}
-          <h3 className="text-white font-medium mb-1 truncate group-hover:text-[#1a3884] transition-colors">
+          <h3 className="text-white font-medium mb-1 truncate group-hover:text-[#045C9A] transition-colors">
             {ticket.title}
           </h3>
 
@@ -127,7 +127,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
 
           {/* User info (for admin view) */}
           {showUser && ticket.userId && (
-            <div className="mt-3 pt-3 border-t border-[#1a3884]/10">
+            <div className="mt-3 pt-3 border-t border-[#045C9A]/10">
               <div className="flex items-center gap-2">
                 {ticket.userId.profileImage ? (
                   <img 
@@ -136,8 +136,8 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
                     className="w-6 h-6 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#1a3884]/20 flex items-center justify-center">
-                    <span className="text-[10px] text-[#1a3884] font-medium">
+                  <div className="w-6 h-6 rounded-full bg-[#045C9A]/20 flex items-center justify-center">
+                    <span className="text-[10px] text-[#045C9A] font-medium">
                       {ticket.userId.fullName?.charAt(0)?.toUpperCase()}
                     </span>
                   </div>
@@ -150,7 +150,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
         </div>
 
         {/* Arrow indicator */}
-        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#1a3884] transition-colors flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#045C9A] transition-colors flex-shrink-0" />
       </div>
     </motion.div>
   );

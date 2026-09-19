@@ -244,16 +244,16 @@ const STATIC_SEARCH_ITEMS = [
   {
     id: "page-support",
     title: "Help & Support",
-    subtitle: "Open support and ticket help",
+    subtitle: "IT support tickets and grievance redressal",
     path: "/dashboard/support",
     type: "Page",
-    keywords: ["help", "support", "ticket", "issue"]
+    keywords: ["help", "support", "ticket", "issue", "it", "grievance"]
   },
   {
     id: "page-grievances",
     title: "Grievance Redressal",
     subtitle: "Submit and track grievances securely",
-    path: "/dashboard/grievances",
+    path: "/dashboard/support?tab=grievance",
     type: "Page",
     keywords: ["grievance", "redressal", "complaint", "issue", "anonymous"]
   },

@@ -21,7 +21,6 @@ import {
   Menu,
   Moon,
   Settings,
-  ShieldAlert,
   ShieldCheck,
   Sparkles,
   Star,
@@ -103,7 +102,6 @@ const menuGroups = [
       { icon: Bell, label: "sidebar.notifications", path: "/dashboard/notifications", onlyMobile: true },
       { icon: Languages, label: "sidebar.language", isLanguageToggle: true, onlyMobile: true },
       { icon: Settings, label: "sidebar.settings", path: "/dashboard/settings" },
-      { icon: ShieldAlert, label: "sidebar.grievances", path: "/dashboard/grievances" },
       { icon: HelpCircle, label: "sidebar.help", path: "/dashboard/support" },
     ]
   }
