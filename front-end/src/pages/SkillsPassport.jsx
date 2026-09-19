@@ -4,24 +4,11 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import {
-    ArrowLeft,
-    Award,
-    BookOpen,
-    Briefcase,
-    Building2,
-    CheckCircle2,
-    Clock,
-    Download,
-    GraduationCap,
-    Mail,
-    Monitor,
-    Phone,
-    Share2,
-    ShieldCheck,
-    Sparkles,
-    Star,
-    UserCircle2
-} from "lucide-react";
+    ArrowLeft, Award, BookOpen, Briefcase, CheckCircle2, ChevronLeft, ChevronRight, Clock,
+    Download, Layers, Share2, ShieldCheck, Sparkles, UserCircle2,
+} from "@/components/icons";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
 import { assessmentApi } from "@/services/assessmentApi";
 import { API_BASE_URL, courseEnrollmentAPI, coursesAPI, getBackendUrl } from "@/services/api";
@@ -115,11 +102,6 @@ const TECH_KEYWORDS = [
     "cyber"
 ];
 
-const PAGE_DIMENSIONS_COVER = {
-    width: "556px",
-    height: "640px"
-};
-
 const PAGE_DIMENSIONS_STANDARD = {
     width: "210mm",
     minHeight: "297mm"
@@ -127,10 +109,6 @@ const PAGE_DIMENSIONS_STANDARD = {
 
 const documentFont = {
     fontFamily: '"Aptos", "Segoe UI", "Trebuchet MS", sans-serif'
-};
-
-const displayFont = {
-    fontFamily: '"Cambria", "Times New Roman", serif'
 };
 
 const normalizeList = (value) => {
@@ -364,7 +342,7 @@ const PassportHeader = ({ sectionName, count }) => {
         <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
                 <div>
-                    <h2 className="text-[20px] font-black text-[#0f2c59] tracking-tight leading-none">
+                    <h2 className="text-[20px] font-black text-[#072036] tracking-tight leading-none" style={{ color: "#072036" }}>
                         SMAART Passport
                     </h2>
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mt-2">
@@ -374,8 +352,8 @@ const PassportHeader = ({ sectionName, count }) => {
             </div>
 
             {/* Verified Badge */}
-            <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#fafbfd] text-[9px] font-black text-slate-450 uppercase tracking-widest shrink-0 shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-slate-400" />
+            <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#EAF7FD] text-[9px] font-black text-[#045C9A] uppercase tracking-widest shrink-0 shadow-sm">
+                <ShieldCheck className="w-4 h-4 text-[#045C9A]" />
                 <span>VERIFIED</span>
             </div>
         </div>
@@ -389,19 +367,19 @@ const PassportProfile = ({ fullName, passportId, profilePhoto }) => {
                 {profilePhoto ? (
                     <img src={profilePhoto} alt={fullName} className="w-full h-full object-cover" />
                 ) : (
-                    <UserCircle2 className="w-10 h-10 text-slate-350" />
+                    <UserCircle2 className="w-10 h-10 text-slate-300" />
                 )}
             </div>
 
             {/* Profile Info styled as the skeleton-like rounded pills */}
             <div className="flex-1 min-w-0 flex flex-col items-start gap-2.5">
                 <div className="flex items-center px-5 py-2 w-fit max-w-full">
-                    <h1 className="text-[18px] font-black text-[#0f2c59] tracking-tight leading-none">
+                    <h1 className="text-[18px] font-black text-[#072036] tracking-tight leading-none" style={{ color: "#072036" }}>
                         {fullName}
                     </h1>
                 </div>
                 <div className="flex items-center px-4 py-1.5 w-fit max-w-full">
-                    <p className="text-[13px] font-black uppercase tracking-wider text-slate-450 leading-none">
+                    <p className="text-[13px] font-black uppercase tracking-wider text-slate-400 leading-none">
                         {passportId}
                     </p>
                 </div>
@@ -415,13 +393,13 @@ const PassportRow = ({ label, badgeText }) => {
         <div className="flex items-center justify-between gap-4 p-3.5 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.01)] hover:border-slate-200/80 transition-all">
             <div className="flex items-center gap-4 min-w-0 flex-1">
                 {/* Circular Check Outline Icon */}
-                <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50/20 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-[#0b2b73]" />
+                <div className="w-8 h-8 rounded-full border border-[#045C9A]/20 bg-[#EAF7FD] flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-[#045C9A]" />
                 </div>
 
                 {/* Label pill in center */}
-                <div className="h-7.5 flex items-center px-4 w-fit max-w-full">
-                    <span className="text-[12px] font-bold text-[#0f2c59] truncate leading-none">
+                <div className="h-8 flex items-center px-4 w-fit max-w-full">
+                    <span className="text-[12px] font-bold text-[#072036] truncate leading-none">
                         {label}
                     </span>
                 </div>
@@ -429,8 +407,8 @@ const PassportRow = ({ label, badgeText }) => {
 
             {/* Badge pill on right */}
             {badgeText && (
-                <div className="h-6.5 flex items-center px-4 shrink-0">
-                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider leading-none">
+                <div className="h-7 flex items-center px-4 shrink-0">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider leading-none">
                         {badgeText}
                     </span>
                 </div>
@@ -473,6 +451,9 @@ const PassportFooter = ({ passportId }) => {
     );
 };
 
+/* The sheet is a printable, always-white document. index.css paints every
+   h1-h6 white under .dark, and that class rule outranks the headings' own
+   colour utilities, so the sheet's headings carry inline colours instead. */
 const PassportPage = ({
     pageNumber,
     passportId,
@@ -483,16 +464,16 @@ const PassportPage = ({
 }) => (
     <section
         ref={pageRef}
-        className="relative w-full overflow-hidden rounded-[32px] border border-slate-100 bg-white px-8 py-8 text-slate-900 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05),_0_4px_18px_-8px_rgba(0,0,0,0.02)] flex flex-col justify-between"
+        className="relative w-full overflow-hidden rounded-2xl border border-[#d7ebf5] bg-white px-8 py-8 text-slate-900 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05),_0_4px_18px_-8px_rgba(0,0,0,0.02)] flex flex-col justify-between"
         style={{
             width: "100%",
-            maxWidth: pageNumber === 1 ? PAGE_DIMENSIONS_COVER.width : PAGE_DIMENSIONS_STANDARD.width,
-            minHeight: pageNumber === 1 ? PAGE_DIMENSIONS_COVER.height : PAGE_DIMENSIONS_STANDARD.minHeight,
+            maxWidth: PAGE_DIMENSIONS_STANDARD.width,
+            minHeight: PAGE_DIMENSIONS_STANDARD.minHeight,
             ...documentFont
         }}
     >
         {/* Decorative background grids/patterns */}
-        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(#1a3884 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{ backgroundImage: "radial-gradient(#045C9A 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
 
         <div className="relative z-10 flex flex-col flex-1 justify-between">
             {/* Header */}
@@ -511,60 +492,30 @@ const PassportPage = ({
 
 const EmptySkillState = ({ title }) => (
     <div className="rounded-[22px] border border-dashed border-slate-200 bg-white/75 px-5 py-8 text-center">
-        <p className="text-sm font-semibold text-[#163878]">{title}</p>
+        <p className="text-sm font-semibold text-[#045C9A]">{title}</p>
         <p className="mt-2 text-sm text-slate-500">No synced records are available for this category yet.</p>
     </div>
 );
 
-const InlinePager = ({ activePage, totalPages, onPrevious, onNext, dark = false }) => (
-    <div
-        className={`inline-flex h-[42px] w-full max-w-[210px] items-center justify-between rounded-[12px] border px-2 py-1 ${dark
-            ? "border-white/20 bg-white/5"
-            : "border-slate-200 bg-white shadow-[0_4px_12px_-4px_rgba(15,23,42,0.1)]"
-            }`}
-    >
-        <button
-            type="button"
-            onClick={onPrevious}
-            disabled={activePage === 1}
-            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${dark
-                ? "border border-white/10 bg-white/20 text-white hover:bg-white/25 hover:border-white/30 active:bg-white/15"
-                : "border border-slate-200 bg-white text-[#163878] hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm active:bg-slate-100"
-                }`}
-        >
-            Prev
+const InlinePager = ({ activePage, totalPages, onPrevious, onNext, pageLabel }) => (
+    <div className="inline-flex items-center gap-1 rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] p-1 dark:border-white/10 dark:bg-[#072036]/60">
+        <button type="button" id="passport-prev" onClick={onPrevious} disabled={activePage === 1} aria-label="Previous page"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#072036] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:text-white dark:hover:bg-white/10">
+            <ChevronLeft className="h-4 w-4" />
         </button>
-        <div className="flex flex-col items-center justify-center min-w-[58px] text-center leading-none">
-            <p className={`text-[8px] font-bold uppercase tracking-[0.2em] ${dark ? "text-blue-200/55" : "text-slate-400"}`}>Page</p>
-            <p className={`mt-0.5 text-[13px] font-semibold ${dark ? "text-white" : "text-[#10285a]"}`}>
-                {activePage} / {totalPages}
-            </p>
-        </div>
-        <button
-            type="button"
-            onClick={onNext}
-            disabled={activePage === totalPages}
-            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${dark
-                ? "border border-[#27498d] bg-[#183b7f] text-white hover:bg-[#214893] active:bg-[#122c60] hover:shadow-[0_6px_12px_-8px_rgba(255,255,255,0.25)]"
-                : "border border-[#163878] bg-[#163878] text-white hover:bg-[#102c66] active:bg-[#0b1e47] hover:shadow-[0_6px_12px_-8px_rgba(22,56,120,0.45)]"
-                }`}
-        >
-            Next
+        <span className="min-w-[64px] text-center text-xs font-bold tabular-nums text-[#072036] dark:text-white" aria-live="polite">{pageLabel}</span>
+        <button type="button" id="passport-next" onClick={onNext} disabled={activePage === totalPages} aria-label="Next page"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#072036] transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:text-white dark:hover:bg-white/10">
+            <ChevronRight className="h-4 w-4" />
         </button>
     </div>
 );
 
-const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = false }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${primary
-            ? "border-[#163878] bg-[#163878] text-white hover:bg-[#102c66]"
-            : "border-slate-200 bg-white text-[#163878] hover:bg-slate-50"
-            } disabled:cursor-not-allowed disabled:opacity-60`}
-        style={documentFont}
-    >
+const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = false, id }) => (
+    <button type="button" id={id} onClick={onClick} disabled={disabled}
+        className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${primary
+            ? "bg-[#072036] text-white shadow-md shadow-[#072036]/20 hover:bg-[#0d3a5f] dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white"
+            : "border border-[#d7ebf5] bg-white text-[#034a7d] hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-white/10"}`}>
         <Icon className="h-4 w-4" />
         {label}
     </button>
@@ -583,7 +534,7 @@ const getExpDateString = (exp) => {
 const ElaboratedExperienceCard = ({ exp }) => {
     return (
         <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
-            <div className="text-[14px] font-extrabold text-[#0f2c59] flex items-center gap-1.5 flex-wrap leading-none">
+            <div className="text-[14px] font-extrabold text-[#072036] flex items-center gap-1.5 flex-wrap leading-none">
                 <span>{exp.companyName || exp.organizationName || exp.organization || "Organization"}</span>
                 {exp.location && (
                     <>
@@ -593,7 +544,7 @@ const ElaboratedExperienceCard = ({ exp }) => {
                 )}
             </div>
 
-            <div className="text-[13px] font-bold text-blue-600 dark:text-blue-500 leading-none pt-0.5">
+            <div className="text-[13px] font-bold text-[#045C9A] leading-none pt-0.5">
                 {exp.role || exp.jobTitle || exp.title || "Professional Role"}
             </div>
 
@@ -615,7 +566,7 @@ const ElaboratedCertificateCard = ({ cert }) => {
 
     return (
         <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
-            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+            <div className="text-[14px] font-extrabold text-[#072036] leading-none">
                 {cert.title || "Certification"}
             </div>
 
@@ -629,12 +580,12 @@ const ElaboratedCertificateCard = ({ cert }) => {
                         href={resolvedUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[12px] text-teal-600 font-extrabold hover:underline inline-flex items-center"
+                        className="text-[12px] text-[#045C9A] font-extrabold hover:underline inline-flex items-center"
                     >
                         View Certificate
                     </a>
                 ) : (
-                    <span className="text-[12px] text-teal-600 font-extrabold cursor-pointer hover:underline">
+                    <span className="text-[12px] text-[#045C9A] font-extrabold cursor-pointer hover:underline">
                         View Certificate
                     </span>
                 )}
@@ -647,7 +598,7 @@ const ElaboratedProjectCard = ({ project }) => {
     const projectUrl = project.link || project.projectLink;
     return (
         <div className="p-5 bg-[#f8f9fc] hover:bg-[#f1f3f9] rounded-2xl border border-slate-100/80 transition-all space-y-2">
-            <div className="text-[14px] font-extrabold text-[#0f2c59] leading-none">
+            <div className="text-[14px] font-extrabold text-[#072036] leading-none">
                 {project.title || "Capstone Project"}
             </div>
 
@@ -657,12 +608,12 @@ const ElaboratedProjectCard = ({ project }) => {
                         href={projectUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[12px] text-blue-600 font-bold hover:underline inline-flex items-center"
+                        className="text-[12px] text-[#045C9A] font-bold hover:underline inline-flex items-center"
                     >
                         View Project +
                     </a>
                 ) : (
-                    <span className="text-[12px] text-blue-600 font-bold cursor-pointer hover:underline">
+                    <span className="text-[12px] text-[#045C9A] font-bold cursor-pointer hover:underline">
                         View Project +
                     </span>
                 )}
@@ -692,6 +643,17 @@ const SkillsPassport = () => {
 
     const [isExporting, setIsExporting] = useState(false);
     const [activePage, setActivePage] = useState(1);
+
+    const [isDarkTheme, setIsDarkTheme] = useState(
+        typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+    );
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDarkTheme(document.documentElement.classList.contains("dark"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const rawUser = sessionStorage.getItem("user");
@@ -1098,7 +1060,11 @@ const SkillsPassport = () => {
     };
 
     if (isLoading) {
-        return <SkillsPassportSkeleton />;
+        return (
+            <PageTransition>
+                <div className="mx-auto max-w-7xl p-4 sm:p-5 lg:p-6"><SkillsPassportSkeleton /></div>
+            </PageTransition>
+        );
     }
 
     // Learning Velocity summary (Blueprint v1.0 PLVI + Total Growth Δ).
@@ -1113,368 +1079,374 @@ const SkillsPassport = () => {
     };
     const hasVelocity = velocity.band != null || velocity.delta != null;
 
+    const sections = [
+        { page: 1, icon: UserCircle2, label: t("skills_passport_page.section_cover", "Cover"), count: null },
+        { page: 2, icon: Briefcase, label: t("skills_passport_page.section_experience", "Experience"), count: passportData.experiences.length },
+        { page: 3, icon: BookOpen, label: t("skills_passport_page.section_courses", "Courses"), count: passportData.credentials.length },
+        { page: 4, icon: Award, label: t("skills_passport_page.section_certificates", "Certificates"), count: passportData.certificates.length },
+        { page: 5, icon: Layers, label: t("skills_passport_page.section_projects", "Projects"), count: passportData.projects.length },
+        { page: 6, icon: Sparkles, label: t("skills_passport_page.section_skills", "Skills"), count: passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length }
+    ];
+    const activeSection = sections.find((sec) => sec.page === activePage) || sections[0];
+    const goPrev = () => setActivePage((page) => Math.max(1, page - 1));
+    const goNext = () => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1));
+
     return (
-        <div className="min-h-screen bg-transparent p-8" style={documentFont}>
-            <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                className="mx-auto flex max-w-[235mm] flex-col gap-5"
-            >
-                {/* Back Button - Mobile Only */}
-                <div className="flex items-center mt-6 mb-5 md:hidden">
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="group flex items-center gap-3 w-fit selection:bg-transparent"
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:shadow-md group-hover:border-slate-350 dark:group-hover:border-slate-600 transition-all duration-300">
-                            <ArrowLeft className="h-4 w-4 text-[#112b6b] dark:text-slate-300 group-hover:-translate-x-0.5 transition-transform" />
-                        </div>
-                        <span className="text-[#112b6b] dark:text-blue-400 text-xs font-extrabold uppercase tracking-[0.15em] transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-300">
-                            Back to Dashboard
-                        </span>
-                    </button>
+        <PageTransition>
+            <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+                <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+                    <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+                </div>
+                <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+                    <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+                    <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
                 </div>
 
-                <div className="mx-auto flex w-full flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between max-w-[210mm] transition-all duration-300">
-                    <div>
-                        <h1 className="text-[1.65rem] font-[800] tracking-tight text-[#10285a]" style={displayFont}>
-                            Skills Passport
-                        </h1>
-                        <p className="mt-1 text-[0.85rem] font-[500] text-slate-500 max-w-[480px] leading-relaxed">
-                            Your comprehensive academic and professional identity, securely synced with live SMAART records.
-                        </p>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap items-center gap-2">
-                        <ActionButton icon={Share2} label="Copy Link" onClick={handleCopyLink} />
-                        <ActionButton
-                            icon={Download}
-                            label={isExporting ? "Exporting..." : "Export PDF"}
-                            onClick={handleExport}
-                            disabled={isExporting}
-                            primary
-                        />
-                    </div>
-                </div>
-
-                {activePage === 1 ? (
-                    <div className="mx-auto w-full max-w-[556px]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
+                <main className="relative z-10">
+                    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
+                        <div className="flex items-center sm:hidden">
+                            <button type="button" onClick={() => navigate("/dashboard")} className="group flex w-fit items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:group-hover:border-[#045C9A]/40">
+                                    <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
+                                </div>
+                                <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                                    {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                                </span>
+                            </button>
                         </div>
-                        <PassportPage
-                            pageNumber={1}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="CAPABILITY & SKILLS RECORD"
-                        >
-                            {/* Profile Cover Section */}
-                            <PassportProfile
-                                fullName={passportData.fullName}
-                                passportId={passportData.passportId}
-                                profilePhoto={passportData.profilePhoto}
-                            />
 
-                            {/* Section Indexes / Table of Contents */}
-                            <div className="space-y-3 mt-6">
-                                <PassportRow
-                                    label="Experience"
-                                    badgeText={`${passportData.experiences.length} ${passportData.experiences.length === 1 ? 'Record' : 'Records'}`}
-                                />
-                                <PassportRow
-                                    label="Courses"
-                                    badgeText={`${passportData.credentials.length} ${passportData.credentials.length === 1 ? 'Course' : 'Courses'}`}
-                                />
-                                <PassportRow
-                                    label="Certificates"
-                                    badgeText={`${passportData.certificates.length} ${passportData.certificates.length === 1 ? 'Certificate' : 'Certificates'}`}
-                                />
-                                <PassportRow
-                                    label="Projects"
-                                    badgeText={`${passportData.projects.length} ${passportData.projects.length === 1 ? 'Project' : 'Projects'}`}
-                                />
-                                <PassportRow
-                                    label="Skills"
-                                    badgeText={`${passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length} Verified`}
-                                />
-                            </div>
-
-                            {/* Learning Velocity — PLVI + Total Growth Δ (T1 → latest stage) */}
-                            {hasVelocity ? (
-                                <div className="mt-6 rounded-2xl border border-[#d6dfef] bg-[#f5f8ff] p-4">
-                                    <div className="mb-3 flex items-center justify-between">
-                                        <h4 className="text-[0.8rem] font-[800] uppercase tracking-[0.12em] text-[#10285a]">
-                                            Learning Velocity
-                                        </h4>
-                                        <span className="rounded-md border border-[#1a3884]/20 bg-[#eef4ff] px-2 py-0.5 text-[0.6rem] font-[800] uppercase tracking-wider text-[#1a3884]">
-                                            {velocity.isFinal ? "Final" : (velocity.stage || "Current")}
-                                        </span>
+                        {/* Hero -- same structure as Skills Vault / Settings / Help */}
+                        <motion.section initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="relative w-full overflow-hidden rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
+                            <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+                            <div className="relative z-10 flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] sm:flex">
+                                        <ShieldCheck className="h-5 w-5" />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="rounded-xl border border-[#d6dfef] bg-white px-3 py-2.5">
-                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Total Growth</p>
-                                            <p className="text-[1.15rem] font-[800] text-[#10285a]">
-                                                {velocity.delta == null ? "—" : `${velocity.delta >= 0 ? "+" : ""}${velocity.delta} pts`}
-                                            </p>
-                                            <p className="text-[0.6rem] font-[500] text-slate-400">since baseline (T1)</p>
+                                    <div>
+                                        <h1 className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl" style={{ letterSpacing: "-0.02em" }}>
+                                            {t("skills_passport_page.title", "Skills Passport")}
+                                        </h1>
+                                        <p className="mt-0.5 max-w-2xl text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                            {t("skills_passport_page.subtitle", "Your verified academic and professional record, synced from live SMAART data and shareable with employers.")}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                    <ActionButton id="passport-copy" icon={Share2} label={t("skills_passport_page.copy_link", "Copy Link")} onClick={handleCopyLink} />
+                                    <ActionButton id="passport-export" icon={Download} label={isExporting ? t("skills_passport_page.exporting", "Exporting...") : t("skills_passport_page.export_pdf", "Export PDF")} onClick={handleExport} disabled={isExporting} primary />
+                                </div>
+                            </div>
+                        </motion.section>
+
+                        {/* Viewer: section rail + document page */}
+                        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.05 }}
+                            className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+                            <nav id="passport-rail" aria-label={t("skills_passport_page.sections", "Passport sections")} className="rounded-2xl border border-[#d7ebf5]/80 bg-white p-2 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f] lg:self-start">
+                                <div className="flex gap-1 overflow-x-auto lg:flex-col" role="tablist" aria-orientation="vertical">
+                                    {sections.map((sec) => {
+                                        const active = activePage === sec.page;
+                                        const Icon = sec.icon;
+                                        return (
+                                            <button key={sec.page} type="button" role="tab" id={`passport-tab-${sec.page}`} aria-selected={active} onClick={() => setActivePage(sec.page)}
+                                                className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors lg:w-full ${active
+                                                    ? "bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]"
+                                                    : "text-[#35566b] hover:bg-[#F1F5F9] hover:text-[#072036] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"}`}>
+                                                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active ? "bg-white/15 dark:bg-[#072036]/10" : "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"}`}>
+                                                    <Icon className="h-4 w-4" />
+                                                </span>
+                                                <span className="flex-1 whitespace-nowrap text-[13px] font-bold">{sec.label}</span>
+                                                {sec.count != null && (
+                                                    <span className={`hidden rounded-full px-2 py-0.5 text-[10px] font-black tabular-nums lg:inline-block ${active ? "bg-white/15 text-white dark:bg-[#072036]/10 dark:text-[#072036]" : "bg-[#F1F5F9] text-[#35566b] dark:bg-white/10 dark:text-slate-300"}`}>
+                                                        {sec.count}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </nav>
+
+                            <section className="flex flex-col rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]" aria-labelledby={`passport-tab-${activePage}`}>
+                                <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7ebf5] px-5 py-4 dark:border-white/10 sm:px-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
+                                            <activeSection.icon className="h-4 w-4" />
                                         </div>
-                                        <div className="rounded-xl border border-[#d6dfef] bg-white px-3 py-2.5">
-                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Velocity Band</p>
-                                            <p className="text-[1.15rem] font-[800] text-[#1a3884]">{velocity.band || "—"}</p>
-                                            <p className="text-[0.6rem] font-[500] text-slate-400">
-                                                {velocity.tDays ? `over ${velocity.tDays} ${velocity.basis === "active" ? "active learning days" : "days"}` : "rate of growth"}
+                                        <div>
+                                            <h2 className="text-base font-extrabold leading-tight text-[#072036] dark:text-white">{activeSection.label}</h2>
+                                            <p className="text-xs text-[#35566b] dark:text-slate-400">
+                                                {t("skills_passport_page.page_of", { page: activePage, total: TOTAL_PAGES, defaultValue: `Page ${activePage} of ${TOTAL_PAGES}` })}
+                                                {activeSection.count != null ? ` · ${activeSection.count} ${t("skills_passport_page.records", "records")}` : ""}
                                             </p>
                                         </div>
                                     </div>
-                                </div>
-                            ) : null}
-                        </PassportPage>
-                    </div>
-                ) : null}
+                                    <InlinePager activePage={activePage} totalPages={TOTAL_PAGES} onPrevious={goPrev} onNext={goNext} pageLabel={`${activePage} / ${TOTAL_PAGES}`} />
+                                </header>
 
-                {activePage === 2 ? (
-                    <div className="mx-auto w-full max-w-[210mm]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
-                        </div>
-                        <PassportPage
-                            pageNumber={2}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="EXPERIENCE"
-                            count={passportData.experiences.length}
-                        >
-                            {/* Professional Experience */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        Professional Experience
-                                    </h3>
-                                    <span className="text-[10px] text-slate-400 font-bold">
-                                        {passportData.experiences.length} total
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {passportData.experiences.slice(0, 4).map((exp, index) => (
-                                        <ElaboratedExperienceCard
-                                            key={exp._id || exp.id || index}
-                                            exp={exp}
-                                        />
-                                    ))}
-                                    {passportData.experiences.length === 0 && (
-                                        <EmptySkillState title="No professional experience records synced yet." />
+                                {/* The A4 document sits on a muted desk. It scrolls sideways on narrow screens instead of shrinking, so the PDF capture stays 1:1. */}
+                                <div id="passport-desk" className="overflow-x-auto rounded-b-2xl bg-[#F1F5F9] px-4 py-5 dark:bg-[#072036]/60 sm:px-6 sm:py-6">
+                                    <div className="mx-auto w-full max-w-[210mm]" style={documentFont}>
+                                    {activePage === 1 && (
+                                        <PassportPage
+                                            pageNumber={1}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="CAPABILITY & SKILLS RECORD"
+                                        >
+                                            {/* Profile Cover Section */}
+                                            <PassportProfile
+                                                fullName={passportData.fullName}
+                                                passportId={passportData.passportId}
+                                                profilePhoto={passportData.profilePhoto}
+                                            />
+                                        
+                                            {/* Section Indexes / Table of Contents */}
+                                            <div className="space-y-3 mt-6">
+                                                <PassportRow
+                                                    label="Experience"
+                                                    badgeText={`${passportData.experiences.length} ${passportData.experiences.length === 1 ? 'Record' : 'Records'}`}
+                                                />
+                                                <PassportRow
+                                                    label="Courses"
+                                                    badgeText={`${passportData.credentials.length} ${passportData.credentials.length === 1 ? 'Course' : 'Courses'}`}
+                                                />
+                                                <PassportRow
+                                                    label="Certificates"
+                                                    badgeText={`${passportData.certificates.length} ${passportData.certificates.length === 1 ? 'Certificate' : 'Certificates'}`}
+                                                />
+                                                <PassportRow
+                                                    label="Projects"
+                                                    badgeText={`${passportData.projects.length} ${passportData.projects.length === 1 ? 'Project' : 'Projects'}`}
+                                                />
+                                                <PassportRow
+                                                    label="Skills"
+                                                    badgeText={`${passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length} Verified`}
+                                                />
+                                            </div>
+                                        
+                                            {/* Learning Velocity — PLVI + Total Growth Δ (T1 → latest stage) */}
+                                            {hasVelocity ? (
+                                                <div className="mt-6 rounded-2xl border border-[#d7ebf5] bg-[#F1F5F9] p-4">
+                                                    <div className="mb-3 flex items-center justify-between">
+                                                        <h4 className="text-[0.8rem] font-[800] uppercase tracking-[0.12em] text-[#072036]" style={{ color: "#072036" }}>
+                                                            Learning Velocity
+                                                        </h4>
+                                                        <span className="rounded-md border border-[#045C9A]/20 bg-[#EAF7FD] px-2 py-0.5 text-[0.6rem] font-[800] uppercase tracking-wider text-[#045C9A]">
+                                                            {velocity.isFinal ? "Final" : (velocity.stage || "Current")}
+                                                        </span>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div className="rounded-xl border border-[#d7ebf5] bg-white px-3 py-2.5">
+                                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Total Growth</p>
+                                                            <p className="text-[1.15rem] font-[800] text-[#072036]">
+                                                                {velocity.delta == null ? "—" : `${velocity.delta >= 0 ? "+" : ""}${velocity.delta} pts`}
+                                                            </p>
+                                                            <p className="text-[0.6rem] font-[500] text-slate-400">since baseline (T1)</p>
+                                                        </div>
+                                                        <div className="rounded-xl border border-[#d7ebf5] bg-white px-3 py-2.5">
+                                                            <p className="text-[0.6rem] font-[700] uppercase tracking-wider text-slate-400">Velocity Band</p>
+                                                            <p className="text-[1.15rem] font-[800] text-[#045C9A]">{velocity.band || "—"}</p>
+                                                            <p className="text-[0.6rem] font-[500] text-slate-400">
+                                                                {velocity.tDays ? `over ${velocity.tDays} ${velocity.basis === "active" ? "active learning days" : "days"}` : "rate of growth"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : null}
+                                        </PassportPage>
                                     )}
-                                </div>
-                            </div>
-                        </PassportPage>
-                    </div>
-                ) : null}
-
-                {activePage === 3 ? (
-                    <div className="mx-auto w-full max-w-[210mm]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
-                        </div>
-                        <PassportPage
-                            pageNumber={3}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="COURSES"
-                            count={passportData.credentials.length}
-                        >
-                            {/* Courses */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        Academic & Professional Courses
-                                    </h3>
-                                    <span className="text-[10px] text-slate-400 font-bold">
-                                        {passportData.credentials.length} total
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {passportData.credentials.slice(0, 4).map((credential) => (
-                                        <PassportRow
-                                            key={credential.id}
-                                            label={credential.title}
-                                            badgeText={credential.difficulty || "COMPLETED"}
-                                        />
-                                    ))}
-                                    {passportData.credentials.length === 0 && (
-                                        <EmptySkillState title="No courses synced yet." />
+                                    {activePage === 2 && (
+                                        <PassportPage
+                                            pageNumber={2}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="EXPERIENCE"
+                                            count={passportData.experiences.length}
+                                        >
+                                            {/* Professional Experience */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400" style={{ color: "#94a3b8" }}>
+                                                        Professional Experience
+                                                    </h3>
+                                                    <span className="text-[10px] text-slate-400 font-bold">
+                                                        {passportData.experiences.length} total
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {passportData.experiences.slice(0, 4).map((exp, index) => (
+                                                        <ElaboratedExperienceCard
+                                                            key={exp._id || exp.id || index}
+                                                            exp={exp}
+                                                        />
+                                                    ))}
+                                                    {passportData.experiences.length === 0 && (
+                                                        <EmptySkillState title="No professional experience records synced yet." />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </PassportPage>
                                     )}
-                                </div>
-                            </div>
-                        </PassportPage>
-                    </div>
-                ) : null}
-
-                {activePage === 4 ? (
-                    <div className="mx-auto w-full max-w-[210mm]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
-                        </div>
-                        <PassportPage
-                            pageNumber={4}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="CERTIFICATES"
-                            count={passportData.certificates.length}
-                        >
-                            {/* Certificates */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        Verified Certifications
-                                    </h3>
-                                    <span className="text-[10px] text-slate-400 font-bold">
-                                        {passportData.certificates.length} total
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {passportData.certificates.slice(0, 4).map((cert, index) => (
-                                        <ElaboratedCertificateCard
-                                            key={cert._id || cert.id || index}
-                                            cert={cert}
-                                        />
-                                    ))}
-                                    {passportData.certificates.length === 0 && (
-                                        <EmptySkillState title="No certifications synced yet." />
+                                    {activePage === 3 && (
+                                        <PassportPage
+                                            pageNumber={3}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="COURSES"
+                                            count={passportData.credentials.length}
+                                        >
+                                            {/* Courses */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400" style={{ color: "#94a3b8" }}>
+                                                        Academic & Professional Courses
+                                                    </h3>
+                                                    <span className="text-[10px] text-slate-400 font-bold">
+                                                        {passportData.credentials.length} total
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {passportData.credentials.slice(0, 4).map((credential) => (
+                                                        <PassportRow
+                                                            key={credential.id}
+                                                            label={credential.title}
+                                                            badgeText={credential.difficulty || "COMPLETED"}
+                                                        />
+                                                    ))}
+                                                    {passportData.credentials.length === 0 && (
+                                                        <EmptySkillState title="No courses synced yet." />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </PassportPage>
                                     )}
-                                </div>
-                            </div>
-                        </PassportPage>
-                    </div>
-                ) : null}
-
-                {activePage === 5 ? (
-                    <div className="mx-auto w-full max-w-[210mm]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
-                        </div>
-                        <PassportPage
-                            pageNumber={5}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="PROJECTS"
-                            count={passportData.projects.length}
-                        >
-                            {/* Projects */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        Featured Projects
-                                    </h3>
-                                    <span className="text-[10px] text-slate-400 font-bold">
-                                        {passportData.projects.length} total
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {passportData.projects.slice(0, 4).map((project, index) => (
-                                        <ElaboratedProjectCard
-                                            key={project._id || project.id || index}
-                                            project={project}
-                                        />
-                                    ))}
-                                    {passportData.projects.length === 0 && (
-                                        <EmptySkillState title="No projects synced yet." />
+                                    {activePage === 4 && (
+                                        <PassportPage
+                                            pageNumber={4}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="CERTIFICATES"
+                                            count={passportData.certificates.length}
+                                        >
+                                            {/* Certificates */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400" style={{ color: "#94a3b8" }}>
+                                                        Verified Certifications
+                                                    </h3>
+                                                    <span className="text-[10px] text-slate-400 font-bold">
+                                                        {passportData.certificates.length} total
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {passportData.certificates.slice(0, 4).map((cert, index) => (
+                                                        <ElaboratedCertificateCard
+                                                            key={cert._id || cert.id || index}
+                                                            cert={cert}
+                                                        />
+                                                    ))}
+                                                    {passportData.certificates.length === 0 && (
+                                                        <EmptySkillState title="No certifications synced yet." />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </PassportPage>
                                     )}
-                                </div>
-                            </div>
-                        </PassportPage>
-                    </div>
-                ) : null}
-
-                {activePage === 6 ? (
-                    <div className="mx-auto w-full max-w-[210mm]">
-                        <div className="mb-2 flex justify-end">
-                            <InlinePager
-                                activePage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
-                                onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
-                            />
-                        </div>
-                        <PassportPage
-                            pageNumber={6}
-                            passportId={passportData.passportId}
-                            pageRef={activePageRef}
-                            sectionName="SKILLS"
-                            count={passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length}
-                        >
-                            <div className="space-y-4">
-                                <div>
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                                        Technical Skills
-                                    </h3>
-                                    <div className="space-y-2.5">
-                                        {passportData.technicalSkills.slice(0, 2).map((skill) => (
-                                            <PassportRow key={skill.label} label={skill.label} badgeText="TECHNICAL" />
-                                        ))}
-                                        {passportData.technicalSkills.length === 0 && (
-                                            <p className="text-[11px] text-slate-400 italic pl-1">No technical skills added</p>
-                                        )}
+                                    {activePage === 5 && (
+                                        <PassportPage
+                                            pageNumber={5}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="PROJECTS"
+                                            count={passportData.projects.length}
+                                        >
+                                            {/* Projects */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400" style={{ color: "#94a3b8" }}>
+                                                        Featured Projects
+                                                    </h3>
+                                                    <span className="text-[10px] text-slate-400 font-bold">
+                                                        {passportData.projects.length} total
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {passportData.projects.slice(0, 4).map((project, index) => (
+                                                        <ElaboratedProjectCard
+                                                            key={project._id || project.id || index}
+                                                            project={project}
+                                                        />
+                                                    ))}
+                                                    {passportData.projects.length === 0 && (
+                                                        <EmptySkillState title="No projects synced yet." />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </PassportPage>
+                                    )}
+                                    {activePage === 6 && (
+                                        <PassportPage
+                                            pageNumber={6}
+                                            passportId={passportData.passportId}
+                                            pageRef={activePageRef}
+                                            sectionName="SKILLS"
+                                            count={passportData.technicalSkills.length + passportData.aiSkills.length + passportData.domainSkills.length}
+                                        >
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2" style={{ color: "#94a3b8" }}>
+                                                        Technical Skills
+                                                    </h3>
+                                                    <div className="space-y-2.5">
+                                                        {passportData.technicalSkills.slice(0, 2).map((skill) => (
+                                                            <PassportRow key={skill.label} label={skill.label} badgeText="TECHNICAL" />
+                                                        ))}
+                                                        {passportData.technicalSkills.length === 0 && (
+                                                            <p className="text-[11px] text-slate-400 italic pl-1">No technical skills added</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                        
+                                                <div>
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2" style={{ color: "#94a3b8" }}>
+                                                        AI Capabilities
+                                                    </h3>
+                                                    <div className="space-y-2.5">
+                                                        {passportData.aiSkills.slice(0, 2).map((skill) => (
+                                                            <PassportRow key={skill.label} label={skill.label} badgeText="AI & AUTOMATION" />
+                                                        ))}
+                                                        {passportData.aiSkills.length === 0 && (
+                                                            <p className="text-[11px] text-slate-400 italic pl-1">No AI capabilities added</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                        
+                                                <div>
+                                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2" style={{ color: "#94a3b8" }}>
+                                                        Domain Expertise
+                                                    </h3>
+                                                    <div className="space-y-2.5">
+                                                        {passportData.domainSkills.slice(0, 2).map((skill) => (
+                                                            <PassportRow key={skill.label} label={skill.label} badgeText="DOMAIN SPECIALIST" />
+                                                        ))}
+                                                        {passportData.domainSkills.length === 0 && (
+                                                            <p className="text-[11px] text-slate-400 italic pl-1">No domain specializations added</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </PassportPage>
+                                    )}
                                     </div>
                                 </div>
-
-                                <div>
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                                        AI Capabilities
-                                    </h3>
-                                    <div className="space-y-2.5">
-                                        {passportData.aiSkills.slice(0, 2).map((skill) => (
-                                            <PassportRow key={skill.label} label={skill.label} badgeText="AI & AUTOMATION" />
-                                        ))}
-                                        {passportData.aiSkills.length === 0 && (
-                                            <p className="text-[11px] text-slate-400 italic pl-1">No AI capabilities added</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-                                        Domain Expertise
-                                    </h3>
-                                    <div className="space-y-2.5">
-                                        {passportData.domainSkills.slice(0, 2).map((skill) => (
-                                            <PassportRow key={skill.label} label={skill.label} badgeText="DOMAIN SPECIALIST" />
-                                        ))}
-                                        {passportData.domainSkills.length === 0 && (
-                                            <p className="text-[11px] text-slate-400 italic pl-1">No domain specializations added</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </PassportPage>
+                            </section>
+                        </motion.div>
                     </div>
-                ) : null}
-            </motion.div>
-        </div>
+                </main>
+            </div>
+        </PageTransition>
     );
 };
 

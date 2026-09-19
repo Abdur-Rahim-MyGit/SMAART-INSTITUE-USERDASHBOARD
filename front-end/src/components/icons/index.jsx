@@ -466,3 +466,7 @@ export const History = /*#__PURE__*/ icon("History", "history");
 export const MessageSquare = /*#__PURE__*/ icon("MessageSquare", "forum");
 export const Inbox = /*#__PURE__*/ icon("Inbox", "inbox");
 export const LifeBuoy = /*#__PURE__*/ icon("LifeBuoy", "support");
+// Skills Passport viewer
+export const Share2 = /*#__PURE__*/ icon("Share2", "share");
+export const UserCircle2 = /*#__PURE__*/ icon("UserCircle2", "person");
+export const Link = /*#__PURE__*/ icon("Link", "link");

@@ -3074,5 +3074,21 @@
     "ticket_created_desc": "Your reference number is {{ref}}. Our support agents will respond shortly.",
     "chat_attached": "Chat transcript attached",
     "chat_attached_desc": "Your recent conversation with the Support Bot has been pre-filled below to speed up diagnosis."
+  },
+  "skills_passport_page": {
+    "title": "Skills Passport",
+    "subtitle": "Your verified academic and professional record, synced from live SMAART data and shareable with employers.",
+    "copy_link": "Copy Link",
+    "export_pdf": "Export PDF",
+    "exporting": "Exporting...",
+    "sections": "Passport sections",
+    "section_cover": "Cover",
+    "section_experience": "Experience",
+    "section_courses": "Courses",
+    "section_certificates": "Certificates",
+    "section_projects": "Projects",
+    "section_skills": "Skills",
+    "page_of": "Page {{page}} of {{total}}",
+    "records": "records"
   }
 }
