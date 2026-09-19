@@ -19,19 +19,19 @@ import { getBackendUrl } from "@/services/api";
 const STATUS_CONFIG = {
   'open': {
     label: 'Open',
-    color: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30'
+    color: 'bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] dark:border-[#045C9A]/40'
   },
   'in-progress': {
     label: 'In Progress',
-    color: 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30'
+    color: 'bg-[#045C9A]/10 text-[#045C9A] border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] dark:border-[#045C9A]/40'
   },
   'resolved': {
     label: 'Resolved',
-    color: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
+    color: 'bg-[#F1F5F9] text-[#35566b] border-[#d7ebf5] dark:bg-white/5 dark:text-slate-300 dark:border-white/10'
   },
   'closed': {
     label: 'Closed',
-    color: 'bg-[#F1F5F9] text-slate-600 border-[#d7ebf5] dark:bg-[#F1F5F9]0/20 dark:text-gray-400 dark:border-slate-500/30'
+    color: 'bg-[#F1F5F9] text-[#35566b] border-[#d7ebf5] dark:bg-white/5 dark:text-slate-300 dark:border-white/10'
   }
 };
 
@@ -49,18 +49,18 @@ const CATEGORY_CONFIG = {
 const PRIORITY_CONFIG = {
   'low': {
     label: 'Low',
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50/60 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20'
+    color: 'text-[#045C9A] dark:text-[#A6D7E8]',
+    bg: 'bg-[#045C9A]/10 border border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:border-[#045C9A]/40'
   },
   'medium': {
     label: 'Medium',
-    color: 'text-amber-600 dark:text-amber-400',
-    bg: 'bg-amber-50/65 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20'
+    color: 'text-[#045C9A] dark:text-[#A6D7E8]',
+    bg: 'bg-[#045C9A]/10 border border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:border-[#045C9A]/40'
   },
   'high': {
     label: 'High',
-    color: 'text-rose-600 dark:text-rose-400',
-    bg: 'bg-rose-50/60 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20'
+    color: 'text-[#045C9A] dark:text-[#A6D7E8]',
+    bg: 'bg-[#045C9A]/10 border border-[#045C9A]/20 dark:bg-[#045C9A]/30 dark:border-[#045C9A]/40'
   }
 };
 
@@ -366,7 +366,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
                       className={`p-4 rounded-xl border ${itsm
                         ? 'bg-[#EAF7FD] border-[#045C9A]/20 dark:bg-[#045C9A]/15 dark:border-[#045C9A]/30'
                         : own
-                          ? 'bg-blue-50/50 border-[#045C9A]/20 dark:bg-[#045C9A]/20 dark:border-[#045C9A]/40'
+                          ? 'bg-[#EAF7FD] border-[#045C9A]/20 dark:bg-[#045C9A]/20 dark:border-[#045C9A]/40'
                           : 'bg-[#F1F5F9] border-[#d7ebf5] dark:bg-[#045C9A]/10 dark:border-[#045C9A]/20'
                         }`}
                     >

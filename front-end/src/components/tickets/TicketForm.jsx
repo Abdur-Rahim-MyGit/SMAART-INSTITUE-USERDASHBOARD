@@ -58,11 +58,6 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
     }
   ];
 
-  const PRIORITIES = [
-    { value: 'low', label: t("support_tickets_page.priority_low", "Low"), selectedClass: 'bg-emerald-50 text-emerald-600 border-emerald-300 ring-2 ring-emerald-500/10' },
-    { value: 'medium', label: t("support_tickets_page.priority_medium", "Medium"), selectedClass: 'bg-amber-50 text-amber-500 border-amber-300 ring-2 ring-amber-500/10' },
-    { value: 'high', label: t("support_tickets_page.priority_high", "High"), selectedClass: 'bg-rose-50 text-rose-600 border-rose-300 ring-2 ring-rose-500/10' }
-  ];
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -187,10 +182,10 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 flex items-center gap-3"
+          className="flex items-center gap-3 rounded-xl border border-[#045C9A]/20 bg-[#EAF7FD] p-4 dark:border-[#045C9A]/40 dark:bg-[#045C9A]/15"
         >
-          <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{t("support_tickets_page.ticket_submitted_successfully", "Ticket submitted successfully")}</span>
+          <CheckCircle className="w-5 h-5 text-[#045C9A] dark:text-[#A6D7E8]" />
+          <span className="text-[#072036] dark:text-white font-bold text-sm">{t("support_tickets_page.ticket_submitted_successfully", "Ticket submitted successfully")}</span>
         </motion.div>
       )}
 
