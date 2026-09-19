@@ -1,13 +1,117 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings as SettingsIcon, Bell, Lock, User, Palette, Globe, Shield, HelpCircle, Loader2, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  User, Bell, Shield, Palette, HelpCircle, Loader2, ArrowLeft, Lock, Mail, Phone,
+  ChevronDown, ChevronRight, FileText, Sun, Moon, Languages, Clock, Calendar,
+  Save, Check, Smartphone, Users, Headset, Bug, Edit2, Settings as SettingsIcon,
+} from "@/components/icons";
 import useUser from "@/hooks/useUser";
 import { API_BASE_URL } from "@/services/api";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
+
+// Same tokens as Skills Vault / Courses / Assessments.
+const SURFACE =
+  "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const PANEL =
+  "bg-[#F1F5F9] dark:bg-[#072036]/60 border border-[#d7ebf5] dark:border-white/10";
+const BTN_PRIMARY =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#072036] text-xs font-bold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white";
+const BTN_GHOST =
+  "inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#d7ebf5] bg-white text-xs font-bold text-[#034a7d] transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:border-white/10 dark:bg-white/5 dark:text-[#A6D7E8] dark:hover:bg-white/10";
+const FIELD =
+  "w-full rounded-xl border border-[#d7ebf5] bg-white px-3.5 py-2.5 text-sm text-[#072036] placeholder:text-slate-400 transition-colors focus:border-[#045C9A] focus:outline-none focus:ring-2 focus:ring-[#045C9A]/15 dark:border-white/10 dark:bg-[#072036]/60 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-[#A6D7E8]";
+const FIELD_DISABLED =
+  "w-full cursor-not-allowed rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] px-3.5 py-2.5 text-sm text-slate-500 dark:border-white/10 dark:bg-[#072036]/40 dark:text-slate-400";
+const LABEL =
+  "mb-1.5 block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]";
+const EASE = [0.25, 0.1, 0.25, 1];
+
+const LANGUAGES = [
+  ["en", "English"], ["hi", "Hindi (हिन्दी)"], ["ta", "Tamil (தமிழ்)"], ["te", "Telugu (తెలుగు)"],
+  ["kn", "Kannada (ಕನ್ನಡ)"], ["ml", "Malayalam (മലയാളം)"], ["pa", "Punjabi (ਪੰਜਾਬੀ)"],
+  ["ur", "Urdu (اردو)"], ["fr", "French (Français)"], ["ar", "Arabic (العربية)"],
+];
+const TIMEZONES = [
+  ["Asia/Kolkata", "Asia/Kolkata (GMT+5:30)"], ["America/New_York", "America/New_York (GMT-5)"],
+  ["Europe/London", "Europe/London (GMT+0)"], ["Asia/Tokyo", "Asia/Tokyo (GMT+9)"],
+];
+const DATE_FORMATS = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"];
+
+/* ── Small building blocks ────────────────────────────────────────────── */
+
+/** Section header inside the content card: icon tile + title + one-line hint. */
+const SectionHead = ({ icon: Icon, title, hint }) => (
+  <div className="flex items-start gap-3">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
+      <Icon className="h-4 w-4" />
+    </div>
+    <div className="min-w-0">
+      <h3 className="text-sm font-extrabold text-[#072036] dark:text-white">{title}</h3>
+      {hint && <p className="mt-0.5 text-xs text-[#35566b] dark:text-slate-400">{hint}</p>}
+    </div>
+  </div>
+);
+
+/** A labelled row with an icon and an action on the right (toggle / button). */
+const SettingRow = ({ icon: Icon, title, desc, children, onClick, id }) => {
+  const Tag = onClick ? "button" : "div";
+  return (
+    <Tag
+      id={id}
+      type={onClick ? "button" : undefined}
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left ${PANEL} ${
+        onClick ? "transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:hover:bg-[#045C9A]/10" : ""
+      }`}
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#045C9A] shadow-sm dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-bold text-[#072036] dark:text-white">{title}</p>
+        {desc && <p className="text-xs text-[#35566b] dark:text-slate-400">{desc}</p>}
+      </div>
+      {children}
+    </Tag>
+  );
+};
+
+/** Accessible switch on brand colours. */
+const Switch = ({ checked, onChange, label }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    aria-label={label}
+    onClick={() => onChange(!checked)}
+    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#045C9A]/40 ${
+      checked ? "bg-[#045C9A]" : "bg-slate-300 dark:bg-white/20"
+    }`}
+  >
+    <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-5" : "translate-x-0.5"}`} />
+  </button>
+);
+
+const SelectField = ({ id, icon: Icon, label, value, onChange, name, options }) => (
+  <div>
+    <label htmlFor={id} className={LABEL}>{label}</label>
+    <div className="relative">
+      {Icon && <Icon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#045C9A] dark:text-[#A6D7E8]" />}
+      <select id={id} name={name} value={value} onChange={onChange} className={`${FIELD} appearance-none ${Icon ? "pl-10" : ""} pr-9`}>
+        {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    </div>
+  </div>
+);
+
+/* ── Page ─────────────────────────────────────────────────────────────── */
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -18,65 +122,61 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [profileFormData, setProfileFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    bio: ""
-  });
+  const [isDarkTheme, setIsDarkTheme] = useState(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkTheme(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
-  const [languageFormData, setLanguageFormData] = useState({
-    timezone: "Asia/Kolkata",
-    dateFormat: "DD/MM/YYYY"
-  });
+  const emptyProfile = { name: "", email: "", phone: "", bio: "" };
+  const [profileFormData, setProfileFormData] = useState(emptyProfile);
+  const [profileSnapshot, setProfileSnapshot] = useState(emptyProfile);
 
-  const [showFAQ, setShowFAQ] = useState(false);
-  const [showDocs, setShowDocs] = useState(false);
+  const emptyRegion = { timezone: "Asia/Kolkata", dateFormat: "DD/MM/YYYY" };
+  const [languageFormData, setLanguageFormData] = useState(emptyRegion);
+  const [regionSnapshot, setRegionSnapshot] = useState(emptyRegion);
+
+  const [notifPrefs, setNotifPrefs] = useState({ email: true, push: true, community: true });
+
+  const [helpView, setHelpView] = useState("menu"); // menu | faq | docs
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [activeFAQIndex, setActiveFAQIndex] = useState(null);
 
-  const faqs = [
-    {
-      question: t("settings_page.faq_q1"),
-      answer: t("settings_page.faq_a1")
-    },
-    {
-      question: t("settings_page.faq_q2"),
-      answer: t("settings_page.faq_a2")
-    },
-    {
-      question: t("settings_page.faq_q3"),
-      answer: t("settings_page.faq_a3")
-    },
-    {
-      question: t("settings_page.faq_q4"),
-      answer: t("settings_page.faq_a4")
-    }
-  ];
+  const faqs = [1, 2, 3, 4].map((n) => ({
+    question: t(`settings_page.faq_q${n}`),
+    answer: t(`settings_page.faq_a${n}`),
+  }));
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.email) return;
-
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        const token = sessionStorage.getItem("token") || localStorage.getItem("token");
         const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         if (response.ok) {
           const data = await response.json();
-          setProfileFormData({
+          const profile = {
             name: data.fullName || user.fullName || "",
             email: data.email || user.email || "",
             phone: data.mobileNumber || user.mobileNumber || "",
-            bio: data.bio || ""
-          });
-          setLanguageFormData({
+            bio: data.bio || "",
+          };
+          const region = {
             timezone: data.timezone || "Asia/Kolkata",
-            dateFormat: data.dateFormat || "DD/MM/YYYY"
-          });
+            dateFormat: data.dateFormat || "DD/MM/YYYY",
+          };
+          setProfileFormData(profile);
+          setProfileSnapshot(profile);
+          setLanguageFormData(region);
+          setRegionSnapshot(region);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -84,36 +184,39 @@ const Settings = () => {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, [user]);
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setProfileFormData(prev => ({ ...prev, [name]: value }));
+    setProfileFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleLanguageChange = (e) => {
+    const { name, value } = e.target;
+    setLanguageFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const patchSection = async (data) => {
+    const response = await fetch(`${API_BASE_URL}/users/register-section`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email, section: "personalDetails", data }),
+    });
+    return response.ok;
   };
 
   const handleSaveProfile = async () => {
     if (!user?.email) return;
-
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          section: 'personalDetails',
-          data: {
-            fullName: profileFormData.name,
-            mobileNumber: profileFormData.phone,
-            bio: profileFormData.bio
-          }
-        })
+      const ok = await patchSection({
+        fullName: profileFormData.name,
+        mobileNumber: profileFormData.phone,
+        bio: profileFormData.bio,
       });
-
-      if (response.ok) {
+      if (ok) {
         toast.success(t("settings_page.profile_success"));
+        setProfileSnapshot(profileFormData);
         await refreshUser();
       } else {
         toast.error(t("settings_page.profile_failed"));
@@ -126,31 +229,17 @@ const Settings = () => {
     }
   };
 
-  const handleLanguageChange = (e) => {
-    const { name, value } = e.target;
-    setLanguageFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleSaveLanguage = async () => {
     if (!user?.email) return;
-
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          section: 'personalDetails',
-          data: {
-            timezone: languageFormData.timezone,
-            dateFormat: languageFormData.dateFormat
-          }
-        })
+      const ok = await patchSection({
+        timezone: languageFormData.timezone,
+        dateFormat: languageFormData.dateFormat,
       });
-
-      if (response.ok) {
+      if (ok) {
         toast.success(t("settings_page.language_success"));
+        setRegionSnapshot(languageFormData);
         await refreshUser();
       } else {
         toast.error(t("settings_page.language_failed"));
@@ -163,6 +252,9 @@ const Settings = () => {
     }
   };
 
+  const profileDirty = JSON.stringify(profileFormData) !== JSON.stringify(profileSnapshot);
+  const regionDirty = JSON.stringify(languageFormData) !== JSON.stringify(regionSnapshot);
+
   const settingsTabs = [
     { id: "profile", label: t("settings.profile_settings"), icon: User, description: t("settings_page.profile_desc") },
     { id: "notifications", label: t("settings.notifications"), icon: Bell, description: t("settings_page.notifications_desc") },
@@ -170,467 +262,414 @@ const Settings = () => {
     { id: "customisation", label: t("settings.customisation"), icon: Palette, description: t("settings_page.customisation_desc") },
     { id: "help", label: t("settings.help"), icon: HelpCircle, description: t("settings_page.help_desc") },
   ];
+  const activeMeta = settingsTabs.find((tab) => tab.id === activeTab);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "profile":
-        return (
-          <div className="space-y-6">
-            {loading ? (
-              <div className="flex items-center justify-center py-10">
-                <Loader2 className="w-8 h-8 animate-spin text-[#1a3884]" />
-              </div>
-            ) : (
-              <>
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.display_name")}</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={profileFormData.name}
-                    onChange={handleProfileChange}
-                    placeholder={t("settings_page.enter_display_name")}
-                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A]"
-                  />
-                </div>
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.email_address")}</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={profileFormData.email}
-                    disabled
-                    placeholder={t("settings_page.enter_email")}
-                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3.5 text-[15px] font-medium text-slate-400 cursor-not-allowed outline-none dark:border-white/5 dark:bg-white/5 dark:text-slate-500"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">{t("settings_page.email_cannot_change")}</p>
-                </div>
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.phone_number")}</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={profileFormData.phone}
-                    onChange={handleProfileChange}
-                    placeholder={t("settings_page.enter_phone_number")}
-                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A]"
-                  />
-                </div>
-                <div>
-                  <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("settings_page.bio")}</label>
-                  <textarea
-                    name="bio"
-                    value={profileFormData.bio}
-                    onChange={handleProfileChange}
-                    placeholder={t("settings_page.tell_about_yourself")}
-                    rows={4}
-                    className="w-full rounded-2xl border border-slate-200 bg-transparent px-4 py-3.5 text-[15px] font-medium text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#045C9A] focus:ring-4 focus:ring-[#045C9A]/10 dark:border-white/10 dark:text-white dark:hover:border-white/20 dark:focus:border-[#045C9A] resize-none"
-                  />
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 dark:border-white/10 dark:bg-white/5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-900 dark:text-white">{t("settings_page.change_password")}</h4>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">{t("settings_page.update_password_desc")}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowChangePasswordModal(true)}
-                      className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-white/10 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
-                    >
-                      {t("settings_page.change")}
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
+  const initials = (profileFormData.name || user?.fullName || "S")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+  /* ── Tab bodies ─────────────────────────────────────────────────────── */
+
+  const renderProfile = () => (
+    <div className="space-y-6">
+      {loading ? (
+        <div className="flex items-center justify-center py-10">
+          <Loader2 className="h-6 w-6 animate-spin text-[#045C9A]" />
+        </div>
+      ) : (
+        <>
+          {/* Identity strip */}
+          <div className={`flex items-center gap-4 rounded-xl px-4 py-3.5 ${PANEL}`}>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#072036] text-sm font-extrabold text-white dark:bg-[#A6D7E8] dark:text-[#072036]">
+              {initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-extrabold text-[#072036] dark:text-white">{profileFormData.name || user?.fullName}</p>
+              <p className="truncate text-xs text-[#35566b] dark:text-slate-400">{profileFormData.email || user?.email}</p>
+            </div>
+            <span className="hidden items-center gap-1 rounded-full bg-[#045C9A]/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] sm:inline-flex">
+              <Check className="h-3 w-3" />
+              {t("settings_page.role_student", "Student")}
+            </span>
           </div>
-        );
 
-      case "notifications":
-        return (
-          <div className="space-y-6">
-            {[
-              { label: t("settings_page.email_notifications"), description: t("settings_page.email_notifications_desc") },
-              { label: t("settings_page.push_notifications"), description: t("settings_page.push_notifications_desc") },
-              { label: t("settings_page.community_activity"), description: t("settings_page.community_activity_desc") },
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-                <div>
-                  <h4 className="text-gray-900 dark:text-white font-medium">{item.label}</h4>
-                  <p className="text-gray-500 dark:text-slate-300 text-sm">{item.description}</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a3884]"></div>
-                </label>
-              </div>
-            ))}
-          </div>
-        );
-
-      case "privacy":
-        return (
-          <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.two_factor_auth")}</h4>
-                  <p className="text-gray-500 dark:text-slate-300 text-sm">{t("settings_page.two_factor_desc")}</p>
-                </div>
-                <button type="button" className="px-4 py-2 rounded-lg bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
-                  {t("settings_page.enable")}
-                </button>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="settings-name" className={LABEL}>{t("settings_page.display_name")}</label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#045C9A] dark:text-[#A6D7E8]" />
+                <input id="settings-name" type="text" name="name" value={profileFormData.name} onChange={handleProfileChange} placeholder={t("settings_page.enter_display_name")} className={`${FIELD} pl-10`} />
               </div>
             </div>
-
-            {/* SMAART Security & Privacy Guidelines */}
-            <div className="p-5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-              <h4 className="flex items-center gap-2 text-[#002147] dark:text-blue-200 font-semibold mb-3">
-                <Shield className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                {t("settings_page.security_guidelines")}
-              </h4>
-              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-slate-300">
-                <li className="flex gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                  <span>
-                    <strong>{t("settings_page.guideline_1_title")}</strong>{t("settings_page.guideline_1_desc")}
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                  <span>
-                    <strong>{t("settings_page.guideline_2_title")}</strong>{t("settings_page.guideline_2_desc")}
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                  <span>
-                    <strong>{t("settings_page.guideline_3_title")}</strong>{t("settings_page.guideline_3_desc")}
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                  <span>
-                    <strong>{t("settings_page.guideline_4_title")}</strong>{t("settings_page.guideline_4_desc")}
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        );
-
-      case "customisation":
-        return (
-          <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <h4 className="text-gray-900 dark:text-white font-medium mb-4">{t("settings_page.theme")}</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: "Light", label: t("settings_page.light") },
-                  { value: "Dark", label: t("settings_page.dark") }
-                ].map((themeOption) => (
-                  <button
-                    key={themeOption.value}
-                    type="button"
-                    onClick={(e) => setTheme(themeOption.value.toLowerCase(), e)}
-                    className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.value.toLowerCase()
-                      ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
-                      : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"
-                      }`}
-                  >
-                    <span className="text-gray-900 dark:text-white font-medium">{themeOption.label}</span>
-                  </button>
-                ))}
+            <div>
+              <label htmlFor="settings-phone" className={LABEL}>{t("settings_page.phone_number")}</label>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#045C9A] dark:text-[#A6D7E8]" />
+                <input id="settings-phone" type="tel" name="phone" value={profileFormData.phone} onChange={handleProfileChange} placeholder={t("settings_page.enter_phone_number")} className={`${FIELD} pl-10`} />
               </div>
             </div>
-
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings.language")}</label>
-              <select
-                value={i18n.language}
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
-              >
-                <option value="en">English</option>
-                <option value="hi">Hindi (हिन्दी)</option>
-                <option value="ta">Tamil (தமிழ்)</option>
-                <option value="te">Telugu (తెలుగు)</option>
-                <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                <option value="ml">Malayalam (മലയാളം)</option>
-                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-                <option value="ur">Urdu (اردو)</option>
-                <option value="fr">French (Français)</option>
-                <option value="ar">Arabic (العربية)</option>
-              </select>
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-email" className={LABEL}>{t("settings_page.email_address")}</label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input id="settings-email" type="email" name="email" value={profileFormData.email} disabled placeholder={t("settings_page.enter_email")} className={`${FIELD_DISABLED} pl-10`} />
+                <Lock className="pointer-events-none absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+              </div>
+              <p className="mt-1.5 text-[11px] text-[#35566b] dark:text-slate-400">{t("settings_page.email_cannot_change")}</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings_page.timezone")}</label>
-              <select
-                name="timezone"
-                value={languageFormData.timezone}
-                onChange={handleLanguageChange}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
-              >
-                <option value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</option>
-                <option value="America/New_York">America/New_York (GMT-5)</option>
-                <option value="Europe/London">Europe/London (GMT+0)</option>
-                <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
-              </select>
-            </div>
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings_page.date_format")}</label>
-              <select
-                name="dateFormat"
-                value={languageFormData.dateFormat}
-                onChange={handleLanguageChange}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
-              >
-                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-              </select>
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-bio" className={LABEL}>{t("settings_page.bio")}</label>
+              <textarea id="settings-bio" name="bio" value={profileFormData.bio} onChange={handleProfileChange} placeholder={t("settings_page.tell_about_yourself")} rows={3} maxLength={300} className={`${FIELD} resize-none`} />
+              <p className="mt-1 text-right text-[11px] tabular-nums text-slate-400">{profileFormData.bio.length}/300</p>
             </div>
           </div>
-        );
 
-      case "help":
-        if (showFAQ) {
-          return (
-            <div className="space-y-4">
-              <button
-                onClick={() => setShowFAQ(false)}
-                className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400 font-medium mb-4 hover:underline"
-              >
-                {t("settings_page.back_to_help")}
+          <div className="border-t border-[#d7ebf5] pt-5 dark:border-white/10">
+            <SettingRow icon={Lock} title={t("settings_page.change_password")} desc={t("settings_page.update_password_desc")}>
+              <button type="button" onClick={() => setShowChangePasswordModal(true)} className={`${BTN_GHOST} px-3 py-1.5`}>
+                <Edit2 className="h-3.5 w-3.5" />
+                {t("settings_page.change")}
               </button>
-              {faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10"
-                >
-                  <button
-                    onClick={() => setActiveFAQIndex(activeFAQIndex === index ? null : index)}
-                    className="w-full flex items-center justify-between text-left"
-                  >
-                    <h4 className="text-gray-900 dark:text-white font-medium">{faq.question}</h4>
-                    <span className="text-gray-400">{activeFAQIndex === index ? "−" : "+"}</span>
+            </SettingRow>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  const renderNotifications = () => (
+    <div className="space-y-3">
+      {[
+        { key: "email", icon: Mail, label: t("settings_page.email_notifications"), desc: t("settings_page.email_notifications_desc") },
+        { key: "push", icon: Smartphone, label: t("settings_page.push_notifications"), desc: t("settings_page.push_notifications_desc") },
+        { key: "community", icon: Users, label: t("settings_page.community_activity"), desc: t("settings_page.community_activity_desc") },
+      ].map((item) => (
+        <SettingRow key={item.key} icon={item.icon} title={item.label} desc={item.desc}>
+          <Switch checked={notifPrefs[item.key]} onChange={(v) => setNotifPrefs((p) => ({ ...p, [item.key]: v }))} label={item.label} />
+        </SettingRow>
+      ))}
+    </div>
+  );
+
+  const renderPrivacy = () => (
+    <div className="space-y-6">
+      <SettingRow icon={Shield} title={t("settings_page.two_factor_auth")} desc={t("settings_page.two_factor_desc")}>
+        <button type="button" className={`${BTN_PRIMARY} px-3.5 py-1.5`}>{t("settings_page.enable")}</button>
+      </SettingRow>
+
+      <div>
+        <SectionHead icon={Lock} title={t("settings_page.security_guidelines")} />
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          {[1, 2, 3, 4].map((n) => (
+            <li key={n} className={`rounded-xl px-4 py-3.5 ${PANEL}`}>
+              <p className="text-[12.5px] font-extrabold text-[#072036] dark:text-white">
+                {t(`settings_page.guideline_${n}_title`).replace(/:\s*$/, "")}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-[#35566b] dark:text-slate-400">{t(`settings_page.guideline_${n}_desc`)}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
+  const renderCustomisation = () => (
+    <div className="space-y-6">
+      <div>
+        <p className={LABEL}>{t("settings_page.theme")}</p>
+        <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label={t("settings_page.theme")}>
+          {[
+            { value: "light", icon: Sun, label: t("settings_page.light") },
+            { value: "dark", icon: Moon, label: t("settings_page.dark") },
+          ].map((opt) => {
+            const active = currentTheme === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={(e) => setTheme(opt.value, e)}
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                  active
+                    ? "border-[#045C9A] bg-[#EAF7FD] dark:border-[#A6D7E8] dark:bg-[#045C9A]/20"
+                    : "border-[#d7ebf5] bg-white hover:border-[#045C9A]/40 dark:border-white/10 dark:bg-[#072036]/60 dark:hover:border-[#A6D7E8]/40"
+                }`}
+              >
+                <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${active ? "bg-[#045C9A] text-white dark:bg-[#A6D7E8] dark:text-[#072036]" : "bg-[#F1F5F9] text-[#045C9A] dark:bg-white/5 dark:text-[#A6D7E8]"}`}>
+                  <opt.icon className="h-4 w-4" />
+                </span>
+                <span className="flex-1 text-[13px] font-bold text-[#072036] dark:text-white">{opt.label}</span>
+                {active && <Check className="h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <SelectField id="settings-language" icon={Languages} label={t("settings.language")} value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)} options={LANGUAGES} />
+        </div>
+        <SelectField id="settings-timezone" icon={Clock} name="timezone" label={t("settings_page.timezone")} value={languageFormData.timezone} onChange={handleLanguageChange} options={TIMEZONES} />
+        <SelectField id="settings-dateformat" icon={Calendar} name="dateFormat" label={t("settings_page.date_format")} value={languageFormData.dateFormat} onChange={handleLanguageChange} options={DATE_FORMATS.map((f) => [f, f])} />
+      </div>
+    </div>
+  );
+
+  const renderHelp = () => {
+    const back = (
+      <button type="button" onClick={() => setHelpView("menu")} className="inline-flex items-center gap-1.5 text-xs font-bold text-[#045C9A] hover:underline dark:text-[#A6D7E8]">
+        <ArrowLeft className="h-3.5 w-3.5" />
+        {t("settings_page.back_to_help").replace(/^←\s*/, "")}
+      </button>
+    );
+
+    if (helpView === "faq") {
+      return (
+        <div className="space-y-4">
+          {back}
+          <div className="space-y-2">
+            {faqs.map((faq, index) => {
+              const open = activeFAQIndex === index;
+              return (
+                <div key={index} className={`rounded-xl ${PANEL}`}>
+                  <button type="button" aria-expanded={open} onClick={() => setActiveFAQIndex(open ? null : index)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
+                    <span className="text-[13px] font-bold text-[#072036] dark:text-white">{faq.question}</span>
+                    <ChevronDown className={`h-4 w-4 shrink-0 text-[#045C9A] transition-transform dark:text-[#A6D7E8] ${open ? "rotate-180" : ""}`} />
                   </button>
-                  <AnimatePresence>
-                    {activeFAQIndex === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="mt-3 text-gray-500 dark:text-slate-300 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 pt-3">
-                          {faq.answer}
-                        </p>
+                  <AnimatePresence initial={false}>
+                    {open && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+                        <p className="border-t border-[#d7ebf5] px-4 py-3 text-xs leading-relaxed text-[#35566b] dark:border-white/10 dark:text-slate-400">{faq.answer}</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-              ))}
-            </div>
-          );
-        }
-
-        if (showDocs) {
-          return (
-            <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-              <button
-                onClick={() => setShowDocs(false)}
-                className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400 font-medium mb-4 hover:underline"
-              >
-                {t("settings_page.back_to_help")}
-              </button>
-
-              <div className="prose dark:prose-invert max-w-none">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-white/10 pb-2">
-                  {t("settings_page.user_documentation")}
-                </h3>
-
-                <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.getting_started")}</h4>
-                  <p className="text-gray-600 dark:text-slate-200 leading-relaxed">
-                    {t("settings_page.getting_started_desc")}
-                  </p>
-                </section>
-
-                <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.core_frameworks")}</h4>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-[#F8FAFC] dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
-                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">{t("settings_page.career_architecture_map")}</h5>
-                      <p className="text-sm text-gray-600 dark:text-slate-300">
-                        {t("settings_page.career_architecture_map_desc")}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-[#F8FAFC] dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
-                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">{t("settings_page.capability_framework")}</h5>
-                      <p className="text-sm text-gray-600 dark:text-slate-300">
-                        {t("settings_page.capability_framework_desc")}
-                      </p>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.navigation_guide")}</h4>
-                  <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-slate-200">
-                    <li><strong>{t("settings_page.nav_dashboard")}</strong>{t("settings_page.nav_dashboard_desc")}</li>
-                    <li><strong>{t("settings_page.nav_skills_vault")}</strong>{t("settings_page.nav_skills_vault_desc")}</li>
-                    <li><strong>{t("settings_page.nav_vision_board")}</strong>{t("settings_page.nav_vision_board_desc")}</li>
-                    <li><strong>{t("settings_page.nav_community")}</strong>{t("settings_page.nav_community_desc")}</li>
-                  </ul>
-                </section>
-
-                <section>
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.need_more_help")}</h4>
-                  <p className="text-gray-600 dark:text-slate-200">
-                    {t("settings_page.need_more_help_desc")}
-                  </p>
-                </section>
-              </div>
-            </div>
-          );
-        }
-
-        return (
-          <div className="space-y-6">
-            <div
-              onClick={() => {
-                setShowFAQ(true);
-                setShowDocs(false);
-              }}
-              className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
-            >
-              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.faq")}</h4>
-              <p className="text-gray-400 text-sm">{t("settings_page.faq_desc")}</p>
-            </div>
-            <div
-              onClick={() => navigate("/dashboard/support")}
-              className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
-            >
-              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.contact_support")}</h4>
-              <p className="text-gray-400 text-sm">{t("settings_page.contact_support_desc")}</p>
-            </div>
-            <div
-              onClick={() => navigate("/dashboard/support")}
-              className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
-            >
-              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.report_bug")}</h4>
-              <p className="text-gray-400 text-sm">{t("settings_page.report_bug_desc")}</p>
-            </div>
-            <div
-              onClick={() => {
-                setShowDocs(true);
-                setShowFAQ(false);
-              }}
-              className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
-            >
-              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.documentation")}</h4>
-              <p className="text-gray-400 text-sm">{t("settings_page.documentation_desc")}</p>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="mx-auto max-w-7xl space-y-6 p-8"
-    >
-      {/* Back Button - Mobile Only */}
-      <div className="md:hidden">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
-        >
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-            <ArrowLeft className="w-4 h-4" />
-          </div>
-          {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-        </button>
-      </div>
-
-      {/* Settings Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar Navigation */}
-        <div className="lg:col-span-1 lg:pr-4">
-          <div className="sticky top-24 flex flex-col gap-1">
-            {settingsTabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 transition-all text-left ${
-                    isActive
-                      ? "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/20 dark:text-white"
-                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
-                  }`}
-                >
-                  <Icon className={`h-5 w-5 flex-shrink-0 transition-colors ${isActive ? "text-[#045C9A] dark:text-white" : "text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white"}`} />
-                  <span className="font-bold text-[14px] tracking-wide">{tab.label}</span>
-                </button>
               );
             })}
           </div>
         </div>
+      );
+    }
 
-        {/* Main Content */}
-        <div className="lg:col-span-3">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-[32px] bg-white border border-slate-100 p-8 lg:p-10 shadow-2xl shadow-slate-200/40 dark:bg-slate-900 dark:border-white/5 dark:shadow-none min-h-[600px]"
-          >
-            <div className="mb-10">
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
-                {settingsTabs.find((tab) => tab.id === activeTab)?.label}
-              </h2>
-              <p className="text-[14.5px] font-medium text-slate-500 dark:text-slate-400">
-                {settingsTabs.find((tab) => tab.id === activeTab)?.description}
-              </p>
+    if (helpView === "docs") {
+      return (
+        <div className="space-y-5">
+          {back}
+          <SectionHead icon={FileText} title={t("settings_page.user_documentation")} />
+          <div className="space-y-5 text-sm">
+            <section>
+              <h4 className="text-[13px] font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">{t("settings_page.getting_started")}</h4>
+              <p className="mt-1 text-xs leading-relaxed text-[#35566b] dark:text-slate-400">{t("settings_page.getting_started_desc")}</p>
+            </section>
+            <section>
+              <h4 className="text-[13px] font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">{t("settings_page.core_frameworks")}</h4>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                {["career_architecture_map", "capability_framework"].map((k) => (
+                  <div key={k} className={`rounded-xl px-4 py-3 ${PANEL}`}>
+                    <p className="text-[12.5px] font-extrabold text-[#072036] dark:text-white">{t(`settings_page.${k}`)}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[#35566b] dark:text-slate-400">{t(`settings_page.${k}_desc`)}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section>
+              <h4 className="text-[13px] font-extrabold text-[#045C9A] dark:text-[#A6D7E8]">{t("settings_page.navigation_guide")}</h4>
+              <ul className="mt-2 space-y-1.5">
+                {["dashboard", "skills_vault", "vision_board", "community"].map((k) => (
+                  <li key={k} className="flex gap-2 text-xs leading-relaxed text-[#35566b] dark:text-slate-400">
+                    <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />
+                    <span><strong className="font-extrabold text-[#072036] dark:text-white">{t(`settings_page.nav_${k}`)}</strong>{t(`settings_page.nav_${k}_desc`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section className={`rounded-xl px-4 py-3 ${PANEL}`}>
+              <p className="text-[12.5px] font-extrabold text-[#072036] dark:text-white">{t("settings_page.need_more_help")}</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#35566b] dark:text-slate-400">{t("settings_page.need_more_help_desc")}</p>
+            </section>
+          </div>
+        </div>
+      );
+    }
+
+    const items = [
+      { icon: HelpCircle, title: t("settings_page.faq"), desc: t("settings_page.faq_desc"), go: () => setHelpView("faq") },
+      { icon: FileText, title: t("settings_page.documentation"), desc: t("settings_page.documentation_desc"), go: () => setHelpView("docs") },
+      { icon: Headset, title: t("settings_page.contact_support"), desc: t("settings_page.contact_support_desc"), go: () => navigate("/dashboard/support") },
+      { icon: Bug, title: t("settings_page.report_bug"), desc: t("settings_page.report_bug_desc"), go: () => navigate("/dashboard/support") },
+    ];
+    return (
+      <div className="grid gap-3 sm:grid-cols-2">
+        {items.map((item) => (
+          <SettingRow key={item.title} icon={item.icon} title={item.title} desc={item.desc} onClick={item.go}>
+            <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+          </SettingRow>
+        ))}
+      </div>
+    );
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "profile": return renderProfile();
+      case "notifications": return renderNotifications();
+      case "privacy": return renderPrivacy();
+      case "customisation": return renderCustomisation();
+      case "help": return renderHelp();
+      default: return null;
+    }
+  };
+
+  const showFooter = activeTab === "profile" || activeTab === "customisation";
+  const dirty = activeTab === "profile" ? profileDirty : regionDirty;
+  const discard = () => (activeTab === "profile" ? setProfileFormData(profileSnapshot) : setLanguageFormData(regionSnapshot));
+
+  return (
+    <PageTransition>
+      <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+          <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+        </div>
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+          <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
+        </div>
+
+        <main className="relative z-10">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
+            {/* Back button -- mobile only */}
+            <div className="flex items-center sm:hidden">
+              <button type="button" onClick={() => navigate("/dashboard")} className="group flex w-fit items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:group-hover:border-[#045C9A]/40">
+                  <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
+                </div>
+                <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                  {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                </span>
+              </button>
             </div>
 
-            {renderTabContent()}
-
-            {/* Save Button */}
-            {(activeTab === "profile" || activeTab === "customisation") && (
-              <div className="mt-12 flex justify-end gap-4 border-t border-slate-100 pt-8 dark:border-white/10">
-                <button className="rounded-xl px-6 py-3 text-[14px] font-bold text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white">
-                  {t("settings_page.cancel")}
-                </button>
-                <button
-                  onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
-                  disabled={saving}
-                  className="flex items-center gap-2 rounded-xl bg-[#045C9A] px-8 py-3 text-[14px] font-bold text-white shadow-lg shadow-[#045C9A]/20 transition-all hover:bg-[#03497b] hover:shadow-xl hover:shadow-[#045C9A]/30 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {t("settings_page.save_changes")}
-                </button>
+            {/* Hero */}
+            <motion.section
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className={`relative w-full overflow-hidden rounded-2xl ${SURFACE}`}
+            >
+              <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+              <div className="relative z-10 flex items-center gap-4 px-6 py-5 sm:px-8 sm:py-6">
+                <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8] sm:flex">
+                  <SettingsIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl" style={{ letterSpacing: "-0.02em" }}>
+                    {t("settings.title", "Settings")}
+                  </h1>
+                  <p className="mt-0.5 max-w-2xl text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                    {t("settings_page.hero_subtitle", "Manage your profile, notifications, security and how the dashboard looks.")}
+                  </p>
+                </div>
               </div>
-            )}
-          </motion.div>
-        </div>
+            </motion.section>
+
+            {/* Layout: nav rail + content */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
+              className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[260px_minmax(0,1fr)]"
+            >
+              <nav id="settings-nav" aria-label={t("settings.title", "Settings")} className={`rounded-2xl p-2 lg:self-start ${SURFACE}`}>
+                <div className="flex gap-1 overflow-x-auto lg:flex-col" role="tablist" aria-orientation="vertical">
+                  {settingsTabs.map((tab) => {
+                    const active = activeTab === tab.id;
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => { setActiveTab(tab.id); setHelpView("menu"); }}
+                        className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors lg:w-full ${
+                          active
+                            ? "bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]"
+                            : "text-[#35566b] hover:bg-[#F1F5F9] hover:text-[#072036] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
+                        }`}
+                      >
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active ? "bg-white/15 dark:bg-[#072036]/10" : "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"}`}>
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span className="whitespace-nowrap text-[13px] font-bold">{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </nav>
+
+              <section className={`flex flex-col rounded-2xl ${SURFACE}`} aria-live="polite">
+                <header className="flex items-center gap-3 border-b border-[#d7ebf5] px-5 py-4 dark:border-white/10 sm:px-6">
+                  {activeMeta && (
+                    <>
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
+                        <activeMeta.icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="text-base font-extrabold leading-tight text-[#072036] dark:text-white">{activeMeta.label}</h2>
+                        <p className="text-xs text-[#35566b] dark:text-slate-400">{activeMeta.description}</p>
+                      </div>
+                    </>
+                  )}
+                </header>
+
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={activeTab + helpView}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-5 py-5 sm:px-6"
+                  >
+                    {renderTabContent()}
+                  </motion.div>
+                </AnimatePresence>
+
+                {showFooter && (
+                  <footer className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-[#d7ebf5] px-5 py-3.5 dark:border-white/10 sm:px-6">
+                    <p className="text-[11px] text-[#35566b] dark:text-slate-400">
+                      {dirty ? t("settings_page.unsaved_changes", "You have unsaved changes.") : t("settings_page.all_saved", "All changes saved.")}
+                    </p>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={discard} disabled={!dirty || saving} className={`${BTN_GHOST} px-3.5 py-2 disabled:cursor-not-allowed disabled:opacity-50`}>
+                        {t("settings_page.cancel")}
+                      </button>
+                      <button
+                        type="button"
+                        id="settings-save"
+                        onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
+                        disabled={saving || !dirty}
+                        className={`${BTN_PRIMARY} px-4 py-2`}
+                      >
+                        {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                        {t("settings_page.save_changes")}
+                      </button>
+                    </div>
+                  </footer>
+                )}
+              </section>
+            </motion.div>
+          </div>
+        </main>
+
+        <ForgotPasswordModal isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} initialEmail={user?.email} />
       </div>
-      <ForgotPasswordModal
-        isOpen={showChangePasswordModal}
-        onClose={() => setShowChangePasswordModal(false)}
-      />
-    </motion.div>
+    </PageTransition>
   );
 };
 
