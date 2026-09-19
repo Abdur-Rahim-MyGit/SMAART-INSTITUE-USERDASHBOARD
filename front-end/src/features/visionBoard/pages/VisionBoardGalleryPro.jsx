@@ -569,7 +569,7 @@ const RenameModal = ({ board, onClose, onSaved, onInstantCheck }) => {
   );
 };
 
-const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
+const CreateModal = ({ onClose, onConfirm, onInstantCheck }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -577,16 +577,12 @@ const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
   const [draftShort, setDraftShort] = useState([]);
   const [draftLong, setDraftLong] = useState([]);
   const [starterId, setStarterId] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const pick = (nextSource) => {
     setSource(nextSource);
     if (nextSource === "blank") {
       setTitle(""); setDescription(""); setDraftShort([]); setDraftLong([]); setStarterId(null);
-      return;
-    }
-    if (nextSource === "career" && suggestion) {
-      setTitle(suggestion.title); setDescription(suggestion.description);
-      setDraftShort(suggestion.shortTermGoals); setDraftLong(suggestion.longTermGoals); setStarterId(suggestion.starterId);
       return;
     }
     const starter = STARTER_BOARDS.find((s) => s.id === nextSource);
@@ -597,7 +593,15 @@ const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
   };
 
   const submit = () => {
-    onConfirm({ title, description, shortTermGoals: draftShort, longTermGoals: draftLong, starterId });
+    if (!title.trim() || !description.trim()) {
+      onConfirm({ title, description, shortTermGoals: draftShort, longTermGoals: draftLong, starterId });
+      return;
+    }
+    setIsNavigating(true);
+    setTimeout(() => {
+      const success = onConfirm({ title, description, shortTermGoals: draftShort, longTermGoals: draftLong, starterId });
+      if (success === false) setIsNavigating(false);
+    }, 10);
   };
 
   const optionClass = (active) =>
@@ -616,24 +620,7 @@ const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-7">
         <p className={`mb-3 text-[11px] ${LABEL}`}>{t("vision_board.start_from", "Start from")}</p>
 
-        {suggestion && (
-          <button type="button" onClick={() => pick("career")} aria-pressed={source === "career"} className={`${optionClass(source === "career")} mb-3`}>
-            <span className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#045C9A] text-white">
-                <Sparkles className="h-4 w-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-extrabold text-[#072036] dark:text-white">
-                  {t("vision_board.suggested_from_path", "Suggested from your career path")}
-                </span>
-                <span className="block truncate text-xs text-[#35566b] dark:text-slate-400">
-                  {suggestion.title} · {suggestion.shortTermGoals.length + suggestion.longTermGoals.length} {t("vision_board.starter_goals", "starter goals")}
-                </span>
-              </span>
-              {source === "career" && <Check className="ml-auto h-5 w-5 shrink-0 text-[#045C9A] dark:text-[#A6D7E8]" />}
-            </span>
-          </button>
-        )}
+
 
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           <button type="button" onClick={() => pick("blank")} aria-pressed={source === "blank"} className={optionClass(source === "blank")}>
@@ -702,9 +689,9 @@ const CreateModal = ({ onClose, onConfirm, suggestion, onInstantCheck }) => {
       </div>
 
       <div className="flex justify-end gap-3 border-t border-[#d7ebf5] px-6 py-4 dark:border-white/10 sm:px-7">
-        <button type="button" onClick={onClose} className={`${BTN_GHOST} h-10 px-5`}>{t("vision_board.cancel")}</button>
-        <button type="button" onClick={submit} className={`${BTN_PRIMARY} h-10 px-5`}>
-          {t("vision_board.start_creating")} <ArrowRight className="h-4 w-4" />
+        <button type="button" onClick={onClose} disabled={isNavigating} className={`${BTN_GHOST} h-10 px-5`}>{t("vision_board.cancel")}</button>
+        <button type="button" onClick={submit} disabled={isNavigating} className={`${BTN_PRIMARY} h-10 px-5`}>
+          {isNavigating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t("vision_board.start_creating")} <ArrowRight className="h-4 w-4" /></>}
         </button>
       </div>
     </ModalShell>
@@ -859,23 +846,23 @@ const VisionBoardGalleryPro = () => {
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
 
-    if (handleInstantCheck(trimmedTitle, "title")) return;
-    if (handleInstantCheck(trimmedDescription, "description")) return;
+    if (handleInstantCheck(trimmedTitle, "title")) return false;
+    if (handleInstantCheck(trimmedDescription, "description")) return false;
 
     if (!trimmedTitle || !trimmedDescription) {
       toast({ title: "Add a title and description", description: "Please enter both fields to continue.", variant: "destructive" });
-      return;
+      return false;
     }
     if (trimmedTitle.length > TITLE_CHAR_LIMIT) {
       toast({ title: "Title is too long", description: `Please keep the title to ${TITLE_CHAR_LIMIT} characters or fewer.`, variant: "destructive" });
-      return;
+      return false;
     }
     if (trimmedDescription.length > DESCRIPTION_CHAR_LIMIT) {
       toast({ title: "Description is too long", description: `Please keep the description within ${DESCRIPTION_CHAR_LIMIT} characters.`, variant: "destructive" });
-      return;
+      return false;
     }
 
-    setShowCreateModal(false);
+    // Deliberately keep the modal open to act as a loading screen while the large Editor component loads
     navigate("/vision-board-pro/create", {
       state: {
         initialTitle: trimmedTitle,
@@ -885,6 +872,7 @@ const VisionBoardGalleryPro = () => {
         starterId,
       },
     });
+    return true;
   };
 
   const handleEdit = (board) => {

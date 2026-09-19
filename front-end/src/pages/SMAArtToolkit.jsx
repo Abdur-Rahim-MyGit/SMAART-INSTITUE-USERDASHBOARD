@@ -203,7 +203,7 @@ const SMAArtToolkit = () => {
                 style={{ letterSpacing: "-0.02em" }}
               >
                 {t("smaart_toolkit.title_1", "SMAART")}{" "}
-                <span className="text-[#045C9A] dark:text-[#A6D7E8]">{t("smaart_toolkit.title_2", "Toolkit")}</span>
+                <span>{t("smaart_toolkit.title_2", "Toolkit")}</span>
               </h1>
               <p className="mt-0.5 text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
                 {t("smaart_toolkit.subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools.")}

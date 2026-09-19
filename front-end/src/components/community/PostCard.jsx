@@ -169,7 +169,7 @@ const PostCard = ({
   return (
     <article
       ref={articleRef}
-      className="community-surface relative overflow-hidden rounded-[24px] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_22px_48px_rgba(15,23,42,0.08)]"
+      className="community-surface relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_22px_48px_rgba(15,23,42,0.08)]"
     >
       <div className="space-y-3">
         <div className="flex items-start gap-3">

@@ -945,9 +945,9 @@ const SkillsPassport = () => {
         addMany(
             [
                 ...(registrationProfile?.jobPreferences || []).map((job) => job?.preferredRole),
-                ...(registrationProfile?.sectorPreferences?.preferredSectors || []),
-                ...(registrationProfile?.sectorPreferences?.secondarySectors || [])
-            ],
+                ...(registrationProfile?.sectorPreferences?.preferredSectors || []).map((s) => typeof s === 'string' ? s : s?.name || s?.label || s?.title || s?.sector || ""),
+                ...(registrationProfile?.sectorPreferences?.secondarySectors || []).map((s) => typeof s === 'string' ? s : s?.name || s?.label || s?.title || s?.sector || "")
+            ].filter(Boolean),
             { bucket: "domain", source: "Career", verified: true }
         );
 
@@ -1140,35 +1140,10 @@ const SkillsPassport = () => {
                             </div>
                         </motion.section>
 
-                        {/* Viewer: section rail + document page */}
+                        {/* Viewer: document page */}
                         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1], delay: 0.05 }}
-                            className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-                            <nav id="passport-rail" aria-label={t("skills_passport_page.sections", "Passport sections")} className="rounded-2xl border border-[#d7ebf5]/80 bg-white p-2 shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f] lg:self-start">
-                                <div className="flex gap-1 overflow-x-auto lg:flex-col" role="tablist" aria-orientation="vertical">
-                                    {sections.map((sec) => {
-                                        const active = activePage === sec.page;
-                                        const Icon = sec.icon;
-                                        return (
-                                            <button key={sec.page} type="button" role="tab" id={`passport-tab-${sec.page}`} aria-selected={active} onClick={() => setActivePage(sec.page)}
-                                                className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors lg:w-full ${active
-                                                    ? "bg-[#072036] text-white dark:bg-[#A6D7E8] dark:text-[#072036]"
-                                                    : "text-[#35566b] hover:bg-[#F1F5F9] hover:text-[#072036] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"}`}>
-                                                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active ? "bg-white/15 dark:bg-[#072036]/10" : "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]"}`}>
-                                                    <Icon className="h-4 w-4" />
-                                                </span>
-                                                <span className="flex-1 whitespace-nowrap text-[13px] font-bold">{sec.label}</span>
-                                                {sec.count != null && (
-                                                    <span className={`hidden rounded-full px-2 py-0.5 text-[10px] font-black tabular-nums lg:inline-block ${active ? "bg-white/15 text-white dark:bg-[#072036]/10 dark:text-[#072036]" : "bg-[#F1F5F9] text-[#35566b] dark:bg-white/10 dark:text-slate-300"}`}>
-                                                        {sec.count}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </nav>
-
-                            <section className="flex flex-col rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]" aria-labelledby={`passport-tab-${activePage}`}>
+                            className="grid grid-cols-1 gap-4 sm:gap-6">
+                            <section className="flex flex-col rounded-2xl border border-[#d7ebf5]/80 bg-white shadow-sm dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]">
                                 <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7ebf5] px-5 py-4 dark:border-white/10 sm:px-6">
                                     <div className="flex items-center gap-3">
                                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]">
