@@ -41,7 +41,7 @@ const DashboardHeader = () => {
       '/dashboard/notes': t('sidebar.notes', 'My Notes'),
       '/dashboard/notifications': t('sidebar.notifications', 'Notifications'),
       '/notifications': t('sidebar.notifications', 'Notifications'),
-      '/dashboard/support': t('sidebar.help', 'Support Tickets'),
+      '/dashboard/support': t('sidebar.help', 'Help & Support'),
       '/tickets': t('sidebar.help', 'Support Tickets'),
       '/dashboard/grievances': t('sidebar.grievances', 'Grievance Redressal'),
       '/grievances': t('sidebar.grievances', 'Grievance Redressal'),

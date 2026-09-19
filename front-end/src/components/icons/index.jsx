@@ -4,7 +4,7 @@
 // component it replaced, so existing JSX such as <Search className="w-4 h-4" />
 // keeps working untouched.
 //
-// The font is subsetted: index.html requests exactly the 145 ligature names
+// The font is subsetted: index.html requests exactly the 183 ligature names
 // listed in ICON_NAMES below (79 KB instead of the full 3.8 MB face). If you add
 // an icon here you MUST add its name to the icon_names list in index.html, or it
 // will render as literal text. In development the console warns when that happens.
@@ -26,6 +26,7 @@ export const ICON_NAMES = Object.freeze([
   "arrow_upward",
   "article",
   "assignment",
+  "attach_file",
   "badge",
   "bar_chart",
   "bolt",
@@ -75,6 +76,7 @@ export const ICON_NAMES = Object.freeze([
   "format_align_left",
   "format_align_right",
   "format_color_fill",
+  "forum",
   "fullscreen",
   "fullscreen_exit",
   "gavel",
@@ -85,12 +87,14 @@ export const ICON_NAMES = Object.freeze([
   "handshake",
   "handyman",
   "help",
+  "history",
   "home_pin",
   "horizontal_distribute",
   "how_to_reg",
   "hub",
   "id_card",
   "image",
+  "inbox",
   "info",
   "inventory_2",
   "keyboard_arrow_down",
@@ -152,6 +156,7 @@ export const ICON_NAMES = Object.freeze([
   "school",
   "search",
   "security",
+  "sell",
   "send",
   "settings",
   "shapes",
@@ -165,6 +170,7 @@ export const ICON_NAMES = Object.freeze([
   "square",
   "star",
   "sticky_note_2",
+  "support",
   "support_agent",
   "tag",
   "target",
@@ -453,3 +459,10 @@ export const Bug = /*#__PURE__*/ icon("Bug", "bug_report");
 export const Headset = /*#__PURE__*/ icon("Headset", "support_agent");
 export const Mail = /*#__PURE__*/ icon("Mail", "mail");
 export const Phone = /*#__PURE__*/ icon("Phone", "call");
+// Help Centre (support tickets + grievances)
+export const Paperclip = /*#__PURE__*/ icon("Paperclip", "attach_file");
+export const Tag = /*#__PURE__*/ icon("Tag", "sell");
+export const History = /*#__PURE__*/ icon("History", "history");
+export const MessageSquare = /*#__PURE__*/ icon("MessageSquare", "forum");
+export const Inbox = /*#__PURE__*/ icon("Inbox", "inbox");
+export const LifeBuoy = /*#__PURE__*/ icon("LifeBuoy", "support");

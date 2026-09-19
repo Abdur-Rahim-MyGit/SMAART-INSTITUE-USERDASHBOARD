@@ -9,7 +9,7 @@ import {
   Loader2,
   CheckCircle,
   Plus
-} from "lucide-react";
+} from "@/components/icons";
 import { createTicket } from "@/services/ticketApi";
 
 const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
@@ -180,17 +180,17 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="space-y-6 text-slate-800 dark:text-slate-100"
+      className="space-y-6 text-[#072036] dark:text-slate-100"
     >
       {/* Success Message */}
       {submitStatus === 'success' && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-green-500/20 border border-green-500/30 flex items-center gap-3"
+          className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 flex items-center gap-3"
         >
-          <CheckCircle className="w-5 h-5 text-green-400" />
-          <span className="text-green-400 font-medium">{t("support_tickets_page.ticket_submitted_successfully", "Ticket submitted successfully")}</span>
+          <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{t("support_tickets_page.ticket_submitted_successfully", "Ticket submitted successfully")}</span>
         </motion.div>
       )}
 
@@ -199,10 +199,10 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center gap-3"
+          className="p-4 rounded-xl bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 flex items-center gap-3"
         >
-          <AlertCircle className="w-5 h-5 text-red-400" />
-          <span className="text-red-400">{errors.submit}</span>
+          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+          <span className="text-rose-600 dark:text-rose-400">{errors.submit}</span>
         </motion.div>
       )}
 
@@ -210,7 +210,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
       {isGuest && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+            <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
               {t("support_tickets_page.name", "Name")} <span className="text-rose-500">*</span>
             </label>
             <input
@@ -219,15 +219,15 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
               value={formData.contactName}
               onChange={handleChange}
               placeholder={t("support_tickets_page.name_placeholder", "Your Full Name")}
-              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactName ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+              className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.contactName ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+                } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all`}
             />
             {errors.contactName && (
-              <p className="mt-1 text-sm text-red-500">{errors.contactName}</p>
+              <p className="mt-1 text-sm text-rose-600">{errors.contactName}</p>
             )}
           </div>
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-700 dark:text-white">
+            <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
               {t("support_tickets_page.email", "Email")} <span className="text-rose-500">*</span>
             </label>
             <input
@@ -236,11 +236,11 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
               value={formData.contactEmail}
               onChange={handleChange}
               placeholder={t("support_tickets_page.email_placeholder", "Your Email Address")}
-              className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.contactEmail ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-                } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+              className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.contactEmail ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+                } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all`}
             />
             {errors.contactEmail && (
-              <p className="mt-1 text-sm text-red-500">{errors.contactEmail}</p>
+              <p className="mt-1 text-sm text-rose-600">{errors.contactEmail}</p>
             )}
           </div>
         </div>
@@ -248,7 +248,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
 
       {/* Title */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("support_tickets_page.title", "Title")} <span className="text-rose-500">*</span>
         </label>
         <input
@@ -257,20 +257,20 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
           value={formData.title}
           onChange={handleChange}
           placeholder={t("support_tickets_page.title_placeholder", "Brief summary of your issue")}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.title ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+          className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.title ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+            } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all`}
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.title}</p>
         )}
       </div>
 
       {/* Category */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("support_tickets_page.category", "Category")} <span className="text-rose-500">*</span>
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORIES.map((cat) => {
             const isSelected = formData.category === cat.value;
             return (
@@ -281,25 +281,27 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
                   setFormData(prev => ({ ...prev, category: cat.value }));
                   if (errors.category) setErrors(prev => ({ ...prev, category: null }));
                 }}
-                className={`p-4 rounded-xl border text-left transition-all ${isSelected
-                  ? 'border-[#1a3884] bg-[#1a3884]/5 dark:bg-[#1a3884]/20 ring-2 ring-[#1a3884]/20 shadow-sm'
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-[#1a3884]/30'
+                aria-pressed={isSelected}
+                className={`relative rounded-xl border p-3.5 pr-8 text-left transition-colors ${isSelected
+                  ? 'border-[#045C9A] bg-[#EAF7FD] dark:border-[#A6D7E8] dark:bg-[#045C9A]/20'
+                  : 'border-[#d7ebf5] bg-white hover:border-[#045C9A]/40 hover:bg-[#F1F5F9] dark:border-white/10 dark:bg-[#072036]/60 dark:hover:border-[#A6D7E8]/40'
                   }`}
               >
-                <span className={`font-bold text-[13.5px] block ${isSelected ? 'text-[#1a3884] dark:text-blue-400' : 'text-slate-950 dark:text-white'}`}>{cat.label}</span>
-                <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mt-1 leading-normal">{cat.description}</p>
+                {isSelected && <CheckCircle className="absolute right-2.5 top-2.5 h-4 w-4 text-[#045C9A] dark:text-[#A6D7E8]" />}
+                <span className={`block text-[13px] font-extrabold leading-snug ${isSelected ? 'text-[#045C9A] dark:text-[#A6D7E8]' : 'text-[#072036] dark:text-white'}`}>{cat.label}</span>
+                <p className="mt-1 text-[11px] leading-normal text-[#35566b] dark:text-slate-400">{cat.description}</p>
               </button>
             );
           })}
         </div>
         {errors.category && (
-          <p className="mt-2 text-sm text-red-400">{errors.category}</p>
+          <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">{errors.category}</p>
         )}
       </div>
 
       {/* Attachments */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("support_tickets_page.attachments", "Attachments")}
         </label>
 
@@ -315,11 +317,11 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
         {attachments.length === 0 ? (
           <label
             htmlFor="attachments-upload"
-            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl cursor-pointer hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all bg-[#fafbfc] dark:bg-transparent"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl cursor-pointer hover:bg-[#F1F5F9] dark:hover:bg-white/5 transition-all bg-[#F1F5F9] dark:bg-transparent"
           >
             <div className="flex flex-col items-center justify-center p-6 text-center">
-              <Paperclip className="w-8 h-8 text-slate-400 mb-2 rotate-45" />
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-250">
+              <Paperclip className="w-8 h-8 text-slate-400 mb-2 " />
+              <span className="text-sm font-semibold text-[#072036] dark:text-slate-300">
                 {t("support_tickets_page.upload_screenshot", "Upload Screenshot")}
               </span>
               <span className="text-xs text-slate-400 mt-1">
@@ -334,20 +336,20 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl font-medium"
+                  className="flex items-center justify-between p-3 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-xl font-medium"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {isImage ? (
                       <img
                         src={URL.createObjectURL(file)}
                         alt={file.name}
-                        className="w-10 h-10 object-cover rounded-lg border border-slate-200 flex-shrink-0"
+                        className="w-10 h-10 object-cover rounded-lg border border-[#d7ebf5] flex-shrink-0"
                       />
                     ) : (
-                      <Paperclip className="w-6 h-6 text-[#1a3884] flex-shrink-0" />
+                      <Paperclip className="w-6 h-6 text-[#045C9A] flex-shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-slate-750 dark:text-white truncate">
+                      <p className="text-xs font-semibold text-[#072036] dark:text-white truncate">
                         {file.name}
                       </p>
                       <p className="text-[10px] text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -368,7 +370,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
             {attachments.length < 20 && (
               <label
                 htmlFor="attachments-upload"
-                className="flex items-center justify-center p-3 border border-dashed border-slate-250 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500"
+                className="flex items-center justify-center p-3 border border-dashed border-[#d7ebf5] dark:border-white/10 rounded-xl cursor-pointer hover:bg-[#F1F5F9] dark:hover:bg-white/5 transition-all text-[#35566b]"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span className="text-xs font-semibold">{t("support_tickets_page.add_more", "Add More")}</span>
@@ -378,13 +380,13 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
         )}
 
         {errors.attachments && (
-          <p className="mt-1 text-sm text-red-500">{errors.attachments}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.attachments}</p>
         )}
       </div>
 
       {/* Description */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("support_tickets_page.description", "Description")} <span className="text-rose-500">*</span>
         </label>
         <textarea
@@ -393,20 +395,20 @@ const TicketForm = ({ onSuccess, onCancel, initialData, isGuest = false }) => {
           onChange={handleChange}
           placeholder={t("support_tickets_page.description_placeholder", "Describe your issue in detail...")}
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.description ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all resize-none`}
+          className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.description ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+            } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all resize-none`}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-500">{errors.description}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.description}</p>
         )}
       </div>
 
       {/* Footer / Submit */}
-      <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-white/5">
+      <div className="flex justify-end pt-4 border-t border-[#d7ebf5] dark:border-white/5">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-xl bg-[#0f2c59] hover:bg-[#153c7a] dark:bg-[#1a3884] dark:hover:bg-[#254ea8] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#072036] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white"
         >
           {isSubmitting ? (
             <>

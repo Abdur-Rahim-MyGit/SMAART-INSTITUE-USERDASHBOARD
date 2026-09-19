@@ -55,8 +55,7 @@ const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
 const LockedOut = lazy(() => import('@/pages/LockedOut'));
 const AssessmentHeld = lazy(() => import('@/components/proctoring/AssessmentHeld'));
-const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
-const GrievancesPage = lazy(() => import('@/pages/GrievancesPage'));
+const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyPassport = lazy(() => import('@/pages/VerifyPassport'));
@@ -197,10 +196,11 @@ const AnimatedRoutes = () => {
                         <Route path="/notifications" element={<Notifications />} />
                         <Route path="/dashboard/notifications" element={<Notifications />} />
                         <Route path="/help" element={<Help />} />
-                        <Route path="/tickets" element={<SupportTicketsPage />} />
-                        <Route path="/dashboard/support" element={<SupportTicketsPage />} />
-                        <Route path="/grievances" element={<GrievancesPage />} />
-                        <Route path="/dashboard/grievances" element={<GrievancesPage />} />
+                        <Route path="/tickets" element={<HelpCenter />} />
+                        <Route path="/dashboard/support" element={<HelpCenter />} />
+                        {/* Grievances now live on the Help Centre's second tab */}
+                        <Route path="/grievances" element={<Navigate to="/dashboard/support?tab=grievance" replace />} />
+                        <Route path="/dashboard/grievances" element={<Navigate to="/dashboard/support?tab=grievance" replace />} />
 
                         {/* Admin — Course management */}
                         <Route path="/dashboard/admin/courses" element={<AdminCourses />} />

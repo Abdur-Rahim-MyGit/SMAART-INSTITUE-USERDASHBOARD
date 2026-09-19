@@ -11,7 +11,7 @@ import {
   Plus,
   ShieldAlert,
   ShieldCheck
-} from "lucide-react";
+} from "@/components/icons";
 import { createGrievance } from "@/services/grievanceApi";
 
 const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
@@ -111,17 +111,17 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="space-y-6 text-slate-800 dark:text-slate-100"
+      className="space-y-6 text-[#072036] dark:text-slate-100"
     >
       {/* Success Message */}
       {submitStatus === 'success' && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-green-500/20 border border-green-500/30 flex items-center gap-3"
+          className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 flex items-center gap-3"
         >
-          <CheckCircle className="w-5 h-5 text-green-400" />
-          <span className="text-green-400 font-medium">{t("grievance.submitted_successfully", "Grievance submitted successfully")}</span>
+          <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{t("grievance.submitted_successfully", "Grievance submitted successfully")}</span>
         </motion.div>
       )}
 
@@ -130,16 +130,16 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-4 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center gap-3"
+          className="p-4 rounded-xl bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 flex items-center gap-3"
         >
-          <AlertCircle className="w-5 h-5 text-red-400" />
-          <span className="text-red-400">{errors.submit}</span>
+          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+          <span className="text-rose-600 dark:text-rose-400">{errors.submit}</span>
         </motion.div>
       )}
 
       {/* Title */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("grievance.title", "Title")} <span className="text-rose-500">*</span>
         </label>
         <input
@@ -148,29 +148,29 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
           value={formData.title}
           onChange={handleChange}
           placeholder={t("grievance.title_placeholder", "Brief summary of your grievance")}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.title ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all`}
+          className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.title ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+            } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all`}
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.title}</p>
         )}
       </div>
 
       {/* Anonymous Submission Option */}
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex gap-3">
           <div className="mt-0.5 sm:mt-0">
             {formData.isAnonymous ? (
-              <ShieldCheck className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
+              <ShieldCheck className="w-6 h-6 text-[#045C9A] dark:text-[#A6D7E8]" />
             ) : (
               <ShieldAlert className="w-6 h-6 text-slate-400" />
             )}
           </div>
           <div>
-            <span className="text-sm font-bold text-slate-950 dark:text-white block">
+            <span className="text-sm font-bold text-[#072036] dark:text-white block">
               {t("grievance.submit_anonymously", "Submit Anonymously")}
             </span>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal mt-0.5">
+            <p className="text-xs text-[#35566b] dark:text-slate-400 leading-normal mt-0.5">
               {t("grievance.anonymous_hint", "If enabled, your name, email, and academic details will be completely hidden from the Admin.")}
             </p>
           </div>
@@ -178,7 +178,7 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         <button
           type="button"
           onClick={() => setFormData(prev => ({ ...prev, isAnonymous: !prev.isAnonymous }))}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${formData.isAnonymous ? 'bg-indigo-650' : 'bg-slate-200 dark:bg-slate-700'
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${formData.isAnonymous ? 'bg-[#045C9A]' : 'bg-slate-200 dark:bg-slate-700'
             }`}
         >
           <span
@@ -190,7 +190,7 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
 
       {/* Attachments */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("grievance.attachments", "Attachments")}
         </label>
 
@@ -206,11 +206,11 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         {attachments.length === 0 ? (
           <label
             htmlFor="grievance-attachments"
-            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl cursor-pointer hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all bg-[#fafbfc] dark:bg-transparent"
+            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#d7ebf5] dark:border-white/10 rounded-2xl cursor-pointer hover:bg-[#F1F5F9] dark:hover:bg-white/5 transition-all bg-[#F1F5F9] dark:bg-transparent"
           >
             <div className="flex flex-col items-center justify-center p-6 text-center">
-              <Paperclip className="w-8 h-8 text-slate-400 mb-2 rotate-45" />
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-250">
+              <Paperclip className="w-8 h-8 text-slate-400 mb-2 " />
+              <span className="text-sm font-semibold text-[#072036] dark:text-slate-300">
                 {t("grievance.upload_file", "Upload Screenshot or PDF Document")}
               </span>
               <span className="text-xs text-slate-400 mt-1">
@@ -225,20 +225,20 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl font-medium"
+                  className="flex items-center justify-between p-3 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-xl font-medium"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {isImage ? (
                       <img
                         src={URL.createObjectURL(file)}
                         alt={file.name}
-                        className="w-10 h-10 object-cover rounded-lg border border-slate-200 flex-shrink-0"
+                        className="w-10 h-10 object-cover rounded-lg border border-[#d7ebf5] flex-shrink-0"
                       />
                     ) : (
-                      <Paperclip className="w-6 h-6 text-[#1a3884] flex-shrink-0" />
+                      <Paperclip className="w-6 h-6 text-[#045C9A] flex-shrink-0" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-slate-750 dark:text-white truncate">
+                      <p className="text-xs font-semibold text-[#072036] dark:text-white truncate">
                         {file.name}
                       </p>
                       <p className="text-[10px] text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -259,7 +259,7 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
             {attachments.length < 5 && (
               <label
                 htmlFor="grievance-attachments"
-                className="flex items-center justify-center p-3 border border-dashed border-slate-250 dark:border-white/10 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500"
+                className="flex items-center justify-center p-3 border border-dashed border-[#d7ebf5] dark:border-white/10 rounded-xl cursor-pointer hover:bg-[#F1F5F9] dark:hover:bg-white/5 transition-all text-[#35566b]"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 <span className="text-xs font-semibold">{t("grievance.add_more", "Add More")}</span>
@@ -269,13 +269,13 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
         )}
 
         {errors.attachments && (
-          <p className="mt-1 text-sm text-red-500">{errors.attachments}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.attachments}</p>
         )}
       </div>
 
       {/* Description */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white">
+        <label className="block text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
           {t("grievance.description", "Description")} <span className="text-rose-500">*</span>
         </label>
         <textarea
@@ -284,20 +284,20 @@ const GrievanceForm = ({ onSuccess, onCancel, initialData }) => {
           onChange={handleChange}
           placeholder={t("grievance.description_placeholder", "Describe your grievance in detail...")}
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border ${errors.description ? 'border-red-500 focus:ring-red-500/20' : 'border-slate-200 dark:border-white/10 focus:border-[#1a3884] focus:ring-[#1a3884]/20'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-4 transition-all resize-none`}
+          className={`w-full px-4 py-3 rounded-xl bg-white dark:bg-[#072036] border ${errors.description ? 'border-rose-400 focus:ring-rose-400/20' : 'border-[#d7ebf5] dark:border-white/10 focus:border-[#045C9A] focus:ring-[#045C9A]/20'
+            } text-[#072036] dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 transition-all resize-none`}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-500">{errors.description}</p>
+          <p className="mt-1 text-sm text-rose-600">{errors.description}</p>
         )}
       </div>
 
       {/* Footer / Submit */}
-      <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-white/5">
+      <div className="flex justify-end pt-4 border-t border-[#d7ebf5] dark:border-white/5">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-xl bg-[#0f2c59] hover:bg-[#153c7a] dark:bg-[#1a3884] dark:hover:bg-[#254ea8] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+          className="flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-xl bg-[#072036] hover:bg-[#0d3a5f] dark:bg-[#045C9A] dark:hover:bg-[#0d3a5f] text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
         >
           {isSubmitting ? (
             <>
