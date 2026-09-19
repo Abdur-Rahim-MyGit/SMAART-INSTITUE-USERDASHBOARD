@@ -55,7 +55,7 @@ import { buildFlowFromCourse, buildFlowFromLearningFlow, TEMP_VIDEO_URL } from "
 import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
 import { markCourseCompleted } from "@/utils/courseProgressStorage";
 import Confetti from 'react-confetti';
-import { HexBadgeSVG, resolveColors } from "@/components/badges/BadgeCard";
+import { StarSealSVG, resolveColors } from "@/components/badges/BadgeCard";
 import { compareCourseIds, resolveStaticCourseTitle, canAccessCourse, normalizeCourseId } from "@/utils/courseUnlock";
 import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
 
@@ -1799,12 +1799,12 @@ const CoursePlayer = () => {
                       transition={{ delay: 0.2, type: "spring", stiffness: 120 }}
                       className="relative"
                     >
-                      <HexBadgeSVG
+                      <StarSealSVG
                         colors={resolveColors(getCourseCategory(courseId))}
                         badgeId={`${courseId}-MASTER`}
-                        courseName={resolveStaticCourseTitle(courseId) || dbCourse?.title || courseId}
                         year={new Date().getFullYear()}
-                        size={180}
+                        size={168}
+                        className="text-white dark:text-[#0d3a5f]"
                       />
                     </motion.div>
                   </div>

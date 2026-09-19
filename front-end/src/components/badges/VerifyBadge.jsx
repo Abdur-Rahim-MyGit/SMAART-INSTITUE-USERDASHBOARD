@@ -11,7 +11,7 @@ import useUser from '@/hooks/useUser';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import PageTransition from '@/components/PageTransition';
 import Navbar from '@/components/Navbar';
-import { HexBadgeSVG, resolveColors } from './BadgeCard';
+import { StarSealSVG, resolveColors } from './BadgeCard';
 
 const tierConfig = {
     bronze: {
@@ -264,7 +264,7 @@ const VerifyBadge = () => {
                             className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-slate-200"
                         >
                             {/* Header */}
-                            <div className="bg-[#1a3884] p-6 text-center">
+                            <div className="bg-[#072036] p-6 text-center">
                                 <p className="text-white/80 text-sm font-medium tracking-wider uppercase mb-1">
                                     SMAART Institute
                                 </p>
@@ -278,16 +278,18 @@ const VerifyBadge = () => {
                                 <div className="flex flex-col items-center">
                                     {/* Badge Icon */}
                                     <div className="w-32 h-32 flex items-center justify-center mb-6 drop-shadow-xl">
-                                        <HexBadgeSVG 
+                                        <StarSealSVG
                                             colors={resolveColors(badge.category)}
                                             badgeId={badge.badgeId || badge.id}
-                                            courseName={(badge.title || '').replace(/ Master$/i, '').trim()}
                                             year={badge.earnedDate ? new Date(badge.earnedDate).getFullYear() : new Date().getFullYear()}
+                                            size={128}
+                                            className="text-white"
+                                            surfaceColor="#ffffff"
                                         />
                                     </div>
 
                                     {/* Badge Title */}
-                                    <h3 className="text-2xl font-bold text-[#1a3884] text-center mb-4">
+                                    <h3 className="text-2xl font-bold text-[#072036] text-center mb-4">
                                         {badge.title}
                                     </h3>
 

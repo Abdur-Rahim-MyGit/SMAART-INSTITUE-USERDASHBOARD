@@ -1241,7 +1241,11 @@
       "all": "All Categories",
       "capability": "Capability",
       "capacity": "Capacity",
-      "leadership": "Leadership"
+      "leadership": "Leadership",
+      "piq": "PIQ",
+      "aiq": "AIQ",
+      "sq": "SQ",
+      "default": "Learning"
     },
     "fallback": {
       "module_master": {
@@ -1252,7 +1256,11 @@
         "title": "Course Conqueror",
         "desc": "Awarded for completing an entire course successfully."
       }
-    }
+    },
+    "locked": "Locked",
+    "locked_hint": "Complete the course to unlock",
+    "locked_toast": "Complete \"{{title}}\" to unlock this badge.",
+    "verified_achievement": "Verified achievement"
   },
   "career_agent": {
     "loading_title": "Synchronizing Intelligence...",
