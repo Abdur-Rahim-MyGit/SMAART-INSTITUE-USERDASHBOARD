@@ -156,7 +156,7 @@ const VerifyCertificate = () => {
                         Certificate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] dark:from-[#C0C0C0] dark:to-[#A8A8A8]">Verification</span>
                     </h1>
                     <p className="text-gray-600 dark:text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
-                        Verify the authenticity of SMAART Institute credentials securely via our blockchain-enabled checkpoint system.
+                        Check any SMAART Institute certificate against our official records. Enter the certificate ID printed on the document, or scan its QR code, to see who it was issued to and whether it is still valid.
                     </p>
                 </motion.div>
 

@@ -4,17 +4,20 @@ import { CheckCircle2, Lock } from "@/components/icons";
 import { toast } from 'sonner';
 
 /* ────────────────────────────────────────────────
-   Module palette — one accent colour per module,
-   navy face + white star shared by every badge.
+   Module palette — every badge shares the SMAART
+   brand navy bezel; only the module code on the
+   seal and the chip label change.
    ──────────────────────────────────────────────── */
+const BRAND = { c1: '#034a7d', c2: '#045C9A' };
+
 export const MODULE_PALETTE = {
-    capacity:   { key: 'capacity',   code: 'CAP', label: 'Capacity',   c1: '#045C9A', c2: '#0A84D6' },
-    capability: { key: 'capability', code: 'APC', label: 'Capability', c1: '#0E8F8F', c2: '#14B8A6' },
-    leadership: { key: 'leadership', code: 'ELR', label: 'Leadership', c1: '#6D28D9', c2: '#8B5CF6' },
-    piq:        { key: 'piq',        code: 'PIQ', label: 'PIQ',        c1: '#D97706', c2: '#F59E0B' },
-    aiq:        { key: 'aiq',        code: 'AIQ', label: 'AIQ',        c1: '#1D4ED8', c2: '#3B82F6' },
-    sq:         { key: 'sq',         code: 'SQ',  label: 'SQ',         c1: '#BE185D', c2: '#EC4899' },
-    default:    { key: 'default',    code: 'SMT', label: 'Learning',   c1: '#045C9A', c2: '#0A84D6' },
+    capacity:   { key: 'capacity',   code: 'CAP', label: 'Capacity',   ...BRAND },
+    capability: { key: 'capability', code: 'APC', label: 'Capability', ...BRAND },
+    leadership: { key: 'leadership', code: 'ELR', label: 'Leadership', ...BRAND },
+    piq:        { key: 'piq',        code: 'PIQ', label: 'PIQ',        ...BRAND },
+    aiq:        { key: 'aiq',        code: 'AIQ', label: 'AIQ',        ...BRAND },
+    sq:         { key: 'sq',         code: 'SQ',  label: 'SQ',         ...BRAND },
+    default:    { key: 'default',    code: 'SMT', label: 'Learning',   ...BRAND },
 };
 
 export const resolveColors = (category = '') => {

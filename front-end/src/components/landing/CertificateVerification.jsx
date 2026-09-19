@@ -114,19 +114,19 @@ const CertificateVerification = ({ isDashboard = false }) => {
                                     {t("landing.verify.badge", "OFFICIAL RECORDS")}
                                 </div>
                                 <h2 className={`font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white ${isDashboard ? 'text-[22px] sm:text-[26px] mb-3' : 'text-3xl md:text-4xl lg:text-[40px] mb-5'}`}>
-                                    {t("landing.verify.title")} <br />
+                                    {t("landing.verify.title", "Certificate")} <br />
                                     <span className="text-[#045C9A] dark:text-[#A6D7E8]">
-                                        {t("landing.verify.title_highlight")}
+                                        {t("landing.verify.title_highlight", "Verification")}
                                     </span>
                                 </h2>
                                 <p className={`font-medium leading-relaxed text-slate-500 dark:text-slate-400 ${isDashboard ? 'text-[13px] mb-6' : 'text-[15px] mb-8 max-w-md'}`}>
-                                    {t("landing.verify.desc")}
+                                    {t("landing.verify.desc", "Check any SMAART Institute certificate against our official records. Enter the certificate ID printed on the document, or scan its QR code, to see who it was issued to, when, and whether it is still valid.")}
                                 </p>
 
                                 <div className="space-y-3">
                                     {[
-                                        { icon: Shield, title: t("landing.verify.f1_title", "TAMPER PROOF"), info: t("landing.verify.f1_info", "Blockchain Secured"), sub: t("landing.verify.f1_sub", "Immutable verification records") },
-                                        { icon: Zap, title: t("landing.verify.f2_title", "INSTANT"), info: t("landing.verify.f2_info", "Real-time Verification"), sub: t("landing.verify.f2_sub", "Zero wait time validation") },
+                                        { icon: Shield, title: t("landing.verify.f1_title", "Official Records"), info: t("landing.verify.f1_info", "Issued by SMAART Institute"), sub: t("landing.verify.f1_sub", "Checked against our certificate registry") },
+                                        { icon: Zap, title: t("landing.verify.f2_title", "Instant Check"), info: t("landing.verify.f2_info", "Result in seconds"), sub: t("landing.verify.f2_sub", "Revoked or expired certificates are flagged") },
                                     ].map((item, idx) => (
                                         <motion.div
                                             key={idx}
