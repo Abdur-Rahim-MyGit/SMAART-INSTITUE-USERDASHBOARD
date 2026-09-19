@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Award, Trophy, BookOpen, Layers, ChevronRight, Download,
-    Shield, Zap, ArrowLeft, ChevronDown
-} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+    Award, Trophy, BookOpen, Layers, ChevronRight, ChevronDown, Download,
+    Zap, ArrowLeft, Loader2,
+} from "@/components/icons";
 import useUser from "@/hooks/useUser";
 import useSmaartCourseProgress from "@/hooks/useSmaartCourseProgress";
 import apiCall, { coursesAPI } from "@/services/api";
 import { assessmentApi } from "@/services/assessmentApi";
+import NeuralBackground from "@/components/ui/NeuralBackground";
+import PageTransition from "@/components/PageTransition";
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import CertificateVerification from "@/components/landing/CertificateVerification";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+
+// Same tokens as CourseStructure / AssessmentsDashboard.
+const SURFACE =
+    "bg-white dark:bg-[#0d3a5f] border border-[#d7ebf5]/80 dark:border-[#045C9A]/20 shadow-sm";
+const PANEL =
+    "bg-[#F1F5F9] dark:bg-[#072036]/60 border border-[#d7ebf5] dark:border-white/10";
+const CHIP_BRAND =
+    "bg-[#045C9A]/10 text-[#045C9A] dark:bg-[#045C9A]/30 dark:text-[#A6D7E8]";
+const BTN_PRIMARY =
+    "inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#072036] text-xs font-bold text-white shadow-md shadow-[#072036]/20 transition-colors hover:bg-[#0d3a5f] dark:bg-[#A6D7E8] dark:text-[#072036] dark:shadow-none dark:hover:bg-white";
+const EASE = [0.25, 0.1, 0.25, 1];
 
 const TABS = [
     { id: "overview", label: "Overview", icon: Layers },
@@ -20,6 +32,13 @@ const TABS = [
     { id: "badges", label: "Badges", icon: Trophy },
     { id: "flashcards", label: "Flashcards", icon: Zap },
 ];
+
+const SectionTitle = ({ title, subtitle }) => (
+    <div className="min-w-0">
+        <h3 className="text-[16px] font-extrabold tracking-tight text-[#072036] dark:text-white">{title}</h3>
+        {subtitle && <p className="mt-0.5 text-[13px] text-[#35566b] dark:text-slate-400">{subtitle}</p>}
+    </div>
+);
 
 const SkillsVault = () => {
     const { t } = useTranslation();
@@ -33,8 +52,18 @@ const SkillsVault = () => {
     const [stageStatus, setStageStatus] = useState({});
     const [earnedBadgesCount, setEarnedBadgesCount] = useState(0);
     const [earnedCerts, setEarnedCerts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [activeFlashcardCategory, setActiveFlashcardCategory] = useState("all");
+
+    const [isDarkTheme, setIsDarkTheme] = useState(
+        typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+    );
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDarkTheme(document.documentElement.classList.contains("dark"));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -59,7 +88,7 @@ const SkillsVault = () => {
                         }
 
                         try {
-                            const certRes = await apiCall('/certificates/my-certificates');
+                            const certRes = await apiCall("/certificates/my-certificates");
                             if (certRes?.certificates) setEarnedCerts(certRes.certificates);
                         } catch (e) {
                             console.error("Failed to fetch certificates", e);
@@ -67,16 +96,15 @@ const SkillsVault = () => {
                     }
                 }
             } catch {
-                // silently fail
-            } finally {
-                setLoading(false);
+                // the vault still renders with whatever loaded
             }
         };
         fetchAll();
     }, []);
 
     const badges = user?.badges || [];
-    const completedAssessments = Object.values(stageStatus).filter(s => s?.completed).length;
+    const badgeCount = earnedBadgesCount > 0 ? earnedBadgesCount : badges.length;
+    const completedAssessments = Object.values(stageStatus).filter((s) => s?.completed).length;
 
     const certificateTypes = [
         { id: "capacity", title: t("skills_vault.certificates.names.capacity", "Certificate in Capacity & Work Readiness"), code: "CAP", level: t("skills_vault.certificates.levels.capacity", "Level 1") },
@@ -110,501 +138,390 @@ const SkillsVault = () => {
     ];
 
     const courseFlashcards = [];
-
     const enrollmentProgress = userProgress?.enrollmentProgress || [];
 
-    courses.forEach(course => {
-        const courseIdStr = String(course._id || '');
-        const enrollment = enrollmentProgress.find(e =>
-            (e.courseCode && e.courseCode === course.courseCode) ||
-            String(e.courseId) === courseIdStr
+    courses.forEach((course) => {
+        const courseIdStr = String(course._id || "");
+        const enrollment = enrollmentProgress.find(
+            (e) => (e.courseCode && e.courseCode === course.courseCode) || String(e.courseId) === courseIdStr
         );
-
-        const isCompleted = completedCourses.includes(course.courseCode) ||
+        const isCompleted =
+            completedCourses.includes(course.courseCode) ||
             completedCourses.includes(course.courseNumber) ||
             completedCourses.includes(courseIdStr);
-
-        // Show flashcards if the user is enrolled in the course or has completed it.
-        const isEnrolled = !!enrollment;
-
-        if (!isCompleted && !isEnrolled) return;
+        if (!isCompleted && !enrollment) return;
 
         const addCard = (card) => {
             if (!card) return;
             const termText = card.front || card.term || card.question;
             const defText = card.back || card.definition || card.answer;
-            if (termText && defText) {
-                // Prevent duplicate terms from being added
-                const isDuplicate = courseFlashcards.some(c => c.term?.toLowerCase() === termText.toLowerCase());
-                if (!isDuplicate) {
-                    courseFlashcards.push({
-                        term: termText,
-                        definition: defText,
-                        category: card.category || course.title || course.courseCode || 'Course Concept'
-                    });
-                }
+            if (!termText || !defText) return;
+            if (courseFlashcards.some((c) => c.term?.toLowerCase() === termText.toLowerCase())) return;
+            courseFlashcards.push({
+                term: termText,
+                definition: defText,
+                category: card.category || course.title || course.courseCode || "Course Concept",
+            });
+        };
+        const addStep = (step) => {
+            if (!step) return;
+            if (step.type === "flashcard" || step.type === "flashcards" || step.contentType === "flashcard") {
+                const cards = step.cards || step.content?.cards || [];
+                if (Array.isArray(cards)) cards.forEach(addCard);
+                else if (step.content && typeof step.content === "object") addCard(step.content);
             }
         };
 
-        // 1. Direct stepE_FlashCard inside learningFlow (standard 8-step format)
         if (course.learningFlow) {
             const lf = course.learningFlow;
-            if (lf.stepE_FlashCard && Array.isArray(lf.stepE_FlashCard.cards)) {
-                lf.stepE_FlashCard.cards.forEach(addCard);
-            }
-
-            // Fallback for general values inside learningFlow
-            Object.values(lf).forEach(step => {
-                if (step && typeof step === 'object') {
-                    if (Array.isArray(step.cards)) {
-                        step.cards.forEach(addCard);
-                    } else if (step.content && Array.isArray(step.content.cards)) {
-                        step.content.cards.forEach(addCard);
-                    }
+            if (Array.isArray(lf.stepE_FlashCard?.cards)) lf.stepE_FlashCard.cards.forEach(addCard);
+            Object.values(lf).forEach((step) => {
+                if (step && typeof step === "object") {
+                    if (Array.isArray(step.cards)) step.cards.forEach(addCard);
+                    else if (Array.isArray(step.content?.cards)) step.content.cards.forEach(addCard);
                 }
             });
         }
-
-        // 2. steps directly on course
-        if (Array.isArray(course.steps)) {
-            course.steps.forEach(step => {
-                if (step.type === 'flashcard' || step.type === 'flashcards' || step.contentType === 'flashcard') {
-                    const cards = step.cards || step.content?.cards || [];
-                    if (Array.isArray(cards)) {
-                        cards.forEach(addCard);
-                    } else if (step.content && typeof step.content === 'object') {
-                        addCard(step.content);
-                    }
-                }
-            });
-        }
-
-        // 3. modules -> days -> steps OR modules -> steps directly
-        if (course.modules && Array.isArray(course.modules)) {
-            course.modules.forEach(module => {
-                // Some builders put steps directly in modules
-                if (Array.isArray(module.steps)) {
-                    module.steps.forEach(step => {
-                        if (step.type === 'flashcard' || step.type === 'flashcards' || step.contentType === 'flashcard') {
-                            const cards = step.cards || step.content?.cards || [];
-                            if (Array.isArray(cards)) {
-                                cards.forEach(addCard);
-                            } else if (step.content && typeof step.content === 'object') {
-                                addCard(step.content);
-                            }
-                        }
-                    });
-                }
-
-                // standard days structure
-                if (module.days && Array.isArray(module.days)) {
-                    module.days.forEach(day => {
-                        if (day.steps && Array.isArray(day.steps)) {
-                            day.steps.forEach(step => {
-                                if (step.type === 'flashcard' || step.type === 'flashcards' || step.contentType === 'flashcard') {
-                                    const cards = step.cards || step.content?.cards || [];
-                                    if (Array.isArray(cards)) {
-                                        cards.forEach(addCard);
-                                    } else if (step.content && typeof step.content === 'object') {
-                                        addCard(step.content);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
+        if (Array.isArray(course.steps)) course.steps.forEach(addStep);
+        if (Array.isArray(course.modules)) {
+            course.modules.forEach((module) => {
+                if (Array.isArray(module.steps)) module.steps.forEach(addStep);
+                if (Array.isArray(module.days)) module.days.forEach((day) => Array.isArray(day.steps) && day.steps.forEach(addStep));
             });
         }
     });
 
     const allFlashcards = [...defaultFlashcards, ...courseFlashcards];
-
-    // Filter by category
-    const uniqueFlashcardCategories = ['all', ...new Set(allFlashcards.map(c => c.category || 'Course Concept'))];
-    const flashcardFilterOptions = uniqueFlashcardCategories.map(cat => ({
+    const uniqueFlashcardCategories = ["all", ...new Set(allFlashcards.map((c) => c.category || "Course Concept"))];
+    const flashcardFilterOptions = uniqueFlashcardCategories.map((cat) => ({
         id: cat,
-        label: cat === 'all' ? t("skills_vault.flashcards.all_categories", "All Categories") : cat.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+        label: cat === "all"
+            ? t("skills_vault.flashcards.all_categories", "All Categories")
+            : cat.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
     }));
+    const filteredFlashcards = allFlashcards.filter(
+        (card) => activeFlashcardCategory === "all" || (card.category || "Course Concept") === activeFlashcardCategory
+    );
 
-    const filteredFlashcards = allFlashcards.filter(card => {
-        return activeFlashcardCategory === 'all' || (card.category || 'Course Concept') === activeFlashcardCategory;
-    });
-
-    if (userLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-[#F5F8FF] dark:bg-[#00152E]">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#d8e6f7] border-t-[#1a3884] shadow-lg dark:border-[#1a3884]/20 dark:border-t-blue-400" />
-            </div>
-        );
-    }
+    const overviewItems = [
+        { key: "certificates", icon: Award, count: earnedCertificates.length, title: t("skills_vault.overview.items.certificates.title", "Certificates"), desc: t("skills_vault.overview.items.certificates.desc", "Verified credentials issued upon completing programme milestones."), stat: t("skills_vault.overview.stats.certificates", "Certificates"), go: () => setActiveTab("certificates") },
+        { key: "badges", icon: Trophy, count: badgeCount, title: t("skills_vault.overview.items.badges.title", "Badges & Achievements"), desc: t("skills_vault.overview.items.badges.desc", "Micro-credentials earned through course activities and engagement."), stat: t("skills_vault.overview.stats.badges", "Badges Earned"), go: () => setActiveTab("badges") },
+        { key: "courses", icon: BookOpen, count: completedCourses.length, title: t("skills_vault.overview.items.courses.title", "Course Overview"), desc: t("skills_vault.overview.items.courses.desc", "A dashboard view of your enrolled courses and overall progress."), stat: t("skills_vault.overview.stats.courses", "Courses"), go: () => navigate("/dashboard/courses") },
+        { key: "flashcards", icon: Zap, count: allFlashcards.length, title: t("skills_vault.overview.items.flashcards.title", "Flashcards & Key Terms"), desc: t("skills_vault.overview.items.flashcards.desc", "Quick-reference cards for quotients and essential terminology."), stat: t("skills_vault.flashcards.title", "Key Flashcards"), go: () => setActiveTab("flashcards") },
+    ];
 
     return (
-        <div className="min-h-screen bg-transparent pb-12 transition-colors duration-300">
-            <div className="mx-auto max-w-7xl p-8">
-
-                {/* Back Button - Mobile Only */}
-                <div className="mb-4 md:hidden">
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
-                    >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-x-1 group-hover:shadow-md dark:border-white/10 dark:bg-slate-800">
-                            <ArrowLeft className="h-4 w-4" />
-                        </div>
-                        {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-                    </button>
+        <PageTransition>
+            <div className="relative min-h-screen overflow-hidden bg-transparent pb-8 transition-colors duration-300">
+                {/* Same ambient layer as the dashboard, courses and assessments pages */}
+                <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-25">
+                    <NeuralBackground theme={isDarkTheme ? "dark" : "light"} />
+                </div>
+                <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+                    <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#045C9A]/5 via-blue-500/5 to-transparent blur-[120px] dark:from-blue-900/10" />
+                    <div className="absolute bottom-10 right-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-indigo-500/5 via-blue-600/5 to-transparent blur-[120px] dark:from-indigo-900/10" />
                 </div>
 
-                {/* Header Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
-                >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                              {(() => {
-                                const title = t("skills_vault.hero_title", "Skills Vault");
-                                const lastSpaceIndex = title.lastIndexOf(" ");
-                                if (lastSpaceIndex !== -1) {
-                                  return (
-                                    <>
-                                      {title.substring(0, lastSpaceIndex)}{" "}
-                                      <span className="text-[#1a3884] dark:text-blue-300">
-                                        {title.substring(lastSpaceIndex + 1)}
-                                      </span>
-                                    </>
-                                  );
-                                }
-                                return title;
-                              })()}
-                            </h1>
-                            <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                                {t("skills_vault.hero_subtitle", "Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.")}
-                            </p>
-                        </div>
-
-                        {/* Moved Stats */}
-                        <div className="flex shrink-0 items-center gap-3">
-                            {/* Certificates Stat */}
-                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/20 dark:border-blue-500/20">
-                                    <Award className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
+                <main className="relative z-10">
+                    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4 pb-10 sm:gap-6 sm:p-5 lg:p-6">
+                        {/* Back button -- mobile only */}
+                        <div className="flex items-center sm:hidden">
+                            <button type="button" onClick={() => navigate("/dashboard")} className="group flex w-fit items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d7ebf5] bg-white shadow-sm transition-all duration-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:group-hover:border-[#045C9A]/40">
+                                    <ArrowLeft className="h-4 w-4 text-[#034a7d] transition-transform group-hover:-translate-x-0.5 dark:text-slate-300" />
                                 </div>
-                                <div className="flex flex-col justify-center">
-                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{earnedCertificates.length}</p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.certificates", "Certificates")}</p>
-                                </div>
-                            </div>
-                            {/* Badges Stat */}
-                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 border border-amber-200/60 dark:bg-amber-950/20 dark:border-amber-900/20">
-                                    <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                                </div>
-                                <div className="flex flex-col justify-center">
-                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">
-                                        {earnedBadgesCount > 0 ? earnedBadgesCount : badges.length}
-                                    </p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.badges", "Badges Earned")}</p>
-                                </div>
-                            </div>
-                            {/* Courses Stat */}
-                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-200/60 dark:bg-emerald-950/20 dark:border-emerald-900/20">
-                                    <BookOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                </div>
-                                <div className="flex flex-col justify-center">
-                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{completedCourses.length}</p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.courses", "Courses")}</p>
-                                </div>
-                            </div>
-                            {/* Assessments Stat */}
-                            <div className="flex items-center gap-3 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 py-2.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50 border border-violet-200/60 dark:bg-violet-950/20 dark:border-violet-900/20">
-                                    <Shield className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                                </div>
-                                <div className="flex flex-col justify-center">
-                                    <p className="text-[14px] font-extrabold leading-none text-[#0d1f4e] dark:text-white">{completedAssessments}</p>
-                                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none">{t("skills_vault.overview.stats.assessments", "Assessments")}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Tabs */}
-                <div className="mb-6 flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                    {TABS.map((tab) => {
-                        const Icon = tab.icon;
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[12px] font-bold whitespace-nowrap transition-all ${isActive
-                                    ? "bg-[#1a3884] text-white shadow-sm"
-                                    : "border border-[#d8e6f7] bg-white text-slate-500 hover:border-[#1a3884]/30 hover:text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-slate-400 dark:hover:text-blue-300"
-                                    }`}
-                            >
-                                <Icon className="h-3.5 w-3.5" />
-                                {t(`skills_vault.tabs.${tab.id}`, tab.label)}
+                                <span className="text-xs font-extrabold uppercase tracking-widest text-[#034a7d] transition-colors group-hover:text-[#045C9A] dark:text-[#A6D7E8] dark:group-hover:text-white">
+                                    {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                                </span>
                             </button>
-                        );
-                    })}
-                </div>
+                        </div>
 
-                {/* Content */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3 }}
-                    >
-
-                        {/* ════════ OVERVIEW TAB ════════ */}
-                        {activeTab === "overview" && (
-                            <div className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                <div className="mb-6">
-                                    <h3 className="text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                        {t("skills_vault.overview.title", "What's in your Skills Vault?")}
-                                    </h3>
-                                    <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                                        {t("skills_vault.overview.subtitle", "Your centralized hub that securely stores and showcases all your professional achievements.")}
-                                    </p>
-                                </div>
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    {[
-                                        { key: "certificates", icon: Award, title: t("skills_vault.overview.items.certificates.title", "Certificates"), desc: t("skills_vault.overview.items.certificates.desc", "Verified credentials issued upon completing programme milestones.") },
-                                        { key: "badges", icon: Trophy, title: t("skills_vault.overview.items.badges.title", "Badges & Achievements"), desc: t("skills_vault.overview.items.badges.desc", "Micro-credentials earned through course activities and engagement.") },
-                                        { key: "courses", icon: BookOpen, title: t("skills_vault.overview.items.courses.title", "Course Overview"), desc: t("skills_vault.overview.items.courses.desc", "A dashboard view of your enrolled courses and overall progress.") },
-                                        { key: "flashcards", icon: Zap, title: t("skills_vault.overview.items.flashcards.title", "Flashcards & Key Terms"), desc: t("skills_vault.overview.items.flashcards.desc", "Quick-reference cards for quotients and essential terminology.") },
-                                    ].map((item, i) => (
-                                        <div key={i} className="flex gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-colors hover:border-[#1a3884]/30 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50">
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                                <item.icon className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-[13.5px] font-bold text-[#0d1f4e] dark:text-white">{item.title}</h4>
-                                                <p className="mt-0.5 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400">{item.desc}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                        {/* Page hero -- same structure and type scale as Courses / Assessments */}
+                        <motion.section
+                            initial={{ opacity: 0, y: -16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, ease: EASE }}
+                            className={`relative w-full overflow-hidden rounded-2xl ${SURFACE}`}
+                        >
+                            <div className="pointer-events-none absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-[#EAF7FD]/70 to-transparent dark:from-[#045C9A]/10" />
+                            <div className="relative z-10 px-6 py-5 sm:px-8 sm:py-6">
+                                <h1 className="text-xl font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white sm:text-2xl" style={{ letterSpacing: "-0.02em" }}>
+                                    {t("skills_vault.hero_title", "Skills Vault")}
+                                </h1>
+                                <p className="mt-0.5 max-w-2xl text-xs font-medium text-[#35566b] dark:text-slate-400 sm:text-sm">
+                                    {t("skills_vault.hero_subtitle", "Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.")}
+                                </p>
                             </div>
-                        )}
+                        </motion.section>
 
-                        {/* ════════ CERTIFICATES TAB ════════ */}
-                        {activeTab === "certificates" && (
-                            <div className="space-y-6">
-                                <div className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <Award className="h-5 w-5 text-[#eab308]" />
-                                                <h3 className="text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                                    {t("skills_vault.certificates.title", "Professional Credentials")}
-                                                </h3>
-                                            </div>
-                                            <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                                                {t("skills_vault.certificates.desc", "Your verified SMAART Institute certifications")}
-                                            </p>
-                                        </div>
-                                        <button
-                                            onClick={() => navigate("/dashboard/certificate")}
-                                            className="flex items-center justify-center gap-1.5 rounded-xl bg-[#1a3884] px-5 py-2.5 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
-                                        >
-                                            <Download className="h-4 w-4" /> {t("skills_vault.certificates.download_centre", "Download Certificates")}
-                                        </button>
-                                    </div>
+                        {/* Tabs */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, ease: EASE, delay: 0.05 }}
+                            id="vault-tabs"
+                            role="tablist"
+                            className={`flex h-11 w-full max-w-full items-center gap-1 overflow-x-auto rounded-xl p-1 sm:w-fit ${PANEL}`}
+                        >
+                            {TABS.map((tab) => {
+                                const Icon = tab.icon;
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={isActive}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-4 text-xs font-bold transition-colors ${
+                                            isActive
+                                                ? "bg-white text-[#045C9A] shadow-sm dark:bg-[#045C9A]/40 dark:text-white"
+                                                : "text-[#35566b] hover:text-[#045C9A] dark:text-slate-400 dark:hover:text-white"
+                                        }`}
+                                    >
+                                        <Icon className="h-4 w-4" />
+                                        {t(`skills_vault.tabs.${tab.id}`, tab.label)}
+                                    </button>
+                                );
+                            })}
+                        </motion.div>
 
-                                    {earnedCertificates.length > 0 ? (
-                                        <div className="grid gap-4 sm:grid-cols-2">
-                                            {earnedCertificates.map((cert) => (
-                                                <div
-                                                    key={cert.certificateId}
-                                                    onClick={() => navigate("/dashboard/certificate", { state: { selectedCertId: cert.id } })}
-                                                    className="group flex cursor-pointer items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
-                                                >
-                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
-                                                        <Award className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <h4 className="mb-1.5 text-[13.5px] font-bold leading-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400">
-                                                            {cert.title}
-                                                        </h4>
-                                                        <div className="flex flex-wrap items-center gap-2">
-                                                            {cert.code && (
-                                                                <span className="rounded-md border border-[#d8e6f7] bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:border-[#1a3884]/20 dark:bg-[#001630] dark:text-slate-400">
-                                                                    {cert.code}
-                                                                </span>
-                                                            )}
-                                                            <span className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
-                                                                <Award className="h-2.5 w-2.5" /> {t("skills_vault.certificates.earned", "Earned")}
-                                                            </span>
-                                                            {cert.issueDate && (
-                                                                <span className="text-[10px] font-semibold text-slate-400">
-                                                                    {new Date(cert.issueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                                                                </span>
-                                                            )}
+                        {userLoading ? (
+                            <div className="flex items-center justify-center py-24">
+                                <Loader2 className="h-9 w-9 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
+                            </div>
+                        ) : (
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25, ease: EASE }}
+                                    role="tabpanel"
+                                >
+                                    {/* ════════ OVERVIEW ════════ */}
+                                    {activeTab === "overview" && (
+                                        <section className={`rounded-2xl p-5 sm:p-6 ${SURFACE}`}>
+                                            <SectionTitle
+                                                title={t("skills_vault.overview.title", "What's in your Skills Vault?")}
+                                                subtitle={t("skills_vault.overview.subtitle", "Your centralized hub that securely stores and showcases all your professional achievements.")}
+                                            />
+                                            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                                {overviewItems.map((item) => (
+                                                    <button
+                                                        key={item.key}
+                                                        type="button"
+                                                        onClick={item.go}
+                                                        className={`group flex items-start gap-4 rounded-xl p-4 text-left transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] ${PANEL}`}
+                                                    >
+                                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#045C9A] shadow-sm dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+                                                            <item.icon className="h-5 w-5" />
                                                         </div>
-                                                    </div>
-                                                    <div className="hidden h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white opacity-0 transition-opacity group-hover:opacity-100 sm:flex dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                                        <ChevronRight className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center dark:border-white/10 dark:bg-white/[0.02]">
-                                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-white/5">
-                                                <Award className="h-7 w-7 text-slate-300 dark:text-slate-600" />
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <h4 className="text-[14px] font-extrabold tracking-tight text-[#072036] dark:text-white">{item.title}</h4>
+                                                                <span className={`inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider tabular-nums ${CHIP_BRAND}`}>
+                                                                    {item.count} {item.stat}
+                                                                </span>
+                                                            </div>
+                                                            <p className="mt-1 text-[12.5px] leading-relaxed text-[#35566b] dark:text-slate-400">{item.desc}</p>
+                                                        </div>
+                                                        <ChevronRight className="mt-3 h-4 w-4 shrink-0 text-slate-300 transition-colors group-hover:text-[#045C9A] dark:text-slate-600 dark:group-hover:text-[#A6D7E8]" />
+                                                    </button>
+                                                ))}
                                             </div>
-                                            <h4 className="mb-1 text-[14px] font-bold text-slate-600 dark:text-slate-300">
-                                                {t("skills_vault.certificates.none_title", "No certificates earned yet")}
-                                            </h4>
-                                            <p className="max-w-sm text-[12.5px] font-medium text-slate-400 dark:text-slate-500">
-                                                {t("skills_vault.certificates.none_desc", "Pass your stage assessments (T2–T4) to earn professional certificates. They'll appear here automatically.")}
-                                            </p>
+                                        </section>
+                                    )}
+
+                                    {/* ════════ CERTIFICATES ════════ */}
+                                    {activeTab === "certificates" && (
+                                        <div className="flex flex-col gap-4 sm:gap-6">
+                                            <section className={`rounded-2xl p-5 sm:p-6 ${SURFACE}`}>
+                                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                                    <SectionTitle
+                                                        title={t("skills_vault.certificates.title", "Professional Credentials")}
+                                                        subtitle={t("skills_vault.certificates.desc", "Your verified SMAART Institute certifications")}
+                                                    />
+                                                    <button type="button" onClick={() => navigate("/dashboard/certificate")} className={`${BTN_PRIMARY} h-9 shrink-0 px-4`}>
+                                                        <Download className="h-4 w-4" />
+                                                        {t("skills_vault.certificates.download_centre", "Download Certificates")}
+                                                    </button>
+                                                </div>
+
+                                                {earnedCertificates.length > 0 ? (
+                                                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                                        {earnedCertificates.map((cert) => (
+                                                            <button
+                                                                key={cert.certificateId}
+                                                                type="button"
+                                                                onClick={() => navigate("/dashboard/certificate", { state: { selectedCertId: cert.id } })}
+                                                                className={`group flex items-start gap-4 rounded-xl p-4 text-left transition-colors hover:border-[#045C9A]/40 hover:bg-[#EAF7FD] dark:hover:bg-white/[0.06] ${PANEL}`}
+                                                            >
+                                                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#045C9A] shadow-sm dark:bg-[#0d3a5f] dark:text-[#A6D7E8]">
+                                                                    <Award className="h-5 w-5" />
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <h4 className="text-[14px] font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white">{cert.title}</h4>
+                                                                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                                                        {cert.code && (
+                                                                            <span className="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-[#35566b] dark:bg-white/[0.06] dark:text-slate-300">
+                                                                                {cert.code}
+                                                                            </span>
+                                                                        )}
+                                                                        {cert.level && (
+                                                                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${CHIP_BRAND}`}>
+                                                                                {cert.level}
+                                                                            </span>
+                                                                        )}
+                                                                        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                                                                            {t("skills_vault.certificates.earned", "Earned")}
+                                                                        </span>
+                                                                        {cert.issueDate && (
+                                                                            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                                                                                {new Date(cert.issueDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <ChevronRight className="mt-3 h-4 w-4 shrink-0 text-slate-300 transition-colors group-hover:text-[#045C9A] dark:text-slate-600 dark:group-hover:text-[#A6D7E8]" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="mt-5 flex flex-col items-center justify-center rounded-xl border border-dashed border-[#d7ebf5] px-6 py-12 text-center dark:border-white/10">
+                                                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#045C9A]/10 dark:bg-[#045C9A]/25">
+                                                            <Award className="h-6 w-6 text-[#045C9A] dark:text-[#A6D7E8]" />
+                                                        </div>
+                                                        <h4 className="text-[15px] font-extrabold tracking-tight text-[#072036] dark:text-white">
+                                                            {t("skills_vault.certificates.none_title", "No certificates earned yet")}
+                                                        </h4>
+                                                        <p className="mt-1.5 max-w-sm text-[12.5px] text-[#35566b] dark:text-slate-400">
+                                                            {t("skills_vault.certificates.none_desc", "Pass your stage assessments (T2–T4) to earn professional certificates. They'll appear here automatically.")}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </section>
+
+                                            <section className={`overflow-hidden rounded-2xl p-2 sm:p-4 ${SURFACE}`}>
+                                                <CertificateVerification isDashboard={true} />
+                                            </section>
                                         </div>
                                     )}
-                                </div>
 
-                                <div className="overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                    <div className="border-b border-[#d8e6f7] p-5 dark:border-[#1a3884]/20">
-                                        <div className="flex items-center gap-2">
-                                            <Shield className="h-4 w-4 text-emerald-500" />
-                                            <h3 className="text-[15px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                                {t("skills_vault.certificates.verification_title", "Credential Verification")}
-                                            </h3>
-                                        </div>
-                                        <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
-                                            {t("skills_vault.certificates.verification_desc", "Verify any SMAART certificate using its unique ID or QR code.")}
-                                        </p>
-                                    </div>
-                                    <div className="p-3">
-                                        <CertificateVerification isDashboard={true} />
-                                    </div>
-                                </div>
-                            </div>
+                                    {/* ════════ BADGES ════════ */}
+                                    {activeTab === "badges" && (
+                                        <section className={`rounded-2xl p-5 sm:p-6 ${SURFACE}`}>
+                                            <BadgeGallery badges={badges} completedCourses={completedCourses} userName={user?.fullName || "Student"} />
+                                        </section>
+                                    )}
+
+                                    {/* ════════ FLASHCARDS ════════ */}
+                                    {activeTab === "flashcards" && (
+                                        <section className={`rounded-2xl p-5 sm:p-6 ${SURFACE}`}>
+                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                                <SectionTitle
+                                                    title={t("skills_vault.flashcards.title", "Key Flashcards")}
+                                                    subtitle={t("skills_vault.overview.items.flashcards.desc", "Quick-reference cards for quotients and essential terminology.")}
+                                                />
+                                                <div className="relative w-full sm:w-64">
+                                                    <select
+                                                        id="flashcard-category"
+                                                        value={activeFlashcardCategory}
+                                                        onChange={(e) => setActiveFlashcardCategory(e.target.value)}
+                                                        aria-label={t("skills_vault.flashcards.all_categories", "All Categories")}
+                                                        className="h-10 w-full cursor-pointer appearance-none rounded-xl border border-[#d7ebf5] bg-[#F1F5F9] pl-3 pr-9 text-xs font-bold text-[#35566b] outline-none transition-colors focus:border-[#045C9A] focus:ring-2 focus:ring-[#045C9A]/20 dark:border-white/10 dark:bg-[#072036]/60 dark:text-slate-300"
+                                                    >
+                                                        {flashcardFilterOptions.map((cat) => (
+                                                            <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                                </div>
+                                            </div>
+
+                                            {filteredFlashcards.length > 0 ? (
+                                                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                                    {filteredFlashcards.map((card, i) => (
+                                                        <FlashcardItem key={`${card.term}-${i}`} card={card} index={i} />
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="mt-5 flex flex-col items-center justify-center rounded-xl border border-dashed border-[#d7ebf5] px-6 py-12 text-center dark:border-white/10">
+                                                    <Zap className="mb-3 h-8 w-8 text-slate-300 dark:text-slate-600" />
+                                                    <p className="text-[13px] font-semibold text-[#35566b] dark:text-slate-400">
+                                                        {t("skills_vault.flashcards.no_cards_found", "No flashcards found for this category.")}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </section>
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
                         )}
-
-                        {/* ════════ BADGES TAB ════════ */}
-                        {activeTab === "badges" && (
-                            <div className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]">
-                                <BadgeGallery badges={badges} completedCourses={completedCourses} userName={user?.fullName || "Student"} />
-                            </div>
-                        )}
-
-
-                        {/* ════════ FLASHCARDS TAB ════════ */}
-                        {activeTab === "flashcards" && (
-                            <div className="space-y-6">
-                                {/* Header with Filters */}
-                                <div className="flex items-center justify-between flex-wrap gap-4 px-1">
-                                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
-                                        <h3 className="text-[13.5px] font-extrabold uppercase tracking-wider text-[#002147] dark:text-white">
-                                            {t("skills_vault.flashcards.title", "Key Flashcards")}
-                                        </h3>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3 sm:w-auto">
-                                        <div className="relative w-full sm:w-auto">
-                                            <select
-                                                value={activeFlashcardCategory}
-                                                onChange={(e) => setActiveFlashcardCategory(e.target.value)}
-                                                className="w-full appearance-none rounded-xl border border-[#d8e6f7] bg-white px-4 py-2.5 pr-10 text-[12.5px] font-bold text-[#0d1f4e] shadow-sm outline-none transition-all hover:border-[#1a3884]/30 focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/20 sm:w-auto dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white"
-                                            >
-                                                {flashcardFilterOptions.map((cat) => (
-                                                    <option key={cat.id} value={cat.id}>
-                                                        {cat.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {filteredFlashcards.length > 0 ? (
-                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                        {filteredFlashcards.map((card, i) => (
-                                            <FlashcardItem key={i} card={card} index={i} />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12 bg-white dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-white/5">
-                                        <Zap className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                                        <h3 className="text-[14px] font-semibold text-slate-500 dark:text-slate-400 mb-2">
-                                            {t("skills_vault.flashcards.no_cards_found", "No flashcards found for this category.")}
-                                        </h3>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                    </motion.div>
-                </AnimatePresence>
+                    </div>
+                </main>
             </div>
-        </div>
+        </PageTransition>
     );
 };
 
-/* ── Flashcard Card Component ── */
+/* ── Flashcard ── */
 const FlashcardItem = ({ card, index }) => {
     const { t } = useTranslation();
     const [flipped, setFlipped] = useState(false);
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            onClick={() => setFlipped(!flipped)}
-            className="group relative h-[180px] cursor-pointer perspective"
-            style={{ perspective: "1000px" }}
+            transition={{ delay: Math.min(index, 8) * 0.04, duration: 0.3, ease: EASE }}
+            className="[perspective:1200px]"
         >
-            <div
-                className={`relative h-full w-full transition-transform duration-500 preserve-3d ${flipped ? "rotate-y-180" : ""}`}
-                style={{ transformStyle: "preserve-3d", transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
+            <button
+                type="button"
+                onClick={() => setFlipped((v) => !v)}
+                aria-pressed={flipped}
+                className="group relative block h-[176px] w-full text-left"
             >
-                {/* Front */}
                 <motion.div
-                    className="absolute inset-0 flex flex-col justify-between rounded-2xl border border-[#d8e6f7] bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-[#1a3884]/20 dark:bg-[#001630]"
-                    style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
-                    animate={{ opacity: flipped ? 0 : 1 }}
+                    animate={{ rotateY: flipped ? 180 : 0 }}
+                    transition={{ duration: 0.5, ease: EASE }}
+                    style={{ transformStyle: "preserve-3d" }}
+                    className="relative h-full w-full"
                 >
-                    <div className="flex justify-center">
-                        <span className="rounded-md border border-blue-200 bg-[#eef4ff] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#1a3884] dark:border-blue-500/20 dark:bg-[#1a3884]/20 dark:text-blue-400">
-                            {card.category}
+                    {/* Front */}
+                    <div
+                        style={{ backfaceVisibility: "hidden" }}
+                        className={`absolute inset-0 flex flex-col justify-between rounded-xl p-4 transition-colors group-hover:border-[#045C9A]/40 ${PANEL}`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider ${CHIP_BRAND}`}>
+                                {card.category}
+                            </span>
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                                {t("skills_vault.flashcards.tap_reveal", "Tap to reveal")}
+                            </span>
+                        </div>
+                        <h4 className="text-[16px] font-extrabold leading-tight tracking-tight text-[#072036] dark:text-white">{card.term}</h4>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8]">
+                            <Zap className="h-3.5 w-3.5" />
+                            {t("skills_vault.flashcards.key_term", "Key term")}
                         </span>
                     </div>
-                    <div className="flex items-center justify-center">
-                        <h4 className="text-center text-[15px] font-extrabold leading-tight text-[#0d1f4e] dark:text-white">
-                            {card.term}
-                        </h4>
-                    </div>
-                    <div className="flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 transition-colors group-hover:text-[#1a3884] dark:group-hover:text-blue-400">
-                        <Zap className="h-3 w-3" /> {t("skills_vault.flashcards.tap_reveal", "Tap to reveal")}
-                    </div>
-                </motion.div>
 
-                {/* Back */}
-                <motion.div
-                    className="absolute inset-0 flex flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#001630] p-5 shadow-lg"
-                    style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                    animate={{ opacity: flipped ? 1 : 0 }}
-                >
-                    <p className="text-center text-[13px] font-medium leading-relaxed text-blue-50">
-                        {card.definition}
-                    </p>
-                    <div className="mt-4 border-t border-white/10 pt-3 text-center text-[9px] font-bold uppercase tracking-wider text-blue-300/50">
-                        {t("skills_vault.flashcards.flip_back", "Flip Back")}
+                    {/* Back */}
+                    <div
+                        style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                        className="absolute inset-0 flex flex-col justify-between rounded-xl border border-[#045C9A]/30 bg-[#072036] p-4 text-white dark:bg-[#045C9A]/25"
+                    >
+                        <p className="text-[12.5px] leading-relaxed text-white/90">{card.definition}</p>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#A6D7E8]">
+                            {t("skills_vault.flashcards.flip_back", "Flip Back")}
+                        </span>
                     </div>
                 </motion.div>
-            </div>
+            </button>
         </motion.div>
     );
 };

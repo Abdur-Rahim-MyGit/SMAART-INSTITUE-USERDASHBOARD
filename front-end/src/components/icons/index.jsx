@@ -4,7 +4,7 @@
 // component it replaced, so existing JSX such as <Search className="w-4 h-4" />
 // keeps working untouched.
 //
-// The font is subsetted: index.html requests exactly the 144 ligature names
+// The font is subsetted: index.html requests exactly the 145 ligature names
 // listed in ICON_NAMES below (79 KB instead of the full 3.8 MB face). If you add
 // an icon here you MUST add its name to the icon_names list in index.html, or it
 // will render as literal text. In development the console warns when that happens.
@@ -166,6 +166,7 @@ export const ICON_NAMES = Object.freeze([
   "star",
   "sticky_note_2",
   "support_agent",
+  "tag",
   "target",
   "terminal",
   "text_fields",
@@ -445,3 +446,4 @@ export const Sticker = /*#__PURE__*/ icon("Sticker", "add_reaction");
 export const Type = /*#__PURE__*/ icon("Type", "text_fields");
 export const Undo2 = /*#__PURE__*/ icon("Undo2", "undo");
 export const Share = /*#__PURE__*/ icon("Share", "share");
+export const Hash = /*#__PURE__*/ icon("Hash", "tag");

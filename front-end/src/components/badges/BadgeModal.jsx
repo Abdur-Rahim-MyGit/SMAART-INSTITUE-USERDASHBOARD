@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, ExternalLink, CheckCircle2, Sparkles, ShieldCheck } from 'lucide-react';
+import { X, Download, ExternalLink, CheckCircle2, Sparkles, ShieldCheck } from "@/components/icons";
 import { FaLinkedin, FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
@@ -130,8 +130,8 @@ const tierStyles = {
     },
     standard: {
         bg: 'bg-blue-50 dark:bg-blue-900/20',
-        color: 'text-[#1a3884] dark:text-blue-400',
-        textColor: 'text-[#1a3884] dark:text-teal-400'
+        color: 'text-[#045C9A] dark:text-[#A6D7E8]',
+        textColor: 'text-[#045C9A] dark:text-[#A6D7E8]'
     }
 };
 
@@ -245,7 +245,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.96, opacity: 0, y: 12 }}
                         transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-                        className="max-h-[92vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.25)] border border-slate-100 dark:border-white/10 scrollbar-thin"
+                        className="max-h-[92vh] overflow-y-auto bg-white dark:bg-[#072036] rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.25)] border border-slate-100 dark:border-white/10 scrollbar-thin"
                     >
                         {/* Close Button */}
                         <button
@@ -480,7 +480,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('linkedin')}
                                     disabled={isSharing}
                                     title="Share on LinkedIn"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#045C9A]/5 hover:bg-[#045C9A] text-[#045C9A] hover:text-white transition-all duration-200 border border-[#045C9A]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaLinkedin className="w-4 h-4" />
                                 </button>
@@ -488,7 +488,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('whatsapp')}
                                     disabled={isSharing}
                                     title="Share on WhatsApp"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#045C9A]/5 hover:bg-[#045C9A] text-[#045C9A] hover:text-white transition-all duration-200 border border-[#045C9A]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaWhatsapp className="w-4.5 h-4.5" />
                                 </button>
@@ -496,7 +496,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('instagram')}
                                     disabled={isSharing}
                                     title="Copy Link for Instagram"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#045C9A]/5 hover:bg-[#045C9A] text-[#045C9A] hover:text-white transition-all duration-200 border border-[#045C9A]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaInstagram className="w-4.5 h-4.5" />
                                 </button>
@@ -506,7 +506,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                             <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto w-full">
                                 <button
                                     onClick={handleDownloadCertificate}
-                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a3884] hover:bg-[#132c6b] text-white text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-sm"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#045C9A] hover:bg-[#034a7d] text-white text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-sm"
                                 >
                                     <Download className="w-3.5 h-3.5" /> Download Badge
                                 </button>
@@ -514,7 +514,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     href={verificationUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[#1a3884] dark:text-blue-400 text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 hover:border-[#1a3884]/30 hover:bg-[#1a3884]/5 dark:hover:bg-[#1a3884]/10 text-center"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[#045C9A] dark:text-[#A6D7E8] text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 hover:border-[#045C9A]/30 hover:bg-[#045C9A]/5 dark:hover:bg-[#045C9A]/10 text-center"
                                 >
                                     <ShieldCheck className="w-3.5 h-3.5" /> Verify Badge
                                 </a>

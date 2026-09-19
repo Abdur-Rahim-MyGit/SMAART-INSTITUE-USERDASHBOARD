@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Sparkles, Lock } from 'lucide-react';
+import { CheckCircle2, Sparkles, Lock } from "@/components/icons";
 import { toast } from 'sonner';
 
 /* ────────────────────────────────────────────────
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 const MODULE_PALETTE = {
     'capacity': {
         hex: '#1a3884', ribbon: '#0d2059', text: '#FFFFFF',
-        label: '#b3c6f5', glow: 'rgba(26,56,132,0.55)', tick: '#7aa3f0',
+        label: '#b3c6f5', glow: 'rgba(4,92,154,0.55)', tick: '#7aa3f0',
     },
     'capability': {
         hex: '#1750b3', ribbon: '#0f3d8c', text: '#FFFFFF',
@@ -32,7 +32,7 @@ const MODULE_PALETTE = {
     },
     'default': {
         hex: '#1a3884', ribbon: '#0d2059', text: '#FFFFFF',
-        label: '#b3c6f5', glow: 'rgba(26,56,132,0.55)', tick: '#7aa3f0',
+        label: '#b3c6f5', glow: 'rgba(4,92,154,0.55)', tick: '#7aa3f0',
     },
 };
 
@@ -227,10 +227,10 @@ const BadgeCard = ({ badge, isLocked = false, onClick }) => {
                 onClick?.(badge);
             }}
             className={`group relative flex flex-col items-center cursor-pointer
-                       rounded-2xl border border-[#d8e6f7] bg-white
+                       rounded-2xl border border-[#d7ebf5] bg-white
                        px-4 pt-6 pb-4 shadow-sm
-                       ${isLocked ? 'opacity-80' : 'hover:shadow-[0_8px_32px_rgba(26,56,132,0.14)] hover:border-[#1a3884]/30'}
-                       dark:border-[#1a3884]/20 dark:bg-[#001630]
+                       ${isLocked ? 'opacity-80' : 'hover:shadow-[0_8px_32px_rgba(4,92,154,0.14)] hover:border-[#045C9A]/30'}
+                       dark:border-[#045C9A]/20 dark:bg-[#0d3a5f]
                        transition-all duration-300 overflow-hidden`}
             style={{ minHeight: 290 }}
         >
@@ -259,8 +259,8 @@ const BadgeCard = ({ badge, isLocked = false, onClick }) => {
             {/* Course name below badge */}
             <h4
                 className={`relative z-10 text-center text-[13px] font-extrabold leading-snug
-                           text-[#0d1f4e] dark:text-white
-                           ${isLocked ? '' : 'group-hover:text-[#1a3884] dark:group-hover:text-blue-300'}
+                           text-[#072036] dark:text-white
+                           ${isLocked ? '' : 'group-hover:text-[#045C9A] dark:group-hover:text-[#A6D7E8]'}
                            transition-colors duration-200 px-1 mb-1`}
             >
                 {shortTitle}
@@ -281,7 +281,7 @@ const BadgeCard = ({ badge, isLocked = false, onClick }) => {
 
             {/* Footer: Verified or Locked */}
             <div className="relative z-10 mt-auto flex w-full items-center justify-center
-                            border-t border-[#d8e6f7] dark:border-[#1a3884]/20 pt-2.5">
+                            border-t border-[#d7ebf5] dark:border-[#045C9A]/20 pt-2.5">
                 {isLocked ? (
                     <span className="flex items-center gap-1.5 text-[9px] font-extrabold
                                      uppercase tracking-widest text-slate-400 dark:text-slate-500">

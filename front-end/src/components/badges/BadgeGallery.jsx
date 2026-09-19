@@ -170,7 +170,7 @@ const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <Loader2 className="w-8 h-8 animate-spin text-teal-600 dark:text-teal-400" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#045C9A] dark:text-[#A6D7E8]" />
             </div>
         );
     }
