@@ -479,7 +479,7 @@
   :root { --r-card: 14px; --r-inner: 10px; --r-ctl: 8px; --r-chip: 6px; }
   body { font-size: 13.5px; }
   .dash-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-  .dash-name span { color: var(--accent-text); font-weight: 800; letter-spacing: 0.02em; }
+  .dash-name span { color: var(--text1); font-weight: 800; letter-spacing: 0.02em; }
   .dash-meta { font-size: 12.5px; font-weight: 500; }
   .btn-ghost, .btn-primary { border-radius: var(--r-ctl); font-weight: 600; font-size: 12.5px; }
   .btn-icon { border-radius: var(--r-ctl); }
@@ -557,6 +557,18 @@
   .foot { font-size: 12px; font-weight: 400; line-height: 1.5; }
   .score-ring b { font-size: 16px; font-weight: 700; }
   .rs-tab { font-size: 13px; font-weight: 500; } .rs-tab.active { font-weight: 600; }
+  /* Degree-fit card: compact, one row per fact */
+  .fit { display: flex; flex-direction: column; gap: 10px; }
+  .fit-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .fit-head .dp-card-title { font-size: 14.5px; }
+  .fit-head .dp-card-sub { margin-top: 0; }
+  .fit-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 820px) { .fit-body { grid-template-columns: 1fr; } }
+  .fit-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: var(--r-inner); background: var(--card); border: 1px solid var(--border); }
+  .fit-item .ms { color: var(--accent-text); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .fit-item b { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .fit-item span { font-size: 13px; line-height: 1.5; color: var(--text2); }
+  .dp-card.tint.fitcard { padding: 14px 18px; }
 
   @media (max-width: 900px) {
     .sidebar { display: none; }
@@ -916,8 +928,10 @@
   function renderRole() {
     var c = mk(), h = '';
     var r = c ? ROLE.m[c] : null;
-    if (r) h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div><div class="dp-card-title">How this role fits your degree in ' + esc(M(c).name) + '</div><div class="dp-card-sub">Known locally as ' + esc(localRole(c)) + '</div></div></div><div class="dp-rule"></div><div class="fit-row"><span class="dchip ' + r.tone + '"><span class="ms">shield</span>' + esc(r.fit) + '</span><p class="dp-text">' + esc(r.rationale) + '</p></div><div class="fit-note"><span class="ms">lightbulb</span><span><strong style="font-weight:600;color:var(--text1)">Skill to bridge — </strong>' + esc(r.bridge) + '</span></div></div>';
-    else h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div class="dp-card-title">How this role fits your degree</div></div><div class="dp-rule"></div><div class="fit-row"><span class="dchip ok"><span class="ms">shield</span>Direct fit</span><p class="dp-text">A B.Com in Business Analytics maps directly to reporting and BI roles: commerce knowledge plus Excel, SQL and one BI tool is the standard entry profile. Fit varies abroad, so select a market to see what changes.</p></div></div>';
+    var fitTitle = 'How this role fits your degree' + (r ? ' in ' + esc(M(c).name) : ''), fitChip = r ? '<span class="dchip ' + r.tone + '"><span class="ms">shield</span>' + esc(r.fit) + '</span>' : '<span class="dchip ok"><span class="ms">shield</span>Direct fit</span>';
+    var fitWhy = r ? r.rationale : 'A B.Com in Business Analytics maps directly to reporting and BI roles: commerce knowledge plus Excel, SQL and one BI tool is the standard entry profile. Select a market to see what changes abroad.';
+    var fitBridge = r ? r.bridge : 'Python for automation and a portfolio of two or three published dashboards lift you from reporting work into analytics roles.';
+    h += '<div class="dp-card tint fitcard"><div class="fit"><div class="fit-head"><div style="display:flex;align-items:center;gap:10px;min-width:0"><span class="ms" style="color:var(--accent-text)">school</span><div><div class="dp-card-title">' + fitTitle + '</div>' + (r ? '<div class="dp-card-sub">Known locally as ' + esc(localRole(c)) + '</div>' : '') + '</div></div>' + fitChip + '</div><div class="fit-body"><div class="fit-item"><span class="ms">verified</span><div><b>Why it fits</b><span>' + esc(fitWhy) + '</span></div></div><div class="fit-item"><span class="ms">lightbulb</span><div><b>Skill to bridge</b><span>' + esc(fitBridge) + '</span></div></div></div></div></div>';
     h += '<div class="dp-grid-2">' +
       card('work', 'What this role does', '', '<p class="dp-text">' + esc(ROLE.definition.replace('A Data Analyst', 'A ' + roleName())) + '</p>') +
       card('checklist', 'Roles and responsibilities', '', '<ul class="checks">' + ROLE.duties.map(function (d) { return '<li><span class="ms">check_circle</span><span>' + esc(d) + '</span></li>'; }).join('') + '</ul>') +
