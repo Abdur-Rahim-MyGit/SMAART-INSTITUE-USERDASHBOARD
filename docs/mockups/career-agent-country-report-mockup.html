@@ -170,6 +170,13 @@
   .pill .ms { color: var(--accent-text); font-size: 16px; }
 
 
+  /* ── Path tabs: label above the full direction name, never truncated ── */
+  .role-tabs-bar { gap: 8px; }
+  .rtab { flex-direction: column; align-items: flex-start; gap: 5px; max-width: 300px; min-width: 0; padding: 8px 12px 10px; white-space: normal; overflow: visible; text-overflow: clip; }
+  .rtab > span:last-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: left; line-height: 1.3; font-size: 13px; white-space: normal !important; }
+  .rtab .rtab-k { align-self: flex-start; }
+  .rtab.active > span:last-child { color: var(--accent-text); }
+
   /* ── Market selector ── */
   .dash-strip { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .mkt { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; flex-shrink: 0; }
