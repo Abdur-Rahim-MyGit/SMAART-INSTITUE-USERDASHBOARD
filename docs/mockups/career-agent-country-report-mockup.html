@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Career Intelligence Report</title>
+<title>SMAART Career Intelligence Report</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_circle,apartment,arrow_back,arrow_downward,arrow_forward,arrow_upward,auto_awesome,badge,bar_chart,bolt,build,business_center,campaign,card_membership,check_circle,checklist,currency_rupee,dark_mode,diversity_3,eco,explore,flag,gavel,genetics,grid_on,groups,handshake,how_to_reg,info,keyboard_arrow_down,light_mode,lightbulb,local_fire_department,map,memory,military_tech,payments,person,progress_activity,psychology,public,radio_button_unchecked,record_voice_over,refresh,route,schedule,school,shield,smart_toy,speed,star,sticky_note_2,translate,trending_flat,trending_up,verified,work,workspace_premium&display=block">
 <style>
@@ -471,6 +471,93 @@
   .cov-chips span { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 6px; border-radius: 5px; background: var(--card2); border: 1px solid var(--border); color: var(--muted); }
   .cov-chips span.on { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent-text); }
 
+  /* ═══════════ TYPE & SPACING SYSTEM (final pass, wins over everything above) ═══════════
+     Sizes:   page title 18 · section title 16 · card title 15 · body 13.5 · support 12.5 · label 11
+     Weights: 700 titles · 600 card titles, chips, labels · 500 UI text · 400 body
+     Colours: text1 headings · text2 body · muted support · accent only for emphasis and interaction
+     Radii:   card 14 · inner 10 · control 8 · chip 6 */
+  :root { --r-card: 14px; --r-inner: 10px; --r-ctl: 8px; --r-chip: 6px; }
+  body { font-size: 13.5px; }
+  .dash-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .dash-name span { color: var(--accent-text); font-weight: 800; letter-spacing: 0.02em; }
+  .dash-meta { font-size: 12.5px; font-weight: 500; }
+  .btn-ghost, .btn-primary { border-radius: var(--r-ctl); font-weight: 600; font-size: 12.5px; }
+  .btn-icon { border-radius: var(--r-ctl); }
+  .rtab .rtab-k { border-radius: 4px; font-weight: 700; }
+  .rtab > span:last-child { font-weight: 500; }
+  .rtab.active > span:last-child { font-weight: 600; }
+  .mkt .mkt-select { border-radius: var(--r-ctl); font-weight: 500; color: var(--text1); }
+
+  .sb-label, .dp-eyebrow, .stat-k, .term-k, .rcard-k, .split-h, .salary-label-k, .stage-k, th, .cert-skill b, .rs-label, .mkt-label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .sb-role-name { font-size: 13.5px; font-weight: 600; }
+  .sb-role-dir, .sb-current-name { font-size: 12.5px; }
+  .sb-current-name { font-weight: 600; color: var(--text1); }
+  .sitem { font-size: 13px; font-weight: 500; border-radius: var(--r-inner); }
+  .sitem.active { font-weight: 600; }
+
+  .ph h2 { font-size: 16px; font-weight: 700; }
+  .ph .ctx { font-size: 12.5px; font-weight: 500; }
+  .ph-tile, .dp-tile, .stat-ic { border-radius: var(--r-inner); }
+
+  .dp-card { border-radius: var(--r-card); }
+  .dp-card-title { font-size: 15px; font-weight: 600; }
+  .dp-card-sub { font-size: 12.5px; font-weight: 500; }
+  .dp-text { font-size: 13.5px; font-weight: 400; line-height: 1.65; color: var(--text2); }
+  .stat { border-radius: var(--r-card); }
+  .stat-v { font-size: 20px; font-weight: 700; }
+  .stat-v.sm { font-size: 14px; font-weight: 600; }
+  .stat-s { font-size: 12px; font-weight: 400; }
+  .mkt-card > .dp-card-head { border-radius: var(--r-card) var(--r-card) 0 0; }
+
+  .dchip { border-radius: var(--r-chip); font-size: 12px; font-weight: 600; height: 24px; padding: 0 9px; }
+  .pill { border-radius: var(--r-ctl); font-size: 13px; font-weight: 500; min-height: 30px; padding: 5px 11px; }
+  .code { border-radius: var(--r-chip); font-size: 10.5px; font-weight: 700; }
+  .fbtn { font-weight: 600; font-size: 12px; }
+
+  th { padding-bottom: 9px; }
+  td { font-size: 13px; }
+  .country { font-weight: 600; font-size: 13.5px; }
+  .country small { font-weight: 400; font-size: 11.5px; }
+  .local { font-weight: 600; color: var(--text1); }
+  .muted { font-size: 12.5px; font-weight: 400; }
+  .range-labels { font-size: 13px; font-weight: 600; }
+  .range-labels span:last-child { color: var(--text1); }
+  .range-inr { font-size: 11.5px; font-weight: 500; }
+  .range-inr > span:first-child { color: var(--accent-text); font-weight: 600; }
+  .adverts { font-size: 14px; font-weight: 700; }
+  .delta { font-size: 12px; font-weight: 600; }
+  .pct { font-size: 13px; font-weight: 700; }
+  .legend { font-size: 12px; font-weight: 500; }
+
+  .term, .value, .trait, .notes li, .rm-item, .stage, .rcard, .cert-card { border-radius: var(--r-inner); }
+  .term-v { font-size: 14px; font-weight: 600; }
+  .term-s, .value span, .trait span, .notes span, .stage-alias, .rcard-fam, .cert-prov, .cert-skill, .cert-dur, .range-note { font-size: 12.5px; font-weight: 400; line-height: 1.5; color: var(--muted); }
+  .notes span { color: var(--text2); }
+  .value b, .trait b, .notes b, .task b { font-size: 13.5px; font-weight: 600; color: var(--text1); }
+  .checks li, .task { font-size: 13.5px; font-weight: 400; line-height: 1.55; color: var(--text2); }
+  .split-h { padding-bottom: 8px; }
+  .stage-title, .rcard-name, .cert-name { font-size: 14.5px; font-weight: 600; line-height: 1.35; }
+  .stage-row { font-size: 12.5px; font-weight: 400; }
+  .stage-row b { font-weight: 600; }
+  .stage-inr, .salary-label-i { font-size: 12px; font-weight: 500; }
+  .stage-prog { font-size: 12px; font-weight: 500; }
+  .rm-item .nm { font-size: 12.5px; font-weight: 500; }
+  .rm-btn { font-size: 11px; font-weight: 600; border-radius: var(--r-chip); }
+  .track-btn { font-size: 12px; font-weight: 600; }
+  .rcard p { font-size: 13px; font-weight: 400; line-height: 1.55; }
+  .overlap b { font-size: 13px; font-weight: 700; }
+  .mini span, .stage-skills span { font-size: 11.5px; font-weight: 500; border-radius: var(--r-chip); }
+  .cov-chips span { font-size: 10px; font-weight: 700; border-radius: 4px; }
+  .matrix td.sk { font-size: 13px; font-weight: 500; }
+  .matrix tr.cat td { font-size: 11px; font-weight: 600; }
+  .cov-bar b { font-size: 12px; font-weight: 700; } .cov-bar span { font-size: 11.5px; font-weight: 400; }
+  .salary-label-v { font-size: 15px; font-weight: 700; }
+  .city { font-size: 13px; font-weight: 500; } .city span:last-child { font-weight: 600; color: var(--text1); }
+  .hint { font-size: 13px; font-weight: 400; border-radius: var(--r-inner); }
+  .foot { font-size: 12px; font-weight: 400; line-height: 1.5; }
+  .score-ring b { font-size: 16px; font-weight: 700; }
+  .rs-tab { font-size: 13px; font-weight: 500; } .rs-tab.active { font-weight: 600; }
+
   @media (max-width: 900px) {
     .sidebar { display: none; }
     .dash-header { padding: 14px 16px 0; }
@@ -491,7 +578,7 @@
   <header class="dash-header">
     <div class="dash-top">
       <div class="dash-title-wrap">
-        <div class="dash-name">Career <span>Intelligence</span> Report</div>
+        <div class="dash-name"><span>SMAART</span> Career Intelligence Report</div>
         <div class="dash-meta">
           <span class="dash-meta-name">Amirtha</span>
           <span class="dash-meta-sep"></span><span>amirtha@gmail.com</span>
