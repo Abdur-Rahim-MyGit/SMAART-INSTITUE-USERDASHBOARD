@@ -215,6 +215,29 @@
   .range-inr span:last-child { color: var(--muted); font-weight: 500; }
   .mobile-nav { flex-wrap: wrap; }
 
+  /* ── Compact header ── */
+  .dash-header { padding: 12px 24px 0; }
+  .dash-top { margin-bottom: 6px; gap: 10px; }
+  .dash-name { font-size: 18px; }
+  .dash-meta { font-size: 12.5px; }
+  .btn-ghost, .btn-primary, .btn-icon { height: 36px; }
+  .btn-ghost, .btn-primary { padding: 0 12px; font-size: 12.5px; }
+  .btn-icon { width: 36px; }
+  .dash-strip { align-items: center; gap: 10px; }
+  .role-tabs-bar { gap: 6px; }
+  .rtab { max-width: 240px; padding: 6px 10px 8px; gap: 3px; }
+  .rtab .rtab-k { font-size: 10px; padding: 1px 5px; }
+  .rtab > span:last-child { font-size: 12.5px; line-height: 1.25; }
+  .mkt { padding-bottom: 6px; gap: 6px; }
+  .mkt .mkt-select { min-width: 150px; height: 32px; font-size: 12.5px; padding: 0 30px 0 32px; border-radius: 8px; }
+  .mkt-wrap .ms { font-size: 17px; right: 8px; }
+  .mkt-wrap .ms.lead { left: 9px; }
+  .dash-main { padding: 18px 24px 36px; }
+  .ph { padding-bottom: 12px; margin-bottom: 16px; }
+  .ph-tile { width: 36px; height: 36px; }
+  .ph h2 { font-size: 17px; }
+  .sb-header { padding: 14px 16px; }
+
   /* ── Market selector ── */
   .dash-strip { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .dash-strip .role-tabs-bar { flex: 0 1 auto; min-width: 0; }
@@ -488,14 +511,12 @@
         <button class="rtab" type="button"><span class="rtab-k">Tertiary</span><span>Marketing &amp; Customer Analytics</span></button>
       </div>
       <div class="mkt hide-mobile">
-        <span class="mkt-label">Market</span>
-        <div class="mkt-wrap">
+        <div class="mkt-wrap" title="Market">
           <span class="ms lead">public</span>
           <select class="mkt-select" id="market" aria-label="Select market"></select>
           <span class="ms">keyboard_arrow_down</span>
         </div>
-        <span class="mkt-label" style="margin-left:8px">Role</span>
-        <div class="mkt-wrap">
+        <div class="mkt-wrap" title="Role">
           <span class="ms lead">work</span>
           <select class="mkt-select" id="role" aria-label="Select role"></select>
           <span class="ms">keyboard_arrow_down</span>
