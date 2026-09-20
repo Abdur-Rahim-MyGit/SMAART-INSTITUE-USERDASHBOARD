@@ -183,6 +183,38 @@
   tr.rowlink { cursor: pointer; }
   tr.rowlink:hover td b { color: var(--accent-text); }
 
+  /* ── Professional pass: quieter chips, hero cards, tinted market card ── */
+  .dchip { text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; height: 26px; }
+  .dchip.brand { font-weight: 600; }
+  .dp-card.hero { border-color: var(--border2); box-shadow: 0 1px 2px rgba(7,32,54,0.04), 0 8px 24px rgba(7,32,54,0.05); }
+  .mkt-card { border-color: var(--accent-border); padding-top: 0; }
+  .mkt-card > .dp-card-head { margin: 0 -24px 14px; padding: 14px 24px; background: var(--accent-tint); border-bottom: 1px solid var(--accent-border); border-radius: 16px 16px 0 0; }
+  .mkt-card > .dp-card-head .dp-tile { background: var(--card); }
+  .mkt-card > .dp-rule { display: none; }
+  @media (max-width: 900px) { .mkt-card > .dp-card-head { margin: 0 -16px 14px; padding: 12px 16px; } }
+  .ph { align-items: center; }
+  .ph .ctx { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 500; }
+  .ph .ctx b { color: var(--text2); font-weight: 600; }
+  .ph .ctx i { width: 3px; height: 3px; border-radius: 50%; background: var(--border2); display: inline-block; }
+  .sb-current { display: flex; align-items: center; gap: 8px; padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .sb-current-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--text1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sb-change { border: none; background: none; color: var(--accent-text); font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
+  .sb-change:hover { text-decoration: underline; }
+  .mkt .mkt-select { min-width: 170px; }
+  .stage-prog { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .stage-prog .meter { flex: 1; }
+  .stage-prog b { color: var(--text1); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .trk { border-top: 1px solid var(--border); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .track-btn { width: 100%; border: none; background: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--accent-text); }
+  .track-btn .ms { font-size: 18px; transition: transform 0.15s; }
+  .trk.open .track-btn .ms { transform: rotate(180deg); }
+  .matrix th.mk, .matrix td.mk { width: 58px; }
+  .dot { width: 14px; height: 14px; } .dot.none { width: 6px; height: 6px; }
+  .range-inr { justify-content: space-between; gap: 10px; font-size: 11.5px; }
+  .range-inr > span { white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; }
+  .range-inr span:last-child { color: var(--muted); font-weight: 500; }
+  .mobile-nav { flex-wrap: wrap; }
+
   /* ── Market selector ── */
   .dash-strip { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .mkt { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; flex-shrink: 0; }
@@ -240,13 +272,13 @@
   tbody tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   .country { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text1); white-space: nowrap; }
   .code { width: 38px; height: 28px; border-radius: 6px; background: var(--accent-tint); border: 1px solid var(--accent-border); color: var(--accent-text); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; display: grid; place-items: center; flex-shrink: 0; }
-  .country small { display: block; font-weight: 500; color: var(--muted); font-size: 11.5px; }
+  .country small { display: block; font-weight: 500; color: var(--muted); font-size: 11.5px; white-space: normal; max-width: 150px; line-height: 1.35; }
   .n { width: 26px; height: 26px; border-radius: 7px; background: var(--accent-tint); color: var(--accent-text); font-size: 11px; font-weight: 700; display: inline-grid; place-items: center; margin-right: 10px; vertical-align: middle; }
   .local { font-weight: 600; color: var(--accent-text); }
   .muted { color: var(--muted); font-size: 12px; }
 
   /* ── Salary ── */
-  .range { display: grid; gap: 6px; min-width: 240px; }
+  .range { display: grid; gap: 6px; min-width: 300px; }
   .range-labels { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--text1); }
   .range-labels span:last-child { color: var(--accent-text); }
   .track { position: relative; height: 6px; border-radius: 6px; background: var(--border); }
@@ -461,17 +493,27 @@
           <select class="mkt-select" id="market" aria-label="Select market"></select>
           <span class="ms">keyboard_arrow_down</span>
         </div>
+        <span class="mkt-label" style="margin-left:8px">Role</span>
+        <div class="mkt-wrap">
+          <span class="ms lead">work</span>
+          <select class="mkt-select" id="role" aria-label="Select role"></select>
+          <span class="ms">keyboard_arrow_down</span>
+        </div>
       </div>
     </div>
   </header>
 
   <div class="mobile-nav">
-    <div class="mkt-wrap" style="flex:1">
+    <div class="mkt-wrap" style="flex:1 1 100%">
+      <select class="mkt-select" id="section-m" aria-label="Select section"></select>
+      <span class="ms">keyboard_arrow_down</span>
+    </div>
+    <div class="mkt-wrap" style="flex:1 1 45%">
       <select class="mkt-select" id="market-m" aria-label="Select market (mobile)"></select>
       <span class="ms">keyboard_arrow_down</span>
     </div>
-    <div class="mkt-wrap" style="flex:1">
-      <select class="mkt-select" id="section-m" aria-label="Select section"></select>
+    <div class="mkt-wrap" style="flex:1 1 45%">
+      <select class="mkt-select" id="role-m" aria-label="Select role (mobile)"></select>
       <span class="ms">keyboard_arrow_down</span>
     </div>
   </div>
@@ -482,6 +524,7 @@
         <div class="sb-label">Active career direction</div>
         <div class="sb-role-indicator"><div class="sb-role-dot"></div><div class="sb-role-name" title="Business Intelligence &amp; Data Visualization">Business Intelligence &amp; Data Visualization</div></div>
         <div class="sb-role-dir">Primary path · 10 job roles</div>
+        <div class="sb-current"><span class="sb-label">Role</span><span class="sb-current-name" id="sb-role">Data Analyst</span><button class="sb-change" type="button" id="sb-change">Change</button></div>
       </div>
       <div class="sidebar-nav" id="sidebar-nav">
         <div class="sb-label">Report sections</div>
@@ -708,7 +751,7 @@
     { id: 'green', label: 'Green Jobs', icon: 'eco', sub: 'Sustainability roles this profile can move into' },
     { id: 'certs', label: 'Certifications', icon: 'card_membership', sub: 'Credentials employers recognise, and where' }
   ];
-  var state = { market: 'IN', section: 'direction', role: 0, skillView: 'map', skillFilter: 'all', progress: {} };
+  var state = { market: 'IN', section: 'direction', role: 0, skillView: 'map', skillFilter: 'all', progress: {}, openStages: {} };
   try {
     var saved = JSON.parse(localStorage.getItem('ca-report-state') || '{}');
     if (saved.market && (saved.market === 'ALL' || IDX[saved.market] !== undefined)) state.market = saved.market;
@@ -735,7 +778,8 @@
   function mktCard(icon, title, sub, body) { return card(icon, title, sub, body, 'mkt-card'); }
   function pickHint(text) { return '<div class="hint"><span class="ms">public</span><span>' + text + ' Choose a market from the <b>Market</b> dropdown in the header.</span></div>'; }
   function panelHead(sec) {
-    return '<div class="ph"><div class="ph-left"><div class="ph-tile"><span class="ms">' + sec.icon + '</span></div><div class="ph-text"><h2>' + esc(sec.label) + '</h2><p>' + esc(sec.sub) + '</p></div></div><div class="ph-right"><span class="dchip brand"><span class="ms">public</span>Viewing: ' + esc(mkName()) + '</span></div></div>';
+    var ctx = (sec.id === 'direction' ? '<b>Business Intelligence &amp; Data Visualization</b>' : '<b>' + esc(roleName()) + '</b><i></i>Business Intelligence &amp; Data Visualization') + '<i></i>' + esc(mkName());
+    return '<div class="ph"><div class="ph-left"><div class="ph-tile"><span class="ms">' + sec.icon + '</span></div><div class="ph-text"><h2>' + esc(sec.label) + '</h2><div class="ctx">' + ctx + '</div></div></div></div>';
   }
   function titleWrap(eyebrow, title, fam, chips) { return '<div class="dp-title-wrap"><div class="dp-eyebrow">' + esc(eyebrow) + '<span class="dp-eyebrow-rule"></span></div><h3 class="rp-title">' + title + '</h3>' + (fam ? '<div class="rp-family">' + fam + '</div>' : '') + (chips ? '<div class="dp-chips">' + chips + '</div>' : '') + '</div>'; }
   function demandChip(d) { return '<span class="dchip ' + chipTone(d) + '">' + d + '</span>'; }
@@ -746,15 +790,14 @@
   /* ═══════════════════════ 1. DIRECTION ═══════════════════════ */
   function renderDirection() {
     var c = mk(), h = '';
-    h += titleWrap('Career direction', 'Business Intelligence &amp; Data Visualization', null, '<span class="dchip brand">Primary path</span><span class="dchip">10 job roles</span><span class="dchip">B.Com · Business Analytics</span>');
-    h += card('map', 'Direction overview', 'What this career direction is about', '<p class="dp-text">' + esc(DIRECTION.description) + '</p><div class="dp-rule" style="margin:14px 0"></div><div class="dp-eyebrow" style="margin-bottom:8px">Job families in this direction</div><div class="pills">' + DIRECTION.families.map(function (f) { return '<span class="pill"><span class="ms">business_center</span>' + esc(f) + '</span>'; }).join('') + '</div>');
+    h += card('map', 'Direction overview', 'Primary path · 10 job roles · B.Com, Business Analytics', '<p class="dp-text">' + esc(DIRECTION.description) + '</p><div class="dp-rule" style="margin:14px 0"></div><div class="dp-eyebrow" style="margin-bottom:8px">Job families in this direction</div><div class="pills">' + DIRECTION.families.map(function (f) { return '<span class="pill"><span class="ms">business_center</span>' + esc(f) + '</span>'; }).join('') + '</div>');
     var rows = ROLES10.map(function (r, i) {
       var cell;
       if (c) { var d = DIRECTION.m[c]; cell = '<td><span class="local">' + esc(d.local[i]) + '</span></td><td class="r">' + demandChip(d.demand[i]) + '</td>'; }
       else { var hi = MARKETS.filter(function (m) { return DIRECTION.m[m.code].demand[i] === 'High'; }).length; cell = '<td><div class="cov-bar"><div class="meter"><i style="width:' + Math.round(hi / MARKETS.length * 100) + '%"></i></div><b>' + hi + '</b><span>of ' + MARKETS.length + ' markets high demand</span></div></td><td class="r">' + demandChip(hi >= 5 ? 'High' : hi >= 2 ? 'Moderate' : 'Low') + '</td>'; }
-      return '<tr class="rowlink" data-open-role="' + i + '" title="Open the role profile"><td><span class="n">' + String(i + 1).padStart(2, '0') + '</span><b>' + esc(r) + '</b></td>' + cell + '</tr>';
+      return '<tr class="rowlink' + (i === state.role ? ' sel' : '') + '" data-open-role="' + i + '" title="Open the role profile"><td><b>' + esc(r) + '</b>' + (i === state.role ? ' <span class="dchip brand" style="margin-left:8px">Selected</span>' : '') + '</td>' + cell + '</tr>';
     }).join('');
-    h += card('explore', 'Job roles in this direction', c ? 'All 10 roles with the title used in ' + M(c).name + ' and local demand. Select a role to open its profile.' : 'All 10 roles and how many markets show high demand for each. Select a role to open its profile.', '<div class="tbl-wrap"><table><thead><tr><th>Role</th><th>' + (c ? 'Called in ' + esc(M(c).name) : 'Demand across markets') + '</th><th class="r">Demand</th></tr></thead><tbody>' + rows + '</tbody></table></div>');
+    h += card('explore', 'Job roles in this direction', c ? 'All 10 roles with the title used in ' + M(c).name + ' and local demand. Select a role to open its profile.' : 'All 10 roles and how many markets show high demand for each. Select a role to open its profile.', '<div class="tbl-wrap"><table><thead><tr><th>Role</th><th>' + (c ? 'Called in ' + esc(M(c).name) : 'Demand across markets') + '</th><th class="r">Demand</th></tr></thead><tbody>' + rows + '</tbody></table></div>', 'hero');
     if (c) { var d = DIRECTION.m[c]; h += mktCard('translate', 'This direction in ' + M(c).name, 'The words employers use, who hires and how mature the market is', '<div class="term-grid">' + term('badge', 'Known locally as', d.known, d.knownNote) + term('apartment', 'Who hires', d.sectors, '') + term('trending_up', 'Market maturity', d.maturity, '') + '</div>'); }
     else h += pickHint('Local names, hiring sectors and maturity differ by market.');
     return h;
@@ -764,9 +807,7 @@
   function renderRole() {
     var c = mk(), h = '';
     var r = c ? ROLE.m[c] : null;
-    h += roleSwitcher();
-    h += titleWrap('Role profile', esc(roleName()), 'Data &amp; Analytics' + (r ? ' · known locally as <strong>' + esc(localRole(c)) + '</strong>' : ''), '<span class="dchip brand">Business Intelligence &amp; Data Visualization</span>' + (r ? '<span class="dchip ' + r.tone + '"><span class="ms">shield</span>' + esc(r.fit) + '</span>' : ''));
-    if (r) h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div class="dp-card-title">How this role fits your degree in ' + esc(M(c).name) + '</div></div><div class="dp-rule"></div><div class="fit-row"><span class="dchip ' + r.tone + '"><span class="ms">shield</span>' + esc(r.fit) + '</span><p class="dp-text">' + esc(r.rationale) + '</p></div><div class="fit-note"><span class="ms">lightbulb</span><span><strong style="font-weight:600;color:var(--text1)">Skill to bridge — </strong>' + esc(r.bridge) + '</span></div></div>';
+    if (r) h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div><div class="dp-card-title">How this role fits your degree in ' + esc(M(c).name) + '</div><div class="dp-card-sub">Known locally as ' + esc(localRole(c)) + '</div></div></div><div class="dp-rule"></div><div class="fit-row"><span class="dchip ' + r.tone + '"><span class="ms">shield</span>' + esc(r.fit) + '</span><p class="dp-text">' + esc(r.rationale) + '</p></div><div class="fit-note"><span class="ms">lightbulb</span><span><strong style="font-weight:600;color:var(--text1)">Skill to bridge — </strong>' + esc(r.bridge) + '</span></div></div>';
     else h += '<div class="dp-card tint compact"><div class="dp-card-head"><div class="dp-tile"><span class="ms">school</span></div><div class="dp-card-title">How this role fits your degree</div></div><div class="dp-rule"></div><div class="fit-row"><span class="dchip ok"><span class="ms">shield</span>Direct fit</span><p class="dp-text">A B.Com in Business Analytics maps directly to reporting and BI roles: commerce knowledge plus Excel, SQL and one BI tool is the standard entry profile. Fit varies abroad, so select a market to see what changes.</p></div></div>';
     h += '<div class="dp-grid-2">' +
       card('work', 'What this role does', '', '<p class="dp-text">' + esc(ROLE.definition.replace('A Data Analyst', 'A ' + roleName())) + '</p>') +
@@ -781,14 +822,14 @@
 
   /* ═══════════════════════ 3. AI EXPOSURE ═══════════════════════ */
   function renderAI() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var vals = MARKETS.map(function (m) { return AI.pct[m.code]; });
     var avg = Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length);
     var max = MARKETS.reduce(function (a, m) { return AI.pct[m.code] > AI.pct[a.code] ? m : a; }, MARKETS[0]);
     var min = MARKETS.reduce(function (a, m) { return AI.pct[m.code] < AI.pct[a.code] ? m : a; }, MARKETS[0]);
-    h += '<div class="dp-grid-4">' + tile('speed', (c ? AI.pct[c] : avg) + '%', c ? 'AI exposure here' : 'Average AI exposure', c ? aiLevel(AI.pct[c]) + ' · ' + M(c).name : 'Across ' + MARKETS.length + ' markets · ' + aiLevel(avg)) + tile('memory', max.name, 'Most exposed market', AI.pct[max.code] + '% of tasks automatable') + tile('shield', min.name, 'Least exposed market', AI.pct[min.code] + '% · ' + aiLevel(AI.pct[min.code])) + tile('verified', AI.score + '/100', 'Future-proof score', 'for analysts who direct AI tools') + '</div>';
+    h += '<div class="dp-grid-3">' + tile('speed', (c ? AI.pct[c] : avg) + '%', c ? 'AI exposure here' : 'Average AI exposure', c ? aiLevel(AI.pct[c]) + ' · ' + M(c).name : 'Across ' + MARKETS.length + ' markets · ' + aiLevel(avg)) + tile('memory', max.name + ' · ' + min.name, 'Most and least exposed', AI.pct[max.code] + '% and ' + AI.pct[min.code] + '% of tasks automatable', true) + tile('verified', AI.score + '/100', 'Future-proof score', 'for analysts who direct AI tools') + '</div>';
     var rows = MARKETS.map(function (m) { var p = AI.pct[m.code]; return '<tr' + (m.code === c ? ' class="sel"' : '') + '><td><div class="country">' + codeChip(m.code) + '<span>' + esc(m.name) + '</span></div></td><td><div class="meter-cell"><div class="meter"><i class="' + aiTone(p) + '" style="width:' + p + '%"></i></div><span class="pct">' + p + '%</span></div></td><td class="r"><span class="dchip ' + (p >= 55 ? 'red' : 'amber') + '">' + aiLevel(p) + '</span></td><td class="muted">' + esc(AI.driver[m.code]) + '</td></tr>'; }).join('');
-    h += card('smart_toy', 'AI exposure by market', 'Share of a ' + roleName() + '\'s weekly tasks that current AI tools can perform or heavily assist', '<div class="tbl-wrap"><table><thead><tr><th>Market</th><th>Exposure</th><th class="r">Level</th><th>What drives it</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="dp-rule" style="margin-top:14px"></div><div class="legend"><span><i style="background:var(--green)"></i>Low · under 35%</span><span><i style="background:var(--amber)"></i>Moderate · 35–55%</span><span><i style="background:var(--accent)"></i>High · 55–75%</span><span><i style="background:var(--red)"></i>Very high · over 75%</span></div>');
+    h += card('smart_toy', 'AI exposure by market', 'Share of a ' + roleName() + '\'s weekly tasks that current AI tools can perform or heavily assist', '<div class="tbl-wrap"><table><thead><tr><th>Market</th><th>Exposure</th><th class="r">Level</th><th>What drives it</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="dp-rule" style="margin-top:14px"></div><div class="legend"><span><i style="background:var(--green)"></i>Low · under 35%</span><span><i style="background:var(--amber)"></i>Moderate · 35–55%</span><span><i style="background:var(--accent)"></i>High · 55–75%</span><span><i style="background:var(--red)"></i>Very high · over 75%</span></div>', 'hero');
     h += card('auto_awesome', 'What AI takes over, and what you keep', 'The task split that decides whether this role is replaced or augmented', '<div class="split"><div class="split-col"><div class="split-h ai"><span class="ms">smart_toy</span>AI takes over</div>' + AI.takes.map(function (t) { return '<div class="task ai"><span class="ms">bolt</span><span><b>' + esc(t[0]) + '</b> — ' + esc(t[1]) + '</span></div>'; }).join('') + '</div><div class="split-col"><div class="split-h you"><span class="ms">person</span>You keep</div>' + AI.keeps.map(function (t) { return '<div class="task you"><span class="ms">check_circle</span><span><b>' + esc(t[0]) + '</b> — ' + esc(t[1]) + '</span></div>'; }).join('') + '</div></div>');
     h += card('diversity_3', 'Human value AI cannot replace', 'Strengths that keep this role in demand as routine work disappears', '<div class="values">' + AI.human.map(function (v) { return '<div class="value"><span class="ms">' + v[0] + '</span><div><b>' + esc(v[1]) + '</b><span>' + esc(v[2]) + '</span></div></div>'; }).join('') + '</div><div class="dp-rule" style="margin:14px 0"></div><div class="score"><div class="score-ring" style="--v:' + AI.score + '"><b>' + AI.score + '</b></div><div><div class="dp-card-title">Outlook: augmented, not replaced</div><p class="dp-text" style="font-size:13px">Demand for analysts who can direct AI tools, validate results and explain them to decision-makers is rising even as routine reporting work disappears. The score combines exposure, task mix and hiring trend.</p></div></div>');
     return h;
@@ -796,24 +837,24 @@
 
   /* ═══════════════════════ 4. SALARY ═══════════════════════ */
   function renderSalary() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var best = MARKETS.reduce(function (a, m) { return SALARY[m.code].high * m.rate > SALARY[a.code].high * a.rate ? m : a; }, MARKETS[0]);
     var most = MARKETS.reduce(function (a, m) { return SALARY[m.code].adverts > SALARY[a.code].adverts ? m : a; }, MARKETS[0]);
     var fast = MARKETS.reduce(function (a, m) { return SALARY[m.code].delta > SALARY[a.code].delta ? m : a; }, MARKETS[0]);
     var s = c ? SALARY[c] : null;
-    h += '<div class="dp-grid-4">' +
-      (c ? tile('payments', localRange(c, s.low, s.high), 'Salary range here', '≈ ' + inrRange(c, s.low, s.high) + ' per year', true) : tile('payments', best.name, 'Highest paying market', localRange(best.code, SALARY[best.code].low, SALARY[best.code].high) + ' · ≈ ' + inrRange(best.code, SALARY[best.code].low, SALARY[best.code].high))) +
+    h += '<div class="dp-grid-3">' +
+      (c ? tile('payments', localRange(c, s.low, s.high), 'Salary range here', (c !== 'IN' ? '≈ ' + inrRange(c, s.low, s.high) + ' per year' : 'median ' + inr(s.med) + ' per year'), true) : tile('payments', best.name, 'Highest paying market', localRange(best.code, SALARY[best.code].low, SALARY[best.code].high) + ' · ≈ ' + inrRange(best.code, SALARY[best.code].low, SALARY[best.code].high))) +
       (c ? tile('campaign', num(s.adverts), 'Job adverts here', 'last 30 days · ' + (s.delta >= 0 ? '+' : '') + s.delta + '% vs previous month') : tile('campaign', num(SALARY[most.code].adverts), 'Most job adverts', most.name + ' · last 30 days')) +
-      tile('trending_up', fast.name, 'Fastest growing demand', '+' + SALARY[fast.code].delta + '% adverts vs previous month') +
-      tile('currency_rupee', c ? inrLocal(c, s.med) : inr(SALARY.IN.med), c ? 'Median in INR' : 'Median in India', c ? 'median ' + local(c, s.med) + ' per year' : 'per year') + '</div>';
+      tile('trending_up', fast.name, 'Fastest growing demand', '+' + SALARY[fast.code].delta + '% adverts vs previous month') + '</div>';
     var maxUsd = 125000;
     var rows = MARKETS.map(function (m) {
       var d = SALARY[m.code], lo = d.low * m.rate / 84 / maxUsd * 100, hi = d.high * m.rate / 84 / maxUsd * 100;
       lo = Math.max(1, Math.min(99, lo)); hi = Math.max(lo + 2, Math.min(100, hi));
-      var monthly = m.monthly ? '<div class="range-note">≈ ' + localRange(m.code, Math.round(d.low / 12), Math.round(d.high / 12)) + ' per month</div>' : '';
-      return '<tr' + (m.code === c ? ' class="sel"' : '') + '><td><div class="country">' + codeChip(m.code) + '<span>' + esc(m.name) + '<small>' + (m.code === 'IN' ? 'INR' : m.cur === 'AED' ? 'AED' : m.cur) + ' · per year</small></span></div></td><td><div class="range"><div class="range-labels"><span>' + local(m.code, d.low) + '</span><span>' + local(m.code, d.high) + '</span></div><div class="track"><div class="band" style="left:' + lo.toFixed(1) + '%;width:' + (hi - lo).toFixed(1) + '%"></div></div>' + (m.code !== 'IN' ? '<div class="range-inr"><span class="ms">currency_rupee</span>≈ ' + inrRange(m.code, d.low, d.high) + ' per year · median ≈ ' + inrLocal(m.code, d.med) + '</div>' : '<div class="range-note">Median ' + inr(d.med) + '</div>') + monthly + '</div></td><td class="r"><span class="adverts">' + num(d.adverts) + '</span><span class="delta ' + (d.delta > 0 ? 'up' : d.delta < 0 ? 'down' : 'flat') + '"><span class="ms">' + (d.delta > 0 ? 'arrow_upward' : d.delta < 0 ? 'arrow_downward' : 'trending_flat') + '</span>' + Math.abs(d.delta) + '%</span></td><td class="r">' + demandChip(d.demand) + '</td></tr>';
+      var sub = (m.code === 'IN' ? 'INR' : m.cur === 'AED' ? 'AED' : m.cur) + ' · per year' + (m.monthly ? ' · adverts quote monthly' : '');
+      var line2 = m.code !== 'IN' ? '<div class="range-inr"><span><span class="ms">currency_rupee</span>≈ ' + inrRange(m.code, d.low, d.high) + '</span><span>Median ' + local(m.code, d.med) + ' · ≈ ' + inrLocal(m.code, d.med) + '</span></div>' : '<div class="range-inr"><span></span><span>Median ' + inr(d.med) + '</span></div>';
+      return '<tr' + (m.code === c ? ' class="sel"' : '') + '><td><div class="country">' + codeChip(m.code) + '<span>' + esc(m.name) + '<small>' + sub + '</small></span></div></td><td><div class="range"><div class="range-labels"><span>' + local(m.code, d.low) + '</span><span>' + local(m.code, d.high) + '</span></div><div class="track"><div class="band" style="left:' + lo.toFixed(1) + '%;width:' + (hi - lo).toFixed(1) + '%"></div></div>' + line2 + '</div></td><td class="r"><span class="adverts">' + num(d.adverts) + '</span><span class="delta ' + (d.delta > 0 ? 'up' : d.delta < 0 ? 'down' : 'flat') + '"><span class="ms">' + (d.delta > 0 ? 'arrow_upward' : d.delta < 0 ? 'arrow_downward' : 'trending_flat') + '</span>' + Math.abs(d.delta) + '%</span></td><td class="r">' + demandChip(d.demand) + '</td></tr>';
     }).join('');
-    h += card('bar_chart', 'Salary range and job adverts by market', 'Entry level to senior, gross per year in local currency with INR beneath. Bars sit on one shared scale so markets can be compared.', '<div class="tbl-wrap"><table><thead><tr><th>Market</th><th>Salary range (low – high)</th><th class="r">Job adverts</th><th class="r">Demand</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="foot"><span class="ms">info</span>Bars are placed on one shared USD-equivalent scale (0 to $125,000), so a wider bar means a wider pay spread. Job adverts count live postings in the last 30 days. INR equivalents use indicative rates: ' + RATES + '.</div>');
+    h += card('bar_chart', 'Salary range and job adverts by market', 'Entry level to senior, gross per year in local currency with INR beneath. Bars sit on one shared scale so markets can be compared.', '<div class="tbl-wrap"><table><thead><tr><th>Market</th><th>Salary range (low – high)</th><th class="r">Job adverts</th><th class="r">Demand</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="foot"><span class="ms">info</span>Bars are placed on one shared USD-equivalent scale (0 to $125,000), so a wider bar means a wider pay spread. Job adverts count live postings in the last 30 days. INR equivalents use indicative rates: ' + RATES + '.</div>', 'hero');
     if (c) {
       var L = ladder(c), maxL = L[3];
       var lad = '<div class="salary-ladder"><div class="salary-track"><div class="salary-track-line"></div>' + L.map(function (v) { var sz = 8 + v / maxL * 12; return '<div class="salary-node" style="width:' + sz + 'px;height:' + sz + 'px"></div>'; }).join('') + '</div><div class="salary-labels">' + L.map(function (v, i) { return '<div class="salary-label"><div class="salary-label-k">' + LADDER[i] + '</div><div class="salary-label-v">' + local(c, v) + '</div>' + (c !== 'IN' ? '<div class="salary-label-i">≈ ' + inrLocal(c, v) + '</div>' : '') + '</div>'; }).join('') + '</div></div>';
@@ -827,10 +868,10 @@
 
   /* ═══════════════════════ 5. SKILL DNA ═══════════════════════ */
   function renderSkills() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var all = []; SKILLS.forEach(function (g) { g.items.forEach(function (it) { all.push({ cat: g.cat, name: it[0], lv: it[1], cert: it[2], must: it[1].filter(function (x) { return x === 2; }).length, any: it[1].filter(function (x) { return x > 0; }).length }); }); });
     var core = all.filter(function (s) { return s.must >= 7; }).length, localOnly = all.filter(function (s) { return s.any <= 3; }).length, certs = all.filter(function (s) { return s.cert; }).length;
-    h += '<div class="dp-grid-4">' + tile('genetics', all.length, 'Skills mapped', 'across ' + SKILLS.length + ' categories') + tile('public', core, 'Core everywhere', 'must-have in 7 or more markets') + tile('flag', localOnly, 'Market-specific', 'asked for in 3 or fewer markets') + tile('workspace_premium', certs, 'With certification', 'skills with a recognised cert') + '</div>';
+    h += '<div class="dp-grid-3">' + tile('genetics', all.length, 'Skills mapped', 'across ' + SKILLS.length + ' categories · ' + certs + ' with a certification') + tile('public', core, 'Core everywhere', 'must-have in 7 or more markets') + tile('flag', localOnly, 'Market-specific', 'asked for in 3 or fewer markets') + '</div>';
     h += '<div class="rs"><div class="rs-label">View</div><div class="rs-tabs" id="skill-views"><button class="rs-tab' + (state.skillView === 'map' ? ' active' : '') + '" type="button" data-sv="map"><span class="rs-n">01</span><span class="ms">grid_on</span>Skill map · all markets</button><button class="rs-tab' + (state.skillView === 'detail' ? ' active' : '') + '" type="button" data-sv="detail"><span class="rs-n">02</span><span class="ms">public</span>Market detail</button></div></div>';
     if (state.skillView === 'map') {
       var filters = [['all', 'All skills'], ['core', 'Core everywhere'], ['local', 'Market-specific'], ['cert', 'With certification']];
@@ -850,7 +891,7 @@
           body += '<tr><td class="sk">' + esc(s.name) + (s.cert ? '<span class="ms" title="Certification available">workspace_premium</span>' : '') + '</td>' + s.lv.map(function (v, i) { return '<td class="mk' + (MARKETS[i].code === c ? ' sel' : '') + '"><span class="dot ' + (v === 2 ? 'must' : v === 1 ? 'nice' : 'none') + '" title="' + esc(MARKETS[i].name) + ': ' + (v === 2 ? 'must-have' : v === 1 ? 'nice-to-have' : 'not asked') + '"></span></td>'; }).join('') + '<td class="cov"><div class="cov-bar"><div class="meter"><i style="width:' + Math.round(s.must / MARKETS.length * 100) + '%"></i></div><b>' + s.must + '</b><span>of ' + MARKETS.length + ' must-have</span></div></td></tr>';
         });
       });
-      h += card('grid_on', 'Skill map across markets', 'One grid instead of nine lists: filled dot = must-have, ring = nice-to-have, small dot = not asked. Rows sort by how many markets need the skill.', fbar + '<div class="matrix-wrap" style="margin-top:14px"><table class="matrix"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div><div class="dp-rule" style="margin-top:14px"></div><div class="legend"><span><i class="dot must" style="border-radius:50%"></i>Must-have</span><span><i class="dot nice" style="border-radius:50%"></i>Nice-to-have</span><span><i class="dot none" style="border-radius:50%"></i>Not asked</span><span><span class="ms" style="font-size:15px;color:var(--accent-text)">workspace_premium</span>Certification available</span></div>');
+      h += card('grid_on', 'Skill map across markets', 'One grid instead of nine lists: filled dot = must-have, ring = nice-to-have, small dot = not asked. Rows sort by how many markets need the skill.', fbar + '<div class="matrix-wrap" style="margin-top:14px"><table class="matrix"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div><div class="dp-rule" style="margin-top:14px"></div><div class="legend"><span><i class="dot must" style="border-radius:50%"></i>Must-have</span><span><i class="dot nice" style="border-radius:50%"></i>Nice-to-have</span><span><i class="dot none" style="border-radius:50%"></i>Not asked</span><span><span class="ms" style="font-size:15px;color:var(--accent-text)">workspace_premium</span>Certification available</span></div>', 'hero');
     } else {
       if (!c) h += pickHint('Market detail shows one market\'s must-have skills, local tools and what is asked only there.');
       else {
@@ -868,18 +909,19 @@
   /* ═══════════════════════ 6. ROADMAP ═══════════════════════ */
   function statusOf(name) { return state.progress[name] || 'todo'; }
   function renderRoadmap() {
-    var c = mk(), h = roleSwitcher(), r = c ? ROADMAP.m[c] : null;
+    var c = mk(), h = '', r = c ? ROADMAP.m[c] : null;
     var allSkills = []; ROADMAP.stages.forEach(function (s) { allSkills = allSkills.concat(s.skills); });
     var done = allSkills.filter(function (n) { return statusOf(n) === 'done'; }).length, doing = allSkills.filter(function (n) { return statusOf(n) === 'doing'; }).length;
-    h += '<div class="dp-grid-4">' + tile('route', ROADMAP.stages.length + ' stages', 'Career stages', 'entry to lead') + tile('schedule', r ? r.years : '5–9 yrs', 'Time to lead level', c ? 'typical in ' + M(c).name : 'varies by market') + tile('check_circle', done + ' / ' + allSkills.length, 'Skills completed', doing + ' in progress') + (r ? tile('payments', localRange(c, r.pay[0][0], r.pay[0][1]), 'Entry pay', c !== 'IN' ? '≈ ' + inrRange(c, r.pay[0][0], r.pay[0][1]) + ' in INR' : 'per year', true) : tile('badge', roleName(), 'Entry title', 'local names differ by market', true)) + '</div>';
+    h += '<div class="dp-grid-3">' + tile('schedule', r ? r.years : '5–9 yrs', 'Time to lead level', c ? 'typical in ' + M(c).name : 'varies by market') + tile('check_circle', done + ' / ' + allSkills.length, 'Skills completed', doing + ' in progress') + (r ? tile('payments', localRange(c, r.pay[0][0], r.pay[0][1]), 'Entry pay', c !== 'IN' ? '≈ ' + inrRange(c, r.pay[0][0], r.pay[0][1]) + ' in INR' : 'per year', true) : tile('badge', roleName(), 'Entry title', 'local names differ by market', true)) + '</div>';
     var stages = ROADMAP.stages.map(function (s, i) {
       var title = r ? (i === 0 ? localRole(c) : r.titles[i]) : (i === 0 ? roleName() : s.t), alias = r ? 'Also: ' + r.alias[i] : '';
       var skills = s.skills.slice(); if (r && r.extra[i]) skills.push(r.extra[i]);
       var list = skills.map(function (n) { var st = statusOf(n), extra = r && r.extra[i] === n; return '<div class="rm-item ' + st + '"><span class="nm' + (extra ? ' extra' : '') + '">' + esc(n) + '</span><button class="rm-btn ' + st + '" type="button" data-skill="' + esc(n) + '"><span class="ms">' + (st === 'done' ? 'check_circle' : st === 'doing' ? 'progress_activity' : 'radio_button_unchecked') + '</span>' + (st === 'done' ? 'Done' : st === 'doing' ? 'In progress' : 'Start') + '</button></div>'; }).join('');
       var pay = r ? '<div class="stage-row"><span>Typical pay</span><b>' + localRange(c, r.pay[i][0], r.pay[i][1]) + '</b></div>' + (c !== 'IN' ? '<div class="stage-inr"><span class="ms">currency_rupee</span>≈ ' + inrRange(c, r.pay[i][0], r.pay[i][1]) + ' in INR' + (M(c).monthly ? ' · ' + localRange(c, Math.round(r.pay[i][0] / 12), Math.round(r.pay[i][1] / 12)) + ' per month' : '') + '</div>' : '') : '<div class="stage-row"><span>Typical pay</span><b>Select a market</b></div>';
-      return '<div class="stage' + (i === 0 ? ' now' : '') + '"><div class="stage-top"><div class="stage-n">' + (i + 1) + '</div><div class="stage-k">' + esc(s.k) + '</div></div><div class="stage-title">' + esc(title) + '</div>' + (alias ? '<div class="stage-alias">' + esc(alias) + '</div>' : '') + '<div class="rm-list">' + list + '</div>' + pay + '</div>';
+      var dn = skills.filter(function (n) { return statusOf(n) === 'done'; }).length;
+      return '<div class="stage' + (i === 0 ? ' now' : '') + '"><div class="stage-top"><div class="stage-n">' + (i + 1) + '</div><div class="stage-k">' + esc(s.k) + '</div></div><div class="stage-title">' + esc(title) + '</div>' + (alias ? '<div class="stage-alias">' + esc(alias) + '</div>' : '') + '<div class="stage-prog"><div class="meter"><i class="' + (dn === skills.length ? 'green' : '') + '" style="width:' + Math.round(dn / skills.length * 100) + '%"></i></div><b>' + dn + '/' + skills.length + '</b></div><div class="trk' + (state.openStages[i] ? ' open' : '') + '"><button class="track-btn" type="button" data-toggle-stage="' + i + '"><span>' + (state.openStages[i] ? 'Hide skills' : 'Track skills') + '</span><span class="ms">keyboard_arrow_down</span></button>' + (state.openStages[i] ? '<div class="rm-list">' + list + '</div>' : '') + '</div>' + pay + '</div>';
     }).join('');
-    h += card('map', c ? 'Progression path in ' + M(c).name : 'Progression path', 'Each stage lists the skills to build. Mark them as you go; a "+ market" tag means that market asks for it in addition to the core list.', '<div class="stages" id="stages">' + stages + '</div><div class="foot"><span class="ms">info</span>Stage 1 is highlighted as your current position. Pay is gross and quoted the way local adverts quote it' + (c && c !== 'IN' ? '; INR equivalents use ' + RATES : '') + '.</div>');
+    h += card('map', c ? 'Progression path in ' + M(c).name : 'Progression path', 'Each stage lists the skills to build. Mark them as you go; a "+ market" tag means that market asks for it in addition to the core list.', '<div class="stages" id="stages">' + stages + '</div><div class="foot"><span class="ms">info</span>Stage 1 is highlighted as your current position. Pay is gross and quoted the way local adverts quote it' + (c && c !== 'IN' ? '; INR equivalents use ' + RATES : '') + '.</div>', 'hero');
     if (r) h += mktCard('flag', 'Local pathway notes · ' + M(c).name, 'How hiring works here and the words to know', '<ul class="notes">' + r.notes.map(function (n) { return '<li><span class="ms">' + n[0] + '</span><div><b>' + esc(n[1]) + '</b><span>' + esc(n[2]) + '</span></div></li>'; }).join('') + '</ul>');
     else h += pickHint('Local titles, pay at each stage and pathway notes appear for one market at a time.');
     return h;
@@ -894,21 +936,20 @@
     }).join('') + '</div>';
   }
   function renderEmerging() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var top = EMERGING.slice().sort(function (a, b) { return b.overlap - a.overlap; })[0];
     var hiringHere = c ? EMERGING.filter(function (r) { return r.hiring[c] === 'H'; }).length : null;
-    h += '<div class="dp-grid-4">' + tile('auto_awesome', EMERGING.length, 'Emerging roles', 'growing out of this direction') + tile('trending_up', top.name, 'Closest to your profile', top.overlap + '% overlap with your Skill DNA', true) + tile('campaign', c ? hiringHere : EMERGING.filter(function (r) { return MARKETS.filter(function (m) { return r.hiring[m.code] === 'H'; }).length >= 4; }).length, c ? 'Hiring now in ' + M(c).name : 'Hiring broadly', c ? 'roles with active hiring' : 'hiring in 4 or more markets') + tile('school', '2–3', 'Bridge skills each', 'typical extra skills needed', true) + '</div>';
-    h += card('auto_awesome', 'Roles growing out of this direction', 'Each card shows why the role is emerging, how much of it you already cover, and the skills that bridge the gap' + (c ? '. Hiring status is for ' + M(c).name + '.' : '.'), roleCards(EMERGING, c, false));
+    h += '<div class="dp-grid-3">' + tile('auto_awesome', EMERGING.length, 'Emerging roles', 'growing out of this direction') + tile('trending_up', top.name, 'Closest to your profile', top.overlap + '% overlap with your Skill DNA', true) + tile('campaign', c ? hiringHere : EMERGING.filter(function (r) { return MARKETS.filter(function (m) { return r.hiring[m.code] === 'H'; }).length >= 4; }).length, c ? 'Hiring now in ' + M(c).name : 'Hiring broadly', c ? 'roles with active hiring' : 'hiring in 4 or more markets') + '</div>';
+    h += card('auto_awesome', 'Roles growing out of this direction', 'Each card shows why the role is emerging, how much of it you already cover, and the skills that bridge the gap' + (c ? '. Hiring status is for ' + M(c).name + '.' : '.'), roleCards(EMERGING, c, false), 'hero');
     if (!c) h += pickHint('Select a market to see which emerging roles are hiring there.');
     return h;
   }
 
   /* ═══════════════════════ 8. GREEN ═══════════════════════ */
   function renderGreen() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var top = GREEN.roles.slice().sort(function (a, b) { return b.overlap - a.overlap; })[0];
-    h += '<div class="dp-grid-4">' + tile('eco', GREEN.roles.length, 'Green roles', 'linked to this direction') + tile('trending_up', top.name, 'Closest to your profile', top.overlap + '% overlap with your Skill DNA', true) + tile('gavel', c ? GREEN.driver[c].split(' ').slice(0, 3).join(' ') : 'Regulation-led', 'Demand driver', c ? GREEN.driver[c] : 'disclosure rules differ by market', true) + tile('campaign', c ? GREEN.roles.filter(function (r) { return r.hiring[c] === 'H'; }).length : GREEN.roles.filter(function (r) { return MARKETS.filter(function (m) { return r.hiring[m.code] === 'H'; }).length >= 3; }).length, c ? 'Hiring now in ' + M(c).name : 'Hiring broadly', c ? 'roles with active hiring' : 'hiring in 3 or more markets') + '</div>';
-    h += card('eco', 'Sustainability roles this profile can move into', 'Green jobs for analysts are mostly reporting and data roles created by new disclosure rules, so the overlap with this direction is high', roleCards(GREEN.roles, c, true));
+    h += card('eco', 'Sustainability roles this profile can move into', 'Green jobs for analysts are mostly reporting and data roles created by new disclosure rules, so the overlap with this direction is high', roleCards(GREEN.roles, c, true), 'hero');
     var drv = c ? '<div class="term-grid">' + term('gavel', 'Regulation driving demand', GREEN.driver[c], '') + term('apartment', 'Who hires', c === 'IN' ? 'Listed companies, Big Four, ESG consultancies' : c === 'DE' || c === 'IE' ? 'Large and listed companies under CSRD, auditors, consultancies' : 'Banks, listed companies, consultancies, auditors', '') + term('school', 'What to add', 'One ESG framework (GRI or ISSB) plus the local reporting template', '') + '</div>' : '<div class="tbl-wrap"><table><thead><tr><th>Market</th><th>Regulation driving demand</th></tr></thead><tbody>' + MARKETS.map(function (m) { return '<tr><td><div class="country">' + codeChip(m.code) + '<span>' + esc(m.name) + '</span></div></td><td class="muted">' + esc(GREEN.driver[m.code]) + '</td></tr>'; }).join('') + '</tbody></table></div>';
     h += (c ? mktCard : card)('gavel', c ? 'Why green jobs are growing in ' + M(c).name : 'What drives green hiring in each market', 'Disclosure rules create the reporting work that analysts do', drv);
     return h;
@@ -916,17 +957,17 @@
 
   /* ═══════════════════════ 9. CERTS ═══════════════════════ */
   function renderCerts() {
-    var c = mk(), h = roleSwitcher();
+    var c = mk(), h = '';
     var list = CERTS.slice().sort(function (a, b) { return b.mk.length - a.mk.length; });
     var inMk = c ? CERTS.filter(function (x) { return x.mk.indexOf(c) >= 0; }) : CERTS;
     var topHere = c ? CERTS.filter(function (x) { return x.top.indexOf(c) >= 0; })[0] : null;
     var global = CERTS.filter(function (x) { return x.mk.length === MARKETS.length; }).length;
-    h += '<div class="dp-grid-4">' + tile('card_membership', inMk.length, c ? 'Recognised in ' + M(c).name : 'Recognised certifications', c ? 'named in local adverts' : 'across all markets') + tile('public', global, 'Recognised everywhere', 'valid in all ' + MARKETS.length + ' markets') + tile('local_fire_department', inMk.filter(function (x) { return x.pri === 'High'; }).length, 'High priority', 'named as must-have') + tile('star', topHere ? topHere.name.split(':')[0] : 'PL-300', c ? 'Most requested here' : 'Most requested overall', 'appears most often in adverts', true) + '</div>';
+    h += '<div class="dp-grid-3">' + tile('card_membership', inMk.length, c ? 'Recognised in ' + M(c).name : 'Recognised certifications', c ? 'named in local adverts · ' + inMk.filter(function (x) { return x.pri === 'High'; }).length + ' high priority' : 'across all markets') + tile('public', global, 'Recognised everywhere', 'valid in all ' + MARKETS.length + ' markets') + tile('star', topHere ? topHere.name.split(':')[0] : 'PL-300', c ? 'Most requested here' : 'Most requested overall', 'appears most often in adverts', true) + '</div>';
     var cards = list.map(function (x) {
       var here = !c || x.mk.indexOf(c) >= 0, isTop = c && x.top.indexOf(c) >= 0;
       return '<div class="cert-card' + (here ? '' : ' dim') + (isTop ? ' top' : '') + '"><div class="cert-top"><div class="cert-ic"><span class="ms">workspace_premium</span></div><div class="cert-name">' + esc(x.name) + '</div></div><div class="cert-prov"><span class="ms">apartment</span><span>' + esc(x.prov) + '</span></div><div class="cert-skill"><b>Covers</b>' + esc(x.covers) + '</div><div class="cert-skill"><b>Recognised in ' + x.mk.length + ' of ' + MARKETS.length + ' markets</b><div class="cov-chips">' + MARKETS.map(function (m) { return '<span class="' + (x.mk.indexOf(m.code) >= 0 ? 'on' : '') + '">' + m.code + '</span>'; }).join('') + '</div></div><div class="cert-foot"><span class="dchip' + (isTop ? ' brand' : x.pri === 'High' ? ' ok' : '') + '">' + (isTop ? 'Most requested here' : x.pri + ' priority') + '</span><span class="cert-dur"><span class="ms">schedule</span>' + esc(x.dur) + '</span></div></div>';
     }).join('');
-    h += card('card_membership', c ? 'Certifications valued in ' + M(c).name : 'Certifications employers recognise', c ? 'Cards recognised here are shown in full; the rest are faded. The highlighted card is the one local adverts name most.' : 'Sorted by how many markets recognise each credential. Select a market to see what it values most.', '<div class="cert-grid">' + cards + '</div><div class="foot"><span class="ms">info</span>Priority reflects how often the credential is named in local adverts for this role. Duration is the typical study time alongside a degree.</div>');
+    h += card('card_membership', c ? 'Certifications valued in ' + M(c).name : 'Certifications employers recognise', c ? 'Cards recognised here are shown in full; the rest are faded. The highlighted card is the one local adverts name most.' : 'Sorted by how many markets recognise each credential. Select a market to see what it values most.', '<div class="cert-grid">' + cards + '</div><div class="foot"><span class="ms">info</span>Priority reflects how often the credential is named in local adverts for this role. Duration is the typical study time alongside a degree.</div>', 'hero');
     return h;
   }
 
@@ -939,6 +980,9 @@
     main.scrollTop = 0;
     Array.prototype.forEach.call(document.querySelectorAll('.sitem[data-view]'), function (b) { b.classList.toggle('active', b.getAttribute('data-view') === state.section); });
     var sm = document.getElementById('section-m'); if (sm) sm.value = state.section;
+    ['role', 'role-m'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = String(state.role); });
+    ['market', 'market-m'].forEach(function (id) { var el = document.getElementById(id); if (el) el.value = state.market; });
+    var sb = document.getElementById('sb-role'); if (sb) sb.textContent = roleName();
     persist();
   }
   /* sidebar */
@@ -951,6 +995,14 @@
     sel.addEventListener('change', function () { state.market = sel.value; var other = sel.id === 'market' ? document.getElementById('market-m') : document.getElementById('market'); if (other) other.value = state.market; render(); });
   }
   fillMarket(document.getElementById('market')); fillMarket(document.getElementById('market-m'));
+  function fillRole(sel) {
+    sel.innerHTML = ROLES10.map(function (r, i) { return '<option value="' + i + '">' + esc(r) + '</option>'; }).join('');
+    sel.value = String(state.role);
+    sel.addEventListener('change', function () { state.role = parseInt(sel.value, 10); render(); });
+  }
+  fillRole(document.getElementById('role')); fillRole(document.getElementById('role-m'));
+  document.getElementById('sb-change').addEventListener('click', function () { var el = document.getElementById('role'); if (el && el.offsetParent) { el.focus(); try { if (el.showPicker) el.showPicker(); } catch (e) { /* not supported */ } } else { document.getElementById('role-m').focus(); } });
+
   var secSel = document.getElementById('section-m');
   secSel.innerHTML = SECTIONS.map(function (s) { return '<option value="' + s.id + '">' + esc(s.label) + '</option>'; }).join('');
   secSel.addEventListener('change', function () { state.section = secSel.value; render(); });
@@ -958,6 +1010,7 @@
   main.addEventListener('click', function (e) {
     var rt = e.target.closest('[data-role]'); if (rt) { state.role = parseInt(rt.getAttribute('data-role'), 10); render(); return; }
     var orr = e.target.closest('[data-open-role]'); if (orr) { state.role = parseInt(orr.getAttribute('data-open-role'), 10); state.section = 'role'; render(); return; }
+    var tg = e.target.closest('[data-toggle-stage]'); if (tg) { var k = tg.getAttribute('data-toggle-stage'); state.openStages[k] = !state.openStages[k]; render(); return; }
     var sv = e.target.closest('[data-sv]'); if (sv) { state.skillView = sv.getAttribute('data-sv'); render(); return; }
     var sf = e.target.closest('[data-sf]'); if (sf) { state.skillFilter = sf.getAttribute('data-sf'); render(); return; }
     var sk = e.target.closest('[data-skill]'); if (sk) { var n = sk.getAttribute('data-skill'), cur = statusOf(n); state.progress[n] = cur === 'todo' ? 'doing' : cur === 'doing' ? 'done' : 'todo'; render(); return; }
