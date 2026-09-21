@@ -614,11 +614,9 @@ export default function WelcomeOnboardingScreen({ navigation }) {
 
   const handleCompleteOnboarding = async () => {
     await storage.setItem('smaart_pref_language', langCode);
-    // FR-AUTH-01 — institution selection is the step between onboarding and
-    // login. This used to replace straight to Login, which is what left
-    // InstitutionSelectorScreen built, registered and unreachable. `navigate`
-    // rather than `replace` so the selector's back button lands here.
-    navigation.navigate('InstitutionSelector');
+    // Students sign in with credentials alone; the backend resolves the college
+    // from the account, so there is deliberately no college-selection step.
+    navigation.replace('Login');
   };
 
   const getSlideMotionStyle = (index) => {

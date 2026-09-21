@@ -537,7 +537,6 @@ router.patch('/register-section', registrationIdentity((req) => req.body?.email)
             acc[key] = (next !== undefined ? next : existing[key]) || '';
             return acc;
           }, {});
-          registration.markModified('address');
         }
 
         // Sync critical fields to the student (student data never goes to users)
@@ -575,7 +574,6 @@ router.patch('/register-section', registrationIdentity((req) => req.body?.email)
           // `zip` is the mobile client's spelling of the same field.
           pincode: data.pincode || data.zip || registration.address?.pincode || '',
         };
-        registration.markModified('address');
 
         // Keep the Student's own address in step, so whichever one a reader
         // reaches first shows the same thing.

@@ -22,7 +22,7 @@ import PillInput from '../../components/PillInput';
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 24 : 16;
 
 export default function LoginScreen({ navigation }) {
-  const { college, authNotice, clearAuthNotice } = useAuth();
+  const { authNotice, clearAuthNotice } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function LoginScreen({ navigation }) {
       <FadeSlideIn duration={380}>
         <View style={styles.topHeader}>
           <Pressable
-            onPress={() => navigation.navigate('InstitutionSelector')}
+            onPress={() => navigation.navigate('WelcomeOnboarding')}
             hitSlop={12}
             style={styles.backBtn}
           >
@@ -75,22 +75,6 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.headerSubtitle}>
             Sign in to enjoy the best educational experience
           </Text>
-
-          {/* FR-AUTH-01 — show the institution chosen on the previous step and
-              give a way back to change it. Sign-in itself does not send the
-              college (the backend resolves it from the account), so this is
-              informational and stays out of the way when none was picked. */}
-          <Pressable
-            onPress={() => navigation.navigate('InstitutionSelector')}
-            style={styles.institutionChip}
-            hitSlop={8}
-          >
-            <Feather name="home" size={13} color="rgba(255,255,255,0.75)" />
-            <Text style={styles.institutionText} numberOfLines={1}>
-              {college?.collegeName || 'Select your institution'}
-            </Text>
-            <Text style={styles.institutionChange}>{college ? 'Change' : 'Choose'}</Text>
-          </Pressable>
         </View>
       </FadeSlideIn>
 
@@ -224,33 +208,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'rgba(255,255,255,0.65)',
     marginTop: 6,
-  },
-  institutionChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 7,
-    marginTop: 16,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    maxWidth: '100%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-  },
-  institutionText: {
-    flexShrink: 1,
-    fontSize: 12.5,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
-  },
-  institutionChange: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: colors.primaryBright,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
   },
   noticeBanner: {
     flexDirection: 'row',

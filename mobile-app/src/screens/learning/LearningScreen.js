@@ -31,7 +31,8 @@ import {
   getCourseStages,
   getUserProgress,
   saveUserProgress,
-  saveQuizProgress,
+  saveTaskProgress,
+  saveVideoProgress,
 } from '../../api/courses';
 import { getCourseNote, saveCourseNote } from '../../api/notes';
 import {
@@ -192,7 +193,58 @@ export default function LearningScreen({ navigation }) {
   // top whenever what they are showing changes.
   const screenScrollRef = useRef(null);
   const playerScrollRef = useRef(null);
-  
+
+  // Completion, unlocks and badges come from the CourseEnrollment record, which
+  // only task-progress and video-progress update; user-progress/save just stores
+  // the resume point. Those routes each load, edit and save the same enrollment
+  // document, so writes run one at a time to avoid overwriting each other.
+  const enrollmentQueueRef = useRef(Promise.resolve());
+  const creditedStepsRef = useRef(new Set());
+  const pendingVideoRef = useRef(new Map());
+
+  const queueEnrollmentWrite = useCallback((write) => {
+    enrollmentQueueRef.current = enrollmentQueueRef.current.then(write).catch((err) => {
+      console.warn('[Learning] enrollment progress sync failed:', err?.message);
+    });
+  }, []);
+
+  // Same call the web makes when a step finishes (CoursePlayer handleStepComplete):
+  // the step number goes in dayId, which is what the server counts.
+  const creditStep = useCallback(
+    (courseCode, stepId) => {
+      const key = `${courseCode}:${stepId}`;
+      if (creditedStepsRef.current.has(key)) return;
+      creditedStepsRef.current.add(key);
+      queueEnrollmentWrite(async () => {
+        try {
+          await saveTaskProgress({ courseCode, moduleId: 1, dayId: stepId, taskId: 1, completed: true });
+        } catch (err) {
+          // Allow a later completion event to retry after a network or server failure.
+          if (!err?.status || err.status >= 500) creditedStepsRef.current.delete(key);
+          throw err;
+        }
+      });
+    },
+    [queueEnrollmentWrite]
+  );
+
+  // The player reports every few seconds; only the newest snapshot per step is sent.
+  const queueVideoSync = useCallback(
+    (payload) => {
+      const key = `${payload.courseCode}:${payload.stepId}`;
+      const pending = pendingVideoRef.current;
+      const alreadyQueued = pending.has(key);
+      pending.set(key, payload);
+      if (alreadyQueued) return;
+      queueEnrollmentWrite(() => {
+        const latest = pending.get(key);
+        pending.delete(key);
+        return saveVideoProgress(latest);
+      });
+    },
+    [queueEnrollmentWrite]
+  );
+
   const userId = user?._id || user?.id;
 
   const fetchData = useCallback(async () => {
@@ -522,6 +574,14 @@ export default function LearningScreen({ navigation }) {
         setFlowSource(resolved.source);
         setStepProgress(saved);
 
+        // Steps finished before progress reached the enrollment get credited
+        // when the course next opens. The server ignores repeats.
+        if (selectedCourse.courseCode) {
+          resolved.steps
+            .filter((s) => isStepComplete(saved[s.stepId]))
+            .forEach((s) => creditStep(selectedCourse.courseCode, s.stepId));
+        }
+
         // Resume on the first step that is neither watched nor answered.
         const firstUnfinished = resolved.steps.findIndex((s) => !isStepComplete(saved[s.stepId]));
         setActiveStepIdx(firstUnfinished === -1 ? 0 : firstUnfinished);
@@ -537,18 +597,14 @@ export default function LearningScreen({ navigation }) {
     return () => {
       cancelled = true;
     };
-  }, [courseModalVisible, selectedCourse]);
+  }, [courseModalVisible, selectedCourse, creditStep]);
 
   /**
    * Checkpoint video position.
    *
-   * Sends the web's exact field names to POST /courseEnrollments/user-progress/save.
-   * `moduleId: '1'` and `dayId: 1` mirror what `CoursePlayer.jsx` sends — the
-   * server upserts on (user, courseCode, moduleId, dayId, stepId), so matching
-   * them means mobile updates the same row rather than creating a parallel one.
-   *
-   * Note the sibling POST /video-progress endpoint expects `maxWatchedTime` /
-   * `isCompleted` instead; the web does not use it, so neither do we.
+   * Mirrors CoursePlayer.jsx: user-progress/save stores the resume point and
+   * video-progress feeds the enrollment's watch time. `moduleId: '1'` and
+   * `dayId: 1` match what the web sends, so both platforms update the same rows.
    */
   const handleVideoProgress = useCallback(
     async ({ maxWatchedTime, duration, completed }) => {
@@ -575,6 +631,17 @@ export default function LearningScreen({ navigation }) {
         },
       }));
 
+      queueVideoSync({
+        courseCode,
+        moduleId: '1',
+        dayId: 1,
+        stepId: step.stepId,
+        maxWatchedTime,
+        videoDuration: duration,
+        isCompleted: completed,
+      });
+      if (completed) creditStep(courseCode, step.stepId);
+
       try {
         await saveUserProgress({
           courseCode,
@@ -591,18 +658,9 @@ export default function LearningScreen({ navigation }) {
         console.warn('[Learning] video progress save failed:', err?.message);
       }
     },
-    [flow, activeStepIdx, selectedCourse]
+    [flow, activeStepIdx, selectedCourse, queueVideoSync, creditStep]
   );
 
-  /**
-   * Grade and record a quiz step.
-   *
-   * Scores locally against the `correctIndex` the backend ships with each
-   * question, then persists twice, matching what the web does: `quiz-progress`
-   * rolls the score into the enrolment's module progress, while
-   * `user-progress/save` marks the step complete in the same row the video
-   * path writes to, so step ticks stay consistent across content types.
-   */
   /**
    * Persist the reflection note for this course.
    *
@@ -643,6 +701,7 @@ export default function LearningScreen({ navigation }) {
           assignmentStatus: 'Submitted',
           assignmentProgress: 100,
         });
+        creditStep(courseCode, step.stepId);
       }
 
       Alert.alert(
@@ -659,8 +718,15 @@ export default function LearningScreen({ navigation }) {
     } finally {
       setNotesSaving(false);
     }
-  }, [selectedCourse, notesText, flow, activeStepIdx]);
+  }, [selectedCourse, notesText, flow, activeStepIdx, creditStep]);
 
+  /**
+   * Grade and record a quiz step.
+   *
+   * Scores locally against the `correctIndex` shipped with each question. As in
+   * the web's CoursePlayer, the step is credited through task-progress and the
+   * score is kept on the user-progress row.
+   */
   const handleQuizSubmit = useCallback(async () => {
     const step = flow[activeStepIdx];
     const courseCode = selectedCourse?.courseCode;
@@ -679,30 +745,21 @@ export default function LearningScreen({ navigation }) {
       [step.stepId]: { ...(prev[step.stepId] || {}), testCompleted: true, testScore: score },
     }));
 
+    creditStep(courseCode, step.stepId);
     try {
-      await Promise.all([
-        saveQuizProgress({
-          courseCode,
-          moduleId: '1',
-          dayId: 1,
-          quizId: String(step.stepId),
-          score,
-          totalPoints,
-        }).catch(() => null),
-        saveUserProgress({
-          courseCode,
-          moduleId: '1',
-          dayId: 1,
-          stepId: step.stepId,
-          testScore: score,
-          testTotalPoints: totalPoints,
-          testCompleted: true,
-        }),
-      ]);
+      await saveUserProgress({
+        courseCode,
+        moduleId: '1',
+        dayId: 1,
+        stepId: step.stepId,
+        testScore: score,
+        testTotalPoints: totalPoints,
+        testCompleted: true,
+      });
     } catch (err) {
       console.warn('[Learning] quiz progress save failed:', err?.message);
     }
-  }, [flow, activeStepIdx, selectedCourse, quizAnswers]);
+  }, [flow, activeStepIdx, selectedCourse, quizAnswers, creditStep]);
 
 
   return (

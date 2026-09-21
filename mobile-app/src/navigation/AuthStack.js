@@ -2,7 +2,6 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from '../screens/auth/SplashScreen';
 import WelcomeOnboardingScreen from '../screens/auth/WelcomeOnboardingScreen';
-import InstitutionSelectorScreen from '../screens/auth/InstitutionSelectorScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import OtpVerifyScreen from '../screens/auth/OtpVerifyScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
@@ -21,9 +20,8 @@ const Stack = createNativeStackNavigator();
  * Entry sequence:
  *  1. Splash — Animated professional white splash
  *  2. WelcomeOnboarding — "Let's get you signed in!"
- *  3. InstitutionSelector — Search College
- *  4. Login — Email & Password
- *  5. OtpVerify — OTP Verification (FR-AUTH-04)
+ *  3. Login — Email & Password (no college selection; the account carries it)
+ *  4. OtpVerify — OTP Verification (FR-AUTH-04)
  *
  * Branches off that spine:
  *  • Signup → SignupOtp → CreatePassword  (FR-AUTH-02, from Login)
@@ -43,7 +41,6 @@ export default function AuthStack() {
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="WelcomeOnboarding" component={WelcomeOnboardingScreen} />
-      <Stack.Screen name="InstitutionSelector" component={InstitutionSelectorScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="OtpVerify" component={OtpVerifyScreen} />
 
