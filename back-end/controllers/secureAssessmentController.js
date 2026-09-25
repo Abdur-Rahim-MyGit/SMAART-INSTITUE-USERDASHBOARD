@@ -110,7 +110,10 @@ exports.createLaunch = async (req, res) => {
     const { id } = req.params;
     if (!isObjectId(id)) return res.status(400).json({ success: false, error: 'Invalid assessment id.' });
 
-    const assessment = await Assessment.findById(id).select('+secure.quitPassword assessmentCode assessmentName secure');
+    // '+path' alone lifts the select:false on the quit password and keeps the
+    // rest of the document. Listing `secure` next to `secure.quitPassword`
+    // would be a projection path collision on MongoDB 4.4+.
+    const assessment = await Assessment.findById(id).select('+secure.quitPassword');
     if (!assessment) return res.status(404).json({ success: false, error: 'Assessment not found.' });
     if (!isSecureFor(assessment, req.user)) {
       return res.status(400).json({ success: false, code: 'NOT_SECURE', error: 'This assessment does not use Safe Exam Browser.' });
