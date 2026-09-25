@@ -21,6 +21,7 @@ describe('services/sebConfig', () => {
     // would also block our own pages. Unmatched URLs are blocked by default.
     expect(s.URLFilterRules.every((r) => r.action === 1)).toBe(true);
     expect(s.allowedDisplaysMaxNumber).toBe(1);
+    expect(s.kioskMode).toBe(1); // Disable Explorer Shell: keeps hardware acceleration
     expect(s.browserMediaCaptureScreen).toBe(true);
     expect(s.sendBrowserExamKey).toBe(true);
     expect(s.hashedQuitPassword).toBe(crypto.createHash('sha256').update('quit-me').digest('hex').toUpperCase());

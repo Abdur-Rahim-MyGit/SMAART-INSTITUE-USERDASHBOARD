@@ -91,6 +91,12 @@ const buildSebSettings = ({ assessment, startUrl, quitUrl, allowedHosts = [], qu
     quitURLConfirm: false,
     ignoreExitKeys: true,
 
+    // Kiosk mode 1 = "Disable Explorer Shell". The default (0, "Create new
+    // desktop") runs the browser on a separate Windows desktop where Chromium
+    // commonly loses hardware acceleration, which makes the camera preview,
+    // face models and screen capture lag badly.
+    kioskMode: 1,
+
     // One display, kiosk-style window
     browserViewMode: 1, // fullscreen
     allowedDisplaysMaxNumber: 1,

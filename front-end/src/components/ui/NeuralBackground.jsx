@@ -1,9 +1,14 @@
 import { useEffect, useRef } from "react";
+import { isLiteGraphics } from "@/utils/graphicsProfile";
 
 const NeuralBackground = ({ theme = 'light' }) => {
   const canvasRef = useRef(null);
+  // Software-rendered browsers (Safe Exam Browser kiosk) pay for every frame
+  // of this canvas on the CPU; the exam page matters more than the ambience.
+  const lite = isLiteGraphics();
 
   useEffect(() => {
+    if (lite) return undefined;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -97,6 +102,7 @@ const NeuralBackground = ({ theme = 'light' }) => {
     };
   }, [theme]);
 
+  if (lite) return null;
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" />;
 };
 

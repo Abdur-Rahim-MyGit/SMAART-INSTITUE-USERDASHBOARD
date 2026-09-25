@@ -105,6 +105,17 @@ New proctoring event types: `seb_launched`, `screen_share_started`,
 `screen_share_stopped` (25), `screen_share_wrong_surface` (20), `seb_missing`
 (40) (risk weights).
 
+## Performance inside SEB
+
+SEB's browser often runs without hardware acceleration, so the app switches
+to a lite graphics mode there (`html.gfx-lite`, see
+`front-end/src/utils/graphicsProfile.js`): no canvas background, no backdrop
+blur or animated glows, slower face-scan cadence in the setup wizard, MediaPipe
+on its CPU delegate when the WebGL renderer is a software rasteriser, and
+720p/5 fps screen capture with VP8 clips. The `.seb` file also uses kiosk mode
+1 ("Disable Explorer Shell"), which keeps hardware acceleration where the
+default "Create new desktop" mode loses it.
+
 ## Storage
 
 Captures are written by `services/secureMediaStore.js` to

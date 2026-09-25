@@ -12,7 +12,9 @@ import { trackMediaStream } from '@/utils/mediaStreams';
  * The stream is registered with the shared media registry so
  * stopAllMediaStreams() (called when the exam ends) also releases it.
  */
-const CLIP_MIME_CANDIDATES = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+// VP8 first: it encodes in software far more cheaply than VP9, and the clips
+// are evidence, not cinema.
+const CLIP_MIME_CANDIDATES = ['video/webm;codecs=vp8', 'video/webm;codecs=vp9', 'video/webm'];
 
 export default function useScreenCapture({ onStopped } = {}) {
   const streamRef = useRef(null);
@@ -56,7 +58,8 @@ export default function useScreenCapture({ onStopped } = {}) {
     let stream;
     try {
       stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'monitor', frameRate: { ideal: 5, max: 10 } },
+        // Capped at 720p / 5 fps: enough to read the screen, cheap to encode.
+        video: { displaySurface: 'monitor', width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 }, frameRate: { ideal: 5, max: 5 } },
         audio: false,
         selfBrowserSurface: 'exclude',
         surfaceSwitching: 'exclude',
@@ -130,7 +133,7 @@ export default function useScreenCapture({ onStopped } = {}) {
     });
     let recorder;
     try {
-      recorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 600000 } : undefined);
+      recorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 400000 } : { videoBitsPerSecond: 400000 });
     } catch {
       return null;
     }

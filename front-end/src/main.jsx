@@ -5,9 +5,13 @@ import "./index.css";
 import "./smaart-design-system.css";
 import "./i18n-setup";
 import { installMediaStreamRegistry } from "./utils/mediaStreams";
+import { applyGraphicsProfile } from "./utils/graphicsProfile";
 
 // Register every camera/microphone stream so a held attempt can shut them all.
 installMediaStreamRegistry();
+// Inside Safe Exam Browser / software-rendered browsers: drop the blur and
+// glow decorations so the CPU is free for the proctoring models.
+applyGraphicsProfile();
 
 // DEV ONLY — kill any stale PWA service worker.
 // This app registers a service worker (PWAPrompt → useRegisterSW). Once

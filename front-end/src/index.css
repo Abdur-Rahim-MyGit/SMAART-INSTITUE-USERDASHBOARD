@@ -302,7 +302,7 @@
     @apply transition-transform duration-300 hover:-translate-y-1;
   }
 
-  /* ─── SMAART Global Design System Utilities ─────────────────────────── */
+  /* ─── SMAART Global Design System Utilities ─────────────────────── */
 
   /* Page background — use on root layout wrappers */
   .page-bg {
@@ -607,3 +607,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .material-symbols-outlined::after {
   content: none;
 }
+
+/* ── Lite graphics (html.gfx-lite) ────────────────────────────────────────────────────
+   Set by utils/graphicsProfile.js inside Safe Exam Browser and on software
+   rasterisers. Backdrop blurs, big blur glows and pulse animations are
+   rasterised on the CPU there and starve the face/gaze models. */
+html.gfx-lite [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+/* Decorative blur glows are pure ornament: hide them instead of drawing 500px
+   gradient layers on the CPU every frame. */
+html.gfx-lite [class*="blur-["] { display: none !important; }
+html.gfx-lite .animate-pulse { animation: none !important; }
+html.gfx-lite * { transition-duration: 0.01ms !important; }

@@ -13,6 +13,7 @@
  */
 
 import { FilesetResolver, FaceLandmarker } from '@mediapipe/tasks-vision';
+import { getGraphicsProfile } from '@/utils/graphicsProfile';
 
 const MEDIAPIPE_WASM_PATH = '/mediapipe/wasm';
 const FACE_LANDMARKER_MODEL = '/mediapipe/face_landmarker.task';
@@ -28,7 +29,9 @@ export function initGaze() {
   initPromise = (async () => {
     const fileset = await FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_PATH);
     landmarker = await FaceLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: FACE_LANDMARKER_MODEL, delegate: 'GPU' },
+      // The GPU delegate on a software WebGL renderer (Safe Exam Browser's
+      // kiosk desktop, VMs) is far slower than plain CPU inference.
+      baseOptions: { modelAssetPath: FACE_LANDMARKER_MODEL, delegate: getGraphicsProfile().software ? 'CPU' : 'GPU' },
       runningMode: 'VIDEO',
       numFaces: 1,
       outputFacialTransformationMatrixes: true,
@@ -49,7 +52,7 @@ export function isGazeReady() {
   return ready;
 }
 
-// ── Eye Aspect Ratio ─────────────────────────────────────────────────────────
+// ── Eye Aspect Ratio ───────────────────────────────────────────────────────────
 // Six-point EAR per eye (Soukupova & Cech). Vertical lid separation over
 // horizontal eye width, so it is invariant to how far the candidate sits from
 // the camera. Indices are the standard MediaPipe Face Mesh eye contours.
@@ -118,7 +121,7 @@ export function detectGaze(videoEl) {
   else if (pitch > 18) gazeDirection = 'looking_down';
   else if (pitch < -18) gazeDirection = 'looking_up';
 
-  // ── Eye openness ────────────────────────────────────────────────────────
+  // ── Eye openness ───────────────────────────────────────────────────────
   // eyesOpen was hard-coded `true` everywhere in the old pipeline, which is
   // why eyes_closed could never fire no matter how long someone slept.
   let eyesOpen = true;
