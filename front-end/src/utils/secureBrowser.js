@@ -7,7 +7,15 @@
 export const isSebBrowser = () => {
   if (typeof navigator === 'undefined') return false;
   if (/\bSEB\/\d/i.test(navigator.userAgent || '')) return true;
-  return typeof window !== 'undefined' && !!window.SafeExamBrowser;
+  if (typeof window !== 'undefined' && window.SafeExamBrowser) return true;
+  // The enter page only ever runs inside SEB (the server refuses the token
+  // exchange otherwise), so a stored secure session is proof enough even when
+  // this SEB build does not stamp its user agent.
+  try {
+    const raw = sessionStorage.getItem('secure_session');
+    if (raw && JSON.parse(raw)?.sebVerified) return true;
+  } catch { /* private mode */ }
+  return false;
 };
 
 /**

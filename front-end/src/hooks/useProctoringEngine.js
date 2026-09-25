@@ -1825,8 +1825,9 @@ export const useProctoringEngine = ({
       }));
     }, 1000);
 
-    // Initial fullscreen check
-    const isNowFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    // Initial fullscreen check. Skipped inside Safe Exam Browser: its window
+    // is already a locked kiosk and the Fullscreen API reports nothing there.
+    const isNowFull = skipFullscreenRef.current || !!(document.fullscreenElement || document.webkitFullscreenElement);
     setIsFullScreen(isNowFull);
     if (!isNowFull) {
       setFullscreenCountdown(15);
