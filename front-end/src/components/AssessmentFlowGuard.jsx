@@ -30,10 +30,14 @@ const AssessmentFlowGuard = ({ children }) => {
     location.pathname.includes("/courses/") &&
     location.pathname.includes("/player");
 
+  // The secure launch page (/assessment/:stage/launch) is a setup screen in
+  // the normal browser: the student is told to go and install Safe Exam
+  // Browser, so leaving the tab there is expected, not a violation.
   const isProctoredRoute =
     ((location.pathname.startsWith("/assessment/") ||
       location.pathname.startsWith("/dashboard/assessments/")) &&
-      !location.pathname.endsWith("/report")) ||
+      !location.pathname.endsWith("/report") &&
+      !location.pathname.endsWith("/launch")) ||
     isCourseRoute;
 
   const handleAutoSubmit = useCallback(() => {
@@ -402,4 +406,3 @@ const AssessmentFlowGuard = ({ children }) => {
 };
 
 export default AssessmentFlowGuard;
-
