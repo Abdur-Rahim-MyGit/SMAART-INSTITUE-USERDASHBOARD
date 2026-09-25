@@ -72,14 +72,15 @@ const buildSebSettings = ({ assessment, startUrl, quitUrl, allowedHosts = [], qu
   [startUrl, quitUrl].forEach((u) => { const h = hostOf(u); if (h) hosts.add(h); });
   allowedHosts.forEach((h) => { const clean = String(h || '').trim(); if (clean) hosts.add(hostOf(clean) || clean); });
 
+  // Only allow rules. With URLFilterEnable on, SEB blocks any URL that no
+  // rule matches, and it evaluates BLOCK rules before ALLOW rules, so a
+  // catch-all block rule would block our own pages as well.
   const filterRules = [...hosts].map((host) => ({
     action: 1, // allow
     active: true,
     expression: `${host}/*`,
     regex: false
   }));
-  // Everything not listed above is blocked.
-  filterRules.push({ action: 0, active: true, expression: '*', regex: false });
 
   const settings = {
     // Launch behaviour

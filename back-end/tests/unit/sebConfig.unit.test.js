@@ -17,7 +17,9 @@ describe('services/sebConfig', () => {
     expect(s.URLFilterEnable).toBe(true);
     const allow = s.URLFilterRules.filter((r) => r.action === 1).map((r) => r.expression);
     expect(allow).toEqual(expect.arrayContaining(['app.example.edu/*', 'api.example.edu/*']));
-    expect(s.URLFilterRules[s.URLFilterRules.length - 1]).toEqual({ action: 0, active: true, expression: '*', regex: false });
+    // No block rules: SEB evaluates block rules first, so a catch-all block
+    // would also block our own pages. Unmatched URLs are blocked by default.
+    expect(s.URLFilterRules.every((r) => r.action === 1)).toBe(true);
     expect(s.allowedDisplaysMaxNumber).toBe(1);
     expect(s.browserMediaCaptureScreen).toBe(true);
     expect(s.sendBrowserExamKey).toBe(true);
