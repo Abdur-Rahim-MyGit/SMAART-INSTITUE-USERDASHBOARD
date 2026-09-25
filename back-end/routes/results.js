@@ -6,6 +6,7 @@ const ProctoringSession = require('../models/ProctoringSession');
 const SupportTicket = require('../models/SupportTicket');
 const { protect } = require('../middleware/auth');
 const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/assessmentAuth');
+const { requireSeb, resolvers: sebResolvers } = require('../middleware/sebGuard');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { getStageByCode, STAGE_DISTRIBUTIONS, getDurationMinutes } = require('../config/stage_distributions');
@@ -120,7 +121,7 @@ const determineLevel = (pct) => {
 };
 
 // Start a new assessment attempt
-router.get('/assessment/:assessmentId/start', async (req, res) => {
+router.get('/assessment/:assessmentId/start', requireSeb(sebResolvers.byAssessmentParam), async (req, res) => {
     try {
         const { assessmentId } = req.params;
         // Robust User ID extraction (handles Mongoose docs, POJOs, and different ID naming conventions)
@@ -460,7 +461,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 });
 
 // Save individual answer (real-time)
-router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
+router.post('/:resultId/answer', verifyAssessmentToken, requireSeb(sebResolvers.byResultParam), async (req, res) => {
     try {
         const { resultId } = req.params;
         const { questionId, selectedValue, questionText } = req.body;
@@ -565,7 +566,7 @@ router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
 });
 
 // Submit completed assessment
-router.post('/:resultId/submit', verifyAssessmentToken, resultController.submitAssessment);
+router.post('/:resultId/submit', verifyAssessmentToken, requireSeb(sebResolvers.byResultParam), resultController.submitAssessment);
 
 // Get all results for a user
 router.get('/user/:userId', async (req, res) => {

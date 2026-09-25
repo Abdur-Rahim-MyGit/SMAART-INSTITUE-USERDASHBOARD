@@ -31,6 +31,10 @@ const ProctoringEventSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
   details: { type: String },
   screenshotUrl: { type: String },
+  // Secure mode evidence: a screen frame (image/jpeg) or a short clip
+  // (video/webm) stored through services/secureMediaStore.
+  mediaUrl: { type: String },
+  mediaType: { type: String, enum: ['image/jpeg', 'image/png', 'image/webp', 'video/webm', 'video/mp4', null] },
   // v2: Structured metadata for ONNX pipeline events
   metadata: {
     qualityScore:    { type: Number },   // 0–100 frame quality at time of event

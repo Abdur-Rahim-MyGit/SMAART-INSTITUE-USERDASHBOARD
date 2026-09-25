@@ -39,7 +39,9 @@ const stageResultSchema = new mongoose.Schema({
     stage: {
         type: String,
         required: true,
-        enum: ['T1', 'T2', 'T3', 'T4', 'AIQ', 'SQ', 'PIQ'],
+        // SP = Secure Pilot: a mirror of T2 used to prove the SEB flow. It
+        // never feeds progression, PLVI or certificates.
+        enum: ['T1', 'T2', 'T3', 'T4', 'SP', 'AIQ', 'SQ', 'PIQ'],
         index: true
     },
     // Which attempt this result belongs to (1, 2, or 3)

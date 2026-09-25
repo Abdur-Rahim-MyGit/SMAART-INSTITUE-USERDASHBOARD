@@ -112,7 +112,9 @@ const submitAssessment = async (req, res) => {
         // the extra minutes confer no advantage.
         const durationMinutes = getDurationMinutes(assessment);
         const deadline = new Date(result.startedAt.getTime() + durationMinutes * 60 * 1000);
-        const secondsLate = Math.floor((Date.now() - deadline.getTime()) / 1000);
+        // A reviewer releasing a held attempt re-runs this path long after the
+        // deadline; the late check already ran at the original submit.
+        const secondsLate = req.reviewRelease ? 0 : Math.floor((Date.now() - deadline.getTime()) / 1000);
         const isLateSubmission = secondsLate > SUBMIT_GRACE_SECONDS;
 
         if (isLateSubmission) {
@@ -356,7 +358,8 @@ const submitAssessment = async (req, res) => {
         }
 
         // Calculate time taken
-        const timeTaken = Math.floor((Date.now() - result.startedAt.getTime()) / 1000);
+        const submitMoment = req.reviewRelease && result.submittedAt ? result.submittedAt.getTime() : Date.now();
+        const timeTaken = Math.floor((submitMoment - result.startedAt.getTime()) / 1000);
 
         // Update result
         result.completionStatus = 'completed';
@@ -368,7 +371,7 @@ const submitAssessment = async (req, res) => {
             // reflects what was actually evaluated.
             await proctoringVerdict.session.save();
         }
-        result.submittedAt = new Date();
+        result.submittedAt = new Date(submitMoment);
         result.timeTaken = timeTaken;
 
         await result.save();

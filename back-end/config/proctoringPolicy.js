@@ -113,10 +113,20 @@ module.exports = {
     proctoring_offline: 30,
     timing_anomaly: 30,
 
+    // Secure mode (Safe Exam Browser + entire-screen capture)
+    screen_share_stopped: 25,      // the student ended the screen share mid-test
+    screen_share_wrong_surface: 20, // a window or tab was shared instead of the monitor
+    seb_missing: 40,               // an attempt request arrived without a valid SEB key
+
     // Info only
     face_registered: 0,
     identity_verified: 0,
-    heartbeat: 0
+    heartbeat: 0,
+    seb_launched: 0,
+    screen_share_started: 0,
+    screen_share_resumed: 0,
+    screen_capture: 0,
+    screen_clip: 0
   },
 
   /**
@@ -179,6 +189,16 @@ module.exports = {
       key: 'attention',
       label: 'You looked away from the screen',
       events: ['gaze_away', 'eyes_closed', 'looking_down', 'attention_check_fail']
+    },
+    {
+      key: 'screen_share',
+      label: 'Screen sharing was interrupted',
+      events: ['screen_share_stopped', 'screen_share_wrong_surface']
+    },
+    {
+      key: 'secure_browser',
+      label: 'The secure browser check failed',
+      events: ['seb_missing']
     },
     {
       key: 'timing',

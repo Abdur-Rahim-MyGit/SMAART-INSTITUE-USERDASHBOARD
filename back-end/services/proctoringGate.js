@@ -135,6 +135,16 @@ const evaluateAttempt = async (result) => {
 
   verdict.session = session;
 
+  // A reviewer has already looked at this session and released it: nothing
+  // recorded on it can hold the attempt again. (Set by the admin decision
+  // endpoint, which then re-runs the submit path to grade the attempt.)
+  if (session.decision?.state === 'released') {
+    verdict.reviewed = true;
+    verdict.riskScore = session.riskScore || 0;
+    verdict.flags = summariseFlags(session.violationsByType);
+    return verdict;
+  }
+
   // Timing analysis runs before scoring so its findings count toward risk.
   const timing = await applyTimingAnalysis(result, session);
   verdict.timing = timing;

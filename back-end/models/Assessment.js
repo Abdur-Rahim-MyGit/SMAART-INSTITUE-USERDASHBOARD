@@ -169,6 +169,29 @@ const assessmentSchema = new mongoose.Schema({
     // When false, results wait for an explicit release.
     releaseScoresImmediately: { type: Boolean, default: true }
   },
+  /**
+   * Secure assessment mode (Safe Exam Browser + entire-screen capture).
+   *
+   * Off by default so every existing assessment keeps running exactly as
+   * before. When enabled, the student must launch the test through SEB (the
+   * server verifies the SEB Config Key hash on every attempt request) and
+   * share their whole screen for the duration. `pilotUserIds` narrows the
+   * rule to a handful of accounts while the flow is being proven; an empty
+   * list means "everyone".
+   */
+  secure: {
+    enabled: { type: Boolean, default: false },
+    requireSeb: { type: Boolean, default: true },
+    requireScreenCapture: { type: Boolean, default: true },
+    screenshotIntervalSec: { type: Number, default: 30, min: 10, max: 300 },
+    retentionDays: { type: Number, default: 90, min: 1, max: 365 },
+    // Never sent to the client: only the .seb builder reads it (hashed).
+    quitPassword: { type: String, default: '', select: false },
+    // Extra hosts SEB may open besides the app itself (e.g. a CDN).
+    allowedUrls: [{ type: String, trim: true }],
+    pilotUserIds: [{ type: mongoose.Schema.Types.ObjectId }],
+    notes: { type: String, trim: true }
+  },
   // Tags and categories
   tags: [{
     type: String,

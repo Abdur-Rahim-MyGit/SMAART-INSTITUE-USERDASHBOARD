@@ -12,6 +12,7 @@ import {
   Loader2 as RiLoader4Line,
   Maximize as RiFullscreenLine,
   Mic as RiSoundModuleLine,
+  Monitor as RiComputerLine,
   RiAlertLine,
   ShieldCheck as RiShieldCheckLine,
   User as RiUserSmileLine,
@@ -28,6 +29,7 @@ import {
   isReady as isModelsReady,
   getModelLoadError,
 } from '@/services/faceVerificationService';
+import { isSebBrowser } from '@/utils/secureBrowser';
 
 // Gap between presence scans. Measured from the END of the previous scan.
 // 50ms ensures smooth, real-time face tracking at ~20 FPS.
@@ -94,15 +96,21 @@ const meanPairwiseSimilarity = (embeddings) => {
   return pairs ? sum / pairs : 1;
 };
 
-export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
+export const ProctoringSetup = ({ onComplete, assessmentTitle, secureMode = null, screenCapture = null }) => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
+  // Secure mode: the whole screen must be shared before the test can start.
+  // Inside Safe Exam Browser the window is already a locked kiosk, so the
+  // browser-fullscreen step is satisfied by definition.
+  const screenRequired = !!(secureMode?.screenCaptureRequired && screenCapture);
+  const insideSeb = isSebBrowser();
+  const screenReady = !screenRequired || screenCapture?.isActive;
   const [cameraState, setCameraState] = useState('pending'); // 'pending' | 'checking' | 'allowed' | 'denied'
   const [micState, setMicState] = useState('pending');       // 'pending' | 'checking' | 'allowed' | 'denied' | 'skipped'
   const [networkLatency, setNetworkLatency] = useState(null);
   const [networkState, setNetworkState] = useState('checking'); // 'checking' | 'good' | 'poor'
   const [consentGranted, setConsentGranted] = useState(false);
-  const [isFullScreenActive, setIsFullScreenActive] = useState(false);
+  const [isFullScreenActive, setIsFullScreenActive] = useState(() => isSebBrowser());
 
   // Face Registration State
   const [modelLoadProgress, setModelLoadProgress] = useState(0);
@@ -579,7 +587,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   // Monitor Fullscreen Status
   useEffect(() => {
     const checkFullscreen = () => {
-      const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const active = isSebBrowser() || !!(document.fullscreenElement || document.webkitFullscreenElement);
       setIsFullScreenActive(active);
     };
     document.addEventListener('fullscreenchange', checkFullscreen);
@@ -587,6 +595,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   }, []);
 
   const triggerFullscreen = () => {
+    if (isSebBrowser()) { setIsFullScreenActive(true); return; }
     const element = document.documentElement;
     if (element.requestFullscreen) {
       element.requestFullscreen();
@@ -596,7 +605,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
   };
 
   const handleNextStep = () => {
-    if (step === 1 && cameraState === 'allowed') {
+    if (step === 1 && cameraState === 'allowed' && screenReady) {
       setStep(2);
     } else if (step === 2 && consentGranted) {
       setStep(3);
@@ -833,6 +842,50 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                   )}
                 </div>
 
+                {/* Screen Row (secure mode only) */}
+                {screenRequired && (
+                  <div id="setup-screen-row" data-state={screenCapture.status} className="flex items-center justify-between gap-3 p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2.5 bg-[#d7ebf5]/50 dark:bg-white/5 rounded-xl">
+                        <RiComputerLine size={20} className="text-slate-600 dark:text-slate-300" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">{t('secure_assessment.setup_screen_title', 'Entire screen')}</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {screenCapture.status === 'error'
+                            ? (screenCapture.error === 'wrong_surface'
+                                ? t('secure_assessment.setup_share_wrong', 'Choose "Entire screen" in the picker')
+                                : screenCapture.error === 'denied'
+                                  ? t('secure_assessment.setup_share_denied', 'Sharing was cancelled')
+                                  : screenCapture.error === 'unsupported'
+                                    ? t('secure_assessment.setup_share_unsupported', 'This browser cannot share the screen')
+                                    : t('secure_assessment.setup_share_error', 'Could not start sharing'))
+                            : t('secure_assessment.setup_screen_desc', 'Share your whole screen, not a window or a tab')}
+                        </p>
+                      </div>
+                    </div>
+                    {screenCapture.isActive ? (
+                      <span className="shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/25">
+                        <RiCheckLine size={14} /> {t('proctoring_setup.allowed', 'Allowed')}
+                      </span>
+                    ) : screenCapture.status === 'requesting' ? (
+                      <span className="shrink-0 text-xs text-slate-400 animate-pulse">{t('proctoring_setup.checking', 'Checking...')}</span>
+                    ) : screenCapture.status === 'error' || screenCapture.status === 'stopped' ? (
+                      <button
+                        id="setup-share-screen"
+                        onClick={() => screenCapture.start()}
+                        className="shrink-0 text-xs font-bold text-[#045C9A] dark:text-[#A6D7E8] hover:underline"
+                      >{t('secure_assessment.setup_share_retry', 'Try again')}</button>
+                    ) : (
+                      <button
+                        id="setup-share-screen"
+                        onClick={() => screenCapture.start()}
+                        className="shrink-0 px-4 py-2 bg-[#045C9A] hover:bg-[#034a7d] text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95"
+                      >{t('secure_assessment.setup_share_button', 'Share screen')}</button>
+                    )}
+                  </div>
+                )}
+
                 {/* Network Row */}
                 <div className="flex items-center justify-between p-4 bg-[#F1F5F9] dark:bg-white/5 border border-[#d7ebf5] dark:border-white/10 rounded-2xl">
                   <div className="flex items-center gap-3">
@@ -887,6 +940,12 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
                     <span><strong>Full-screen mode</strong> — Full-screen removes distractions and prevents access to other apps while you test.</span>
                   </div>
+                  {screenRequired && (
+                    <div className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#045C9A] dark:bg-[#A6D7E8]" />
+                      <span><strong>Screen sharing</strong> — {t('secure_assessment.consent_screen', 'we keep a picture of your entire screen every {{seconds}} seconds and a short clip when something is flagged.', { seconds: secureMode?.screenshotIntervalSec || 30 }).replace(/^Screen sharing — /, '')}</span>
+                    </div>
+                  )}
                 </div>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
                   All session records are securely processed under the Digital Personal Data Protection Act (DPDPA 2023) and auto-purged within 30 days of attempt completion.
@@ -903,7 +962,8 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                     'Only one person is allowed.',
                     'Do not switch tabs or windows.',
                     'Stay in full-screen mode.',
-                    'Do not use your phone or look away repeatedly.'
+                    'Do not use your phone or look away repeatedly.',
+                    ...(screenRequired ? [t('secure_assessment.rule_keep_share', 'Keep your entire screen shared until you submit.')] : [])
                   ].map((rule, i) => (
                     <li key={i} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
                       <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-[#F1F5F9]0" />
@@ -1140,7 +1200,7 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
                 {isFullScreenActive ? (
                   <div className="space-y-2">
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-full inline-flex items-center gap-1 border border-emerald-100 dark:border-emerald-500/25">
-                      <RiCheckLine size={16} /> {t('proctoring_setup.fullscreen_active', 'Fullscreen Active')}
+                      <RiCheckLine size={16} /> {insideSeb ? t('proctoring_setup.seb_kiosk_active', 'Safe Exam Browser kiosk mode active') : t('proctoring_setup.fullscreen_active', 'Fullscreen Active')}
                     </span>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('proctoring_setup.ready_to_launch', 'Assessment is ready to launch.')}</p>
                   </div>
@@ -1177,11 +1237,11 @@ export const ProctoringSetup = ({ onComplete, assessmentTitle }) => {
               <button
                 onClick={handleNextStep}
                 disabled={
-                  (step === 1 && (cameraState !== 'allowed' || micState !== 'allowed')) ||
+                  (step === 1 && (cameraState !== 'allowed' || micState !== 'allowed' || !screenReady)) ||
                   (step === 2 && !consentGranted) ||
                   (step === 3 && registrationState !== 'registered')
                 }
-                className={`px-6 py-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${((step === 1 && cameraState === 'allowed' && micState === 'allowed') ||
+                className={`px-6 py-3 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${((step === 1 && cameraState === 'allowed' && micState === 'allowed' && screenReady) ||
                     (step === 2 && consentGranted) ||
                     (step === 3 && registrationState === 'registered'))
                     ? 'bg-[#045C9A] hover:bg-[#034a7d] text-white shadow-md hover:shadow-lg hover:translate-x-0.5'

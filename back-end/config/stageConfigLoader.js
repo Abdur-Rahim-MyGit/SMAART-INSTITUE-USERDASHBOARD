@@ -160,6 +160,7 @@ const STAGE_DURATION_MINUTES = {
     T2: 40,
     T3: 45,
     T4: 40,
+    SP: 40, // Secure Pilot mirrors T2
     AIQ: 45,
     SQ: 45,
     PIQ: 45,

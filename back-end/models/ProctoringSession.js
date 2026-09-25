@@ -73,6 +73,33 @@ const ProctoringSessionSchema = new mongoose.Schema({
   // Warning count (warnings shown to user, separate from totalViolations)
   warningCount: { type: Number, default: 0 },
 
+  // ── Secure assessment (Safe Exam Browser + screen capture) ─────────────
+  secure: {
+    mode: { type: String, enum: ['none', 'seb', 'standard'], default: 'none' },
+    sebVerified: { type: Boolean, default: false },
+    // 'header' = SEB's own X-SafeExamBrowser-ConfigKeyHash matched,
+    // 'jsapi'  = the key read from SEB's JavaScript API matched.
+    sebVerification: { type: String, default: '' },
+    sebUserAgent: { type: String, default: '' },
+    screenCapture: {
+      granted: { type: Boolean, default: false },
+      surface: { type: String, default: '' },
+      startedAt: { type: Date },
+      interruptions: { type: Number, default: 0 },
+      frames: { type: Number, default: 0 },
+      clips: { type: Number, default: 0 },
+      lastFrameAt: { type: Date }
+    },
+    device: {
+      platform: { type: String, default: '' },
+      screenCount: { type: Number },
+      userAgent: { type: String, default: '' }
+    },
+    // Captures are deleted by the retention job once this passes.
+    retentionUntil: { type: Date },
+    mediaPurged: { type: Boolean, default: false }
+  },
+
   startedAt: { type: Date, default: Date.now },
   completedAt: { type: Date }
 }, { timestamps: true });

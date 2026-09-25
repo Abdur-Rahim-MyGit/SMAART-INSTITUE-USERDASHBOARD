@@ -293,8 +293,14 @@ export const useProctoringEngine = ({
   isActive = false,
   registeredFaceDescriptor = null, // Median face embedding from ProctoringSetup
   registeredAllEmbeddings = null,  // All registered frame embeddings (best-match verify)
-  onLockout = null // Custom submit callback
+  onLockout = null, // Custom submit callback
+  // Inside Safe Exam Browser the window is already a locked kiosk and the
+  // Fullscreen API reports nothing useful, so leaving "fullscreen" must not
+  // count against the candidate.
+  skipFullscreenEnforcement = false
 }) => {
+  const skipFullscreenRef = useRef(skipFullscreenEnforcement);
+  useEffect(() => { skipFullscreenRef.current = skipFullscreenEnforcement; }, [skipFullscreenEnforcement]);
   const [warningsCount, setWarningsCount] = useState(0);
   // The SERVER owns the warning budget and sends it with every decision. Until
   // the first decision arrives we render the local fallback, but we must never
@@ -366,7 +372,7 @@ export const useProctoringEngine = ({
   const [isAudioCalibrated, setIsAudioCalibrated] = useState(false);
 
   // Fullscreen State
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(skipFullscreenEnforcement);
   const [fullscreenCountdown, setFullscreenCountdown] = useState(0);
 
   // Attention Check State
@@ -1403,6 +1409,11 @@ export const useProctoringEngine = ({
 
   // Fullscreen changes
   const handleFullscreenChange = useCallback(() => {
+    if (skipFullscreenRef.current) {
+      setIsFullScreen(true);
+      setFullscreenCountdown(0);
+      return;
+    }
     const active = !!(
       document.fullscreenElement ||
       document.webkitFullscreenElement ||
@@ -1942,7 +1953,11 @@ export const useProctoringEngine = ({
     // Inactivity presence check
     showInactivityOverlay,
     dismissInactivityOverlay,
-    failInactivityCheck
+    failInactivityCheck,
+
+    // Secure mode: lets the screen-capture layer record its own violations
+    // (share stopped, wrong surface) through the same server-driven ladder.
+    reportExternalViolation: reportViolation
   };
 };
 

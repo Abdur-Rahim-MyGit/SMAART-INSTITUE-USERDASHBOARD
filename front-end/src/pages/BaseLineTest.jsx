@@ -38,6 +38,10 @@ import ProctoringWarningModal from "@/components/proctoring/ProctoringWarningMod
 import AttentionCheck from "@/components/proctoring/AttentionCheck";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import { stopAllMediaStreams } from "@/utils/mediaStreams";
+import useScreenCapture from "@/hooks/useScreenCapture";
+import { secureAssessmentApi } from "@/services/secureAssessmentApi";
+import { proctoringApi } from "@/services/proctoringApi";
+import { isSebBrowser } from "@/utils/secureBrowser";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -45,6 +49,9 @@ const STAGE_MAP = {
   T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
   T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 34, durationMinutes: 45, maxAttempts: 3, passingPercentage: 60 },
   T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 36, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
+  // Secure Pilot: the T2 paper taken inside Safe Exam Browser. Stored under
+  // its own stage so it never touches real progression.
+  SP: { code: 'ASM00009', name: 'Secure Pilot', title: 'Secure Pilot', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
 };
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
@@ -189,6 +196,13 @@ const BaseLineTest = () => {
   // Attempt tracking for retry system (T2-T4+)
   const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
   const [setupCompleted, setSetupCompleted] = useState(false);
+  // Secure mode (Safe Exam Browser + entire-screen capture)
+  const [secureMode, setSecureMode] = useState(null);
+  const [shareLost, setShareLost] = useState(false);
+  const insideSeb = useRef(isSebBrowser()).current;
+  const shareStoppedRef = useRef(() => {});
+  const screenCapture = useScreenCapture({ onStopped: () => shareStoppedRef.current() });
+  const shareStartedLoggedRef = useRef(false);
   const [registeredFaceDescriptor, setRegisteredFaceDescriptor] = useState(null);
   const [registeredAllEmbeddings, setRegisteredAllEmbeddings] = useState(null);
   const [registrationMetadata, setRegistrationMetadata] = useState(null); // quality/model info for backend persistence
@@ -439,6 +453,17 @@ const BaseLineTest = () => {
           throw new Error(t("baseline_test.report_not_found", "Report not found for {{title}}. Have you completed it yet?", { title: translatedTitle }));
         }
 
+        // Secure mode: a secure paper may only be started inside Safe Exam
+        // Browser. Outside it, hand over to the launch page (the server would
+        // refuse the start anyway).
+        const secureRes = await secureAssessmentApi.status(assessmentCode).catch(() => null);
+        const secureInfo = secureRes?.data || null;
+        setSecureMode(secureInfo);
+        if (secureInfo?.sebRequired && !isSebBrowser()) {
+          navigate(`/assessment/${stageKey}/launch`, { replace: true });
+          return;
+        }
+
         // Fetch assessment by stage code
         console.log(`Fetching assessment details for ${assessmentCode}...`);
         const assessmentResponse = await assessmentApi.getByCode(assessmentCode);
@@ -512,6 +537,11 @@ const BaseLineTest = () => {
       } catch (err) {
         console.error("❌ Error initializing assessment:", err);
         
+        if (err.data && err.data.sebRequired) {
+            navigate(`/assessment/${stageKey}/launch`, { replace: true });
+            return;
+        }
+
         // --- PROCTORING LOCK CHECK ---
         if (err.data && err.data.locked) {
             clearTimerPersistence();
@@ -792,7 +822,9 @@ const BaseLineTest = () => {
     // Inactivity presence check
     showInactivityOverlay,
     dismissInactivityOverlay,
-    failInactivityCheck
+    failInactivityCheck,
+    proctoringSessionId,
+    reportExternalViolation
   } = useProctoringEngine({
     resultId: resultId,
     assessmentId: assessment?._id,
@@ -800,7 +832,89 @@ const BaseLineTest = () => {
     registeredFaceDescriptor,
     registeredAllEmbeddings,
     registrationMetadata,
+    // SEB is already a locked kiosk; the Fullscreen API says nothing useful there.
+    skipFullscreenEnforcement: insideSeb,
   });
+
+  // ── Secure mode: screen capture during the exam ──────────────────────────
+  const screenActive = !!(secureMode?.screenCaptureRequired && setupCompleted && !submitted && !error && proctoringSessionId);
+
+  // The share ended (student pressed "Stop sharing", or the OS revoked it).
+  // Block the paper, freeze the clock and record it.
+  shareStoppedRef.current = () => {
+    if (!setupCompleted || submitted) return;
+    setShareLost(true);
+    reportExternalViolation?.('screen_share_stopped', t("secure_assessment.share_stopped_warning", "Screen sharing was stopped. Share your entire screen again to continue."));
+  };
+
+  // One "share started" record per session, then a frame every interval.
+  useEffect(() => {
+    if (!screenActive || !screenCapture.isActive || shareLost) return undefined;
+    const sessionId = proctoringSessionId;
+    if (!shareStartedLoggedRef.current) {
+      shareStartedLoggedRef.current = true;
+      proctoringApi.logEvent(sessionId, {
+        eventType: 'screen_share_started', severity: 'info',
+        details: `Entire screen shared (${screenCapture.surface || 'unknown'})`,
+        metadata: { surface: screenCapture.surface || '' }
+      }).catch(() => {});
+    }
+    const intervalMs = Math.max(10, secureMode?.screenshotIntervalSec || 30) * 1000;
+    let stopped = false;
+    const snap = async () => {
+      if (stopped) return;
+      try {
+        const blob = await screenCapture.captureFrame();
+        if (blob && !stopped) await secureAssessmentApi.uploadScreen(sessionId, blob, 'frame');
+      } catch (err) {
+        console.warn('[Secure] frame upload failed:', err?.message || err);
+      }
+    };
+    const first = setTimeout(snap, 1500);
+    const timer = setInterval(snap, intervalMs);
+    return () => { stopped = true; clearTimeout(first); clearInterval(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenActive, screenCapture.isActive, shareLost, proctoringSessionId, secureMode?.screenshotIntervalSec]);
+
+  // A violation: keep a frame of the screen right now plus a short clip.
+  useEffect(() => {
+    if (!screenActive || !screenCapture.isActive || !lastViolationType || !warningsCount) return;
+    const sessionId = proctoringSessionId;
+    const reason = String(lastViolationType).slice(0, 64);
+    (async () => {
+      try {
+        const frame = await screenCapture.captureFrame();
+        if (frame) await secureAssessmentApi.uploadScreen(sessionId, frame, 'frame', reason);
+        const clip = await screenCapture.captureClip({ durationMs: 8000 });
+        if (clip) await secureAssessmentApi.uploadScreen(sessionId, clip, 'clip', reason);
+      } catch (err) {
+        console.warn('[Secure] evidence upload failed:', err?.message || err);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastViolationType, warningsCount]);
+
+  const resumeScreenShare = useCallback(async () => {
+    const r = await screenCapture.start();
+    if (r.ok) {
+      setShareLost(false);
+      if (proctoringSessionId) {
+        proctoringApi.logEvent(proctoringSessionId, {
+          eventType: 'screen_share_resumed', severity: 'info',
+          details: `Screen share resumed (${r.surface})`, metadata: { surface: r.surface }
+        }).catch(() => {});
+      }
+      return;
+    }
+    if (r.reason === 'wrong_surface') {
+      toast.error(t("secure_assessment.wrong_surface", 'Choose "Entire screen", not a window or a tab.'));
+      reportExternalViolation?.('screen_share_wrong_surface', t("secure_assessment.wrong_surface", 'Choose "Entire screen", not a window or a tab.'));
+    } else if (r.reason === 'denied') {
+      toast.error(t("secure_assessment.share_denied", "Screen sharing was cancelled. You must share your entire screen to continue."));
+    } else {
+      toast.error(t("secure_assessment.share_failed", "Could not start screen sharing."));
+    }
+  }, [screenCapture, proctoringSessionId, reportExternalViolation, t]);
 
   // Keep submitRef always pointing at the latest submit callback
   useEffect(() => {
@@ -810,8 +924,8 @@ const BaseLineTest = () => {
   // Keep the countdown's view of the pause state current without re-running
   // the timer effect.
   useEffect(() => {
-    isPausedRef.current = isPaused;
-  }, [isPaused]);
+    isPausedRef.current = isPaused || shareLost;
+  }, [isPaused, shareLost]);
 
   // Once the report is on screen the proctored session is over: clear any
   // scroll lock left behind by a modal, start the report at the top, and leave
@@ -994,6 +1108,8 @@ const BaseLineTest = () => {
             setSetupCompleted(true);
           }}
           assessmentTitle={translatedTitle}
+          secureMode={secureMode}
+          screenCapture={secureMode?.screenCaptureRequired ? screenCapture : null}
         />
       )}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -1558,6 +1674,17 @@ const BaseLineTest = () => {
                   </button>
                 )}
 
+                {insideSeb && (
+                  <button
+                    id="secure-finish"
+                    onClick={() => { window.location.assign('/secure/exit'); }}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#045C9A] px-6 py-2.5 text-[13px] font-semibold text-white shadow-md shadow-[#045C9A]/20 transition-colors hover:bg-[#034a7d] sm:w-auto"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    {t("secure_assessment.finish_close_seb", "Finish and close Safe Exam Browser")}
+                  </button>
+                )}
+
                 <button
                   onClick={() => navigate("/dashboard")}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d7ebf5] bg-white px-5 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-[#F1F5F9] sm:w-auto dark:border-white/10 dark:bg-[#0d3a5f] dark:text-slate-100 dark:hover:bg-[#0d3a5f]/70"
@@ -1612,6 +1739,39 @@ const BaseLineTest = () => {
         badge={earnedBadge}
         userName={user?.fullName || t("baseline_test.student", "Student")}
       />
+
+      {/* Secure mode: the screen share was stopped — block until it is back */}
+      {shareLost && !submitted && setupCompleted && (
+        <div id="share-lost" className="fixed inset-0 z-[80] flex items-center justify-center bg-[#072036]/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-md rounded-2xl border border-[#d7ebf5]/80 bg-white p-6 shadow-2xl dark:border-white/10 dark:bg-[#0d3a5f] sm:p-7">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300">
+                <Monitor className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-[#35566b] dark:text-[#A6D7E8]">
+                  {t("secure_assessment.eyebrow", "Secure assessment")}
+                </p>
+                <h3 className="mt-1 text-lg font-extrabold text-[#072036] dark:text-white">
+                  {t("secure_assessment.share_lost_title", "Screen sharing stopped")}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  {t("secure_assessment.share_lost_text", "The timer is paused. Share your entire screen again to continue. This interruption has been recorded.")}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              id="share-resume"
+              onClick={resumeScreenShare}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#072036] px-5 py-3 text-[13px] font-semibold text-white shadow-md transition-colors hover:bg-[#0d3a5f] dark:bg-[#A6D7E8] dark:text-[#072036] dark:hover:bg-white"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("secure_assessment.share_again", "Share entire screen again")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Activity Restriction Warning Modal */}
       <ProctoringWarningModal

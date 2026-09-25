@@ -160,7 +160,7 @@ const raiseLockTicket = async (session) => {
 exports.startSession = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
-    const { resultId, assessmentId, environmentCheck } = req.body;
+    const { resultId, assessmentId, environmentCheck, secure: secureInfo } = req.body;
 
     if (!resultId || !assessmentId) {
       return res.status(400).json({ success: false, error: 'resultId and assessmentId are required.' });
@@ -196,7 +196,49 @@ exports.startSession = async (req, res) => {
       status: 'active'
     });
 
+    // ── Secure mode bookkeeping ──────────────────────────────────────────
+    // sebGuard ran before this handler when the assessment is secure; it
+    // leaves its verdict on req.seb. Retention is decided here, once.
+    if (req.seb?.required || secureInfo) {
+      const Assessment = require('../models/Assessment');
+      const assessment = await Assessment.findById(assessmentId).select('secure').lean();
+      const retentionDays = assessment?.secure?.retentionDays || 90;
+      session.secure = {
+        mode: req.seb?.required ? 'seb' : (secureInfo?.mode === 'standard' ? 'standard' : 'none'),
+        sebVerified: !!req.seb?.verified,
+        sebVerification: req.seb?.method || '',
+        sebUserAgent: req.seb?.required ? String(req.headers['user-agent'] || '').slice(0, 300) : '',
+        screenCapture: {
+          granted: !!secureInfo?.screenCapture?.granted,
+          surface: String(secureInfo?.screenCapture?.surface || '').slice(0, 32),
+          startedAt: secureInfo?.screenCapture?.granted ? new Date() : undefined,
+          interruptions: 0,
+          frames: 0,
+          clips: 0
+        },
+        device: {
+          platform: String(secureInfo?.device?.platform || '').slice(0, 64),
+          screenCount: Number(secureInfo?.device?.screenCount) || undefined,
+          userAgent: String(req.headers['user-agent'] || '').slice(0, 300)
+        },
+        retentionUntil: new Date(Date.now() + retentionDays * 24 * 60 * 60 * 1000),
+        mediaPurged: false
+      };
+    }
+
     await session.save();
+
+    if (session.secure?.mode === 'seb') {
+      await new ProctoringEvent({
+        sessionId: session._id,
+        userId,
+        eventType: 'seb_launched',
+        severity: 'info',
+        details: session.secure.sebVerified
+          ? `Safe Exam Browser verified (${session.secure.sebVerification})`
+          : 'Safe Exam Browser required but not verified (logging mode)'
+      }).save();
+    }
 
     res.status(201).json({
       success: true,
@@ -249,6 +291,8 @@ exports.logEvent = async (req, res) => {
       'camera_quality_check', 'registration_quality', 'identity_confidence',
       // v3 batch verification events
       'verification_batch', 'face_absent_reminder',
+      // secure mode (SEB + screen capture) info events
+      'seb_launched', 'screen_share_started', 'screen_share_resumed', 'screen_capture', 'screen_clip',
     ];
     const metadataPayload = req.body.metadata || {};
 
@@ -262,7 +306,21 @@ exports.logEvent = async (req, res) => {
         session.identityVerified = true;
         session.identityVerifiedAt = new Date();
       }
+      if (eventType === 'screen_share_started' || eventType === 'screen_share_resumed') {
+        session.secure = session.secure || {};
+        session.secure.screenCapture = session.secure.screenCapture || {};
+        session.secure.screenCapture.granted = true;
+        if (!session.secure.screenCapture.startedAt) session.secure.screenCapture.startedAt = new Date();
+        if (metadataPayload.surface) session.secure.screenCapture.surface = String(metadataPayload.surface).slice(0, 32);
+        session.markModified('secure');
+      }
     } else {
+      if (eventType === 'screen_share_stopped' || eventType === 'screen_share_wrong_surface') {
+        session.secure = session.secure || {};
+        session.secure.screenCapture = session.secure.screenCapture || {};
+        session.secure.screenCapture.interruptions = (session.secure.screenCapture.interruptions || 0) + 1;
+        session.markModified('secure');
+      }
       // Increment violation counts on session
       session.totalViolations += 1;
 

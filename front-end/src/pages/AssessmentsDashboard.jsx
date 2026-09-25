@@ -20,6 +20,7 @@ import {
     X as CloseIcon,
 } from "@/components/icons";
 import { assessmentApi } from "@/services/assessmentApi";
+import { secureAssessmentApi } from "@/services/secureAssessmentApi";
 import NeuralBackground from "@/components/ui/NeuralBackground";
 import PageTransition from "@/components/PageTransition";
 import { toast } from "sonner";
@@ -182,6 +183,9 @@ const AssessmentsDashboard = () => {
     const [stages, setStages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedStage, setSelectedStage] = useState(null);
+    // Secure mode (Safe Exam Browser): per-stage status and the pilot card
+    const [secureByStage, setSecureByStage] = useState({});
+    const [pilot, setPilot] = useState(null);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     useEffect(() => {
@@ -275,6 +279,52 @@ const AssessmentsDashboard = () => {
         }
     };
 
+    // Ask the server which stages run in secure mode for this student, and
+    // whether the Secure Pilot card should show at all.
+    useEffect(() => {
+        if (!stages.length) return undefined;
+        let cancelled = false;
+        (async () => {
+            const entries = await Promise.all(
+                stages.map(async (s) => {
+                    if (!s.code) return [s.key, null];
+                    const r = await secureAssessmentApi.status(s.code).catch(() => null);
+                    return [s.key, r?.data || null];
+                })
+            );
+            const pilotRes = await secureAssessmentApi.pilot().catch(() => null);
+            if (cancelled) return;
+            const map = {};
+            entries.forEach(([k, v]) => { if (v) map[k] = v; });
+            if (pilotRes?.data?.available) {
+                map.SP = pilotRes.data.secure || { secure: true, sebRequired: true };
+                setPilot(pilotRes.data);
+            } else {
+                setPilot(null);
+            }
+            setSecureByStage(map);
+        })();
+        return () => { cancelled = true; };
+    }, [stages]);
+
+    const displayStages = pilot
+        ? [
+            ...stages,
+            {
+                key: "SP",
+                code: pilot.assessmentCode || "ASM00009",
+                title: t("secure_assessment.dashboard_pilot_title", "Secure Pilot"),
+                subtitle: t("secure_assessment.dashboard_pilot_subtitle", "Safe Exam Browser"),
+                description: t("secure_assessment.dashboard_pilot_description", "The T2 paper taken inside Safe Exam Browser with your entire screen shared. Pilot results are stored separately and do not affect your progress."),
+                totalQuestions: pilot.totalQuestions || 34,
+                duration: `${pilot.durationMinutes || 40} min`,
+                secure: true,
+            },
+        ]
+        : stages;
+
+    const isSecureStage = (key) => !!(secureByStage[key]?.secure);
+
     const handleAction = (stage) => {
         if (isCompleted(stage.key)) {
             navigate(`/assessment/${stage.key}/report`);
@@ -365,13 +415,14 @@ const AssessmentsDashboard = () => {
                             <SkeletonGrid />
                         ) : (
                             <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                                {stages.map((stage, index) => (
+                                {displayStages.map((stage, index) => (
                                     <StageCard
                                         key={stage.key}
                                         stage={stage}
                                         index={index}
                                         completed={isCompleted(stage.key)}
                                         stageData={stageStatus[stage.key]}
+                                        secure={isSecureStage(stage.key)}
                                         onAction={() => handleAction(stage)}
                                     />
                                 ))}
@@ -435,6 +486,18 @@ const AssessmentsDashboard = () => {
 
 
 
+                                {isSecureStage(selectedStage.key) && (
+                                    <div id="modal-secure" className="rounded-2xl border border-[#045C9A]/20 bg-[#045C9A]/5 p-4 dark:border-[#A6D7E8]/20 dark:bg-[#A6D7E8]/5">
+                                        <div className="mb-1.5 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest text-[#045C9A] dark:text-[#A6D7E8]">
+                                            <ShieldCheck className="h-4 w-4 shrink-0" />
+                                            {t("secure_assessment.dashboard_modal_title", "Runs in Safe Exam Browser")}
+                                        </div>
+                                        <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                                            {t("secure_assessment.dashboard_modal_text", "You will be taken to a short setup page first: install Safe Exam Browser (once), then open the test inside it with your camera, microphone and entire screen shared.")}
+                                        </p>
+                                    </div>
+                                )}
+
                                 {/* Integrity & Security Warning */}
                                 <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-950/10">
                                     <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-widest mb-3">
@@ -493,10 +556,12 @@ const AssessmentsDashboard = () => {
                                 </button>
                                 <button
                                     disabled={!agreedToTerms}
+                                    id="start-stage"
                                     onClick={() => {
                                         const stageKey = selectedStage.key;
+                                        const secure = isSecureStage(stageKey);
                                         setSelectedStage(null);
-                                        navigate(`/assessment/${stageKey}`);
+                                        navigate(secure ? `/assessment/${stageKey}/launch` : `/assessment/${stageKey}`);
                                     }}
                                     className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-300 ${agreedToTerms
                                             ? "bg-[#045C9A] hover:bg-[#072036] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
@@ -518,7 +583,7 @@ const AssessmentsDashboard = () => {
 
 // GuidelinesSection component has been removed as it is now integrated into the start assessment modal gate
 
-const StageCard = ({ stage, index, completed, stageData, onAction }) => {
+const StageCard = ({ stage, index, completed, stageData, secure = false, onAction }) => {
     const { t } = useTranslation();
     const score = stageData?.score;
     const durationLabel = getDurationLabel(stage.duration, t);
@@ -559,8 +624,14 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                 <h3 className="text-base font-bold leading-tight tracking-tight text-[#072036] dark:text-white">
                                     {t(`assessments_dashboard.stages.${stage.key}.title`, stage.title)}
                                 </h3>
-                                <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                                    {t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}
+                                <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                    <span>{t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}</span>
+                                    {secure && (
+                                        <span className="inline-flex items-center gap-1 rounded border border-[#045C9A]/20 bg-[#045C9A]/5 px-1.5 py-0.5 text-[9.5px] text-[#045C9A] dark:border-[#A6D7E8]/20 dark:bg-[#A6D7E8]/10 dark:text-[#A6D7E8]" data-secure-chip>
+                                            <ShieldCheck className="h-3 w-3" />
+                                            {t("secure_assessment.dashboard_chip", "Secure")}
+                                        </span>
+                                    )}
                                 </p>
                             </div>
                         </div>

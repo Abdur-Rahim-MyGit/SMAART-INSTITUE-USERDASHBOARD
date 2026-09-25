@@ -4,11 +4,23 @@ const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
+const secureCtrl = require('../controllers/secureAssessmentController');
 router.use(generalLimiter);
 
+// ── Secure mode (Safe Exam Browser) — public endpoints ──────────────────────
+// SEB downloads the .seb file itself, with no cookie, so the launch token in
+// the query string is the credential. The exchange runs inside SEB before the
+// app has a session; it is protected by the SEB Config Key check instead.
+router.get('/:id/seb-config', secureCtrl.downloadSebConfig);
+router.post('/secure/exchange', secureCtrl.exchangeLaunch);
 
 // Apply protection to all assessment routes
 router.use(protect);
+
+// ── Secure mode — signed-in endpoints ───────────────────────────────────────
+router.get('/secure/pilot', secureCtrl.pilotAssessment);
+router.get('/code/:code/secure-status', secureCtrl.secureStatus);
+router.post('/:id/secure/launch', secureCtrl.createLaunch);
 
 // SECURITY: only staff may see the answer key. For everyone else (e.g. students
 // loading an assessment to take it) strip questions[].correctAnswer so the

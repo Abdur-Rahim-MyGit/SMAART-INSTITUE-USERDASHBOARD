@@ -34,6 +34,25 @@ function startCronJobs() {
     logger.error('[CRON] Failed checking daily analytics count:', err);
   });
 
+  // Secure assessments: delete screen frames/clips past their retention
+  // window (SECURE_MEDIA_RETENTION_DAYS, default 90). Runs nightly at 03:15.
+  cron.schedule('15 3 * * *', async () => {
+    try {
+      const mediaStore = require('../services/secureMediaStore');
+      const ProctoringEvent = require('../models/ProctoringEvent');
+      const days = mediaStore.DEFAULT_RETENTION_DAYS;
+      const { removed, checked } = await mediaStore.purgeOlderThan(days);
+      const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      const events = await ProctoringEvent.deleteMany({
+        eventType: { $in: ['screen_capture', 'screen_clip'] },
+        timestamp: { $lt: cutoff }
+      });
+      logger.info(`[CRON] Secure media purge: ${removed}/${checked} session folders removed, ${events.deletedCount || 0} evidence events deleted (older than ${days} days)`);
+    } catch (err) {
+      logger.error('[CRON] Secure media purge failed:', err);
+    }
+  });
+
   // Every Sunday at 00:00
   cron.schedule('0 0 * * 0', async () => {
     try {

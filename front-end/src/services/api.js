@@ -1,6 +1,7 @@
 // API service for backend communication
 // Dynamically detect API URL based on current hostname (for mobile/network access)
 import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
+import { sebHeaders } from '@/utils/secureBrowser';
 
 const getApiBaseUrl = () => {
   // If an API base is configured at build time (e.g. "/api" for same-origin
@@ -156,6 +157,10 @@ export const apiCall = async (endpoint, options = {}) => {
     try {
       const headers = {
         ...getAuthHeaders(),
+        // Inside Safe Exam Browser: the Config Key from SEB's JavaScript API,
+        // so the server can verify secure-mode requests even when SEB does
+        // not attach its own hash header to fetch() calls.
+        ...sebHeaders(),
         ...options.headers,
       };
 

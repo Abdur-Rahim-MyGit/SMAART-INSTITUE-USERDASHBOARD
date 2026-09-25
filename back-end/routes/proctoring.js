@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const { protect, authorize } = require('../middleware/auth');
 const proctoringController = require('../controllers/proctoringController');
+const secureProctoring = require('../controllers/secureProctoringController');
+const { requireSeb, resolvers: sebResolvers } = require('../middleware/sebGuard');
 
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, '../uploads/proctoring');
@@ -54,12 +56,23 @@ router.post('/webhook/unlock', verifyWebhookSecret, proctoringController.webhook
 // Protect all routes
 router.use(protect);
 
-router.post('/session/start', proctoringController.startSession);
+router.post('/session/start', requireSeb(sebResolvers.byBodyAssessment), proctoringController.startSession);
 router.post('/session/:sessionId/event', proctoringController.logEvent);
 router.post('/session/:sessionId/complete', proctoringController.completeSession);
 router.post('/session/:sessionId/lock', proctoringController.triggerLock);
 router.post('/session/:sessionId/upload-snapshot', upload.single('snapshot'), proctoringController.uploadSnapshot);
 router.post('/session/:sessionId/heartbeat', proctoringController.heartbeat);
+// Secure mode: periodic screen frames and short clips (kept in memory, then
+// handed to services/secureMediaStore — never written by multer directly).
+const screenUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: secureProctoring.limits.CLIP_MAX_BYTES },
+  fileFilter: (req, file, cb) => {
+    if (/^(image\/(jpeg|png|webp)|video\/(webm|mp4))$/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Only JPEG/PNG/WebP frames or WebM/MP4 clips are allowed.'));
+  }
+});
+router.post('/session/:sessionId/screen', screenUpload.single('media'), secureProctoring.uploadScreen);
 // v2: Face embedding persistence routes
 router.post('/session/:sessionId/registration', proctoringController.saveRegistration);
 router.get('/session/:sessionId/embedding', proctoringController.getEmbedding);
@@ -69,6 +82,9 @@ router.post('/session/:sessionId/verification', proctoringController.logVerifica
 // Admin-only routes
 router.get('/admin/sessions', authorize('admin'), proctoringController.getSessions);
 router.get('/admin/session/:sessionId', authorize('admin'), proctoringController.getSessionDetails);
+router.get('/admin/session/:sessionId/evidence', authorize('admin'), secureProctoring.listEvidence);
+router.post('/admin/session/:sessionId/decision', authorize('admin'), secureProctoring.reviewDecision);
+router.get('/screen/:sessionId/:filename', authorize('admin'), secureProctoring.serveScreenMedia);
 
 // Serve a proctoring snapshot (admin only). Static access to uploads/proctoring
 // is blocked in server.js, so this is the only way to view a captured frame.

@@ -55,6 +55,9 @@ const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
 const LockedOut = lazy(() => import('@/pages/LockedOut'));
 const AssessmentHeld = lazy(() => import('@/components/proctoring/AssessmentHeld'));
+const SecureLaunch = lazy(() => import('@/pages/SecureLaunch'));
+const SecureEnter = lazy(() => import('@/pages/SecureEnter'));
+const SecureExit = lazy(() => import('@/pages/SecureExit'));
 const HelpCenter = lazy(() => import('@/pages/HelpCenter'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
@@ -116,6 +119,10 @@ const AnimatedRoutes = () => {
                     <Route path="/verify-badge" element={<VerifyBadge />} />
                     <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
                     <Route path="/vision-board/shared/:token" element={<SharedVisionBoard />} />
+                    {/* Secure assessment: Safe Exam Browser lands here (no session yet)
+                        and leaves through the exit page (SEB's quit URL). */}
+                    <Route path="/secure/enter" element={<SecureEnter />} />
+                    <Route path="/secure/exit" element={<SecureExit />} />
                     <Route path="/legal" element={<Legal />} />
                     <Route path="/employer/register" element={<EmployerRegister />} />
 
@@ -155,6 +162,7 @@ const AnimatedRoutes = () => {
                         <Route path="/my-assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
                         <Route path="/dashboard/assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
                         <Route path="/dashboard/assessment-centre" element={<AssessmentsDashboard />} />
+                        <Route path="/assessment/:stage/launch" element={<SecureLaunch />} />
                         <Route path="/dashboard/assessments/baseline" element={<BaseLineTest />} />
                         <Route path="/dashboard/micro-assessments" element={<MicroAssessmentList />} />
                         <Route path="/dashboard/micro-assessments/:id" element={<MicroAssessmentPlayer />} />
