@@ -54,6 +54,11 @@ const STAGE_MAP = {
   SP: { code: 'ASM00009', name: 'Secure Pilot', title: 'Secure Pilot', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 60 },
 };
 
+// Minimum time a question must stay on screen before "Next" unlocks. This was
+// a 5 s anti-guessing gate; students experienced it as the page lagging, so it
+// is now off. Raise it again here if the gate is ever wanted back.
+const MIN_ANSWER_TIME_MS = 0;
+
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
 const getBandColor = (level) => {
   // Uniform professional styling with Brand Colors
@@ -575,7 +580,7 @@ const BaseLineTest = () => {
     const interval = setInterval(() => {
       const elapsed = Date.now() - questionStartTime;
       setTimeElapsed(elapsed);
-      if (elapsed >= 5000) {
+      if (elapsed >= MIN_ANSWER_TIME_MS) {
         clearInterval(interval);
       }
     }, 200);
@@ -616,7 +621,7 @@ const BaseLineTest = () => {
 
   const nextQ = () => {
     if (interactionLocked || submitted) return;
-    const timeRequired = 5000; // 5 seconds
+    const timeRequired = MIN_ANSWER_TIME_MS;
     if (timeElapsed < timeRequired) {
       return; // Block navigation if timer hasn't elapsed
     }
@@ -1246,15 +1251,15 @@ const BaseLineTest = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.9 }}
                           onClick={nextQ}
-                          disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
-                          className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-[#045C9A]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2.5 ${timeElapsed < 5000
+                          disabled={timeElapsed < MIN_ANSWER_TIME_MS || interactionLocked || submitting || timeExpired}
+                          className={`px-8 md:px-10 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-xl shadow-[#045C9A]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2.5 ${timeElapsed < MIN_ANSWER_TIME_MS
                             ? 'bg-[#d7ebf5] dark:bg-[#0d3a5f] text-slate-400 dark:text-slate-500 cursor-not-allowed border border-transparent dark:border-[#045C9A]/25'
                             : 'bg-[#045C9A] dark:bg-[#045C9A] text-white hover:bg-[#0d3a5f] dark:hover:bg-[#034a7d] hover:shadow-sm hover:-translate-y-1'
                             }`}
                         >
-                          {timeElapsed < 5000 ? (
+                          {timeElapsed < MIN_ANSWER_TIME_MS ? (
                             <>
-                              <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((5000 - timeElapsed) / 1000) })}</span>
+                              <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((MIN_ANSWER_TIME_MS - timeElapsed) / 1000) })}</span>
                               <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                             </>
                           ) : (
